@@ -13,8 +13,8 @@ def to_parse(method, operation, data):
     """
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
-    conn.request(method, operation, 
+    conn.request(method, '/' + PARSE_VERSION + '/' + operation, 
                     json.dumps(data), REST_CONNECTION_META)
-    result = json.loads(connection.getresponse().read())
+    result = json.loads(conn.getresponse().read())
     conn.close()
     return result
