@@ -29,6 +29,7 @@ def account_alert(account):
     store = account.store
     atype = account.subscription.type
     
+    # may cause division by 0!!!
     percent = store.active_users / atype.max_users
     
     #if they are at 80 percent of their users, alert

@@ -1,6 +1,7 @@
 # Django settings for repunch project.
 from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -84,6 +85,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     #FS_SITE_DIR+"/static",
+    os.getcwd() + '/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -131,7 +133,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    FS_SITE_DIR+'/templates'
+    FS_SITE_DIR+'/templates',
+    os.getcwd() + '/templates', 
 )
 
 AUTH_USER_MODEL = 'accounts.Account'
@@ -156,7 +159,9 @@ INSTALLED_APPS = (
 	'apps.rewards',
 	'apps.messages',
     'apps.analysis',
-    'libs.repunch'
+    'libs.repunch',
+
+    'django_extensions',
 )
 
 

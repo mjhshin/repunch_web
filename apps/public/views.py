@@ -40,13 +40,20 @@ def sign_up(request):
             tz = rputils.get_timezone('93003')
             store.store_timezone = tz.zone
             store.save()
-            
+                    
+
             if store != None:
                 try:
                     # TODO: need to make this transactional
                     #create subscription
                     subscription = subscription_form.save(commit=False);
                     subscription.status = 1;
+                    
+                    # make sure that a subscription type of free exist
+                    if not SubscriptionType.objects.filter(monthly_cost=0,status=1): # TODO refactor?
+                        SubscriptionType.objects.create(name="Free",
+                            max_users=50, max_messages=1)
+
                     subscription.type = SubscriptionType.objects.filter(monthly_cost=0,status=1).get();
                     subscription.save();
                     
@@ -57,7 +64,6 @@ def sign_up(request):
                     account.subscription = subscription
                     account.set_password(request.POST.get('password'))
                     account.is_active = 1
-                    
                     account.save()
                                         
                     #auto login
@@ -76,7 +82,7 @@ def sign_up(request):
                         # TODO: handle this
                         pass
                         
-                except Exception:
+                except Exception as e:
                     store.delete()
                     # TODO: send error
             

@@ -8,6 +8,16 @@ class ContactForm(forms.Form):
     
     # send email to administrator
     def send(self):
-        full_message = "Someon has filled out the contact form on repunch\r\nName: %s\r\nEmail: %s\r\nMessage:\r\n %s" % (self.cleaned_data['full_name'], self.cleaned_data['email'], self.cleaned_data['message'])
+        full_message = "Someon has filled out the contact form on"+\
+           " repunch\r\nName: %s\r\nEmail: %s\r\nMessage:\r\n %s" %\
+                (self.cleaned_data['full_name'], 
+                self.cleaned_data['email'], 
+                self.cleaned_data['message'])
         
-        send_mail("Contact Form", full_message, self.cleaned_data['email'], ['rick@cambiolabs.com'], fail_silently=False)
+        send_mail("Contact Form", full_message, 
+                self.cleaned_data['email'], ['rick@cambiolabs.com'],
+                fail_silently=False)
+
+        send_mail("Contact Form", full_message, 
+                self.cleaned_data['email'], ['vandolf@repunch.com'],
+                fail_silently=False)

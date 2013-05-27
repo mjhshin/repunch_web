@@ -54,12 +54,12 @@ class Settings(models.Model):
 	
 class SubscriptionType(models.Model):
 	name = models.CharField(max_length=255)
-	description = models.TextField()
-	monthly_cost = models.IntegerField(default=0)
+	description = models.TextField(blank=True)
+	monthly_cost = models.IntegerField(default=0, blank=True)
 	max_users = models.IntegerField(default=0)
 	max_messages = models.IntegerField(default=0)
-	level = models.IntegerField(default=0)
-	status = models.IntegerField(choices=((1,'Active'),(0,'Inactive')),default=0,max_length=255)
+	level = models.IntegerField(default=0, blank=True)
+	status = models.IntegerField(choices=((1,'Active'),(0,'Inactive')),default=1,max_length=255, blank=True)
 	
 	def __unicode__( self ):
 		return self.description
