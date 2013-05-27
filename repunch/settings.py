@@ -26,12 +26,21 @@ DATABASES = {
     }
 }
 
-#configuration for SMTP
+# configuration for SMTP
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'testuser@cambiolabs.com'
 EMAIL_HOST_PASSWORD = 'T3st1T2013!'
 EMAIL_USE_TLS = True
+
+# PARSE 
+REST_APPLICATION_ID = "uYZFKpiF66fYLXBCw3MMyZthdRRU7V6tyOWY4kRf"
+REST_API_KEY = "bM0wtOLyMfJf8CAIs4TmVm1JPyag74ZWXpHkuHmu"
+
+# PAYPAL
+PAYPAL_CLIENT_ID = "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM"
+PAYPAL_CLIENT_SECRET = "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
+PAYPAL_MODE = "sandbox"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
