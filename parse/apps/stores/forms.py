@@ -6,17 +6,15 @@ from django.core.validators import email_re
 from json import dumps
 
 from parse.apps.stores.models import Store
-from parse.utils import to_parse
 
-class ParseStoreForm(object):
+class StoreForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
     def __init__(self, data={}):
         self.store = Store(data)
 
     def is_valid(self, errors):
         """ 
-        errors is a dictionary. Returns len(errors) == 0 
-        excludes store_avatar, active_users, store_timezone        
+        errors is a dictionary. Returns len(errors) == 0     
         """
         s = self.store
         f = ['store_name', 'street', 'city', 'state', 'zip',
@@ -31,7 +29,7 @@ class ParseStoreForm(object):
 
     def save(self):
         """ posts up the data to Parse """
-        to_parse('POST', 'classes/ParseStore', self.store.__dict__)
+        self.store.save()
         return True
 
 

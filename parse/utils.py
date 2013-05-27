@@ -6,7 +6,7 @@ import json, httplib
 
 from repunch.settings import PARSE_VERSION, REST_CONNECTION_META
 
-def to_parse(method, operation, data):
+def parse(method, operation, data):
     """
     sends a request to parse using specified method, operation, and data
     data is a dictionary, usually the object.__dict__

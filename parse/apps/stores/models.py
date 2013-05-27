@@ -2,6 +2,7 @@
 Parse equivalence of Django apps.stores.models
 """ 
 from repunch.settings import TIME_ZONE
+from parse.utils import parse
 
 class Store(object):
     """ Equivalence class of apps.accounts.models.Account """
@@ -18,6 +19,11 @@ class Store(object):
         self.store_avatar = data.get('store_avatar')
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
+
+    def save(self):
+        """ posts up the data to Parse """
+        parse('POST', 'classes/Store', self.__dict__)
+        return True
 
     def delete(self):
         # TODO 

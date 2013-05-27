@@ -80,7 +80,7 @@ class Subscription(models.Model):
 	ppid = models.CharField(max_length=255,null=True,blank=True)
 	ppvalid = models.DateField(null=True,blank=True)
 	
-	#store credit card information
+	# store credit card information
 	def store_cc(self, cc_number, cvv):
 		
 		paypalrestsdk.configure(mode=PAYPAL_MODE, client_id=PAYPAL_CLIENT_ID, client_secret=PAYPAL_CLIENT_SECRET)

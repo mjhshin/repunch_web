@@ -13,7 +13,8 @@ class Store(models.Model):
 	phone_number = models.CharField(max_length=255)
 	email = models.EmailField(max_length=255)
 	store_description = models.TextField()
-	store_avatar = models.ImageField(max_length=255,upload_to='images/avatars/stores',blank=True)
+	store_avatar = models.ImageField(max_length=255,
+                        upload_to='images/avatars/stores',blank=True)
 	active_users = models.IntegerField(default=0)
 	
 	store_timezone = models.CharField(max_length=100,

@@ -8,9 +8,9 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
-from parse.stores.forms import StoreForm
-from parse.accounts.forms import AccountForm,\
-SubscriptionForm
+from parse.stores.forms import StoreForm as pStoreForm
+from parse.accounts.forms import AccountForm as pAccountForm,\
+SubscriptionForm as pSubscriptionForm
 
 def index(request):
     data = {'home_nav': True}
@@ -36,70 +36,61 @@ def sign_up(request):
     
     if request.method == 'POST':
         # these forms are now just for rendering into html
-        store_form = StoreSignUpForm(request.POST)
-        account_form = AccountForm(request.POST)
-        subscription_form = SubscriptionForm(request.POST)
+        store_form = pStoreSignUpForm(request.POST)
+        account_form = pAccountForm(request.POST)
+        subscription_form = pSubscriptionForm(request.POST)
         # if store_form.is_valid() and account_form.is_valid() and\
         #   subscription_form.is_valid(): # All validation rules pass
 
         # actual form validations are now done through ParseForms
-        store_pf = ParseStoreForm(request.POST)
-        account_pf = ParseAccountForm(request.POST)
-        subscription_pf = ParseSubscriptionForm(request.POST)
+        store_pf = StoreForm(request.POST)
+        account_pf = AccountForm(request.POST)
+        subscription_pf = SubscriptionForm(request.POST)
         # pass is corresponding form's error dicts to fillem up
         # if validation fails
         if store_pf.is_valid(store_form.errors) and\
-            account_pf.is_valid(account_form.errors) and\
-            subscription_pf.is_valid(subscription_form):
+            subscription_pf.is_valid(subscription_form and\
+            account_pf.is_valid(account_form.errors) ):
               
+            # save store
             tz = rputils.get_timezone('93003')
-            store.store_timezone = tz.zone
-            store.save()
+            store_pf.store.store_timezone = tz.zone
+            store_pf.save()
 
-            if store != None:
-                try:
-                    # TODO: need to make this transactional
-                    #create subscription
-                    subscription = subscription_form.save(commit=False);
-                    subscription.status = 1;
-                    
-                    # make sure that a subscription type of free exist
-                    if not SubscriptionType.objects.filter(monthly_cost=0,status=1): # TODO refactor?
-                        SubscriptionType.objects.create(name="Free",
-                            max_users=50, max_messages=1)
+            # make sure that a subscription type of free exist
+            SubscriptionType.init_parse()
 
-                    subscription.type = SubscriptionType.objects.filter(monthly_cost=0,status=1).get();
-                    subscription.save();
-                    
-                    subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
-                    
-                    account = account_form.save(commit=False)               
-                    account.store = store
-                    account.subscription = subscription
-                    account.set_password(request.POST.get('password'))
-                    account.is_active = 1
-                    account.save()
-                                        
-                    #auto login
-                    user_login = authenticate(username=account.username, password=request.POST.get('password'))
-                    if user_login != None:
-                        try:
-                            login(request, user_login) #log into the system
-                        except Exception as e:
-                            print(e)
-                        request.session['account'] = account
-                        
-                        #need to set this for the auto long
-                        rputils.set_timezone(request, tz)
-                        return redirect(reverse('store_index'))
-                    else:
-                        # TODO: handle this
-                        pass
-                        
-                except Exception as e:
-                    store.delete()
-                    # TODO: send error
+            # TODO: need to make this transactional
+            # save subscription
+            subscription_pf.save()
             
+            subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
+            
+            account = account_form.save(commit=False)               
+            account.store = store
+            account.subscription = subscription
+            account.set_password(request.POST.get('password'))
+            account.is_active = 1
+            account.save()
+                                
+            #auto login
+            user_login = authenticate(username=account.username,
+                    password=request.POST.get('password'))
+            if user_login != None:
+                try:
+                    login(request, user_login) #log into the system
+                except Exception as e:
+                    print(e)
+                request.session['account'] = account
+                
+                #need to set this for the auto long
+                rputils.set_timezone(request, tz)
+                return redirect(reverse('store_index'))
+            else:
+                # TODO: handle this
+                # should never go here though
+                pass
+                    
     else:
         store_form = StoreSignUpForm() # An unbound form
         account_form = AccountForm()

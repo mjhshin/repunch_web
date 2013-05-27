@@ -15,7 +15,7 @@ class StoreSignUpForm(forms.ModelForm):
     class Meta:
         model = Store
         exclude = ('phone_number', 'store_description',
-                'store_avatar', 'active_users', 'store_timezone')
+                 'store_avatar', 'active_users', 'store_timezone')
         
 class StoreAvatarForm(forms.ModelForm):
     class Meta:

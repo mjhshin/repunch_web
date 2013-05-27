@@ -2,9 +2,13 @@
 Parse equivalence of Django apps.accounts.models
 """
 
-class Account(object):
+from parse.core.model import ParseObject
+from parse.utils import parse
+
+class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account """
     def __init__(self, data={}):
+        super(Account, self).__init__()
         self.objectId = data.get('objectId')
         self.username = data.get('username')
         self.password = data.get('password')
@@ -34,14 +38,10 @@ class Account(object):
         # TODO
         return False
     
-    def delete(self):
-        # TODO
-        pass
-
-    
-class Subscription(object):
+class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
     def __init__(self, data={}):
+        super(Subscription, self).__init__()
         self.objectId = data.get('objectId')
         self.status = data.get('status')
         self.first_name = data.get('first_name')
@@ -71,9 +71,13 @@ class Subscription(object):
         # TODO
         pass
 
-class SubscriptionType(object):
+class SubscriptionType(ParseObject):
     """ Equivalence class of apps.accounts.models.SubscriptionType """
+    ACTIVE = 'active'
+    INACTIVE = 'inactive'
+
     def __init__(self, data):
+        super(SubscriptionType, self).__init__()
         self.objectId = data.get('objectId')
         self.name = data.get('name')
         self.description = data.get('description')
@@ -81,5 +85,21 @@ class SubscriptionType(object):
         self.max_users = data.get('max_users', 0)
         self.max_messages = data.get('max_messages', 0)
         self.level = data.get('level', 0)
-        self.status = data.get('status', "active")
+        self.status = data.get('status', ACTIVE)
+
+    def init_parse(self):
+        """ make sure that a free subscription type exist """
+        
+
+
+
+
+
+
+
+
+
+
+
+        
         
