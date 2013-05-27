@@ -1,0 +1,39 @@
+{% extends "public/base.djhtml" %}
+{% load static %}
+
+{% block title %}Contact Us{% endblock %}
+{% block styles %}
+<style type="text/css">
+	#contact-form input { width: 300px; }
+	#contact-form textarea { width: 600px; }
+</style>
+{% endblock %}
+{% block javascript %}
+	<script type="text/javascript" src="{% static "public/js/jquery.slides.min.js" %}"></script>
+{% endblock %}
+
+
+{% block pageblock %}
+<section id="page-wrapper">
+	<div id="page-content">
+		<h1 id="contact-header">Contact Us</h1>
+		<div id="contact-content">
+			<aside class="col1">				
+				<form id="contact-form" action="{% url 'public_contact' %}" method="POST">{% csrf_token %}
+					{{ form.as_p }}
+					<a class="button orange" href="#" onclick="$('#contact-form').submit(); return false;" style="margin:0;">Send</a>
+				</form>
+				<br/>
+				<br/>
+			</aside>
+			<aside class="col2">
+				<img id="about-map" src="{% static "public/images/about-map.jpg" %}" alt="">
+                <br/>
+				<span id="map-address">123 Main Street<br>Somewhere, US</span>
+				<br/>
+				<br/>
+			</aside>
+		</div>
+	</div>
+</section>
+{% endblock %}

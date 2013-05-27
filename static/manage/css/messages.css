@@ -1,0 +1,19 @@
+.tr.draft, .tr.unread{
+	font-weight:bold;
+}
+
+#header-date, #header-feedback-date, .feedback-date, .date{
+	width:100px;
+}
+
+#header-subject, .subject, #header-feedback-subject, .feedback-subject {
+	width:250px;
+}
+
+#header-status, .status, #header-feedback-status, .feedback-status {
+	width:80px;
+}
+
+#header-from, .from, #header-feedback-from, .feedback-from {
+	width:160px;
+}

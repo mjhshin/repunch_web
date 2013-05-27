@@ -1,0 +1,25 @@
+{% extends "public/base.djhtml" %}
+{% load static %}
+
+{% block title %}Jobs{% endblock %}
+
+
+{% block pageblock %}
+<section id="page-wrapper">
+	<div id="page-content">
+		<h1 id="about-header">Jobs</h1>
+		<div id="about-content">
+			<aside class="col1">
+				<h3>Mauris pretium luctus semper. Praesent laoreet vestibulum odio a sillicitudin. Duis risus est, blandit volutpat volutpat at, adispiscing vitae arcu. Suspendisse ullamcorper libero quis lacus fringilla posuere.</h3>
+				<img id="team-photo" src="img/team-photo.jpg" alt="">
+				<p>Lorem ipsum dolor sit amet, consectetur adiscisping elit. Fusce ac justo est, ac hendrerit urna. Phsellus diam sapien, malesuada ac sagittis non, rutrum faucibus enim. Praesent ante sem, consequat vel tristique at, eleifend ac nisl.</p>
+				<p>Etieam varius egestas turpis, ac porta augue sollicitudin vel. Nunc ullamcorper convallis volutpat. Suspendisse eu nulla dolor. Fusce risus ligula, euismod id luctus sit amet, fringilla vel ipsum. Lorem ipsum dolor sit amet, consectetur adiscisping elit. Fusce ac justo est, ac hendrerit urna. Phsellus diam sapien, malesuada ac sagittis non, rutrum faucibus enim. Praesent ante sem, consequat vel.</p>
+			</aside>
+			<aside class="col2">
+				
+			</aside>
+			<div class="clear-both"></div>
+		</div>
+	</div>
+</section>
+{% endblock %}

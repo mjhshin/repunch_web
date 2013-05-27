@@ -1,0 +1,108 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load store_tags %}{% load account_tags %}
+
+{% block title %}My Account{% endblock %}
+{% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.css" %}" />{% endblock %}
+
+
+{% block content %}
+{% with account=request.session.account %}
+	{% with store=account.store %}
+	<!-- possibly move to header -->
+	{% account_alert account as alert %}
+	{% if alert %}
+	<div class="notification">
+		<div>Alert! You are reaching your subscription max.</div>
+	</div>
+	{% endif %}
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+	
+	<div class="section first" id="store-details">
+		<div class="section-title">
+			Store Details
+		</div>
+		
+		<div class="white-box" id="store-details-content">
+			{% if store.store_avatar  %}
+				<img src="{{ MEDIA_URL }}{{ store.store_avatar }}" alt="" class="avatar-big" />
+			{% else %}
+				<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
+			{% endif %}
+			<div id="store-details-content-right">
+				<div id="address">
+					<span class="bold">{{ store.store_name }}</span>
+					<p>
+						{{ store.street }}<br />
+						{{ store.city }}, {{ store.state }} {{ store.zip }}<br />
+						{{ store.phone_number }}<br />
+						{{ store.email }}
+					</p>
+				</div>
+				<div id="hours">
+					<span class="bold">Hours:</span>
+					<p>
+						{% hours store %}
+						<!--
+						Mon-Fri: 11:00 am - 11:00 pm<br />
+						Closed Saturday &amp; Sunday
+						-->
+					</p>
+				</div>
+				<div id="description">
+					<span class="bold">Store Description</span>
+					<p>{{ store.store_description }}</p>
+				</div>
+			</div>
+			<div class="clear">&nbsp;</div>
+		</div>
+		
+		<a href="{% url 'store_edit'  %}" class="button blue">Edit Store Details</a>
+	</div>
+	
+	<div class="section">
+		{% with type=account.subscription.type %}
+		<div class="section-title">
+			Current Subscription: 
+			<span style="font-weight:bold;">
+				{{ type }}
+			</span>
+		</div>
+		
+		<div class="white-box" id="limits-box">
+			<div class="limit-details">
+				<div class="bar-graph"><div style="height: {% account_user_usage account 52 %}px"></div></div>
+				<div class="description">
+					<div class="label">USERS</div>
+					<div class="count">{% account_user_count account %}</div>
+					<div class="limit">of {% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users}}{% endif %}</div>
+				</div>
+			</div>
+			<div class="limit-details right">
+				<div class="bar-graph"><div style="height: {% account_message_usage account 52 %}px"></div></div>
+				<div class="description">
+					<div class="label">SENT MESSAGES</div>
+					<div class="count">{% account_message_count account %}</div>
+					<div class="limit">of {{ type.max_messages }}</div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		{% endwith %}
+		<div id="account-options" class="form-options">
+			<a href="{% url 'account_upgrade' %}" class="button blue">
+				{% if account.is_free %}
+				Upgrade Account
+				{% else %}
+				Update Account
+				{% endif %}
+			</a>
+			<a href="#" class="red">Cancel My Account</a>
+		</div>
+	</div>
+	{% endwith %}
+{% endwith %}
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load util_tags %}
+
+{% block title %}Analysis{% endblock %}
+{% block styles %}	
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/analysis.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/analysis.js" %}"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(updateTrendsGraph);
+      google.setOnLoadCallback(updateBreakdownGraph);
+      
+      var _trends_graph_url = '{% url 'analysis_index' %}trends/';
+      var _breakdown_graph_url = '{% url 'analysis_index' %}breakdown/';
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+
+	<div class="section" id="trends">
+		<div class="section-title">Trends</div>
+		<div class="white-box" id="trends-container">
+			<div class="graph-options-container">
+				<div class="graph-type-options">
+					<select name="trends-type" id="trends-type">
+						<option value="punches">Punches</option>
+						<option value="facebook">Facebook Posts</option>
+						<option value="patrons">Unique Patrons</option>
+					</select>
+				</div>
+				<div id="trends-dates" class="graph-options">
+					<label>Date Range:</label> <input type="text" name="trends-start-date" id="trends-start-date" value="{% today -6 %}"/><span>to</span><input type="text" name="trends-end-date" id="trends-end-date" value="{% today %}"/>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div id="trends-graph">
+				
+			</div>
+		</div>
+	</div>
+	
+	<div class="section" id="breakdown">
+		<div class="section-title">Breakdown</div>
+		<div class="white-box" id="breakdown-container">
+			<div class="graph-options-container">
+				<div class="graph-type-options">
+					<select name="breakdown-type" id="breakdown-type">
+						<option value="punches">Punches</option>
+						<option value="facebook">Facebook Posts</option>
+						<option value="patrons">Unique Patrons</option>
+					</select>
+				</div>
+				<div id="breakdown-filters" class="graph-options">
+					<select name="breakdown-filter" id="breakdown-filter">
+						<option value="gender">Gender</option>
+						<option value="age">Age</option>						
+					</select>
+					&nbsp;&nbsp;
+					<select name="breakdown-range" id="breakdown-range">
+						<option value="today">Today</option>
+						<option value="week-to-date">This Week</option>
+						<option value="last-week">Last Week</option>
+						<option value="month-to-date">Month-to-Date</option>
+						<option value="last-month">Last Month</option>
+					</select>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<div id="breakdown-graph">
+				
+			</div>			
+		</div>
+	</div>
+	
+	<div class="section" id="rewards">
+		<div class="section-title">Rewards</div>
+		<div class="white-box table tab-body" style="display: block;">
+			<div class="table-header">
+				<div class="th sorted asc" id="header-reward_name">Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-reward_redemptions">Redemptions <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			{% for reward in rewards %}
+		    <div class="tr  {% cycle '' 'odd' %}">
+				<div class="td reward_name">{{ reward.reward_name }}</div>
+				<div class="td reward_redemptions">{{ reward.redemption_count }}</div>
+			</div>
+			{% empty %}
+			<div class="tr ">
+				<div class="td">No Rewards</div>
+			</div>
+			{% endfor %}			
+		</div>
+	</div>
+{% endblock %}

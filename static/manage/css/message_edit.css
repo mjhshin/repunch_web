@@ -1,0 +1,42 @@
+#id_subject{ width:656px; }
+
+#id_message{ 
+	width:656px; 
+	height:200px;
+}
+
+#id_send_to{
+	float:left;
+}
+
+#offer-cb-container {
+	margin-top: 15px; 
+}
+
+#offer-cb-container input { 
+	border-radius: 0px;
+	padding: 0px;	
+	height: auto;
+}
+
+#offer-cb-container label {
+	display: inline;
+	margin: 0px 0px 0px 5px;
+}
+
+#id_offer_expiration {
+	width: 200px;
+}
+
+/* for time picker */
+/* css for timepicker */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; }
+.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }

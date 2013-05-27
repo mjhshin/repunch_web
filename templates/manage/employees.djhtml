@@ -1,0 +1,112 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load store_tags %}{% load util_tags %}
+
+{% block title %}Messages{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employees.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/employees.js" %}"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(updateChart);
+      
+      var _graph_url = '{% url 'employee_graph' %}';
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+{{ request.show_pending }}
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+	{% employees_pending request.session.account.store as epcount %}
+	{% if epcount > 0  %}
+	<div class="notification">
+		<div>You have {{ epcount }} employee{{ epcount|pluralize }} pending approval</div>
+	</div>
+	{% endif %}
+	
+	<div class="section">
+		
+		<div class="tab-container">
+			<div class="tab  {% if show_pending == False %}active{% endif %}" id="tab-employees">Employees</div>
+			<div class="tab {% if show_pending %}active{% endif %}" id="tab-pending">Pending {% if epcount > 0 %}({{ epcount }}){% endif %}</div>
+		</div>
+		
+		<div class="white-box table tab-body {% if show_pending == False %}active{% endif %}" id="tab-body-employees">
+			<div class="table-header">
+				<div class="th" id="header-first_name">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-last_name">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-date_added">Date Added <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th sorted desc" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-graph">Graph <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-remove">Remove <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			{% for employee in employees %}
+			<div class="tr {% cycle 'odd' '' %}">
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td first_name">{{ employee.first_name }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td last_name">{{ employee.last_name }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td date_added">{{ employee.date_added|date:"m/d/y" }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td punches">{{ employee.lifetime_punches }}</div></a>
+				<div class="td graph"><input type="checkbox" name="employee-graph-cb" value="{{ employee.id }}" /></div>
+				<div class="td remove"><a href="{% url 'employee_delete' employee.id %}"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Remove" /></a></div>
+			</div>
+			{% empty %}
+			<div class="tr odd">
+				<div class="td">No Employees</div>
+			</div>
+			{% endfor %}
+		</div>
+		
+		<div class="white-box table tab-body {% if show_pending %}active{% endif %}" id="tab-body-pending">
+			<div id="keymap">
+					<img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" />Approve
+					<img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /> Deny
+				</div>
+			<div class="table-header">
+				<div class="th" id="header-first_name_pending">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-last_name_pending">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-date_added_pending">Date Added <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-approve">Approve? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			
+			{% for employee in pending %}
+			<div class="tr {% cycle 'odd' '' %}">
+				<div class="td first_name_pending">{{ employee.first_name }}</div>
+				<div class="td last_name_pending">{{ employee.last_name }}</div>
+				<div class="td date_added_pending">{{ employee.date_added|date:"m/d/y" }}</div>
+				<div class="td approve">
+					<a href="{% url 'employee_approve' employee.id %}" class="employee approve"><img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
+					<a href="{% url 'employee_deny' employee.id %}" class="employee deny"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a>
+				</div>
+			</div>
+			{% empty %}
+			<div class="tr odd">
+				<div class="td">No Pending Employees</div>
+			</div>
+			{% endfor %}
+		</div>
+		
+	</div>
+	
+	<div class="section" style="position: relative;">
+		
+		<div class="section-title">Punches Given</div>
+		<div id="graph-dates">
+			<input type="text" name="graph-start-date" id="graph-start-date" value="{% today -6 %}"/><span>to</span><input type="text" name="graph-end-date" id="graph-end-date" value="{% today %}"/>
+		</div>
+		
+		<div class="white-box" id="employee-chart">
+			<p>Please select an employee to start graphing...</p>
+		</div>
+	</div>
+{% endblock %}

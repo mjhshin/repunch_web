@@ -1,0 +1,103 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}Edit Employee{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.css" %}" />
+	
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/employee_edit.js" %}"></script>
+	
+	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+	<script type="text/javascript">
+		var _order_by = 'date_punched';
+		var _order_dir = 'desc';
+		var _page_url = '{% url 'employee_punches' employee_id %}';
+	</script>
+{% endblock %}
+
+
+{% block content %}
+	
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+		
+	<form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
+		{% if form.instance.id != None %}
+		<div id="photo-edit">
+			<div class="white-box">
+				{% if not form.instance.employee_avatar %}
+					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
+				{% else %}
+					<img src="{{ MEDIA_URL }}{{ form.instance.employee_avatar }}" class="avatar-big" />
+				{% endif %}
+			</div>
+			<a href="{% url 'employee_avatar' form.instance.id %}" id="upload-avatar">Add/Change Photo</a>
+		</div>
+		{% endif %}
+		
+		<h2>Edit Employee</h2>
+		
+		<div class="input-container">
+			{{ form.first_name.errors }}
+			<label for="first_name">First Name</label>
+			{{ form.first_name }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.last_name.errors }}
+			<label for="last_name">Last Name</label>
+			{{ form.last_name }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.email.errors }}
+			<label for="email">First Name</label>
+			{{ form.email }}
+		</div>
+		
+		<div class="input-container info" id="date_added">
+			<label>Date Added</label>
+			<span>{{ form.instance.date_added|date:"m/d/y" }}</span>
+		</div>
+		
+		<div class="input-container info">
+			<label>Lifetime Punches</label>
+			<span>{{ form.instance.lifetime_punches }}</span>
+		</div>
+		
+		<div id="edit-employees-options" class="form-options">
+			<a onclick="$('#employee-form').submit(); return false;" class="button blue">Save Changes</a>
+			<a href="{% url 'employee_delete' employee_id %}" id="delete-button" class="red">Delete Employee</a>
+		</div>
+		
+		<div class="section">
+			<div class="section-title">Punch History</div>
+			<div class="white-box table" id="tab-body-punches">
+				<div class="table-header">
+					<div class="th sorted desc" id="header-date_punched">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+					<div class="th not-sortable" id="header-time">Time</div>
+					<div class="th not-sortable" id="header-customer">Customer <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+					<div class="th not-sortable" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				</div>
+				<div id="table-body">
+					<div class="tr" id="load-row">
+						<div class="td date_punched"><a id="load-more" onclick="loadRow(1); return false;">Load more...</a></div>
+						<div class="td time">&nbsp;</div>
+						<div class="td customer">&nbsp;</div>
+						<div class="td punches">&nbsp;</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+
+{% endblock %}

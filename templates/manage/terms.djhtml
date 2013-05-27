@@ -1,0 +1,26 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load util_tags %}
+
+{% block title %}Terms &amp; Conditions{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/terms.css" %}" />
+{% endblock %}
+
+
+{% block content %}
+
+	<div class="section" style="margin-top: 0px;">
+		<div class="section-title">Terms &amp; Conditions</div>
+		<div class="white-box" id="terms-details">
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ullamcorper, tortor id convallis pharetra, justo tellus tempor nulla, id faucibus augue tellus a erat. Integer tincidunt pretium mauris eu sodales. Maecenas non elit dolor. Praesent eu nisi augue, sit amet consectetur odio. Donec aliquam vulputate sem, et gravida enim hendrerit vitae. Nunc commodo ornare tellus id aliquet. Ut eget interdum mi. Nulla imperdiet risus quis nulla fringilla blandit. Mauris tincidunt ullamcorper quam, nec accumsan neque eleifend eu. Quisque pharetra, elit nec porta tincidunt, purus felis consectetur nulla, et eleifend est dolor at elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nulla ligula, venenatis at lacinia sed, rhoncus non odio. Donec pellentesque, purus quis consectetur placerat, neque neque blandit risus, ut vehicula lorem mi eu felis. Nunc ut sapien ac augue ornare vulputate ac at risus. Vivamus et lacus magna. Curabitur venenatis pharetra metus, vel blandit nisl tempus at.
+				<br/><br/>
+				Pellentesque non facilisis velit. Pellentesque tempus urna ac massa consequat non porttitor arcu scelerisque. Ut accumsan velit sit amet leo fringilla scelerisque. Cras commodo neque ac risus pharetra placerat. Nam felis risus, feugiat sed dictum id, ultrices sed urna. Aenean at odio arcu. Nullam pretium aliquam fermentum. Ut sed ante nec lacus molestie facilisis quis a nulla.
+				<br/><br/>
+				Sed posuere pellentesque felis. Vivamus a enim at quam placerat porta quis vel mi. Etiam sit amet neque vitae nunc varius tincidunt. Maecenas dignissim ante non nisi facilisis a pulvinar eros malesuada. Mauris nec nibh tincidunt elit accumsan pellentesque. Nullam sollicitudin eros eu turpis tempus quis pretium nisi venenatis. Donec sed ipsum ut lorem sollicitudin interdum ac ut ante. Vivamus et urna sed sem molestie pharetra. Curabitur ut tristique arcu.
+				<br/><br/>
+				Aliquam ligula nunc, dignissim vel consectetur ut, porttitor eget sem. Integer id lacus massa, sit amet viverra mi. Morbi rhoncus enim diam, sed tincidunt eros. Pellentesque scelerisque blandit posuere. Integer viverra, nulla ut molestie pellentesque, lacus lacus vulputate orci, ac vehicula nibh quam eget diam. Nulla vel turpis quis lorem sollicitudin lobortis. Aenean auctor dignissim ultricies. Cras malesuada blandit euismod. In porttitor pharetra neque ut laoreet. In quis metus eu felis semper tempor in quis augue. Phasellus volutpat suscipit magna scelerisque condimentum. Phasellus consectetur consequat dui ac accumsan. Morbi ac ligula diam, eu blandit ipsum. Donec bibendum viverra ornare. Sed iaculis, orci in venenatis tristique, velit lectus laoreet augue, a imperdiet justo ipsum in odio. Quisque tincidunt aliquam mattis. 
+			</p>
+		</div>
+	</div>
+{% endblock %}

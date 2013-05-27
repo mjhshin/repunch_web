@@ -1,0 +1,83 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load store_tags %}
+
+{% block title %}Messages{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+
+	<a href="{% url 'message_edit' 0 %}" class="button blue">+ Create New Message</a>
+	
+	<div class="section">
+		
+		<div class="tab-container">
+			<div class="tab active" id="tab-sent">Sent</div>
+			{% feedback_unread request.session.account.store as fcount %}
+						
+			<div class="tab" id="tab-feedback">Feedback{% if fcount > 0 %} ({{ fcount }}){% endif %}</div>
+		</div>
+		
+		<div class="white-box table tab-body active" id="tab-body-sent">
+			<div class="table-header">
+				<div class="th sorted desc" id="header-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-status">Status <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-date-sent">Date Sent <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			
+			{% for message in messages %}
+			<div class="tr {% cycle '' 'odd' %} {% ifequal message.status 'Draft'%}draft{% endifequal %} ">
+				<a href="{% url 'message_edit' message.id %}">
+					<div class="td date">{{ message.date_added|date:"m/d/y" }}</div>
+					<div class="td subject">{{ message.subject }}</div>
+					<div class="td status">{{ message.status }}</div>
+					<div class="td date-sent">{% if message.date_sent  %}{{ message.date_sent|date:"m/d/y" }}{% endif %}</div>
+				</a>
+			</div>
+			{% empty %}
+			<div class="tr">
+				<div class="td date">No Messages</div>
+				<div class="td subject">&nbsp;</div>
+				<div class="td status">&nbsp;</div>
+				<div class="td date-sent">&nbsp;</div>
+			</div>
+			{% endfor %}
+		</div>
+		
+		<div class="white-box table tab-body" id="tab-body-feedback">
+			<div class="table-header">
+				<div class="th sorted desc" id="header-feedback-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-feedback-from">From <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-feedback-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			
+			{% for fb in feedback %}
+			<div class="tr {% cycle '' 'odd' %} {% ifequal fb.status 0 %}unread{% endifequal %}">
+				<a href="{% url 'feedback_details' fb.id %}">
+					<div class="td date">{{ fb.date_added|date:"m/d/y" }}</div>
+					<div class="td from">{{ fb.patron.name }}{% if fb.thread_count > 0 %}&nbsp;({{ fb.thread_count }}){% endif %}</div>
+					<div class="td subject">{{ fb.subject }}</div>
+				</a>
+			</div>
+			{% empty %}
+			<div class="tr">
+				<div class="td date">No Feedback</div>
+				<div class="td subject">&nbsp;</div>
+				<div class="td status">&nbsp;</div>
+				<div class="td date-sent">&nbsp;</div>
+			</div>
+			{% endfor %}
+			
+		</div>
+	</div>
+
+{% endblock %}

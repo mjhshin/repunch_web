@@ -1,0 +1,25 @@
+{% load static %}{% load store_tags %}
+
+{% for punch in punches %}
+	<div class="tr {{forloop.counter|divisibleby:2|yesno:",odd"}}">
+		<div class="td date_punched">{{ punch.date_punched|date:"m/d/y" }}</div>
+		<div class="td time">{{ punch.date_punched|date:"g:i A" }}</div>
+		<div class="td customer">{{ punch.patron.name }}</div>
+		<div class="td punches">{{ punch.punches }}</div>
+	</div>
+	{% if forloop.last and punches.has_next %}
+	<div class="tr {{forloop.counter|divisibleby:2|yesno:"odd,"}}" id="load-row">
+		<div class="td date_punched"><a id="load-more" onclick="loadRow({{ punches.next_page_number }}); return false;">Load more...</a></div>
+		<div class="td time">&nbsp;</div>
+		<div class="td customer">&nbsp;</div>
+		<div class="td punches">&nbsp;</div>
+	</div>
+	{% endif %}
+{% empty %}
+	<div class="tr {% cycle 'odd' '' %}">
+		<div class="td date">No punches</div>
+		<div class="td time">&nbsp;</div>
+		<div class="td customer">&nbsp;</div>
+		<div class="td punches">&nbsp;</div>
+	</div>
+{% endfor %}

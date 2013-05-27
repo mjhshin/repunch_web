@@ -1,0 +1,101 @@
+{% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>re:punch | {% block title %}{% endblock %}</title>
+	
+	<!-- include page specific css -->
+	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+	
+	{% block styles %}{% endblock %}
+	
+	
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="{% static "manage/js/global.js" %}"></script>
+	
+	{% block javascript %}{% endblock %}
+	
+</head>
+<body>
+	<div id="site-frame">
+		<div id="header">
+			<div id="header-left">
+				<img src="{% static "manage/images/logo_header.png" %}" alt="re:punch" id="logo-header" />&nbsp;
+			</div>
+			<div id="header-right">
+				<div id="account-info">
+					<a href="{% url 'store_index' %}">
+						{% if request.session.account.store.store_avatar  %}
+							<img src="{{ MEDIA_URL }}{{ request.session.account.store.store_avatar }}?{% timestamp %}" alt="" class="avatar-small" />
+						{% else %}
+							<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-small" />
+						{% endif %}
+						<span id="account-name">{{ user.username }}</span>
+					</a>
+				</div>
+				<div id="logout">
+					<a href="{% url 'manage_logout' %}" id="link-logout">Sign Out</a>
+				</div>
+			</div>
+		</div>
+		<div id="content-frame">
+			<div id="nav">
+				
+				<div class="nav-item {% if account_nav %}active{% endif %}">
+					<a href="{% url 'store_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
+						<span class="nav-item-title">My Account</span>
+						{% account_alert request.session.account as alert %}
+						{% if alert %}
+						<div class="nav-item-badge">!</div>
+						{% endif %}
+					</a>
+				</div>
+				<div class="nav-item {% if rewards_nav %}active{% endif %}">
+					<a href="{% url 'rewards_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_rewards.png" %}" alt="" />
+						<span class="nav-item-title">Rewards</span>
+					</a>
+				</div>
+				<div class="nav-item {% if messages_nav %}active{% endif %}">
+					<a href="{% url 'messages_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_messages.png" %}" alt="" />
+						<span class="nav-item-title">Messages</span>
+						{% feedback_unread request.session.account.store as fcount %}
+						{% if fcount > 0 %}
+						<div class="nav-item-badge">{{ fcount }}</div>
+						{% endif %}
+					</a>
+				</div>
+				<div class="nav-item {% if analysis_nav %}active{% endif %}">
+					<a href="{% url 'analysis_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_analysis.png" %}" alt="" />
+						<span class="nav-item-title">Analysis</span>
+					</a>
+				</div>
+				<div class="nav-item {% if employees_nav %}active{% endif %}">
+					<a href="{% url 'employees_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_employees.png" %}" alt="" />
+						<span class="nav-item-title">Employees</span>
+						{% employees_pending request.session.account.store as epcount %}
+						{% if epcount > 0 %}
+						<div class="nav-item-badge">{{ epcount }}</div>
+						{% endif %}
+					</a>
+				</div>
+				<div class="nav-item {% if settings_nav %}active{% endif %}">
+					<a href="{% url 'account_settings' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_settings.png" %}" alt="" />
+						<span class="nav-item-title">Settings</span>
+					</a>
+				</div>
+			</div>
+			<div id="main-content">{% block content %}{% endblock %}</div><!-- close main-content -->
+			<div class="clear">&nbsp;</div>
+		</div><!-- close content-frame -->
+	</div><!-- close site-frame -->
+	<div id="footer">
+		<img src="{% static "manage/images/logo_footer.png" %}" alt="re:punch" id="logo-footer" />
+	</div>
+</body>
+</html>

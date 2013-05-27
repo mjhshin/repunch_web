@@ -1,0 +1,83 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}{{ is_new|yesno:"Add New,Edit" }} Message{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
+	<script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>
+	<script src="{% static "manage/js/message_edit.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+	<form action="{% url 'message_edit' message_id %}" method="post" id="message-form">{% csrf_token %}
+		<input type="hidden" name="status" id="status" value="{{ form.status.value }}" />
+		<input type="hidden" name="action" id="action" value="draft" />
+		{% if form.errors.status %}
+			<div class="notification">
+				<div>
+					This message cannot be sent because you have reached your maximum messages sent for this month. Please save as a draft or click on the "Upgrade Account" button to automatically upgrade your account and send the message.
+					<br/>
+					<a id="upgrade" class="button blue" style="margin-top: 10px;">Upgrade Account</a>
+					<span style="clear: left; display: block;"></span>
+				</div>
+			</div>
+		{% else %}
+			{% if error or success %}
+			<div class="notification {% if success %}success{% endif %} hide">
+				<div>{{ error }}{{ success }}</div>
+			</div>
+			{% endif %}			
+			{% if form.date_sent.value %}
+			<div class="notification success">
+				<div>Sent: {{ form.date_sent.value }} to X recipients in the group "some group"</div>
+			</div>
+			{% endif %}
+		{% endif %}
+		
+		<h2>{{ is_new|yesno:"Add New,Edit" }} Message</h2>
+		
+		{{ form.send_to_group.errors }}
+		<label for="send_to">Send to</label>
+		{{ form.send_to_group }}
+	
+		{{ form.subject.errors }}
+		<label for="subject">Subject</label>
+		{{ form.subject }}
+		
+		{{ form.message.errors }}
+		<label for="message">Message</label>
+		{{ form.message }}
+		
+		<div id="attach-offer-container">
+			<div id="offer-cb-container">
+				{{ form.attach_offer }}<label for="id_attach_offer">Attach Offer</label>
+			</div>
+			<div id="offer-details" style="display: {% if form.attach_offer.value == True %}block{% else %}none{% endif %};">
+				{{ form.offer_title.errors }}
+				<label for="id_offer_title">Offer Title</label>
+				{{ form.offer_title }}
+				
+				{{ form.offer_expiration.errors }}
+				<label for="id_offer_expiration">Expiration Date</label>
+				<input type="text" id="id_offer_expiration" name="offer_expiration" value="{{ form.offer_expiration.value|date:'m/d/y h:m A' }}" />
+			</div>
+		</div>
+		
+		<div id="message-detail-options" class="form-options">
+		{% if form.status.value != "Sent" %}
+			<a id="send-now" class="button blue">Send Now</a>
+			<a id="save-draft" class="button gray">Save Draft</a>
+			<a href="{% url 'messages_index' %}" class="red">Cancel</a>
+		{% else %}
+			<a href="{% url 'message_duplicate' form.instance.id%}" class="button blue">Duplicate &amp; Edit</a>
+			<a href="{% url 'message_delete' form.instance.id %}" id="delete-button" class="red">Delete Message</a>
+		{% endif %}
+		</div>
+	</form>
+
+{% endblock %}

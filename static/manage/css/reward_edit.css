@@ -1,0 +1,15 @@
+h2{
+	margin-bottom:6px;
+}
+
+input#id_reward_name{
+	width:386px;
+}
+
+input#id_punches{
+	width:100px;
+}
+
+div#photo-edit{
+	margin:50px 30px 0 0;
+}

@@ -1,0 +1,45 @@
+input#recurring_charge{
+	height:auto;
+	padding:0;
+	border:0;
+	vertical-align:middle;
+}
+
+label#label_recurring_charge{
+	display:inline;
+	margin:0;
+	font-weight:normal;
+}
+
+div#card_number_container img{
+	vertical-align:middle;
+}
+
+input#card_number{
+	vertical-align:middle;
+}
+
+select{
+	margin-top:5px;
+}
+
+input#id_cc_cvv, input#id_state, input#id_zip{
+	width:75px;
+}
+
+input#id_address{
+	width:300px;
+}
+
+div#recurring_charge_container {
+	margin-top:20px;
+}
+
+div#recurring_charge_container input { height: auto; padding: 0px; margin: 0px 5px 0px 0px; border: 0px; vertical-align: middle;}
+div#recurring_charge_container label { font-size: 12px; font-weight: normal; margin: 0px; display: inline;}
+div#recurring_charge_container .errorlist { margin-top: 0px; }
+div#recurring_charge_container .errorlist li { top: 0px; }
+
+div.input-container.sub-types ul { list-style: none; margin: 0px; padding: 0px; }
+div.input-container.sub-types ul li { margin: 0px 0px 5px 0px }
+div.input-container.sub-types input { height: auto; padding: 0px; margin: 0px 5px 0px 0px; border: 0px; vertical-align: middle;}

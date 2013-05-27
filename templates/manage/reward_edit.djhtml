@@ -1,0 +1,72 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.css" %}" />
+	
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/rewards.js" %}"></script>
+	
+	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+{% endblock %}
+
+
+{% block content %}
+	
+	<form action="{% url 'reward_edit' reward_id %}" method="post" id="reward-form">{% csrf_token %}
+		{% if error or success %}
+		<div class="notification {% if success %}success{% endif %} hide">
+			<div>{{ error }}{{ success }}</div>
+		</div>
+		{% endif %}
+		
+		{% if form.instance.id != None %}
+		<div id="photo-edit">
+			<div class="white-box">
+				{% if not form.instance.reward_avatar %}
+					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
+				{% else %}
+					<img src="{{ MEDIA_URL }}{{ form.instance.reward_avatar }}" class="avatar-big" />
+				{% endif %}
+			</div>
+			<a href="{% url 'reward_avatar' form.instance.id %}" id="upload-avatar">Add/Change Photo</a>
+		</div>
+		{% endif %}
+	
+		<h2>{{ is_new|yesno:"Add New,Edit" }} Reward</h2>
+		
+		<div class="input-container">
+			{{ form.reward_name.errors }}
+			<label for="reward_name">Reward Name</label>
+			{{ form.reward_name }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.description.errors }}
+			<label for="description" id="label_store_description">Description</label>
+			{{ form.description }}
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.punches.errors }}
+			<label for="punches">Punches</label>
+			{{ form.punches }}
+		</div>
+		
+		<div id="edit-reward-options" class="form-options">
+			<a  class="button blue" onclick="$('#reward-form').submit(); return false;">Save Reward</a>
+			{% if is_new %}
+				<a href="{% url 'rewards_index' %}" class="red">Cancel</a>
+			{% else %}
+				<a id="delete-link" href="{% url 'reward_delete' reward_id %}" class="red">Delete Reward</a>
+			{% endif %}
+		</div>
+	</form>
+
+{% endblock %}

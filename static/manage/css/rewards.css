@@ -1,0 +1,54 @@
+.reward{
+	color:#666;
+	border:1px solid #CCC;
+	border-radius:4px;
+	height:58px;
+	margin-bottom:10px;
+	background-color:white;
+	padding:0;
+	line-height:inherit;
+}
+
+.reward a{
+	display:block;
+	height:58px;
+	color:#666;
+}
+
+.reward_punches{
+	width:66px;
+	line-height:58px;
+	text-align:center;
+	border-right:1px dotted #CCC;
+	font-size:24px;
+	color:#F06E1A;
+	padding:0;
+}
+
+.reward_summary{
+	width:560px;
+	padding: 10px 10px 0 10px;
+}
+
+.avatar-medium{
+	float:left;
+	margin-right:10px;
+}
+
+.reward_title{
+	font-weight:bold;
+	font-size:16px;
+}
+
+.reward_description{
+	font-size:11px;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+	display:block;
+	margin-top:4px;
+}
+
+.table-header div {
+	cursor: default;
+}

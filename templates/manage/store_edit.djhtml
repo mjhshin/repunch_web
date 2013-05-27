@@ -1,0 +1,189 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load store_tags %}{% load util_tags %}
+
+{% block title %}Edit Store Details{% endblock %}
+{% block styles %}
+	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+{% endblock %}
+{% block javascript %}
+	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
+	<script type="text/javascript">
+		var _hours_preview_url = '{% url 'store_hours' %}';
+	</script>
+{% endblock %}
+
+
+{% block content %}
+{% with store=request.session.account.store %}
+	
+	<form action="{% url 'store_edit' %}" method="post" id="account-edit-form">{% csrf_token %}
+		{% if error or success %}
+		<div class="notification {% if success %}success{% endif %} hide">
+			<div>{{ error }}{{ success }}</div>
+		</div>
+		{% endif %}
+		
+		<div id="photo-edit">
+			<div class="white-box">
+				{% if store.store_avatar  %}
+					<img src="{{ MEDIA_URL }}{{ store.store_avatar }}?{% timestamp %}" class="avatar-big" />
+				{% else %}
+					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
+				{% endif %}
+			</div>
+			<a href="{% url 'store_avatar' %}" id="upload-avatar">Add/Change Photo</a>
+		</div>
+	
+		
+		<h2>Edit Store Details</h2>	
+		{{ form.non_field_errors }}
+		<div class="input-container">
+			{{ form.store_name.errors }}
+			<label for="store_name">Store Name</label>
+			{{ form.store_name }}
+		</div>
+		
+		<div class="input-container street-container">
+			{{ form.street.errors }}
+			<label for="street">Street</label>
+			{{ form.street }}
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.city.errors }}
+			<label for="city">City</label>
+			{{ form.city }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.state.errors }}
+			<label for="state">State</label>
+			{{ form.state }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.zip.errors }}
+			<label for="zip">Zip</label>
+			{{ form.zip }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.country.errors }}
+			<label for="country">Country</label>
+			<select name="country" id="country">
+				<option>United States of America</option>
+			</select>
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.phone_number.errors }}
+			<label for="phone_number">Phone Number</label>
+			{{ form.phone_number }}
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.email.errors }}
+			<label for="email">Email</label>
+			{{ form.email }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.store_description.errors }}
+			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">200 character limit</label>
+			{{ form.store_description }}
+		</div>
+		
+		{{ hours_formset.management_form }}
+		{{ hours_formset.non_form_errors }}
+		
+		<div class="input-container clearheight" style="width: 650px;">
+			<label>Hours</label>
+			{% for hform in hours_formset %}
+				<ul class="hours-form django-form" id="{{ hform.prefix }}-row">
+					{{ hform.id }}
+					<input type="hidden" name="{{ hform.store.html_name }}" id="{{ hform.store.auto_id }}" value="{{ store.id }}" />
+					<input type="hidden" name="{{ hform.list_order.html_name }}" id="{{ hform.list_order.auto_id }}" value="{{ hform.list_order.value }}" />
+					<input type="hidden" name="{{ hform.DELETE.html_name }}" id="{{ hform.DELETE.auto_id }}" value="" />
+					<li class="days" id="{{ hform.days.html_name }}">
+						<div {% if '1' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_0">S</div>
+						<div {% if '2' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_1">M</div>
+						<div {% if '3' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_2">T</div>
+						<div {% if '4' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_3">W</div>
+						<div {% if '5' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_4">T</div>
+						<div {% if '6' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_5">F</div>
+						<div {% if '7' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_6">S</div>
+					</li>
+					<li class="time"><span>from</span>{% time_selector hform.open.html_name hform.open.value %}</li>
+					<li class="time close"><span>to</span>{% time_selector hform.close.html_name hform.close.value %}</li>
+					<li class="buttons">
+						<div class="add" id="{{ hform.prefix }}-add"></div>
+						<div class="remove" id="{{ hform.prefix }}-remove"></div>
+					</li>
+				</ul>
+			{% empty %}
+				<ul class="hours-form" id="hours-0-row">
+					<input type="hidden" name="hours-0-id" id="hours-0-id" value="">
+					<input type="hidden" name="hours-0-store" id="hours-0-store" value="{{ store.id }}" />
+					<input id="hours-0-list_order" type="hidden" value="0" name="hours-0-list_order" />
+					<input id="hours-0-DELETE" type="hidden" value="" name="hours-0-DELETE" />
+					<li class="days">
+						<div id="hours-0-days_0">S</div>
+						<div id="hours-0-days_1">M</div>
+						<div id="hours-0-days_2">T</div>
+						<div id="hours-0-days_3">W</div>
+						<div id="hours-0-days_4">T</div>
+						<div id="hours-0-days_5">F</div>
+						<div id="hours-0-days_6">S</div>
+					</li>
+					<li class="time"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
+					<li class="time close"><span>to</span>{% time_selector 'hours-0-close' None %}</li>
+					<li class="buttons">
+						<div class="add" id="hours-0-add"></div>
+					</li>
+				</ul>
+			{% endfor %}
+			
+			<ul class="hours-form" id="clone-row" style="display: none;">
+				<input type="hidden" name="clone-id" id="clone-id" value="">
+				<input type="hidden" name="clone-store" id="clone-store" value="{{ store.id }}" />
+				<input id="clone-list_order" type="hidden" value="0" name="clone-list_order" />
+				<input id="clone-DELETE" type="hidden" value="" name="clone-DELETE" />
+				<li class="days">
+					<div id="clone-days_0">S</div>
+					<div id="clone-days_1">M</div>
+					<div id="clone-days_2">T</div>
+					<div id="clone-days_3">W</div>
+					<div id="clone-days_4">T</div>
+					<div id="clone-days_5">F</div>
+					<div id="clone-days_6">S</div>
+				</li>
+				<li class="time"><span>from</span>{% time_selector 'clone-open' None %}</li>
+				<li class="time close"><span>to</span>{% time_selector 'clone-close' None %}</li>
+				<li class="buttons">
+					<div class="add" id="clone-add"></div>
+					<div class="remove" id="clone-remove"></div>
+				</li>
+			</ul>
+			<div style="clear: left"></div>
+		</div>		
+		
+		<div class="input-container clearheight">
+			<label>What customers see:</label>
+			<div id="store-hours-preview">
+				
+			</div>
+		</div>
+				
+		<div id="edit-store-options" class="form-options">
+			<a class="button blue" id="save-button">Save Changes</a>
+			<a href="{% url 'store_index' %}" class="red">Cancel</a>
+		</div>
+	</form>
+{% endwith %}
+{% endblock %}

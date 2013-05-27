@@ -1,0 +1,53 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}Rewards{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/rewards.css" %}" />{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+
+	<a href="{% url 'reward_edit' 0 %}" class="button blue">+ Create New Reward</a>
+	
+	<div class="section">
+		<div class="section-title">Rewards</div>
+		
+		<div class="table-header">
+			<div class="th">Punches</div>
+			<div class="th">Name</div>
+		</div>
+		
+		{% for reward in rewards %}
+		    <div class="tr reward {% cycle '' 'odd' %}">
+				<a href="{% url 'reward_edit' reward.id %}">
+					<div class="td reward_punches">{{ reward.punches }}</div>
+					<div class="td reward_summary">
+						{% if reward.reward_avatar %}
+						<img src="{{ MEDIA_URL }}{{ reward.reward_avatar }}" alt="" class="avatar-medium">
+						{% endif %}
+						<span class="reward_title">{{ reward.reward_name}}</span><br />
+						<span class="reward_description">{{ reward.description }}</span>
+					</div>
+				</a>
+			</div>
+		{% empty %}
+		    <div class="tr reward">
+				<div class="td reward_punches">&nbsp;</div>
+				<div class="td reward_summary">
+					<img src="/images/avatars/avatar-joes.jpg" alt="" class="avatar-medium">
+					<span class="reward_title">No Rewards</span><br />
+					<span class="reward_description">You have not added any rewards. Click on the &quot;Create New Reward&quot; button above.</span>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+{% endblock %}

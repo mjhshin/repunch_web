@@ -1,0 +1,47 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+{% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/settings.css" %}" />{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/django_ajax.js" %}"></script>
+	<script src="{% static "manage/js/settings.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+	<form action="{% url 'account_settings' %}" method="post" id="settings-form">{% csrf_token %}
+		{% if error or success %}
+		<div class="notification {% if success %}success{% endif %} hide">
+			<div>{{ error }}{{ success }}</div>
+		</div>
+		{% endif %}
+		
+		<h2>Settings</h2>
+	
+		{{ form.punches_customer.errors }}
+		<label for="punches_per_day">Number of separate times a customer can receive punches per day</label>
+		{{ form.punches_customer }}
+		
+		{{ form.punches_employee.errors }}
+		<label for="employee_punches">Number of punches allowed by an employee at one time</label>
+		{{ form.punches_employee }}
+		
+		{{ form.punches_facebook.errors }}
+		<label for="facebook_free_punches">Free Punch Allowance for Facebook</label>
+		{{ form.punches_facebook }}
+		
+		<div style="clear: left">&nbsp;</div>
+		
+		{% if form.instance.id  %}
+		<label for="retailer_id">Retailer ID</label>
+		<div id="retailer_id">{{ form.instance.retailer_id  }}</div> <a href="{% url 'refresh_retailer_id' %}" id="link_refresh_retailer_id"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_id" /></a>
+		{% endif %}
+		
+		<div id="settings-options" class="form-options">
+			<a onclick="$('#settings-form').submit(); return false;" class="button blue">Save Settings</a>
+			<a href="{% url 'store_index' %}" class="red">Cancel changes</a>
+		</div>
+
+	</form>
+{% endblock %}

@@ -1,0 +1,36 @@
+label{
+	width:300px;
+	margin-top:25px;
+}
+
+input{
+	width:61px;
+}
+
+div#retailer_id{
+	height:48px;
+	line-height:48px;
+	color:#666;
+	text-align:center;
+	font-weight:bold;
+	font-size: 18px;
+	width:198px;
+	vertical-align:middle;
+	border:1px solid #CCC;
+	border-radius: 4px;
+	background-color:#EEE;
+	float:left;
+}
+
+div#retailer_id.refreshed { 
+	border:1px solid #FFCC66;
+	background-color:#FFFFCC;
+}
+
+img#refresh_retailer_id{
+	margin:4px 15px;
+}
+
+div#settings-options{
+	margin-top:40px;
+}

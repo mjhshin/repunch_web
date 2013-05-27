@@ -1,0 +1,42 @@
+#header-reward_name, .reward_name {
+	width:200px;
+}
+
+#header-reward_redemptions, .reward_redemptions {
+	width:110px;
+}
+.graph-options-container {
+	height: 40px;
+	position: relative;
+}
+.graph-options-container .graph-type-options {
+	float: left;
+}
+
+#trends-dates, #breakdown-filters { 
+	position: absolute; 
+	top: 0px; 
+	right: 0px; 
+}
+#trends-dates input { 
+	width: 90px; 
+	height: 22px; 
+}
+
+#trends-dates label {
+	font-size: 12px;
+	color: #999;
+	padding: 0px 5px;
+	height: 22px;
+	line-height: 22px;
+	margin: 0px;
+	display: inline;
+}
+
+#trends-dates span {
+	font-size: 11px;
+	color: #999;
+	padding: 0px 5px;
+	height: 22px;
+	line-height: 22px;
+}

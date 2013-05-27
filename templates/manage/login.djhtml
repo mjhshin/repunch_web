@@ -1,0 +1,40 @@
+{% load static %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>re:punch | Login</title>
+	
+	<!-- include page specific css -->
+	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+	<link href="{% static "manage/css/login.css" %}" rel="stylesheet" />
+	
+	
+</head>
+<body>
+	<div id="site-frame">
+		<div id="header">
+			<div id="header-left">
+				<img src="{% static "manage/images/logo_header.png" %}" alt="re:punch" id="logo-header" />&nbsp;
+			</div>
+		</div>
+		<div id="content-frame">
+			<div id="main-content">
+				{% if error or success %}
+				<div class="notification {% if success %}success{% endif %} hide">
+					<div>{{ error }}{{ success }}</div>
+				</div>
+				{% endif %}
+				
+				<form action="{% url 'repunch.views.manage_login' %}" method="post">{% csrf_token %}
+				{{ form.as_p }}
+				<input type="submit" value="Submit" />
+				</form>
+			</div><!-- close main-content -->
+			<div class="clear">&nbsp;</div>
+		</div><!-- close content-frame -->
+	</div><!-- close site-frame -->
+	<div id="footer">
+		<img src="{% static "manage/images/logo_footer.png" %}" alt="re:punch" id="logo-footer" />
+	</div>
+</body>
+</html>

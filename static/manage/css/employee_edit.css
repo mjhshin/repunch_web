@@ -1,0 +1,27 @@
+#date_added{
+	clear:left;
+}
+
+#photo-edit{
+	margin:50px 40px 0 0;
+}
+
+.form-options{
+	clear:left !important;
+}
+
+/* punch table styles */
+#header-date_punched, .date_punched {
+	width:100px;
+}
+#header-time, .time {
+	width:100px;
+}
+#header-customer, .customer {
+	width:200px;
+}
+#header-punches, .punches {
+	width:110px;
+}
+
+#load-row a { font-weight: bold; cursor: pointer; }

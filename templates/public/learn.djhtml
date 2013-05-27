@@ -1,0 +1,132 @@
+{% extends "public/base.djhtml" %}
+{% load static %}
+
+{% block title %}Learn More for Business{% endblock %}
+{% block javascript %}
+	<script type="text/javascript" src="{% static "public/js/learnmore.js" %}"></script>
+{% endblock %}
+
+
+{% block pageblock %}
+<section id="page-wrapper">
+	<div id="page-content">
+		<section id="learn-bottom">
+			<h1>Learn More for Businesses</h1>	
+			<nav id="learn-bottom-menu" class="bottom-shadow">
+				<a href="#" id="tabRewards" class="active"><img src="{% static "public/images/icon_star-orange.png" %}" alt=""> Rewards</a>
+				<a href="#" id="tabMessages"><img src="{% static "public/images/icon_mail-gray.png" %}" alt=""> Messages</a>
+				<a href="#" id="tabFeedback"><img src="{% static "public/images/icon_chat-bubble-gray.png" %}" alt=""> Feedback</a>
+				<a href="#" id="tabAnalytics"><img src="{% static "public/images/icon_graph-gray.png" %}" alt=""> Analytics</a>
+				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt=""> Social Marketing</a>
+				<a href="#" id="tabPlans-pricing"><img src="{% static "public/images/icon_tag-gray.png" %}" alt=""> Plans/Pricing</a>
+			</nav>
+			<div id="learn-bottom-tabs-contents">
+				<div id="tabRewardsBody" class="tab active">
+					<aside class="col1">
+						<h2><!--<img src="{% static "public/images/icon_star-orange.png" %}" alt="">-->Customize Rewards for your Loyal Patrons</h2>
+						<ul>
+							<li><span class="bold blue">SUPER SIMPLE</span> Easily create rewards that are unique to your business</li>
+							<li><span class="bold blue">CHANGE IT UP</span> You can change or edit rewards at any time</li>
+							<li><span class="bold blue">FOCUS!</span> Draw the attention of your customers to specific products</li>
+						</ul>
+					</aside>
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+					</aside>
+				</div>
+				<div id="tabMessagesBody" class="tab">
+					<aside class="col1" style="width:350px;">
+						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized<br>Messages and Offers</h2>
+						<ul>
+							<li><span class="bold blue">NO EMAIL BLASTS.</span> Send messages directly to your customers' phones about things they are really interested in <span class="italic georgia">-- Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></li>
+							<li><span class="bold blue">TIME SENSITIVE OFFERS.</span> Send time sensitive offers directly to your customers <span class="italic georgia">-- Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></li>
+						</ul>
+					</aside>
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+					</aside>
+				</div>
+				<div id="tabFeedbackBody" class="tab">
+					<aside class="col1">
+						<h2><!--<img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="">--> Gather Valuable Feedback</h2>
+						<ul>
+							<li><span class="bold blue">CUSTOMER IS ALWAYS RIGHT.</span> View feedback from your customers privately within the Repunch Dashboard. <span class="italic georgia">-- Joe thinks you should host a trivia night. Sally wishes you would open an hour earlier. Jason thinks you should start offering chocolate croissants.</span></li>
+							<li><span class="bold blue">RESPOND.</span> Learn what your patrons think, and respond directly to them!</li>
+						</ul>
+					</aside>
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+					</aside>
+				</div>
+				<div id="tabAnalyticsBody" class="tab">
+					<aside class="col1">
+						<h2><!--<img src="{% static "public/images/icon_graph-orange.png" %}" alt="">-->Collect Valuable Data</h2>
+						<ul>
+							<li><span class="bold blue">WHO ARE THEY?</span> Learn more about who your customers are</li>
+							<li><span class="bold blue">PEAKS & TROUGHS.</span>  See when customers are flooding in and when business is slow (perhaps you'll want to send out some messages to turn those troughs upside down)</li>
+							<li><span class="bold blue">REDEMPTION.</span>  Monitor reward redemption to see which products your customers love.</li>
+							<li><span class="bold blue">SOCIAL UNIVERSE.</span>  See how often your patrons are posting about you on Facebook.</li>
+						</ul>
+					</aside>
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+					</aside>
+				</div>
+				<div id="tabSocialBody" class="tab">
+					<aside class="col1">
+						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Social Media Exposure and Gifting</h2>
+						<ul>
+							<li><span class="blue bold">SOCIAL MEDIA INTEGRATION.</span> Encourage customers to share their Repunch activity on Facebook by granting them extra punches. <span class="italic georgia">-- Dish Matt an extra couple punches for telling all of his friends on Facebook about your store.</span></li>
+							<li><span class="blue bold">GIFTING.</span> Customers bring their friends to your store by earning rewards and "gifting" them to their friends.</li>
+						</ul>
+					</aside>
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+					</aside>
+				</div>
+				<div id="tabPlans-pricingBody" class="tab">
+					<aside class="col1" style="width:100%; padding-top:0;">
+						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2>
+						<ul>
+							<li>No hardware or POS integration required!</li>
+							<li>Your employees can download the Repunch Retailer App - Once you grant them permission, they can begin dishing out punches and validating rewards.</li>
+							<li>You can monitor each employee's punch behavior to prevent fraud and to analyze employee.</li>
+						</ul>
+						<section id="learn-plans">
+			<h1>Plans &amp; Pricing</h1>
+	        	<div id="price-plan-boxes">
+	        	{% for type in types %}
+	              <div class="bkg_price-plan-box">
+	                  <h3>{{ type.name }} </h3>
+	                  <p class="orange-text">
+	                  		{% if type.monthly_cost == 0 %}
+	                  	FREE
+	                  	{% else %}
+	                  		${{ type.monthly_cost }}/mo
+	                  	{% endif %}
+	                  </p>
+	                  <span>
+	                  	{% if type.max_users == -1 %}
+	                  		Unlimited Users
+	                  	{% else %}
+	                  		up to {{ type.max_users }} user{{ type.max_users|pluralize }}
+	                  	{% endif %}<br>
+	                  	{{ type.max_messages }} message{{ type.max_messages|pluralize }}/month
+	                  </span>
+	              </div>
+	              {% endfor %}
+	           </div>
+			<h3 style="clear:both;padding-top:50px; text-align:center;">If you would rather have a Repunch-specific device to run the Retailer App, we can supply this for you. We can also provide you with a dock to hold phones and an extra long charging cord. There are fees associated with these items.</h3>
+	    </section>
+				</div>						
+			</div>
+		</section>
+	</div>
+</section>
+{% endblock %}
+
+{% block adblock %}
+<section id="ad-wrapper">
+	<div id="ad-content">Ready to start rewarding your customers? <a href="{% url 'public_signup' %}" class="button orange">Sign Up for Free</a></div>
+</section>
+{% endblock %}

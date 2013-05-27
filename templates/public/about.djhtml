@@ -1,0 +1,71 @@
+{% extends "public/base.djhtml" %}
+{% load static %}
+
+{% block title %}About Us{% endblock %}
+
+{% block styles %}
+	<link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block javascript %}
+	<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
+	<script type="text/javascript" src="{% static "public/js/about.js" %}"></script>
+{% endblock %}
+
+{% block pageblock %}
+<section id="page-wrapper">
+	<div id="page-content">
+		<h1 id="about-header">About Us</h1>
+		<div id="about-content">
+			<aside class="col1">
+				<h3>Mauris pretium luctus semper. Praesent laoreet vestibulum odio a sillicitudin. Duis risus est, blandit volutpat volutpat at, adispiscing vitae arcu. Suspendisse ullamcorper libero quis lacus fringilla posuere.</h3>
+				<img id="team-photo" src="http://placehold.it/890x270" alt="">
+				<p>Lorem ipsum dolor sit amet, consectetur adiscisping elit. Fusce ac justo est, ac hendrerit urna. Phsellus diam sapien, malesuada ac sagittis non, rutrum faucibus enim. Praesent ante sem, consequat vel tristique at, eleifend ac nisl.</p>
+				<p>Etieam varius egestas turpis, ac porta augue sollicitudin vel. Nunc ullamcorper convallis volutpat. Suspendisse eu nulla dolor. Fusce risus ligula, euismod id luctus sit amet, fringilla vel ipsum. Lorem ipsum dolor sit amet, consectetur adiscisping elit. Fusce ac justo est, ac hendrerit urna. Phsellus diam sapien, malesuada ac sagittis non, rutrum faucibus enim. Praesent ante sem, consequat vel.</p>
+			</aside>
+			<aside class="col2">
+				
+			</aside>
+			<div class="clear-both"></div>
+			<div id="the-team">
+				<h2 id="the-team-title">The Team</h2>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>First Last</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><h4>Lorem ipsum...</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><ul><li>Lorem ipsum dolor</li><li>Aenean ultricies varius dolor ac lobortis</li><li>Nullam id magna mauris</li></ul></div>">
+					<div class="member-picture-border">
+						<div class="member-picture"></div>
+					</div>
+					<h2 class="member-name">First Last</h2>
+					<div class="member-title">Job Title</div>
+				</div>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>First Last</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><h4>Lorem ipsum...</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><ul><li>Lorem ipsum dolor</li><li>Aenean ultricies varius dolor ac lobortis</li><li>Nullam id magna mauris</li></ul></div>">
+					<div class="member-picture-border">
+						<div class="member-picture"></div>
+					</div>
+					<h2 class="member-name">First Last</h2>
+					<div class="member-title">Job Title</div>
+				</div>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>First Last</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><h4>Lorem ipsum...</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><ul><li>Lorem ipsum dolor</li><li>Aenean ultricies varius dolor ac lobortis</li><li>Nullam id magna mauris</li></ul></div>">
+					<div class="member-picture-border">
+						<div class="member-picture"></div>
+					</div>
+					<h2 class="member-name">First Last</h2>
+					<div class="member-title">Job Title</div>
+				</div>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>First Last</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><h4>Lorem ipsum...</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><ul><li>Lorem ipsum dolor</li><li>Aenean ultricies varius dolor ac lobortis</li><li>Nullam id magna mauris</li></ul></div>">
+					<div class="member-picture-border">
+						<div class="member-picture"></div>
+					</div>
+					<h2 class="member-name">First Last</h2>
+					<div class="member-title">Job Title</div>
+				</div>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>First Last</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><h4>Lorem ipsum...</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ultricies varius dolor ac lobortis. Nullam id magna mauris.</p><ul><li>Lorem ipsum dolor</li><li>Aenean ultricies varius dolor ac lobortis</li><li>Nullam id magna mauris</li></ul></div>">
+					<div class="member-picture-border">
+						<div class="member-picture"></div>
+					</div>
+					<h2 class="member-name">First Last</h2>
+					<div class="member-title">Job Title</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}

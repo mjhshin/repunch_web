@@ -1,0 +1,97 @@
+div#notification{
+	margin-bottom:0;
+}
+
+div#limits-box
+{
+	height: 70px;
+	width: 370px;
+	padding: 0px;
+}
+
+
+div.limit-details {
+	float: left;
+	width: 160px;
+	height: 50px;
+	padding: 10px;
+	color: #ABABAB;
+}
+
+div.limit-details.right {
+	border-left: 1px dotted #CCC;
+	padding-left: 15px;
+}
+
+div.limit-details div.bar-graph {
+	float: left;
+	width: 30px;
+	height: 50px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	position: relative;
+	margin-right: 10px;
+}
+
+div.limit-details div.bar-graph div {
+	width: 32px;
+	height: 25px;
+	background-color: #F06D1A;
+	border-radius: 3px;
+	position: absolute;
+	bottom: -1px;
+	left: -1px;
+}
+
+div.limit-details div.description {
+	float: left;
+	position: relative;
+}
+
+div.limit-details div.description div.label {
+	font-size: 13px;
+}
+
+div.limit-details div.description div.count {
+	font-size: 30px;
+	font-weight: bold;
+	float: left;
+	width: 50px;
+	height: 40px;
+	line-height: 40px;
+}
+
+div.limit-details div.description div.limit {
+	font-size: 11px;
+	float: left;
+	white-space: nowrap;
+	position: relative;
+	bottom: -15px;
+}
+
+div#store-details a.button{
+	margin-top:20px;
+}
+
+img.avatar-big{
+	float:left;
+}
+
+div#store-details-content-right{
+	float:left;
+	width:518px;
+	margin-left:20px;
+	color:#666;
+}
+
+div#address{
+} 
+
+div#hours{
+	margin-top:20px;
+}
+
+div#description{
+	clear:both;
+	margin-top:20px;
+}

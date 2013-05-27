@@ -1,0 +1,43 @@
+{% load static %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+	
+	{% if success %}
+	<script type="text/javascript">
+		window.parent.avatarUploadComplete();
+	</script>
+	{% else %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#upload-btn').click(function(){
+				
+				if($('#id_store_avatar').val().length == 0)
+				{
+					alert('Please select an image to upload.');	
+				}
+				else
+				{
+					$('#avatar-form').submit();
+				}
+			});
+		})
+	</script>
+	{% endif %}
+	
+
+</head>
+<body style="background-image: none; background-color: white;">
+	<form action="{{ url }}" method="post" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
+		<div class="input-container">
+			{{ form }}
+		</div>
+		
+		<div id="edit-store-options" class="form-options">
+			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
+			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
+		</div>
+	</form>
+</body>
+</html>

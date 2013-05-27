@@ -1,0 +1,110 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}
+
+{% block title %}Account Upgrade{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/upgradeaccount.css" %}" />{% endblock %}
+
+
+{% block content %}
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+	{% if form.non_field_errors %}
+	<div class="notification">
+		<div>{{ form.non_field_errors }}</div>
+	</div>
+	{% endif %}
+	
+
+	<h2>{% if account.is_free %}Upgrade Account{% else %}{% endif %}</h2>
+	
+	<form action="{% url 'account_upgrade' %}" method="post" id="upgrade-form">{% csrf_token %}
+	<div class="section first">
+		<div class="section-title">
+			Credit Card Information
+		</div>
+		
+		<div class="input-container">
+			{{ form.first_name.errors }}
+			<label for="first_name">First Name</label>
+			{{ form.first_name }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.last_name.errors }}
+			<label for="last_name">Last Name</label>
+			{{ form.last_name }}
+		</div>
+		
+		<div class="input-container" id="card_number_container">
+			{{ form.cc_number.errors }}
+			<label for="card_number">Card Number</label>
+			{{ form.cc_number }}
+			<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
+			<img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
+			<img src="{% static "manage/images/icon_discover.png" %}" alt="Discover" />
+			<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.cc_cvv.errors }}
+			<label for="cvc">CVC</label>
+			{{ form.cc_cvv }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.cc_expiration.errors }}
+			<label for="expiration_month">Expiration</label>
+			{{ form.cc_expiration }}
+		</div>
+	</div>
+	
+	<div class="section">
+		<div class="section-title">
+			Billing Address
+		</div>
+		
+		<div class="input-container">
+			{{ form.address.errors }}
+			<label for="street">Street</label>
+			{{ form.address }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.city.errors }}
+			<label for="city">City</label>
+			{{ form.city }}
+		</div>
+		
+		<div class="input-container clearheight">
+			{{ form.state.errors }}
+			<label for="state">State</label>
+			{{ form.state }}
+		</div>
+		
+		<div class="input-container">
+			{{ form.zip.errors }}
+			<label for="id_zip">Zip</label>
+			{{ form.zip }}
+		</div>
+		
+		<div class="input-container">
+			<label for="country">Country</label>
+			{{ form.country }}
+		</div>
+		
+		<div style="clear: left;"></div>
+		<div class="input-container" id="recurring_charge_container">
+			{{ form.recurring.errors }}
+			{{ form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'manage_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
+		</div>
+	</div>
+	
+	<div id="upgrade-options" class="form-options">
+		<a onclick="$('#upgrade-form').submit(); return false;" class="button blue">Submit</a>
+		<a href="{% url 'store_index' %}" class="red">Back</a>
+	</div>
+	</form>
+{% endblock %}

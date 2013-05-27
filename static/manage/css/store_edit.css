@@ -1,0 +1,124 @@
+h2{
+	margin-bottom:6px;
+}
+
+input#id_store_name{
+	width: 398px;
+}
+
+div#street-container{
+	clear:left;
+}
+
+input#id_street{
+	width:348px;
+}
+
+input#id_state{
+	width: 100px;
+}
+
+input#id_zip{
+	width:100px;
+}
+
+input#id_email{
+	width:248px;
+}
+
+select#id_country{
+	margin-top:4px;
+}
+
+label#label_store_description{
+	float:left;
+}
+
+label#character_limit{
+	float:right;
+	font-weight:normal;
+	font-size:10px;
+	font-style:italic;
+	margin-top:20px;
+}
+
+textarea#id_store_description{
+	clear:both;
+	float:left;
+}
+
+div#notification { }
+
+
+/* hours form style */
+ul.hours-form { 
+	height: 30px; 
+	list-style: none; 
+	margin: 0px 0px 5px 0px; 
+	padding: 0px;
+	clear: left;
+}
+ul.hours-form li { 
+	float: left; 
+	display: block; 
+	height: 30px; 
+	line-height: 30px;
+	margin: 0px;
+	padding: 0px;
+}
+ul.hours-form li span {
+	font-size: 14px;
+	color: #999;
+}
+ul.hours-form li.days { 
+	width: 260px; 
+}
+ul.hours-form li.days div { 
+	background-color: #FFF; 
+	width: 30px; 
+	height: 30px; 
+	margin-right: 5px; 
+	border: 1px solid #CCC; 
+	border-radius: 4px; 
+	line-height: 30px; 
+	text-align: center; 
+	font-size: 14px; 
+	font-weight: bold; 
+	color: #999;
+	float: left;
+	cursor: pointer;
+}
+ul.hours-form li.days div.active { 
+	background-color: #FFFFCC; 
+	border-color: #F9B64B; 
+	color: #666; 
+}
+ul.hours-form li.time { 
+	width: 135px; 
+}
+ul.hours-form li.time select {
+	margin-left: 5px;
+}
+ul.hours-form li.time.close {
+	width: 120px;
+}
+ul.hours-form li.buttons { 
+	width: 80px; 
+}
+ul.hours-form li.buttons div {
+	width: 30px;
+	height: 30px;
+	margin-right: 5px;
+	background: transparent url('../images/hours_add.png') no-repeat center center;
+	float: left;
+	cursor: pointer;
+}
+ul.hours-form li.buttons div.remove {
+	background-image: url('../images/hours_remove.png');
+}
+
+
+#store-hours-preview{
+	color: #666;
+	font-size: 12px;
+}

@@ -1,0 +1,149 @@
+{% extends "public/base.djhtml" %}
+{% load static %}
+
+{% block title %}FAQ{% endblock %}
+
+
+{% block pageblock %}
+<section id="page-wrapper">
+	<div id="page-content">
+		<h1 id="faq-header">FAQ</h1>
+		<div id="faq-content">
+			<aside class="col1">
+            		<h2>Repunch for Consumers</h2>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>What is Repunch?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Repunch is a consumer loyalty app that rewards you for frequenting your favorite retailers.</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How do I become a Repunch user?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Download the Repunch consumer app for your iPhone or Android. You can then sign up through Facebook, or by entering a few basic pieces of info about yourself.</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How much does the app cost?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Free!</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How do I get punched?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>When you pay at a participating merchant, just open the Repunch app and tap your smartphone with the store's smartphone. The bigger your purchase, the more punches you receive.</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How do I redeem rewards?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Each store offers a few different rewards worth certain numbers of punches. If you want to redeem one and you have enough punches, you just select it and then tap your phone with the merchant's phone.</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>Who is sending me messages?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>We know getting a ton of emails is annoying. So, we will never provide your email address to anyone. Stores where you have been punched can push you notifications through the app. These are stores that you like sending you cool info or special offers so you may want to check them out.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>Can I use my punches at any location?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>No. You can only use punches at the store where you earned them.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>Who can I gift rewards to?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>You can gift rewards to any of your Facebook friends that are Repunch users.</p>
+					</div>
+				</div>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>What if I am having problems with the app?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>We apologize if you run into any such issues. Please contact us immediately and we will fix it asap.</p>
+					</div>
+				</div>
+				<h2>Repunch for Retailers</h2>
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How do I become a Repunch retailer?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Put in some basic info on this site's sign-up page. We will contact you within a few hours to verify your information. You will then have access to your dashboard and can start using Repunch. We will help you customize your rewards if you'd like our input. We will also bring you a dock for your phone and some marketing materials asap.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>What is the cost for joining as a Repunch retailer?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Repunch is absolutely free to start. We only begin charging once we are demonstrating value through engaged users. As you move into paid tiers, you gain access to more users and can send out more messages.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>What hardware and marketing materials will Repunch be providing, and what will they cost?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Repunch will be providing a free standing dock that fits all smartphones, as well as in-store Repunch marketing materials. These items will be complimentary upon joining as a Repunch retailer.<br /><br />While you can run the Repunch Retailer App on any iPhone or Android that you have in your store, you can also elect to purchase a Repunch-specific device. We can supply this and/or an extra-long charging cord to you at cost.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>How will retailers be charged for the service?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>When first signing up for Repunch, you will be asked to input some basic credit card information that will be charged on a monthly billing cycle. Again, we will not charge you anything until you have 50+ customers using Repunch at your business.</p>
+					</div>
+				</div>				
+				<div id="accordion-wrapper">
+					<div class="accordionButton">
+						<h3>Will retailers be offered support?</h3>
+					</div>
+					<div class="accordionContent">
+					<p>Absolutely. A knowledgeable representative will assist you not only in getting set-up and comfortable with the platform, but we'll always be there to aid you if you ever have any questions.</p>
+					</div>
+				</div>				
+			</aside>
+			<aside class="col2">
+				<h3>Don't see your question</h3>
+				<p id="question-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia  Curae; Suspendisse potenti.</p>
+				<form id="make-question-form" method="post" action="{% url 'public_contact' %}">{% csrf_token %}
+					{{ form.full_name.errors }}
+			        <label for="id_full_name">Name</label>
+			        {{ form.full_name }}
+			        
+			        {{ form.email.errors }}
+			        <label for="id_email">Email</label>
+			        {{ form.email }}
+			        
+			        {{ form.message.errors }}
+			        <label for="id_message">What's Your Question?</label>
+			        {{ form.message }}
+					<a class="button orange" href="#" onclick="$('#make-question-form').submit(); return false;">Send</a>
+				</form>
+			</aside>
+		</div>
+	</div>
+</section>
+{% endblock %}

@@ -1,0 +1,82 @@
+#header-first_name, .first_name, #header-first_name_pending, .first_name_pending{
+	width:110px;
+}
+
+#header-last_name, .last_name, #header-last_name_pending, .last_name_pending{
+	width:110px;
+}
+
+#header-date_added, .date_added, #header-date_added_pending, .date_added_pending{
+	width:110px;
+	text-align:center;
+}
+
+#header-punches, .punches{
+	width:110px;
+	text-align:center;
+}
+
+#header-graph, .graph{
+	width:70px;
+	text-align:center;
+}
+
+.graph input {
+	border: 0px;
+}
+
+#header-remove, .remove, #header-approve, .approve{
+	text-align:center;
+	padding-right:0;
+	width:80px;
+}
+
+.remove img{
+	margin-top:6px;
+}
+
+.approve img{
+	margin:6px 3px 0;
+}
+
+#tab-body-pending { 
+	position: relative; 
+}
+#tab-body-pending #keymap { 
+	position: absolute; 
+	right: 20px;
+	top: -25px; 
+	font-size: 12px; 
+	color: #666; 
+	width: 200px;
+	height: 16px;
+	line-height: 16px;
+	text-align: right;
+}
+#tab-body-pending #keymap img { 
+	margin: 0px 5px 0px 10px;
+	vertical-align: middle
+}
+
+#employee-chart p {
+	font-size: 12px;
+	color: #999;
+}
+
+#graph-dates { 
+	position: absolute; 
+	top: -2px; 
+	left: 125px; 
+}
+#graph-dates input { 
+	width: 90px; 
+	height: 22px; 
+}
+
+#graph-dates span {
+	font-size: 11px;
+	color: #999;
+	padding: 0px 5px;
+	height: 22px;
+	line-height: 22px;
+}

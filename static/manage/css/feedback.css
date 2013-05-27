@@ -1,0 +1,60 @@
+#id_subject {
+	width: 656px;
+}
+
+#id_message {
+	width: 656px;
+	height: 200px;
+}
+
+#id_send_to {
+	float: left;
+}
+
+a.breadcrumb {
+	display: block;
+	font-size: 11px;
+	text-decoration: none;
+	margin-bottom: 20px;
+}
+div.white-box {
+	padding: 0px;
+}
+div.white-box.response {
+	background-color: #EFFCFF;
+}
+div.white-box div.sect {
+	border-bottom: 1px dotted #CCCCCC;
+	padding: 5px 10px;
+	clear: left;
+}
+div.white-box div.sect.yellow {
+	background-color: #FFFFCC;
+}
+div.white-box div.sect label {
+	float: left;
+	font-weight: normal;
+	margin: 0px;
+	display: block;
+	font-size: 12px;
+	margin-right: 5px;
+}
+div.white-box div.sect span {
+	font-weight: bold;
+	font-size: 12px;
+	display: block;
+	float: left;
+	margin-right: 10px;
+	color: #666;
+}
+div.white-box div.sect.meta {
+}
+div.white-box div.sect.subject {
+}
+div.white-box div.sect.message {
+	border-bottom: 0px;
+	font-size: 12px;
+	padding-bottom: 20px;
+	color: #666;
+}
+div.divider { clear: left; height: 10px; }
