@@ -39,15 +39,11 @@ def sign_up(request):
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm(request.POST)
         if store_form.is_valid() and account_form.is_valid() and subscription_form.is_valid(): # All validation rules pass
-            # store = store_form.save(commit=False)
-            store = 
+            store = store_form.save(commit=False
             
             tz = rputils.get_timezone('93003')
             store.store_timezone = tz.zone
             store.save()
-    
-            
-                    
 
             if store != None:
                 try:

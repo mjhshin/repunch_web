@@ -7,6 +7,8 @@ from models import Account, Settings, Subscription, SubscriptionType
 from libs.repunch import rpforms, rpccutils, rputils
 
 class AccountForm(forms.ModelForm):
+    """ PARSE SAFE """    
+
     confirm_password = forms.CharField(widget=forms.PasswordInput())
     
     def clean_password(self):
@@ -23,6 +25,8 @@ class AccountForm(forms.ModelForm):
         
         
 class SubscriptionForm(forms.ModelForm):
+    """ PARSE SAFE """    
+
     cc_cvv = forms.CharField()
     recurring = forms.NullBooleanField(widget=forms.CheckboxInput(), required=True)
         
