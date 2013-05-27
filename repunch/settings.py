@@ -34,8 +34,14 @@ EMAIL_HOST_PASSWORD = 'T3st1T2013!'
 EMAIL_USE_TLS = True
 
 # PARSE 
+PARSE_VERSION = '1'
 REST_APPLICATION_ID = "uYZFKpiF66fYLXBCw3MMyZthdRRU7V6tyOWY4kRf"
 REST_API_KEY = "bM0wtOLyMfJf8CAIs4TmVm1JPyag74ZWXpHkuHmu"
+REST_CONNECTION_META = {
+       "X-Parse-Application-Id": REST_APPLICATION_ID,
+       "X-Parse-REST-API-Key":REST_API_KEY,
+       "Content-Type": "application/json"
+}
 
 # PAYPAL
 PAYPAL_CLIENT_ID = "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM"
@@ -50,7 +56,7 @@ ALLOWED_HOSTS = ['stage.repunch.com', 'repunch.com', 'www.repunch.com']
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Denver'
+TIME_ZONE = "America/New_York"
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.djhtml

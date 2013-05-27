@@ -1,6 +1,7 @@
 from django.db import models
 
 from libs.repunch import rpforms
+from repunch.settings import TIME_ZONE
 
 class Store(models.Model):
 	store_name = models.CharField(max_length=255)
@@ -15,7 +16,8 @@ class Store(models.Model):
 	store_avatar = models.ImageField(max_length=255,upload_to='images/avatars/stores',blank=True)
 	active_users = models.IntegerField(default=0)
 	
-	store_timezone = models.CharField(max_length=100, default="America/New York")
+	store_timezone = models.CharField(max_length=100,
+                        default=TIME_ZONE)
 	
 	def __unicode__(self):
 		return self.store_name

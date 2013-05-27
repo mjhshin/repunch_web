@@ -14,7 +14,8 @@ class StoreSignUpForm(forms.ModelForm):
     """ PARSE SAFE """
     class Meta:
         model = Store
-        exclude = ('phone_number', 'store_description', 'store_avatar', 'active_users', 'store_timezone')
+        exclude = ('phone_number', 'store_description',
+                'store_avatar', 'active_users', 'store_timezone')
         
 class StoreAvatarForm(forms.ModelForm):
     class Meta:

@@ -8,9 +8,9 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
-from parse.stores.models import ParseStore
-from parse.accounts.models import ParseAccount, ParseSubscription,\
-ParseSubscriptionType
+from parse.stores.forms import StoreForm
+from parse.accounts.forms import AccountForm,\
+SubscriptionForm
 
 def index(request):
     data = {'home_nav': True}
@@ -34,13 +34,24 @@ def about(request):
 def sign_up(request):
     data = {'sign_up_nav': True}
     
-    if request.method == 'POST': # If the form has been submitted...
+    if request.method == 'POST':
+        # these forms are now just for rendering into html
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm(request.POST)
-        if store_form.is_valid() and account_form.is_valid() and subscription_form.is_valid(): # All validation rules pass
-            store = store_form.save(commit=False
-            
+        # if store_form.is_valid() and account_form.is_valid() and\
+        #   subscription_form.is_valid(): # All validation rules pass
+
+        # actual form validations are now done through ParseForms
+        store_pf = ParseStoreForm(request.POST)
+        account_pf = ParseAccountForm(request.POST)
+        subscription_pf = ParseSubscriptionForm(request.POST)
+        # pass is corresponding form's error dicts to fillem up
+        # if validation fails
+        if store_pf.is_valid(store_form.errors) and\
+            account_pf.is_valid(account_form.errors) and\
+            subscription_pf.is_valid(subscription_form):
+              
             tz = rputils.get_timezone('93003')
             store.store_timezone = tz.zone
             store.save()

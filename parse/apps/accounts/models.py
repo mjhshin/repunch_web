@@ -2,9 +2,9 @@
 Parse equivalence of Django apps.accounts.models
 """
 
-class ParseAccount(object):
+class Account(object):
     """ Equivalence class of apps.accounts.models.Account """
-    def __init__(self, data):
+    def __init__(self, data={}):
         self.objectId = data.get('objectId')
         self.username = data.get('username')
         self.password = data.get('password')
@@ -13,7 +13,7 @@ class ParseAccount(object):
         self.last_name = data.get('last_name')
         self.phone = data.get('phone')
 
-        self.store_id = **data.get('store_id')
+        self.store_id = data.get('store_id')
 
     def get_settings(self):
         # TODO
@@ -39,9 +39,9 @@ class ParseAccount(object):
         pass
 
     
-class ParseSubscription(object):
+class Subscription(object):
     """ Equivalence class of apps.accounts.models.Subscription """
-    def __init__(self, data):
+    def __init__(self, data={}):
         self.objectId = data.get('objectId')
         self.status = data.get('status')
         self.first_name = data.get('first_name')
@@ -71,15 +71,15 @@ class ParseSubscription(object):
         # TODO
         pass
 
-class ParseSubscriptionType(object):
+class SubscriptionType(object):
     """ Equivalence class of apps.accounts.models.SubscriptionType """
     def __init__(self, data):
         self.objectId = data.get('objectId')
         self.name = data.get('name')
         self.description = data.get('description')
-        self.monthly_cost = data.get('monthly_cost', default=0)
-        self.max_users = data.get('max_users')
-        self.max_messages = data.get('max_messages')
-        self.level = data.get('level')
-        self.status = data.get('status')
+        self.monthly_cost = data.get('monthly_cost', 0)
+        self.max_users = data.get('max_users', 0)
+        self.max_messages = data.get('max_messages', 0)
+        self.level = data.get('level', 0)
+        self.status = data.get('status', "active")
         
