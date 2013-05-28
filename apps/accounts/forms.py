@@ -56,7 +56,8 @@ class SubscriptionForm(forms.ModelForm):
         super(SubscriptionForm, self).clean()
         cleaned_data = self.cleaned_data
         
-        # if cc_number doesn't exists, it is because we already  have an error
+        # if cc_number doesn't exists, it is because we already 
+        # have an error
         if 'cc_number' in cleaned_data:
             cc = cleaned_data['cc_number']
             mask = (len(cc)-4)*'*'

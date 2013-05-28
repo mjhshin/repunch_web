@@ -57,11 +57,9 @@ def sign_up(request):
             store_pf.store.store_timezone = tz.zone
             store_pf.save()
 
-            # make sure that a subscription type of free exist
-            SubscriptionType.init_parse()
-
             # TODO: need to make this transactional
             # save subscription
+            subscription_pf.subscription.type_id = # TODO
             subscription_pf.save()
             
             subscription_pf.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);

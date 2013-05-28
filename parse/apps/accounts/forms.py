@@ -2,7 +2,13 @@
 Provides form validation for Parse classes from app.accounts.models
 """
 
-from parse.apps.accounts.models import Account
+from parse.apps.accounts.models import Account, Subscription
+
+
+class SubscriptionForm(object):
+    """  Equivalence class of apps.accounts.forms.SubscriptionForm """
+    def __init__(self, data={}):
+        self.subscription = Subscription(data)
 
 class AccountForm(object):
     """  Equivalence class of apps.accounts.forms.AccountForm """
@@ -21,10 +27,13 @@ class AccountForm(object):
             errors['email'] = "Please enter a valid email."
     
         # TODO VALIDATE STORE_ID AND SUBSCRIPTION_ID
+        # username should also be unique
         
         
         return len(errors) == 0
 
-    def create(self):
+    def save(self):
         """ create a new Account in Parse """
         return self.account.save()
+
+

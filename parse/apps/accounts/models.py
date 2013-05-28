@@ -3,7 +3,7 @@ Parse equivalence of Django apps.accounts.models
 """
 
 from libs.repunch.rpccutils import get_cc_type
-from parse.core.model import ParseObject
+from parse.core.models import ParseObject
 from parse.utils import parse
 
 class Account(ParseObject):
@@ -56,6 +56,9 @@ class Invoice(ParseObject):
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
+    ACTIVE = 'Active'
+    INACTIVE = 'Inactive'
+    ERROR = "Billing Error"
     def __init__(self, data={}):
         super(Subscription, self).__init__()
         self.objectId = data.get('objectId')
@@ -80,88 +83,87 @@ class Subscription(ParseObject):
                                 client_id=PAYPAL_CLIENT_ID, 
                                 client_secret=PAYPAL_CLIENT_SECRET)
 		
-		credit_card = paypalrestsdk.CreditCard({
-		# ###CreditCard
-		   # A resource representing a credit card that can be
-		   # used to fund a payment.
-		   "type": get_cc_type(cc_number),
-		   "number": cc_number,
-		   "expire_month": self.cc_expiration.month,
-		   "expire_year": self.cc_expiration.year,
-		   "cvv2": cvv,
-		   "first_name": self.first_name,
-		   "last_name": self.last_name,
-		
-		    # ###Address
-		    # Base Address object used as shipping or billing
-		    # address in a payment. [Optional]
-		   "billing_address": {
-		     "line1": self.address,
-		     "city": self.city,
-		     "state": self.state,
-		     "postal_code": self.zip,
-		     "country_code": self.country }})
+        credit_card = paypalrestsdk.CreditCard({
+	           # ###CreditCard
+	           # A resource representing a credit card that can be
+	           # used to fund a payment.
+	           "type": get_cc_type(cc_number),
+	           "number": cc_number,
+	           "expire_month": self.cc_expiration.month,
+	           "expire_year": self.cc_expiration.year,
+	           "cvv2": cvv,
+	           "first_name": self.first_name,
+	           "last_name": self.last_name,
+	
+	            # ###Address
+	            # Base Address object used as shipping or billing
+	            # address in a payment. [Optional]
+	           "billing_address": {
+	             "line1": self.address,
+	             "city": self.city,
+	             "state": self.state,
+	             "postal_code": self.zip,
+	             "country_code": self.country }})
 		
 		# Make API call & get response status
 		# ###Save
 		# Creates the credit card as a resource
 		# in the PayPal vault.
-		if credit_card.create():
-			self.ppid = credit_card.id
-			self.ppvalid = datetime.datetime.strptime(credit_card.valid_until[:10], "%Y-%m-%d")
-			
-			self.save();
-			return True
-		else:
-			print("Error while creating CreditCard:")
-			
-		return False
+        if credit_card.create():
+            self.ppid = credit_card.id
+            self.ppvalid = datetime.datetime.strptime(credit_card.valid_until[:10], "%Y-%m-%d")
+
+            self.save();
+            return True
+        else:
+            print("Error while creating CreditCard:")
+
+        return False
         
 
     def charge_cc(self):
         paypalrestsdk.configure(mode=PAYPAL_MODE, 
                             client_id=PAYPAL_CLIENT_ID,
                             client_secret=PAYPAL_CLIENT_SECRET)
-		payment = paypalrestsdk.Payment({
-				"intent": "sale",
-			  	"payer": {
-				"payment_method": "credit_card",
-			    "funding_instruments": [{
-			      	"credit_card_token": {
-			        	"credit_card_id": self.ppid }}]},
-			
-			  "transactions": [{
-			    	"amount": {
-			      		"total": self.type.monthly_cost,
-			      		"currency": "USD" },
-		      		"description": "Recurring monthly subscription from repunch.com." 
-			  		}]
-				})
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {
+            "payment_method": "credit_card",
+            "funding_instruments": [{
+              	"credit_card_token": {
+                	"credit_card_id": self.ppid }}]},
+
+            "transactions": [{
+                "amount": {
+              		"total": self.type.monthly_cost, # TODO
+              		"currency": "USD" },
+                "description": "Recurring monthly subscription from repunch.com." 
+                }] })
+
+        if payment.create():
+            invoice = Invoice()
+            invoice.account = Account.objects.filter(subscription=self).get() # TODO
+
+            invoice.charge_date = datetime.datetime.now()
+            invoice.response_code = payment.id
+            invoice.status = payment.state
+            if invoice.status == 'approved':
+	            invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
+
+            invoice.save()
+            return invoice
+        else:
+            print("Error while creating payment:")
+            raise Exception(payment.error)
 		
-		if payment.create():
-			invoice = Invoice()
-			invoice.account = Account.objects.filter(subscription=self).get()
-			
-			invoice.charge_date = datetime.datetime.now()
-			invoice.response_code = payment.id
-			invoice.status = payment.state
-			if invoice.status == 'approved':
-				invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
-			
-			invoice.save()
-			return invoice
-		else:
-			print("Error while creating payment:")
-			raise Exception(payment.error)
-		
-		return None
+        return None
 
 class SubscriptionType(ParseObject):
     """ Equivalence class of apps.accounts.models.SubscriptionType """
-    ACTIVE = 'active'
-    INACTIVE = 'inactive'
+    ACTIVE = 'Active'
+    INACTIVE = 'Inactive'
 
-    def __init__(self, data):
+    def __init__(self, data={}):
         super(SubscriptionType, self).__init__()
         self.objectId = data.get('objectId')
         self.name = data.get('name')
@@ -171,11 +173,6 @@ class SubscriptionType(ParseObject):
         self.max_messages = data.get('max_messages', 0)
         self.level = data.get('level', 0)
         self.status = data.get('status', ACTIVE)
-
-    def init_parse(self):
-        """ make sure that a free subscription type exist """
-        pass
-
 
 
 

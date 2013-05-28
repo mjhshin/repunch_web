@@ -27,10 +27,9 @@ class StoreForm(object):
         
         return len(errors) == 0
 
-    def create(self):
+    def save(self):
         """ create a new Store in Parse """
-        self.store.create()
-        return True
+        return self.store.save()
 
 
 

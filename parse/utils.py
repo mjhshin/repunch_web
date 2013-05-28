@@ -2,19 +2,40 @@
 Helpers methods for parse.apps to enfore the DRY principle.
 """
 
-import json, httplib
+import json, httplib, urllib
 
 from repunch.settings import PARSE_VERSION, REST_CONNECTION_META
 
-def parse(method, operation, data):
+def parse(method, url, data, query=None):
     """
-    sends a request to parse using specified method, operation, and data
-    data is a dictionary, usually the object.__dict__
+    sends a request to parse using specified method, url, data,
+    and optionally a query.
+    
+    data is a dictionary/json, usually it is a ParseObject.__dict__
+    query is a dictionary/json containing constraints for filtering.
+    Note that is the method is GET, data parameter is ignored.
+
+    Returns None if request does not return a json object.
     """
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
-    conn.request(method, '/' + PARSE_VERSION + '/' + operation, 
-                    json.dumps(data), REST_CONNECTION_META)
-    result = json.loads(conn.getresponse().read())
+
+    if method == "POST":
+        conn.request("POST", '/' + PARSE_VERSION + '/' + url, 
+                        json.dumps(data), REST_CONNECTION_META)
+    elif method == "GET":
+        if query:
+            params = '?' + urllib.urlencode({"where":\
+                                        json.dumps(query)})
+        else:
+            params = ''
+        conn.request("GET", '/' + PARSE_VERSION + '/' + url +\
+                '%s' % (params, ), '',  REST_CONNECTION_META)
+
+    try:
+        result = json.loads(conn.getresponse().read())
+    except ValueError:
+        result = None
+
     conn.close()
     return result

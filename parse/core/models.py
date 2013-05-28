@@ -9,13 +9,23 @@ class ParseObject(object):
         # for future additions
         pass
 
+    def update(self):
+        """ Saves changes to this object to the Parse DB.
+            Returns True if update is successful. """
+        # TODO
+        pass
+
     def save(self):
         """ 
-        creates a new ParseObject if it does not exist yet.
-        
+        saves/creates this object to the DB. This does not check 
+        uniqueness of any field. 
+        Use update to save an existing object.
+
+        Note that self.__dict__ contains objectId which will result
+        to the parse request returning an error only if it is not None
         """
-        parse('POST', 'classes/' + self.__class__.__name__,
-                self.__dict__)
+        path = 'classes/' + self.__class__.__name__
+        parse('POST', path, self.__dict__)
         return True
 
     def delete(self):
