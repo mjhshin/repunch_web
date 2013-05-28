@@ -9,7 +9,10 @@ from parse.core.models import ParseObject
 from parse.utils import parse
 
 class Account(ParseObject):
-    """ Equivalence class of apps.accounts.models.Account """
+    """ Equivalence class of apps.accounts.models.Account 
+        This account is special in that it is the model for
+        Parse.User
+    """
     def __init__(self, data={}):
         super(Account, self).__init__()
         self.objectId = data.get('objectId')
@@ -22,8 +25,12 @@ class Account(ParseObject):
         self.is_active = data.get('is_active', True)
         self.is_staff = data.get('is_staff', False)
         self.is_superuser = data.get('is_superuser', False)
+        self.sessionToken = data.get("sessionToken")
 
-        self.store_id = data.get('store_id')
+        self.Store_id = data.get('store_id')
+
+    def path(self):
+        return "users"
 
     def set_password(self, new_pass):
         """ sets the password to a hashed new_pass """
@@ -77,7 +84,8 @@ class Subscription(ParseObject):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.cc_number = data.get('cc_number')
-        self.cc_expiration = data.get('cc_expiration')
+        self.cc_expiration_month = data.get('cc_expiration_month')
+        self.cc_expiration_year = data.get('cc_expiration_year')
         self.address = data.get('address')
         self.city = data.get('city')
         self.state = data.get('state')

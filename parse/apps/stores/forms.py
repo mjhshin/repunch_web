@@ -7,7 +7,7 @@ from json import dumps
 
 from parse.apps.stores.models import Store
 
-class StoreForm(object):
+class StoreSignUpForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
     def __init__(self, data={}):
         self.store = Store(data)

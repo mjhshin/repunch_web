@@ -13,46 +13,45 @@ class ParseObject(object):
         self.objectId = None
         self.createdAt = None
         self.updatedAt = None
-        pass
 
     def path(self):
         """ returns the path of this class or use with parse 
             returns classes/ClassName
         """
         return "classes/" + self.__class__.__name__
-        
-connection.request('PUT', '/1/classes/GameScore/7Lw8Jo8Lv0', json.dumps({
-       "opponents": {
-         "__op": "AddRelation",
-         "objects": [
-           {
-             "__type": "Pointer",
-             "className": "Player",
-             "objectId": "x64dPWz09W"
-           }
-         ]
-       }
-     }),  REST_CONNECTION_META)
 
+    def update_locally(self, data):
+        """
+        Replaces values of matching attributes in data
+        """
+        for key, value in data.itervalues():
+            if key in self.__dict__.iterkeys():
+                self.__dict__[key] = value
 
     def update(self):
         """ Save changes to this object to the Parse DB.
-            Returns True if update is successful. 
-            
-            If there exist a relation to other objects,
-            this method makes sure that the relation exists.
+        Returns True if update is successful. 
+        
+        If there exist a relation to other objects,
+        this method makes sure that the relation exists.
         """
         rels = []
-        # check for relations
-        for f in self.__dic__.iterkeys():
+        # check for relations 
+        # rels will now contain a list of tuples (className, objectId)
+        for f in self.__dict__.iterkeys():
             if f.endswith("_id"):
-                rels.append(f)
+                rels.append( (f[:-3], self.__dict__["f"]) )
 
-        # format the relation to put in data
+        # populate the data in proper format
         if rels:
             data = self.__dict__[:]
             for rel in rels:
-                pass
+                data[rel(0).lower()] = {
+                    "__type": "Pointer",
+                    "className": rel[0],
+                    "objectId": rel[1]
+                }
+                
             parse("PUT", self.path(), data, self.objectId)
         else:
             parse("PUT", self.path(), self.__dict__, self.objectId)
@@ -84,7 +83,7 @@ connection.request('PUT', '/1/classes/GameScore/7Lw8Jo8Lv0', json.dumps({
         Must override this if there is any type of relation that this 
         object has with other objects.
         """
-        res = parse('POST', path, self.path())
+        res = parse('POST', self.path(), self.__dict__)
         self.createdAt = res["createdAt"]
         self.objectId = res["objectId"]
         return True

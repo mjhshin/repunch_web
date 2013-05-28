@@ -4,6 +4,7 @@ Provides form validation for Parse classes from app.accounts.models
 
 import re
 from datetime import datetime
+from django.core.validators import email_re
 
 from parse.apps.accounts.models import Account, Subscription
 from libs.repunch import rpforms, rpccutils, rputils
@@ -34,8 +35,8 @@ class SubscriptionForm(object):
     
         # cc_expiration
         now = datetime.now()
-        if s.cc_number.year == now.year:
-            if s.cc_number.month < now.month:
+        if s.cc_expiration_year == now.year:
+            if s.cc_expiration_month < now.month:
                 errors["cc_expiration"] = "Your credit card has"+\
                                         " expired!"
         

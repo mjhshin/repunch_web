@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login # TODO replace
 
 from apps.accounts.models import SubscriptionType, Subscription
 from apps.accounts.forms import AccountForm, SubscriptionForm
@@ -8,8 +8,9 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
+from parse.utils import login
 from parse.apps.accounts.cache import free
-from parse.apps.stores.forms import StoreForm as pStoreForm
+from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
 
@@ -37,16 +38,16 @@ def sign_up(request):
     
     if request.method == 'POST':
         # these forms are now just for rendering into html
-        store_form = pStoreSignUpForm(request.POST)
-        account_form = pAccountForm(request.POST)
-        subscription_form = pSubscriptionForm(request.POST)
+        store_form = StoreSignUpForm(request.POST)
+        account_form = AccountForm(request.POST)
+        subscription_form = SubscriptionForm(request.POST)
         # if store_form.is_valid() and account_form.is_valid() and\
         #   subscription_form.is_valid(): # All validation rules pass
 
         # actual form validations are now done through ParseForms
-        store_pf = StoreForm(request.POST)
-        account_pf = AccountForm(request.POST)
-        subscription_pf = SubscriptionForm(request.POST)
+        store_pf = pStoreSignUpForm(request.POST)
+        account_pf = pAccountForm(request.POST)
+        subscription_pf = pSubscriptionForm(request.POST)
         # pass is corresponding form's error dicts to fillem up
         # if validation fails
         if store_pf.is_valid(store_form.errors) and\
@@ -76,16 +77,18 @@ def sign_up(request):
             su.subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
             acount = ac.account
             account.store_id = store_pf.store.objectId
-            account.subscription_id = su.subscription
+            account.subscription_id = su.subscription.objectId
             account.set_password(request.POST.get('password'))
             account.save()
 
             #auto login
-            user_login = authenticate(account, 
+            user_login = login(account, 
                                 request.get("password"))
             if user_login != None:
                 try:
-                    login(request, user_login) #log into the system
+                    # login(request, user_login) #log into the system
+                    # must do this myself TODO
+                    pass
                 except Exception as e:
                     print(e)
                 request.session['account'] = account
