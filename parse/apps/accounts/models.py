@@ -3,7 +3,10 @@ Parse equivalence of Django apps.accounts.models
 """
 from datetime import datetime
 from django.contrib.auth.hashers import make_password
+import paypalrestsdk
 
+from repunch.settings import PAYPAL_CLIENT_SECRET,\
+PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject
 from parse.utils import parse
@@ -25,9 +28,10 @@ class Account(ParseObject):
         self.is_active = data.get('is_active', True)
         self.is_staff = data.get('is_staff', False)
         self.is_superuser = data.get('is_superuser', False)
-        self.sessionToken = data.get("sessionToken")
+        self.sessionToken = data.get('sessionToken')
 
-        self.Store_id = data.get('store_id')
+        self.Account = data.get('Account')
+        self.Store = data.get('Store')
 
     def path(self):
         return "users"
@@ -69,7 +73,7 @@ class Invoice(ParseObject):
         self.trans_id = data.get('trans_id')
         self.amount = data.get('amount')
 
-        self.Account_id = data.get('Account_id')
+        self.Account = data.get('Account')
     
     
 class Subscription(ParseObject):
@@ -94,7 +98,7 @@ class Subscription(ParseObject):
         self.ppid = data.get('ppid')
         self.ppvalid = data.get('ppvalid')
 
-        self.SubscriptionType_id = data.get('subscriptionType_id')
+        self.SubscriptionType = data.get('SubscriptionType')
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """
@@ -108,8 +112,8 @@ class Subscription(ParseObject):
 	           # used to fund a payment.
 	           "type": get_cc_type(cc_number),
 	           "number": cc_number,
-	           "expire_month": self.cc_expiration.month,
-	           "expire_year": self.cc_expiration.year,
+	           "expire_month": self.cc_expiration_month,
+	           "expire_year": self.cc_expiration_year,
 	           "cvv2": cvv,
 	           "first_name": self.first_name,
 	           "last_name": self.last_name,
@@ -130,8 +134,7 @@ class Subscription(ParseObject):
 		# in the PayPal vault.
         if credit_card.create():
             self.ppid = credit_card.id
-            self.ppvalid = datetime.strptime(credit_card.valid_until[:10], "%Y-%m-%d")
-
+            self.ppvalid = credit_card.valid_until[:10]
             self.update();
             return True
         else:
@@ -161,7 +164,7 @@ class Subscription(ParseObject):
 
         if payment.create():
             invoice = Invoice()
-            invoice.account_id = self.objectId
+            invoice.Account = self.objectId
             invoice.charge_date = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state
@@ -191,13 +194,6 @@ class SubscriptionType(ParseObject):
         self.max_messages = data.get('max_messages', 0)
         self.level = data.get('level', 0)
         self.status = data.get('status', ACTIVE)
-
-
-
-
-
-
-
 
 
 

@@ -16,7 +16,7 @@ class ParseObject(object):
 
     def path(self):
         """ returns the path of this class or use with parse 
-            returns classes/ClassName
+        returns classes/ClassName
         """
         return "classes/" + self.__class__.__name__
 
@@ -24,9 +24,31 @@ class ParseObject(object):
         """
         Replaces values of matching attributes in data
         """
-        for key, value in data.itervalues():
+        for key, value in data.iteritems():
             if key in self.__dict__.iterkeys():
                 self.__dict__[key] = value
+
+    def get_relations(self):
+        """
+        Returns a dictionary of relations of this class.
+        A relation is an attribute of this class if the first
+        character of the attribute is capitalized.
+        """
+        rels, data = [], {}
+        # check for relations 
+        # rels will now contain a list of tuples (className, objectId)
+        for key, value in self.__dict__.iteritems():
+            if key[0].isupper():
+                rels.append( (key, value) )
+        # populate the data in proper format
+        if rels:
+            for rel in rels:
+                data[rel[0]] = {
+                    "__type": "Pointer",
+                    "className": rel[0],
+                    "objectId": rel[1]
+                }
+        return data
 
     def update(self):
         """ Save changes to this object to the Parse DB.
@@ -35,26 +57,16 @@ class ParseObject(object):
         If there exist a relation to other objects,
         this method makes sure that the relation exists.
         """
-        rels = []
-        # check for relations 
-        # rels will now contain a list of tuples (className, objectId)
-        for f in self.__dict__.iterkeys():
-            if f.endswith("_id"):
-                rels.append( (f[:-3], self.__dict__["f"]) )
-
-        # populate the data in proper format
+        data = self.__dict__.copy()
+        rels = self.get_relations()
         if rels:
-            data = self.__dict__[:]
-            for rel in rels:
-                data[rel(0).lower()] = {
-                    "__type": "Pointer",
-                    "className": rel[0],
-                    "objectId": rel[1]
-                }
-                
-            parse("PUT", self.path(), data, self.objectId)
-        else:
-            parse("PUT", self.path(), self.__dict__, self.objectId)
+            for key, value in rels.iteritems():
+                data[key] = value
+        res = parse("PUT", self.path(), data, self.objectId)
+        if "error" in res:
+            return False
+        self.update_locally(res)
+        return True
 
     def fetchAll(self):
         """ 
@@ -80,12 +92,18 @@ class ParseObject(object):
         Note that self.__dict__ contains objectId which will result
         to the parse request returning an error only if it is not None
 
-        Must override this if there is any type of relation that this 
-        object has with other objects.
+        If there exist a relation to other objects,
+        this method makes sure that the relation exists.
         """
-        res = parse('POST', self.path(), self.__dict__)
-        self.createdAt = res["createdAt"]
-        self.objectId = res["objectId"]
+        data = self.__dict__.copy()
+        rels = self.get_relations()
+        if rels:
+            for key, value in rels.iteritems():
+                data[key] = value
+        res = parse('POST', self.path(), data)
+        if "error" in res:
+            return False
+        self.update_locally(res)
         return True
 
     def delete(self):

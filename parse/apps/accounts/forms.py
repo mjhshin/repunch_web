@@ -9,6 +9,7 @@ from django.core.validators import email_re
 from parse.apps.accounts.models import Account, Subscription
 from libs.repunch import rpforms, rpccutils, rputils
 
+
 class SubscriptionForm(object):
     """  Equivalence class of apps.accounts.forms.SubscriptionForm """
     def __init__(self, data={}):
@@ -18,8 +19,8 @@ class SubscriptionForm(object):
 
     def is_valid(self, errors):
         """ errors is a dictionary. Returns len(errors) == 0 
-            TODO : credit card processing will go here after cleaning
-            cc_number
+        TODO: credit card processing will go here after 
+        cleaning cc_number
         """    
         s = self.subscription
         # cc_number
@@ -28,7 +29,7 @@ class SubscriptionForm(object):
         if rpccutils.validate_checksum(s.cc_number) == False:
             errors["cc_number"] = "Enter a valid credit card number."
             s.cc_number = None
-        if rpccutils.validate_cc_type(s.cc_number) == False:
+        if rpccutils.validate_cc_type(str(s.cc_number)) == False:
             errors["cc_number"] = "Credit card type is not "+\
                                     "accepted."
             s.cc_number = None
@@ -39,6 +40,13 @@ class SubscriptionForm(object):
             if s.cc_expiration_month < now.month:
                 errors["cc_expiration"] = "Your credit card has"+\
                                         " expired!"
+
+        # recurring
+        if not self.recurring:
+            errors["recurring"] = "You must accept the Terms &"+\
+                    " Conditions to continue."
+
+        return len(errors) == 0
         
     def save(self):
         """ create a new subscription in Parse """
@@ -59,7 +67,7 @@ class AccountForm(object):
             errors['email'] = "Please enter a valid email."
     
         # TODO VALIDATE STORE_ID AND SUBSCRIPTION_ID
-        # username should also be unique
+        # username and email should needs to be unique
         
         return len(errors) == 0
 

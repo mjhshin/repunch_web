@@ -7,7 +7,7 @@ from libs.repunch import rpccutils
 from apps.stores.models import Store
 from libs.repunch.rpccutils import get_cc_type
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
-PAYPAL_CLIENT_SECRET, PAYPAL_MODE
+PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 
 class Account(AbstractUser):
 	store = models.OneToOneField(Store,null=True,blank=True)

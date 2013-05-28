@@ -36,7 +36,7 @@ def parse(method, path, data=None, query=None):
 
     elif method == "PUT":
         conn.request("PUT", '/' + PARSE_VERSION + '/' + path+\
-                '%s' % (query, ), '', json.dumps(data),
+                '%s' % (query, ), json.dumps(data),
                 REST_CONNECTION_META)
 
     try:

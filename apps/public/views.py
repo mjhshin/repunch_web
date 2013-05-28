@@ -43,7 +43,7 @@ def sign_up(request):
         subscription_form = SubscriptionForm(request.POST)
         # if store_form.is_valid() and account_form.is_valid() and\
         #   subscription_form.is_valid(): # All validation rules pass
-
+        
         # actual form validations are now done through ParseForms
         store_pf = pStoreSignUpForm(request.POST)
         account_pf = pAccountForm(request.POST)
@@ -51,8 +51,8 @@ def sign_up(request):
         # pass is corresponding form's error dicts to fillem up
         # if validation fails
         if store_pf.is_valid(store_form.errors) and\
-            subscription_pf.is_valid(subscription_form and\
-            account_pf.is_valid(account_form.errors) ):
+            subscription_pf.is_valid(subscription_form.errors) and\
+            account_pf.is_valid(account_form.errors):
 
             st, su, ac = store_pf, subscription_pf, account_pf
             
@@ -63,7 +63,7 @@ def sign_up(request):
 
             # TODO: need to make this transactional
             # save subscription
-            su.subscription.type_id = free.objectId
+            su.subscription.SubscriptionType = free.get("objectId")
             su.save()
 
             # TODO refactor templates to use parse forms instead
@@ -71,19 +71,20 @@ def sign_up(request):
                 cc = su.subscription.cc_number
                 mask = (len(cc)-4)*'*'
                 mask += cc[-4:]
+                subscription_form.data = subscription_form.data.copy()
                 subscription_form.data['cc_number'] = mask
-            # REMOVE -------------
+                # REMOVE -------------
             
-            su.subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
-            acount = ac.account
-            account.store_id = store_pf.store.objectId
-            account.subscription_id = su.subscription.objectId
+            su.subscription.store_cc(su.subscription.cc_number,
+                    su.cc_cvv)
+            account = ac.account
+            account.Store = store_pf.store.objectId
+            account.Subscription = su.subscription.objectId
             account.set_password(request.POST.get('password'))
             account.save()
 
             #auto login
-            user_login = login(account, 
-                                request.get("password"))
+            user_login = login(account, request.POST.get("password"))
             if user_login != None:
                 try:
                     # login(request, user_login) #log into the system
