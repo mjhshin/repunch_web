@@ -8,8 +8,9 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
-from parse.stores.forms import StoreForm as pStoreForm
-from parse.accounts.forms import AccountForm as pAccountForm,\
+from parse.apps.accounts import free
+from parse.apps.stores.forms import StoreForm as pStoreForm
+from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
 
 def index(request):
@@ -51,26 +52,35 @@ def sign_up(request):
         if store_pf.is_valid(store_form.errors) and\
             subscription_pf.is_valid(subscription_form and\
             account_pf.is_valid(account_form.errors) ):
-              
+
+            st, su, ac = store_pf, subscription_pf, account_pf
+            
             # save store
             tz = rputils.get_timezone('93003')
-            store_pf.store.store_timezone = tz.zone
-            store_pf.save()
+            st.store.store_timezone = tz.zone
+            st.save()
 
             # TODO: need to make this transactional
             # save subscription
-            subscription_pf.subscription.type_id = # TODO
-            subscription_pf.save()
+            su.subscription.type_id = free.objectId
+            su.save()
+
+            # TODO refactor templates to use parse forms instead
+            if su.subscription.cc_number:
+                cc = su.subscription.cc_number
+                mask = (len(cc)-4)*'*'
+                mask += cc[-4:]
+                subscription_form.data['cc_number'] = mask
+            # REMOVE -------------
             
-            subscription_pf.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
-            
-            account = account_form.save(commit=False)               
-            account.store = store
-            account.subscription = subscription
+            su.subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
+                      
+            acount = ac.account
+            account.store_id = store_pf.store.objectId
+            account.subscription_id = su.subscription
             account.set_password(request.POST.get('password'))
-            account.is_active = 1
             account.save()
-                                
+
             #auto login
             user_login = authenticate(username=account.username,
                     password=request.POST.get('password'))

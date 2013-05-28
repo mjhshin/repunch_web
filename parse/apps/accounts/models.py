@@ -1,6 +1,8 @@
 """
 Parse equivalence of Django apps.accounts.models
 """
+from datetime import datetime
+from django.contrib.auth.hashers import make_password
 
 from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject
@@ -17,8 +19,15 @@ class Account(ParseObject):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.phone = data.get('phone')
+        self.is_active = data.get('is_active', True)
+        self.is_staff = data.get('is_staff', False)
+        self.is_superuser = data.get('is_superuser', False)
 
         self.store_id = data.get('store_id')
+
+    def set_password(self, new_pass):
+        """ sets the password to a hashed new_pass """
+        self.password = make_password(new_pass)
 
     def get_settings(self):
         # TODO
@@ -52,6 +61,8 @@ class Invoice(ParseObject):
         self.avs_response = data.get('avs_response')
         self.trans_id = data.get('trans_id')
         self.amount = data.get('amount')
+
+        self.account_id = data.get('account_id')
     
     
 class Subscription(ParseObject):
@@ -111,9 +122,9 @@ class Subscription(ParseObject):
 		# in the PayPal vault.
         if credit_card.create():
             self.ppid = credit_card.id
-            self.ppvalid = datetime.datetime.strptime(credit_card.valid_until[:10], "%Y-%m-%d")
+            self.ppvalid = datetime.strptime(credit_card.valid_until[:10], "%Y-%m-%d")
 
-            self.save();
+            self.update();
             return True
         else:
             print("Error while creating CreditCard:")
@@ -142,9 +153,8 @@ class Subscription(ParseObject):
 
         if payment.create():
             invoice = Invoice()
-            invoice.account = Account.objects.filter(subscription=self).get() # TODO
-
-            invoice.charge_date = datetime.datetime.now()
+            invoice.account_id = self.objectId
+            invoice.charge_date = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':

@@ -6,8 +6,7 @@ import datetime, re, pytz
 from models import Account, Settings, Subscription, SubscriptionType
 from libs.repunch import rpforms, rpccutils, rputils
 
-class AccountForm(forms.ModelForm):
-    """ PARSE SAFE """    
+class AccountForm(forms.ModelForm):   
 
     confirm_password = forms.CharField(widget=forms.PasswordInput())
     
