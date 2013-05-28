@@ -4,7 +4,6 @@ Provides form validation for Parse classes from app.accounts.models
 
 from parse.apps.accounts.models import Account
 
-
 class AccountForm(object):
     """  Equivalence class of apps.accounts.forms.AccountForm """
     def __init__(self, data={}):
@@ -26,7 +25,6 @@ class AccountForm(object):
         
         return len(errors) == 0
 
-    def save(self):
-        """ posts up the data to Parse """
-        self.account.save()
-        return True
+    def create(self):
+        """ create a new Account in Parse """
+        return self.account.save()

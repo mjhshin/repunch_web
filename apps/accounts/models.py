@@ -83,7 +83,9 @@ class Subscription(models.Model):
 	# store credit card information
 	def store_cc(self, cc_number, cvv):
 		
-		paypalrestsdk.configure(mode=PAYPAL_MODE, client_id=PAYPAL_CLIENT_ID, client_secret=PAYPAL_CLIENT_SECRET)
+		paypalrestsdk.configure(mode=PAYPAL_MODE,
+                                client_id=PAYPAL_CLIENT_ID,
+                                client_secret=PAYPAL_CLIENT_SECRET)
 		
 		credit_card = paypalrestsdk.CreditCard({
 		# ###CreditCard

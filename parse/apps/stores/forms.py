@@ -27,9 +27,9 @@ class StoreForm(object):
         
         return len(errors) == 0
 
-    def save(self):
-        """ posts up the data to Parse """
-        self.store.save()
+    def create(self):
+        """ create a new Store in Parse """
+        self.store.create()
         return True
 
 

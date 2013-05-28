@@ -5,8 +5,15 @@ from parse.utils import parse
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models """
-    def create(self):
-        """ posts up the data to Parse """
+    def __init__(self):
+        # for future additions
+        pass
+
+    def save(self):
+        """ 
+        creates a new ParseObject if it does not exist yet.
+        
+        """
         parse('POST', 'classes/' + self.__class__.__name__,
                 self.__dict__)
         return True

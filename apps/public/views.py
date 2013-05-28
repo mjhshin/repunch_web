@@ -64,7 +64,7 @@ def sign_up(request):
             # save subscription
             subscription_pf.save()
             
-            subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
+            subscription_pf.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
             
             account = account_form.save(commit=False)               
             account.store = store
