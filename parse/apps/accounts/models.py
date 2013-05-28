@@ -13,8 +13,12 @@ from parse.utils import parse
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
-        This account is special in that it is the model for
-        Parse.User
+    This account is special in that it is the model for
+    Parse.User.
+        
+    IMPORTANT!
+    The Parse table of this class is the Parse.User table in the DB!
+    So don't go looking for an Account class in the Data Browser!
     """
     def __init__(self, data={}):
         super(Account, self).__init__()
@@ -30,7 +34,7 @@ class Account(ParseObject):
         self.is_superuser = data.get('is_superuser', False)
         self.sessionToken = data.get('sessionToken')
 
-        self.Account = data.get('Account')
+        self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')
 
     def path(self):

@@ -38,13 +38,20 @@ def parse(method, path, data=None, query=None):
         conn.request("PUT", '/' + PARSE_VERSION + '/' + path+\
                 '%s' % (query, ), json.dumps(data),
                 REST_CONNECTION_META)
-
     try:
         result = json.loads(conn.getresponse().read())
-    except ValueError:
-        result = None
+    except ValueError as e:
+        conn.close()
+        return None
 
     conn.close()
+    
+    if "results" in result:
+        if len(result["results"]) > 0:
+            return result["results"][0]
+        else:
+            return None
+
     return result
 
 
@@ -65,7 +72,8 @@ def login(account, raw_pass):
     """
     res = parse("GET", "login", query={"username":account.username,
                     "password":make_password(account.password)} )
-    if res:
+    print res
+    if res and "error" not in res:
         account.update_locally(res)
     else:
         return None

@@ -63,10 +63,13 @@ class ParseObject(object):
             for key, value in rels.iteritems():
                 data[key] = value
         res = parse("PUT", self.path(), data, self.objectId)
-        if "error" in res:
-            return False
-        self.update_locally(res)
-        return True
+        if res:
+            if "error" in res:
+                return False
+            self.update_locally(res)
+            return True
+
+        return False
 
     def fetchAll(self):
         """ 
@@ -101,10 +104,13 @@ class ParseObject(object):
             for key, value in rels.iteritems():
                 data[key] = value
         res = parse('POST', self.path(), data)
-        if "error" in res:
-            return False
-        self.update_locally(res)
-        return True
+        if res:
+            if "error" in res:
+                return False
+            self.update_locally(res)
+            return True
+        
+        return False
 
     def delete(self):
         """ delete the row corresponding to this object in Parse """
