@@ -21,3 +21,4 @@ class Store(ParseObject):
         self.store_avatar = data.get('store_avatar')
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
+

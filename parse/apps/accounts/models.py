@@ -62,7 +62,7 @@ class Invoice(ParseObject):
         self.trans_id = data.get('trans_id')
         self.amount = data.get('amount')
 
-        self.account_id = data.get('account_id')
+        self.Account_id = data.get('Account_id')
     
     
 class Subscription(ParseObject):
@@ -86,7 +86,7 @@ class Subscription(ParseObject):
         self.ppid = data.get('ppid')
         self.ppvalid = data.get('ppvalid')
 
-        self.type_id = data.get('subscriptionType_id')
+        self.SubscriptionType_id = data.get('subscriptionType_id')
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """

@@ -24,7 +24,6 @@ class AccountForm(forms.ModelForm):
         
         
 class SubscriptionForm(forms.ModelForm):
-    """ PARSE SAFE """    
 
     cc_cvv = forms.CharField()
     recurring = forms.NullBooleanField(widget=forms.CheckboxInput(), required=True)

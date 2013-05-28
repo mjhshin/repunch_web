@@ -3,8 +3,10 @@ Helpers methods for parse.apps to enfore the DRY principle.
 """
 
 import json, httplib, urllib
+from django.contrib.auth.hashers import make_password
 
 from repunch.settings import PARSE_VERSION, REST_CONNECTION_META
+from parse.apps.accounts.models import Account    
 
 def parse(method, path, data=None, query=None):
     """
@@ -45,3 +47,27 @@ def parse(method, path, data=None, query=None):
 
     conn.close()
     return result
+
+
+def authenticate(user, raw_pass):
+    """ returns True if the hash of raw_pass == the pass in the DB.
+        pass2 is the hash stored in the DB- which is hashed. 
+        Returns the Account object if successful, otherwise None.
+    """
+    res = parse("GET", user.path(), query)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

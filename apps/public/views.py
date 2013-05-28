@@ -8,7 +8,7 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
-from parse.apps.accounts import free
+from parse.apps.accounts.cache import free
 from parse.apps.stores.forms import StoreForm as pStoreForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
@@ -74,7 +74,6 @@ def sign_up(request):
             # REMOVE -------------
             
             su.subscription.store_cc(subscription_form.data['cc_number'], subscription_form.data['cc_cvv']);
-                      
             acount = ac.account
             account.store_id = store_pf.store.objectId
             account.subscription_id = su.subscription
@@ -82,8 +81,8 @@ def sign_up(request):
             account.save()
 
             #auto login
-            user_login = authenticate(username=account.username,
-                    password=request.POST.get('password'))
+            user_login = authenticate(account, 
+                                request.get("password"))
             if user_login != None:
                 try:
                     login(request, user_login) #log into the system
@@ -91,7 +90,7 @@ def sign_up(request):
                     print(e)
                 request.session['account'] = account
                 
-                #need to set this for the auto long
+                # need to set this for the auto long
                 rputils.set_timezone(request, tz)
                 return redirect(reverse('store_index'))
             else:

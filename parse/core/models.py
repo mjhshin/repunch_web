@@ -1,7 +1,6 @@
 """
 Core models for the Parse interface.
 """
-from django.contrib.auth.hashers import make_password
 
 from parse.utils import parse
 
@@ -22,11 +21,41 @@ class ParseObject(object):
         """
         return "classes/" + self.__class__.__name__
         
+connection.request('PUT', '/1/classes/GameScore/7Lw8Jo8Lv0', json.dumps({
+       "opponents": {
+         "__op": "AddRelation",
+         "objects": [
+           {
+             "__type": "Pointer",
+             "className": "Player",
+             "objectId": "x64dPWz09W"
+           }
+         ]
+       }
+     }),  REST_CONNECTION_META)
+
 
     def update(self):
         """ Save changes to this object to the Parse DB.
-            Returns True if update is successful. """
-        parse("PUT", self.path(), self.__dict__, self.objectId)
+            Returns True if update is successful. 
+            
+            If there exist a relation to other objects,
+            this method makes sure that the relation exists.
+        """
+        rels = []
+        # check for relations
+        for f in self.__dic__.iterkeys():
+            if f.endswith("_id"):
+                rels.append(f)
+
+        # format the relation to put in data
+        if rels:
+            data = self.__dict__[:]
+            for rel in rels:
+                pass
+            parse("PUT", self.path(), data, self.objectId)
+        else:
+            parse("PUT", self.path(), self.__dict__, self.objectId)
 
     def fetchAll(self):
         """ 

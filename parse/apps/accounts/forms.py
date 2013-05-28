@@ -39,7 +39,6 @@ class SubscriptionForm(object):
                 errors["cc_expiration"] = "Your credit card has"+\
                                         " expired!"
         
-
     def save(self):
         """ create a new subscription in Parse """
         self.subscription.save()
@@ -60,7 +59,6 @@ class AccountForm(object):
     
         # TODO VALIDATE STORE_ID AND SUBSCRIPTION_ID
         # username should also be unique
-        
         
         return len(errors) == 0
 
