@@ -46,9 +46,12 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     sessionToken - which should be the same (and not None)
     """
     actual_decorator = user_passes_test(
-        lambda req: req.session[SESSION_KEY] == req.session['account'].sessionToken and req.session['account'].sessionToken,
-        login_url=login_url,
-        redirect_field_name=redirect_field_name
+        lambda req: req.session.get('account') and\
+                    req.session[SESSION_KEY] ==\
+                    req.session['account'].sessionToken and\
+                    req.session['account'].sessionToken,
+                    login_url=login_url,
+                    redirect_field_name=redirect_field_name
     )
     if function:
         return actual_decorator(function)

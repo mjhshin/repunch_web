@@ -6,9 +6,25 @@ import re
 from datetime import datetime
 from django.core.validators import email_re
 
+from parse.auth import login
 from parse.apps.accounts.models import Account, Subscription
 from libs.repunch import rpforms, rpccutils, rputils
 
+class LoginForm(object):
+    """  Equivalence class of apps.accounts.forms.LoginForm """
+    def __init__(self, data={}):
+        self.username = data.get('username')
+        self.password = data.get('password')
+    
+    def do_login(self, request):
+        account = login(request, request.POST.get('username'), 
+                            request.POST.get("password"), Account())
+        # rputils.set_timezone(request, pytz.timezone(account.store.store_timezone)) TODO
+        return account
+
+    def is_valid(self):
+        # TODO
+        return True
 
 class SubscriptionForm(object):
     """  Equivalence class of apps.accounts.forms.SubscriptionForm """

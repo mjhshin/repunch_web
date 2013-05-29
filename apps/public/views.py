@@ -14,6 +14,8 @@ from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
 
+# TODO REPLACE DJANGO FORMS
+
 def index(request):
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)

@@ -10,20 +10,68 @@ register = template.Library()
 
 @register.assignment_tag
 def feedback_unread(store):
-    return 0
+    return Feedback.objects.filter(store_id=store.id, status=0).count()
 
 
 @register.assignment_tag
 def employees_pending(store):
-    return 0
+    return Employee.objects.filter(store_id=store.id, status=0).count()
 
 
 @register.simple_tag
 def hours(store):
-    return "HELLO"
+    return HoursInterpreter(hours=Hours.objects.filter(store_id=store.id).order_by('list_order')).readable() 
 
 
 @register.simple_tag
 def time_selector(fieldid, timestamp):
     
-    return "HELLO"
+    thour = 10
+    tmin = 0
+        
+    if timestamp != None:
+        if isinstance(timestamp, datetime.time):
+            thour = timestamp.hour
+            tmin = timestamp.minute
+        else:
+            thour, tmin, _ = timestamp.split(':')
+            thour = int(thour)
+            tmin = int(tmin)
+    
+    rv = ['<select id="id_',fieldid,'" name="',fieldid,'">']
+    
+    # midnight
+    if thour == 0:
+        rv.extend(('<option ', ('selected' if  tmin == 0 else ''),' value="0:00:00">12:00 AM</option>',
+                       '<option ', ('selected' if  tmin == 30 else ''),' value="0:30:00">12:30 AM</option>'))
+    else:
+        rv.extend(('<option value="0:00:00">12:00 AM</option>',
+                   '<option value="0:30:00">12:30 AM</option>'))
+    
+    # morning
+    for hour in range(1, 12):
+        if hour == thour:
+            rv.extend(('<option ', ('selected' if  tmin == 0  else ''),' value="',str(hour),':00:00">',str(hour),':00 AM</option>',
+                       '<option ', ('selected' if  tmin == 30   else ''),' value="',str(hour),':30:00">',str(hour),':30 AM</option>'))
+        else:
+            rv.extend(('<option value="',str(hour),':00:00">',str(hour),':00 AM</option>',
+                       '<option value="',str(hour),':30:00">',str(hour),':30 AM</option>'))
+        
+    # noon
+    if thour == 12:
+        rv.extend(('<option ', ('selected' if  tmin == 0  else ''),' value="12:00:00">12:00 PM</option>',
+                       '<option ', ('selected' if  tmin == 0  else ''),' value="12:30:00">12:30 PM</option>'))
+    else:
+        rv.extend(('<option value="12:00:00">12:00 PM</option>',
+                   '<option value="12:30:00">12:30 PM</option>'))
+        
+    for hour in range(1, 12):
+        if (hour + 12) == thour:
+            rv.extend(('<option ', ('selected' if  tmin == 0 else ''),' value="',str(hour+12),':00:00">',str(hour),':00 PM</option>',
+                       '<option ', ('selected' if  tmin == 30 else ''),' value="',str(hour+12),':30:00">',str(hour),':30 PM</option>'))
+        else:
+            rv.extend(('<option value="',str(hour+12),':00:00">',str(hour),':00 PM</option>',
+                       '<option value="',str(hour+12),':30:00">',str(hour),':30 PM</option>'))
+
+    rv.append('</select>')
+    return ''.join(rv)
