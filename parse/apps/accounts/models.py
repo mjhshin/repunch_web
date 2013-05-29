@@ -11,6 +11,7 @@ from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject
 from parse.utils import parse
 from parse.auth import hash_password
+from parse.apps.accounts.cache import free
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -55,13 +56,8 @@ class Account(ParseObject):
         self.password = hash_password(new_pass)
 
     def get_settings(self):
-        # TODO
-        return None
+        return self.get("settings") 
 
-    def is_authenticated(self):
-        """ returns True if sessionToken if available """
-        return self.sessionToken is not None
-        
     def get_sents_available(self):
         """
         returns how many messages can be sent this month
@@ -70,15 +66,29 @@ class Account(ParseObject):
         return None
     
     def is_free(self):
-        # TODO
-        return True
+		return self.get('subscription').get('subscriptionType').objectId == free.objectId)
 
-    def upgrade(self):
-        # TODO
-        return False
+    def change_subscriptionType(self, sub_type):
+        """ change the SubscriptionType of this account to sub_type.
+        sub_type is the objectId of the SubscriptionType """
+        subscription = self.get("subscription")
+        subscription.set("SubscriptionType", sub_type)
+        subscription.update()
+
+class Settings(ParseObject):
+    """ Equivalence class of apps.accounts.models.Settings """
+    def __init__(self, data={}):
+        self.punches_customer = data.get("punches_customer")
+        self.punches_employee = data.get("punches_employee")
+        self.punches_facebook = data.get("punches_facebook")    
+        self.retailer_id = data.get("retailer_id")
+
+        self.Account = data.get("Account")      
+        self.account = None
+        
 
 class Invoice(ParseObject):
-    """ Equivalence class of apps.accounts.models.Subscription """
+    """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, data={}):
         self.charge_date = data.get('charge_date')
         self.status = data.get('status')
@@ -211,13 +221,16 @@ class SubscriptionType(ParseObject):
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
 
+    FREE = "Free"
+    MIDDLEWEIGHT = "MiddleWeight"
+    HEAVYWEIGHT = "HeavyWeight"
+
     def __init__(self, data={}):
-        self.name = data.get('name')
-        self.description = data.get('description')
+        self.name = data.get('name', FREE)
+        self.description = data.get('description', "Free membership")
         self.monthly_cost = data.get('monthly_cost', 0)
-        self.max_users = data.get('max_users', 0)
-        self.max_messages = data.get('max_messages', 0)
-        self.level = data.get('level', 0)
+        self.max_users = data.get('max_users', 50)
+        self.max_messages = data.get('max_messages', 1)
         self.status = data.get('status', SubscriptionType.ACTIVE)
 
         super(SubscriptionType, self).__init__(data)

@@ -5,10 +5,25 @@ from repunch.settings import TIME_ZONE
 from parse.utils import parse
 from parse.core.models import ParseObject
 
+DAYS = ((1, 'Sunday'),
+		(2, 'Monday'),
+        (3, 'Tuesday'),
+        (4, 'Wednesday'),
+        (5, 'Thursday'),
+        (6, 'Friday'),
+        (7, 'Saturday'))
+
+SHORT_DAYS = ((1, 'Sun'),
+		(2, 'Mon'),
+        (3, 'Tues'),
+        (4, 'Wed'),
+        (5, 'Thurs'),
+        (6, 'Fri'),
+        (7, 'Sat'))
+
 class Store(ParseObject):
-    """ Equivalence class of apps.accounts.models.Account """
+    """ Equivalence class of apps.accounts.models.Store """
     def __init__(self, data={}):
-        super(Store, self).__init__(data)
         self.store_name = data.get('store_name')
         self.city = data.get('city')
         self.state = data.get('state')
@@ -20,4 +35,21 @@ class Store(ParseObject):
         self.store_avatar = data.get('store_avatar')
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
+
+        super(Store, self).__init__(data)
+
+class Hours(ParseObject):
+    """ Equivalence class of apps.accounts.models.Hours """
+
+    def __init__(self, data={}):
+        self.days = data.get('days')
+        self.open = data.get('open')
+        self.close = data.get('close')
+        self.list_order = data.get('list_order')
+
+        super(Hours, self).__init__(data)
+
+
+
+
 

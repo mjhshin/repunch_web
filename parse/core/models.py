@@ -1,5 +1,5 @@
 """
-Core models for the Parse interface.
+Parse models corresponding to Django models
 """
 
 from parse.utils import parse
@@ -18,6 +18,9 @@ class ParseObject(object):
             This can be used as a cache.
         3. the init method of this class must be called in the 
             __init__ method of the subclass with the initial data
+        4. use the get(self, attr) method to get an attribute.
+            Do not reference the attrs directly by using a dot UNLESS
+            the attribute is objectId, createdAt, or updatedAt.
     """
     def __init__(self, data={}):
         self.objectId = data.get('objectId')
@@ -43,7 +46,7 @@ class ParseObject(object):
                 else:
                     self.__dict__[key] = value
 
-    def get_relations(self):
+    def get_pointers(self):
         """
         Returns a dictionary of relations of this class.
         A relation is an attribute of this class if the first
@@ -103,25 +106,37 @@ class ParseObject(object):
 
         return self.__dict__[attr]
 
+    def set(self, attr, val):
+        """ set this object's attr to val. This does not commit
+        anything up to Parse. """
+        self.__dict__[attr] = val
+        
+
     def update(self):
         """ Save changes to this object to the Parse DB.
         Returns True if update is successful. 
         
         If there exist a relation to other objects,
-        this method makes sure that the relation exists.
+        this method makes sure that the relation exists-
+        only supports Pointer __type at the moment.
         """
         # exclude cache attrs
         data = {}
         for key, value in self.__dict__.iteritems():
             if key[0].islower() and\
                     key[0].upper() + key[1:] in self.__dict__:
+                # clear the cache objects if their pointers changed
+                if value and value.objectId !=\
+                    self.__dict__[key[0].upper() + key[1:]]:
+                    self.__dict__[key[0].upper() + key[1:]] = None
                 continue
             data[key] = value
         
-        rels = self.get_relations()
+        rels = self.get_pointers()
         if rels:
             for key, value in rels.iteritems():
                 data[key] = value
+
         res = parse("PUT", self.path(), data, self.objectId)
         if res:
             if "error" in res:
@@ -130,17 +145,6 @@ class ParseObject(object):
             return True
 
         return False
-
-    def refresh(self):
-        """ 
-        Fetches all the attributes of this object from the DB.        
-
-        Must have the objectId available or this does nothing and
-        returns False.
-        """
-        if not self.objectId:
-            return False
-        # TODO 
 
     def save(self):
         """ 
@@ -166,7 +170,7 @@ class ParseObject(object):
                 continue
             data[key] = value
 
-        rels = self.get_relations()
+        rels = self.get_pointers()
         if rels:
             for key, value in rels.iteritems():
                 data[key] = value
@@ -179,6 +183,17 @@ class ParseObject(object):
             return True
         
         return False
+
+    def refresh(self):
+        """ 
+        Fetches all the attributes of this object from the DB.        
+
+        Must have the objectId available or this does nothing and
+        returns False.
+        """
+        if not self.objectId:
+            return False
+        # TODO 
 
     def delete(self):
         """ delete the row corresponding to this object in Parse """

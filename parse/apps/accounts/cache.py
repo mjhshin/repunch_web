@@ -15,5 +15,6 @@ free_type = {"name":"Free", "description":"Free membership",
 free = parse("GET", "classes/SubscriptionType", query={
                 "where":dumps(free_type)})
 if not 'results' in free or not free['results']:
-    free = parse("POST", "classes/SubscriptionType", data=free_type)
-
+    free = SubscriptionType(parse("POST", "classes/SubscriptionType", data=free_type))
+else:
+    free = SubscriptionType(free['results'][0])

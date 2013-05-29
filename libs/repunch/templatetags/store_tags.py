@@ -1,10 +1,12 @@
 from django import template
-from apps.messages.models import Feedback
+import datetime
+
 from apps.employees.models import Employee
 from apps.stores.models import Hours
 from apps.stores import models
 from libs.repunch.rphours_util import HoursInterpreter
-import datetime
+
+from parse.apps.messages.models import Feedback
 
 register = template.Library()
 

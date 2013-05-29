@@ -65,7 +65,7 @@ def sign_up(request):
 
             # TODO: need to make this transactional
             # save subscription
-            su.subscription.SubscriptionType = free.get('results')[0].get("objectId")
+            su.subscription.SubscriptionType = free.objectId
             su.save()
 
             # TODO refactor templates to use parse forms instead
