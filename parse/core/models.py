@@ -31,10 +31,14 @@ class ParseObject(object):
     def update_locally(self, data):
         """
         Replaces values of matching attributes in data
+        capitalized attributes only store an objectId.
         """
         for key, value in data.iteritems():
             if key in self.__dict__.iterkeys():
-                self.__dict__[key] = value
+                if key[0].isupper() and type(value) is dict:
+                    self.__dict__[key] = value.get('objectId')
+                else:
+                    self.__dict__[key] = value
 
     def get_relations(self):
         """
@@ -158,6 +162,7 @@ class ParseObject(object):
             for key, value in rels.iteritems():
                 data[key] = value
         res = parse('POST', self.path(), data)
+        
         if res:
             if "error" in res:
                 return False
