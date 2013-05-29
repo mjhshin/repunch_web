@@ -43,12 +43,6 @@ def parse(method, path, data=None, query=None):
         return None
 
     conn.close()
-    
-    if "results" in result:
-        if len(result["results"]) > 0:
-            return result["results"][0]
-        else:
-            return None
 
     return result
 

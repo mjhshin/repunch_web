@@ -26,6 +26,7 @@ def login(request, username, password, account):
     """
     res = parse("GET", "login", query={"username":username,
                     "password":hash_password(password)} )
+
     if res and "error" not in res:
         account.update_locally(res)
         request.session[SESSION_KEY] = account.sessionToken

@@ -218,7 +218,7 @@ class SubscriptionType(ParseObject):
         self.max_users = data.get('max_users', 0)
         self.max_messages = data.get('max_messages', 0)
         self.level = data.get('level', 0)
-        self.status = data.get('status', ACTIVE)
+        self.status = data.get('status', SubscriptionType.ACTIVE)
 
         super(SubscriptionType, self).__init__(data)
 

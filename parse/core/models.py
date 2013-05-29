@@ -99,7 +99,7 @@ class ParseObject(object):
                     return None
         else: # attr is a regular attr
             res = parse("GET", self.path(), query={"keys":attr})
-            self.update_locally(res)
+            self.update_locally(res.get('results')[0])
 
         return self.__dict__[attr]
 

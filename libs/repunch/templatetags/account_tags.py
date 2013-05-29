@@ -3,6 +3,7 @@ from django import template
 import datetime
 
 from apps.messages.models import Message
+from parse.utils import parse
 
 register = template.Library()
 
@@ -39,8 +40,9 @@ def account_alert(account):
 def account_message_usage(account, percent_of=None):
     atype = account.get('subscription').get('type')
     now = datetime.datetime.now()
-    
-    message_count = Message.objects.filter(date_sent__year=now.year, date_sent__month=now.month, store=account.store ).count()    
+
+    Message.objects.filter(date_sent__year=now.year,
+        date_sent__month=now.month, store=account.store ).count()    
     
     percent = message_count/atype.max_messages
     if(percent > 1): #don't go past 1
