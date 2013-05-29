@@ -9,8 +9,8 @@ register = template.Library()
 @register.simple_tag
 def account_user_usage(account, percent_of=None):
     
-    store = account.store
-    atype = account.subscription.type
+    store = account.get('store')
+    atype = account.get('subscription').get('subscriptionType')
     
     if atype.max_users == -1:
         percent = 0
@@ -26,8 +26,9 @@ def account_user_usage(account, percent_of=None):
 
 @register.assignment_tag
 def account_alert(account):
-    store = account.store
-    atype = account.subscription.type
+    store = account.get('store')
+    print account.__dict__
+    atype = account.get('subscription').get('subscriptionType')
     
     # may cause division by 0!!!
     percent = store.active_users / atype.max_users
@@ -37,10 +38,10 @@ def account_alert(account):
 
 @register.simple_tag
 def account_message_usage(account, percent_of=None):
-    atype = account.subscription.type
+    atype = account.get('subscription').get('subscriptionType')
     now = datetime.datetime.now()
     
-    message_count = Message.objects.filter(date_sent__year=now.year, date_sent__month=now.month, store=account.store ).count()    
+    message_count = Message.objects.filter(date_sent__year=now.year, date_sent__month=now.month, store=account.get('store') ).count()    
     
     percent = message_count/atype.max_messages
     if(percent > 1): #don't go past 1
@@ -53,7 +54,7 @@ def account_message_usage(account, percent_of=None):
 
 @register.simple_tag
 def account_user_count(account):
-    return account.store.active_users
+    return account.get('store').active_users
     
 
 @register.simple_tag
@@ -61,5 +62,5 @@ def account_message_count(account):
     
     now = datetime.datetime.now()
     
-    return Message.objects.filter(date_sent__year=now.year, date_sent__month=now.month, store=account.store ).count()
+    return Message.objects.filter(date_sent__year=now.year, date_sent__month=now.month, store=account.get('store') ).count()
 

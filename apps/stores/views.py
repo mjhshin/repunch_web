@@ -9,7 +9,6 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from parse.auth.decorators import login_required
 
-
 @login_required
 def index(request):
     data = {'account_nav': True}
@@ -20,7 +19,6 @@ def index(request):
         data['error'] = request.GET.get("error")
     
     return render(request, 'manage/store_details.djhtml', data)
-
 
 @login_required
 def edit(request):

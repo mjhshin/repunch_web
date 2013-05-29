@@ -37,6 +37,18 @@ class Account(ParseObject):
         self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')
 
+        # actual objects used for caching
+        self.store = None
+        self.subscription = None
+
+    def get_class(self, className):
+        if className == "Subscription":
+            return getattr(__import__('parse.apps.accounts.models'),
+                                className)
+        elif className == "Store":
+            return getattr(__import__('parse.apps.stores.models'),
+                                className)
+
     def path(self):
         return "users"
 
@@ -82,7 +94,13 @@ class Invoice(ParseObject):
         self.amount = data.get('amount')
 
         self.Account = data.get('Account')
-    
+        
+        self.account = None
+        
+    def get_class(self, className):
+        if className == "Account":
+            return getattr(__import__('parse.apps.accounts.models'),
+                                className)
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
@@ -107,6 +125,13 @@ class Subscription(ParseObject):
         self.ppvalid = data.get('ppvalid')
 
         self.SubscriptionType = data.get('SubscriptionType')
+
+        self.subscriptionType = None
+
+    def get_class(self, className):
+        if className == "SubscriptionType":
+            return getattr(__import__('parse.apps.accounts.models'),
+                                className)
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """

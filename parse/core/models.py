@@ -6,8 +6,16 @@ from parse.utils import parse
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models 
-        This class is abstract and no concrete objects should be
-        created using this class.
+    This class is abstract and no concrete objects should be
+    created using this class.
+
+    Rules:
+        1. If the first letter of an attribute is capitalized, then
+            it is treated as a Pointer or Relation
+        2. If the first letter of an lower case and there exist a #1
+            matching the attr if it was capitalized, 
+            then the attr will not be saved to Parse.
+            This can be used as a cache.
     """
     def __init__(self):
         self.objectId = None
@@ -50,6 +58,38 @@ class ParseObject(object):
                 }
         return data
 
+    def get_class(self, className):
+        """
+        Need to override this for every class in order to use caching.
+        Returns the class with the className.
+        TODO Automate this process?
+        """
+        return None
+
+    def get(self, attr):
+        """ returns attr if it is not None, otherwise fetches the 
+        attr from the Parse DB and returns that. 
+
+        If the attr is a #2, then it is treated
+        as a cache for a ParseObject. Note that all of this 
+        attribute's data is retrieved.
+        """    
+        if attr not in self.__dict__:
+            return None
+        if self.__dict__.get(attr) is not None and\
+            not (key[0].islower() and\
+                    key.capitalize() in self.__dict__):
+            return self.__dict__.get(attr)
+
+        # fetch the data
+        res = parse("GET", "classes/" + attr.capitalize() +\
+                        "/" + self.__dict__.get(attr.capitalize()))
+        if "error" not in res:
+            c = self.get_class(attr.capitalize())
+            self.__dict__[attr] = c(res)
+    
+        return self.__dict__.get(attr)
+
     def update(self):
         """ Save changes to this object to the Parse DB.
         Returns True if update is successful. 
@@ -57,7 +97,14 @@ class ParseObject(object):
         If there exist a relation to other objects,
         this method makes sure that the relation exists.
         """
-        data = self.__dict__.copy()
+        # exclude cache attrs
+        data = {}
+        for key, value in self.__dict__.iteritems():
+            if key[0].islower() and\
+                    key.capitalize() in self.__dict__:
+                continue
+            data[key] = value
+        
         rels = self.get_relations()
         if rels:
             for key, value in rels.iteritems():
@@ -71,7 +118,7 @@ class ParseObject(object):
 
         return False
 
-    def fetchAll(self):
+    def refresh(self):
         """ 
         Fetches all the attributes of this object from the DB.        
 
@@ -98,7 +145,14 @@ class ParseObject(object):
         If there exist a relation to other objects,
         this method makes sure that the relation exists.
         """
-        data = self.__dict__.copy()
+         # exclude cache attrs
+        data = {}
+        for key, value in self.__dict__.iteritems():
+            if key[0].islower() and\
+                    key.capitalize() in self.__dict__:
+                continue
+            data[key] = value
+
         rels = self.get_relations()
         if rels:
             for key, value in rels.iteritems():
