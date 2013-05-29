@@ -1,10 +1,10 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from django.http import HttpResponse
 from datetime import timedelta
 import datetime, json
 
+from parse.auth.decorators import login_required
 from apps.rewards.models import Reward
 from apps.employees.models import Employee
 from apps.patrons.models import Patron, FacebookPost

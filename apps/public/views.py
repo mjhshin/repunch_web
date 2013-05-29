@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login # TODO replace
 
 from apps.accounts.models import SubscriptionType, Subscription
 from apps.accounts.forms import AccountForm, SubscriptionForm
@@ -8,7 +7,8 @@ from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
-from parse.utils import login
+from parse.auth import login
+from parse.apps.accounts.models import Account
 from parse.apps.accounts.cache import free
 from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
@@ -83,23 +83,15 @@ def sign_up(request):
             account.set_password(request.POST.get('password'))
             account.save()
 
-            #auto login
-            user_login = login(account, request.POST.get("password"))
+            # auto login
+            user_login = login(request, account.username, 
+                            request.POST.get("password"), Account())
             if user_login != None:
-                try:
-                    # login(request, user_login) #log into the system
-                    # must do this myself TODO
-                    pass
-                except Exception as e:
-                    print(e)
-                request.session['account'] = account
-                
                 # need to set this for the auto long
                 rputils.set_timezone(request, tz)
                 return redirect(reverse('store_index'))
             else:
-                # TODO: handle this
-                # should never go here though
+                # TODO: should never go here though
                 pass
                     
     else:

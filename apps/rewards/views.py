@@ -1,9 +1,9 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 import urllib
 
+from parse.auth.decorators import login_required
 from apps.rewards.models import Reward
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 

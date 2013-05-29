@@ -3,7 +3,6 @@ Helpers methods for parse.apps to enfore the DRY principle.
 """
 
 import json, httplib, urllib
-from django.contrib.auth.hashers import make_password
 
 from repunch.settings import PARSE_VERSION, REST_CONNECTION_META   
 
@@ -27,7 +26,10 @@ def parse(method, path, data=None, query=None):
                         json.dumps(data), REST_CONNECTION_META)
     elif method == "GET":
         if query:
-            params = '?' + urllib.urlencode({"where":\
+            if path == "login":
+                params = '?' + urllib.urlencode(query)
+            else:
+                params = '?' + urllib.urlencode({"where":\
                                         json.dumps(query)})
         else:
             params = ''
@@ -54,29 +56,6 @@ def parse(method, path, data=None, query=None):
 
     return result
 
-
-def login(account, raw_pass):
-    """ 
-    returns True if the hash of raw_pass == the pass in the DB.
-    pass2 is the hash stored in the DB- which is hashed. 
-    Returns the Account object if successful, otherwise None.
-
-    If authentication is successful, account is updated {
-      "username": "cooldude6",
-      "phone": "415-392-0202",
-      "createdAt": "2011-11-07T20:58:34.448Z",
-      "updatedAt": "2011-11-07T20:58:34.448Z",
-      "objectId": "g7y9tkhB7O",
-      "sessionToken": "pnktnjyb996sj4p156gjtp4im"
-    }
-    """
-    res = parse("GET", "login", query={"username":account.username,
-                    "password":make_password(account.password)} )
-    print res
-    if res and "error" not in res:
-        account.update_locally(res)
-    else:
-        return None
     
     
 

@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -8,6 +7,7 @@ from apps.stores.models import Store, Hours
 from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
+from parse.auth.decorators import login_required
 
 
 @login_required

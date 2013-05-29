@@ -1,9 +1,9 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 import json, urllib
 
+from parse.auth.decorators import login_required
 from forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 

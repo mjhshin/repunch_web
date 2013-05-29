@@ -2,7 +2,6 @@
 Parse equivalence of Django apps.accounts.models
 """
 from datetime import datetime
-from django.contrib.auth.hashers import make_password
 import paypalrestsdk
 
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
@@ -10,6 +9,7 @@ PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject
 from parse.utils import parse
+from parse.auth import hash_password
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -42,11 +42,15 @@ class Account(ParseObject):
 
     def set_password(self, new_pass):
         """ sets the password to a hashed new_pass """
-        self.password = make_password(new_pass)
+        self.password = hash_password(new_pass)
 
     def get_settings(self):
         # TODO
         return None
+
+    def is_authenticated(self):
+        """ returns True if sessionToken if available """
+        return self.sessionToken is not None
         
     def get_sents_available(self):
         """

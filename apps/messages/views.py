@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
@@ -6,6 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 import urllib, datetime
 
+from parse.auth.decorators import login_required
 from apps.messages.models import Message, Feedback
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils

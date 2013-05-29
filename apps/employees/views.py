@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
@@ -7,6 +6,7 @@ from django.db.models import Sum
 from datetime import datetime
 import urllib, json
 
+from parse.auth.decorators import login_required
 from apps.employees.models import Employee
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
