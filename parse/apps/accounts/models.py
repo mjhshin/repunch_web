@@ -2,6 +2,7 @@
 Parse equivalence of Django apps.accounts.models
 """
 from datetime import datetime
+from importlib import import_module
 import paypalrestsdk
 
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
@@ -21,8 +22,6 @@ class Account(ParseObject):
     So don't go looking for an Account class in the Data Browser!
     """
     def __init__(self, data={}):
-        super(Account, self).__init__()
-        self.objectId = data.get('objectId')
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
@@ -36,18 +35,17 @@ class Account(ParseObject):
 
         self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')
-
         # actual objects used for caching
         self.store = None
         self.subscription = None
 
+        super(Account, self).__init__(data)
+
     def get_class(self, className):
         if className == "Subscription":
-            return getattr(__import__('parse.apps.accounts.models'),
-                                className)
+            return getattr(import_module('parse.apps.accounts.models'), className)
         elif className == "Store":
-            return getattr(__import__('parse.apps.stores.models'),
-                                className)
+            return getattr(import_module('parse.apps.stores.models'), className)
 
     def path(self):
         return "users"
@@ -82,8 +80,6 @@ class Account(ParseObject):
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
     def __init__(self, data={}):
-        super(Invoice, self).__init__()
-        self.objectId = data.get('objectId')
         self.charge_date = data.get('charge_date')
         self.status = data.get('status')
         self.response = data.get('response')
@@ -94,13 +90,13 @@ class Invoice(ParseObject):
         self.amount = data.get('amount')
 
         self.Account = data.get('Account')
-        
         self.account = None
+        
+        super(Invoice, self).__init__(data)
         
     def get_class(self, className):
         if className == "Account":
-            return getattr(__import__('parse.apps.accounts.models'),
-                                className)
+            return getattr(import_module('parse.apps.accounts.models'), className)
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
@@ -108,8 +104,6 @@ class Subscription(ParseObject):
     INACTIVE = 'Inactive'
     ERROR = "Billing Error"
     def __init__(self, data={}):
-        super(Subscription, self).__init__()
-        self.objectId = data.get('objectId')
         self.status = data.get('status')
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
@@ -125,13 +119,13 @@ class Subscription(ParseObject):
         self.ppvalid = data.get('ppvalid')
 
         self.SubscriptionType = data.get('SubscriptionType')
-
         self.subscriptionType = None
+
+        super(Subscription, self).__init__(data)
 
     def get_class(self, className):
         if className == "SubscriptionType":
-            return getattr(__import__('parse.apps.accounts.models'),
-                                className)
+            return getattr(import_module('parse.apps.accounts.models'), className)
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """
@@ -218,8 +212,6 @@ class SubscriptionType(ParseObject):
     INACTIVE = 'Inactive'
 
     def __init__(self, data={}):
-        super(SubscriptionType, self).__init__()
-        self.objectId = data.get('objectId')
         self.name = data.get('name')
         self.description = data.get('description')
         self.monthly_cost = data.get('monthly_cost', 0)
@@ -227,6 +219,8 @@ class SubscriptionType(ParseObject):
         self.max_messages = data.get('max_messages', 0)
         self.level = data.get('level', 0)
         self.status = data.get('status', ACTIVE)
+
+        super(SubscriptionType, self).__init__(data)
 
 
 

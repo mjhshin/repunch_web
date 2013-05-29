@@ -8,8 +8,7 @@ from parse.core.models import ParseObject
 class Store(ParseObject):
     """ Equivalence class of apps.accounts.models.Account """
     def __init__(self, data={}):
-        super(Store, self).__init__()
-        self.objectId = data.get('objectId')
+        super(Store, self).__init__(data)
         self.store_name = data.get('store_name')
         self.city = data.get('city')
         self.state = data.get('state')

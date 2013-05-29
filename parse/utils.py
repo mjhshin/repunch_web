@@ -26,11 +26,7 @@ def parse(method, path, data=None, query=None):
                         json.dumps(data), REST_CONNECTION_META)
     elif method == "GET":
         if query:
-            if path == "login":
-                params = '?' + urllib.urlencode(query)
-            else:
-                params = '?' + urllib.urlencode({"where":\
-                                        json.dumps(query)})
+            params = '?' + urllib.urlencode(query)
         else:
             params = ''
         conn.request("GET", '/' + PARSE_VERSION + '/' + path +\

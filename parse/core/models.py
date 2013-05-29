@@ -16,11 +16,14 @@ class ParseObject(object):
             matching the attr if it was capitalized, 
             then the attr will not be saved to Parse.
             This can be used as a cache.
+        3. the init method of this class must be called in the 
+            __init__ method of the subclass with the initial data
     """
-    def __init__(self):
-        self.objectId = None
-        self.createdAt = None
-        self.updatedAt = None
+    def __init__(self, data={}):
+        self.objectId = data.get('objectId')
+        self.createdAt = data.get('createdAt')
+        self.updatedAt = data.get('updateAt')
+        self.update_locally(data)
 
     def path(self):
         """ returns the path of this class or use with parse 
@@ -80,19 +83,25 @@ class ParseObject(object):
         """    
         if attr not in self.__dict__:
             return None
-        if self.__dict__.get(attr) is not None and\
-            not (key[0].islower() and\
-                    key.capitalize() in self.__dict__):
+        if self.__dict__.get(attr):
             return self.__dict__.get(attr)
 
-        # fetch the data
-        res = parse("GET", "classes/" + attr.capitalize() +\
-                        "/" + self.__dict__.get(attr.capitalize()))
-        if "error" not in res:
-            c = self.get_class(attr.capitalize())
-            self.__dict__[attr] = c(res)
-    
-        return self.__dict__.get(attr)
+        # attr is a cache - construct the object
+        if attr[0].islower() and\
+                    attr[0].upper() + attr[1:] in self.__dict__:
+                className = attr[0].upper() + attr[1:]
+                res = parse("GET", "classes/" + className +\
+                        "/" + self.__dict__.get(className))
+                if "error" not in res:
+                    c = self.get_class(className)
+                    self.__dict__[attr] = c(res)
+                else:
+                    return None
+        else: # attr is a regular attr
+            res = parse("GET", self.path(), query={"keys":attr})
+            self.update_locally(res)
+
+        return self.__dict__[attr]
 
     def update(self):
         """ Save changes to this object to the Parse DB.
@@ -105,7 +114,7 @@ class ParseObject(object):
         data = {}
         for key, value in self.__dict__.iteritems():
             if key[0].islower() and\
-                    key.capitalize() in self.__dict__:
+                    key[0].upper() + key[1:] in self.__dict__:
                 continue
             data[key] = value
         
