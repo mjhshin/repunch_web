@@ -36,6 +36,9 @@ class Store(ParseObject):
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
 
+        self.Patrons_ = "Patrons"
+        self.patrons = None
+
         super(Store, self).__init__(data)
 
 class Hours(ParseObject):

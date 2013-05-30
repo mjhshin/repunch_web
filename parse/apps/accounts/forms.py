@@ -66,7 +66,7 @@ class SubscriptionForm(object):
         
     def save(self):
         """ create a new subscription in Parse """
-        self.subscription.save()
+        self.subscription.create()
 
 class AccountForm(object):
     """  Equivalence class of apps.accounts.forms.AccountForm """
@@ -89,6 +89,6 @@ class AccountForm(object):
 
     def save(self):
         """ create a new Account in Parse """
-        return self.account.save()
+        return self.account.create()
 
 

@@ -208,7 +208,7 @@ class Subscription(ParseObject):
             if invoice.status == 'approved':
 	            invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
 
-            invoice.save()
+            invoice.create()
             return invoice
         else:
             print("Error while creating payment:")

@@ -11,13 +11,26 @@ class ParseObject(object):
 
     Rules:
         1. If the first letter of an attribute is capitalized, then
-            it is treated as a Pointer or Relation
+            it is treated as a Pointer. If the first letter of an
+            attribute is capitalized and it endswith an 
+            underscore then it is a Relation.
+            A Pointer attr may be None or contain an objectId.
+            A Relation is a constant string, which is the name.
+
         2. If the first letter of an lower case and there exist a #1
             matching the attr if it was capitalized, 
             then the attr will not be saved to Parse.
             This can be used as a cache.
+            A cache for a Pointer contains None or a ParseObject.
+            A cache for a Relation contains None or a list of
+            ParseObjects.
+           
+        2.5 Also, the value of a Relation attr is not pushed up.
+            Use add_relations for Relations.
+
         3. the init method of this class must be called in the 
             __init__ method of the subclass with the initial data
+
         4. use the get(self, attr) method to get an attribute.
             Do not reference the attrs directly by using a dot UNLESS
             the attribute is objectId, createdAt, or updatedAt.
@@ -40,33 +53,14 @@ class ParseObject(object):
         capitalized attributes only store an objectId.
         """
         for key, value in data.iteritems():
+            # make sure Relation vals are untouched
+            if key.endswith("_"):
+                continue
             if key in self.__dict__.iterkeys():
                 if key[0].isupper() and type(value) is dict:
                     self.__dict__[key] = value.get('objectId')
                 else:
                     self.__dict__[key] = value
-
-    def get_pointers(self):
-        """
-        Returns a dictionary of relations of this class.
-        A relation is an attribute of this class if the first
-        character of the attribute is capitalized.
-        """
-        rels, data = [], {}
-        # check for relations 
-        # rels will now contain a list of tuples (className, objectId)
-        for key, value in self.__dict__.iteritems():
-            if key[0].isupper():
-                rels.append( (key, value) )
-        # populate the data in proper format
-        if rels:
-            for rel in rels:
-                data[rel[0]] = {
-                    "__type": "Pointer",
-                    "className": rel[0],
-                    "objectId": rel[1]
-                }
-        return data
 
     def get_class(self, className):
         """
@@ -89,7 +83,7 @@ class ParseObject(object):
         if self.__dict__.get(attr):
             return self.__dict__.get(attr)
 
-        # attr is a cache - construct the object
+        # Pointer cache
         if attr[0].islower() and\
                     attr[0].upper() + attr[1:] in self.__dict__:
                 className = attr[0].upper() + attr[1:]
@@ -100,6 +94,12 @@ class ParseObject(object):
                     self.__dict__[attr] = c(res)
                 else:
                     return None
+
+        # Relation cache
+        elif attr[0].islower() and attr[0].upper() + attr[1:] +\
+                "_" in self.__dict__:
+            # TODO
+
         else: # attr is a regular attr
             res = parse("GET", self.path(), query={"keys":attr})
             self.update_locally(res.get('results')[0])
@@ -110,29 +110,30 @@ class ParseObject(object):
         """ set this object's attr to val. This does not commit
         anything up to Parse. """
         self.__dict__[attr] = val
-        
+
+    def add_relation(self, rel, objectIds):
+        """ Adds the list of objectIds to the given relation rel 
+        Adds the relations to Parse and empty 
+        the cache. Returns True if successful.
+        """
+        if rel not self.__dict__:
+            return False
+    
+        # TODO
 
     def update(self):
         """ Save changes to this object to the Parse DB.
         Returns True if update is successful. 
         
-        If there exist a relation to other objects,
-        this method makes sure that the relation exists-
-        only supports Pointer __type at the moment.
+        Handles Pointers to other objects. If the pointer changed,
+        then the cache corresponding to the attr is set to None.
+        Relations are not handled by update. Use add_relation
+        for Relations.
         """
         # exclude cache attrs
-        data = {}
-        for key, value in self.__dict__.iteritems():
-            if key[0].islower() and\
-                    key[0].upper() + key[1:] in self.__dict__:
-                # clear the cache objects if their pointers changed
-                if value and value.objectId !=\
-                    self.__dict__[key[0].upper() + key[1:]]:
-                    self.__dict__[key[0].upper() + key[1:]] = None
-                continue
-            data[key] = value
+        data = self._exclude_attrs()
         
-        rels = self.get_pointers()
+        rels = self._get_pointers()
         if rels:
             for key, value in rels.iteritems():
                 data[key] = value
@@ -146,31 +147,23 @@ class ParseObject(object):
 
         return False
 
-    def save(self):
+    def create(self):
         """ 
-        saves/creates this object to the DB. This does not check 
+        creates this object to the DB. This does not check 
         uniqueness of any field. 
         Use update to save an existing object.
 
-        After a successful request, this 
-        object will now have the objectId available but not the rest
-        of its attributes. Use
+        After a successful request, this object will now have the
+        objectId available but not the rest of its attributes. 
 
         Note that self.__dict__ contains objectId which will result
         to the parse request returning an error only if it is not None
 
-        If there exist a relation to other objects,
-        this method makes sure that the relation exists.
+        If there exist a Pointer to other objects,
+        this method makes sure that it is saved as a Pointer.
         """
-         # exclude cache attrs
-        data = {}
-        for key, value in self.__dict__.iteritems():
-            if key[0].islower() and\
-                    key.capitalize() in self.__dict__:
-                continue
-            data[key] = value
-
-        rels = self.get_pointers()
+        data = self._exclude_attrs()
+        rels = self._get_pointers()
         if rels:
             for key, value in rels.iteritems():
                 data[key] = value
@@ -184,19 +177,57 @@ class ParseObject(object):
         
         return False
 
-    def refresh(self):
-        """ 
-        Fetches all the attributes of this object from the DB.        
-
-        Must have the objectId available or this does nothing and
-        returns False.
-        """
-        if not self.objectId:
-            return False
-        # TODO 
-
     def delete(self):
         """ delete the row corresponding to this object in Parse """
         # TODO 
         pass
+
+
+    ### "Private" methods
+    def _get_pointers(self):
+        """
+        Returns a dictionary of relations of this class.
+        An attribute is a Pointer if the first character is
+        capitalized. 
+
+        Note that this only handles Pointers. Use add_relations
+        for relations.
+        """
+        pointers, data = [], {}
+
+        # pointers will now contain a list of tuples 
+        # (className, objectId)
+        for key, value in self.__dict__.iteritems():
+            if key[0].isupper() and not key.endswith("_"):
+                pointers.append( (key, value) )
+            
+        # populate the data in proper format
+        if pointers:
+            for pointer in pointers:
+                data[pointer[0]] = {
+                    "__type": "Pointer",
+                    "className": pointer[0],
+                    "objectId": pointer[1]
+                }
+
+        return data
+
+    def _exclude_attrs(self):
+        """ returns a dictionary containing all the keys and values
+        in self.__dict__ that are not used for caching and not 
+        a relation. """
+        data = {}
+        for key, value in self.__dict__.iteritems():
+            if key.endswith("_") or (key[0].islower() and\
+                key[0].upper() + key[1:] + "_" in self.__dict__):
+                continue
+            if  key[0].islower() and\
+                (key[0].upper() + key[1:] in self.__dict__):
+                # clear the cache objects if their pointers changed
+                if value and value.objectId !=\
+                    self.__dict__[key[0].upper() + key[1:]]:
+                    self.__dict__[key[0].upper() + key[1:]] = None
+                continue
+            data[key] = value
+        return data
 

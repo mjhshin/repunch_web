@@ -29,7 +29,7 @@ class StoreSignUpForm(object):
 
     def save(self):
         """ create a new Store in Parse """
-        return self.store.save()
+        return self.store.create()
 
 
 

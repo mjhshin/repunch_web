@@ -8,7 +8,8 @@ class Patron(models.Model):
     gender = models.IntegerField(choices=((0,'Unknown'),(1,'Male'),(2, 'Female')),default=0)
     dob = models.DateField(null=True, blank=True)
     date_added = models.DateField(auto_now_add=True)
-    status = models.IntegerField(choices=((0,'Inactive'),(1,'Active')),default=0)
+    status = models.IntegerField(choices=((0,'Inactive'),
+                        (1,'Active')),default=0)
         
         
 class PatronStore(models.Model):

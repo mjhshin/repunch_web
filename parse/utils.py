@@ -33,9 +33,8 @@ def parse(method, path, data=None, query=None):
                 '%s' % (params, ), '',  REST_CONNECTION_META)
 
     elif method == "PUT":
-        conn.request("PUT", '/' + PARSE_VERSION + '/' + path+\
-                '%s' % (query, ), json.dumps(data),
-                REST_CONNECTION_META)
+        conn.request("PUT", '/' + PARSE_VERSION + '/' + path +\
+               '/' + query, json.dumps(data), REST_CONNECTION_META)
     try:
         result = json.loads(conn.getresponse().read())
     except ValueError as e:
