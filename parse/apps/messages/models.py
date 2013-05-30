@@ -46,7 +46,7 @@ class Feedback(ParseObject):
         self.subject = data.get("subject")
         self.message = data.get("message")
         self.is_response = data.get("is_response", False)
-        self.status = data.get("status", READ)
+        self.status = data.get("status", UNREAD)
 
         self.Patron = data.get("Patron")
         self.patron = None

@@ -8,10 +8,10 @@ import paypalrestsdk
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
 PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
-from parse.core.models import ParseObject
+from parse.core.models import ParseObject, ParseObjectManager
 from parse.utils import parse
 from parse.auth import hash_password
-from parse.apps.accounts.cache import free
+from parse.apps.accounts import free
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -22,6 +22,17 @@ class Account(ParseObject):
     The Parse table of this class is the Parse.User table in the DB!
     So don't go looking for an Account class in the Data Browser!
     """
+    
+    # override the objects method since this differs from 
+    # the rest in that this is the User class in the Parse DB
+    # so instead of classes/className for GET requests it is users/
+    @classmethod
+    def objects(cls):
+        if not hasattr(cls, "_manager"):
+            setattr(cls, "_manager", ParseObjectManager('users',
+                    '',  cls.__name__, cls.__module__))
+        return cls._manager
+
     def __init__(self, data={}):
         self.username = data.get('username')
         self.password = data.get('password')
@@ -66,7 +77,7 @@ class Account(ParseObject):
         return None
     
     def is_free(self):
-		return self.get('subscription').get('subscriptionType').objectId == free.objectId)
+		return self.get('subscription').get('subscriptionType').objectId == free['objectId']
 
     def change_subscriptionType(self, sub_type):
         """ change the SubscriptionType of this account to sub_type.
@@ -226,7 +237,7 @@ class SubscriptionType(ParseObject):
     HEAVYWEIGHT = "HeavyWeight"
 
     def __init__(self, data={}):
-        self.name = data.get('name', FREE)
+        self.name = data.get('name', SubscriptionType.FREE)
         self.description = data.get('description', "Free membership")
         self.monthly_cost = data.get('monthly_cost', 0)
         self.max_users = data.get('max_users', 50)

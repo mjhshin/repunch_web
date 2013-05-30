@@ -1,29 +1,28 @@
 from django import template
 import datetime
 
-from apps.employees.models import Employee
-from apps.stores.models import Hours
-from apps.stores import models
 from libs.repunch.rphours_util import HoursInterpreter
 
 from parse.apps.messages.models import Feedback
+from parse.apps.employees.models import Employee
+from parse.apps.stores.models import Hours
 
 register = template.Library()
 
 @register.assignment_tag
 def feedback_unread(store):
-    return Feedback.objects.filter(store_id=store.id, status=0).count()
-
+    return Feedback.objects().count(Store=store.objectId, 
+                        status=Feedback.UNREAD)
 
 @register.assignment_tag
 def employees_pending(store):
-    return Employee.objects.filter(store_id=store.id, status=0).count()
-
+    return Employee.objects().count(Store=store.objectId, 
+                        status=Employee.PENDING)
 
 @register.simple_tag
 def hours(store):
-    return HoursInterpreter(hours=Hours.objects.filter(store_id=store.id).order_by('list_order')).readable() 
-
+    return HoursInterpreter(hours=\
+        Hours.objects().filter(Store=store.objectId)).readable()
 
 @register.simple_tag
 def time_selector(fieldid, timestamp):

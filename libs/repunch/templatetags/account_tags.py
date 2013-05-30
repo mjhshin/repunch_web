@@ -2,7 +2,7 @@ from __future__ import division
 from django import template
 import datetime
 
-from apps.messages.models import Message
+from parse.apps.messages.models import Message
 from parse.utils import parse
 
 register = template.Library()
@@ -10,7 +10,7 @@ register = template.Library()
 @register.simple_tag
 def account_user_usage(account, percent_of=None):
     store = account.get('store')
-    atype = account.get('subscription').get('type')
+    atype = account.get('subscription').get('subscriptionType')
     
     if atype.max_users == -1:
         percent = 0
@@ -38,7 +38,7 @@ def account_alert(account):
 
 @register.simple_tag
 def account_message_usage(account, percent_of=None):
-    atype = account.get('subscription').get('type')
+    atype = account.get('subscription').get('subscriptionType')
     now = datetime.datetime.now()
 
     Message.objects.filter(date_sent__year=now.year,

@@ -1,4 +1,4 @@
-from apps.stores import models
+from parse.apps.stores import models
 
 import types
 

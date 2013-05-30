@@ -1,8 +1,58 @@
 """
 Parse models corresponding to Django models
 """
+from json import dumps
+from importlib import import_module
 
 from parse.utils import parse
+
+class ParseObjectManager(object):
+    """
+    Provides extra methods for ParseObjects such as counting.
+    This provides functionality similar to Django's Model.objects
+    """
+    def __init__(self, path, pathClassName, className, module):
+        self.path = path
+        self.pathClassName = pathClassName
+        self.className = className
+        self.module = module
+    
+    def count(self, **params):
+        """ returns the number of objects that matches the
+        filter parameters in params
+        """
+        res = parse("GET", self.path + self.pathClassName, query={
+                    "where":dumps(params),
+                    "count":1,"limit":0} )
+
+        if res and 'count' in res:
+            return res['count']
+        return 0
+
+    def filter(self, **params):
+        """ returns the list of objects that matches the
+        filter parameters in params. This can be used to get all
+        the class objects.
+        """
+        q = {}
+        # separate the "where" parameters from the rest
+        if "limit" in params:
+            q["limit"] = params.pop("limit")
+        if "order" in params:
+            q["order"] = params.pop("order")
+        
+        q["where"] = dumps(params)
+        res = parse("GET", self.path + self.pathClassName, query=q)
+                  
+        if res and "results" in res:
+            objClass = getattr(import_module(self.module), 
+                                self.className)
+            objs = []
+            for data in res['results']:
+                objs.append(objClass(data))     
+            return objs
+        
+        return None
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models 
@@ -44,6 +94,18 @@ class ParseObject(object):
             Do not reference the attrs directly by using a dot UNLESS
             the attribute is objectId, createdAt, or updatedAt.
     """
+    
+    # initialize the manager for a class
+    # must be overriden by the ParseObject that will be used as the
+    # User class in Parse DB
+
+    @classmethod
+    def objects(cls):
+        if not hasattr(cls, "_manager"):
+            setattr(cls, "_manager", ParseObjectManager('classes/',
+                    cls.__name__,  cls.__name__, cls.__module__))
+        return cls._manager
+
     def __init__(self, data={}):
         self.objectId = data.get('objectId')
         self.createdAt = data.get('createdAt')
@@ -109,12 +171,12 @@ class ParseObject(object):
                 "_" in self.__dict__:
             className = self.__dic__[attr[0].upper() + attr[1:] + "_"]
             relName = attr[0].upper() + attr[1:]
-            res = parse("GET", , query={
+            res = parse("GET", 'classes/' + className, query={
                     "where":json.dumps({
                         "$relatedTo":{ 
                         "object":{
                             "__type": "Pointer",
-                            "className": className,
+                            "className": self.__class__.__name__,
                             "objectId": self.objectId},
                         "key": relName, }  })  })
             if res and "error" not in res:
@@ -141,7 +203,7 @@ class ParseObject(object):
         Adds the relations to Parse and empty  the cache. 
         Returns True if successful.
         """
-        if relAttrName not self.__dict__:
+        if relAttrName not in self.__dict__:
             return False
         objs = []
         for oid in objectIds:
@@ -254,9 +316,11 @@ class ParseObject(object):
         a relation. """
         data = {}
         for key, value in self.__dict__.iteritems():
+            # exclude the Relation attr and its cache attr
             if key.endswith("_") or (key[0].islower() and\
                 key[0].upper() + key[1:] + "_" in self.__dict__):
                 continue
+            # exclude the Pointer cache
             if  key[0].islower() and\
                 (key[0].upper() + key[1:] in self.__dict__):
                 # clear the cache objects if their pointers changed

@@ -1,6 +1,8 @@
 """
 Parse equivalence of Django apps.stores.models
 """ 
+from importlib import import_module
+
 from repunch.settings import TIME_ZONE
 from parse.utils import parse
 from parse.core.models import ParseObject

@@ -9,7 +9,7 @@ from libs.repunch import rputils
 
 from parse.auth import login
 from parse.apps.accounts.models import Account
-from parse.apps.accounts.cache import free
+from parse.apps.accounts import free
 from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
@@ -65,7 +65,7 @@ def sign_up(request):
 
             # TODO: need to make this transactional
             # save subscription
-            su.subscription.SubscriptionType = free.objectId
+            su.subscription.SubscriptionType = free['objectId']
             su.save()
 
             # TODO refactor templates to use parse forms instead
@@ -83,7 +83,7 @@ def sign_up(request):
             account.Store = store_pf.store.objectId
             account.Subscription = su.subscription.objectId
             account.set_password(request.POST.get('password'))
-            account.save()
+            account.create()
 
             # auto login
             user_login = login(request, account.username, 
