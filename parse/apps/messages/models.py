@@ -16,7 +16,7 @@ class Message(ParseObject):
     ONLY_ONE_PUNCH = "Only One Punch"
     
     def __init__(self, data={}):
-        self.date_added = data.get('date_added', date.today())
+        self.date_added = data.get('date_added', date.today().isoformat())
         self.date_sent = data.get('date_sent')
         self.subject = data.get('subject')
         self.status = data.get('status', DRAFT)
@@ -41,7 +41,7 @@ class Feedback(ParseObject):
     UNREAD = "Unread"
     
     def __init__(self, data={}):
-        self.date_added = data.get('date_added', date.today())
+        self.date_added = data.get('date_added', date.today().isoformat())
         self.subject = data.get("subject")
         self.message = data.get("message")
         self.is_response = data.get("is_response", False)

@@ -23,7 +23,7 @@ class Patron(ParseObject):
         self.gender = data.get("gender", UNKNOWN)
         self.dob = data.get("dob")
         self.status = data.get("status", ACTIVE)
-        self.date_added = data.get("date_added", date.today())
+        self.date_added = data.get("date_added", date.today().isoformat())
 
         self.Stores_ = "Store"
 
@@ -37,7 +37,7 @@ class Patron(ParseObject):
 class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """
     def __init__(self, data={}):
-        self.date_added = data.get("date_added", date.today())
+        self.date_added = data.get("date_added", date.today().isoformat())
         
         self.Patron = data.get("Patron")
         self.Store = data.get("Store")

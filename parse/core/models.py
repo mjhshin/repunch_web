@@ -129,7 +129,13 @@ class ParseObject(object):
 
     ### Dates:
         
-        Dates are attributes whose name starts with date.
+        Dates are attributes whose name starts with date_.
+        These attributes needs to contain a UTC timestamp stored in
+        ISO 8601 format.
+        
+        e.g. 
+            from datetime import datetime
+            self.set("date_born", datetime.today().isoformat())
 
         -------------------------------
 
@@ -141,6 +147,12 @@ class ParseObject(object):
         method. However, objectId, createdAt, updatedAt may
         be accessed without having to use this method.
         
+        -------------------------------
+
+    ### self.set(attr, value)
+
+        Sets the value of the attribute to the given value.
+
         -------------------------------
 
     ### self.update()
@@ -304,13 +316,8 @@ class ParseObject(object):
         Relations are not handled by update. Use add_relation
         for Relations.
         """
-        # exclude cache attrs
-        data = self._exclude_attrs()
-        
-        rels = self._get_pointers()
-        if rels:
-            for key, value in rels.iteritems():
-                data[key] = value
+        # get the formated data to be put in the request
+        data = self._get_formatted_data()
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
         if res and "error" not in res:
@@ -334,12 +341,7 @@ class ParseObject(object):
         If there exist a Pointer to other objects,
         this method makes sure that it is saved as a Pointer.
         """
-        data = self._exclude_attrs()
-        rels = self._get_pointers()
-        if rels:
-            for key, value in rels.iteritems():
-                data[key] = value
-        res = parse('POST', self.path(), data)
+        data = self._get_formatted_data()
         
         if res and "error" not in res:
             self.update_locally(res)
@@ -354,48 +356,24 @@ class ParseObject(object):
 
 
     ### "Private" methods
-    def _get_pointers(self):
+    def _get_formatted_data(self):
+        """ 
+        returns a dictionary to be used in a PUT request for Parse.
+
+        Relations, Relation caches, 
+        and Pointer caches are not included.
         """
-        Returns a dictionary of relations of this class.
-        An attribute is a Pointer if the first character is
-        capitalized. 
-
-        Note that this only handles Pointers. Use add_relations
-        for relations.
-        """
-        pointers, data = [], {}
-
-        # pointers will now contain a list of tuples 
-        # (className, objectId)
-        for key, value in self.__dict__.iteritems():
-            if key[0].isupper() and not key.endswith("_"):
-                pointers.append( (key, value) )
-            
-        # populate the data in proper format
-        if pointers:
-            for pointer in pointers:
-                data[pointer[0]] = {
-                    "__type": "Pointer",
-                    "className": pointer[0],
-                    "objectId": pointer[1]
-                }
-
-        return data
-
-    def _exclude_attrs(self):
-        """ returns a dictionary containing all the keys and values
-        in self.__dict__ that are not used for caching and not 
-        a relation. """
         data = {}
         for key, value in self.__dict__.iteritems():
-            # exclude the Relation attr and its cache attr
+            # exclude Relation attrs
             if key.endswith("_"):
                 continue
+            # exclude Relation caches and clear it
             if key[0].islower() and\
                 key[0].upper() + key[1:] + "_" in self.__dict__:
                 self.__dict__[key] = None
                 continue
-            # exclude the Pointer cache
+            # exclude the Pointer cache and maybe clear it
             if  key[0].islower() and\
                 (key[0].upper() + key[1:] in self.__dict__):
                 # clear the cache objects if their pointers changed
@@ -403,6 +381,23 @@ class ParseObject(object):
                     self.__dict__[key[0].upper() + key[1:]]:
                     self.__dict__[key] = None
                 continue
-            data[key] = value
+
+            # Pointers
+            if key[0].isupper() and not key.endswith("_"):
+                data[key] = {
+                    "__type": "Pointer",
+                    "className": key,
+                    "objectId": value
+                }
+            # Dates
+            elif key.startswith("date_"):
+                data[key] = {
+                    "__type": "Date",
+                    "iso": value
+                }
+            # regular attributes
+            else:
+                data[key] = value
+
         return data
 

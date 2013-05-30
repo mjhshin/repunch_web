@@ -2,6 +2,8 @@
 Parse equivalence of Django apps.employees.models
 """ 
 
+from datetime import datetime
+
 from parse.core.models import ParseObject
 from parse.utils import parse
 
@@ -28,7 +30,7 @@ class Reward(ParseObject):
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
     def __init__(self, data={}):
-        self.date_punched = data.get("date_punched")
+        self.date_punched = data.get("date_punched", datetime.now().isoformat())
         self.punches = data.get("punches")
 
         self.Reward = data.get("Reward")
@@ -40,7 +42,7 @@ class Punch(ParseObject):
 class Redemption(ParseObject):
     """ Equivalence class of apps.rewards.models.Redemption """
     def __init__(self, data={}):
-        self.date_punched = data.get("date_punched")
+        self.date_punched = data.get("date_punched", datetime.now().isoformat())
         self.punches = data.get("punches")
 
         self.Reward = data.get("Reward")

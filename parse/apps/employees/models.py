@@ -17,7 +17,7 @@ class Employee(ParseObject):
         self.first_name = data.get("first_name")
         self.last_name = data.get("last_name")
         self.email = data.get("email")
-        self.date_added = data.get("date_added", date.today())
+        self.date_added = data.get("date_added", date.today().isoformat())
         self.status = data.get("status", PENDING)
         self.employee_avatar = data.get("employee_avatar")
 

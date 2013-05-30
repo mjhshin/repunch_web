@@ -96,7 +96,7 @@ class Settings(ParseObject):
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, data={}):
-        self.charge_date = data.get('charge_date')
+        self.date_charged = data.get('date_charged')
         self.status = data.get('status')
         self.response = data.get('response')
         self.response_code = data.get('response_code')
@@ -206,7 +206,7 @@ class Subscription(ParseObject):
         if payment.create():
             invoice = Invoice()
             invoice.Account = self.objectId
-            invoice.charge_date = datetime.now()
+            invoice.date_charged = datetime.now().isoformat()
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':
