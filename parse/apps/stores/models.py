@@ -39,7 +39,6 @@ class Store(ParseObject):
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
 
         self.Patrons_ = "Patron"
-        self.patrons = None
 
         super(Store, self).__init__(data)
 
@@ -58,7 +57,6 @@ class Hours(ParseObject):
         self.list_order = data.get('list_order')
 
         self.Store = data.get("Store")
-        self.store = None
 
         super(Hours, self).__init__(data)
 

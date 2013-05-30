@@ -6,6 +6,8 @@ from importlib import import_module
 
 from parse.utils import parse
 
+NOT_WHERE_CONSTRAINTS = ["include", "count", "limit"]
+
 class ParseObjectManager(object):
     """
     Provides extra methods for ParseObjects such as counting.
@@ -17,31 +19,30 @@ class ParseObjectManager(object):
         self.className = className
         self.module = module
     
-    def count(self, **params):
-        """ returns the number of objects that matches the
-        filter parameters in params
+    def count(self, **constraints):
+        """ returns the number of objects that matches the constraints
         """
         res = parse("GET", self.path + self.pathClassName, query={
-                    "where":dumps(params),
+                    "where":dumps(constraints),
                     "count":1,"limit":0} )
 
         if res and 'count' in res:
             return res['count']
         return 0
 
-    def filter(self, **params):
+    def filter(self, **constraints):
         """ returns the list of objects that matches the
-        filter parameters in params. This can be used to get all
-        the class objects.
+        constraints.the class objects.
+
+        See NOT_WHERE_CONSTRAINTS for 
+        supported non-object attr constraints
         """
         q = {}
         # separate the "where" parameters from the rest
-        if "limit" in params:
-            q["limit"] = params.pop("limit")
-        if "order" in params:
-            q["order"] = params.pop("order")
+        for p in NOT_WHERE_CONSTRAINTS:
+            q[p] = constraints.pop(p)
         
-        q["where"] = dumps(params)
+        q["where"] = dumps(constraints)
         res = parse("GET", self.path + self.pathClassName, query=q)
                   
         if res and "results" in res:
@@ -59,40 +60,98 @@ class ParseObject(object):
     This class is abstract and no concrete objects should be
     created using this class.
 
-    Rules:
-        1. If the first letter of an attribute is capitalized, then
-            it is treated as a Pointer. If the first letter of an
-            attribute is capitalized and it endswith an 
-            underscore then it is a Relation.
-            A Pointer attr may be None or contain an objectId.
-            A Relation is a constant string, which is the name of
-            the class that will be stored in the relation.
+    Usage Notes
+    -----------------------------------------------------------
+    ### Initialization:
 
-        1.1 To get the object of a Pointer, use it's cache attr.
-            To get the objects of a Relation, use it's cache attr.
+        The init method of this class must be called in the 
+        __init__ method of the subclass with the initial data.
+        
+        e.g. 
+            class Person(ParseObject):
+                def __init__(self, data={})
+                    # regular type
+                    self.name = data.get("name")
+                    # Date type
+                    self.date_born = data.get("date_born")
+                    # Pointer type
+                    self.Mother = date.get("Mother")
+                    # Relation type
+                    self.Friends_ = "Person"
 
-        1.2 The attr name of the Pointers and Relations are used
-            for the column name in the Parse DB (excluding _
-            at the end of each Relation attr.
+                    super(Person, self).__init__()
 
-        2. If the first letter of an lower case and there exist a #1
-            matching the attr if its first char is capitalized 
-            (plus an _ at the end if it is a Relation), 
-            then the attr will not be saved to Parse.
-            This can be used as a cache.
-            A cache for a Pointer contains None or a ParseObject.
-            A cache for a Relation contains None or a list of
-            ParseObjects, which only contain their objectIds.
-           
-        2.5 Also, the value of a Relation attr is not pushed up.
-            Use add_relations for Relations.
+        -------------------------------
 
-        3. the init method of this class must be called in the 
-            __init__ method of the subclass with the initial data
+    Supported Data Types
+    -----------------------------------------------------------
+    ### Pointers:
 
-        4. use the get(self, attr) method to get an attribute.
-            Do not reference the attrs directly by using a dot UNLESS
-            the attribute is objectId, createdAt, or updatedAt.
+        Pointers are attributes whose first character is upper-cased.
+ 
+            e.g. self.MilkyWay
+
+        These attributes should store an objectId. 
+        The name of the attribute is used as the column name in Parse.
+
+        A cache attribute is created that contains the actual 
+        ParseObject (initially None) that it points to.
+        The cache attribute name is the Pointer name with the first
+        character lowercased.
+            e.g. self.milkyWay
+        To get the actual object:
+            e.g. self.get("milkyWay")
+        -------------------------------
+
+    ### Relations:
+
+        Relations are attributes whose first character is 
+        upper-cased and ends with and underscore.
+
+            e.g. self.MilkyWay_
+
+        These attributes should store the name of the class is
+        stored in the relation and should not be modified.
+        The name of the attribute is used as the column name in Parse.
+
+        A cache attribute is created that contains the actual list of
+        ParseObjects (initially None) that it contains.
+        The cache attribute name is the Relation name with the first
+        character lowercased and the underscore at the end stripped.
+
+            e.g. self.milkyWay
+
+        To get the actual list of objects:
+
+            e.g. self.get("milkyWay")
+
+        -------------------------------
+
+    ### Dates:
+        
+        Dates are attributes whose name starts with date.
+
+        -------------------------------
+
+    Instance Methods
+    -----------------------------------------------------------
+    ### self.get(attr)
+        
+        All class attributes values should be obtained using this
+        method. However, objectId, createdAt, updatedAt may
+        be accessed without having to use this method.
+        
+        -------------------------------
+
+    ### self.update()
+
+        Updates the data in the Parse DB with this object's values.
+        Cache attributes are not pushed up and are set to None.
+        However, for Pointers, the cache attributes are only set to
+        None if the Pointer's objectId has changed.
+    
+        -------------------------------
+
     """
     
     # initialize the manager for a class
@@ -110,7 +169,20 @@ class ParseObject(object):
         self.objectId = data.get('objectId')
         self.createdAt = data.get('createdAt')
         self.updatedAt = data.get('updateAt')
+
+        self._generate_cache_attrs()
         self.update_locally(data)
+
+    def _generate_cache_attrs(self):
+        """ 
+        create the cache attrs for the Pointers and Relations if any.
+        """
+        for attr in self.__dict__:
+            # Relations
+            if attr[0].isupper() and attr.endswith("_"):
+                setattr(self, attr[0].lower() + attr[1:-1] , None)
+            elif attr[0].isupper() and not attr.endswith("_"):
+                setattr(self, attr[0].lower() + attr[1:] , None)
 
     def path(self):
         """ returns the path of this class or use with parse 
@@ -317,8 +389,11 @@ class ParseObject(object):
         data = {}
         for key, value in self.__dict__.iteritems():
             # exclude the Relation attr and its cache attr
-            if key.endswith("_") or (key[0].islower() and\
-                key[0].upper() + key[1:] + "_" in self.__dict__):
+            if key.endswith("_"):
+                continue
+            if key[0].islower() and\
+                key[0].upper() + key[1:] + "_" in self.__dict__:
+                self.__dict__[key] = None
                 continue
             # exclude the Pointer cache
             if  key[0].islower() and\
@@ -326,7 +401,7 @@ class ParseObject(object):
                 # clear the cache objects if their pointers changed
                 if value and value.objectId !=\
                     self.__dict__[key[0].upper() + key[1:]]:
-                    self.__dict__[key[0].upper() + key[1:]] = None
+                    self.__dict__[key] = None
                 continue
             data[key] = value
         return data

@@ -47,9 +47,6 @@ class Account(ParseObject):
 
         self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')
-        # actual objects used for caching
-        self.store = None
-        self.subscription = None
 
         super(Account, self).__init__(data)
 
@@ -94,9 +91,7 @@ class Settings(ParseObject):
         self.punches_facebook = data.get("punches_facebook")    
         self.retailer_id = data.get("retailer_id")
 
-        self.Account = data.get("Account")      
-        self.account = None
-        
+        self.Account = data.get("Account")
 
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
@@ -111,7 +106,6 @@ class Invoice(ParseObject):
         self.amount = data.get('amount')
 
         self.Account = data.get('Account')
-        self.account = None
         
         super(Invoice, self).__init__(data)
         
@@ -140,7 +134,6 @@ class Subscription(ParseObject):
         self.ppvalid = data.get('ppvalid')
 
         self.SubscriptionType = data.get('SubscriptionType')
-        self.subscriptionType = None
 
         super(Subscription, self).__init__(data)
 

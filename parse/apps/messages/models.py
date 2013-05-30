@@ -28,7 +28,6 @@ class Message(ParseObject):
         self.offer_expiration = data.get('offer_expiration')
 
         self.Store = data.get("Store")
-        self.store = None
 
         super(Message, self).__init__(data)
 
@@ -49,11 +48,8 @@ class Feedback(ParseObject):
         self.status = data.get("status", UNREAD)
 
         self.Patron = data.get("Patron")
-        self.patron = None
-        self.Parent = data.get("Parent")        
-        self.parent = None
+        self.Parent = data.get("Parent") 
         self.Store = data.get("Store")
-        self.store = None
 
         super(Feedback, self).__init__(data)
 

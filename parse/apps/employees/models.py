@@ -21,8 +21,7 @@ class Employee(ParseObject):
         self.status = data.get("status", PENDING)
         self.employee_avatar = data.get("employee_avatar")
 
-        self.Store = data.get("Store")      
-        self.store = None
+        self.Store = data.get("Store")
 
         super(Employee, self).__init__(data)
 

@@ -41,7 +41,7 @@ def account_message_usage(account, percent_of=None):
     atype = account.get('subscription').get('subscriptionType')
     now = datetime.datetime.now()
 
-    Message.objects.filter(date_sent__year=now.year,
+    message_count = Message.objects.filter(date_sent__year=now.year,
         date_sent__month=now.month, store=account.store ).count()    
     
     percent = message_count/atype.max_messages

@@ -26,7 +26,6 @@ class Patron(ParseObject):
         self.date_added = data.get("date_added", date.today())
 
         self.Stores_ = "Store"
-        self.stores = None
 
         super(Patron, self).__init__(data)
 
@@ -41,9 +40,7 @@ class FacebookPost(ParseObject):
         self.date_added = data.get("date_added", date.today())
         
         self.Patron = data.get("Patron")
-        self.patron = None
         self.Store = data.get("Store")
-        self.store = None
 
         super(FacebookPost, self).__init__(data)
 

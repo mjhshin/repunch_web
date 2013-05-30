@@ -13,8 +13,7 @@ class Reward(ParseObject):
         self.punches = data.get("punches")
         self.reward_avatar = data.get("reward_avatar")
 
-        self.Store = data.get("Store")      
-        self.store = None
+        self.Store = data.get("Store")
 
         super(Reward, self).__init__(data)
 
@@ -32,12 +31,9 @@ class Punch(ParseObject):
         self.date_punched = data.get("date_punched")
         self.punches = data.get("punches")
 
-        self.Reward = data.get("Reward")      
-        self.reward = None
+        self.Reward = data.get("Reward")
         self.Patron = data.get("Patron")
-        self.patron = None
         self.Employee = data.get("Employee")
-        self.employee = None    
         
         super(Punch, self).__init__(data)
 
@@ -47,12 +43,9 @@ class Redemption(ParseObject):
         self.date_punched = data.get("date_punched")
         self.punches = data.get("punches")
 
-        self.Reward = data.get("Reward")      
-        self.reward = None
+        self.Reward = data.get("Reward")
         self.Patron = data.get("Patron")
-        self.patron = None
         self.Employee = data.get("Employee")
-        self.employee = None    
         
         super(Redemption, self).__init__(data)
     
