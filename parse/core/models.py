@@ -15,15 +15,24 @@ class ParseObject(object):
             attribute is capitalized and it endswith an 
             underscore then it is a Relation.
             A Pointer attr may be None or contain an objectId.
-            A Relation is a constant string, which is the name.
+            A Relation is a constant string, which is the name of
+            the class that will be stored in the relation.
+
+        1.1 To get the object of a Pointer, use it's cache attr.
+            To get the objects of a Relation, use it's cache attr.
+
+        1.2 The attr name of the Pointers and Relations are used
+            for the column name in the Parse DB (excluding _
+            at the end of each Relation attr.
 
         2. If the first letter of an lower case and there exist a #1
-            matching the attr if it was capitalized, 
+            matching the attr if its first char is capitalized 
+            (plus an _ at the end if it is a Relation), 
             then the attr will not be saved to Parse.
             This can be used as a cache.
             A cache for a Pointer contains None or a ParseObject.
             A cache for a Relation contains None or a list of
-            ParseObjects.
+            ParseObjects, which only contain their objectIds.
            
         2.5 Also, the value of a Relation attr is not pushed up.
             Use add_relations for Relations.
@@ -89,7 +98,7 @@ class ParseObject(object):
                 className = attr[0].upper() + attr[1:]
                 res = parse("GET", "classes/" + className +\
                         "/" + self.__dict__.get(className))
-                if "error" not in res:
+                if res and "error" not in res:
                     c = self.get_class(className)
                     self.__dict__[attr] = c(res)
                 else:
@@ -98,9 +107,23 @@ class ParseObject(object):
         # Relation cache
         elif attr[0].islower() and attr[0].upper() + attr[1:] +\
                 "_" in self.__dict__:
-            # TODO
-
-        else: # attr is a regular attr
+            className = self.__dic__[attr[0].upper() + attr[1:] + "_"]
+            relName = attr[0].upper() + attr[1:]
+            res = parse("GET", , query={
+                    "where":json.dumps({
+                        "$relatedTo":{ 
+                        "object":{
+                            "__type": "Pointer",
+                            "className": className,
+                            "objectId": self.objectId},
+                        "key": relName, }  })  })
+            if res and "error" not in res:
+                c = self.get_class(className)
+                self.__dic__[attr] = [ c(d) for d in res['results'] ]
+            else:
+                return None 
+        # attr is a regular attr
+        else: 
             res = parse("GET", self.path(), query={"keys":attr})
             self.update_locally(res.get('results')[0])
 
@@ -111,15 +134,32 @@ class ParseObject(object):
         anything up to Parse. """
         self.__dict__[attr] = val
 
-    def add_relation(self, rel, objectIds):
-        """ Adds the list of objectIds to the given relation rel 
-        Adds the relations to Parse and empty 
-        the cache. Returns True if successful.
+    def add_relation(self, relAttrName, objectIds):
+        """ Adds the list of objectIds to the given relation. 
+        relAttrName is a str, which is the name of the Relation attr.
+
+        Adds the relations to Parse and empty  the cache. 
+        Returns True if successful.
         """
-        if rel not self.__dict__:
+        if relAttrName not self.__dict__:
             return False
-    
-        # TODO
+        objs = []
+        for oid in objectIds:
+            objs.append( { "__type": "Pointer",
+                           "className": self.__dict__[relAttrName],
+                           "objectId": oid } )
+        res = parse("PUT", self.path() + "/" + self.objectId, {
+                    relAttrName[:-1]: {
+                        "__op": "AddRelation",
+                        "objects": objs, 
+                    }
+                 } )
+        if res and 'error' not in res:
+            cacheAttrName = relAttrName[0].lower() + relAttrName[1:-1]
+            self.__dic__[cacheAttrName] = None
+            return True
+        else:
+            return False
 
     def update(self):
         """ Save changes to this object to the Parse DB.
@@ -138,10 +178,8 @@ class ParseObject(object):
             for key, value in rels.iteritems():
                 data[key] = value
 
-        res = parse("PUT", self.path(), data, self.objectId)
-        if res:
-            if "error" in res:
-                return False
+        res = parse("PUT", self.path() + "/" + self.objectId, data)
+        if res and "error" not in res:
             self.update_locally(res)
             return True
 
@@ -169,9 +207,7 @@ class ParseObject(object):
                 data[key] = value
         res = parse('POST', self.path(), data)
         
-        if res:
-            if "error" in res:
-                return False
+        if res and "error" not in res:
             self.update_locally(res)
             return True
         

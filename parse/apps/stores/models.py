@@ -36,10 +36,15 @@ class Store(ParseObject):
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
 
-        self.Patrons_ = "Patrons"
+        self.Patrons_ = "Patron"
         self.patrons = None
 
         super(Store, self).__init__(data)
+
+    def get_class(self, className):
+        if className == "Patron":
+            return getattr(import_module('parse.apps.patrons.models'),
+                                className)
 
 class Hours(ParseObject):
     """ Equivalence class of apps.stores.models.Hours """

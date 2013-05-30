@@ -24,10 +24,15 @@ class Patron(ParseObject):
         self.status = data.get("status", ACTIVE)
         self.date_added = data.get("date_added", date.today())
 
-        self.Stores_ = "Stores"
+        self.Stores_ = "Store"
         self.stores = None
 
         super(Patron, self).__init__(data)
+
+    def get_class(self, className):
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                                className)
 
 class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """

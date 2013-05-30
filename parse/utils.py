@@ -13,7 +13,6 @@ def parse(method, path, data=None, query=None):
     
     data is a dictionary/json, usually it is a ParseObject.__dict__
     query is a dictionary/json containing constraints for filtering.
-    However, query must be a string (objectId) if method is PUT
     Note that is the method is GET, data parameter is ignored.
 
     Returns None if request does not return a json object.
@@ -33,8 +32,8 @@ def parse(method, path, data=None, query=None):
                 '%s' % (params, ), '',  REST_CONNECTION_META)
 
     elif method == "PUT":
-        conn.request("PUT", '/' + PARSE_VERSION + '/' + path +\
-               '/' + query, json.dumps(data), REST_CONNECTION_META)
+        conn.request("PUT", '/' + PARSE_VERSION + '/' + path,
+                        json.dumps(data), REST_CONNECTION_META)
     try:
         result = json.loads(conn.getresponse().read())
     except ValueError as e:
