@@ -33,7 +33,7 @@ class Account(ParseObject):
                     '',  cls.__name__, cls.__module__))
         return cls._manager
 
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
@@ -48,7 +48,7 @@ class Account(ParseObject):
         self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')
 
-        super(Account, self).__init__(data)
+        super(Account, self).__init__(**data)
 
     def get_class(self, className):
         if className == "Subscription":
@@ -85,7 +85,7 @@ class Account(ParseObject):
 
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.punches_customer = data.get("punches_customer")
         self.punches_employee = data.get("punches_employee")
         self.punches_facebook = data.get("punches_facebook")    
@@ -93,11 +93,11 @@ class Settings(ParseObject):
 
         self.Account = data.get("Account")
 
-        super(Settings, self).__init__(data)
+        super(Settings, self).__init__(**data)
 
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.date_charged = data.get('date_charged')
         self.status = data.get('status')
         self.response = data.get('response')
@@ -109,7 +109,7 @@ class Invoice(ParseObject):
 
         self.Account = data.get('Account')
         
-        super(Invoice, self).__init__(data)
+        super(Invoice, self).__init__(**data)
         
     def get_class(self, className):
         if className == "Account":
@@ -120,7 +120,7 @@ class Subscription(ParseObject):
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
     ERROR = "Billing Error"
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.status = data.get('status')
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
@@ -137,7 +137,7 @@ class Subscription(ParseObject):
 
         self.SubscriptionType = data.get('SubscriptionType')
 
-        super(Subscription, self).__init__(data)
+        super(Subscription, self).__init__(**data)
 
     def get_class(self, className):
         if className == "SubscriptionType":
@@ -231,7 +231,7 @@ class SubscriptionType(ParseObject):
     MIDDLEWEIGHT = "MiddleWeight"
     HEAVYWEIGHT = "HeavyWeight"
 
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.name = data.get('name', SubscriptionType.FREE)
         self.description = data.get('description', "Free membership")
         self.monthly_cost = data.get('monthly_cost', 0)
@@ -239,7 +239,7 @@ class SubscriptionType(ParseObject):
         self.max_messages = data.get('max_messages', 1)
         self.status = data.get('status', SubscriptionType.ACTIVE)
 
-        super(SubscriptionType, self).__init__(data)
+        super(SubscriptionType, self).__init__(**data)
 
 
 

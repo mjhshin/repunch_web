@@ -1,5 +1,8 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load account_tags %}
+{% load static %}
+{% load store_tags %}
+{% load account_tags %}
+{% load parse_tags %}
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.css" %}" />{% endblock %}
@@ -7,7 +10,7 @@
 
 {% block content %}
 {% with account=request.session.account %}
-	{% with store=account.store %}
+	{% with store=account|get:"store" %}
 	<!-- possibly move to header -->
 	{% account_alert account as alert %}
 	{% if alert %}
@@ -27,14 +30,14 @@
 		</div>
 		
 		<div class="white-box" id="store-details-content">
-			{% if store.store_avatar  %}
+			{% if store|get:'store_avatar'  %}
 				<img src="{{ MEDIA_URL }}{{ store.store_avatar }}" alt="" class="avatar-big" />
 			{% else %}
 				<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
 			{% endif %}
 			<div id="store-details-content-right">
 				<div id="address">
-					<span class="bold">{{ store.store_name }}</span>
+					<span class="bold">{{ store|get:'store_name' }}</span>
 					<p>
 						{{ store.street }}<br />
 						{{ store.city }}, {{ store.state }} {{ store.zip }}<br />

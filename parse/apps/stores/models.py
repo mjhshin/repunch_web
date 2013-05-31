@@ -25,7 +25,7 @@ SHORT_DAYS = ((1, 'Sun'),
 
 class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.store_name = data.get('store_name')
         self.city = data.get('city')
         self.state = data.get('state')
@@ -40,7 +40,7 @@ class Store(ParseObject):
 
         self.Patrons_ = "Patron"
         
-        super(Store, self).__init__(data)
+        super(Store, self).__init__(**data)
 
     def get_class(self, className):
         if className == "Patron":
@@ -50,7 +50,7 @@ class Store(ParseObject):
 class Hours(ParseObject):
     """ Equivalence class of apps.stores.models.Hours """
 
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.days = data.get('days')
         self.open = data.get('open')
         self.close = data.get('close')
@@ -58,7 +58,7 @@ class Hours(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Hours, self).__init__(data)
+        super(Hours, self).__init__(**data)
 
 
 

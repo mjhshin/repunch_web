@@ -46,10 +46,11 @@ def sign_up(request):
         # if store_form.is_valid() and account_form.is_valid() and\
         #   subscription_form.is_valid(): # All validation rules pass
         
+        postDict = request.POST.dict()
         # actual form validations are now done through ParseForms
-        store_pf = pStoreSignUpForm(request.POST)
-        account_pf = pAccountForm(request.POST)
-        subscription_pf = pSubscriptionForm(request.POST)
+        store_pf = pStoreSignUpForm(**postDict)
+        account_pf = pAccountForm(**postDict)
+        subscription_pf = pSubscriptionForm(**postDict)
         # pass is corresponding form's error dicts to fillem up
         # if validation fails
         if store_pf.is_valid(store_form.errors) and\

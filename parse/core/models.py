@@ -51,7 +51,7 @@ class ParseObjectManager(object):
                                 self.className)
             objs = []
             for data in res['results']:
-                objs.append(objClass(data))     
+                objs.append(objClass(**data))     
             return objs
         
         return None
@@ -177,8 +177,32 @@ class ParseObject(object):
                     cls.__name__,  cls.__name__, cls.__module__))
         return cls._manager
 
-    def __init__(self, data):
-        self.update_locally(data)
+    def __init__(self, **data):
+        """
+        Inserts data from data to self.__dict__.
+        This must be called at the end of the __init__ method of the
+        subclass if provided.
+        
+        If the __init__ method of the subclass is not provided or
+        does not set initial attributes, then all data are inserted.
+        e.g. 
+            class Person(ParseObject):
+                pass
+            person = Person(name="nick", age=9)
+
+        Otherwise, only the data that is in __dict__ is inserted.
+        e.g. 
+            class Person(ParseObject):
+                def __init__(self, **data):
+                    self.name = data.get("name")
+                    super(Person, self).__init__(**data)
+            person = Person(name="nick", age=9)
+        In the above example name is inserted but not age.
+        """
+        if len(data) > 0:
+            self.update_locally(data, False)
+        else:
+            self.update_locally(data, True)
 
     """
     def _generate_cache_attrs(self):
@@ -203,7 +227,7 @@ class ParseObject(object):
         """
         return "classes/" + self.__class__.__name__
 
-    def update_locally(self, data):
+    def update_locally(self, data, create=True):
         """
         Replaces values of matching attributes in data
         capitalized attributes only store an objectId.
@@ -218,10 +242,9 @@ class ParseObject(object):
                 if key[0].isupper() and type(value) is dict:
                     setattr(self, key, value.get('objectId'))
                     continue
-
-            setattr(self, key, value)
-
-                
+            
+            if create:
+                setattr(self, key, value)
 
     def get_class(self, className):
         """
@@ -250,7 +273,7 @@ class ParseObject(object):
                         "/" + self.__dict__.get(className))
                 if res and "error" not in res:
                     c = self.get_class(className)
-                    setattr(self, attr, c(res))
+                    setattr(self, attr, c(**res['results'][0]))
                 else:
                     return None
 
@@ -269,13 +292,13 @@ class ParseObject(object):
                         "key": relName, }  })  })
             if res and "error" not in res:
                 c = self.get_class(className)
-                setattr(self, attr, [ c(d) for d in res['results'] ])
+                setattr(self, attr, [ c(**d) for d in res['results'] ])
             else:
                 return None 
         # attr is a regular attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr})
-            self.update_locally(res.get('results')[0])
+            setattr(self, attr, res.get('results')[0])
 
         return self.__dict__.get(attr)
 
@@ -325,7 +348,7 @@ class ParseObject(object):
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
         if res and "error" not in res:
-            self.update_locally(res)
+            self.update_locally(res, True)
             return True
 
         return False
@@ -348,7 +371,7 @@ class ParseObject(object):
         data = self._get_formatted_data()
         res = parse('POST', self.path(), data)
         if res and "error" not in res:
-            self.update_locally(res)
+            self.update_locally(res, True)
             return True
         
         return False

@@ -15,7 +15,7 @@ class Message(ParseObject):
     ALL = "All"
     ONLY_ONE_PUNCH = "Only One Punch"
     
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.date_added = data.get('date_added', date.today().isoformat())
         self.date_sent = data.get('date_sent')
         self.subject = data.get('subject')
@@ -29,7 +29,7 @@ class Message(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Message, self).__init__(data)
+        super(Message, self).__init__(**data)
 
     def get_absolute_url(self):
 		return reverse('message_edit', args=[self.objectId])
@@ -40,7 +40,7 @@ class Feedback(ParseObject):
     READ = "Read"
     UNREAD = "Unread"
     
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.date_added = data.get('date_added', date.today().isoformat())
         self.subject = data.get("subject")
         self.message = data.get("message")
@@ -51,7 +51,7 @@ class Feedback(ParseObject):
         self.Parent = data.get("Parent") 
         self.Store = data.get("Store")
 
-        super(Feedback, self).__init__(data)
+        super(Feedback, self).__init__(**data)
 
     def get_absolute_url(self):
 		# the details are based on the parent (main) message

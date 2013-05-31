@@ -13,7 +13,7 @@ class Employee(ParseObject):
     APPROVED = "Approved"
     DENIED = "Denied"
 
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.first_name = data.get("first_name")
         self.last_name = data.get("last_name")
         self.email = data.get("email")
@@ -23,7 +23,7 @@ class Employee(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Employee, self).__init__(data)
+        super(Employee, self).__init__(**data)
 
     def lifetime_punches(self):
         return parse("GET", "classes/Punch", query={"where":json.dumps({

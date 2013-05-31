@@ -9,7 +9,7 @@ from parse.utils import parse
 
 class Reward(ParseObject):
     """ Equivalence class of apps.rewards.models.Reward """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.name = data.get("name")
         self.description = data.get("description")
         self.punches = data.get("punches")
@@ -17,7 +17,7 @@ class Reward(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Reward, self).__init__(data)
+        super(Reward, self).__init__(**data)
 
     def get_absolute_url(self):
 		return reverse('reward_edit', args=[self.objectId])
@@ -29,7 +29,7 @@ class Reward(ParseObject):
 
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.date_punched = data.get("date_punched", datetime.now().isoformat())
         self.punches = data.get("punches")
 
@@ -37,11 +37,11 @@ class Punch(ParseObject):
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         
-        super(Punch, self).__init__(data)
+        super(Punch, self).__init__(**data)
 
 class Redemption(ParseObject):
     """ Equivalence class of apps.rewards.models.Redemption """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.date_punched = data.get("date_punched", datetime.now().isoformat())
         self.punches = data.get("punches")
 
@@ -49,6 +49,6 @@ class Redemption(ParseObject):
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         
-        super(Redemption, self).__init__(data)
+        super(Redemption, self).__init__(**data)
     
 

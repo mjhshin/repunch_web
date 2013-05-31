@@ -12,7 +12,7 @@ from libs.repunch import rpforms, rpccutils, rputils
 
 class LoginForm(object):
     """  Equivalence class of apps.accounts.forms.LoginForm """
-    def __init__(self, data={}):
+    def __init__(self, **data):
         self.username = data.get('username')
         self.password = data.get('password')
     
@@ -28,8 +28,8 @@ class LoginForm(object):
 
 class SubscriptionForm(object):
     """  Equivalence class of apps.accounts.forms.SubscriptionForm """
-    def __init__(self, data={}):
-        self.subscription = Subscription(data)
+    def __init__(self, **data):
+        self.subscription = Subscription(**data)
         self.cc_cvv = data.get("cc_cvv")
         self.recurring = data.get("recurring")
 
@@ -70,8 +70,8 @@ class SubscriptionForm(object):
 
 class AccountForm(object):
     """  Equivalence class of apps.accounts.forms.AccountForm """
-    def __init__(self, data={}):
-        self.account = Account(data)
+    def __init__(self, **data):
+        self.account = Account(**data)
 
     def is_valid(self, errors):
         """ errors is a dictionary. Returns len(errors) == 0 """
