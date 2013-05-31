@@ -40,7 +40,8 @@ class ParseObjectManager(object):
         q = {}
         # separate the "where" parameters from the rest
         for p in NOT_WHERE_CONSTRAINTS:
-            q[p] = constraints.pop(p)
+            if p in constraints:
+                q[p] = constraints.pop(p)
         
         q["where"] = dumps(constraints)
         res = parse("GET", self.path + self.pathClassName, query=q)
@@ -75,7 +76,7 @@ class ParseObject(object):
                     # Date type
                     self.date_born = data.get("date_born")
                     # Pointer type
-                    self.Mother = date.get("Mother")
+                    self.Mother = data.get("Mother")
                     # Relation type
                     self.Friends_ = "Person"
 
@@ -91,15 +92,14 @@ class ParseObject(object):
  
             e.g. self.MilkyWay
 
-        These attributes should store an objectId. 
+        These attributes need to store a dictionary containing at 
+        least the objectId. 
         The name of the attribute is used as the column name in Parse.
 
         A cache attribute is created that contains the actual 
         ParseObject (initially None) that it points to.
         The cache attribute name is the Pointer name with the first
-        character lowercased.
-            e.g. self.milkyWay
-        To get the actual object:
+        character lowercased. To get the actual object:
             e.g. self.get("milkyWay")
         -------------------------------
 
@@ -177,24 +177,25 @@ class ParseObject(object):
                     cls.__name__,  cls.__name__, cls.__module__))
         return cls._manager
 
-    def __init__(self, data={}):
-        self.objectId = data.get('objectId')
-        self.createdAt = data.get('createdAt')
-        self.updatedAt = data.get('updateAt')
-
-        self._generate_cache_attrs()
+    def __init__(self, data):
         self.update_locally(data)
 
+    """
     def _generate_cache_attrs(self):
-        """ 
+        ''' 
         create the cache attrs for the Pointers and Relations if any.
-        """
+        '''
+        to_gen = {}
         for attr in self.__dict__:
             # Relations
             if attr[0].isupper() and attr.endswith("_"):
-                setattr(self, attr[0].lower() + attr[1:-1] , None)
+                to_gen[attr[0].lower() + attr[1:-1]] = None
             elif attr[0].isupper() and not attr.endswith("_"):
-                setattr(self, attr[0].lower() + attr[1:] , None)
+                to_gen[attr[0].lower() + attr[1:]] = None
+
+        for key, value in to_gen.iteritems():
+            setattr(self, key, value)
+    """
 
     def path(self):
         """ returns the path of this class or use with parse 
@@ -206,16 +207,21 @@ class ParseObject(object):
         """
         Replaces values of matching attributes in data
         capitalized attributes only store an objectId.
+        If the attribute does not exist, it is created.
+        Pointer caches are created if data for the Pointer is in data.
         """
         for key, value in data.iteritems():
-            # make sure Relation vals are untouched
             if key.endswith("_"):
                 continue
-            if key in self.__dict__.iterkeys():
+            if key in self.__dict__:
+                # Pointers attrs- store only the objectId
                 if key[0].isupper() and type(value) is dict:
-                    self.__dict__[key] = value.get('objectId')
-                else:
-                    self.__dict__[key] = value
+                    setattr(self, key, value.get('objectId'))
+                    continue
+
+            setattr(self, key, value)
+
+                
 
     def get_class(self, className):
         """
@@ -232,9 +238,7 @@ class ParseObject(object):
         If the attr is a #2, then it is treated
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
-        """    
-        if attr not in self.__dict__:
-            return None
+        """
         if self.__dict__.get(attr):
             return self.__dict__.get(attr)
 
@@ -246,7 +250,7 @@ class ParseObject(object):
                         "/" + self.__dict__.get(className))
                 if res and "error" not in res:
                     c = self.get_class(className)
-                    self.__dict__[attr] = c(res)
+                    setattr(self, attr, c(res))
                 else:
                     return None
 
@@ -265,20 +269,20 @@ class ParseObject(object):
                         "key": relName, }  })  })
             if res and "error" not in res:
                 c = self.get_class(className)
-                self.__dic__[attr] = [ c(d) for d in res['results'] ]
+                setattr(self, attr, [ c(d) for d in res['results'] ])
             else:
                 return None 
         # attr is a regular attr
-        else: 
+        elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr})
             self.update_locally(res.get('results')[0])
 
-        return self.__dict__[attr]
+        return self.__dict__.get(attr)
 
     def set(self, attr, val):
         """ set this object's attr to val. This does not commit
         anything up to Parse. """
-        self.__dict__[attr] = val
+        setattr(self, attr, val)
 
     def add_relation(self, relAttrName, objectIds):
         """ Adds the list of objectIds to the given relation. 
@@ -292,7 +296,7 @@ class ParseObject(object):
         objs = []
         for oid in objectIds:
             objs.append( { "__type": "Pointer",
-                           "className": self.__dict__[relAttrName],
+                           "className": getattr(self, relAttrName),
                            "objectId": oid } )
         res = parse("PUT", self.path() + "/" + self.objectId, {
                     relAttrName[:-1]: {
@@ -342,7 +346,7 @@ class ParseObject(object):
         this method makes sure that it is saved as a Pointer.
         """
         data = self._get_formatted_data()
-        
+        res = parse('POST', self.path(), data)
         if res and "error" not in res:
             self.update_locally(res)
             return True
@@ -371,7 +375,7 @@ class ParseObject(object):
             # exclude Relation caches and clear it
             if key[0].islower() and\
                 key[0].upper() + key[1:] + "_" in self.__dict__:
-                self.__dict__[key] = None
+                setattr(self, key, None)
                 continue
             # exclude the Pointer cache and maybe clear it
             if  key[0].islower() and\
@@ -379,7 +383,7 @@ class ParseObject(object):
                 # clear the cache objects if their pointers changed
                 if value and value.objectId !=\
                     self.__dict__[key[0].upper() + key[1:]]:
-                    self.__dict__[key] = None
+                    setattr(self, key, None)
                 continue
 
             # Pointers

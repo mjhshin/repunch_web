@@ -10,6 +10,7 @@ from parse.apps.stores.models import Store
 class StoreSignUpForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
     def __init__(self, data={}):
+        print data
         self.store = Store(data)
 
     def is_valid(self, errors):
@@ -22,6 +23,7 @@ class StoreSignUpForm(object):
         for e in f:
             if s.__dict__.get(e) and len(s.__dict__.get(e)) > 255:
                 errors[s] = "%s cannot exceed 255 characters." % (x,)
+
         if s.email and not email_re.match(s.email):
             errors['email'] = "Please enter a valid email."
         

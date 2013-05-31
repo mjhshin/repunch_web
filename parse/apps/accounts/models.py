@@ -93,6 +93,8 @@ class Settings(ParseObject):
 
         self.Account = data.get("Account")
 
+        super(Settings, self).__init__(data)
+
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, data={}):

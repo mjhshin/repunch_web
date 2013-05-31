@@ -20,8 +20,8 @@ def parse(method, path, data=None, query=None):
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
 
-    if method == "POST":
-        conn.request("POST", '/' + PARSE_VERSION + '/' + path, 
+    if method in ("POST", "PUT"):
+        conn.request(method, '/' + PARSE_VERSION + '/' + path, 
                         json.dumps(data), REST_CONNECTION_META)
     elif method == "GET":
         if query:
@@ -31,9 +31,6 @@ def parse(method, path, data=None, query=None):
         conn.request("GET", '/' + PARSE_VERSION + '/' + path +\
                 '%s' % (params, ), '',  REST_CONNECTION_META)
 
-    elif method == "PUT":
-        conn.request("PUT", '/' + PARSE_VERSION + '/' + path,
-                        json.dumps(data), REST_CONNECTION_META)
     try:
         result = json.loads(conn.getresponse().read())
     except ValueError as e:

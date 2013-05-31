@@ -39,7 +39,7 @@ class Store(ParseObject):
         self.store_timezone = data.get('store_timezone', TIME_ZONE)
 
         self.Patrons_ = "Patron"
-
+        
         super(Store, self).__init__(data)
 
     def get_class(self, className):
