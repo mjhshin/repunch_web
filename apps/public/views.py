@@ -68,6 +68,14 @@ def sign_up(request):
             # save subscription
             su.subscription.SubscriptionType = free['objectId']
             su.save()
+      
+            su.subscription.store_cc(su.subscription.cc_number,
+                    su.cc_cvv)
+            account = ac.account
+            account.Store = store_pf.store.objectId
+            account.Subscription = su.subscription.objectId
+            account.set_password(request.POST.get('password'))
+            account.create()
 
             # TODO refactor templates to use parse forms instead
             if su.subscription.cc_number:
@@ -77,14 +85,6 @@ def sign_up(request):
                 subscription_form.data = subscription_form.data.copy()
                 subscription_form.data['cc_number'] = mask
                 # REMOVE -------------
-            
-            su.subscription.store_cc(su.subscription.cc_number,
-                    su.cc_cvv)
-            account = ac.account
-            account.Store = store_pf.store.objectId
-            account.Subscription = su.subscription.objectId
-            account.set_password(request.POST.get('password'))
-            account.create()
 
             # auto login
             user_login = login(request, account.username, 

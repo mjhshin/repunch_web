@@ -198,7 +198,13 @@ class ParseObject(object):
                     super(Person, self).__init__(**data)
             person = Person(name="nick", age=9)
         In the above example name is inserted but not age.
+
+        All ParseObjects have 3 attributes by default:
+        objectId, createdAt, updatedAt
         """
+        self.objectId = data.get("objectId")
+        self.createdAt = data.get("createdAt")
+        self.updatedAt = data.get("updatedAt")
         if len(data) > 0:
             self.update_locally(data, False)
         else:
@@ -273,7 +279,7 @@ class ParseObject(object):
                         "/" + self.__dict__.get(className))
                 if res and "error" not in res:
                     c = self.get_class(className)
-                    setattr(self, attr, c(**res['results'][0]))
+                    setattr(self, attr, c(**res))
                 else:
                     return None
 
