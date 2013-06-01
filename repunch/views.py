@@ -14,7 +14,7 @@ def manage_login(request):
     data = {}
     if request.method == 'POST': # If the form has been submitted...
         form = LoginForm(request.POST) # A form bound to the POST data
-        pform = pLoginForm(request.POST)
+        pform = pLoginForm(**request.POST.dict())
         if pform.is_valid(): # All validation rules pass
             user = pform.do_login(request)
             if user:
