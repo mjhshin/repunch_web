@@ -6,8 +6,8 @@ from importlib import import_module
 from dateutil import parser
 
 from parse.utils import parse
-
-NOT_WHERE_CONSTRAINTS = ["include", "count", "limit", "order"]
+from parse.core.formatter import query,\
+format_date, format_pointer
 
 class ParseObjectManager(object):
     """
@@ -21,31 +21,30 @@ class ParseObjectManager(object):
         self.module = module
     
     def count(self, **constraints):
-        """ returns the number of objects that matches the constraints
+        """ 
+        returns the number of objects that matches the constraints
         """
-        res = parse("GET", self.path + self.pathClassName, query={
-                    "where":dumps(constraints),
-                    "count":1,"limit":0} )
+        constraints["count"] = 1
+        constraints["limit"] = 0
+        res = parse("GET", self.path + self.pathClassName,
+                        query=query(constraints) )
 
         if res and 'count' in res:
             return res['count']
         return 0
 
     def filter(self, **constraints):
-        """ returns the list of objects that matches the
-        constraints.the class objects.
-
-        See NOT_WHERE_CONSTRAINTS for 
-        supported non-object attr constraints
-        """
-        q = {}
-        # separate the "where" parameters from the rest
-        for p in NOT_WHERE_CONSTRAINTS:
-            if p in constraints:
-                q[p] = constraints.pop(p)
+        """ 
+        Returns the list of objects that matches the constraints.
         
-        q["where"] = dumps(constraints)
-        res = parse("GET", self.path + self.pathClassName, query=q)
+        See WHERE_OPTIONS for all currently supported options.
+        Double underscores allow for usage of WHERE_OPTIONS like 
+        gte (greater than or equal to). 
+
+        TODO Also allows queries spanning multiple classes.
+        """
+        res = parse("GET", self.path + self.pathClassName, 
+                    query=query(constraints))
                   
         if res and "results" in res:
             objClass = getattr(import_module(self.module), 
@@ -55,7 +54,9 @@ class ParseObjectManager(object):
                 objs.append(objClass(**data))     
             return objs
         
-        return None
+        return None 
+
+    def _prepare_query
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models 
@@ -271,15 +272,15 @@ class ParseObject(object):
 
         # Pointer cache
         if attr[0].islower() and\
-                    attr[0].upper() + attr[1:] in self.__dict__:
-                className = attr[0].upper() + attr[1:]
-                res = parse("GET", "classes/" + className +\
-                        "/" + self.__dict__.get(className))
-                if res and "error" not in res:
-                    c = self.get_class(className)
-                    setattr(self, attr, c(**res))
-                else:
-                    return None
+            attr[0].upper() + attr[1:] in self.__dict__:
+            className = attr[0].upper() + attr[1:]
+            res = parse("GET", "classes/" + className +\
+                    "/" + self.__dict__.get(className))
+            if res and "error" not in res:
+                c = self.get_class(className)
+                setattr(self, attr, c(**res))
+            else:
+                return None
 
         # Relation cache
         elif attr[0].islower() and attr[0].upper() + attr[1:] +\
@@ -305,12 +306,12 @@ class ParseObject(object):
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
             setattr(self, attr, 
-                        parser.parse(res.get('results')[0][attr]))
+                    parser.parse(res.get('results')[0].get(attr)) )
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
-            setattr(self, attr, res.get('results')[0][attr])
+            setattr(self, attr, res.get('results')[0].get(attr) )
 
         return self.__dict__.get(attr)
 
@@ -395,8 +396,8 @@ class ParseObject(object):
         # TODO 
         pass
 
-
     ### "Private" methods
+
     def _get_formatted_data(self):
         """ 
         returns a dictionary to be used in a PUT request for Parse.
@@ -425,20 +426,13 @@ class ParseObject(object):
 
             # Pointers
             if key[0].isupper() and not key.endswith("_"):
-                data[key] = {
-                    "__type": "Pointer",
-                    "className": key,
-                    "objectId": value
-                }
+                data[key] = format_pointer(key, value)
             # Dates
             elif key.startswith("date_"):
-                data[key] = {
-                    "__type": "Date",
-                    "iso": parser.parse(value.isoformat()).isoformat()
-                }
+                data[key] = format_date(value)
             # regular attributes
-            else:
-                data[key] = value
+            # else:
+            #    data[key] = value
 
         return data
 

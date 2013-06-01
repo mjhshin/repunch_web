@@ -41,11 +41,7 @@ def account_message_usage(account, percent_of=None):
     atype = account.get('subscription').get('subscriptionType')
     now = datetime.now()
 
-    # create the datetime object for comparison since all dates
-    # are stored as strings
-    # TODO
-    
-    message_count = 0 
+    message_count = Message.objects().count(objectId=)
     
     percent = message_count/atype.max_messages
     if(percent > 1): #don't go past 1
