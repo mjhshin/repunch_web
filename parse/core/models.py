@@ -2,7 +2,6 @@
 Parse models corresponding to Django models
 """
 from json import dumps
-from importlib import import_module
 from dateutil import parser
 
 from parse.utils import parse
@@ -14,11 +13,10 @@ class ParseObjectManager(object):
     Provides extra methods for ParseObjects such as counting.
     This provides functionality similar to Django's Model.objects
     """
-    def __init__(self, path, pathClassName, className, module):
+    def __init__(self, path, pathClassName, cls):
         self.path = path
         self.pathClassName = pathClassName
-        self.className = className
-        self.module = module
+        self.cls = cls
     
     def count(self, **constraints):
         """ 
@@ -31,7 +29,16 @@ class ParseObjectManager(object):
 
         if res and 'count' in res:
             return res['count']
+
         return 0
+
+    def get(self, **constraints):
+        """
+        Returns the first result returned by filter if any.
+        """
+        res = self.filter(**constraints)
+        if res:
+            return res[0]
 
     def filter(self, **constraints):
         """ 
@@ -47,16 +54,12 @@ class ParseObjectManager(object):
                     query=query(constraints))
                   
         if res and "results" in res:
-            objClass = getattr(import_module(self.module), 
-                                self.className)
             objs = []
             for data in res['results']:
-                objs.append(objClass(**data))     
+                objs.append(self.cls(**data))     
             return objs
         
         return None 
-
-    def _prepare_query
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models 
@@ -152,6 +155,10 @@ class ParseObject(object):
         All class attributes values should be obtained using this
         method. However, objectId, createdAt, updatedAt may
         be accessed without having to use this method.
+
+        createdAt and updatedAt are of __type Date.
+        However, they are always stored as strings in iso format in
+        ParseObjects.
         
         -------------------------------
 
@@ -192,10 +199,10 @@ class ParseObject(object):
     # User class in Parse DB
 
     @classmethod
-    def objects(cls):
+    def objects(cls):  
         if not hasattr(cls, "_manager"):
             setattr(cls, "_manager", ParseObjectManager('classes/',
-                    cls.__name__,  cls.__name__, cls.__module__))
+                    cls.__name__,  cls))
         return cls._manager
 
     def __init__(self, create=True, **data):
@@ -240,15 +247,18 @@ class ParseObject(object):
         Pointer caches are created if data for the Pointer is in data.
         """
         for key, value in data.iteritems():
-            if key.endswith("_"):
+            if key.endswith("_") or (key not in self.__dict__ and\
+                not create):
                 continue
-            if key in self.__dict__:
-                # Pointers attrs- store only the objectId
-                if key[0].isupper() and type(value) is dict:
-                    setattr(self, key, value.get('objectId'))
-                    continue
-            
-            if create:
+
+            # Pointers attrs- store only the objectId
+            if key[0].isupper() and type(value) is dict:
+                setattr(self, key, value.get('objectId'))
+            # make sure dates are datetime objects
+            elif key.startswith("date_") and type(value) is dict:
+                setattr(self, key, 
+                            parser.parse(value.get('iso')) )
+            else:
                 setattr(self, key, value)
 
     def get_class(self, className):
@@ -288,7 +298,7 @@ class ParseObject(object):
             className = self.__dic__[attr[0].upper() + attr[1:] + "_"]
             relName = attr[0].upper() + attr[1:]
             res = parse("GET", 'classes/' + className, query={
-                    "where":json.dumps({
+                    "where":dumps({
                         "$relatedTo":{ 
                         "object":{
                             "__type": "Pointer",
@@ -305,13 +315,15 @@ class ParseObject(object):
         elif attr.startswith("date_"):
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
-            setattr(self, attr, 
+            if 'results' in res and res['results']:
+                setattr(self, attr, 
                     parser.parse(res.get('results')[0].get(attr)) )
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
-            setattr(self, attr, res.get('results')[0].get(attr) )
+            if 'results' in res and res['results']:
+                setattr(self, attr, res.get('results')[0].get(attr) )
 
         return self.__dict__.get(attr)
 

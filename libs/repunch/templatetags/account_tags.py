@@ -1,7 +1,9 @@
 from __future__ import division
 from django import template
-from datetime import datetime
+from datetime import date
+from dateutil import parser
 
+from libs.dateutil.extras import start_month, end_month
 from parse.apps.messages.models import Message
 from parse.utils import parse
 
@@ -39,9 +41,11 @@ def account_alert(account):
 @register.simple_tag
 def account_message_usage(account, percent_of=None):
     atype = account.get('subscription').get('subscriptionType')
-    now = datetime.now()
-
-    message_count = Message.objects().count(objectId=)
+    
+    today = date.today()
+    message_count = Message.objects().count(Store=\
+            account.get("Store"), date_sent__gte=start_month(today),
+            date_sent__lte=end_month(today))
     
     percent = message_count/atype.max_messages
     if(percent > 1): #don't go past 1
@@ -59,8 +63,8 @@ def account_user_count(account):
 
 @register.simple_tag
 def account_message_count(account):
-    
-    now = datetime.now()
-    # TODO
-    return 0
+    today = date.today()
+    return Message.objects().count(Store=\
+            account.get("Store"), date_sent__gte=start_month(today),
+            date_sent__lte=end_month(today))
 

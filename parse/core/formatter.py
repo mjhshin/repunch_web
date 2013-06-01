@@ -29,7 +29,7 @@ def format_pointer(className, objectId):
             "className": className,
             "objectId": objectId }
 
-def query(contraints):
+def query(constraints):
     """
     Returns the formatted constraints in Parse format.
     """
@@ -38,13 +38,17 @@ def query(contraints):
         if key in NOT_WHERE_CONSTRAINTS:
             q[key] = value
     
-        if key.__contains__("__"):
-            args = key.split("__")
-            if len(args) == 2 and args[1] in WHERE_OPTIONS:
-                if args[0].__contains__("date_"):
-                    where[key] = {
-                        "$" + args[1]: format_date(value)
-                    }
+        else:
+            # where options TODO spanning tables
+            if key.__contains__("__"):
+                args = key.split("__")
+                if len(args) == 2 and args[1] in WHERE_OPTIONS:
+                    if args[0].__contains__("date_"):
+                        where[key] = {
+                            "$" + args[1]: format_date(value)
+                        }
+            else: # regular where params
+                where[key] = value
 
     q['where'] = json.dumps(where)
     return q

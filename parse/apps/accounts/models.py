@@ -29,7 +29,7 @@ class Account(ParseObject):
     def objects(cls):
         if not hasattr(cls, "_manager"):
             setattr(cls, "_manager", ParseObjectManager('users',
-                    '',  cls.__name__, cls.__module__))
+                    '',  cls))
         return cls._manager
 
     def __init__(self, **data):
@@ -120,7 +120,7 @@ class Subscription(ParseObject):
     INACTIVE = 'Inactive'
     ERROR = "Billing Error"
     def __init__(self, **data):
-        self.status = data.get('status')
+        self.status = data.get('status', Subscription.ACTIVE)
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.cc_number = data.get('cc_number')
