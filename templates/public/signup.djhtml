@@ -76,9 +76,9 @@
 					</div>
 					
 					<div class="clear-both"></div>
-					{{ account_form.phone.errors }}
-					<label for="id_phone">Your Phone Number</label>
-					{{ account_form.phone }}
+					{{ account_form.phone_number.errors }}
+					<label for="id_phone_number">Your Phone Number</label>
+					{{ account_form.phone_number }}
 					
 					{{ account_form.email.errors }}
 					<label for="id_email">Your Email Address</label>

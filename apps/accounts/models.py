@@ -12,7 +12,7 @@ PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 class Account(AbstractUser):
 	store = models.OneToOneField(Store,null=True,blank=True)
 	subscription = models.OneToOneField('Subscription',null=True,blank=True)
-	phone = models.CharField(max_length=255)
+	phone_number = models.CharField(max_length=255)
 
 	objects = UserManager()
 	

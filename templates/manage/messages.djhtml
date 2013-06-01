@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}
+{% load static %}{% load store_tags %}{% load parse_tags %}
 
 {% block title %}Messages{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
@@ -21,7 +21,7 @@
 		
 		<div class="tab-container">
 			<div class="tab active" id="tab-sent">Sent</div>
-			{% feedback_unread request.session.account.store as fcount %}
+			{% feedback_unread request.session.account|get:'store' as fcount %}
 						
 			<div class="tab" id="tab-feedback">Feedback{% if fcount > 0 %} ({{ fcount }}){% endif %}</div>
 		</div>
@@ -37,10 +37,10 @@
 			{% for message in messages %}
 			<div class="tr {% cycle '' 'odd' %} {% ifequal message.status 'Draft'%}draft{% endifequal %} ">
 				<a href="{% url 'message_edit' message.id %}">
-					<div class="td date">{{ message.date_added|date:"m/d/y" }}</div>
-					<div class="td subject">{{ message.subject }}</div>
-					<div class="td status">{{ message.status }}</div>
-					<div class="td date-sent">{% if message.date_sent  %}{{ message.date_sent|date:"m/d/y" }}{% endif %}</div>
+					<div class="td date">{{ message|get:'date_added'|date:"m/d/y" }}</div>
+					<div class="td subject">{{ message|get:'subject' }}</div>
+					<div class="td status">{{ message|get:'status' }}</div>
+					<div class="td date-sent">{% if message|get:'date_sent'  %}{{ message|get:'date_sent'|date:"m/d/y" }}{% endif %}</div>
 				</a>
 			</div>
 			{% empty %}
@@ -63,8 +63,8 @@
 			{% for fb in feedback %}
 			<div class="tr {% cycle '' 'odd' %} {% ifequal fb.status 0 %}unread{% endifequal %}">
 				<a href="{% url 'feedback_details' fb.id %}">
-					<div class="td date">{{ fb.date_added|date:"m/d/y" }}</div>
-					<div class="td from">{{ fb.patron.name }}{% if fb.thread_count > 0 %}&nbsp;({{ fb.thread_count }}){% endif %}</div>
+					<div class="td date">{{ fb|get:'date_added'|date:"m/d/y" }}</div>
+					<div class="td from">{{ fb|get:'patron'|get:'name' }}{% if fb.thread_count > 0 %}&nbsp;({{ fb.thread_count }}){% endif %}</div>
 					<div class="td subject">{{ fb.subject }}</div>
 				</a>
 			</div>

@@ -8,7 +8,7 @@ from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account
+from parse.apps.accounts.models import Account, SubscriptionType
 from parse.apps.accounts import free
 from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
@@ -23,6 +23,7 @@ def index(request):
 def learn(request):
     data = {'learn_nav': True}
     
+    data['unlimited'] = SubscriptionType.UNLIMITED
     data['types'] = SubscriptionType.objects.filter(status=1).order_by('monthly_cost')
     return render(request, 'public/learn.djhtml', data)
 

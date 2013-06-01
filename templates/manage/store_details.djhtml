@@ -1,8 +1,4 @@
-{% extends "manage/base.djhtml" %}
-{% load static %}
-{% load store_tags %}
-{% load account_tags %}
-{% load parse_tags %}
+{% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}{% load parse_tags %}
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.css" %}" />{% endblock %}
@@ -39,10 +35,10 @@
 				<div id="address">
 					<span class="bold">{{ store|get:'store_name' }}</span>
 					<p>
-						{{ store.street }}<br />
-						{{ store.city }}, {{ store.state }} {{ store.zip }}<br />
-						{{ store.phone_number }}<br />
-						{{ store.email }}
+						{{ store|get:'street' }}<br />
+						{{ store|get:'city' }}, {{ store|get:'state' }} {{ store|get:'zip' }}<br />
+						{{ store|get:'phone_number' }}<br />
+						{{ store|get:'email' }}
 					</p>
 				</div>
 				<div id="hours">
@@ -57,7 +53,7 @@
 				</div>
 				<div id="description">
 					<span class="bold">Store Description</span>
-					<p>{{ store.store_description }}</p>
+					<p>{{ store|get:'store_description' }}</p>
 				</div>
 			</div>
 			<div class="clear">&nbsp;</div>
@@ -67,11 +63,11 @@
 	</div>
 	
 	<div class="section">
-		{% with type=account.subscription.type %}
+		{% with type=account|get:'subscription'|get:'subscriptionType' %}
 		<div class="section-title">
 			Current Subscription: 
 			<span style="font-weight:bold;">
-				{{ type }}
+				{{ type|get:'name' }}
 			</span>
 		</div>
 		
@@ -81,7 +77,7 @@
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count account %}</div>
-					<div class="limit">of {% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users}}{% endif %}</div>
+					<div class="limit">of {% if type|get:'max_users' == -1 %}unlimited{% else %}{{ type|get:'max_users' }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="limit-details right">
@@ -89,7 +85,7 @@
 				<div class="description">
 					<div class="label">SENT MESSAGES</div>
 					<div class="count">{% account_message_count account %}</div>
-					<div class="limit">of {{ type.max_messages }}</div>
+					<div class="limit">of {{ type|get:'max_messages' }}</div>
 				</div>
 			</div>
 			<div class="clear"></div>

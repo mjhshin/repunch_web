@@ -2,10 +2,9 @@
 Parse equivalence of Django apps.messages.models
 """
 
-from datetime import date
+from datetime import datetime
 from json import dumps
 
-from parse.utils import parse
 from parse.core.models import ParseObject
 
 class Message(ParseObject):
@@ -16,7 +15,7 @@ class Message(ParseObject):
     ONLY_ONE_PUNCH = "Only One Punch"
     
     def __init__(self, **data):
-        self.date_added = data.get('date_added', date.today().isoformat())
+        self.date_added = data.get('date_added', datetime.now().isoformat())
         self.date_sent = data.get('date_sent')
         self.subject = data.get('subject')
         self.status = data.get('status', DRAFT)
@@ -29,7 +28,7 @@ class Message(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Message, self).__init__(**data)
+        super(Message, self).__init__(False, **data)
 
     def get_absolute_url(self):
 		return reverse('message_edit', args=[self.objectId])
@@ -41,17 +40,18 @@ class Feedback(ParseObject):
     UNREAD = "Unread"
     
     def __init__(self, **data):
-        self.date_added = data.get('date_added', date.today().isoformat())
+        self.date_added = data.get('date_added', datetime.now().isoformat())
         self.subject = data.get("subject")
         self.message = data.get("message")
         self.is_response = data.get("is_response", False)
         self.status = data.get("status", UNREAD)
 
         self.Patron = data.get("Patron")
-        self.Parent = data.get("Parent") 
+        # parent = models.ForeignKey('self', null=True, blank=True)
+        self.Feedback = data.get("Feedback") 
         self.Store = data.get("Store")
 
-        super(Feedback, self).__init__(**data)
+        super(Feedback, self).__init__(False, **data)
 
     def get_absolute_url(self):
 		# the details are based on the parent (main) message
@@ -60,8 +60,7 @@ class Feedback(ParseObject):
 		return reverse('feedback_details', args=[self.get("parent").objectId])
 
     def thread_count(self):
-		return parse("GET", self.path(), query={"where":json.dumps({
-               "Parent":self.objectId}),"count":1,"limit":0})["count"]
+		return Feedback.objects().count(Feedback=self.objectId)
 
 
 

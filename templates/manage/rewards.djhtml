@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}Rewards{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/rewards.css" %}" />{% endblock %}
@@ -27,14 +27,14 @@
 		
 		{% for reward in rewards %}
 		    <div class="tr reward {% cycle '' 'odd' %}">
-				<a href="{% url 'reward_edit' reward.id %}">
-					<div class="td reward_punches">{{ reward.punches }}</div>
+				<a href="{% url 'reward_edit' reward.objectId %}">
+					<div class="td reward_punches">{{ reward|get:'punches' }}</div>
 					<div class="td reward_summary">
-						{% if reward.reward_avatar %}
-						<img src="{{ MEDIA_URL }}{{ reward.reward_avatar }}" alt="" class="avatar-medium">
+						{% if reward|get:'reward_avatar' %}
+						<img src="{{ MEDIA_URL }}{{ reward|get:'reward_avatar' }}" alt="" class="avatar-medium">
 						{% endif %}
-						<span class="reward_title">{{ reward.reward_name}}</span><br />
-						<span class="reward_description">{{ reward.description }}</span>
+						<span class="reward_title">{{ reward|get:'reward_name' }}</span><br />
+						<span class="reward_description">{{ reward|get:'description' }}</span>
 					</div>
 				</a>
 			</div>

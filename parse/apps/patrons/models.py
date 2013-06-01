@@ -27,7 +27,7 @@ class Patron(ParseObject):
 
         self.Stores_ = "Store"
 
-        super(Patron, self).__init__(**data)
+        super(Patron, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Store":
@@ -42,5 +42,5 @@ class FacebookPost(ParseObject):
         self.Patron = data.get("Patron")
         self.Store = data.get("Store")
 
-        super(FacebookPost, self).__init__(**data)
+        super(FacebookPost, self).__init__(False, **data)
 

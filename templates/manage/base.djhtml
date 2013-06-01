@@ -1,8 +1,4 @@
-{% load static %}
-{% load store_tags %}
-{% load account_tags %}
-{% load util_tags %}
-{% load parse_tags %}
+{% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}{% load parse_tags %}
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -31,12 +27,12 @@
 			<div id="header-right">
 				<div id="account-info">
 					<a href="{% url 'store_index' %}">
-						{% if request.session.account.store.store_avatar  %}
-							<img src="{{ MEDIA_URL }}{{ request.session.account.store.store_avatar }}?{% timestamp %}" alt="" class="avatar-small" />
+						{% if request.session.account|get:'store'|get:'store_avatar'  %}
+							<img src="{{ MEDIA_URL }}{{ request.session.account|get:'store'|get:'store_avatar' }}?{% timestamp %}" alt="" class="avatar-small" />
 						{% else %}
 							<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-small" />
 						{% endif %}
-						<span id="account-name">{{ user.username }}</span>
+						<span id="account-name">{{ request.session.account|get:'username' }}</span>
 					</a>
 				</div>
 				<div id="logout">
@@ -83,7 +79,7 @@
 					<a href="{% url 'employees_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_employees.png" %}" alt="" />
 						<span class="nav-item-title">Employees</span>
-						{% employees_pending request.session.account.store as epcount %}
+						{% employees_pending request.session.account|get:'store' as epcount %}
 						{% if epcount > 0 %}
 						<div class="nav-item-badge">{{ epcount }}</div>
 						{% endif %}

@@ -76,8 +76,8 @@ class AccountForm(object):
     def is_valid(self, errors):
         """ errors is a dictionary. Returns len(errors) == 0 """
         s = self.account
-        if s.phone and len(s.phone) > 255:
-            errors['phone'] = "Phone number cannot exceed 255 "+\
+        if s.phone_number and len(s.phone_number) > 255:
+            errors['phone_number'] = "Phone number cannot exceed 255 "+\
                                 " characters."
         if s.email and not email_re.match(s.email):
             errors['email'] = "Please enter a valid email."

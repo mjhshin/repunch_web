@@ -4,7 +4,6 @@ Parse equivalence of Django apps.stores.models
 from importlib import import_module
 
 from repunch.settings import TIME_ZONE
-from parse.utils import parse
 from parse.core.models import ParseObject
 
 DAYS = ((1, 'Sunday'),
@@ -27,6 +26,7 @@ class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
     def __init__(self, **data):
         self.store_name = data.get('store_name')
+        self.street = data.get("street")
         self.city = data.get('city')
         self.state = data.get('state')
         self.zip = data.get('zip')
@@ -40,7 +40,7 @@ class Store(ParseObject):
 
         self.Patrons_ = "Patron"
         
-        super(Store, self).__init__(**data)
+        super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Patron":
@@ -58,7 +58,7 @@ class Hours(ParseObject):
 
         self.Store = data.get("Store")
 
-        super(Hours, self).__init__(**data)
+        super(Hours, self).__init__(False, **data)
 
 
 

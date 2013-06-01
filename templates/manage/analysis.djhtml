@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load util_tags %}
+{% load static %}{% load util_tags %}{% load parse_tags %}
 
 {% block title %}Analysis{% endblock %}
 {% block styles %}	
@@ -89,7 +89,7 @@
 			</div>
 			{% for reward in rewards %}
 		    <div class="tr  {% cycle '' 'odd' %}">
-				<div class="td reward_name">{{ reward.reward_name }}</div>
+				<div class="td reward_name">{{ reward|get:'reward_name' }}</div>
 				<div class="td reward_redemptions">{{ reward.redemption_count }}</div>
 			</div>
 			{% empty %}

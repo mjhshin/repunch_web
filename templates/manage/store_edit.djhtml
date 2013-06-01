@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load util_tags %}
+{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
@@ -20,7 +20,7 @@
 
 
 {% block content %}
-{% with store=request.session.account.store %}
+{% with store=request.session.account|get:'store' %}
 	
 	<form action="{% url 'store_edit' %}" method="post" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
@@ -31,8 +31,8 @@
 		
 		<div id="photo-edit">
 			<div class="white-box">
-				{% if store.store_avatar  %}
-					<img src="{{ MEDIA_URL }}{{ store.store_avatar }}?{% timestamp %}" class="avatar-big" />
+				{% if store|get:'store_avatar'  %}
+					<img src="{{ MEDIA_URL }}{{ store|get:'store_avatar' }}?{% timestamp %}" class="avatar-big" />
 				{% else %}
 					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
 				{% endif %}

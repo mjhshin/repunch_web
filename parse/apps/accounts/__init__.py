@@ -12,7 +12,7 @@ ACTIVE = 'Active'
 
 # make sure that a subscription type of free exist in the DB
 free_type = {"name":"Free", "description":"Free membership", 
-                "monthly_cost":0, "max_users":1,
+                "monthly_cost":0, "max_users":50,
                 "max_messages":1, "level":0, 
                 "status": ACTIVE }
 free = parse("GET", "classes/SubscriptionType", query={

@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load util_tags %}
+{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
 
 {% block title %}Messages{% endblock %}
 {% block styles %}
@@ -28,7 +28,7 @@
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
-	{% employees_pending request.session.account.store as epcount %}
+	{% employees_pending request.session.account|get:'store' as epcount %}
 	{% if epcount > 0  %}
 	<div class="notification">
 		<div>You have {{ epcount }} employee{{ epcount|pluralize }} pending approval</div>
@@ -53,12 +53,12 @@
 			</div>
 			{% for employee in employees %}
 			<div class="tr {% cycle 'odd' '' %}">
-				<a href="{% url 'employee_edit' employee.id %}"><div class="td first_name">{{ employee.first_name }}</div></a>
-				<a href="{% url 'employee_edit' employee.id %}"><div class="td last_name">{{ employee.last_name }}</div></a>
-				<a href="{% url 'employee_edit' employee.id %}"><div class="td date_added">{{ employee.date_added|date:"m/d/y" }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td first_name">{{ employee|get:'first_name' }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td last_name">{{ employee|get:'last_name' }}</div></a>
+				<a href="{% url 'employee_edit' employee.id %}"><div class="td date_added">{{ employee|get:'date_added'|date:"m/d/y" }}</div></a>
 				<a href="{% url 'employee_edit' employee.id %}"><div class="td punches">{{ employee.lifetime_punches }}</div></a>
 				<div class="td graph"><input type="checkbox" name="employee-graph-cb" value="{{ employee.id }}" /></div>
-				<div class="td remove"><a href="{% url 'employee_delete' employee.id %}"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Remove" /></a></div>
+				<div class="td remove"><a href="{% url 'employee_delete' employee.objectId %}"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Remove" /></a></div>
 			</div>
 			{% empty %}
 			<div class="tr odd">
@@ -81,12 +81,12 @@
 			
 			{% for employee in pending %}
 			<div class="tr {% cycle 'odd' '' %}">
-				<div class="td first_name_pending">{{ employee.first_name }}</div>
-				<div class="td last_name_pending">{{ employee.last_name }}</div>
-				<div class="td date_added_pending">{{ employee.date_added|date:"m/d/y" }}</div>
+				<div class="td first_name_pending">{{ employee|get:'first_name' }}</div>
+				<div class="td last_name_pending">{{ employee|get:'last_name' }}</div>
+				<div class="td date_added_pending">{{ employee|get:'date_added'|date:"m/d/y" }}</div>
 				<div class="td approve">
-					<a href="{% url 'employee_approve' employee.id %}" class="employee approve"><img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
-					<a href="{% url 'employee_deny' employee.id %}" class="employee deny"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a>
+					<a href="{% url 'employee_approve' employee.objectId %}" class="employee approve"><img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
+					<a href="{% url 'employee_deny' employee.objectId %}" class="employee deny"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a>
 				</div>
 			</div>
 			{% empty %}

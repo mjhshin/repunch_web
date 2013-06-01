@@ -3,10 +3,11 @@ Parse models corresponding to Django models
 """
 from json import dumps
 from importlib import import_module
+from dateutil import parser
 
 from parse.utils import parse
 
-NOT_WHERE_CONSTRAINTS = ["include", "count", "limit"]
+NOT_WHERE_CONSTRAINTS = ["include", "count", "limit", "order"]
 
 class ParseObjectManager(object):
     """
@@ -70,7 +71,7 @@ class ParseObject(object):
         
         e.g. 
             class Person(ParseObject):
-                def __init__(self, data={})
+                def __init__(self, **data)
                     # regular type
                     self.name = data.get("name")
                     # Date type
@@ -80,7 +81,7 @@ class ParseObject(object):
                     # Relation type
                     self.Friends_ = "Person"
 
-                    super(Person, self).__init__()
+                    super(Person, self).__init__(False, **data)
 
         -------------------------------
 
@@ -130,12 +131,16 @@ class ParseObject(object):
     ### Dates:
         
         Dates are attributes whose name starts with date_.
-        These attributes needs to contain a UTC timestamp stored in
-        ISO 8601 format.
+        These attributes can be set to datetime.datetime 
+        or datetime.date
         
         e.g. 
             from datetime import datetime
-            self.set("date_born", datetime.today().isoformat())
+            self.set("date_born", datetime.now())
+            self.set("date_born", date.today())
+
+        Getting these attributes using the get method will return a 
+        datetime.datetime object.
 
         -------------------------------
 
@@ -164,6 +169,21 @@ class ParseObject(object):
     
         -------------------------------
 
+    Class methods
+    ---------------------------------------------------------
+
+    ### ParseObject.objects()
+        
+        All ParseObjects come with an objects manager.
+        This manager handles queries, and other things.
+
+        e.g. To get the number of Persons whose name is jason:
+
+            class Person(ParseObject):
+                pass
+            Person.objects().count(name="jason")
+
+
     """
     
     # initialize the manager for a class
@@ -177,26 +197,24 @@ class ParseObject(object):
                     cls.__name__,  cls.__name__, cls.__module__))
         return cls._manager
 
-    def __init__(self, **data):
+    def __init__(self, create=True, **data):
         """
-        Inserts data from data to self.__dict__.
+        Inserts data into to self.__dict__.
         This must be called at the end of the __init__ method of the
         subclass if provided.
         
-        If the __init__ method of the subclass is not provided or
-        does not set initial attributes, then all data are inserted.
+        All data are inserted if the create parameter is not set to 
+        False (default is True).
         e.g. 
             class Person(ParseObject):
                 pass
-            person = Person(name="nick", age=9)
+            person = Person(create=True, name="nick", age=9)
 
         Otherwise, only the data that is in __dict__ is inserted.
         e.g. 
             class Person(ParseObject):
-                def __init__(self, **data):
-                    self.name = data.get("name")
-                    super(Person, self).__init__(**data)
-            person = Person(name="nick", age=9)
+                pass
+            person = Person(create=False, name="nick", age=9)
         In the above example name is inserted but not age.
 
         All ParseObjects have 3 attributes by default:
@@ -205,27 +223,7 @@ class ParseObject(object):
         self.objectId = data.get("objectId")
         self.createdAt = data.get("createdAt")
         self.updatedAt = data.get("updatedAt")
-        if len(data) > 0:
-            self.update_locally(data, False)
-        else:
-            self.update_locally(data, True)
-
-    """
-    def _generate_cache_attrs(self):
-        ''' 
-        create the cache attrs for the Pointers and Relations if any.
-        '''
-        to_gen = {}
-        for attr in self.__dict__:
-            # Relations
-            if attr[0].isupper() and attr.endswith("_"):
-                to_gen[attr[0].lower() + attr[1:-1]] = None
-            elif attr[0].isupper() and not attr.endswith("_"):
-                to_gen[attr[0].lower() + attr[1:]] = None
-
-        for key, value in to_gen.iteritems():
-            setattr(self, key, value)
-    """
+        self.update_locally(data, create)
 
     def path(self):
         """ returns the path of this class or use with parse 
@@ -298,20 +296,30 @@ class ParseObject(object):
                         "key": relName, }  })  })
             if res and "error" not in res:
                 c = self.get_class(className)
-                setattr(self, attr, [ c(**d) for d in res['results'] ])
+                setattr(self, attr, 
+                            [ c(**d) for d in res['results'] ])
             else:
                 return None 
-        # attr is a regular attr
+        # date object
+        elif attr.startswith("date_"):
+            res = parse("GET", self.path(), query={"keys":attr,
+                    "where":dumps({"objectId":self.objectId})})
+            setattr(self, attr, 
+                        parser.parse(res.get('results')[0][attr]))
+        # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
-            res = parse("GET", self.path(), query={"keys":attr})
-            setattr(self, attr, res.get('results')[0])
+            res = parse("GET", self.path(), query={"keys":attr,
+                    "where":dumps({"objectId":self.objectId})})
+            setattr(self, attr, res.get('results')[0][attr])
 
         return self.__dict__.get(attr)
 
     def set(self, attr, val):
         """ set this object's attr to val. This does not commit
         anything up to Parse. """
+        # TODO check attr and val validity
         setattr(self, attr, val)
+        return True
 
     def add_relation(self, relAttrName, objectIds):
         """ Adds the list of objectIds to the given relation. 
@@ -426,7 +434,7 @@ class ParseObject(object):
             elif key.startswith("date_"):
                 data[key] = {
                     "__type": "Date",
-                    "iso": value
+                    "iso": parser.parse(value.isoformat()).isoformat()
                 }
             # regular attributes
             else:

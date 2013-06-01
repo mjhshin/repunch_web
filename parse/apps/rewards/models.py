@@ -5,27 +5,24 @@ Parse equivalence of Django apps.employees.models
 from datetime import datetime
 
 from parse.core.models import ParseObject
-from parse.utils import parse
 
 class Reward(ParseObject):
     """ Equivalence class of apps.rewards.models.Reward """
     def __init__(self, **data):
-        self.name = data.get("name")
+        self.reward_name = data.get("reward_name")
         self.description = data.get("description")
         self.punches = data.get("punches")
         self.reward_avatar = data.get("reward_avatar")
 
         self.Store = data.get("Store")
 
-        super(Reward, self).__init__(**data)
+        super(Reward, self).__init__(False, **data)
 
     def get_absolute_url(self):
 		return reverse('reward_edit', args=[self.objectId])
 	
 	def redemption_count(self):
-		return parse("GET", "classes/Redemption",
-            query={"where":json.dumps({"Reward":self.objectId}), 
-                    "count":1,"limit":0})["count"]
+        return Redemption.objects().filter(Reward=self.objectId)
 
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
@@ -37,7 +34,7 @@ class Punch(ParseObject):
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         
-        super(Punch, self).__init__(**data)
+        super(Punch, self).__init__(False, **data)
 
 class Redemption(ParseObject):
     """ Equivalence class of apps.rewards.models.Redemption """
@@ -49,6 +46,6 @@ class Redemption(ParseObject):
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         
-        super(Redemption, self).__init__(**data)
+        super(Redemption, self).__init__(False, **data)
     
 

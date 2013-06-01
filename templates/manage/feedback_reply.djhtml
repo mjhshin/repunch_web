@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}Feedback Reply{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
@@ -18,7 +18,7 @@
 	
 	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Feedback Inbox</a>
 	
-	<form action="{% url 'feedback_reply' feedback.id %}" method="post" id="message-form">{% csrf_token %}
+	<form action="{% url 'feedback_reply' feedback.objectId %}" method="post" id="message-form">{% csrf_token %}
 		<div class="white-box">
 			<div class="sect meta yellow">
 				<label>Date:</label><span>{% now "m/d/y" %}</span>
@@ -41,16 +41,16 @@
 	<div class="divider"></div>
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ feedback.date_added|date:"m/d/y" }}</span>
-			<label>From:</label><span>{{ feedback.patron.name }}</span>
+			<label>Date:</label><span>{{ feedback|get:'date_added'|date:"m/d/y" }}</span>
+			<label>From:</label><span>{{ feedback|get:'patron'|get:'name' }}</span>
 			<div style="clear: left;"></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>{{ feedback.subject }}</span>
+			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
 		<div class="sect message">
-			{{ feedback.message }}
+			{{ feedback|get:'message' }}
 		</div>
 	</div>
 

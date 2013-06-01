@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}Feedback Details{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
@@ -21,16 +21,16 @@
 	
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ feedback.date_added|date:"m/d/y" }}</span>
-			<label>From:</label><span>{{ feedback.patron.name }}</span>
+			<label>Date:</label><span>{{ feedback|get:'date_added'|date:"m/d/y" }}</span>
+			<label>From:</label><span>{{ feedback|get:'patron'|get:'name' }}</span>
 			<div style="clear: left;" /></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>{{ feedback.subject }}</span>
+			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
 		<div class="sect message">
-			{{ feedback.message }}
+			{{ feedback|get:'message' }}
 		</div>
 	</div>
 	<div id="message-detail-options" class="form-options">
@@ -40,14 +40,14 @@
 	
 	<div class="divider" style="height: 20px;"></div>
 	{% for reply in replies %}
-	{% ifnotequal reply.id feedback.id %}
+	{% ifnotequal reply.objectId feedback.objectId %}
 	<div class="white-box {% if reply.is_response == 1 %}response{% endif %}">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ reply.date_added|date:"m/d/y" }}</span>
+			<label>Date:</label><span>{{ reply|get:'date_added'|date:"m/d/y" }}</span>
 			<label>From:</label>
 			<span>
-				{% if reply.is_response == 0 %}
-				{{ reply.patron.name }}
+				{% if not reply|get:'is_response' %}
+				{{ reply|get:'patron'|get:'name' }}
 				{% else %}
 				{{ account_username }}
 				{% endif %}
@@ -55,11 +55,11 @@
 			<div style="clear: left;" /></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>{{ reply.subject }}</span>
+			<label>Subject:</label><span>{{ reply|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
 		<div class="sect message">
-			{{ reply.message }}
+			{{ reply|get:'message' }}
 		</div>
 	</div>
 	<div class="divider"></div>
