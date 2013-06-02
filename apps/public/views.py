@@ -10,7 +10,7 @@ from libs.repunch import rputils
 from parse.auth import login
 from parse.apps.accounts.models import Account, SubscriptionType
 from parse.apps.accounts import free
-from parse.apps.stores.forms import StoreSignUpForm as pStoreSignUpForm
+from parse.apps.stores.forms import StoreForm as pStoreForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
 SubscriptionForm as pSubscriptionForm
 
@@ -49,7 +49,7 @@ def sign_up(request):
         
         postDict = request.POST.dict()
         # actual form validations are now done through ParseForms
-        store_pf = pStoreSignUpForm(**postDict)
+        store_pf = pStoreForm(**postDict)
         account_pf = pAccountForm(**postDict)
         subscription_pf = pSubscriptionForm(**postDict)
         # pass is corresponding form's error dicts to fillem up

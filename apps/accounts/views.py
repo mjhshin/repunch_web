@@ -3,9 +3,11 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 import json, urllib
 
-from parse.auth.decorators import login_required
 from forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
+
+from parse.auth.decorators import login_required
+from parse.apps.accounts.forms import SubscriptionForm as pSubscriptionForm
 
 @login_required
 def settings(request):
@@ -59,21 +61,26 @@ def refresh(request):
 def upgrade(request):
     data = {'account_nav': True}
     account = request.session['account']
-    subscription = account.subscription 
+    subscription = account.get('subscription')
     
     if request.method == 'POST': # If the form has been submitted...
-        form = SubscriptionForm(request.POST, instance=subscription, account=account) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            subscription = form.save()
-            account.subscription = subscription;
+        form = SubscriptionForm(request.POST) 
+        pform = pSubscriptionForm(instance=subscription, 
+                                    **request.POST.dict())
+
+        if pform.is_valid(form.errors): 
+            pform.subscription.SubscriptionType =\
+                            subscription.SubscriptionType
+            pform.update()
+            account.subscription = pform.subscription
+            account.subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv']);
             
-            subscription.store_cc(form.data['cc_number'], form.data['cc_cvv']);
-            
-            request.session['account'] = account
-            return redirect(reverse('store_index')+ "?%s" % urllib.urlencode({'success': 'Your account has been updated.'}))
+            return redirect(reverse('store_index')+ "?%s" %\
+                        urllib.urlencode({'success':\
+                            'Your account has been updated.'}))
     else:
-        form = SubscriptionForm(instance=subscription, account=account)
+        form = SubscriptionForm(subscription.__dict__)
     
     data['form'] = form
-    data['account'] = account
     return render(request, 'manage/account_upgrade.djhtml', data)

@@ -36,7 +36,7 @@ def edit(request):
         pform = pStoreForm(instance=account.get("store"), 
                             **request.POST.dict())
         
-        if pform.is_valid():# and formset.is_valid(): # All validation rules pass
+        if pform.is_valid(form.errors):# and formset.is_valid(): # All validation rules pass
             pform.update()
             
             # formset.save()            

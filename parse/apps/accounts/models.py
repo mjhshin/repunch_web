@@ -177,7 +177,7 @@ class Subscription(ParseObject):
         if credit_card.create():
             self.ppid = credit_card.id
             self.ppvalid = credit_card.valid_until[:10]
-            self.update();
+            self.update()
             return True
         else:
             print("Error while creating CreditCard:")

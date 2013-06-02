@@ -16,18 +16,20 @@ WHERE_OPTIONS = [
 def format_date(dateObj):
     """
     Returns the Parse Date __type of the given
-    datetime.date or datetime.datetime object
+    datetime.date or datetime.datetime object or None.
     """
-    return { "__type": "Date",
+    if dateObj:
+        return { "__type": "Date",
           "iso": parser.parse(dateObj.isoformat()).isoformat() }
 
 def format_pointer(className, objectId):
     """
-    Returns the Parse Pointer __type.
+    Returns the Parse Pointer __type or None.
     """
-    return { "__type": "Pointer",
-            "className": className,
-            "objectId": objectId }
+    if objectId:
+        return { "__type": "Pointer",
+                "className": className,
+                "objectId": objectId }
 
 def query(constraints):
     """

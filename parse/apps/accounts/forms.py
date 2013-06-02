@@ -28,10 +28,13 @@ class LoginForm(object):
 
 class SubscriptionForm(object):
     """  Equivalence class of apps.accounts.forms.SubscriptionForm """
-    def __init__(self, **data):
+    def __init__(self, instance=None, **data):
         self.subscription = Subscription(**data)
         self.cc_cvv = data.get("cc_cvv")
         self.recurring = data.get("recurring")
+        if instance:
+            self.subscription.objectId = instance.objectId
+        
 
     def is_valid(self, errors):
         """ errors is a dictionary. Returns len(errors) == 0 
@@ -70,7 +73,7 @@ class SubscriptionForm(object):
 
     def update(self):
         """ update an existing Subscription in Parse """
-        return self.subscription.update()
+        self.subscription.update()
 
 class AccountForm(object):
     """  Equivalence class of apps.accounts.forms.AccountForm """
@@ -97,6 +100,6 @@ class AccountForm(object):
 
     def update(self):
         """ update an existing Account in Parse """
-        return self.account.update()
+        self.account.update()
 
 

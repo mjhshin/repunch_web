@@ -7,7 +7,7 @@ from json import dumps
 
 from parse.apps.stores.models import Store
 
-class StoreSignUpForm(object):
+class StoreForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
     def __init__(self, instance=None, **data):
         self.store = Store(**data)
@@ -32,11 +32,11 @@ class StoreSignUpForm(object):
 
     def create(self):
         """ create a new Store in Parse """
-        return self.store.create()
+        self.store.create()
 
     def update(self):
         """ update an existing Store in Parse """
-        return self.store.update()
+        self.store.update()
 
 
 
