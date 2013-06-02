@@ -259,8 +259,7 @@ class ParseObject(object):
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
             else:
-                if value:
-                    setattr(self, key, value)
+                setattr(self, key, value)
 
     def get_class(self, className):
         """
@@ -269,6 +268,15 @@ class ParseObject(object):
         TODO Automate this process?
         """
         return None
+
+    def fetchAll(self):
+        """
+        Gets all of this object's data from parse and update all
+        of its value locally.
+        """
+        res = parse("GET", self.path() + "/" + self.objectId)
+        if res and "error" not in res:
+            self.update_locally(res, False)
 
     def get(self, attr):
         """ returns attr if it is not None, otherwise fetches the 

@@ -226,15 +226,15 @@ class SubscriptionType(ParseObject):
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
 
-    FREE = "Free"
-    MIDDLEWEIGHT = "MiddleWeight"
-    HEAVYWEIGHT = "HeavyWeight"
+    FREE = "FREE"
+    MIDDLEWEIGHT = "MIDDLEWEIGHT"
+    HEAVYWEIGHT = "HEAVYWEIGHT"
 
     UNLIMITED = -1
 
     def __init__(self, **data):
         self.name = data.get('name', SubscriptionType.FREE)
-        self.description = data.get('description', "Free membership")
+        self.description = data.get('description')
         self.monthly_cost = data.get('monthly_cost', 0)
         # use UNLIMITED below for heavywight type
         self.max_users = data.get('max_users', 50)

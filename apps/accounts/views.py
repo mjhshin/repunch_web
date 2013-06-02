@@ -75,6 +75,8 @@ def upgrade(request):
             account.subscription = pform.subscription
             account.subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv']);
+
+            # TODO upgrade to next level
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
