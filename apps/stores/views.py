@@ -9,7 +9,7 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from parse.auth.decorators import login_required
 
-# TODO REPLACE DJANGO FORMS
+from parse.apps.stores.forms import StoreForm as pStoreForm
 
 @login_required
 def index(request):
@@ -27,31 +27,33 @@ def edit(request):
     data = {'account_nav': True}
     account = request.session['account']
     
-    HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
+    # TODO replace Hours formset
+    # HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
     
     if request.method == 'POST': # If the form has been submitted...
-        formset = HoursFormSet(request.POST, prefix='hours', instance=account.store)
-        form = StoreForm(request.POST, instance=account.store) # A form bound to the POST data
+        # formset = HoursFormSet(request.POST, prefix='hours', instance=account.store)
+        form = StoreForm(request.POST) # A form bound to the POST data
+        pform = pStoreForm(instance=account.get("store"), 
+                            **request.POST.dict())
         
-        if form.is_valid() and formset.is_valid(): # All validation rules pass
-            store = form.save()
+        if pform.is_valid():# and formset.is_valid(): # All validation rules pass
+            pform.update()
             
-            formset.save()            
+            # formset.save()            
             
             #always need to reload form for deleted fields
-            formset = HoursFormSet(prefix='hours', instance=store) 
+            # formset = HoursFormSet(prefix='hours', instance=store) 
             #reload the store and put it in the session
-            
-            account.store = store;
-            request.session['account'] = account
+
+            account.store = pform.store
             data['success'] = "Store details have been saved."
     else:
-        form = StoreForm(instance=account.store);
-        formset = HoursFormSet(prefix='hours', instance=account.store)
+        form = StoreForm(account.get("store").__dict__);
+        # formset = HoursFormSet(prefix='hours', instance=account.store)
 
     
     data['form'] = form
-    data['hours_formset'] = formset
+    # data['hours_formset'] = formset
     
     return render(request, 'manage/store_edit.djhtml', data)
     

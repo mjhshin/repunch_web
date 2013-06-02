@@ -60,20 +60,20 @@ def sign_up(request):
 
             st, su, ac = store_pf, subscription_pf, account_pf
             
-            # save store
+            # create store
             tz = rputils.get_timezone('93003')
             st.store.store_timezone = tz.zone
-            st.save()
+            st.create()
 
             # TODO: need to make this transactional
             # save subscription
             su.subscription.SubscriptionType = free['objectId']
-            su.save()
+            su.create()
       
             su.subscription.store_cc(su.subscription.cc_number,
                     su.cc_cvv)
             account = ac.account
-            account.Store = store_pf.store.objectId
+            account.Store = st.store.objectId
             account.Subscription = su.subscription.objectId
             account.set_password(request.POST.get('password'))
             account.create()

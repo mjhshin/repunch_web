@@ -9,8 +9,10 @@ from parse.apps.stores.models import Store
 
 class StoreSignUpForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
-    def __init__(self, **data):
+    def __init__(self, instance=None, **data):
         self.store = Store(**data)
+        if instance:
+            self.store.objectId = instance.objectId
 
     def is_valid(self, errors):
         """ 
@@ -28,11 +30,13 @@ class StoreSignUpForm(object):
         
         return len(errors) == 0
 
-    def save(self):
+    def create(self):
         """ create a new Store in Parse """
         return self.store.create()
 
-
+    def update(self):
+        """ update an existing Store in Parse """
+        return self.store.update()
 
 
 

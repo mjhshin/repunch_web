@@ -259,7 +259,8 @@ class ParseObject(object):
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
             else:
-                setattr(self, key, value)
+                if value:
+                    setattr(self, key, value)
 
     def get_class(self, className):
         """
@@ -443,8 +444,8 @@ class ParseObject(object):
             elif key.startswith("date_"):
                 data[key] = format_date(value)
             # regular attributes
-            # else:
-            #    data[key] = value
+            else:
+                data[key] = value
 
         return data
 
