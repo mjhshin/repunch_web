@@ -49,7 +49,10 @@ def query(constraints):
                         where[key] = {
                             "$" + args[1]: format_date(value)
                         }
-            else: # regular where params
+            # Pointer __type
+            elif key[0].isupper and not key.endswith('_'): 
+                where[key] = format_pointer(key, value)
+            else:# regular where params
                 where[key] = value
 
     q['where'] = json.dumps(where)

@@ -5,15 +5,14 @@ from django.utils import timezone
 from PIL import Image
 import json, time, pytz
 
-from apps.accounts.models import Settings
+from parse.apps.accounts.models import Settings
 
 # function for generating unique ID for retailer
 def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
     gid = ''.join(random.choice(chars) for x in range(size))
     
     #make sure this is a unique ID
-    accounts = Settings.objects.filter(retailer_id=gid).count()
-    if accounts == 0:
+    if Settings.objects().count(retailer_id=gid) == 0:
         return gid
     
     return generate_id()

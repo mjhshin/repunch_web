@@ -28,7 +28,7 @@ def login(request, username, password, account):
                     "password":hash_password(password)} )
 
     if res and "error" not in res:
-        account.update_locally(res)
+        account.update_locally(res, False)
         request.session[SESSION_KEY] = account.sessionToken
         request.session['account'] = account
         return account

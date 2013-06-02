@@ -48,10 +48,10 @@ class Account(AbstractUser):
 	
 class Settings(models.Model):
 	account = models.ForeignKey(Account)
+	retailer_id = models.CharField(max_length=255, default="")
 	punches_customer = models.IntegerField('Number of separate times a customer can receive punches per day')
 	punches_employee = models.IntegerField('Number of punches allowed by an employee at one time')
 	punches_facebook = models.IntegerField('Free Punch Allowance for Facebook')
-	retailer_id = models.CharField(max_length=255,default='')
 	
 class SubscriptionType(models.Model):
 	name = models.CharField(max_length=255)

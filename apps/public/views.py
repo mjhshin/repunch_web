@@ -8,7 +8,8 @@ from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, SubscriptionType
+from parse.apps.accounts.models import Account, SubscriptionType,\
+Settings
 from parse.apps.accounts import free
 from parse.apps.stores.forms import StoreForm as pStoreForm
 from parse.apps.accounts.forms import AccountForm as pAccountForm,\
@@ -69,7 +70,7 @@ def sign_up(request):
             # save subscription
             su.subscription.SubscriptionType = free['objectId']
             su.create()
-      
+
             su.subscription.store_cc(su.subscription.cc_number,
                     su.cc_cvv)
             account = ac.account

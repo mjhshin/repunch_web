@@ -2,12 +2,12 @@
 Provides form validation for Parse classes from app.accounts.models
 """
 
-import re
+import re, pytz
 from datetime import datetime
 from django.core.validators import email_re
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, Subscription
+from parse.apps.accounts.models import Account, Subscription, Settings
 from libs.repunch import rpforms, rpccutils, rputils
 
 class LoginForm(object):
@@ -19,7 +19,8 @@ class LoginForm(object):
     def do_login(self, request):
         account = login(request, request.POST.get('username'), 
                             request.POST.get("password"), Account())
-        # rputils.set_timezone(request, pytz.timezone(account.store.store_timezone)) TODO
+        rputils.set_timezone(request, 
+            pytz.timezone(account.get('store').get('store_timezone')))
         return account
 
     def is_valid(self):
@@ -29,11 +30,13 @@ class LoginForm(object):
 class SubscriptionForm(object):
     """  Equivalence class of apps.accounts.forms.SubscriptionForm """
     def __init__(self, instance=None, **data):
-        self.subscription = Subscription(**data)
+        if instance:
+            self.subscription = Subscription(**instance.__dict__)
+            self.subscription.update_locally(data, False)
+        else:
+            self.subscription = Subscription(**data)
         self.cc_cvv = data.get("cc_cvv")
         self.recurring = data.get("recurring")
-        if instance:
-            self.subscription.objectId = instance.objectId
         
 
     def is_valid(self, errors):
@@ -102,4 +105,39 @@ class AccountForm(object):
         """ update an existing Account in Parse """
         self.account.update()
 
+class SettingsForm(object):
+    """  Equivalence class of apps.accounts.forms.SettingsForm """
+    def __init__(self, instance=None, **data):
+        if instance:
+            self.settings = Settings(**instance.__dict__)
+            self.settings.update_locally(data, False)
+        else:
+            self.settings = Settings(**data)
+
+    def is_valid(self, errors):
+        """ errors is a dictionary. Returns len(errors) == 0 """
+        s = self.settings
+        lst = (s.get('punches_customer'), s.get('punches_employee'),
+                s.get('punches_facebook'))
+
+        for each in lst:
+            try:
+                num = int(each)
+            except TypeError:
+                errors[each] =\
+                            "This field must be a number."
+            else:
+                if num < 0:
+                    errors[each] =\
+                            "Cannot be a negative number."
+                
+        return len(errors) == 0
+
+    def create(self):
+        """ create a new Settings in Parse """
+        self.settings.create()
+
+    def update(self):
+        """ update an existing Settings in Parse """
+        self.settings.update()
 

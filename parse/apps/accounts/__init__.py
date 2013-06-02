@@ -6,6 +6,14 @@ from json import dumps
 
 from parse.utils import parse
 
+"""
+DEFAULT_ACC_SETTINGS = {
+    'punches_customer':1,
+    'punches_employee':50,
+    'punches_facebook':20,
+}
+"""
+
 # Value must be the same as parse.apps.accounts.models constants
 # cannot import it here since it will cause cyclic imports
 ACTIVE = 'Active'

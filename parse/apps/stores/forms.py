@@ -10,9 +10,11 @@ from parse.apps.stores.models import Store
 class StoreForm(object):
     """ Equivalence class of apps.stores.forms.StoreForm """
     def __init__(self, instance=None, **data):
-        self.store = Store(**data)
         if instance:
-            self.store.objectId = instance.objectId
+            self.store = Store(**instance.__dict__)
+            self.store.update_locally(data, False)
+        else:
+            self.store = Store(**data)
 
     def is_valid(self, errors):
         """ 

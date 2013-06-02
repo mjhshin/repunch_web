@@ -7,25 +7,24 @@ from forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 
 from parse.auth.decorators import login_required
-from parse.apps.accounts.forms import SubscriptionForm as pSubscriptionForm
+from parse.apps.accounts.forms import SubscriptionForm as pSubscriptionForm, SettingsForm as pSettingsForm
+from parse.apps.accounts import free, middle, heavy
+from parse.apps.accounts.models import Settings
 
 @login_required
 def settings(request):
     data = {'settings_nav': True}
     account = request.session['account']
     settings = account.get_settings(); 
-    
-    if request.method == 'POST': # If the form has been submitted...
-        form = SettingsForm(request.POST, instance=settings) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            settings = form.save(commit=False)
-            
-            if settings.account_id == None:
-                settings.account = account
-                settings.retailer_id = rputils.generate_id()
-            
-            settings.save()
-            
+    if settings == None:
+        settings = Settings.objects().create(Account=account.objectId,
+                        retailer_id=rputils.generate_id())
+
+    if request.method == 'POST':
+        form = SettingsForm(request.POST) 
+        pform = pSettingsForm(instance=settings, **request.POST.dict())
+        if pform.is_valid(form.errors): 
+            pform.update()
             data['success'] = "Settings have been saved."
         else:
             data['error'] = 'Error saving settings.';
@@ -33,9 +32,10 @@ def settings(request):
         if settings == None:
             form = SettingsForm();
         else:
-            form = SettingsForm(instance=settings);
+            form = SettingsForm(settings.__dict__);
     
     data['form'] = form
+    data['settings'] = settings
     return render(request, 'manage/settings.djhtml', data)
 
 
@@ -69,14 +69,22 @@ def upgrade(request):
                                     **request.POST.dict())
 
         if pform.is_valid(form.errors): 
-            pform.subscription.SubscriptionType =\
-                            subscription.SubscriptionType
+            # consult accounts.__init__
+            typeId = pform.subscription.get("SubscriptionType")
+            if typeId == free.get('objectId'):
+                pform.subscription.set("SubscriptionType", 
+                                        middle.get('objectId'))
+            elif typeId == middle.get('objectId'):
+                pform.subscription.set("SubscriptionType", 
+                                        heavy.get('objectId'))
+            else:
+                form.errors['level'] = "You cannot "+\
+                                    "upgrade any further."                
+
             pform.update()
             account.subscription = pform.subscription
             account.subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv']);
-
-            # TODO upgrade to next level
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\

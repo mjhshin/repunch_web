@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}Settings{% endblock %}
 {% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/settings.css" %}" />{% endblock %}
@@ -33,9 +33,9 @@
 		
 		<div style="clear: left">&nbsp;</div>
 		
-		{% if form.instance.id  %}
+		{% if settings  %}
 		<label for="retailer_id">Retailer ID</label>
-		<div id="retailer_id">{{ form.instance.retailer_id  }}</div> <a href="{% url 'refresh_retailer_id' %}" id="link_refresh_retailer_id"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_id" /></a>
+		<div id="retailer_id">{{ settings|get:'retailer_id'  }}</div> <a href="{% url 'refresh_retailer_id' %}" id="link_refresh_retailer_id"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_id" /></a>
 		{% endif %}
 		
 		<div id="settings-options" class="form-options">

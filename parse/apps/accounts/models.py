@@ -63,7 +63,7 @@ class Account(ParseObject):
         self.password = hash_password(new_pass)
 
     def get_settings(self):
-        return self.get("settings") 
+		return Settings.objects().get(Account=self.objectId);
 
     def get_sents_available(self):
         """

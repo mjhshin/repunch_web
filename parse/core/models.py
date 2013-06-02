@@ -32,6 +32,12 @@ class ParseObjectManager(object):
 
         return 0
 
+    def create(self, **data):
+        """ Creates a ParseObject and returns it. """
+        obj = self.cls(**data)
+        obj.create()
+        return obj
+
     def get(self, **constraints):
         """
         Returns the first result returned by filter if any.
