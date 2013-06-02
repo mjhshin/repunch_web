@@ -42,14 +42,11 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
 
     The key difference b/w this and the original Django implementation
     is that the test for authentication is now using the sessionToken
-    retrieved from Parse and comparing that with the accounts
-    sessionToken - which should be the same (and not None)
+    retrieved from Parse.
     """
     actual_decorator = user_passes_test(
         lambda req: req.session.get('account') and\
-                    req.session[SESSION_KEY] ==\
-                    req.session['account'].sessionToken and\
-                    req.session['account'].sessionToken,
+                    req.session[SESSION_KEY],
                     login_url=login_url,
                     redirect_field_name=redirect_field_name
     )

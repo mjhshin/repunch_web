@@ -29,7 +29,7 @@ def login(request, username, password, account):
 
     if res and "error" not in res:
         account.update_locally(res, False)
-        request.session[SESSION_KEY] = account.sessionToken
+        request.session[SESSION_KEY] = res.get('sessionToken')
         request.session['account'] = account
         return account
     else:

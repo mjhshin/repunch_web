@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
+from django.contrib.auth import SESSION_KEY
 import json, urllib
 
 from forms import SettingsForm, SubscriptionForm
@@ -40,15 +41,17 @@ def settings(request):
 
 
 def refresh(request):
-    if request.user.is_authenticated():
+    if request.session.get('account') and\
+            request.session.get(SESSION_KEY):
         data = {'success': False}
         account = request.session['account']
         settings = account.get_settings();
+        
         if settings == None:
             raise Http404
         else:
-            settings.retailer_id = rputils.generate_id()
-            settings.save()
+            settings.set('retailer_id', rputils.generate_id())
+            settings.update()
             
             data['success'] = True
             data['retailer_id'] = settings.retailer_id
