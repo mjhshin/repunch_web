@@ -7,9 +7,9 @@ from apps.stores.models import Store, Hours
 from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
-from parse.auth.decorators import login_required
 
-from parse.apps.stores.forms import StoreForm as pStoreForm
+from parse.apps.stores.models import Store
+from parse.auth.decorators import login_required
 
 @login_required
 def index(request):
@@ -32,12 +32,11 @@ def edit(request):
     
     if request.method == 'POST': # If the form has been submitted...
         # formset = HoursFormSet(request.POST, prefix='hours', instance=account.store)
-        form = StoreForm(request.POST) # A form bound to the POST data
-        pform = pStoreForm(instance=account.get("store"), 
-                            **request.POST.dict())
-        
-        if pform.is_valid(form.errors):# and formset.is_valid(): # All validation rules pass
-            pform.update()
+        form = StoreForm(request.POST)
+        if form.is_valid():# and formset.is_valid(): 
+            store = Store(**account.get("store").__dict__)
+            store.update_locally(**request.POST.dict())
+            store.update()
             
             # formset.save()            
             
@@ -45,7 +44,7 @@ def edit(request):
             # formset = HoursFormSet(prefix='hours', instance=store) 
             #reload the store and put it in the session
 
-            account.store = pform.store
+            account.store = store
             data['success'] = "Store details have been saved."
     else:
         form = StoreForm(account.get("store").__dict__);

@@ -8,14 +8,9 @@ from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, SubscriptionType,\
-Settings
+from parse.apps.accounts.models import Account, Subscription
 from parse.apps.accounts import free
-from parse.apps.stores.forms import StoreForm as pStoreForm
-from parse.apps.accounts.forms import AccountForm as pAccountForm,\
-SubscriptionForm as pSubscriptionForm
-
-# TODO REPLACE DJANGO FORMS
+from parse.apps.stores.models import Store
 
 def index(request):
     data = {'home_nav': True}
@@ -41,52 +36,38 @@ def sign_up(request):
     data = {'sign_up_nav': True}
     
     if request.method == 'POST':
-        # these forms are now just for rendering into html
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm(request.POST)
-        # if store_form.is_valid() and account_form.is_valid() and\
-        #   subscription_form.is_valid(): # All validation rules pass
-        
-        postDict = request.POST.dict()
-        # actual form validations are now done through ParseForms
-        store_pf = pStoreForm(**postDict)
-        account_pf = pAccountForm(**postDict)
-        subscription_pf = pSubscriptionForm(**postDict)
-        # pass is corresponding form's error dicts to fillem up
-        # if validation fails
-        if store_pf.is_valid(store_form.errors) and\
-            subscription_pf.is_valid(subscription_form.errors) and\
-            account_pf.is_valid(account_form.errors):
 
-            st, su, ac = store_pf, subscription_pf, account_pf
-            
+        if store_form.is_valid() and account_form.is_valid() and\
+           subscription_form.is_valid():
+            postDict = request.POST.dict()
+
             # create store
             tz = rputils.get_timezone('93003')
-            st.store.store_timezone = tz.zone
-            st.create()
+            store = Store(**postDict)
+            store.store_timezone = tz.zone
+            store.create()
 
             # TODO: need to make this transactional
             # save subscription
-            su.subscription.SubscriptionType = free['objectId']
-            su.create()
+            subscription = Subscription(**postDict)
+            subscription.SubscriptionType = free['objectId']
+            subscription.create()
 
-            su.subscription.store_cc(su.subscription.cc_number,
-                    su.cc_cvv)
-            account = ac.account
-            account.Store = st.store.objectId
-            account.Subscription = su.subscription.objectId
+            subscription.store_cc(subscription_form.data['cc_number'],
+                            subscription_form.data['cc_cvv'])
+
+            account = Account(**postDict)
+            account.Store = store.objectId
+            account.Subscription = subscription.objectId
             account.set_password(request.POST.get('password'))
             account.create()
 
-            # TODO refactor templates to use parse forms instead
-            if su.subscription.cc_number:
-                cc = su.subscription.cc_number
-                mask = (len(cc)-4)*'*'
-                mask += cc[-4:]
-                subscription_form.data = subscription_form.data.copy()
-                subscription_form.data['cc_number'] = mask
-                # REMOVE -------------
+            # set for storing in session
+            account.set("store", store)
+            account.set("subscription", subscription)
 
             # auto login
             user_login = login(request, account.username, 

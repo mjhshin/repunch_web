@@ -42,7 +42,6 @@ class Account(ParseObject):
         self.is_active = data.get('is_active', True)
         self.is_staff = data.get('is_staff', False)
         self.is_superuser = data.get('is_superuser', False)
-        self.sessionToken = data.get('sessionToken')
 
         self.Subscription = data.get('Subscription')
         self.Store = data.get('Store')

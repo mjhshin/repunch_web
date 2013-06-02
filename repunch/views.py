@@ -4,20 +4,15 @@ from django.contrib.auth import logout
 from django.contrib.auth import SESSION_KEY
 import pytz
 
-from parse.apps.accounts.forms import LoginForm as pLoginForm
 from apps.accounts.forms import LoginForm
 from libs.repunch import rputils
 
-# TODO REPLACE DJANGO FORMS
-
 def manage_login(request):
     data = {}
-    if request.method == 'POST': # If the form has been submitted...
-        form = LoginForm(request.POST) # A form bound to the POST data
-        pform = pLoginForm(**request.POST.dict())
-        if pform.is_valid(): # All validation rules pass
-            user = pform.do_login(request)
-            if user:
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid(): 
+            if form.do_login(request):
                 return redirect(reverse('store_index'))
             else:
                 data['message'] = "Bad Login!"       
