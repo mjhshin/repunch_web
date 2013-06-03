@@ -40,7 +40,7 @@ class Account(ParseObject):
 
     def get_class(self, className):
         if className == "Subscription":
-            return getattr(import_module('parse.apps.accounts.models'), className)
+            return Subscription.__class__
         elif className == "Store":
             return getattr(import_module('parse.apps.stores.models'), className)
 
@@ -80,6 +80,10 @@ class Settings(ParseObject):
 
         super(Settings, self).__init__(False, **data)
 
+    def get_class(self, className):
+        if className == "Account":
+            return Account.__class__
+
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, **data):
@@ -98,7 +102,7 @@ class Invoice(ParseObject):
         
     def get_class(self, className):
         if className == "Account":
-            return getattr(import_module('parse.apps.accounts.models'), className)
+            return Account.__class__
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
@@ -123,7 +127,7 @@ class Subscription(ParseObject):
 
     def get_class(self, className):
         if className == "SubscriptionType":
-            return getattr(import_module('parse.apps.accounts.models'), className)
+            return SubscriptionType.__class__
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """

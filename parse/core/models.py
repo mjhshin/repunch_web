@@ -320,6 +320,7 @@ class ParseObject(object):
             className = attr[0].upper() + attr[1:]
             res = parse("GET", "classes/" + className +\
                     "/" + self.__dict__.get(className))
+
             if res and "error" not in res:
                 c = self.get_class(className)
                 setattr(self, attr, c(**res))

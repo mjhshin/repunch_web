@@ -2,6 +2,8 @@
 Parse equivalence of Django apps.employees.models
 """ 
 
+from importlib import import_module
+
 from parse.core.models import ParseObject
 from parse.apps.employees import PENDING
 from parse.apps.rewards.models import Punch
@@ -21,3 +23,9 @@ class Employee(ParseObject):
         self.Store = data.get("Store")
 
         super(Employee, self).__init__(False, **data)
+    
+    def get_class(self, className):
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                                className)
+        

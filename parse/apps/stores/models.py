@@ -60,7 +60,9 @@ class Hours(ParseObject):
 
         super(Hours, self).__init__(False, **data)
 
-
+    def get_class(self, className):
+        if className == "Store":
+            return Store.__class__
 
 
 

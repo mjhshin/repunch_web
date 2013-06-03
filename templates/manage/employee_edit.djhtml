@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}Edit Employee{% endblock %}
 {% block styles %}
@@ -31,16 +31,16 @@
 	{% endif %}
 		
 	<form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
-		{% if form.instance.id != None %}
+		{% if employee.objectId %}
 		<div id="photo-edit">
 			<div class="white-box">
-				{% if not form.instance.employee_avatar %}
+				{% if not employee|get:'employee_avatar' %}
 					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
 				{% else %}
-					<img src="{{ MEDIA_URL }}{{ form.instance.employee_avatar }}" class="avatar-big" />
+					<img src="{{ MEDIA_URL }}{{ employee|get:'employee_avatar' }}" class="avatar-big" />
 				{% endif %}
 			</div>
-			<a href="{% url 'employee_avatar' form.instance.id %}" id="upload-avatar">Add/Change Photo</a>
+			<a href="{% url 'employee_avatar' employee.objectId %}" id="upload-avatar">Add/Change Photo</a>
 		</div>
 		{% endif %}
 		
@@ -66,12 +66,12 @@
 		
 		<div class="input-container info" id="date_added">
 			<label>Date Added</label>
-			<span>{{ form.instance.date_added|date:"m/d/y" }}</span>
+			<span>{{ employee|get:'createdAt'|date:"m/d/y" }}</span>
 		</div>
 		
 		<div class="input-container info">
 			<label>Lifetime Punches</label>
-			<span>{{ form.instance.lifetime_punches }}</span>
+			<span>{{ employee|get:'lifetime_punches' }}</span>
 		</div>
 		
 		<div id="edit-employees-options" class="form-options">

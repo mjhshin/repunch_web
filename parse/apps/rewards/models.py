@@ -22,6 +22,11 @@ class Reward(ParseObject):
     def redemption_count(self):
         return Redemption.objects().filter(Reward=self.objectId)
 
+    def get_class(self, className):
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                                className
+
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
     def __init__(self, **data):
@@ -33,6 +38,17 @@ class Punch(ParseObject):
         
         super(Punch, self).__init__(False, **data)
 
+    def get_class(self, className):
+        if className == "Patron":
+            return getattr(import_module('parse.apps.patrons.models'),
+                                className)
+        elif className == "Reward":
+            return getattr(import_module('parse.apps.rewards.models'),
+                                className)
+        elif className == "Employee":
+            return getattr(import_module('parse.apps.employees.'+\
+                                'models'), className)
+        
 class Redemption(ParseObject):
     """ Equivalence class of apps.rewards.models.Redemption """
     def __init__(self, **data):
@@ -44,4 +60,14 @@ class Redemption(ParseObject):
         
         super(Redemption, self).__init__(False, **data)
     
+        def get_class(self, className):
+            if className == "Patron":
+                return getattr(import_module('parse.apps.patrons.models'),
+                                    className)
+            elif className == "Reward":
+                return getattr(import_module('parse.apps.rewards.models'),
+                                    className)
+            elif className == "Employee":
+                return getattr(import_module('parse.apps.employees.'+\
+                                    'models'), className)
 
