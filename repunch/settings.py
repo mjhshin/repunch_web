@@ -42,6 +42,7 @@ REST_CONNECTION_META = {
        "X-Parse-REST-API-Key":REST_API_KEY,
        "Content-Type": "application/json"
 }
+USER_CLASS = "Account"
 
 # PAYPAL
 PAYPAL_CLIENT_ID = "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM"

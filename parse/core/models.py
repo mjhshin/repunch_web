@@ -4,6 +4,7 @@ Parse models corresponding to Django models
 from json import dumps
 from dateutil import parser
 
+from repunch.settings import USER_CLASS
 from parse.utils import parse
 from parse.core.formatter import query,\
 format_date, format_pointer
@@ -13,9 +14,11 @@ class ParseObjectManager(object):
     Provides extra methods for ParseObjects such as counting.
     This provides functionality similar to Django's Model.objects
     """
-    def __init__(self, path, pathClassName, cls):
-        self.path = path
-        self.pathClassName = pathClassName
+    def __init__(self, cls):
+        if cls.__name__ == USER_CLASS:
+            self.path = 'classes/' + "_User"
+        else:
+            self.path = 'classes/' + cls.__name__
         self.cls = cls
     
     def count(self, **constraints):
@@ -24,8 +27,7 @@ class ParseObjectManager(object):
         """
         constraints["count"] = 1
         constraints["limit"] = 0
-        res = parse("GET", self.path + self.pathClassName,
-                        query=query(constraints) )
+        res = parse("GET", self.path, query=query(constraints) )
 
         if res and 'count' in res:
             return res['count']
@@ -56,8 +58,7 @@ class ParseObjectManager(object):
 
         TODO Also allows queries spanning multiple classes.
         """
-        res = parse("GET", self.path + self.pathClassName, 
-                    query=query(constraints))
+        res = parse("GET", self.path, query=query(constraints))
                   
         if res and "results" in res:
             objs = []
@@ -199,16 +200,11 @@ class ParseObject(object):
 
 
     """
-    
-    # initialize the manager for a class
-    # must be overriden by the ParseObject that will be used as the
-    # User class in Parse DB
 
     @classmethod
     def objects(cls):  
         if not hasattr(cls, "_manager"):
-            setattr(cls, "_manager", ParseObjectManager('classes/',
-                    cls.__name__,  cls))
+            setattr(cls, "_manager", ParseObjectManager(cls))
         return cls._manager
 
     def __init__(self, create=True, **data):
@@ -243,7 +239,10 @@ class ParseObject(object):
         """ returns the path of this class or use with parse 
         returns classes/ClassName
         """
-        return "classes/" + self.__class__.__name__
+        if self.__class__.__name__ == USER_CLASS:
+            return 'classes/' + "_User"
+        else:
+            return "classes/" + self.__class__.__name__
 
     def update_locally(self, data, create=True):
         """
@@ -311,13 +310,18 @@ class ParseObject(object):
         elif attr[0].islower() and attr[0].upper() + attr[1:] +\
                 "_" in self.__dict__:
             className = self.__dic__[attr[0].upper() + attr[1:] + "_"]
+            # need to use _user as classname if it is the USER_CLASS
+            if className == USER_CLASS:
+                tmp = "_User"
+            else:
+                tmp = className
             relName = attr[0].upper() + attr[1:]
-            res = parse("GET", 'classes/' + className, query={
+            res = parse("GET", 'classes/' + tmp, query={
                     "where":dumps({
                         "$relatedTo":{ 
                         "object":{
                             "__type": "Pointer",
-                            "className": self.__class__.__name__,
+                            "className": self.path().split('/')[1],
                             "objectId": self.objectId},
                         "key": relName, }  })  })
             if res and "error" not in res:
@@ -358,10 +362,13 @@ class ParseObject(object):
         """
         if relAttrName not in self.__dict__:
             return False
+        className = getattr(self, relAttrName)
+        if className == USER_CLASS:
+            className = "_User"
         objs = []
         for oid in objectIds:
             objs.append( { "__type": "Pointer",
-                           "className": getattr(self, relAttrName),
+                           "className": className,
                            "objectId": oid } )
         res = parse("PUT", self.path() + "/" + self.objectId, {
                     relAttrName[:-1]: {
@@ -460,6 +467,5 @@ class ParseObject(object):
             # regular attributes
             else:
                 data[key] = value
-
         return data
 

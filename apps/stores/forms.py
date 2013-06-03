@@ -5,16 +5,20 @@ from models import Store
 from libs.repunch import rputils
 from repunch import settings
 
-class StoreForm(forms.ModelForm):
-    class Meta:
-        model = Store
-        exclude = ('store_avatar', 'active_users', 'store_timezone')
+class StoreSignUpForm(forms.Form):
+    store_name = forms.CharField(max_length=255)
+    street = forms.CharField(max_length=255)
+    city = forms.CharField(max_length=255)
+    state = forms.CharField(max_length=255)
+    zip = forms.CharField(max_length=255)
+    country = forms.CharField(max_length=255)
+    email = forms.EmailField(max_length=255)
+
+class StoreForm(StoreSignUpForm):
+    phone_number = forms.CharField(max_length=255)
+    store_description = forms.CharField(max_length=200, 
+                                    widget=forms.Textarea())
         
-class StoreSignUpForm(forms.ModelForm):
-    class Meta:
-        model = Store
-        exclude = ('phone_number', 'store_description',
-                 'store_avatar', 'active_users', 'store_timezone')
         
 class StoreAvatarForm(forms.ModelForm):
     class Meta:

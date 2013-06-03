@@ -10,7 +10,7 @@ PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.auth import hash_password
-from parse.apps.accounts import free
+from parse.apps.accounts import free, FREE, ACTIVE
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -21,16 +21,6 @@ class Account(ParseObject):
     The Parse table of this class is the Parse.User table in the DB!
     So don't go looking for an Account class in the Data Browser!
     """
-    
-    # override the objects method since this differs from 
-    # the rest in that this is the User class in the Parse DB
-    # so instead of classes/className for GET requests it is users/
-    @classmethod
-    def objects(cls):
-        if not hasattr(cls, "_manager"):
-            setattr(cls, "_manager", ParseObjectManager('users',
-                    '',  cls))
-        return cls._manager
 
     def __init__(self, **data):
         self.username = data.get('username')
@@ -53,9 +43,6 @@ class Account(ParseObject):
             return getattr(import_module('parse.apps.accounts.models'), className)
         elif className == "Store":
             return getattr(import_module('parse.apps.stores.models'), className)
-
-    def path(self):
-        return "users"
 
     def set_password(self, new_pass):
         """ sets the password to a hashed new_pass """
@@ -115,11 +102,8 @@ class Invoice(ParseObject):
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
-    ACTIVE = 'Active'
-    INACTIVE = 'Inactive'
-    ERROR = "Billing Error"
     def __init__(self, **data):
-        self.status = data.get('status', Subscription.ACTIVE)
+        self.status = data.get('status', ACTIVE)
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.cc_number = data.get('cc_number')
@@ -179,8 +163,12 @@ class Subscription(ParseObject):
             self.update()
             return True
         else:
-            print("Error while creating CreditCard:")
-
+            print "Error while creating CreditCard:"
+            # raise Exception(credit_card.error)
+            # TODO does not check if information is correct
+            # only if the fields are in correct format!
+            raise Exception("Incorrect credit card information.")
+            
         return False
         
 
@@ -198,7 +186,7 @@ class Subscription(ParseObject):
 
             "transactions": [{
                 "amount": {
-              		"total": self.type.monthly_cost, # TODO
+              		"total": self.get('subscriptionType').get('monthly_cost'),
               		"currency": "USD" },
                 "description": "Recurring monthly subscription from repunch.com." 
                 }] })
@@ -206,7 +194,7 @@ class Subscription(ParseObject):
         if payment.create():
             invoice = Invoice()
             invoice.Account = self.objectId
-            invoice.date_charged = datetime.now().isoformat()
+            invoice.date_charged = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':
@@ -215,30 +203,25 @@ class Subscription(ParseObject):
             invoice.create()
             return invoice
         else:
-            print("Error while creating payment:")
-            raise Exception(payment.error)
+            print "Error while creating payment:"
+            # TODO Might want to charge curtomer 1 dollar to verify
+            # account if store_cc fails to do so
+            raise Exception("Something went wrong, "+\
+                            "please make sure that you have the"+\
+                            " correct credit card information.")
 		
         return None
 
 class SubscriptionType(ParseObject):
     """ Equivalence class of apps.accounts.models.SubscriptionType """
-    ACTIVE = 'Active'
-    INACTIVE = 'Inactive'
-
-    FREE = "FREE"
-    MIDDLEWEIGHT = "MIDDLEWEIGHT"
-    HEAVYWEIGHT = "HEAVYWEIGHT"
-
-    UNLIMITED = -1
-
     def __init__(self, **data):
-        self.name = data.get('name', SubscriptionType.FREE)
+        self.name = data.get('name', FREE)
         self.description = data.get('description')
         self.monthly_cost = data.get('monthly_cost', 0)
         # use UNLIMITED below for heavywight type
         self.max_users = data.get('max_users', 50)
         self.max_messages = data.get('max_messages', 1)
-        self.status = data.get('status', SubscriptionType.ACTIVE)
+        self.status = data.get('status', ACTIVE)
 
         super(SubscriptionType, self).__init__(False, **data)
 

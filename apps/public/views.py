@@ -51,14 +51,15 @@ def sign_up(request):
             store.create()
 
             # TODO: need to make this transactional
-            # save subscription
+            # create subscription
             subscription = Subscription(**postDict)
             subscription.SubscriptionType = free['objectId']
             subscription.create()
-
             subscription.store_cc(subscription_form.data['cc_number'],
                             subscription_form.data['cc_cvv'])
+            
 
+            # create account
             account = Account(**postDict)
             account.Store = store.objectId
             account.Subscription = subscription.objectId
@@ -71,7 +72,7 @@ def sign_up(request):
 
             # auto login
             user_login = login(request, account.username, 
-                            request.POST.get("password"), Account())
+                            request.POST.get("password"), account)
             if user_login != None:
                 # need to set this for the auto long
                 rputils.set_timezone(request, tz)
@@ -81,7 +82,7 @@ def sign_up(request):
                 pass
                     
     else:
-        store_form = StoreSignUpForm() # An unbound form
+        store_form = StoreSignUpForm()
         account_form = AccountForm()
         subscription_form = SubscriptionForm()
 

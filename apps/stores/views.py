@@ -30,12 +30,13 @@ def edit(request):
     # TODO replace Hours formset
     # HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
     
-    if request.method == 'POST': # If the form has been submitted...
-        # formset = HoursFormSet(request.POST, prefix='hours', instance=account.store)
+    if request.method == 'POST': 
+        # formset = HoursFormSet(request.POST, prefix='hours',
+        # instance=account.store)
         form = StoreForm(request.POST)
         if form.is_valid():# and formset.is_valid(): 
             store = Store(**account.get("store").__dict__)
-            store.update_locally(**request.POST.dict())
+            store.update_locally(request.POST.dict(), False)
             store.update()
             
             # formset.save()            
@@ -45,10 +46,12 @@ def edit(request):
             #reload the store and put it in the session
 
             account.store = store
+            request.session['account'] = account
             data['success'] = "Store details have been saved."
     else:
         form = StoreForm(account.get("store").__dict__);
-        # formset = HoursFormSet(prefix='hours', instance=account.store)
+        # formset = HoursFormSet(prefix='hours',
+        # instance=account.store)
 
     
     data['form'] = form
@@ -77,9 +80,9 @@ def avatar(request):
     data = {}
     account = request.session['account']
     
-    if request.method == 'POST': # If the form has been submitted...
-        form = StoreAvatarForm(request.POST, request.FILES, instance=account.store) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
+    if request.method == 'POST': 
+        form = StoreAvatarForm(request.POST, request.FILES, instance=account.store)
+        if form.is_valid():
             
             #need to remove old file
             store = form.save()

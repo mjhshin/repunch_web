@@ -5,6 +5,8 @@ Format python objects to Parse objects, which are dictionaries.
 import json
 from dateutil import parser
 
+from repunch.settings import USER_CLASS
+
 NOT_WHERE_CONSTRAINTS = [
     "include", "count", "limit", "order"
 ]
@@ -26,9 +28,13 @@ def format_pointer(className, objectId):
     """
     Returns the Parse Pointer __type or None.
     """
+    if className == USER_CLASS:
+        tmp = "_User"
+    else:
+        tmp = className
     if objectId:
         return { "__type": "Pointer",
-                "className": className,
+                "className": tmp,
                 "objectId": objectId }
 
 def query(constraints):
@@ -50,7 +56,7 @@ def query(constraints):
                             "$" + args[1]: format_date(value)
                         }
             # Pointer __type
-            elif key[0].isupper and not key.endswith('_'): 
+            elif key[0].isupper() and not key.endswith('_'): 
                 where[key] = format_pointer(key, value)
             else:# regular where params
                 where[key] = value

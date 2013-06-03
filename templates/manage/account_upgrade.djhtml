@@ -20,7 +20,8 @@
 
 	<h2>{% if account.is_free %}Upgrade Account{% else %}{% endif %}</h2>
 	
-	<form action="{% url 'account_upgrade' %}" method="post" id="upgrade-form">{% csrf_token %}
+    {# action specified via script below #}
+	<form method="post" id="upgrade-form">{% csrf_token %}
 	<div class="section first">
 		<div class="section-title">
 			Credit Card Information
@@ -101,9 +102,17 @@
 			{{ form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'manage_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
 		</div>
 	</div>
-	
-	<div id="upgrade-options" class="form-options">
-		<a onclick="$('#upgrade-form').submit(); return false;" class="button blue">Submit</a>
+
+    <script>
+    function submitSubscriptionForm(action){
+        var f = $('#upgrade-form').attr("action", action);
+        f.submit()
+    }
+    </script>
+
+    <div class="form-options">
+		<a onclick="submitSubscriptionForm('{% url 'account_update' %}'); return false;" class="button blue">Update</a>
+		<a onclick="submitSubscriptionForm('{% url 'account_upgrade' %}'); return false;" class="button blue">Upgrade</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 	</div>
 	</form>
