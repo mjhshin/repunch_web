@@ -71,8 +71,10 @@ def delete(request, employee_id):
                     objectId=employee_id)
     if not employee:
         raise Http404
-    
+
+    # TODO delete Punches and Rewards Pointers to this employee?
     employee.delete()
+
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
