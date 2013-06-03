@@ -4,15 +4,16 @@ from django.http import Http404, HttpResponseRedirect
 import urllib
 
 from parse.auth.decorators import login_required
-from apps.rewards.models import Reward
+from parse.apps.rewards.models import Reward
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
 @login_required
 def index(request):
     data = {'rewards_nav': True}
-    store = request.session['account'].store
+    store = request.session['account'].get('store')
     
-    data['rewards'] = Reward.objects.filter(store=store.id).order_by('punches')
+    data['rewards'] = Reward.objects().filter(Store=\
+                            store.objectId, order='punches')
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -24,41 +25,54 @@ def index(request):
 
 @login_required
 def edit(request, reward_id):
-    reward_id = int(reward_id)
-    reward = None
-    store = request.session['account'].store
-    data = {'rewards_nav': True, 'reward_id': reward_id}
-    data['is_new'] = (reward_id==0);
-    
-    #need to make sure this reward really belongs to this store
-    if(reward_id > 0):
-        try:
-            reward = Reward.objects.filter(store=store.id).get(id=reward_id)
-        except Reward.DoesNotExist:
+    account = request.session['account']
+    store = account.get('store')
+ 
+    # reward id being 0 is a flag for new reward which don't exist
+    is_new, reward = False, None
+    try:
+        reward_id = int(reward_id)
+        if reward_id == 0:
+            is_new = True
+            reward = Reward.objects().create(Store=\
+                    store.objectId, reward_name="Untitled") 
+    except ValueError: # reward exists
+        reward = Reward.objects().get(Store=\
+                        store.objectId, objectId=reward_id)
+        if not reward:
             raise Http404
+
+    data = {'rewards_nav': True}
+    data['is_new'] = is_new;
     
-    if request.method == 'POST': # If the form has been submitted...
-        form = RewardForm(request.POST, instance=reward) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            reward = form.save(commit=False)
-            reward.store = store
-            reward.save();
+    if request.method == 'POST': 
+        form = RewardForm(request.POST) 
+        if form.is_valid():
+            reward.update_locally(request.POST.dict(), False)
+            reward.set("Store", store.objectId)
+            reward.update()
+            
             #reload the store and put it in the session
-            if reward_id > 0:
+            request.session['account'] = account
+            data['reward_id'] = reward.objectId
+            if not is_new:
                 data['success'] = "Reward has been updated."
             else:
-                return HttpResponseRedirect(reward.get_absolute_url()+ "?%s" % urllib.urlencode({'success': 'Reward has been added.'}))#Since this is new we need to redirect the page
+            # Since this is new we need to redirect the page
+                return HttpResponseRedirect(\
+                    reward.get_absolute_url()+ "?%s" %\
+                     urllib.urlencode({'success':\
+                    'Reward has been added.'}))
+        
     else:
-        if reward_id == 0:
-            form = RewardForm()
-        else:
+        form = RewardForm(reward.__dict__)
+        if not is_new:
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
             if request.GET.get("error"):
                 data['error'] = request.GET.get("error")
             
-            form = RewardForm(instance=reward)
-    
+    data['reward_id'] = reward.objectId
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
@@ -66,39 +80,41 @@ def edit(request, reward_id):
 def delete(request, reward_id):
     reward_id = int(reward_id)
     reward = None
-    store = request.session['account'].store
+    account = request.session['account']
+    store = account.get('store')
     
     #need to make sure this reward really belongs to this store
     if(reward_id > 0):
-        try:
-            reward = Reward.objects.filter(store=store.id).get(id=reward_id)
-        except Reward.DoesNotExist:
+        reward = Reward.objects().get(Store=\
+                            store.objectId, objectId=reward.objectId)
+        if not reward:
             raise Http404
     else:
         raise Http404
     
     reward.delete()
-    return redirect(reverse('rewards_index')+ "?%s" % urllib.urlencode({'success': 'Reward has been removed.'}))
+    return redirect(reverse('rewards_index')+\
+                "?%s" % urllib.urlencode({'success':\
+                'Reward has been removed.'}))
 
 @login_required
 def avatar(request, reward_id):
-    reward_id = int(reward_id)
     data = {}
-    store = request.session['account'].store
+    account = request.session['account']
+    store = account.get('store')
     
     #need to make sure this reward really belongs to this store
-    if(reward_id > 0):
-        try:
-            reward = Reward.objects.filter(store=store.id).get(id=reward_id)
-        except Reward.DoesNotExist:
-            raise Http404
-    else:
+    reward = Reward.objects().get(Store=\
+                        store.objectId, objectId=reward_id)
+    if not reward:
         raise Http404
     
-    if request.method == 'POST': # If the form has been submitted...
-        form = RewardAvatarForm(request.POST, request.FILES, instance=reward) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            form.save()
+    if request.method == 'POST':
+        # request.FILES ?
+        form = RewardAvatarForm(request.POST) 
+        if form.is_valid():
+            # TODO delete previous file
+            # TODO uploadd new file
             data['success'] = True
     else:
         form = RewardAvatarForm();

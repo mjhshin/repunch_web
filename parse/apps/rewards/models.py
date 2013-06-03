@@ -19,9 +19,9 @@ class Reward(ParseObject):
         super(Reward, self).__init__(False, **data)
 
     def get_absolute_url(self):
-		return reverse('reward_edit', args=[self.objectId])
-	
-	def redemption_count(self):
+	    return reverse('reward_edit', args=[self.objectId])
+
+    def redemption_count(self):
         return Redemption.objects().filter(Reward=self.objectId)
 
 class Punch(ParseObject):

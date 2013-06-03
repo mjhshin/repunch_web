@@ -5,17 +5,20 @@ import os
 from libs.repunch import rputils
 from repunch import settings
 
-class RewardForm(forms.ModelForm):
-    class Meta:
-        model = Reward
-        exclude = ('store', 'reward_avatar', 'redemptions')
+class RewardForm(forms.Form):
+    reward_name = forms.CharField(max_length=255)
+    description = forms.CharField(widget=forms.Textarea())
+    punches = forms.IntegerField(min_value=1)
         
-class RewardAvatarForm(forms.ModelForm):
+class RewardAvatarForm(forms.Form):
+    reward_avatar = forms.CharField(max_length=255) # TODO HTML
+    """
     class Meta:
         model = Reward
         fields = ('reward_avatar',)
         
-    def save(self, force_insert=False, force_update=False, commit=True):    
+    def save(self, force_insert=False, force_update=False,
+                commit=True):    
             
         if self.instance != None:
             reward = Reward.objects.filter().get(id=self.instance.id)
@@ -27,6 +30,8 @@ class RewardAvatarForm(forms.ModelForm):
                 
         reward = super(RewardAvatarForm, self).save()
         if reward != None:
-            rputils.rescale(os.path.join(settings.MEDIA_ROOT, reward.reward_avatar.name))
+            rputils.rescale(os.path.join(settings.MEDIA_ROOT,
+                reward.reward_avatar.name))
         
         return reward
+    """
