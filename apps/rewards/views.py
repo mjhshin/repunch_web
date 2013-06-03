@@ -13,7 +13,7 @@ def index(request):
     store = request.session['account'].get('store')
     
     data['rewards'] = Reward.objects().filter(Store=\
-                            store.objectId, order='punches')
+                            store.objectId, order='-punches')
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -71,25 +71,21 @@ def edit(request, reward_id):
                 data['success'] = request.GET.get("success")
             if request.GET.get("error"):
                 data['error'] = request.GET.get("error")
-            
+               
+    data['reward'] = reward
     data['reward_id'] = reward.objectId
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
 @login_required
 def delete(request, reward_id):
-    reward_id = int(reward_id)
-    reward = None
     account = request.session['account']
     store = account.get('store')
     
     #need to make sure this reward really belongs to this store
-    if(reward_id > 0):
-        reward = Reward.objects().get(Store=\
-                            store.objectId, objectId=reward.objectId)
-        if not reward:
-            raise Http404
-    else:
+    reward = Reward.objects().get(Store=\
+                        store.objectId, objectId=reward_id)
+    if not reward:
         raise Http404
     
     reward.delete()

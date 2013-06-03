@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load parse_tags %}
 
 {% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
 {% block styles %}
@@ -26,16 +26,16 @@
 		</div>
 		{% endif %}
 		
-		{% if form.instance.id != None %}
+		{% if not is_new %}
 		<div id="photo-edit">
 			<div class="white-box">
-				{% if not form.instance.reward_avatar %}
-					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
+				{% if not reward|get:'reward_avatar' %}
+					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" /> {# TODO DEFAULT IMAGE #}
 				{% else %}
-					<img src="{{ MEDIA_URL }}{{ form.instance.reward_avatar }}" class="avatar-big" />
+					<img src="{{ reward|get:'reward_avatar' }}" class="avatar-big" />
 				{% endif %}
 			</div>
-			<a href="{% url 'reward_avatar' form.instance.id %}" id="upload-avatar">Add/Change Photo</a>
+			<a href="{% url 'reward_avatar' reward.objectId %}" id="upload-avatar">Add/Change Photo</a>
 		</div>
 		{% endif %}
 	

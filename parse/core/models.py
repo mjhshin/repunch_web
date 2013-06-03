@@ -427,11 +427,12 @@ class ParseObject(object):
 
     def delete(self):
         """ delete the row corresponding to this object in Parse """
-        # TODO 
-        pass
+        res = parse("DELETE", self.path() + '/' + self.objectId)
+        if 'error' not in res:
+            return True
+        return False
 
     ### "Private" methods
-
     def _get_formatted_data(self):
         """ 
         returns a dictionary to be used in a PUT request for Parse.

@@ -20,9 +20,13 @@ def parse(method, path, data=None, query=None):
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
 
-    if method in ("POST", "PUT"):
+    if method in ("POST", "PUT", "DELETE"):
+        if data:
+            d = json.dumps(data)
+        else:
+            d = ''
         conn.request(method, '/' + PARSE_VERSION + '/' + path, 
-                        json.dumps(data), REST_CONNECTION_META)
+                        d, REST_CONNECTION_META)
     elif method == "GET":
         if query:
             params = '?' + urllib.urlencode(query)

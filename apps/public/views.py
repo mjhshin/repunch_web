@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 
-from apps.accounts.models import SubscriptionType, Subscription
 from apps.accounts.forms import AccountForm, SubscriptionForm
 from apps.stores.forms import StoreSignUpForm
 from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, Subscription
-from parse.apps.accounts import free
+from parse.apps.accounts.models import Account, Subscription,\
+SubscriptionType
+from parse.apps.accounts import free, UNLIMITED, ACTIVE
 from parse.apps.stores.models import Store
 
 def index(request):
@@ -19,8 +19,9 @@ def index(request):
 def learn(request):
     data = {'learn_nav': True}
     
-    data['unlimited'] = SubscriptionType.UNLIMITED
-    data['types'] = SubscriptionType.objects.filter(status=1).order_by('monthly_cost')
+    data['unlimited'] = UNLIMITED
+    data['types'] = SubscriptionType.objects().filter(status=ACTIVE,
+                        order="-monthly_cost")
     return render(request, 'public/learn.djhtml', data)
 
 def faq(request):
