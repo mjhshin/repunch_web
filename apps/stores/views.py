@@ -79,15 +79,28 @@ def hours_preview(request):
 def avatar(request):
     data = {}
     account = request.session['account']
+    store = account.get('store')
     
     if request.method == 'POST': 
-        form = StoreAvatarForm(request.POST, request.FILES, instance=account.store)
+        form = StoreAvatarForm(request.POST)
+        print dir(request.FILES.dict()['store_avatar'].file)
+        from PIL import Image
+        im = Image.open(request.FILES.dict()['store_avatar'].file)
+        im.save('tst.png', 'PNG')
         if form.is_valid():
             
-            #need to remove old file
-            store = form.save()
+            #need to remove old file]
+            if store.store_avatar:
+                try:                
+                    store.store_avatar.delete()
+                except Exception:
+                    pass # do nothing, 
+                
+            store = super(StoreAvatarForm, self).save()
+            if store != None:
+                rputils.rescale(os.path.join(settings.MEDIA_ROOT, store.store_avatar.name))
             
-            #resize image if
+            return store
             
             account.store = store;
             request.session['account'] = account;

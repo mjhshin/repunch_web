@@ -37,10 +37,15 @@ EMAIL_USE_TLS = True
 PARSE_VERSION = '1'
 REST_APPLICATION_ID = "uYZFKpiF66fYLXBCw3MMyZthdRRU7V6tyOWY4kRf"
 REST_API_KEY = "bM0wtOLyMfJf8CAIs4TmVm1JPyag74ZWXpHkuHmu"
-REST_CONNECTION_META = {
+REST_CONNECTION_META_JSON = {
        "X-Parse-Application-Id": REST_APPLICATION_ID,
        "X-Parse-REST-API-Key":REST_API_KEY,
        "Content-Type": "application/json"
+}
+REST_CONNECTION_META_PNG = {
+       "X-Parse-Application-Id": REST_APPLICATION_ID,
+       "X-Parse-REST-API-Key":REST_API_KEY,
+       "Content-Type": "image/png"
 }
 USER_CLASS = "Account"
 

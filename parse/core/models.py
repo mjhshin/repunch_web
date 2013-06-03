@@ -7,7 +7,7 @@ from dateutil import parser
 from repunch.settings import USER_CLASS
 from parse.utils import parse
 from parse.core.formatter import query,\
-format_date, format_pointer
+format_date, format_pointer, format_file
 
 class ParseObjectManager(object):
     """
@@ -155,6 +155,15 @@ class ParseObject(object):
 
         -------------------------------
 
+    ### Files:
+
+        Images have a postfix of _avatar and contains the name attr.
+        Use get with a postfix of _avatar_url to get the url.
+
+        e.g. 
+            self.employee_avatar
+            self.get('employee_avatar_url')
+
     Instance Methods
     -----------------------------------------------------------
     ### self.get(attr)
@@ -259,6 +268,10 @@ class ParseObject(object):
             # Pointers attrs- store only the objectId
             if key[0].isupper() and type(value) is dict:
                 setattr(self, key, value.get('objectId'))
+            elif key.endswith("_avatar") and value and\
+                type(value) is dict: 
+                setattr(self, key, value.get('name'))
+                setattr(self, key + "_url", value.get('url'))
             # make sure dates are datetime objects
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
@@ -307,7 +320,7 @@ class ParseObject(object):
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
         """
-        # assumin all objects have these by default
+        # assuming all objects have these by default
         if attr in ("createdAt", "updatedAt"):
             return parser.parse(self.__dict__.get(attr))
 
@@ -358,6 +371,13 @@ class ParseObject(object):
             if 'results' in res and res['results']:
                 setattr(self, attr, 
                     parser.parse(res.get('results')[0].get(attr)) )
+        # File type avatar
+        elif attr.endswith("_avatar_url") and attr in self.__dict__:
+            res = parse("GET", self.path(), query={"keys":attr,
+                    "where":dumps({"objectId":self.objectId})})
+            if 'results' in res and res['results']:
+                setattr(self, attr, res['results'][0].get(\
+                    attr.split("_url")[0]).get('url'))
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
@@ -479,6 +499,11 @@ class ParseObject(object):
                     self.__dict__[key[0].upper() + key[1:]]:
                     setattr(self, key, None)
                 continue
+            # exclude avatar url
+            if key.endswith("_avatar_url"):
+                # NOTE cache is not cleared so manually set cache
+                # to None when changing file!
+                continue
 
             # Pointers
             if key[0].isupper() and not key.endswith("_"):
@@ -486,6 +511,9 @@ class ParseObject(object):
             # Dates
             elif key.startswith("date_"):
                 data[key] = format_date(value)
+            # File avatars
+            elif key.endswith("_avatar"):
+                data[key] = format_file(value)
             # regular attributes
             else:
                 data[key] = value

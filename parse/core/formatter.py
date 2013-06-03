@@ -37,6 +37,14 @@ def format_pointer(className, objectId):
                 "className": tmp,
                 "objectId": objectId }
 
+def format_file(name):
+    """
+    Returns the Parse File __type or None.
+    """
+    if name:
+        return { "__type": "File",
+                "name": name }
+
 def query(constraints):
     """
     Returns the formatted constraints in Parse format.
