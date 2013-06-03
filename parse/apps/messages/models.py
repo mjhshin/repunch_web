@@ -2,6 +2,8 @@
 Parse equivalence of Django apps.messages.models
 """
 
+from importlib import import_module
+
 from parse.core.models import ParseObject
 from parse.apps.messages import DRAFT, UNREAD
 

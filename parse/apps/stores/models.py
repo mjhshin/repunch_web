@@ -62,7 +62,7 @@ class Hours(ParseObject):
 
     def get_class(self, className):
         if className == "Store":
-            return Store.__class__
+            return Store
 
 
 

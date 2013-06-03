@@ -2,6 +2,8 @@
 Parse equivalence of Django apps.employees.models
 """ 
 
+from importlib import import_module
+
 from parse.core.models import ParseObject
 
 class Reward(ParseObject):
@@ -25,7 +27,7 @@ class Reward(ParseObject):
     def get_class(self, className):
         if className == "Store":
             return getattr(import_module('parse.apps.stores.models'),
-                                className
+                                className)
 
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
