@@ -21,7 +21,7 @@
 	
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ feedback|get:'date_added'|date:"m/d/y" }}</span>
+			<label>Date:</label><span>{{ feedback|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label><span>{{ feedback|get:'patron'|get:'name' }}</span>
 			<div style="clear: left;" /></div>
 		</div>
@@ -43,7 +43,7 @@
 	{% ifnotequal reply.objectId feedback.objectId %}
 	<div class="white-box {% if reply.is_response == 1 %}response{% endif %}">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ reply|get:'date_added'|date:"m/d/y" }}</span>
+			<label>Date:</label><span>{{ reply|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label>
 			<span>
 				{% if not reply|get:'is_response' %}

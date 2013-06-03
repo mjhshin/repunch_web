@@ -4,15 +4,13 @@ from libs.repunch import rputils
 from repunch import settings
 import os
 
-class EmployeeForm(forms.ModelForm):
-    class Meta:
-        model = Employee
-        exclude = ('store', 'date_added', 'status', 'employee_avatar')
+class EmployeeForm(forms.Form):
+    first_name = forms.CharField(max_length=255)
+    last_name = forms.CharField(max_length=255)
+    email = forms.CharField(max_length=255)
         
-class EmployeeAvatarForm(forms.ModelForm):
-    class Meta:
-        model = Employee
-        fields = ('employee_avatar',)
+class EmployeeAvatarForm(forms.Form):
+    employee_avatar = forms.ImageField()
         
     def save(self, force_insert=False, force_update=False, commit=True):    
             

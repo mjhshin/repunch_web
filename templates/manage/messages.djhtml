@@ -37,7 +37,7 @@
 			{% for message in messages %}
 			<div class="tr {% cycle '' 'odd' %} {% ifequal message.status 'Draft'%}draft{% endifequal %} ">
 				<a href="{% url 'message_edit' message.id %}">
-					<div class="td date">{{ message|get:'date_added'|date:"m/d/y" }}</div>
+					<div class="td date">{{ message|get:'createdAt'|date:"m/d/y" }}</div>
 					<div class="td subject">{{ message|get:'subject' }}</div>
 					<div class="td status">{{ message|get:'status' }}</div>
 					<div class="td date-sent">{% if message|get:'date_sent'  %}{{ message|get:'date_sent'|date:"m/d/y" }}{% endif %}</div>
@@ -63,7 +63,7 @@
 			{% for fb in feedback %}
 			<div class="tr {% cycle '' 'odd' %} {% ifequal fb.status 0 %}unread{% endifequal %}">
 				<a href="{% url 'feedback_details' fb.id %}">
-					<div class="td date">{{ fb|get:'date_added'|date:"m/d/y" }}</div>
+					<div class="td date">{{ fb|get:'createdAt'|date:"m/d/y" }}</div>
 					<div class="td from">{{ fb|get:'patron'|get:'name' }}{% if fb.thread_count > 0 %}&nbsp;({{ fb.thread_count }}){% endif %}</div>
 					<div class="td subject">{{ fb.subject }}</div>
 				</a>

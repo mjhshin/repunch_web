@@ -20,10 +20,8 @@ class StoreForm(StoreSignUpForm):
                                     widget=forms.Textarea())
         
         
-class StoreAvatarForm(forms.ModelForm):
-    class Meta:
-        model = Store
-        fields = ('store_avatar',)
+class StoreAvatarForm(forms.Form):
+    store_avatar = forms.ImageField()
         
     def save(self, force_insert=False, force_update=False, commit=True):    
             

@@ -3,7 +3,9 @@ import datetime
 
 from libs.repunch.rphours_util import HoursInterpreter
 
+from parse.apps.messages import UNREAD
 from parse.apps.messages.models import Feedback
+from parse.apps.employees import PENDING
 from parse.apps.employees.models import Employee
 from parse.apps.stores.models import Hours
 
@@ -12,12 +14,12 @@ register = template.Library()
 @register.assignment_tag
 def feedback_unread(store):
     return Feedback.objects().count(Store=store.objectId, 
-                        status=Feedback.UNREAD)
+                        status=UNREAD)
 
 @register.assignment_tag
 def employees_pending(store):
     return Employee.objects().count(Store=store.objectId, 
-                        status=Employee.PENDING)
+                        status=PENDING)
 
 @register.simple_tag
 def hours(store):

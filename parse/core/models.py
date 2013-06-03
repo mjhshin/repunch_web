@@ -282,6 +282,22 @@ class ParseObject(object):
         res = parse("GET", self.path() + "/" + self.objectId)
         if res and "error" not in res:
             self.update_locally(res, False)
+            return True
+        return False
+
+    def increment(self, attr, amount):
+        """
+        increments this object's attribute by amount.
+        Attribute must be an integer!
+        """
+        res = parse("PUT", self.path() + "/" + self.objectId, {
+                attr: {
+                 "__op": "Increment",
+                 "amount": amount } })
+        if res and "error" not in res:
+            self.set(attr, self.__dict__.get(attr) + amount)
+            return True
+        return False
 
     def get(self, attr):
         """ returns attr if it is not None, otherwise fetches the 
@@ -291,6 +307,10 @@ class ParseObject(object):
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
         """
+        # assumin all objects have these by default
+        if attr in ("createdAt", "updatedAt"):
+            return parser.parse(self.__dict__.get(attr))
+
         if self.__dict__.get(attr):
             return self.__dict__.get(attr)
 

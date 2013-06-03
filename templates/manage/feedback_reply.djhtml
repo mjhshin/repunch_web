@@ -41,7 +41,7 @@
 	<div class="divider"></div>
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ feedback|get:'date_added'|date:"m/d/y" }}</span>
+			<label>Date:</label><span>{{ feedback|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label><span>{{ feedback|get:'patron'|get:'name' }}</span>
 			<div style="clear: left;"></div>
 		</div>

@@ -2,20 +2,13 @@
 Parse equivalence of Django apps.messages.models
 """
 
-from datetime import datetime
-from json import dumps
-
 from parse.core.models import ParseObject
+from parse.apps.messages import DRAFT, UNREAD
 
 class Message(ParseObject):
     """ Equivalence class of apps.messages.models.Message """
-    DRAFT = "Draft"
-    SENT = "Sent"
-    ALL = "All"
-    ONLY_ONE_PUNCH = "Only One Punch"
     
     def __init__(self, **data):
-        self.date_added = data.get('date_added', datetime.now().isoformat())
         self.date_sent = data.get('date_sent')
         self.subject = data.get('subject')
         self.status = data.get('status', DRAFT)
@@ -36,11 +29,8 @@ class Message(ParseObject):
 
 class Feedback(ParseObject):
     """ Equivalence class of apps.messages.models.Feedback """
-    READ = "Read"
-    UNREAD = "Unread"
     
     def __init__(self, **data):
-        self.date_added = data.get('date_added', datetime.now().isoformat())
         self.subject = data.get("subject")
         self.message = data.get("message")
         self.is_response = data.get("is_response", False)

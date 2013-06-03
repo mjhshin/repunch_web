@@ -7,7 +7,8 @@ from datetime import datetime
 import urllib, json
 
 from parse.auth.decorators import login_required
-from apps.employees.models import Employee
+from parse.apps.employees import PENDING, APPROVED
+from parse.apps.employees.models import Employee
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
 
@@ -15,10 +16,12 @@ from libs.repunch import rputils
 @login_required
 def index(request):
     data = {'employees_nav': True}
-    store = request.session['account'].store
+    account = request.session['account']
     
-    data['employees'] = Employee.objects.filter(store=store.id)
-    data['pending'] = Employee.objects.filter(store=store.id, status=0)
+    data['employees'] = Employee.objects().filter(Store=\
+                        account.get('Store'), status=APPROVED)
+    data['pending'] = Employee.objects().filter(Store=\
+                        account.get('Store'), status=PENDING)
     
     data['show_pending'] = (request.GET.get("show_pending") is not None); 
     
