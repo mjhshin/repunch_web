@@ -8,7 +8,7 @@ from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 
-from parse.utils import delete_file, create_file
+from parse.utils import delete_file, create_png
 from parse.apps.stores.models import Store
 from parse.auth.decorators import login_required
 
@@ -89,7 +89,7 @@ def avatar(request):
             if store.get('store_avatar'):
                 delete_file(store.store_avatar, 'png')
                 
-            res = create_file(request.FILES['store_avatar'], 'png')
+            res = create_png(request.FILES['store_avatar'])
             print res
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')

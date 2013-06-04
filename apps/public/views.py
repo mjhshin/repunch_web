@@ -9,7 +9,7 @@ from libs.repunch import rputils
 from parse.auth import login
 from parse.apps.accounts.models import Account, Subscription,\
 SubscriptionType
-from parse.apps.accounts import free, UNLIMITED, ACTIVE
+from parse.apps.accounts import sub_type, UNLIMITED, ACTIVE
 from parse.apps.stores.models import Store
 
 def index(request):
@@ -20,8 +20,7 @@ def learn(request):
     data = {'learn_nav': True}
     
     data['unlimited'] = UNLIMITED
-    data['types'] = SubscriptionType.objects().filter(status=ACTIVE,
-                        order="-monthly_cost")
+    data['types'] = sub_type
     return render(request, 'public/learn.djhtml', data)
 
 def faq(request):
@@ -54,7 +53,7 @@ def sign_up(request):
             # TODO: need to make this transactional
             # create subscription
             subscription = Subscription(**postDict)
-            subscription.SubscriptionType = free['objectId']
+            subscription.subscriptionType = 0
             subscription.create()
             subscription.store_cc(subscription_form.data['cc_number'],
                             subscription_form.data['cc_cvv'])

@@ -10,7 +10,7 @@ PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.auth import hash_password
-from parse.apps.accounts import free, FREE, ACTIVE
+from parse.apps.accounts import sub_type, FREE, ACTIVE
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -26,21 +26,24 @@ class Account(ParseObject):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
-        self.first_name = data.get('first_name')
-        self.last_name = data.get('last_name')
-        self.phone_number = data.get('phone_number')
-        self.is_active = data.get('is_active', True)
-        self.is_staff = data.get('is_staff', False)
-        self.is_superuser = data.get('is_superuser', False)
+        # strings : store, employee, patron
+        self.account_type = data.get('account_type')
 
         self.Subscription = data.get('Subscription')
+        # two of these are null
         self.Store = data.get('Store')
+        self.Patron = data.get('Patron')
+        self.Employee = data.get('Employee')
 
         super(Account, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Subscription":
             return Subscription
+        elif className == "Patron":
+            return getattr(import_module('parse.apps.patrons.models'), className)
+        elif className == "Employee":
+            return getattr(import_module('parse.apps.employees.models'), className)
         elif className == "Store":
             return getattr(import_module('parse.apps.stores.models'), className)
 
@@ -59,14 +62,12 @@ class Account(ParseObject):
         return None
     
     def is_free(self):
-		return self.get('subscription').get('subscriptionType').objectId == free['objectId']
+		return self.get('subscription').get('subscriptionType') == 0
 
     def change_subscriptionType(self, sub_type):
         """ change the SubscriptionType of this account to sub_type.
         sub_type is the objectId of the SubscriptionType """
-        subscription = self.get("subscription")
-        subscription.set("SubscriptionType", sub_type)
-        subscription.update()
+        # TODO type is now only integer
 
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """
@@ -108,6 +109,8 @@ class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
     def __init__(self, **data):
         self.status = data.get('status', ACTIVE)
+        # stores the level in sub_type
+        self.subscription_type = data.get('subscription_type', 0)
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.cc_number = data.get('cc_number')
@@ -121,13 +124,7 @@ class Subscription(ParseObject):
         self.ppid = data.get('ppid')
         self.ppvalid = data.get('ppvalid')
 
-        self.SubscriptionType = data.get('SubscriptionType')
-
         super(Subscription, self).__init__(False, **data)
-
-    def get_class(self, className):
-        if className == "SubscriptionType":
-            return SubscriptionType
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """
@@ -190,7 +187,7 @@ class Subscription(ParseObject):
 
             "transactions": [{
                 "amount": {
-              		"total": self.get('subscriptionType').get('monthly_cost'),
+              		"total": sub_type[self.get('subscriptionType')].get('monthly_cost'),
               		"currency": "USD" },
                 "description": "Recurring monthly subscription from repunch.com." 
                 }] })
@@ -216,6 +213,7 @@ class Subscription(ParseObject):
 		
         return None
 
+"""
 class SubscriptionType(ParseObject):
     """ Equivalence class of apps.accounts.models.SubscriptionType """
     def __init__(self, **data):
@@ -228,7 +226,7 @@ class SubscriptionType(ParseObject):
         self.status = data.get('status', ACTIVE)
 
         super(SubscriptionType, self).__init__(False, **data)
-
+"""
 
 
         

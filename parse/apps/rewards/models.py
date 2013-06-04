@@ -34,7 +34,7 @@ class Punch(ParseObject):
     def __init__(self, **data):
         self.punches = data.get("punches")
 
-        self.Reward = data.get("Reward")
+        # self.Reward = data.get("Reward")
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         
@@ -43,9 +43,6 @@ class Punch(ParseObject):
     def get_class(self, className):
         if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'),
-                                className)
-        elif className == "Reward":
-            return getattr(import_module('parse.apps.rewards.models'),
                                 className)
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.'+\

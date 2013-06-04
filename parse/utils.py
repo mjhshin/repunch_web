@@ -74,9 +74,9 @@ def parse(method, path, data=None, query=None,
     return result
 
     
-def create_file(uploadedFile, fType):
+def create_png(uploadedFile):
     """ 
-    creates the given uploadedFile
+    creates the given uploadedFile, which is a png image.
     """
     im = Image.open(uploadedFile.file)
     tmp = tempfile.NamedTemporaryFile()
@@ -88,7 +88,7 @@ def create_file(uploadedFile, fType):
     # also filename must be alpha-numeric! 
     # Otherwise, BadFileName results
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                uploadedFile.name), tmp.name, cMeta=fType)
+                uploadedFile.name), tmp.name, cMeta='png')
     # don't forget to delete the file
     tmp.unlink(tmp.name)
     return res
