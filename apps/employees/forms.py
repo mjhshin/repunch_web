@@ -10,7 +10,7 @@ class EmployeeForm(forms.Form):
     email = forms.CharField(max_length=255)
         
 class EmployeeAvatarForm(forms.Form):
-    employee_avatar = forms.ImageField()
+    employee_avatar = forms.FileField()
         
     def save(self, force_insert=False, force_update=False, commit=True):    
             

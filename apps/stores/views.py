@@ -2,12 +2,15 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
+from PIL import Image
+import tempfile
 
 from apps.stores.models import Store, Hours
 from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 
+from parse.utils import delete_file, create_file
 from parse.apps.stores.models import Store
 from parse.auth.decorators import login_required
 
@@ -82,26 +85,23 @@ def avatar(request):
     store = account.get('store')
     
     if request.method == 'POST': 
-        form = StoreAvatarForm(request.POST)
-        print dir(request.FILES.dict()['store_avatar'].file)
-        from PIL import Image
-        im = Image.open(request.FILES.dict()['store_avatar'].file)
-        im.save('tst.png', 'PNG')
+        form = StoreAvatarForm(request.POST, request.FILES)
+        im = Image.open(request.FILES['store_avatar'].file)
+        tmp = tempfile.NamedTemporaryFile()
+        im.save(tmp, 'png')
         if form.is_valid():
-            
-            #need to remove old file]
-            if store.store_avatar:
-                try:                
-                    store.store_avatar.delete()
-                except Exception:
-                    pass # do nothing, 
+            # need to remove old file
+            if store.get('store_avatar'):
+                delete_file(store.get('store_avatar'), 'png')
                 
-            store = super(StoreAvatarForm, self).save()
-            if store != None:
-                rputils.rescale(os.path.join(settings.MEDIA_ROOT, store.store_avatar.name))
-            
-            return store
-            
+            res = create_file(tmp.name,
+                        request.FILES['store_avatar'].name, 'png')
+     
+            if res and 'error' not in res:
+                store.store_avatar = res.get('name')
+                store.store_avatar_url = res.get('url')
+           
+            store.update()
             account.store = store;
             request.session['account'] = account;
             

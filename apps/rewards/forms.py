@@ -11,7 +11,7 @@ class RewardForm(forms.Form):
     punches = forms.IntegerField(min_value=1)
         
 class RewardAvatarForm(forms.Form):
-    employee_avatar = forms.ImageField()
+    employee_avatar = forms.FileField()
     """
     class Meta:
         model = Reward

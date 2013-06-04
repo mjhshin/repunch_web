@@ -23,24 +23,38 @@ def parse(method, path, data=None, query=None,
     conn.connect()
 
     if cMeta == 'json':
-        cMeta = REST_CONNECTION_META_JSON
+        rcm = REST_CONNECTION_META_JSON
     elif cMeta == 'png':
-        cMeta = REST_CONNECTION_META_PNG
+        rcm = REST_CONNECTION_META_PNG
 
     if method in ("POST", "PUT", "DELETE"):
         if data:
-            d = json.dumps(data)
+            # create a new Parse object
+            if cMeta == 'json':
+                conn.request(method, '/' + PARSE_VERSION + '/' +\
+                        path, json.dumps(data), rcm)
+            elif cMeta == 'png':
+                # delete a file
+                if method == "DELETE":
+                    conn.request(method, '/' + PARSE_VERSION + '/' +\
+                        path, '', rcm)
+                # create a file
+                elif method == "POST":
+                    with open(data, 'r') as fid:
+                        conn.request(method, '/' + PARSE_VERSION +\
+                            '/' + path, fid, rcm)
+                        fid.close()
         else:
-            d = ''
-        conn.request(method, '/' + PARSE_VERSION + '/' + path, 
-                        d, cMeta)
+            conn.request(method, '/' + PARSE_VERSION + '/' +\
+                        path, '', rcm)
+
     elif method == "GET":
         if query:
             params = '?' + urllib.urlencode(query)
         else:
             params = ''
         conn.request("GET", '/' + PARSE_VERSION + '/' + path +\
-                '%s' % (params, ), '',  cMeta)
+                '%s' % (params, ), '',  rcm)
 
     try:
         result = json.loads(conn.getresponse().read())
@@ -53,14 +67,23 @@ def parse(method, path, data=None, query=None,
     return result
 
     
+def create_file(filePath, fName, fType):
+    """ 
+    creates the given filePath with the given name and type 
+    """
+    return parse("POST", 'files/' + fName, filePath, cMeta=fType)
     
 
-
-
-
-
-
-
+def delete_file(name, fType):
+    """ deletes the given file """    
+    res = parse("DELETE", 'files/' + name, cMeta=fType)
+    print name
+    print name
+    print name
+    print name
+    if res and 'error' not in res:
+        return True
+    return False
 
 
 

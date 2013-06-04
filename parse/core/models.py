@@ -268,8 +268,7 @@ class ParseObject(object):
             # Pointers attrs- store only the objectId
             if key[0].isupper() and type(value) is dict:
                 setattr(self, key, value.get('objectId'))
-            elif key.endswith("_avatar") and value and\
-                type(value) is dict: 
+            elif key.endswith("_avatar") and type(value) is dict: 
                 setattr(self, key, value.get('name'))
                 setattr(self, key + "_url", value.get('url'))
             # make sure dates are datetime objects

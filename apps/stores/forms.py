@@ -21,7 +21,7 @@ class StoreForm(StoreSignUpForm):
         
         
 class StoreAvatarForm(forms.Form):
-    store_avatar = forms.ImageField()
+    store_avatar = forms.FileField()
         
     def save(self, force_insert=False, force_update=False, commit=True):    
             
