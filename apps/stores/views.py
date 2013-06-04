@@ -2,8 +2,6 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
-from PIL import Image
-import tempfile
 
 from apps.stores.models import Store, Hours
 from apps.accounts.models import Account
@@ -86,21 +84,17 @@ def avatar(request):
     
     if request.method == 'POST': 
         form = StoreAvatarForm(request.POST, request.FILES)
-        im = Image.open(request.FILES['store_avatar'].file)
-        tmp = tempfile.NamedTemporaryFile()
-        im.save(tmp, 'png')
         if form.is_valid():
             # need to remove old file
             if store.get('store_avatar'):
-                delete_file(store.get('store_avatar'), 'png')
+                delete_file(store.store_avatar, 'png')
                 
-            res = create_file(tmp.name,
-                        request.FILES['store_avatar'].name, 'png')
-     
+            res = create_file(request.FILES['store_avatar'], 'png')
+            print res
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
-           
+            # TODO LINK HTML with the image urls
             store.update()
             account.store = store;
             request.session['account'] = account;
