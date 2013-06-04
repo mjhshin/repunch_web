@@ -6,18 +6,19 @@ from dateutil import parser
 from libs.dateutil.extras import start_month, end_month
 from parse.apps.messages.models import Message
 from parse.utils import parse
+from parse.apps.accounts import sub_type
 
 register = template.Library()
 
 @register.simple_tag
 def account_user_usage(account, percent_of=None):
     store = account.get('store')
-    atype = account.get('subscription').get('subscriptionType')
+    atype = sub_type[account.get('subscription').get('subscriptionType')]
     
-    if atype.max_users == -1:
+    if atype['max_users'] == -1:
         percent = 0
     else:
-        percent = store.active_users/atype.max_users
+        percent = store.active_users/atype['max_users']
         if(percent > 1):
             percent = 1
     
@@ -30,24 +31,24 @@ def account_user_usage(account, percent_of=None):
 def account_alert(account):
     store = account.get('store')
     account.get('subscription')
-    atype = account.get('subscription').get('subscriptionType')
+    atype = sub_type[account.get('subscription').get('subscriptionType')]
     
     # may cause division by 0!!!
-    percent = store.active_users / atype.max_users
+    percent = store.active_users / atype['max_users']
     
     #if they are at 80 percent of their users, alert
     return (percent >= .8)
 
 @register.simple_tag
 def account_message_usage(account, percent_of=None):
-    atype = account.get('subscription').get('subscriptionType')
+    atype = sub_type[account.get('subscription').get('subscriptionType')]
     
     today = date.today()
     message_count = Message.objects().count(Store=\
             account.get("Store"), date_sent__gte=start_month(today),
             date_sent__lte=end_month(today))
     
-    percent = message_count/atype.max_messages
+    percent = message_count/atype['max_messages']
     if(percent > 1): #don't go past 1
         percent = 1
     

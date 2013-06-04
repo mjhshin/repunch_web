@@ -35,15 +35,17 @@ EMAIL_USE_TLS = True
 
 # PARSE 
 PARSE_VERSION = '1'
-REST_APPLICATION_ID = "uYZFKpiF66fYLXBCw3MMyZthdRRU7V6tyOWY4kRf"
-REST_API_KEY = "bM0wtOLyMfJf8CAIs4TmVm1JPyag74ZWXpHkuHmu"
+PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
+PARSE_MASTER_KEY = 'K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB'
+REST_API_KEY = "LVlPD43KJK4oGsP5f8ItFCA7RD4fwahTKQYRudod"
+
 REST_CONNECTION_META_JSON = {
-       "X-Parse-Application-Id": REST_APPLICATION_ID,
+       "X-Parse-Application-Id": PARSE_APPLICATION_ID,
        "X-Parse-REST-API-Key":REST_API_KEY,
        "Content-Type": "application/json"
 }
 REST_CONNECTION_META_PNG = {
-       "X-Parse-Application-Id": REST_APPLICATION_ID,
+       "X-Parse-Application-Id": PARSE_APPLICATION_ID,
        "X-Parse-REST-API-Key":REST_API_KEY,
        "Content-Type": "image/png"
 }

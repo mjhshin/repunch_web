@@ -13,7 +13,6 @@ class Patron(ParseObject):
     def __init__(self, **data):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
-        self.email = data.get("email")
         self.phone_number = data.get('phone_number')
         self.gender = data.get("gender", UNKNOWN)
         self.dob = data.get("dob")

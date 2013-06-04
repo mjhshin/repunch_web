@@ -3,7 +3,6 @@ from django.contrib.auth import authenticate
 from django.utils import timezone
 import datetime, re, pytz
 
-from models import Account, Settings, Subscription, SubscriptionType
 from libs.repunch import rpforms, rpccutils, rputils
 
 from parse.apps.accounts.models import Account

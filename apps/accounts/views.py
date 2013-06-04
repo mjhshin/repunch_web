@@ -8,13 +8,13 @@ from forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 
 from parse.auth.decorators import login_required
-from parse.apps.accounts import free, middle, heavy
 from parse.apps.accounts.models import Settings
 
 @login_required
 def settings(request):
     data = {'settings_nav': True}
     account = request.session['account']
+    store = account.get('store')
     settings = account.get_settings(); 
     if settings == None:
         settings = Settings.objects().create(Account=account.objectId,
@@ -25,11 +25,18 @@ def settings(request):
         if form.is_valid(): 
             settings.update_locally(request.POST.dict(), False)
             settings.update()
+            # Shin chose to move punches_facebook to Store...
+            store.set("punches_facebook", 
+                        request.POST["punches_facebook"])
+            store.update()
+
             data['success'] = "Settings have been saved."
         else:
             data['error'] = 'Error saving settings.';
     else:
         form = SettingsForm(settings.__dict__);
+        # shin chose to move punches_facebook to Store...
+        form.data['punches_facebook'] = store.get('punches_facebook')
     
     data['form'] = form
     data['settings'] = settings
@@ -112,13 +119,11 @@ def upgrade(request):
 
         if form.is_valid(): 
             # consult accounts.__init__
-            typeId = subscription.get("SubscriptionType")
-            if typeId == free.get('objectId'):
-                subscription.set("SubscriptionType", 
-                                        middle.get('objectId'))
-            elif typeId == middle.get('objectId'):
-                subscription.set("SubscriptionType", 
-                                        heavy.get('objectId'))        
+            level = subscription.get("subscriptionType")
+            if level == 0:
+                subscription.set("subscriptionType", 1)
+            elif level == 1:
+                subscription.set("subscriptionType", 2)        
 
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)

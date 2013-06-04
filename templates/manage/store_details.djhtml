@@ -27,7 +27,7 @@
 		
 		<div class="white-box" id="store-details-content">
 			{% if store|get:'store_avatar'  %}
-				<img src="{{ MEDIA_URL }}{{ store.store_avatar }}" alt="" class="avatar-big" />
+				<img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" />
 			{% else %}
 				<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
 			{% endif %}
@@ -38,7 +38,7 @@
 						{{ store|get:'street' }}<br />
 						{{ store|get:'city' }}, {{ store|get:'state' }} {{ store|get:'zip' }}<br />
 						{{ store|get:'phone_number' }}<br />
-						{{ store|get:'email' }}
+						{{ account|get:'email' }}
 					</p>
 				</div>
 				<div id="hours">
@@ -63,11 +63,12 @@
 	</div>
 	
 	<div class="section">
-		{% with type=account|get:'subscription'|get:'subscriptionType' %}
+		{% with tmp=account|get:'subscription'|get:'subscriptionType' %}
+        {% with type=tmp|get_sub_type %}
 		<div class="section-title">
 			Current Subscription: 
 			<span style="font-weight:bold;">
-				{{ type|get:'name' }}
+				{{ type.name }}
 			</span>
 		</div>
 		
@@ -77,7 +78,7 @@
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count account %}</div>
-					<div class="limit">of {% if type|get:'max_users' == -1 %}unlimited{% else %}{{ type|get:'max_users' }}{% endif %}</div>
+					<div class="limit">of {% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="limit-details right">
@@ -85,7 +86,7 @@
 				<div class="description">
 					<div class="label">SENT MESSAGES</div>
 					<div class="count">{% account_message_count account %}</div>
-					<div class="limit">of {{ type|get:'max_messages' }}</div>
+					<div class="limit">of {{ type.max_messages }}</div>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -102,6 +103,7 @@
 			<a href="#" class="red">Cancel My Account</a>
 		</div>
 	</div>
+    {% endwith %}
 	{% endwith %}
 {% endwith %}
 {% endblock %}

@@ -28,7 +28,7 @@ class Account(ParseObject):
         self.email = data.get('email')
         # strings : store, employee, patron
         self.account_type = data.get('account_type')
-
+        # Subscription only for store TODO move from store point to this
         self.Subscription = data.get('Subscription')
         # two of these are null
         self.Store = data.get('Store')
@@ -73,8 +73,7 @@ class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """
     def __init__(self, **data):
         self.punches_customer = data.get("punches_customer")
-        self.punches_employee = data.get("punches_employee")
-        self.punches_facebook = data.get("punches_facebook")    
+        self.punches_employee = data.get("punches_employee") 
         self.retailer_id = data.get("retailer_id")
 
         self.Account = data.get("Account")
@@ -110,7 +109,7 @@ class Subscription(ParseObject):
     def __init__(self, **data):
         self.status = data.get('status', ACTIVE)
         # stores the level in sub_type
-        self.subscription_type = data.get('subscription_type', 0)
+        self.subscriptionType = data.get('subscriptionType', 0)
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.cc_number = data.get('cc_number')
@@ -215,7 +214,7 @@ class Subscription(ParseObject):
 
 """
 class SubscriptionType(ParseObject):
-    """ Equivalence class of apps.accounts.models.SubscriptionType """
+    # Equivalence class of apps.accounts.models.SubscriptionType
     def __init__(self, **data):
         self.name = data.get('name', FREE)
         self.description = data.get('description')

@@ -37,8 +37,9 @@ class Store(ParseObject):
         self.store_description = data.get('store_description')
         self.store_avatar = data.get('store_avatar')
         self.active_users = data.get('active_users', 0)
-        self.store_timezone = data.get('store_timezone', TIME_ZONE)
-
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.punches_facebook = data.get("punches_facebook")  
+   
         self.Patrons_ = "Patron"
         
         super(Store, self).__init__(False, **data)

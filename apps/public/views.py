@@ -7,8 +7,7 @@ from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, Subscription,\
-SubscriptionType
+from parse.apps.accounts.models import Account, Subscription
 from parse.apps.accounts import sub_type, UNLIMITED, ACTIVE
 from parse.apps.stores.models import Store
 
@@ -20,7 +19,8 @@ def learn(request):
     data = {'learn_nav': True}
     
     data['unlimited'] = UNLIMITED
-    data['types'] = sub_type
+    types = [value for value in sub_type.itervalues()]
+    data['types'] = types
     return render(request, 'public/learn.djhtml', data)
 
 def faq(request):
@@ -63,6 +63,7 @@ def sign_up(request):
             account = Account(**postDict)
             account.Store = store.objectId
             account.Subscription = subscription.objectId
+            account.account_type = "store"
             account.set_password(request.POST.get('password'))
             account.create()
 

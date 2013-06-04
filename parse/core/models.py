@@ -418,7 +418,7 @@ class ParseObject(object):
                  } )
         if res and 'error' not in res:
             cacheAttrName = relAttrName[0].lower() + relAttrName[1:-1]
-            self.__dic__[cacheAttrName] = None
+            self.__dict__[cacheAttrName] = None
             return True
         else:
             return False

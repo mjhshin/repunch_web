@@ -13,7 +13,7 @@ def index(request):
     store = request.session['account'].get('store')
     
     data['rewards'] = Reward.objects().filter(Store=\
-                            store.objectId, order='-punches')
+                            store.objectId, order='punches')
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")

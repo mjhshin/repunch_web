@@ -6,7 +6,8 @@ import json, httplib, urllib, tempfile, re, string
 from PIL import Image
 
 from repunch.settings import PARSE_VERSION,\
-REST_CONNECTION_META_JSON, REST_CONNECTION_META_PNG
+REST_CONNECTION_META_JSON, REST_CONNECTION_META_PNG,\
+PARSE_MASTER_KEY
 
 BAD_FILE_CHR = re.compile('[\W_]+')
 
@@ -41,8 +42,7 @@ def parse(method, path, data=None, query=None,
             elif cMeta == 'png':
                 # delete a file
                 if method == "DELETE":
-                    rcm["X-Parse-Master-Key"] =\
-                         "CW0aN2fsmS4vap0Q4LJ1OxH9zYAN4Ev9clzopjSy"
+                    rcm["X-Parse-Master-Key"] = PARSE_MASTER_KEY
                     conn.request(method, '/' + PARSE_VERSION + '/' +\
                         path, '', rcm)
                 # create a file

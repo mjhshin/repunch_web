@@ -39,6 +39,11 @@ def edit(request):
             store = Store(**account.get("store").__dict__)
             store.update_locally(request.POST.dict(), False)
             store.update()
+
+            # store no longer has email field. Email now exclusive to
+            # Accounts (_User) class
+            account.email = request.POST['email']
+            account.update()
             
             # formset.save()            
             
@@ -50,7 +55,8 @@ def edit(request):
             request.session['account'] = account
             data['success'] = "Store details have been saved."
     else:
-        form = StoreForm(account.get("store").__dict__);
+        form = StoreForm(account.get("store").__dict__)
+        form.data['email'] = account.get('email')
         # formset = HoursFormSet(prefix='hours',
         # instance=account.store)
 
