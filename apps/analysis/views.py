@@ -5,7 +5,6 @@ from datetime import timedelta
 import datetime, json
 
 from parse.auth.decorators import login_required
-from apps.rewards.models import Reward
 from apps.employees.models import Employee
 from apps.patrons.models import Patron, FacebookPost
 from libs.repunch import rputils
@@ -15,9 +14,9 @@ from libs.dateutil.relativedelta import relativedelta
 def index(request):
     data = {'analysis_nav': True}
     account = request.session['account']
+    store = account.gte('store')
     
-    
-    data['rewards'] = Reward.objects.filter(store=account.store.id).order_by('reward_name')
+    data['rewards'] = store.get('rewards')
     return render(request, 'manage/analysis.djhtml', data)
 
 

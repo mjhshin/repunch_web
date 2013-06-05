@@ -19,6 +19,10 @@ def settings(request):
     if settings == None:
         settings = Settings.objects().create(retailer_id=rputils.generate_id())
         store.Settings = settings.objectId
+        store.settings = settings
+        store.update()
+        account.store = store
+        account.store.settings = settings
 
     if request.method == 'POST':
         form = SettingsForm(request.POST)
@@ -29,6 +33,10 @@ def settings(request):
             store.set("punches_facebook", 
                         request.POST["punches_facebook"])
             store.update()
+    
+            store.settings = settings
+            account.store = store
+            request.session['account'] = account
 
             data['success'] = "Settings have been saved."
         else:

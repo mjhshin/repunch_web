@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
 
-from apps.stores.models import Store, Hours
+from apps.stores.models import Store
 from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
@@ -70,10 +70,10 @@ def edit(request):
 def hours_preview(request):
     store = request.session['account'].store
     
-    HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
+    # HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
     
     hours = []
-    formset = HoursFormSet(request.GET, prefix='hours', instance=store)
+    # formset = HoursFormSet(request.GET, prefix='hours', instance=store)
     if formset.is_valid():
         for form in formset:
             if(not 'DELETE' in form.changed_data):

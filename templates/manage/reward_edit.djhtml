@@ -25,19 +25,6 @@
 			<div>{{ error }}{{ success }}</div>
 		</div>
 		{% endif %}
-		
-		{% if not is_new %}
-		<div id="photo-edit">
-			<div class="white-box">
-				{% if not reward|get:'reward_avatar' %}
-					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" /> {# TODO DEFAULT IMAGE #}
-				{% else %}
-					<img src="{{ reward|get:'reward_avatar' }}" class="avatar-big" />
-				{% endif %}
-			</div>
-			<a href="{% url 'reward_avatar' reward.objectId %}" id="upload-avatar">Add/Change Photo</a>
-		</div>
-		{% endif %}
 	
 		<h2>{{ is_new|yesno:"Add New,Edit" }} Reward</h2>
 		

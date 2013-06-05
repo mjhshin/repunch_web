@@ -60,7 +60,7 @@
 		
 		<div class="input-container">
 			{{ form.email.errors }}
-			<label for="email">First Name</label>
+			<label for="email">Email</label>
 			{{ form.email }}
 		</div>
 		

@@ -4,7 +4,6 @@ from django.http import Http404, HttpResponseRedirect
 import urllib
 
 from parse.auth.decorators import login_required
-from parse.apps.rewards.models import Reward
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
 @login_required
@@ -12,8 +11,7 @@ def index(request):
     data = {'rewards_nav': True}
     store = request.session['account'].get('store')
     
-    data['rewards'] = Reward.objects().filter(Store=\
-                            store.objectId, order='punches')
+    data['rewards'] = store.get('rewards')
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -25,6 +23,7 @@ def index(request):
 
 @login_required
 def edit(request, reward_id):
+    # reward key is now just an array key
     account = request.session['account']
     store = account.get('store')
  
@@ -34,11 +33,13 @@ def edit(request, reward_id):
         reward_id = int(reward_id)
         if reward_id == 0:
             is_new = True
-            reward = Reward.objects().create(Store=\
-                    store.objectId, reward_name="Untitled") 
+            # a reward is now just a dictionary to be added to 
+            # the rewards array
+            reward = {'reward_name':None, "description":None, 
+                        "punches":None}
+            
     except ValueError: # reward exists
-        reward = Reward.objects().get(Store=\
-                        store.objectId, objectId=reward_id)
+        reward = store.rewards[reward_id]
         if not reward:
             raise Http404
 

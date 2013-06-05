@@ -112,7 +112,6 @@
 
     <div class="form-options">
 		<a onclick="submitSubscriptionForm('{% url 'account_update' %}'); return false;" class="button blue">Update</a>
-		<a onclick="submitSubscriptionForm('{% url 'account_upgrade' %}'); return false;" class="button blue">Upgrade</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 	</div>
 	</form>

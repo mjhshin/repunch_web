@@ -5,6 +5,7 @@ from datetime import datetime
 from importlib import import_module
 import paypalrestsdk
 
+from parse.apps.accounts import ACTIVE
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
 PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
@@ -45,55 +46,41 @@ class Store(ParseObject):
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
         self.punches_facebook = data.get("punches_facebook")  
+
+        # [{"day":0,"open_time":"0900","close_time":"2200"}, 
+        #    ... up to day 6]
+        self.hours = data.get("hours")
+        # [{"reward_name":"Free bottle of wine", "description":
+        # "Must be under $25 in value",
+        # "punches":10,"redemption_count":0},]
+        self.rewards = data.get("rewards")
    
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
 
         self.Feedbacks_ = "Feedback"
-        self.Messages_ = "Message"
-        self.Patrons_ = "Patron"
-        self.PatronsStores_ = "PatronStore"
-        self.Rewards_ = "Reward"
+        self.Punches_ = "Punch"
+        self.PatronStores_ = "PatronStore"
         self.Invoice_ = "Invoice"
         self.Employees_ = "Employee"
-        self.Hours_ = "Hours"
         
         super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className in ("Patron", "PatronStore"):
+        if className == "PatronStore":
             return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className in ("Message", "Feedback"):
+        elif className == "Feedback":
             return getattr(import_module('parse.apps.messages.models'), className)
         elif className == "Settings":
             return Settings
-        elif className == "Hours":
-            return Hours
         elif className == "Invoice":
             return Invoice
         elif className == "Subscription":
             return Subscription
+        elif className == "Punch":
+            return getattr(import_module('parse.apps.rewards.models'), className)
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.models'), className)
-        elif className == "Reward":
-            return getattr(import_module('parse.apps.rewards.models'), className)
-
-class Hours(ParseObject):
-    """ Equivalence class of apps.stores.models.Hours """
-
-    def __init__(self, **data):
-        self.days = data.get('days')
-        self.open = data.get('open')
-        self.close = data.get('close')
-        self.list_order = data.get('list_order')
-
-        self.Store = data.get("Store")
-
-        super(Hours, self).__init__(False, **data)
-
-    def get_class(self, className):
-        if className == "Store":
-            return Store
 
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
@@ -243,5 +230,24 @@ class SubscriptionType(ParseObject):
         self.status = data.get('status', ACTIVE)
 
         super(SubscriptionType, self).__init__(False, **data)
+"""
+
+"""
+class Hours(ParseObject):
+    # Equivalence class of apps.stores.models.Hours 
+
+    def __init__(self, **data):
+        self.days = data.get('days')
+        self.open = data.get('open')
+        self.close = data.get('close')
+        self.list_order = data.get('list_order')
+
+        self.Store = data.get("Store")
+
+        super(Hours, self).__init__(False, **data)
+
+    def get_class(self, className):
+        if className == "Store":
+            return Store
 """
  

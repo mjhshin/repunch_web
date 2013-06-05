@@ -7,7 +7,6 @@ from parse.apps.messages import UNREAD
 from parse.apps.messages.models import Feedback
 from parse.apps.employees import PENDING
 from parse.apps.employees.models import Employee
-from parse.apps.stores.models import Hours
 
 register = template.Library()
 
@@ -23,8 +22,9 @@ def employees_pending(store):
 
 @register.simple_tag
 def hours(store):
-    return HoursInterpreter(hours=\
-        Hours.objects().filter(Store=store.objectId)).readable()
+    #return HoursInterpreter(hours=\
+    #    Hours.objects().filter(Store=store.objectId)).readable()   
+    return None
 
 @register.simple_tag
 def time_selector(fieldid, timestamp):

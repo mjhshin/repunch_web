@@ -15,7 +15,7 @@
 	</div>
 	{% endif %}
 
-	<a href="{% url 'reward_edit' 0 %}" class="button blue">+ Create New Reward</a>
+	<a href="{% url 'reward_edit' -1 %}" class="button blue">+ Create New Reward</a>
 	
 	<div class="section">
 		<div class="section-title">Rewards</div>
@@ -28,24 +28,12 @@
 		{% for reward in rewards %}
 		    <div class="tr reward {% cycle '' 'odd' %}">
 				<a href="{% url 'reward_edit' reward.objectId %}">
-					<div class="td reward_punches">{{ reward|get:'punches' }}</div>
+					<div class="td reward_punches">{{ reward.punches }}</div>
 					<div class="td reward_summary">
-						{% if reward|get:'reward_avatar' %}
-						<img src="{{ MEDIA_URL }}{{ reward|get:'reward_avatar' }}" alt="" class="avatar-medium">
-						{% endif %}
-						<span class="reward_title">{{ reward|get:'reward_name' }}</span><br />
-						<span class="reward_description">{{ reward|get:'description' }}</span>
+						<span class="reward_title">{{ reward.reward_name }}</span><br />
+						<span class="reward_description">{{ reward.description }}</span>
 					</div>
 				</a>
-			</div>
-		{% empty %}
-		    <div class="tr reward">
-				<div class="td reward_punches">&nbsp;</div>
-				<div class="td reward_summary">
-					<img src="/images/avatars/avatar-joes.jpg" alt="" class="avatar-medium">
-					<span class="reward_title">No Rewards</span><br />
-					<span class="reward_description">You have not added any rewards. Click on the &quot;Create New Reward&quot; button above.</span>
-				</div>
 			</div>
 		{% endfor %}
 	</div>
