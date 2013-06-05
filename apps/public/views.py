@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 
-from apps.accounts.forms import AccountForm, SubscriptionForm
-from apps.stores.forms import StoreSignUpForm
+from apps.accounts.forms import AccountForm
+from apps.stores.forms import StoreSignUpForm, SubscriptionForm
 from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
-from parse.apps.accounts.models import Account, Subscription
+from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED, ACTIVE
-from parse.apps.stores.models import Store
+from parse.apps.stores.models import Store, Subscription
 
 def index(request):
     data = {'home_nav': True}

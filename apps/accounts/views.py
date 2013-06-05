@@ -4,21 +4,21 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth import SESSION_KEY
 import json, urllib
 
-from forms import SettingsForm, SubscriptionForm
+from apps.stores.forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 
 from parse.auth.decorators import login_required
-from parse.apps.accounts.models import Settings
+from parse.apps.stores.models import Settings
 
 @login_required
 def settings(request):
     data = {'settings_nav': True}
     account = request.session['account']
     store = account.get('store')
-    settings = account.get_settings(); 
+    settings = store.get('settings'); 
     if settings == None:
-        settings = Settings.objects().create(Account=account.objectId,
-                        retailer_id=rputils.generate_id())
+        settings = Settings.objects().create(retailer_id=rputils.generate_id())
+        store.Settings = settings.objectId
 
     if request.method == 'POST':
         form = SettingsForm(request.POST)

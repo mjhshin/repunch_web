@@ -328,7 +328,7 @@ class ParseObject(object):
 
         # Pointer cache
         if attr[0].islower() and\
-            attr[0].upper() + attr[1:] in self.__dict__:
+            self.__dict__.get(attr[0].upper() + attr[1:]):
             className = attr[0].upper() + attr[1:]
             res = parse("GET", "classes/" + className +\
                     "/" + self.__dict__.get(className))

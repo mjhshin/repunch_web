@@ -5,7 +5,7 @@ from django.utils import timezone
 from PIL import Image
 import json, time, pytz
 
-from parse.apps.accounts.models import Settings
+from parse.apps.stores.models import Settings
 
 # function for generating unique ID for retailer
 def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
