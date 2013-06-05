@@ -19,6 +19,9 @@ class Patron(ParseObject):
         self.status = data.get("status", ACTIVE)
 
         self.Stores_ = "Store"
+        self.Feedbacks_ = "Feedback"
+        self.FacebookPosts_ = "FacebookPost"
+        self.PatronStores_ = "PatronStore"
 
         super(Patron, self).__init__(False, **data)
 
@@ -26,12 +29,30 @@ class Patron(ParseObject):
         if className == "Store":
             return getattr(import_module('parse.apps.stores.models'),
                                 className)
+        elif className == "Feedback":
+            return getattr(import_module('parse.apps.messages.models'),
+                                className)
+        elif className == "PatronStore":
+            return PatronStore
+        elif className == "FacebookPost":
+            return FacebookPost
+
+class PatronStore(ParseObject):
+    """ New class not in Django """
+    def __init__(self, **data):
+        self.Patron = data.get("Patron")
+        self.Store = data.get("Store")
+        self.punch_count data.get("punch_count", 0)
+    def get_class(self, className):
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                                className)
+        elif className == "Patron":
+            return Patron
 
 class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """
     def __init__(self, **data):
-        self.date_added = data.get("date_added", date.today().isoformat())
-        
         self.Patron = data.get("Patron")
         self.Store = data.get("Store")
 

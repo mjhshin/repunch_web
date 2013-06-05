@@ -21,6 +21,7 @@ class Employee(ParseObject):
         self.lifetime_punches = data.get("lifetime_punches", 0)
 
         self.Punches_ = "Punch"
+
         self.Store = data.get("Store")
 
         super(Employee, self).__init__(False, **data)

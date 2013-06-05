@@ -13,28 +13,18 @@ class Reward(ParseObject):
         self.description = data.get("description")
         self.punches = data.get("punches")
         self.reward_avatar = data.get("reward_avatar")
-
-        self.Store = data.get("Store")
+        self.redemption_count = data.get("redemption_count")
 
         super(Reward, self).__init__(False, **data)
 
     def get_absolute_url(self):
 	    return reverse('reward_edit', args=[self.objectId])
 
-    def redemption_count(self):
-        return Redemption.objects().filter(Reward=self.objectId)
-
-    def get_class(self, className):
-        if className == "Store":
-            return getattr(import_module('parse.apps.stores.models'),
-                                className)
-
 class Punch(ParseObject):
     """ Equivalence class of apps.rewards.models.Punch """
     def __init__(self, **data):
         self.punches = data.get("punches")
 
-        # self.Reward = data.get("Reward")
         self.Patron = data.get("Patron")
         self.Employee = data.get("Employee")
         

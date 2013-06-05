@@ -49,7 +49,10 @@ class Store(ParseObject):
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
 
+        self.Feedbacks_ = "Feedback"
+        self.Messages_ = "Message"
         self.Patrons_ = "Patron"
+        self.PatronsStores_ = "PatronStore"
         self.Rewards_ = "Reward"
         self.Invoice_ = "Invoice"
         self.Employees_ = "Employee"
@@ -58,9 +61,10 @@ class Store(ParseObject):
         super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className == "Patron":
-            return getattr(import_module('parse.apps.patrons.models'),
-                                className)
+        if className in ("Patron", "PatronStore"):
+            return getattr(import_module('parse.apps.patrons.models'), className)
+        elif className in ("Message", "Feedback"):
+            return getattr(import_module('parse.apps.messages.models'), className)
         elif className == "Settings":
             return Settings
         elif className == "Hours":
@@ -72,8 +76,7 @@ class Store(ParseObject):
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.models'), className)
         elif className == "Reward":
-            return getattr(import_module('parse.apps.rewards.models'),
-                                className)
+            return getattr(import_module('parse.apps.rewards.models'), className)
 
 class Hours(ParseObject):
     """ Equivalence class of apps.stores.models.Hours """
@@ -103,14 +106,9 @@ class Invoice(ParseObject):
         self.avs_response = data.get('avs_response')
         self.trans_id = data.get('trans_id')
         self.amount = data.get('amount')
-
-        self.Store = data.get('Store')
         
         super(Invoice, self).__init__(False, **data)
         
-    def get_class(self, className):
-        if className == "Store":
-            return Store
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """

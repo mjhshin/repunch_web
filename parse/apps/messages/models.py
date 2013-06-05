@@ -21,6 +21,7 @@ class Message(ParseObject):
         self.offer_title = data.get('offer_title')
         self.offer_expiration = data.get('offer_expiration')
 
+        # TODO keep if more than 1 Pointer
         self.Store = data.get("Store")
 
         super(Message, self).__init__(False, **data)
