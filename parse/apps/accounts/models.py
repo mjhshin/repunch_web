@@ -11,6 +11,7 @@ from libs.repunch.rpccutils import get_cc_type
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.auth import hash_password
 from parse.apps.accounts import sub_type, FREE, ACTIVE
+from parse.apps.stores.models import Store
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -88,13 +89,14 @@ class Invoice(ParseObject):
         self.trans_id = data.get('trans_id')
         self.amount = data.get('amount')
 
-        self.Account = data.get('Account')
+        self.Store = data.get('Store')
         
         super(Invoice, self).__init__(False, **data)
         
     def get_class(self, className):
-        if className == "Account":
-            return Account
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                                className)
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
@@ -185,7 +187,8 @@ class Subscription(ParseObject):
 
         if payment.create():
             invoice = Invoice()
-            invoice.Account = self.objectId
+            invoice.Store = Store.objects().get(Subscription=\
+                                self.objectId).objectId
             invoice.date_charged = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state

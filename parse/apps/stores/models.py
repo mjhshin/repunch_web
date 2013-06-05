@@ -42,12 +42,16 @@ class Store(ParseObject):
    
         self.Subscription = data.get("Subscription")
         self.Patrons_ = "Patron"
+        self.Rewards_ = "Reward"
         
         super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'),
+                                className)
+        elif className == "Reward":
+            return getattr(import_module('parse.apps.rewards.models'),
                                 className)
         elif className == "Subscription":
             return getattr(import_module('parse.apps.accounts.models'), className)
