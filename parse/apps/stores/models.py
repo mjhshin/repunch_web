@@ -40,6 +40,7 @@ class Store(ParseObject):
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
         self.punches_facebook = data.get("punches_facebook")  
    
+        self.Subscription = data.get("Subscription")
         self.Patrons_ = "Patron"
         
         super(Store, self).__init__(False, **data)
@@ -48,6 +49,8 @@ class Store(ParseObject):
         if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'),
                                 className)
+        elif className == "Subscription":
+            return getattr(import_module('parse.apps.accounts.models'), className)
 
 class Hours(ParseObject):
     """ Equivalence class of apps.stores.models.Hours """

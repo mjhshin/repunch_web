@@ -342,7 +342,7 @@ class ParseObject(object):
         # Relation cache
         elif attr[0].islower() and attr[0].upper() + attr[1:] +\
                 "_" in self.__dict__:
-            className = self.__dic__[attr[0].upper() + attr[1:] + "_"]
+            className = self.__dict__[attr[0].upper() + attr[1:] + "_"]
             # need to use _user as classname if it is the USER_CLASS
             if className == USER_CLASS:
                 tmp = "_User"

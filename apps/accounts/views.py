@@ -70,7 +70,7 @@ def update(request):
     # I think that a copy is made here so any changes made to account
     # will not affect the account object in the session. maybe
     account = request.session['account']
-    subscription = account.get('subscription')
+    subscription = account.get("store").get('subscription')
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST) 
@@ -91,7 +91,7 @@ def update(request):
                         'manage/account_upgrade.djhtml', data)
 
             # just in case account is a copy as noted above
-            account.subscription = subscription
+            account.store.subscription = subscription
             request.session['account'] = account
 
             
@@ -112,7 +112,7 @@ def upgrade(request):
     # I think that a copy is made here so any changes made to account
     # will not affect the account object in the session. maybe
     account = request.session['account']
-    subscription = account.get('subscription')
+    subscription = account.get("store").get('subscription')
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST) 
@@ -127,6 +127,7 @@ def upgrade(request):
 
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
+            
 
             try:
                 subscription.store_cc(form.data['cc_number'],
@@ -140,7 +141,7 @@ def upgrade(request):
                         'manage/account_upgrade.djhtml', data)
 
             # just in case account is a copy as noted above
-            account.subscription = subscription
+            account.store.subscription = subscription
             request.session['account'] = account
 
             return redirect(reverse('store_index')+ "?%s" %\

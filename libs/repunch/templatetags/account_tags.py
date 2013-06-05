@@ -13,7 +13,7 @@ register = template.Library()
 @register.simple_tag
 def account_user_usage(account, percent_of=None):
     store = account.get('store')
-    atype = sub_type[account.get('subscription').get('subscriptionType')]
+    atype = sub_type[store.get('subscription').get('subscriptionType')]
     
     if atype['max_users'] == -1:
         percent = 0
@@ -30,8 +30,7 @@ def account_user_usage(account, percent_of=None):
 @register.assignment_tag
 def account_alert(account):
     store = account.get('store')
-    account.get('subscription')
-    atype = sub_type[account.get('subscription').get('subscriptionType')]
+    atype = sub_type[store.get('subscription').get('subscriptionType')]
     
     # may cause division by 0!!!
     percent = store.active_users / atype['max_users']
@@ -41,7 +40,7 @@ def account_alert(account):
 
 @register.simple_tag
 def account_message_usage(account, percent_of=None):
-    atype = sub_type[account.get('subscription').get('subscriptionType')]
+    atype = sub_type[account.get('store').get('subscription').get('subscriptionType')]
     
     today = date.today()
     message_count = Message.objects().count(Store=\

@@ -63,7 +63,7 @@
 	</div>
 	
 	<div class="section">
-		{% with tmp=account|get:'subscription'|get:'subscriptionType' %}
+		{% with tmp=account|get:'store'|get:'subscription'|get:'subscriptionType' %}
         {% with type=tmp|get_sub_type %}
 		<div class="section-title">
 			Current Subscription: 

@@ -28,8 +28,7 @@ class Account(ParseObject):
         self.email = data.get('email')
         # strings : store, employee, patron
         self.account_type = data.get('account_type')
-        # Subscription only for store TODO move from store point to this
-        self.Subscription = data.get('Subscription')
+
         # two of these are null
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')
@@ -38,9 +37,7 @@ class Account(ParseObject):
         super(Account, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className == "Subscription":
-            return Subscription
-        elif className == "Patron":
+        if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'), className)
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.models'), className)
@@ -62,12 +59,7 @@ class Account(ParseObject):
         return None
     
     def is_free(self):
-		return self.get('subscription').get('subscriptionType') == 0
-
-    def change_subscriptionType(self, sub_type):
-        """ change the SubscriptionType of this account to sub_type.
-        sub_type is the objectId of the SubscriptionType """
-        # TODO type is now only integer
+		return self.get('store').get('subscription').get('subscriptionType') == 0
 
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """

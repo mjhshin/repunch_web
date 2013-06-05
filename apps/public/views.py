@@ -44,12 +44,6 @@ def sign_up(request):
            subscription_form.is_valid():
             postDict = request.POST.dict()
 
-            # create store
-            tz = rputils.get_timezone('93003')
-            store = Store(**postDict)
-            store.store_timezone = tz.zone
-            store.create()
-
             # TODO: need to make this transactional
             # create subscription
             subscription = Subscription(**postDict)
@@ -57,19 +51,23 @@ def sign_up(request):
             subscription.create()
             subscription.store_cc(subscription_form.data['cc_number'],
                             subscription_form.data['cc_cvv'])
-            
+
+            # create store
+            tz = rputils.get_timezone('93003')
+            store = Store(**postDict)
+            store.store_timezone = tz.zone
+            store.Subscription = subscription.objectId
+            store.create()      
 
             # create account
             account = Account(**postDict)
             account.Store = store.objectId
-            account.Subscription = subscription.objectId
             account.account_type = "store"
             account.set_password(request.POST.get('password'))
             account.create()
 
             # set for storing in session
             account.set("store", store)
-            account.set("subscription", subscription)
 
             # auto login
             user_login = login(request, account.username, 
