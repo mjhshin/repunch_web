@@ -19,4 +19,15 @@ $(document).ready(function() {
       }, 
     });
 
+    // format value of categories before submition
+    $("#signup-form").submit(function(){
+        var cats = ''
+        $(".closable-box").each(function(){
+            cats = cats + $(this).text() + ',';
+        });
+        $( "#categories" ).val(cats);
+        alert($( "#categories" ).val())
+        return true;
+    });
+
 });

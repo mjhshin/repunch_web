@@ -12,7 +12,7 @@ NOT_WHERE_CONSTRAINTS = [
 ]
 
 WHERE_OPTIONS = [
-    "lt", "lte", "gt", "gte", 
+    "lt", "lte", "gt", "gte", "in", "nin",
 ]
 
 def format_date(dateObj):
@@ -59,10 +59,17 @@ def query(constraints):
             if key.__contains__("__"):
                 args = key.split("__")
                 if len(args) == 2 and args[1] in WHERE_OPTIONS:
+                    # date comparisons
                     if args[0].__contains__("date_"):
                         where[key] = {
                             "$" + args[1]: format_date(value)
                         }
+                    # in and not in, value must be an array
+                    else:
+                        where[key] = {
+                            "$" + args[1]: value
+                        }
+                
             # Pointer __type
             elif key[0].isupper() and not key.endswith('_'): 
                 where[key] = format_pointer(key, value)

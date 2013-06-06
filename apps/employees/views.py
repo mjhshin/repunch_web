@@ -10,6 +10,7 @@ from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED, DENIED
 from parse.apps.employees.models import Employee
+from parse.apps.rewards.models import Punch
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
 
@@ -191,8 +192,6 @@ def punches(request, employee_id):
 
 @login_required
 def graph(request):
-    from apps.rewards.models import Punch
-        
     employee_ids = request.GET.getlist('employee[]')
     start = request.GET.get('start')
     end = request.GET.get('end');
@@ -205,7 +204,7 @@ def graph(request):
     columns = [
                 {"id":"", "label":"Date", "type":"string"}
                ]
-    employees = Employee.objects.filter(pk__in=employee_ids)
+    employees = Employee.objects().filter(objectId=employee_ids)
     for emp in employees:
         columns.append({"id":"", "label":emp.first_name+' '+emp.last_name, "type":"number"})
 

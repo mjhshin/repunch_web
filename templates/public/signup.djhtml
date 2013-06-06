@@ -47,7 +47,7 @@
 				    {{ store_form.store_name }}
 
                     <div id="categories-box" class="ui-widget">
-                          <label for="categories">Categories</label>
+                          <label for="categories">Categories (limit of 2)</label>
                           <input id="categories" />
                     </div>
 					

@@ -60,6 +60,10 @@ def sign_up(request):
             store = Store(**postDict)
             store.store_timezone = tz.zone
             store.Subscription = subscription.objectId
+            # categories need to be properly formatted 
+            # from "sunny beach,sun dawn" TODO
+            # to [{alias:"sunny", name:"sunny beach"}...]
+            store.categories = categories
             store.create()      
 
             # create account
@@ -122,12 +126,30 @@ def categories(request):
     # term is the key in request.GET
     if request.method == "GET" or request.is_ajax():
         categories = Category.objects.filter(name__startswith=\
-                        request.GET['term'])[:8]
+                        request.GET['term'])[:6]
         data = []
         for each in categories:
             data.append(name)
 
-        return HttpResponse(json.dumps(["one hundred beeach resot","two","three"]), 
+        # TODO remove hen data has been added
+        data = [ ("Amateur Sports Teams", 'amateursportsteams'),
+            ("Amusement Parks", 'amusementparks'),
+            ("Aquariums", 'aquariums'),
+            ('Archery', 'archery'),
+            ('Badminton', 'badminton'),
+            ('Beaches', 'beaches'),
+            ('Bike Rentals', 'bikerentals'),
+            ('Boating', 'boating'),
+            ('Bowling', 'bowling'),
+            ('Climbing', 'climbing'),
+            ('Disc Golf', 'discgolf'),
+            ('Diving', 'diving') ]
+        d = []
+        for each in data:
+            d.append(each[0])
+        # -------------------
+
+        return HttpResponse(json.dumps(d), 
                     content_type="application/json")
     else:
         return HttpResponse('')
