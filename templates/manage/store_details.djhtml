@@ -93,12 +93,8 @@
 		</div>
 		{% endwith %}
 		<div id="account-options" class="form-options">
-			<a href="{% url 'account_upgrade' %}" class="button blue">
-				{% if account.is_free %}
-				Upgrade Account
-				{% else %}
+			<a href="{% url 'account_update' %}" class="button blue">
 				Update Account
-				{% endif %}
 			</a>
 			<a href="#" class="red">Cancel My Account</a>
 		</div>

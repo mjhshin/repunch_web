@@ -11,6 +11,7 @@ def index(request):
     data = {'rewards_nav': True}
     store = request.session['account'].get('store')
     
+    print store.get('rewards')
     data['rewards'] = store.get('rewards')
     
     if request.GET.get("success"):
@@ -26,22 +27,28 @@ def edit(request, reward_id):
     # reward key is now just an array key
     account = request.session['account']
     store = account.get('store')
- 
-    # reward id being 0 is a flag for new reward which don't exist
-    is_new, reward = False, None
+    rewards = store.get('rewards')
+    init_count = len(store.get('rewards'))
+
     try:
         reward_id = int(reward_id)
-        if reward_id == 0:
+    except ValueError:
+        raise Http404
+ 
+    # reward id being -1 is a flag for new reward which don't exist
+    is_new, reward = False, None
+    if reward_id < len(store.get('rewards')) and reward_id > -2:
+        if reward_id == -1:
             is_new = True
             # a reward is now just a dictionary to be added to 
             # the rewards array
             reward = {'reward_name':None, "description":None, 
                         "punches":None}
+        else: # reward exists
+            reward = rewards[reward_id]
+    else: 
+        raise Http404
             
-    except ValueError: # reward exists
-        reward = store.rewards[reward_id]
-        if not reward:
-            raise Http404
 
     data = {'rewards_nav': True}
     data['is_new'] = is_new;
@@ -49,13 +56,18 @@ def edit(request, reward_id):
     if request.method == 'POST': 
         form = RewardForm(request.POST) 
         if form.is_valid():
-            reward.update_locally(request.POST.dict(), False)
-            reward.set("Store", store.objectId)
-            reward.update()
+            store.add_unique('rewards', reward)
+            store.rewards = None
+            now_count = len(store.get('rewards'))
+            if now_count > init_count:
+                rewards.append(reward)
+                store.set('rewards', rewards)
+                reward_id = now_count
             
             #reload the store and put it in the session
+            account.store = store
             request.session['account'] = account
-            data['reward_id'] = reward.objectId
+            data['reward_id'] = len(store.get('rewards'))
             if not is_new:
                 data['success'] = "Reward has been updated."
             else:
@@ -64,9 +76,11 @@ def edit(request, reward_id):
                     reward.get_absolute_url()+ "?%s" %\
                      urllib.urlencode({'success':\
                     'Reward has been added.'}))
-        
     else:
-        form = RewardForm(reward.__dict__)
+        if reward_id >= 0 :
+            form = RewardForm(rewards[reward_id])
+        else:
+            form = RewardForm()
         if not is_new:
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
@@ -74,7 +88,7 @@ def edit(request, reward_id):
                 data['error'] = request.GET.get("error")
                
     data['reward'] = reward
-    data['reward_id'] = reward.objectId
+    data['reward_id'] = reward_id
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
@@ -93,6 +107,7 @@ def delete(request, reward_id):
     return redirect(reverse('rewards_index')+\
                 "?%s" % urllib.urlencode({'success':\
                 'Reward has been removed.'}))
+
 
 @login_required
 def avatar(request, reward_id):

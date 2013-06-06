@@ -3,7 +3,13 @@
 }
 
 #photo-edit{
+    position:relative;
 	margin:50px 40px 0 0;
+    left:40px; top:50px;
+}
+
+#photo-edit #edit-employees-options a {
+    color:white;
 }
 
 .form-options{

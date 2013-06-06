@@ -7,7 +7,7 @@ from repunch.settings import REST_CONNECTION_META_JSON
 # once so just keep it here.
 if not PunchCode.objects().get(punch_code='00000'):
     reqs, code = [], 0
-    while code != 99999:
+    while code < 100000:
         reqs.append({
             "method": "POST",
                 "path": "/1/classes/PunchCode",

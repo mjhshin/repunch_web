@@ -33,37 +33,15 @@
 	<form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
 		{% if employee.objectId %}
 		<div id="photo-edit">
-			<div class="white-box">
-				{% if not employee|get:'employee_avatar' %}
-					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
-				{% else %}
-					<img src="{{ MEDIA_URL }}{{ employee|get:'employee_avatar' }}" class="avatar-big" />
-				{% endif %}
-			</div>
-			<a href="{% url 'employee_avatar' employee.objectId %}" id="upload-avatar">Add/Change Photo</a>
+			<div id="edit-employees-options" class="form-options">
+			    <a onclick="$('#employee-form').submit(); return false;" class="button blue">Delete Employee</a>
+		    </div>
 		</div>
 		{% endif %}
 		
-		<h2>Edit Employee</h2>
-		
-		<div class="input-container">
-			{{ form.first_name.errors }}
-			<label for="first_name">First Name</label>
-			{{ form.first_name }}
-		</div>
-		
-		<div class="input-container">
-			{{ form.last_name.errors }}
-			<label for="last_name">Last Name</label>
-			{{ form.last_name }}
-		</div>
-		
-		<div class="input-container">
-			{{ form.email.errors }}
-			<label for="email">Email</label>
-			{{ form.email }}
-		</div>
-		
+		<h2>{{ form.data.last_name }}, {{ form.data.first_name }}</h2>
+        <p>{{ form.data.email }}<p>	    
+    
 		<div class="input-container info" id="date_added">
 			<label>Date Added</label>
 			<span>{{ employee|get:'createdAt'|date:"m/d/y" }}</span>
@@ -72,11 +50,6 @@
 		<div class="input-container info">
 			<label>Lifetime Punches</label>
 			<span>{{ employee|get:'lifetime_punches' }}</span>
-		</div>
-		
-		<div id="edit-employees-options" class="form-options">
-			<a onclick="$('#employee-form').submit(); return false;" class="button blue">Save Changes</a>
-			<a href="{% url 'employee_delete' employee_id %}" id="delete-button" class="red">Delete Employee</a>
 		</div>
 		
 		<div class="section">

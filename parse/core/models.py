@@ -393,6 +393,11 @@ class ParseObject(object):
         setattr(self, attr, val)
         return True
 
+    def add_unique(self, arrName, vals):
+        """ adds the list of vals to the array with the given name """
+        parse("PUT", self.path() + '/' + self.objectId, {arrName:\
+                {'__op':'AddUnique', 'objects':vals} })
+
     def add_relation(self, relAttrName, objectIds):
         """ Adds the list of objectIds to the given relation. 
         relAttrName is a str, which is the name of the Relation attr.

@@ -45,6 +45,9 @@ class Store(ParseObject):
         self.store_avatar = data.get('store_avatar')
         self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.neighborhood = data.get('neighborhood')
+        self.cross_streets = data.get('cross_streets')
+        
         self.punches_facebook = data.get("punches_facebook")  
 
         # [{"day":0,"open_time":"0900","close_time":"2200"}, 
@@ -54,6 +57,9 @@ class Store(ParseObject):
         # "Must be under $25 in value",
         # "punches":10,"redemption_count":0},]
         self.rewards = data.get("rewards")
+        # [{"alias":"bakery","name":"Bakeries"},
+        # {"alias":"coffee","name":"Coffee & Tea"}]
+        self.categories = data.get('categories')
    
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")

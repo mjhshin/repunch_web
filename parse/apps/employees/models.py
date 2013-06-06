@@ -14,7 +14,6 @@ class Employee(ParseObject):
     def __init__(self, **data):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
-        self.phone_number = data.get('phone_number')
         self.status = data.get("status", PENDING)
         self.employee_avatar = data.get("employee_avatar")
         # must be updated everytime a punch event occurs TODO

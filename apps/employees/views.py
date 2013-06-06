@@ -7,6 +7,7 @@ from datetime import datetime
 import urllib, json
 
 from parse.auth.decorators import login_required
+from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
@@ -40,14 +41,18 @@ def edit(request, employee_id):
     #need to make sure this reward really belongs to this store
     employee = Employee.objects().get(Store=store.objectId,
                     objectId=employee_id)
-    if not employee:
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not employee or not acc:
         raise Http404
     
     if request.method == 'POST': 
+        # shouldn't go here, shin scrapped editing employee info
         form = EmployeeForm(request.POST)
         if form.is_valid(): 
             employee.update_locally(request.POST.dict(), False)
             employee.update()
+            acc.set('email', request.POST['email'])
+            acc.update()
             data['success'] = "Employee has been updated."
     else:
         if request.GET.get("success"):
@@ -56,6 +61,7 @@ def edit(request, employee_id):
             data['error'] = request.GET.get("error")
             
         form = EmployeeForm(employee.__dict__)
+        form.data['email'] = acc.get('email')
     
     data['form'] = form
     data['employee'] = employee

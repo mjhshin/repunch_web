@@ -22,7 +22,7 @@ def settings(request):
         store.settings = settings
         store.update()
         account.store = store
-        account.store.settings = settings
+        request.session['account'] = account
 
     if request.method == 'POST':
         form = SettingsForm(request.POST)
@@ -32,9 +32,9 @@ def settings(request):
             # Shin chose to move punches_facebook to Store...
             store.set("punches_facebook", 
                         request.POST["punches_facebook"])
-            store.update()
-    
+            store.Settings = settings.objectId
             store.settings = settings
+            store.update()
             account.store = store
             request.session['account'] = account
 
