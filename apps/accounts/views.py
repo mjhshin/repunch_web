@@ -56,14 +56,17 @@ def refresh(request):
             request.session.get(SESSION_KEY):
         data = {'success': False}
         account = request.session['account']
-        settings = account.get_settings();
+        store = account.get('store')
+        settings = store.get('settings');
         
         if settings == None:
             raise Http404
         else:
             settings.set('retailer_id', rputils.generate_id())
             settings.update()
-            
+            store.settings = settings
+            account.store = store
+            request.session['account'] = account
             
             data['success'] = True
             data['retailer_id'] = settings.retailer_id

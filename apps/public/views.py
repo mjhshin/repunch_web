@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+import json
 
 from apps.accounts.forms import AccountForm
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm
@@ -112,3 +114,37 @@ def thank_you(request):
 
 def jobs(request):
     return render(request, 'public/jobs.djhtml')
+
+CATEGORIES = [
+    ("Amateur Sports Teams", 'amateursportsteams'),
+    ("Amusement Parks", 'amusementparks'),
+    ("Aquariums", 'aquariums'),
+    ('Archery', 'archery'),
+    ('Badminton', 'badminton'),
+    ('Beaches', 'beaches'),
+    ('Bike Rentals', 'bikerentals'),
+    ('Boating', 'boating'),
+    ('Bowling', 'bowling'),
+    ('Climbing', 'climbing'),
+    ('Disc Golf', 'discgolf'),
+    ('Diving', 'diving'),
+]
+
+def categories(request):
+    """ takes in ajax requests and returns a list of choices for
+    autocompletion in json format """
+    if request.method == "GET" or request.is_ajax():
+        # populate the choices with words starting with word
+        data = []
+        # TODO
+
+        return HttpResponse(json.dumps(data), 
+                    content_type="application/json")
+    else:
+        return HttpResponse('')
+
+
+
+
+
+

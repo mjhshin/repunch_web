@@ -11,7 +11,6 @@ def index(request):
     data = {'rewards_nav': True}
     store = request.session['account'].get('store')
     
-    print store.get('rewards')
     data['rewards'] = store.get('rewards')
     
     if request.GET.get("success"):

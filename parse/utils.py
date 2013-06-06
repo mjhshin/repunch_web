@@ -2,12 +2,12 @@
 Helpers methods for parse.apps to enfore the DRY principle.
 """
 
-import json, httplib, urllib, tempfile, re, string
+import json, httplib, urllib, tempfile, re
 from PIL import Image
 
 from repunch.settings import PARSE_VERSION,\
-REST_CONNECTION_META_JSON, REST_CONNECTION_META_PNG,\
-PARSE_MASTER_KEY
+REST_CONNECTION_META,\
+PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as dim
 
 BAD_FILE_CHR = re.compile('[\W_]+')
 
@@ -26,11 +26,8 @@ def parse(method, path, data=None, query=None,
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
 
-    if cMeta == 'json':
-        rcm = REST_CONNECTION_META_JSON.copy()
-    elif cMeta == 'png':
-        rcm = REST_CONNECTION_META_PNG.copy()
-
+    rcm = REST_CONNECTION_META.copy()
+    rcm["Content-Type"] = "application/" + cMeta
     d = None
 
     if method in ("POST", "PUT", "DELETE"):
@@ -40,19 +37,22 @@ def parse(method, path, data=None, query=None,
                 conn.request(method, '/' + PARSE_VERSION + '/' +\
                         path, json.dumps(data), rcm)
             elif cMeta == 'png':
-                # delete a file
-                if method == "DELETE":
-                    rcm["X-Parse-Master-Key"] = PARSE_MASTER_KEY
-                    conn.request(method, '/' + PARSE_VERSION + '/' +\
-                        path, '', rcm)
+                # if method == "DELETE":
+                # delete should have no data
                 # create a file
-                elif method == "POST":
-                    conn.request(method, '/' + PARSE_VERSION +\
-                            '/' + path, open(data, 'r'), rcm)
-                    # data.close() don't close the file yet!
-                    # transaction may not be done, wait for response!
+                conn.request(method, '/' + PARSE_VERSION +\
+                        '/' + path, open(data, 'r'), rcm)
+                # data.close() don't close the file yet!
+                # transaction may not be done, wait for response!
         else:
-            conn.request(method, '/' + PARSE_VERSION + '/' +\
+            if method == "DELETE":
+                rcm.pop("X-Parse-REST-API-Key")
+                rcm.pop("Content-Type")
+                rcm["X-Parse-Master-Key"] = PARSE_MASTER_KEY
+                conn.request(method, '/' + PARSE_VERSION + '/' +\
+                        path, '', rcm)
+            else:
+                conn.request(method, '/' + PARSE_VERSION + '/' +\
                         path, '', rcm)
 
     elif method == "GET":
@@ -73,6 +73,33 @@ def parse(method, path, data=None, query=None,
     conn.close()
     return result
 
+def rescale(image_path, img_format, width=dim[0], height=dim[1]):
+    max_width = width
+    max_height = height
+    img = Image.open(image_path)
+    
+    src_width, src_height = img.size
+    src_ratio = float(src_width) / float(src_height)
+    dst_width, dst_height = max_width, max_height
+    dst_ratio = float(dst_width) / float(dst_height)
+    
+    if dst_ratio < src_ratio:
+        crop_height = src_height
+        crop_width = crop_height * dst_ratio
+        x_offset = float(src_width - crop_width) / 2
+        y_offset = 0
+    else:
+        crop_width = src_width
+        crop_height = crop_width / dst_ratio
+        x_offset = 0
+        y_offset = float(src_height - crop_height) / 3
+        
+    # we can crop
+    # img = img.crop(x0, y0, x1, y1)
+    img = img.resize((int(dst_width), int(dst_height)), Image.ANTIALIAS)
+        
+    img.save(image_path, img_format)
+
     
 def create_png(uploadedFile):
     """ 
@@ -83,6 +110,7 @@ def create_png(uploadedFile):
     # don't auto delete the tmp file on close
     tmp.delete = False
     im.save(tmp, 'png')
+    rescale(tmp.name, 'png')
     tmp.close()
     # filenames with spaces and tabs causes broken pipe!
     # also filename must be alpha-numeric! 
@@ -94,8 +122,8 @@ def create_png(uploadedFile):
     return res
 
 def delete_file(name, fType):
-    """ deletes the given file """    
-    return parse("DELETE", 'files/' + name, cMeta=fType)
+    """ deletes the given file """   
+    parse("DELETE", 'files/' + name, cMeta=fType)
 
 
 

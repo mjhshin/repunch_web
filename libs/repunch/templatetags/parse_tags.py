@@ -14,8 +14,6 @@ def get(parseObject, attr):
     This simply calls the get method of the parseObject with the
     parameter attr.
     """
-    if attr == "store_avatar_url":
-        print parseObject.get(attr)
     return parseObject.get(attr)
 
     

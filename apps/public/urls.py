@@ -12,5 +12,6 @@ urlpatterns = patterns('apps.public.views',
     url(r'^contact/$', 'contact', name='public_contact'),
     url(r'^contact/thank_you/$', 'thank_you', name='public_thank_you'),
     url(r'^jobs/$', 'jobs', name='public_jobs'),
+    url(r'^categories/$', 'categories', name='public_categories'),
     
 )

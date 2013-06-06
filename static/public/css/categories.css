@@ -1,0 +1,22 @@
+/*
+    For the categories auto-complete feature.
+*/
+
+#categories-box {
+    position:relative; left:5px;
+    width: 400px;
+    margin-top:0px; padding-top:0px;
+    border:1px solid black;
+    background:red;
+    display:inline-block;
+}
+
+#categories-box input {
+    width:200px;
+}
+
+#categories-box label {
+    position:relative; top:-26px;
+}
+
+

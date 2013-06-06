@@ -3,6 +3,10 @@
 
 {% block title %}Sign-up{% endblock %}
 
+{% block styles %}
+<link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
+{% endblock %}
+
 {% block pageblock %}
 <section id="page-wrapper">
 	<div id="page-content">
@@ -36,10 +40,16 @@
 				{% endif %}
 				<form id="signup-form" action="{% url 'public_signup' %}" method="post">{% csrf_token %}
 					<input type="hidden" name="country" id="id_country" value="US" />
-					<p>Store Information</p>
-					{{ store_form.store_name.errors }}
-					<label for="id_store_name">Business Name</label>
-					{{ store_form.store_name }}
+
+				    <p>Store Information</p>
+				    {{ store_form.store_name.errors }}
+				    <label for="id_store_name">Business Name</label>
+				    {{ store_form.store_name }}
+
+                    <div id="categories-box" class="ui-widget">
+                          <label for="categories">Categories</label>
+                          <input id="categories" />
+                    </div>
 					
 					{{ store_form.street.errors }}
 					<label for="id_street">Business Address</label>

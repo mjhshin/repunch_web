@@ -18,7 +18,7 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
     return generate_id()
     
 
-def rescale(image_path, width=100, height=100):
+def rescale(image_path, width=400, height=400):
     max_width = width
     max_height = height
 

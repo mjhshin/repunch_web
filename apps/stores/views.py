@@ -96,11 +96,9 @@ def avatar(request):
                 delete_file(store.store_avatar, 'png')
                 
             res = create_png(request.FILES['store_avatar'])
-            print res
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
-            # TODO LINK HTML with the image urls
             store.update()
             account.store = store;
             request.session['account'] = account;

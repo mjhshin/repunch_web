@@ -38,16 +38,11 @@ PARSE_VERSION = '1'
 PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
 PARSE_MASTER_KEY = 'K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB'
 REST_API_KEY = "LVlPD43KJK4oGsP5f8ItFCA7RD4fwahTKQYRudod"
+PARSE_IMAGE_DIMENSIONS = (400, 400)
 
-REST_CONNECTION_META_JSON = {
+REST_CONNECTION_META = {
        "X-Parse-Application-Id": PARSE_APPLICATION_ID,
-       "X-Parse-REST-API-Key":REST_API_KEY,
-       "Content-Type": "application/json"
-}
-REST_CONNECTION_META_PNG = {
-       "X-Parse-Application-Id": PARSE_APPLICATION_ID,
-       "X-Parse-REST-API-Key":REST_API_KEY,
-       "Content-Type": "image/png"
+       "X-Parse-REST-API-Key":REST_API_KEY
 }
 USER_CLASS = "Account"
 
