@@ -104,8 +104,7 @@ class ParseObject(object):
  
             e.g. self.MilkyWay
 
-        These attributes need to store a dictionary containing at 
-        least the objectId. 
+        These attributes to the objectId of the object it points to.
         The name of the attribute is used as the column name in Parse.
 
         A cache attribute is created that contains the actual 
@@ -393,10 +392,33 @@ class ParseObject(object):
         setattr(self, attr, val)
         return True
 
-    def add_unique(self, arrName, vals):
-        """ adds the list of vals to the array with the given name """
-        parse("PUT", self.path() + '/' + self.objectId, {arrName:\
-                {'__op':'AddUnique', 'objects':vals} })
+    def array_add_unique(self, arrName, vals):
+        """ adds the list of vals to the array with the given name
+        If the array in Parse is currently null, this sets the 
+        array to vals. This does not check for uniqueness in vals.
+        """
+        return self._array_op('AddUnique', arrName, vals)
+
+    def array_remove(self, arrName, vals):
+        """ removes the list of vals from the array.
+        If the array in Parse is currently null, this sets the 
+        array to vals. This does not check for uniqueness in vals.
+        """
+        return self._array_op('Remove', arrName, vals)
+
+    def _array_op(self, op, arrName, vals):
+        """ array operations """
+        if getattr(self, arrName): # array is not null/None
+            res = parse("PUT", self.path() + '/' + self.objectId, 
+                {arrName: {'__op':op, 'objects':vals} })
+        else: # array does not exist. initialize it here.
+            res = parse("PUT", self.path() + '/' + self.objectId, 
+                {arrName:vals })
+
+        if res and 'error' not in res:
+            self.update_locally(res, False)
+            return True
+        return False 
 
     def add_relation(self, relAttrName, objectIds):
         """ Adds the list of objectIds to the given relation. 

@@ -12,7 +12,13 @@ class Punch(ParseObject):
         # use createdAt for date created - the timestamp
         self.punches = data.get("punches")
         
+        self.Patron = data.get('Patron')
+        
         super(Punch, self).__init__(False, **data)
+
+    def get_class(self, className):
+        if className == "Patron":
+            return getattr(import_module('parse.apps.patrons.models'), className)
 
 """
 class Reward(ParseObject):
