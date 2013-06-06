@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 import json
 
+from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm
 from forms import ContactForm
@@ -115,30 +116,18 @@ def thank_you(request):
 def jobs(request):
     return render(request, 'public/jobs.djhtml')
 
-CATEGORIES = [
-    ("Amateur Sports Teams", 'amateursportsteams'),
-    ("Amusement Parks", 'amusementparks'),
-    ("Aquariums", 'aquariums'),
-    ('Archery', 'archery'),
-    ('Badminton', 'badminton'),
-    ('Beaches', 'beaches'),
-    ('Bike Rentals', 'bikerentals'),
-    ('Boating', 'boating'),
-    ('Bowling', 'bowling'),
-    ('Climbing', 'climbing'),
-    ('Disc Golf', 'discgolf'),
-    ('Diving', 'diving'),
-]
-
 def categories(request):
     """ takes in ajax requests and returns a list of choices for
     autocompletion in json format """
+    # term is the key in request.GET
     if request.method == "GET" or request.is_ajax():
-        # populate the choices with words starting with word
+        categories = Category.objects.filter(name__startswith=\
+                        request.GET['term'])[:8]
         data = []
-        # TODO
+        for each in categories:
+            data.append(name)
 
-        return HttpResponse(json.dumps(data), 
+        return HttpResponse(json.dumps(["one hundred beeach resot","two","three"]), 
                     content_type="application/json")
     else:
         return HttpResponse('')

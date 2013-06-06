@@ -177,7 +177,9 @@ INSTALLED_APPS = (
 	'apps.rewards',
 	'apps.messages',
     'apps.analysis',
+    'apps.db_static',
     'libs.repunch',
+    
 
     'django_extensions',
 )
