@@ -151,6 +151,8 @@ class ParseObject(object):
 
         Getting these attributes using the get method will return a 
         datetime.datetime object.
+ 
+        createdAt and updatedAt are built-in date types.
 
         -------------------------------
 
@@ -172,8 +174,6 @@ class ParseObject(object):
         be accessed without having to use this method.
 
         createdAt and updatedAt are of __type Date.
-        However, they are always stored as strings in iso format in
-        ParseObjects.
         
         -------------------------------
 
@@ -275,6 +275,8 @@ class ParseObject(object):
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
+            elif key in ("createdAt", "updatedAt"):
+                setattr(self, key, parser.parse(value) )
             else:
                 setattr(self, key, value)
 
@@ -311,13 +313,16 @@ class ParseObject(object):
             return True
         return False
 
-    def get(self, attr):
+    def get(self, attr, **constraints):
         """ returns attr if it is not None, otherwise fetches the 
         attr from the Parse DB and returns that. 
 
         If the attr is a #2, then it is treated
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
+
+        constraints for getting objects in a relation.
+        it should not contain NON_WHERE_OPTIONS!
         """
         # assuming all objects have these by default
         if attr in ("createdAt", "updatedAt"):
@@ -349,14 +354,16 @@ class ParseObject(object):
             else:
                 tmp = className
             relName = attr[0].upper() + attr[1:]
-            res = parse("GET", 'classes/' + tmp, query={
-                    "where":dumps({
+            where_dict = {
                         "$relatedTo":{ 
                         "object":{
                             "__type": "Pointer",
                             "className": self.path().split('/')[1],
                             "objectId": self.objectId},
-                        "key": relName, }  })  })
+                        "key": relName},  }
+            where_dict.update(query(constraints, where_only=True))
+            res = parse("GET", 'classes/' + tmp, query={
+                    "where":dumps(where_dict)  })
             if res and "error" not in res:
                 c = self.get_class(className)
                 setattr(self, attr, 
@@ -536,7 +543,8 @@ class ParseObject(object):
             if key[0].isupper() and not key.endswith("_"):
                 data[key] = format_pointer(key, value)
             # Dates
-            elif key.startswith("date_"):
+            elif key.startswith("date_") or\
+                key in ("createdAt", "updatedAt"):
                 data[key] = format_date(value)
             # File avatars
             elif key.endswith("_avatar"):

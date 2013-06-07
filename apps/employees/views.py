@@ -204,9 +204,9 @@ def graph(request):
     columns = [
                 {"id":"", "label":"Date", "type":"string"}
                ]
-    employees = Employee.objects().filter(objectId=employee_ids)
+    employees = Employee.objects().filter(objectId__in=employee_ids)
     for emp in employees:
-        columns.append({"id":"", "label":emp.first_name+' '+emp.last_name, "type":"number"})
+        columns.append({"id":"", "label":emp.get('first_name')+' '+emp.get('last_name'), "type":"number"})
 
     punch_map = {}
     punches = Punch.objects.extra(select={'myd': "date(date_punched)"}).values('myd', 'employee').filter(date_punched__range=(start, end),employee_id__in=employees).annotate(num_punches=Sum('punches'))
