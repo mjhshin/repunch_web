@@ -4,9 +4,12 @@ from django.http import HttpResponse
 from datetime import timedelta
 import datetime, json
 
-from parse.auth.decorators import login_required
+
 from apps.employees.models import Employee
 from apps.patrons.models import Patron, FacebookPost
+
+from parse.core.advanced_queries import relational_query
+from parse.auth.decorators import login_required
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
@@ -23,9 +26,9 @@ def trends_graph(request, data_type=None, start=None, end=None ):
     account = request.session['account']
     store = account.get('store')
     
-    start = datetime.datetime.strptime(start, "%Y-%m-%d")#.strftime("%Y-%m-%d")
+    start = datetime.datetime.strptime(start, "%Y-%m-%d")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = datetime.datetime.strptime(end, "%Y-%m-%d")#.strftime("%Y-%m-%d")
+    end = datetime.datetime.strptime(end, "%Y-%m-%d")
     end = end.replace(hour=23, minute=59, second=59, microsecond=0)
     columns = []
     rows = []
@@ -123,11 +126,25 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
         if filter == 'gender':
             results.append(["Range", "Unknown", "Male", "Female"]);
             
-            punches = store.get('punches', createdAt__lte=end, createdAt__gte=start, 
-Punch.objects.values('patron__gender').filter(date_punched__range=[start, end], employee__store=account.store).annotate(num_punches=Sum('punches'))     
-            rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0]
-            for punch in punches:
-                rows[punch['patron__gender']+1] = punch['num_punches']
+            # WARNING! max punches returned is 1000!
+            unknown, male, female = 0, 0, 0 
+            male_punches = relational_query(store.objectId, "Store",
+                "Punches", "Punch", "Patron", "Patron", 
+                {"gender": "male"}, {'createdAt__lte':end,
+                    'createdAt__gte':start})['results']
+            female_punches = relational_query(store.objectId, "Store",
+                "Punches", "Punch", "Patron", "Patron", 
+                {"gender": "female"}, {'createdAt__lte':end,
+                    'createdAt__gte':start})['results']
+            # aggregate the punches
+            for p in male_punches:
+                male += p.get('punches')
+            for p in female_punches:
+                female += p.get('punches')
+
+            rows = [start.strftime("%m/%d/%Y")+\
+                    ' - '+end.strftime("%m/%d/%Y"),
+                    unknown, male, female]
             results.append(rows)
         
         elif filter == 'age':

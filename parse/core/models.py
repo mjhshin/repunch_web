@@ -367,7 +367,7 @@ class ParseObject(object):
             where_dict.update(query(constraints, where_only=True))
             q = {}
             q.update({"where":dumps(where_dict)})
-            # add the non where options
+            # add the not where options
             [q.update({k:v}) for k,v in constraints.iteritems() if\
                 k in NOT_WHERE_CONSTRAINTS]
             res = parse("GET", 'classes/' + tmp, query=q)

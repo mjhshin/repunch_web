@@ -16,10 +16,12 @@ relational_query('4IBEy0cum4', 'Store', 'Punches', 'Punch',
 import json
 
 from parse.utils import parse
+from parse.core.formatter import query
 
 def relational_query(src_id, src_class, src_key, dst_class,
         dst_class_key, dst_class_key_class, dst_class_key_where,
-        dst_class_key_where_exclude=False):
+        dst_class_where=None, dst_class_key_where_exclude=False,
+        count=False):
     """ 
     Make a query in an object's relation where the query involves
     a pointer to another class.
@@ -30,18 +32,20 @@ def relational_query(src_id, src_class, src_key, dst_class,
     src_key : the name of the relation column of the src_class
 
     dst_class : the output object's class - the class we are querying.
+    dst_class_where : append more constraints to the where clause.
     dst_class_key : the name of the column in the dst_class in which
                     the inQuery applies.
     dst_class_key_class : the class name of the dst_class_key
     dst_class_key_where : where parameter of the dst_class_key_class
     dst_class_key_where_exclude : inQuery if false
+
+    count : if True, will only return the count of the results
     """
     if dst_class_key_where_exclude:
         x = "$notInQuery"
     else:
         x = "$inQuery"
-    return parse("GET", "classes" + "/" + dst_class, query={
-            "where":json.dumps({
+    where = {
                 # specify the relation (which class contains
                 # it and which column is it
                 "$relatedTo": {
@@ -59,8 +63,20 @@ def relational_query(src_id, src_class, src_key, dst_class,
                         "className": dst_class_key_class,
                     }
                 }      
-            }), # end where
-        }) # end parse
+            }
+    if dst_class_where:
+        where.update(query(dst_class_where, where_only=True))
+    if count:
+        res = parse("GET", "classes" + "/" + dst_class, query={
+            "where":json.dumps(where), "count":1, "limit":0,
+        })
+        if 'error' not in res:
+            return res['count']
+        return None # shall not be 0
+    
+    return parse("GET", "classes" + "/" + dst_class, query={
+            "where":json.dumps(where), 
+        })
 
 
 

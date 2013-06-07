@@ -1,4 +1,4 @@
-UNKNOWN = "Unknown"
-MALE = "Male"
-FEMALE = "Female" 
+UNKNOWN = "unknown" # should never be used!
+MALE = "male"
+FEMALE = "female" 
 
