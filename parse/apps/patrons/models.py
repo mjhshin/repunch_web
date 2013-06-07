@@ -55,15 +55,11 @@ class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """
     def __init__(self, **data):
         self.Patron = data.get("Patron")
-        self.Store = data.get("Store")
 
         super(FacebookPost, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className == "Store":
-            return getattr(import_module('parse.apps.stores.models'),
-                                className)
-        elif className == "Patron":
+        if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'),
                                 className)
 

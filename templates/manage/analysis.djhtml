@@ -89,8 +89,8 @@
 			</div>
 			{% for reward in rewards %}
 		    <div class="tr  {% cycle '' 'odd' %}">
-				<div class="td reward_name">{{ reward.title }}</div>
-				<div class="td reward_redemptions">{{ reward.redeem_count }}</div>
+				<div class="td reward_name">{{ reward.reward_name }}</div>
+				<div class="td reward_redemptions">{{ reward.redemption_count }}</div>
 			</div>
 			{% empty %}
 			<div class="tr ">

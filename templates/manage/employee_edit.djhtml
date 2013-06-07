@@ -16,7 +16,7 @@
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
 	<script type="text/javascript">
 		var _order_by = 'createdAt';
-		var _order_dir = 'asc';
+		var _order_dir = 'desc';
 		var _page_url = '{% url 'employee_punches' employee_id %}';
 	</script>
 {% endblock %}

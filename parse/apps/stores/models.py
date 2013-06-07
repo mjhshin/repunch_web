@@ -72,11 +72,12 @@ class Store(ParseObject):
         self.PatronStores_ = "PatronStore"
         self.Invoice_ = "Invoice"
         self.Employees_ = "Employee"
+        self.FacebookPosts_ = "FacebookPost"
         
         super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className == "PatronStore":
+        if className in ("PatronStore", "FacebookPost") :
             return getattr(import_module('parse.apps.patrons.models'), className)
         elif className == "Feedback":
             return getattr(import_module('parse.apps.messages.models'), className)

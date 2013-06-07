@@ -46,7 +46,7 @@ def edit(request, reward_id):
             # a reward is now just a dictionary to be added to 
             # the rewards array
             reward = {'reward_name':None, "description":None, 
-                        "punches":None}
+                        "punches":None, 'redemption_count':0}
         else: # reward exists
             old_reward = rewards[reward_id]
     else: 
@@ -57,9 +57,12 @@ def edit(request, reward_id):
         if form.is_valid():
             reward = {'reward_name':form.data['reward_name'], 
                 "description":form.data['description'], 
-                "punches":form.data['punches']}
+                "punches":form.data['punches'],
+                "redemption_count":0}
   
             if not is_new:
+                reward["redemption_count"] =\
+                    old_reward["redemption_count"]
                 store.array_remove('rewards', [old_reward])
 
             store.array_add_unique('rewards', [reward])

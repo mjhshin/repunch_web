@@ -14,18 +14,14 @@ from libs.dateutil.relativedelta import relativedelta
 def index(request):
     data = {'analysis_nav': True}
     account = request.session['account']
-    store = account.gte('store')
-    
+    store = account.get('store')
     data['rewards'] = store.get('rewards')
     return render(request, 'manage/analysis.djhtml', data)
 
-
-
 @login_required
 def trends_graph(request, data_type=None, start=None, end=None ):
-    from apps.rewards.models import Punch
-        
     account = request.session['account']
+    store = account.get('store')
     
     start = datetime.datetime.strptime(start, "%Y-%m-%d")#.strftime("%Y-%m-%d")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -41,11 +37,18 @@ def trends_graph(request, data_type=None, start=None, end=None ):
                    ]
             
         punch_map = {}
-        punches = Punch.objects.extra(select={'myd': "date(date_punched)"}).values('myd').filter(date_punched__range=(start, end),employee__store=account.store).annotate(num_punches=Sum('punches')).order_by('-date_punched')
+        punches = store.get('punches', createdAt__lte=end,
+                    createdAt__gte=start,order='createdAt')
         
         #create dictionary for easy search
-        for punch in punches:
-            punch_map[punch['myd'].strftime("%m/%d")] = punch['num_punches'] 
+        if punches:
+            for punch in punches:
+                key = punch.createdAt.strftime("%m/%d")
+                if key in punch_map:
+                    punch_map[key] = punch_map[key]+\
+                                        punch.get('punches')
+                else:
+                    punch_map[key] = punch.get('punches')
     
         rows = []
         for single_date in rputils.daterange(start, end):
@@ -65,10 +68,16 @@ def trends_graph(request, data_type=None, start=None, end=None ):
                    ]
             
         post_map = {}
-        posts = FacebookPost.objects.extra(select={'myd': "date(date_posted)"}).values('myd').filter(date_posted__range=(start, end),store=account.store).annotate(num_posts=Count('id'))
+        posts = store.get("facebookPosts", createdAt__lte=end,
+                    createdAt__gte=start)
         #create dictionary for easy search
-        for post in posts:
-            post_map[post['myd'].strftime("%m/%d")] = post['num_posts'] 
+        if posts:
+            for post in posts:
+                key = post.createdAt.strftime("%m/%d")
+                if key in post_map:
+                    post_map[key] = post_map[key] + 1
+                else:
+                    post_map[key] = 1
     
         rows = []
         for single_date in rputils.daterange(start, end):
@@ -82,28 +91,21 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             c.append({"v": post_count})
             rows.append({'c': c})
     else: #patrons
+        # total number of patrons at a particular date
         columns = [
                     {"id":"", "label":"Date", "type":"string"},
                     {"id":"", "label":'Patrons', "type":"number"}
                    ]
-            
-        punch_map = {}
-        punches = Punch.objects.extra(select={'myd': "date(date_punched)"}).values('myd').filter(date_punched__range=(start, end),employee__store=account.store).annotate(num_patrons=Count('patron', distinct=True))
-        
-        #create dictionary for easy search
-        for punch in punches:
-            punch_map[punch['myd'].strftime("%m/%d")] = punch['num_patrons'] 
-    
         rows = []
         for single_date in rputils.daterange(start, end):
             str_date = single_date.strftime("%m/%d")
+            # need to set single_date's hours, mins, sec to max
+            d = single_date.replace(hour=23, minute=59, second=59)
             c = [{"v": str_date}]
-            try:
-                punch_count = punch_map[str_date]
-            except KeyError:
-                punch_count = 0
+            patron_count = store.get('patronStores', count=1,
+                                limit=0, createdAt__lte=d)
                     
-            c.append({"v": punch_count})
+            c.append({"v": patron_count})
             rows.append({'c': c})
         
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
@@ -112,11 +114,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 
 @login_required
 def breakdown_graph(request, data_type=None, filter=None, range=None):
-    from apps.rewards.models import Punch
-    from django.db import connection
-    
-    account = request.session['account']    
-    
+    account = request.session['account'] 
     (start, end) = rputils.calculate_daterange(range)
     
     results = [] 

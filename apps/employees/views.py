@@ -205,12 +205,17 @@ def graph(request):
     punch_map = {}
     # since a punch no longer contains a pointer to an employee
     # the query must be made in the punches for each employee...
-    for emp in employees:
-        for punch in emp.get('punches', createdAt__gte=start, 
-            createdAt__lte=end):
-            print punch.__dict__
-            punch_map[punch.createdAt.strftime("%m/%d")+'-'+\
-                emp.objectId] = punch.get('punches')
+    if employees:
+        for emp in employees:
+            for punch in emp.get('punches', createdAt__gte=start, 
+                createdAt__lte=end):
+                key = punch.createdAt.strftime("%m/%d")+'-'+\
+                    emp.objectId
+                if key in punch_map: 
+                    punch_map[key] = punch_map[key] +\
+                                punch.get('punches')
+                else:
+                    punch_map[key] = punch.get('punches')
 
 
     rows = []

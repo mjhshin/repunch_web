@@ -322,8 +322,10 @@ class ParseObject(object):
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
 
-        constraints for getting objects in a relation.
-        it should not contain NON_WHERE_OPTIONS!
+        Constraints may also be provided to filter objects
+        in a relation. If limit of 0 is given or result is empty, 
+        then the cache will be set to None. If count is given,
+        then this method will return the count and not the list.
         """
         # assuming all objects have these by default
         if attr in ("createdAt", "updatedAt"):
@@ -370,9 +372,14 @@ class ParseObject(object):
                 k in NOT_WHERE_CONSTRAINTS]
             res = parse("GET", 'classes/' + tmp, query=q)
             if res and "error" not in res:
-                c = self.get_class(className)
-                setattr(self, attr, 
-                            [ c(**d) for d in res['results'] ])
+                if len(res['results']) == 0:
+                    setattr(self, attr, None)
+                else:
+                    c = self.get_class(className)
+                    setattr(self, attr, 
+                                [ c(**d) for d in res['results'] ])
+                if 'count' in res:
+                    return res['count']
             else:
                 return None 
         # date object
