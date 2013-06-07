@@ -147,32 +147,24 @@ def avatar(request, employee_id):
 
 @login_required
 def punches(request, employee_id):
-    employee_id = int(employee_id)
-    store = request.session['account'].store
-    employee = None
+    store = request.session['account'].get('store')
     data = {'employee_id': employee_id}
-    
-    if(employee_id > 0):
-        try:
-            employee = Employee.objects.filter(store=store.id).get(id=employee_id)
-        except Employee.DoesNotExist:
-            raise Http404
-    else:
+
+    # make sure that this employee belongs to this store
+    employee = Employee.objects().get(Store=\
+            store.objectId, objectId=employee_id)
+    if not employee:
         raise Http404
     
     order_by = request.POST.get('order_by')
     if order_by == None:
-        order_by = 'date_punched'
-    
-    if order_by == 'customer':
-        order_by = 'patron'
+        order_by = 'createdAt'
     
     order_dir = request.POST.get('order_dir')
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
     
-    
-    paginator = Paginator(Punch.objects.filter(employee_id=employee.id).order_by(order_by), 12)
+    paginator = Paginator(employee.get('punches', order=order_by), 12)
     
     page = request.GET.get('page')
     try:

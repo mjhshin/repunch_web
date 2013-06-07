@@ -36,7 +36,7 @@ $(document).ready(function(){
 			}
 			_order_dir = 'desc';
 		}
-		
+
 		//remove all but the last row because it has the replacement
 		$('.tr:not(:last-child)').remove();
 		$('#table-body').html('<div class="tr" id="load-row"></div>');

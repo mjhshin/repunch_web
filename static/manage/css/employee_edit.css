@@ -17,13 +17,13 @@
 }
 
 /* punch table styles */
-#header-date_punched, .date_punched {
+#header-createdAt, .date_punched {
 	width:100px;
 }
 #header-time, .time {
 	width:100px;
 }
-#header-customer, .customer {
+#header-patron, .customer {
 	width:200px;
 }
 #header-punches, .punches {

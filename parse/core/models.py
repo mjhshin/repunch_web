@@ -7,7 +7,8 @@ from dateutil import parser
 from repunch.settings import USER_CLASS
 from parse.utils import parse
 from parse.core.formatter import query,\
-format_date, format_pointer, format_file
+format_date, format_pointer, format_file,\
+NOT_WHERE_CONSTRAINTS
 
 class ParseObjectManager(object):
     """
@@ -362,8 +363,12 @@ class ParseObject(object):
                             "objectId": self.objectId},
                         "key": relName},  }
             where_dict.update(query(constraints, where_only=True))
-            res = parse("GET", 'classes/' + tmp, query={
-                    "where":dumps(where_dict)  })
+            q = {}
+            q.update({"where":dumps(where_dict)})
+            # add the non where options
+            [q.update({k:v}) for k,v in constraints.iteritems() if\
+                k in NOT_WHERE_CONSTRAINTS]
+            res = parse("GET", 'classes/' + tmp, query=q)
             if res and "error" not in res:
                 c = self.get_class(className)
                 setattr(self, attr, 

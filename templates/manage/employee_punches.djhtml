@@ -2,9 +2,9 @@
 
 {% for punch in punches %}
 	<div class="tr {{forloop.counter|divisibleby:2|yesno:",odd"}}">
-		<div class="td date_punched">{{ punch|get:'date_punched'|date:"m/d/y" }}</div>
-		<div class="td time">{{ punch|get:'date_punched'|date:"g:i A" }}</div>
-		<div class="td customer">{{ punch|get:'patron'|get:'name' }}</div>
+		<div class="td date_punched">{{ punch.createdAt|date:"m/d/y" }}</div>
+		<div class="td time">{{ punch.createdAt|date:"g:i A" }}</div>
+		<div class="td customer">{{ punch|get:'patron'|get:'first_name' }} {{ punch|get:'patron'|get:'last_name' }}</div>
 		<div class="td punches">{{ punch|get:'punches' }}</div>
 	</div>
 	{% if forloop.last and punches.has_next %}

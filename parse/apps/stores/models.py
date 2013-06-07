@@ -60,6 +60,9 @@ class Store(ParseObject):
         # [{"alias":"bakery","name":"Bakeries"},
         # {"alias":"coffee","name":"Coffee & Tea"}]
         self.categories = data.get('categories')
+
+        # GeoPoint TODO
+        # self.coordinates = data.get('coordinates')
    
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
