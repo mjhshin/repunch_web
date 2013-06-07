@@ -115,6 +115,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 @login_required
 def breakdown_graph(request, data_type=None, filter=None, range=None):
     account = request.session['account'] 
+    store = account.get('store')
     (start, end) = rputils.calculate_daterange(range)
     
     results = [] 
@@ -122,7 +123,8 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
         if filter == 'gender':
             results.append(["Range", "Unknown", "Male", "Female"]);
             
-            punches = Punch.objects.values('patron__gender').filter(date_punched__range=[start, end], employee__store=account.store).annotate(num_punches=Sum('punches'))     
+            punches = store.get('punches', createdAt__lte=end, createdAt__gte=start, 
+Punch.objects.values('patron__gender').filter(date_punched__range=[start, end], employee__store=account.store).annotate(num_punches=Sum('punches'))     
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0]
             for punch in punches:
                 rows[punch['patron__gender']+1] = punch['num_punches']
