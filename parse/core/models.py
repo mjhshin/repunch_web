@@ -326,7 +326,7 @@ class ParseObject(object):
         """
         # assuming all objects have these by default
         if attr in ("createdAt", "updatedAt"):
-            return parser.parse(self.__dict__.get(attr))
+            return self.__dict__.get(attr)
 
         if self.__dict__.get(attr):
             return self.__dict__.get(attr)

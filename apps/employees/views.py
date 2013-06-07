@@ -147,8 +147,6 @@ def avatar(request, employee_id):
 
 @login_required
 def punches(request, employee_id):
-    from apps.rewards.models import Punch
-
     employee_id = int(employee_id)
     store = request.session['account'].store
     employee = None
@@ -195,6 +193,9 @@ def graph(request):
     employee_ids = request.GET.getlist('employee[]')
     start = request.GET.get('start')
     end = request.GET.get('end');
+
+    # store has a relation so lets take it from there
+    store = request.session['account'].get('store')
     
     start = datetime.strptime(start, "%m/%d/%Y")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -204,16 +205,21 @@ def graph(request):
     columns = [
                 {"id":"", "label":"Date", "type":"string"}
                ]
-    employees = Employee.objects().filter(objectId__in=employee_ids)
+    employees = store.get('employees', objectId__in=employee_ids)
     for emp in employees:
-        columns.append({"id":"", "label":emp.get('first_name')+' '+emp.get('last_name'), "type":"number"})
-
+        columns.append({"id":"", "label":emp.get('first_name')+\
+                ' '+emp.get('last_name'), "type":"number"})
+  
     punch_map = {}
-    punches = Punch.objects.extra(select={'myd': "date(date_punched)"}).values('myd', 'employee').filter(date_punched__range=(start, end),employee_id__in=employees).annotate(num_punches=Sum('punches'))
-    
-    #create dictionary for easy search
-    for punch in punches:
-        punch_map[punch['myd'].strftime("%m/%d")+'-'+str(punch['employee'])] = punch['num_punches'] 
+    # since a punch no longer contains a pointer to an employee
+    # the query must be made in the punches for each employee...
+    for emp in employees:
+        for punch in emp.get('punches', createdAt__gte=start, 
+            createdAt__lte=end):
+            print punch.__dict__
+            punch_map[punch.createdAt.strftime("%m/%d")+'-'+\
+                emp.objectId] = punch.get('punches')
+
 
     rows = []
     for single_date in rputils.daterange(start, end):
@@ -221,11 +227,13 @@ def graph(request):
         c = [{"v": str_date}]
         for emp in employees:
             try:
-                punch_count = punch_map[str_date + '-' + str(emp.id)]
+                punch_count = punch_map[str_date + '-' + emp.objectId]
             except KeyError:
                 punch_count = 0
-                
             c.append({"v": punch_count})
         rows.append({'c': c})
-        
+
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
+
+
+
