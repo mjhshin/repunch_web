@@ -20,7 +20,7 @@ $(document).ready(function() {
       select: function( event, ui ) {
         if ($(".closable-box").length > 2){
             $(".closable-box").first().remove();
-            $(".close-xtag").first().remove()
+            $(".close-xtag").first().remove();
             reset(); resetX();
             $(".closable-box").first().fadeOut(1000, function(){
                 $(this).remove();
@@ -51,6 +51,7 @@ $(document).ready(function() {
             });
             $(this).prev().fadeOut(1000, function(){
                 $(this).remove();
+                reset(); resetX();
             });
         });
         // make sure that the appended has correct left value

@@ -156,9 +156,17 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
                 end_dob = now + relativedelta(years=start_age)
-                val = Punch.objects.values('employee__store').filter(date_punched__range=[start, end], patron__dob__range=[start_dob, end_dob], employee__store=account.store).annotate(num_punches=Sum('punches'))
-                if len(val) > 0:
-                    rows[idx] = val[0]['num_punches']
+                punches = relational_query(store.objectId, "Store",
+                    "Punches", "Punch", "Patron", "Patron", 
+                    {'date_of_birth__lte':end_dob,
+                     'date_of_birth__gte':start_dob},
+                    {'createdAt__lte':end, 
+                     'createdAt__gte':start})['results']
+                punch_count = 0
+                if punches: 
+                    for punch in punches:
+                        punch_count += punch['punches']
+                rows[idx] = punch_count
             results.append(rows)
             
     elif data_type == 'facebook':
@@ -187,7 +195,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                     
             results.append(rows)
             
-    else: #patrons
+    else: # patrons
         if filter == 'gender':
             results.append(["Range", "Unknown", "Male", "Female"]);
             

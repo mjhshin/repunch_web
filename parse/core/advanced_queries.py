@@ -4,12 +4,14 @@ Contains somewhat advanced queries not yet supported in ParseObjects.
 Example : relational_query
 To get the Punch objects in the relation of a Store object where
 the name of the relation is Punches and the store object's
-objectID is 4IBEy0cum4. Furthermore, the Punches must have a 
+objectID is 4IBEy0cum4. Furthermore, the Punches must have been
+created before end-date and after start-date and must have a 
 pointer to a Patron whose gender is Female.
 
 The method call is:
 relational_query('4IBEy0cum4', 'Store', 'Punches', 'Punch',
-    'Patron', 'Patron', {"gender": "Female"} )
+    'Patron', 'Patron', {"gender": "Female"},
+    {'createdAt__lte':end-date, 'createdAt__gte':start-date} )
 
 """
 
@@ -59,7 +61,8 @@ def relational_query(src_id, src_class, src_key, dst_class,
                 # this how queries are done to Pointer types
                 dst_class_key:{
                     x:{
-                        "where":dst_class_key_where,
+                        "where":query(dst_class_key_where,
+                                    where_only=True),
                         "className": dst_class_key_class,
                     }
                 }      
