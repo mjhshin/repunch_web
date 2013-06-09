@@ -172,12 +172,21 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
     elif data_type == 'facebook':
         if filter == 'gender':
             results.append(["Range", "Unknown", "Male", "Female"]);
-            
-            posts = FacebookPost.objects.values('patron__gender').filter(date_posted__range=[start, end], store=account.store).annotate(num_posts=Count('id'))     
-            rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0]
-            for post in posts:
-                rows[post['patron__gender']+1] = post['num_posts']
-            results.append(rows)
+            results.append([
+                start.strftime("%m/%d/%Y")+\
+                    ' - '+end.strftime("%m/%d/%Y"),
+                    0, 
+                    relational_query(store.objectId, "Store",
+                        "FacebookPosts", "FacebookPost", 
+                        "Patron", "Patron", 
+                        {"gender": "male"}, {'createdAt__lte':end,
+                        'createdAt__gte':start}, count=True), 
+                    relational_query(store.objectId, "Store",
+                        "FacebookPosts", "FacebookPost", 
+                        "Patron", "Patron", 
+                        {"gender": "female"}, {'createdAt__lte':end,
+                        'createdAt__gte':start}, count=True), 
+            ])
         
         elif filter == 'age':
             results.append(["Range", "<20", "20-29", "30-39", "40-49", ">50"]);
@@ -198,12 +207,21 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
     else: # patrons
         if filter == 'gender':
             results.append(["Range", "Unknown", "Male", "Female"]);
-            
-            punches = Punch.objects.values('patron__gender').filter(date_punched__range=[start, end], employee__store=account.store).annotate(num_patrons=Count('patron', distinct=True))     
-            rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0]
-            for punch in punches:
-                rows[punch['patron__gender']+1] = punch['num_patrons']
-            results.append(rows)
+            results.append([
+                start.strftime("%m/%d/%Y")+\
+                    ' - '+end.strftime("%m/%d/%Y"),
+                    0, 
+                    relational_query(store.objectId, "Store",
+                        "PatronStores", "PatronStore", 
+                        "Patron", "Patron", 
+                        {"gender": "male"}, {'createdAt__lte':end,
+                        'createdAt__gte':start}, count=True), 
+                    relational_query(store.objectId, "Store",
+                        "PatronStores", "PatronStore", 
+                        "Patron", "Patron", 
+                        {"gender": "female"}, {'createdAt__lte':end,
+                        'createdAt__gte':start}, count=True), 
+            ])
             
         elif filter == 'age':
             results.append(["Range", "<20", "20-29", "30-39", "40-49", ">50"]);
