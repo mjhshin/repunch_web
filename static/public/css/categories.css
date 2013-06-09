@@ -17,9 +17,9 @@
     position:relative; top:2px;
 }
 
-.closable-box {
+.closable-box, .close-xtag {
     margin-left:2px;
-    padding:4px 10px;
+    padding:4px 10px; 
     border:1px groove #7294af;
     font-size:1.2em;
     font-weight:bold;
@@ -29,13 +29,26 @@
     background: -webkit-linear-gradient(top,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%); 
     background: -o-linear-gradient(top,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%); 
     background: -ms-linear-gradient(top,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%);
-     -moz-border-radius: 4px;
+    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     -khtml-border-radius: 4px;
     border-radius: 4px;
-    
 }
 
-.closable-box:hover {
+.closable-box {
+    padding-right:42px;
+}
+
+.close-xtag {
+    position:relative; left:-35px; 
+    background-image: -ms-linear-gradient(top left, #FFFFFF 0%, #747982 100%);
+    background-image: -moz-linear-gradient(top left, #FFFFFF 0%, #747982 100%);
+    background-image: -o-linear-gradient(top left, #FFFFFF 0%, #747982 100%);
+    background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #FFFFFF), color-stop(1, #747982));
+    background-image: -webkit-linear-gradient(top left, #FFFFFF 0%, #747982 100%);
+    background-image: linear-gradient(to bottom right, #FFFFFF 0%, #747982 100%);
+}
+
+.close-xtag:hover {
     cursor:move;
 }

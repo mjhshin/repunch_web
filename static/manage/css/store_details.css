@@ -74,7 +74,8 @@ div#store-details a.button{
 }
 
 img.avatar-big{
-	float:left;
+	position:relative; left:18px;
+    margin-bottom:14px;
 }
 
 div#store-details-content-right{
