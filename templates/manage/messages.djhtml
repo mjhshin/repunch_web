@@ -30,25 +30,19 @@
 			<div class="table-header">
 				<div class="th sorted desc" id="header-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-status">Status <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-date-sent">Date Sent <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
 			{% for message in messages %}
-			<div class="tr {% cycle '' 'odd' %} {% ifequal message.status 'Draft'%}draft{% endifequal %} ">
-				<a href="{% url 'message_edit' message.id %}">
+			<div class="tr {% cycle '' 'odd' %}">
+				<a href="{% url 'message_edit' message.objectId %}">
 					<div class="td date">{{ message|get:'createdAt'|date:"m/d/y" }}</div>
 					<div class="td subject">{{ message|get:'subject' }}</div>
-					<div class="td status">{{ message|get:'status' }}</div>
-					<div class="td date-sent">{% if message|get:'date_sent'  %}{{ message|get:'date_sent'|date:"m/d/y" }}{% endif %}</div>
 				</a>
 			</div>
 			{% empty %}
 			<div class="tr">
 				<div class="td date">No Messages</div>
 				<div class="td subject">&nbsp;</div>
-				<div class="td status">&nbsp;</div>
-				<div class="td date-sent">&nbsp;</div>
 			</div>
 			{% endfor %}
 		</div>
@@ -61,10 +55,10 @@
 			</div>
 			
 			{% for fb in feedback %}
-			<div class="tr {% cycle '' 'odd' %} {% ifequal fb.status 0 %}unread{% endifequal %}">
-				<a href="{% url 'feedback_details' fb.id %}">
+			<div class="tr {% cycle '' 'odd' %} {% if not fb.is_read %}unread{% endif %}">
+				<a href="{% url 'feedback_details' fb.objectId %}">
 					<div class="td date">{{ fb|get:'createdAt'|date:"m/d/y" }}</div>
-					<div class="td from">{{ fb|get:'patron'|get:'name' }}{% if fb.thread_count > 0 %}&nbsp;({{ fb.thread_count }}){% endif %}</div>
+					<div class="td from">{{ fb|get:'sender_name' }}</div>
 					<div class="td subject">{{ fb.subject }}</div>
 				</a>
 			</div>
@@ -72,8 +66,6 @@
 			<div class="tr">
 				<div class="td date">No Feedback</div>
 				<div class="td subject">&nbsp;</div>
-				<div class="td status">&nbsp;</div>
-				<div class="td date-sent">&nbsp;</div>
 			</div>
 			{% endfor %}
 			

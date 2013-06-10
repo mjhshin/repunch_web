@@ -9,19 +9,32 @@ from parse.apps.messages import DRAFT, UNREAD
 
 class Message(ParseObject):
     """ Equivalence class of apps.messages.models.Message """
+
+    # message_types
+    FEEDBACK = "feedback"
+    GIFT = "gift"
+    RETAILER = "retailer"
     
     def __init__(self, **data):
-        self.date_sent = data.get('date_sent')
-        self.subject = data.get('subject')
-        self.status = data.get('status', DRAFT)
-        self.message = data.get('message')
-        self.send_to_group = data.get('send_to_group', DRAFT)
-        self.sent_to_recipients_count = data.get('sent_to_recipients_count', 0)
-        self.attach_offer = data.get('attach_offer', False)
-        self.offer_title = data.get('offer_title')
-        self.offer_expiration = data.get('offer_expiration')
+        self.subject = data.get("subject")
+        self.body = data.get("body")
+        self.offer_title = data.get("offer_title")
+        self.date_offer_expiration = data.get('date_offer_expiration')
+        self.message_type = data.get("message_type")
+        self.is_read = data.get("is_read", False)
+        # store name or patron fullname
+        self.sender_name = data.get("sender_name")
+        # empty messages sent by patrons
+        self.store_id = data.get("store_id")
+    
+        self.Reply = data.get("Reply")
 
-        self.Store = data.get("Store")
+        # NOT IN SERVER SIDE
+        # reward_title = string
+        # reward_description = string
+        # reward_id = string
+        # reward_punches = interger
+        # ---------------
 
         super(Message, self).__init__(False, **data)
 
@@ -29,53 +42,6 @@ class Message(ParseObject):
 		return reverse('message_edit', args=[self.objectId])
 
     def get_class(self, className):
-        if className == "Store":
-            return getattr(import_module('parse.apps.stores.models'),
-                                className)
-
-class Feedback(ParseObject):
-    """ Equivalence class of apps.messages.models.Feedback """
-    
-    def __init__(self, **data):
-        self.subject = data.get("subject")
-        self.message = data.get("message")
-        self.is_response = data.get("is_response", False)
-        self.status = data.get("status", UNREAD)
-
-        self.Patron = data.get("Patron")
-        # parent = models.ForeignKey('self', null=True, blank=True)
-        self.Feedback = data.get("Feedback") 
-        self.Store = data.get("Store")
-
-        super(Feedback, self).__init__(False, **data)
-
-    def get_class(self, className):
-        if className == "Store":
-            return getattr(import_module('parse.apps.stores.models'),
-                                className)
-        elif className == "Patron":
-            return getattr(import_module('parse.apps.patrons.models'),
-                                className)
-        elif className == "Feedback":
-            return self.__class__
-
-    def get_absolute_url(self):
-		# the details are based on the parent (main) message
-		if not self.Parent:
-			return reverse('feedback_details', args=[self.objectId])
-		return reverse('feedback_details', args=[self.get("parent").objectId])
-
-    def thread_count(self):
-		return Feedback.objects().count(Feedback=self.objectId)
-
-
-
-
-
-
-
-
-
-
-
-
+        """ note that a reply/feedback is also a message """
+        if className == "Reply":
+            return Message

@@ -17,7 +17,7 @@ def settings(request):
     store = account.get('store')
     settings = store.get('settings'); 
     if settings == None:
-        settings = Settings.objects().create(retailer_id=rputils.generate_id())
+        settings = Settings.objects().create(retailer_pin=rputils.generate_id())
         store.Settings = settings.objectId
         store.settings = settings
         store.update()
@@ -62,14 +62,14 @@ def refresh(request):
         if settings == None:
             raise Http404
         else:
-            settings.set('retailer_id', rputils.generate_id())
+            settings.set('retailer_pin', rputils.generate_id())
             settings.update()
             store.settings = settings
             account.store = store
             request.session['account'] = account
             
             data['success'] = True
-            data['retailer_id'] = settings.retailer_id
+            data['retailer_pin'] = settings.retailer_pin
         
         return HttpResponse(json.dumps(data), content_type="application/json")
     else:

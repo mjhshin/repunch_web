@@ -4,7 +4,7 @@ import datetime
 from libs.repunch.rphours_util import HoursInterpreter
 
 from parse.apps.messages import UNREAD
-from parse.apps.messages.models import Feedback
+from parse.apps.messages.models import Message
 from parse.apps.employees import PENDING
 from parse.apps.employees.models import Employee
 
@@ -12,8 +12,8 @@ register = template.Library()
 
 @register.assignment_tag
 def feedback_unread(store):
-    return Feedback.objects().count(Store=store.objectId, 
-                        status=UNREAD)
+    return store.get("receivedMessages", is_read=False, 
+                    count=1, limit=0)
 
 @register.assignment_tag
 def employees_pending(store):

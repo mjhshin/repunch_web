@@ -1,12 +1,12 @@
 $(document).ready(function(){
-	$('#link_refresh_retailer_id').click(function(){
+	$('#link_refresh_retailer_pin').click(function(){
 		
 		try
 		{
 			$.post($(this).attr('href'), function(data) {
 				if(data.success)
 				{
-					$('#retailer_id').addClass('refreshed').html(data.retailer_id);
+					$('#retailer_pin').addClass('refreshed').html(data.retailer_pin);
 				}
 				else
 				{

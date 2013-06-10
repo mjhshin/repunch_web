@@ -7,7 +7,7 @@ input{
 	width:61px;
 }
 
-div#retailer_id{
+div#retailer_pin{
 	height:48px;
 	line-height:48px;
 	color:#666;
@@ -22,12 +22,12 @@ div#retailer_id{
 	float:left;
 }
 
-div#retailer_id.refreshed { 
+div#retailer_pin.refreshed { 
 	border:1px solid #FFCC66;
 	background-color:#FFFFCC;
 }
 
-img#refresh_retailer_id{
+img#refresh_retailer_pin{
 	margin:4px 15px;
 }
 

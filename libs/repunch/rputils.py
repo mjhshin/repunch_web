@@ -12,7 +12,7 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
     gid = ''.join(random.choice(chars) for x in range(size))
     
     #make sure this is a unique ID
-    if Settings.objects().count(retailer_id=gid) == 0:
+    if Settings.objects().count(retailer_pin=gid) == 0:
         return gid
     
     return generate_id()

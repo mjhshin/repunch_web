@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}
 
-{% block title %}{{ is_new|yesno:"Add New,Edit" }} Message{% endblock %}
+{% block title %}{{ is_new|yesno:"Add New,View" }} Message{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
@@ -32,26 +32,24 @@
 				<div>{{ error }}{{ success }}</div>
 			</div>
 			{% endif %}			
-			{% if form.date_sent.value %}
 			<div class="notification success">
-				<div>Sent: {{ form.date_sent.value }} to X recipients in the group "some group"</div>
+				<div>Sent: {{ message.createdAt|date:'m/d/y h:m A' }} to X recipients in the group "some group"</div>
 			</div>
-			{% endif %}
 		{% endif %}
 		
-		<h2>{{ is_new|yesno:"Add New,Edit" }} Message</h2>
+		<h2>{{ is_new|yesno:"Add New,View" }} Message</h2>
 		
 		{{ form.send_to_group.errors }}
-		<label for="send_to">Send to</label>
+		<label for="send_to">{% if is_new %}Send to{% else %}Sent to{% endif %}</label>
 		{{ form.send_to_group }}
 	
 		{{ form.subject.errors }}
 		<label for="subject">Subject</label>
 		{{ form.subject }}
 		
-		{{ form.message.errors }}
-		<label for="message">Message</label>
-		{{ form.message }}
+		{{ form.body.errors }}
+		<label for="message">Body</label>
+		{{ form.body }}
 		
 		<div id="attach-offer-container">
 			<div id="offer-cb-container">
@@ -62,21 +60,15 @@
 				<label for="id_offer_title">Offer Title</label>
 				{{ form.offer_title }}
 				
-				{{ form.offer_expiration.errors }}
-				<label for="id_offer_expiration">Expiration Date</label>
-				<input type="text" id="id_offer_expiration" name="offer_expiration" value="{{ form.offer_expiration.value|date:'m/d/y h:m A' }}" />
+				{{ form.date_offer_expiration.errors }}
+				<label for="id_date_offer_expiration">Expiration Date</label>
+				<input type="text" id="id_date_offer_expiration" name="date_offer_expiration" value="{{ form.date_offer_expiration.value|date:'m/d/y h:m A' }}" />
 			</div>
 		</div>
 		
 		<div id="message-detail-options" class="form-options">
-		{% if form.status.value != "Sent" %}
-			<a id="send-now" class="button blue">Send Now</a>
-			<a id="save-draft" class="button gray">Save Draft</a>
-			<a href="{% url 'messages_index' %}" class="red">Cancel</a>
-		{% else %}
-			<a href="{% url 'message_duplicate' form.instance.id%}" class="button blue">Duplicate &amp; Edit</a>
-			<a href="{% url 'message_delete' form.instance.id %}" id="delete-button" class="red">Delete Message</a>
-		{% endif %}
+			<a href="{% url 'message_duplicate' message.objectId %}" class="button blue">Duplicate &amp; Edit</a>
+			<a href="{% url 'message_delete' message.objectId %}" id="delete-button" class="red">Delete Message</a>
 		</div>
 	</form>
 

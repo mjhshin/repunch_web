@@ -34,8 +34,8 @@
 		<div style="clear: left">&nbsp;</div>
 		
 		{% if settings  %}
-		<label for="retailer_id">Retailer ID</label>
-		<div id="retailer_id">{{ settings|get:'retailer_id'  }}</div> <a href="{% url 'refresh_retailer_id' %}" id="link_refresh_retailer_id"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_id" /></a>
+		<label for="retailer_pin">Retailer PIN</label>
+		<div id="retailer_pin">{{ settings|get:'retailer_pin'  }}</div> <a href="{% url 'refresh_retailer_pin' %}" id="link_refresh_retailer_pin"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_pin" /></a>
 		{% endif %}
 		
 		<div id="settings-options" class="form-options">

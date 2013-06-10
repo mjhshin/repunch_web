@@ -6,7 +6,7 @@ from django.utils import timezone
 import urllib, datetime
 
 from parse.auth.decorators import login_required
-from apps.messages.models import Message, Feedback
+from parse.apps.messages.models import Message
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils
 
@@ -17,10 +17,11 @@ connection.queries
 def index(request):
     rputils.set_timezone(request)
     data = {'messages_nav': True}
-    store = request.session['account'].store
-    
-    data['messages'] = Message.objects.filter(store=store.id).order_by('-date_added')
-    data['feedback'] = Feedback.objects.filter(store=store.id,parent=None).order_by('-date_added')
+    store = request.session['account'].get('store')
+        
+    data['messages'] = store.get("sentMessages")
+    print data['messages']
+    data['feedback'] = store.get("receivedMessages")
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -33,57 +34,48 @@ def index(request):
 @login_required
 def edit(request, message_id):
     rputils.set_timezone(request)
-    message_id = int(message_id)
-    message = None
-    account = request.session['account'];
-    store = account.store
-    data = {'messages_nav': True, 'message_id': message_id}
-    data['is_new'] = (message_id==0);
+    account = request.session['account']
+    store = account.get('store')
     
-    #need to make sure this reward really belongs to this store
-    if(message_id > 0):
-        try:
-            message = Message.objects.filter(store=store).get(id=message_id)
-        except Message.DoesNotExist:
+    is_new = message_id == 0 
+    data = {'messages_nav': True, 'message_id': message_id,
+            'is_new':is_new}
+    
+    if not is_new: # retrieve the message
+        message = store.get("sentMessages", objectId=message_id)[0]
+        if not message:
             raise Http404
+    else: # create the message
+        message = Message.objects().create(message_type=\
+                Message.RETAILER, store_id=store.objectId)
     
-    if request.method == 'POST': # If the form has been submitted...
-        form = MessageForm(request.POST, instance=message, account=account) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            message = form.save(commit=False)
-            message.store = store;
-            
-            if message.status == 'Sent' and message.date_sent == None:
-                message.date_sent = datetime.date.today()
-            elif form.data['action']  == 'upgrade' :
+    if request.method == 'POST':
+        form = MessageForm(request.POST) 
+        if form.is_valid():
+            if form.data['action']  == 'upgrade':
+                # TODO upgrade
+                pass
+                """
                 if account.upgrade():
                     message.status = 'Sent'
                     message.date_sent = datetime.date.today()
-                    request.session['account'] = account # update with the new subscriptoin
+                    request.session['account'] = account 
                 else:
                     data['error'] = "Error upgrading your account."
+                """
             
-            
-            if not data.has_key('error'):
-                message.save();
-                
-                success_message = "Message has been saved as a draft."
-                if message.status == 'Sent':
-                    success_message = "Message has been sent."
-                
-                #reload the store and put it in the session
-                if message_id > 0:
-                    form = MessageForm(instance=message)
-                    data['success'] = success_message
-                else:
-                    return HttpResponseRedirect(message.get_absolute_url() + "?%s" % urllib.urlencode({'success': success_message}))#Since this is new we need to redirect the page
+            message.update_locally(request.POST.dict())
+            message.update()
+            # call cloud function TODO
+            success_message = "Message has been sent."
+            if not is_new:
+                form = MessageForm(message.__dict__)
+                data['success'] = success_message
             else:
-                pass #nothing to do for now
+                return HttpResponseRedirect(message.get_absolute_url() + "?%s" % urllib.urlencode({'success': success_message}))
+
         else:
-            if 'status' in form.errors:
-                data['error'] = form.errors['status']
-            else:
-                data['error'] = "Unable to save form. Please correct any errors below and submit again."
+            data['error'] = "The form you submitted has errors."
     else:
         if message_id == 0:
             form = MessageForm()
@@ -93,52 +85,47 @@ def edit(request, message_id):
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
             
-            form = MessageForm(instance=message)
+            form = MessageForm(message.__dict__)
     
     data['form'] = form
+    data['message'] = message
 
     return render(request, 'manage/message_edit.djhtml', data)
 
 @login_required
 def delete(request, message_id):
-    message_id = int(message_id)
-    message = None
     store = request.session['account'].store
     
-    #need to make sure this reward really belongs to this store
-    if(message_id > 0):
-        try:
-            message = Message.objects.filter(store=store.id).get(id=message_id)
-        except Message.DoesNotExist:
-            raise Http404
-    else:
+    message = store.get("sentMessages", objectId=message_id)[0]
+    if not message:
         raise Http404
     
     message.delete()
-    return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Message has been deleted.'}))
+    return redirect(reverse('messages_index')+\
+            "?%s" % urllib.urlencode({'success':\
+            'Message has been deleted.'}))
 
 @login_required
 def duplicate(request, message_id):
-    message_id = int(message_id)
-    message = None
-    store = request.session['account'].store
+    """ this is a resend feature so that stores do not have to type
+    the same message again to send it to the same group """
     
-    #need to make sure this reward really belongs to this store
-    if(message_id > 0):
-        try:
-            message = Message.objects.filter(store=store.id).get(id=message_id)
-        except Message.DoesNotExist:
-            raise Http404
-    else:
+    store = request.session['account'].get('store')
+    
+    message = store.get("sentMessages", objectId=message_id)[0]
+    if not message:
         raise Http404
     
-    #reset values so this is a draft message
-    message.pk = None
-    message.date_sent = None
-    message.status = 'Draft'
-    message.save()
+    # make a copy of the message but do not create it up to parse!
+    dup_message = Message(message_type=\
+                Message.RETAILER, store_id=store.objectId,
+                subject=dup_message.get('subject'), 
+                body=dup_message.get('body'),
+                offer_title=dup_message.get('offer_title'),
+                date_offer_expiration=\
+                    dup_message.get('date_offer_expiration') )
     
-    return redirect(message.get_absolute_url()+ "?%s" % urllib.urlencode({'success': 'Message has been duplicated.'}))
+    return redirect(dup_message.get_absolute_url()+ "?%s" % urllib.urlencode({'success': 'Message has been duplicated.'}))
 
 @login_required
 def feedback(request, feedback_id):

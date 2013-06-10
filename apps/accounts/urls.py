@@ -5,7 +5,7 @@ urlpatterns = patterns('apps.accounts.views',
     url(r'^update', 'update', name='account_update'),
     url(r'^settings$', 'settings', name='account_settings'),
     url(r'^settings/refresh$', 'refresh', 
-                                name='refresh_retailer_id'),   
+                                name='refresh_retailer_pin'),   
  
 )
 

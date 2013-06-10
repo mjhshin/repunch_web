@@ -67,20 +67,19 @@ class Store(ParseObject):
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
 
-        self.Feedbacks_ = "Feedback"
         self.Punches_ = "Punch"
         self.PatronStores_ = "PatronStore"
         self.Invoice_ = "Invoice"
         self.Employees_ = "Employee"
         self.FacebookPosts_ = "FacebookPost"
+        self.SentMessages_ = "Message"
+        self.ReceivedMessages_ = "Message"
         
         super(Store, self).__init__(False, **data)
 
     def get_class(self, className):
         if className in ("PatronStore", "FacebookPost") :
             return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className == "Feedback":
-            return getattr(import_module('parse.apps.messages.models'), className)
         elif className == "Settings":
             return Settings
         elif className == "Invoice":
@@ -91,6 +90,8 @@ class Store(ParseObject):
             return getattr(import_module('parse.apps.rewards.models'), className)
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.models'), className)
+        elif className == "Message":
+            return getattr(import_module('parse.apps.messages.models'), className)
 
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
@@ -222,10 +223,26 @@ class Settings(ParseObject):
     def __init__(self, **data):
         self.punches_customer = data.get("punches_customer")
         self.punches_employee = data.get("punches_employee") 
-        self.retailer_id = data.get("retailer_id")
+        self.retailer_pin = data.get("retailer_pin")
 
         super(Settings, self).__init__(False, **data)
 
+
+class Hours(object):
+    """
+    This is not an actual class in the database at Parse.
+    This class is simply for interfacing with the HoursInterpreter.
+
+    days = rpforms.MultiSelectField(max_length=250, blank=True, choices=DAYS)
+	open = models.TimeField()
+	close = models.TimeField()
+	list_order = models.IntegerField(default=0)
+    """
+    def __init__(self, days, open, close, list_order):
+        self.days = days
+        self.open = open
+        self.close = close
+        self.list_order = list_order
 
 """
 class SubscriptionType(ParseObject):
@@ -241,23 +258,3 @@ class SubscriptionType(ParseObject):
 
         super(SubscriptionType, self).__init__(False, **data)
 """
-
-"""
-class Hours(ParseObject):
-    # Equivalence class of apps.stores.models.Hours 
-
-    def __init__(self, **data):
-        self.days = data.get('days')
-        self.open = data.get('open')
-        self.close = data.get('close')
-        self.list_order = data.get('list_order')
-
-        self.Store = data.get("Store")
-
-        super(Hours, self).__init__(False, **data)
-
-    def get_class(self, className):
-        if className == "Store":
-            return Store
-"""
- 

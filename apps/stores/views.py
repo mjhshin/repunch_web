@@ -2,14 +2,13 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
+from datetime import datetime
 
-from apps.stores.models import Store
-from apps.accounts.models import Account
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 
 from parse.utils import delete_file, create_png
-from parse.apps.stores.models import Store
+from parse.apps.stores.models import Store, Hours
 from parse.auth.decorators import login_required
 
 @login_required
@@ -28,14 +27,9 @@ def edit(request):
     data = {'account_nav': True}
     account = request.session['account']
     
-    # TODO replace Hours formset
-    # HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
-    
     if request.method == 'POST': 
-        # formset = HoursFormSet(request.POST, prefix='hours',
-        # instance=account.store)
         form = StoreForm(request.POST)
-        if form.is_valid():# and formset.is_valid(): 
+        if form.is_valid() and formset.is_valid(): 
             store = Store(**account.get("store").__dict__)
             store.update_locally(request.POST.dict(), False)
             store.update()
@@ -44,12 +38,6 @@ def edit(request):
             # Accounts (_User) class
             account.email = request.POST['email']
             account.update()
-            
-            # formset.save()            
-            
-            #always need to reload form for deleted fields
-            # formset = HoursFormSet(prefix='hours', instance=store) 
-            #reload the store and put it in the session
 
             account.store = store
             request.session['account'] = account
@@ -57,29 +45,19 @@ def edit(request):
     else:
         form = StoreForm(account.get("store").__dict__)
         form.data['email'] = account.get('email')
-        # formset = HoursFormSet(prefix='hours',
-        # instance=account.store)
 
     
     data['form'] = form
-    # data['hours_formset'] = formset
-    
+
     return render(request, 'manage/store_edit.djhtml', data)
-    
+
 @login_required
 def hours_preview(request):
-    store = request.session['account'].store
+    store = request.session['account'].get('store')
     
-    # HoursFormSet = inlineformset_factory(Store, Hours, extra=0)
-    
-    hours = []
-    # formset = HoursFormSet(request.GET, prefix='hours', instance=store)
-    if formset.is_valid():
-        for form in formset:
-            if(not 'DELETE' in form.changed_data):
-                hours.append(form.instance)
-    
-    return HttpResponse(HoursInterpreter(hours).readable(), content_type="text/html")
+    print request.GET # TODO
+
+    return HttpResponse(HoursInterpreter([ Hours(days=["1","2","3"], open=datetime.now(), close=datetime.now(), list_order=1) ]).readable(), content_type="text/html")
     
     
 @login_required
@@ -100,7 +78,7 @@ def avatar(request):
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
             store.update()
-            account.store = store;
+            account.store = store
             request.session['account'] = account;
             
             data['success'] = True
