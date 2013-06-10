@@ -1,0 +1,54 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load parse_tags %}
+
+{% block title %}Message Details{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/message_edit.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+	
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
+	</div>
+	{% endif %}
+	
+	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Message Inbox</a>
+
+    <div class="notification success">
+		<div>Sent: {{ message.createdAt|date:'m/d/y h:m A' }} to X recipients in the group "some group"</div>
+	</div>
+	
+	<div class="white-box">
+		<div class="sect meta">
+			<label>Date sent:</label><span>{{ message|get:'createdAt'|date:"m/d/y" }}</span>
+			<div style="clear: left;" /></div>
+		</div>
+		<div class="sect subject">
+			<label>Subject:</label><span>{{ message|get:'subject' }}</span>
+			<div style="clear: left;"></div>
+		</div>
+		<div class="sect message">
+			{{ message|get:'body' }}
+		</div>
+	</div>
+    <br>
+    {% if message|get:'offer_title' %}
+    <div class="white-box">
+        <div class="sect meta">
+		    <label>Offer Title: </label><span>{{ message|get:'offer_title' }}</span>
+            <label>Expiration Date: </label><span>{{ message|get:'date_offer_expiration'|date:'m/d/y h:m A' }}</span>
+		    <div style="clear: left;"></div>
+	    </div>
+    </div>
+    {% endif %}
+
+	<div id="message-detail-options" class="form-options">
+		<a href="{% url 'message_delete' message.objectId %}" id="delete-button" class="red">Delete Message</a>
+	</div>
+
+{% endblock %}

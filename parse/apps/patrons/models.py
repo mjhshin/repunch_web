@@ -46,6 +46,7 @@ class PatronStore(ParseObject):
         # Store's objectId as string
         self.store_id = data.get("store_id")
         self.punch_count = data.get("punch_count", 0)
+        self.all_time_punches = data.get('all_time_punches', 0)
 
     def get_class(self, className):
         if className == "Patron":

@@ -3,10 +3,12 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
+from dateutil import parser
 import urllib, datetime
 
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
+from parse.apps.messages import RETAILER, FILTERS
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils
 
@@ -20,7 +22,6 @@ def index(request):
     store = request.session['account'].get('store')
         
     data['messages'] = store.get("sentMessages")
-    print data['messages']
     data['feedback'] = store.get("receivedMessages")
     
     if request.GET.get("success"):
@@ -36,23 +37,18 @@ def edit(request, message_id):
     rputils.set_timezone(request)
     account = request.session['account']
     store = account.get('store')
-    
-    is_new = message_id == 0 
+
     data = {'messages_nav': True, 'message_id': message_id,
-            'is_new':is_new}
-    
-    if not is_new: # retrieve the message
-        message = store.get("sentMessages", objectId=message_id)[0]
-        if not message:
-            raise Http404
-    else: # create the message
-        message = Message.objects().create(message_type=\
-                Message.RETAILER, store_id=store.objectId)
+        "filters": FILTERS}
     
     if request.method == 'POST':
         form = MessageForm(request.POST) 
-        if form.is_valid():
-            if form.data['action']  == 'upgrade':
+        # check here if limit has been reached TODO
+        limit_reached = False
+        data['limit_reached'] = limit_reached
+
+        if form.is_valid() and not limit_reached:
+            if form.data.get('action')  == 'upgrade':
                 # TODO upgrade
                 pass
                 """
@@ -63,21 +59,39 @@ def edit(request, message_id):
                 else:
                     data['error'] = "Error upgrading your account."
                 """
-            
-            message.update_locally(request.POST.dict())
-            message.update()
-            # call cloud function TODO
-            success_message = "Message has been sent."
-            if not is_new:
-                form = MessageForm(message.__dict__)
-                data['success'] = success_message
+
+            # create the message
+            message = Message.objects().create(message_type=\
+                RETAILER, store_id=store.objectId)
+            message.update_locally(request.POST.dict(), False)
+
+            # check if attach offer is selected
+            if 'attach_offer' in request.POST.dict():
+                # make sure that date is a date and not string
+                message.set('date_offer_expiration', 
+                    parser.parse(request.POST['attach_offer']) )
             else:
-                return HttpResponseRedirect(message.get_absolute_url() + "?%s" % urllib.urlencode({'success': success_message}))
+                # pop the offer
+                message.set('offer_title', None)
+                message.set('date_offer_expiration', None)
+
+            message.update()
+            data['message'] = message
+            # add to the store's relation
+            store.add_relation("SentMessages_", [message.objectId]) 
+            # update the session
+            account.set('store', store)
+            request.session['account'] = account
+            success_message = "Message has been sent."
+
+            # call cloud function TODO
+
+            return HttpResponseRedirect(message.get_absolute_url())
 
         else:
             data['error'] = "The form you submitted has errors."
     else:
-        if message_id == 0:
+        if message_id in (0, '0'):
             form = MessageForm()
         else:
             if request.GET.get("error"):
@@ -85,12 +99,24 @@ def edit(request, message_id):
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
             
+            message = store.get("sentMessages", objectId=message_id)[0]
+            data['message'] = message
             form = MessageForm(message.__dict__)
     
     data['form'] = form
-    data['message'] = message
 
     return render(request, 'manage/message_edit.djhtml', data)
+
+@login_required
+def details(request, message_id):
+    store = request.session['account'].get('store')
+
+    message = store.get("sentMessages", objectId=message_id)[0]
+    if not message:
+        raise Http404
+
+    return render(request, 'manage/message_details.djhtml', 
+            {'message':message, 'messages_nav': True})
 
 @login_required
 def delete(request, message_id):
@@ -99,34 +125,18 @@ def delete(request, message_id):
     message = store.get("sentMessages", objectId=message_id)[0]
     if not message:
         raise Http404
+
+    # delete reply to message first if exist
+    if message.get('Reply'):
+        msg_reply = message.get('reply')
+        msg_reply.delete()
     
     message.delete()
     return redirect(reverse('messages_index')+\
             "?%s" % urllib.urlencode({'success':\
             'Message has been deleted.'}))
 
-@login_required
-def duplicate(request, message_id):
-    """ this is a resend feature so that stores do not have to type
-    the same message again to send it to the same group """
-    
-    store = request.session['account'].get('store')
-    
-    message = store.get("sentMessages", objectId=message_id)[0]
-    if not message:
-        raise Http404
-    
-    # make a copy of the message but do not create it up to parse!
-    dup_message = Message(message_type=\
-                Message.RETAILER, store_id=store.objectId,
-                subject=dup_message.get('subject'), 
-                body=dup_message.get('body'),
-                offer_title=dup_message.get('offer_title'),
-                date_offer_expiration=\
-                    dup_message.get('date_offer_expiration') )
-    
-    return redirect(dup_message.get_absolute_url()+ "?%s" % urllib.urlencode({'success': 'Message has been duplicated.'}))
-
+# FEEDBACK ------------------------------------------
 @login_required
 def feedback(request, feedback_id):
     feedback_id = int(feedback_id)

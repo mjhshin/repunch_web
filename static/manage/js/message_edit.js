@@ -32,7 +32,7 @@ $(document).ready(function(){
 		}
 	})
 	
-	$( "#id_offer_expiration" ).datetimepicker({
+	$( "#id_date_offer_expiration" ).datetimepicker({
 		timeFormat: "hh:mm tt"
 	});
 });

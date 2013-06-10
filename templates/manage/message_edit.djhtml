@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}
 
-{% block title %}{{ is_new|yesno:"Add New,View" }} Message{% endblock %}
+{% block title %}Send New Message{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
@@ -16,8 +16,7 @@
 {% block content %}
 	<form action="{% url 'message_edit' message_id %}" method="post" id="message-form">{% csrf_token %}
 		<input type="hidden" name="status" id="status" value="{{ form.status.value }}" />
-		<input type="hidden" name="action" id="action" value="draft" />
-		{% if form.errors.status %}
+		{% if limit_reached %}
 			<div class="notification">
 				<div>
 					This message cannot be sent because you have reached your maximum messages sent for this month. Please save as a draft or click on the "Upgrade Account" button to automatically upgrade your account and send the message.
@@ -31,17 +30,17 @@
 			<div class="notification {% if success %}success{% endif %} hide">
 				<div>{{ error }}{{ success }}</div>
 			</div>
-			{% endif %}			
-			<div class="notification success">
-				<div>Sent: {{ message.createdAt|date:'m/d/y h:m A' }} to X recipients in the group "some group"</div>
-			</div>
+			{% endif %}
 		{% endif %}
 		
-		<h2>{{ is_new|yesno:"Add New,View" }} Message</h2>
+		<h2>Send New Message</h2>
 		
-		{{ form.send_to_group.errors }}
-		<label for="send_to">{% if is_new %}Send to{% else %}Sent to{% endif %}</label>
-		{{ form.send_to_group }}
+		<label for="send_to">Send to </label>
+        <select name="chosen_filter">
+            {% for filter in filters %}
+            <option value="{{ filter.0 }}">{{ filter.1 }}</option>
+            {% endfor %}
+        </select>
 	
 		{{ form.subject.errors }}
 		<label for="subject">Subject</label>
@@ -67,8 +66,8 @@
 		</div>
 		
 		<div id="message-detail-options" class="form-options">
-			<a href="{% url 'message_duplicate' message.objectId %}" class="button blue">Duplicate &amp; Edit</a>
-			<a href="{% url 'message_delete' message.objectId %}" id="delete-button" class="red">Delete Message</a>
+            <a id="send-now" class="button blue">Send Now</a>
+			<a href="{% url 'messages_index' %}" id="delete-button" class="red">Cancel</a>
 		</div>
 	</form>
 

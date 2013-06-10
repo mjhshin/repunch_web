@@ -5,12 +5,12 @@ from models import Message
 
 
 class MessageForm(forms.Form):
-    subject = forms.CharField(max_length=100)
+    subject = forms.CharField(max_length=50)
     body = forms.CharField(max_length=255, 
         widget=forms.Textarea(attrs={"cols":40, "rows":10}))
 
     attach_offer = forms.BooleanField(required=False)
-    offer_title = forms.CharField(max_length=100, required=False)
+    offer_title = forms.CharField(max_length=75, required=False)
     date_offer_expiration = forms.DateTimeField(input_formats=['%m/%d/%Y %I:%M %p'], required=False)
     
    
@@ -30,14 +30,14 @@ class MessageForm(forms.Form):
         
         return title
     
-    def clean_offer_expiration(self):
-        exp = self.cleaned_data['offer_expiration']
+    def clean_date_offer_expiration(self):
+        exp = self.cleaned_data['date_offer_expiration']
         
         if self.cleaned_data['attach_offer']:
             if exp == None:
                 raise forms.ValidationError('Please enter an expiration date.')
             else:
-                #make sure the expiration is in the future
+                # make sure the expiration is in the future
                 now = timezone.now()
                 if now >= exp:
                     raise forms.ValidationError('Please enter an expiration date that is later than today.')

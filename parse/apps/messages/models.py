@@ -2,19 +2,13 @@
 Parse equivalence of Django apps.messages.models
 """
 
+from django.core.urlresolvers import reverse
 from importlib import import_module
 
 from parse.core.models import ParseObject
-from parse.apps.messages import DRAFT, UNREAD
 
 class Message(ParseObject):
-    """ Equivalence class of apps.messages.models.Message """
-
-    # message_types
-    FEEDBACK = "feedback"
-    GIFT = "gift"
-    RETAILER = "retailer"
-    
+    """ Equivalence class of apps.messages.models.Message """    
     def __init__(self, **data):
         self.subject = data.get("subject")
         self.body = data.get("body")
@@ -39,7 +33,7 @@ class Message(ParseObject):
         super(Message, self).__init__(False, **data)
 
     def get_absolute_url(self):
-		return reverse('message_edit', args=[self.objectId])
+		return reverse('message_details', args=[self.objectId])
 
     def get_class(self, className):
         """ note that a reply/feedback is also a message """
