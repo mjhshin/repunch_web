@@ -29,8 +29,8 @@ def age_range_incorrect():
 def age_range_correct():
     """
     The below is the correct way to implement an age range.
-    This implementation does not leave out an entire year 
-    even a second in between two date ranges.
+    This implementation does not leave out even a second in 
+    between two date ranges.
     
     e.g.
     
