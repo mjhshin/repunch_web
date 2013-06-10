@@ -5,8 +5,7 @@ from datetime import timedelta
 import datetime, json
 
 
-from apps.employees.models import Employee
-from apps.patrons.models import Patron, FacebookPost
+from parse.apps.patrons.models import Patron
 
 from parse.core.advanced_queries import relational_query
 from parse.auth.decorators import login_required
@@ -152,10 +151,15 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
            
             now = datetime.datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
-            age_ranges = [(1, 0, -19), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
+            age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -40), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
+                start_dob = start_dob.replace(hour=0, minute=0, 
+                                            second=0)
                 end_dob = now + relativedelta(years=start_age)
+                end_dob = end_dob + relativedelta(days=-1)
+                end_dob = end_dob.replace(hour=23, minute=59, 
+                                        second=59)
                 punches = relational_query(store.objectId, "Store",
                     "Punches", "Punch", "Patron", "Patron", 
                     {'date_of_birth__lte':end_dob,
@@ -193,14 +197,22 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
            
             now = datetime.datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
-            age_ranges = [(1, 0, -19), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
+            age_ranges = [(1, 0, -20), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
+                start_dob = start_dob.replace(hour=0, minute=0, 
+                                            second=0)
                 end_dob = now + relativedelta(years=start_age)
-                val = FacebookPost.objects.values('store').filter(date_posted__range=[start, end], patron__dob__range=[start_dob, end_dob], store=account.store).annotate(num_posts=Count('id'))
-                
-                if len(val) > 0:
-                    rows[idx] = val[0]['num_posts']
+                end_dob = end_dob + relativedelta(days=-1)
+                end_dob = end_dob.replace(hour=23, minute=59, 
+                                        second=59)
+                rows[idx] = relational_query(store.objectId, "Store",
+                    "FacebookPosts", "FacebookPost", 
+                    "Patron", "Patron", 
+                    {'date_of_birth__lte':end_dob,
+                     'date_of_birth__gte':start_dob},
+                    {'createdAt__lte':end, 
+                     'createdAt__gte':start}, count=True)
                     
             results.append(rows)
             
@@ -228,13 +240,22 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             
             now = datetime.datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
-            age_ranges = [(1, 0, -19), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
+            age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -39), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
+                start_dob = start_dob.replace(hour=0, minute=0, 
+                                            second=0)
                 end_dob = now + relativedelta(years=start_age)
-                val = Punch.objects.values('employee__store').filter(date_punched__range=[start, end], patron__dob__range=[start_dob, end_dob], employee__store=account.store).annotate(num_patrons=Count('patron', distinct=True))
-                if len(val) > 0:
-                    rows[idx] = val[0]['num_patrons']
+                end_dob = end_dob + relativedelta(days=-1)
+                end_dob = end_dob.replace(hour=23, minute=59, 
+                                        second=59)
+                rows[idx] = relational_query(store.objectId, "Store",
+                    "PatronStores", "PatronStore", 
+                    "Patron", "Patron", 
+                    {'date_of_birth__lte':end_dob,
+                     'date_of_birth__gte':start_dob},
+                    {'createdAt__lte':end, 
+                     'createdAt__gte':start}, count=True)
             results.append(rows)
         
     return HttpResponse(json.dumps(results), content_type="application/json")
