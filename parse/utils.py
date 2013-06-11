@@ -125,7 +125,10 @@ def delete_file(name, fType):
     """ deletes the given file """   
     parse("DELETE", 'files/' + name, cMeta=fType)
 
-
+def cloud_call(func_name, params):
+    """ Calls a cloud function with the name func_name and with
+    the parameters params. """
+    return parse("POST", "functions/" + func_name, params)
 
 
 

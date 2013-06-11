@@ -6,6 +6,7 @@ from django.utils import timezone
 from dateutil import parser
 import urllib, datetime
 
+from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -90,6 +91,13 @@ def edit(request, message_id):
             success_message = "Message has been sent."
 
             # call cloud function TODO
+            print cloud_call("retailer_message", {
+                "store_id":store.objectId,
+                "store_name":store.get('store_name'),
+                "subject":message.get('subject'),
+                "message_id":message.objectId,
+                "filter":request.POST['chosen_filter'],
+            })
 
             return HttpResponseRedirect(message.get_absolute_url())
 

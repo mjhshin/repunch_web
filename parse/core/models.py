@@ -510,9 +510,6 @@ class ParseObject(object):
         data = self._get_formatted_data()
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
-            
-        if self.__class__.__name__ == "Message":
-            print data
         if res and "error" not in res:
             self.update_locally(res, True)
             return True

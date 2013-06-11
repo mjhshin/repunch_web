@@ -101,9 +101,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     
     var PatronStore = Parse.Object.extend("PatronStore");
     var patronStoreQuery = Parse.Query(PatronStore);
+    var userQuery = new Parse.Query(Parse.User);
     var installationQuery = Parse.Query(Parse.Installation);
     var filter = request.params.filter;
 
+    // get a subset of patrons
     if (filter === "all"){
         patronStoreQuery.equalTo("store_id", 
             request.params.store_id);
@@ -120,41 +122,34 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         return
     }
     
-    // step 1: get all of the PatronStores that match the filter
-    // step 2: get all of the usernames from the Patron pointer in each PatronStore
-    // step 3: prep the installationQuery
-    // note that the limit of 1000 parse objects returned per query
-    patronStoreQuery.select("username");
-    patronStoreQuery.find().then(function(patronStores) {
-        var usernames = new Array();
-        for (var i=0; i<patronStores.length; i++){
-            usernames.push();
-            
-        }
+    patronStoreQuery.select("Patron");
+    // get a subset of users that are in the patronStoreQuery results
+    userQuery.equalTo("account_type", "patron");
+    userQuery.matchesKeyInQuery("Patron", patronStoreQuery);
+    userQuery.select("username");
+    // match the installation with the username in the 
+    // userQuery results
+    installationQuery.matchesKeyInQuery("username", userQuery);
 
-        installationQuery.containedIn("username", usernames);
-        Parse.Push.send({
-            where:installationQuery, 
-            data: {
-                alert: "New message from " + request.params.store_name,
-                subject: request.params.subject,
-                body: request.params.body,
-                store_id: request.params.store_id,
-                store_name: request.params.store_name,
-                message_id: request.params.message_id,
-            }, 
-            }, {
-                success: function() {
-                    response.success("success");
-                },
-                error: function(error) {
-                    response.error("error");
-                }
-        }); // end Parse.Push
-
-    }); // end patronStoreQuery
+    Parse.Push.send({
+        where:installationQuery, 
+        data: {
+            alert: "New message from " + request.params.store_name,
+            subject: request.params.subject,
+            store_id: request.params.store_id,
+            store_name: request.params.store_name,
+            message_id: request.params.message_id,
+        }, 
+        }, {
+            success: function() {
+                response.success("success");
+            },
+            error: function(error) {
+                response.error("error");
+            }
+    }); // end Parse.Push
  
-});
+}); // end Parse.Cloud.define
  
 ////////////////////////////////////////////////////
 //
