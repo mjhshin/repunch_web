@@ -53,6 +53,9 @@ def query(constraints, where_only=False):
     # ignore is a list for keys to skip because it has a partner
     # e.g. createdAt__lte, createdAt__gte
     for key, value in constraints.iteritems():
+        # skip key ending with a number greater than 1 ($or)
+        if key[-1].isdigit() and int(key[-1]) > 1:
+            continue
         if key in ignore:
             continue
         if key in NOT_WHERE_CONSTRAINTS:
@@ -87,6 +90,21 @@ def query(constraints, where_only=False):
                     else: 
                         inner.update({"$" + args[1]: value})
                     where.update({args[0]:inner})
+
+            # compound queries ($or) keys endwith a number TODO
+            # currently only supports 1 key to be in the $or
+            # only supports regular where params (not date or ptr)
+            elif not key.__contains__("__") and\
+                key[-1].isdigit() and int(key[-1]) == 1:
+                cts, ind = [{key[:-1]:value}], 2
+                while True:
+                    if key[:-1] + str(ind) not in constraints:
+                        break                    
+                    cts.append({ key[:-1] + str(ind):\
+                        contraints.get( [key[:-1] + str(ind)] ) })
+                    ind += 1
+                where["$or"] = cts
+
             # dates built-ins
             elif key in ("createdAt", "updatedAt") or\
                 key.startswith("date_"):

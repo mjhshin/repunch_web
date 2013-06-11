@@ -1,0 +1,11 @@
+{
+    "applications": {
+        "Repunch": {
+            "applicationId": "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh", 
+            "masterKey": "K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB"
+        }, 
+        "_default": {
+            "link": "Repunch"
+        }
+    }
+}

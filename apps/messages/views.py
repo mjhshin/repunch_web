@@ -8,7 +8,7 @@ import urllib, datetime
 
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
-from parse.apps.messages import RETAILER, FEEDBACK, FILTERS
+from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils
 
@@ -23,7 +23,7 @@ def index(request):
         
     data['messages'] = store.get("sentMessages")
     # when a store replies, it also gets stored in the received
-    # with message type RETAILER
+    # with message type BASIC or OFFER
     data['feedback'] = store.get("receivedMessages", 
                             message_type=FEEDBACK)
     
@@ -64,9 +64,8 @@ def edit(request, message_id):
                 """
 
             # create the message
-            message = Message.objects().create(message_type=\
-                RETAILER, sender_name=store.get('store_name'),
-                    store_id=store.objectId)
+            message = Message.objects().create(sender_name=\
+                    store.get('store_name'), store_id=store.objectId)
             message.update_locally(request.POST.dict(), False)
 
             # check if attach offer is selected
@@ -74,10 +73,12 @@ def edit(request, message_id):
                 # make sure that date is a date and not string
                 message.set('date_offer_expiration', 
                     parser.parse(request.POST['attach_offer']) )
+                message.set('message_type', OFFER)
             else:
                 # pop the offer
                 message.set('offer_title', None)
                 message.set('date_offer_expiration', None)
+                message.set('message_type', BASIC)
 
             message.update()
             data['message'] = message
@@ -131,7 +132,7 @@ def delete(request, message_id):
         raise Http404
 
     # delete reply to message first if exist
-    # there shouldn't be any from messages sent by retailer
+    # there shouldn't be any from messages sent by store
     # except if it is a reply to a feedback but just to be safe
     if message.get('Reply'):
         msg_reply = message.get('reply')
@@ -190,11 +191,10 @@ def feedback_reply(request, feedback_id):
             data['error'] = 'You cannot reply more than once to a '+\
                                 'feedback.'
         else:
-            # create RETAILER message
+            # create BASIC message
             msg = Message.objects().create(message_type=\
-                RETAILER, sender_name=store.get('store_name'),
-                store_id=store.objectId, subject=\
-                'Re: ' + feedback.get('subject'), body=body,)
+                BASIC, sender_name=store.get('store_name'),
+                store_id=store.objectId, body=body)
             # add to ReceivedMessages relation
             store.add_relation("ReceivedMessages_", [msg.objectId])
             # set feedback Reply pointer to message

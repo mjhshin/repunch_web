@@ -10,4 +10,6 @@ FILTERS = ( ('all', ALL),
 # message_types
 FEEDBACK = "feedback"
 GIFT = "gift"
-RETAILER = "retailer"
+# retailer split into 2
+BASIC = "basic"
+OFFER = "offer"
