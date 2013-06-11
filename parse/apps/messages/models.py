@@ -18,7 +18,7 @@ class Message(ParseObject):
         self.is_read = data.get("is_read", False)
         # store name or patron fullname
         self.sender_name = data.get("sender_name")
-        # empty messages sent by patrons
+        # empty if message sent by patrons
         self.store_id = data.get("store_id")
     
         self.Reply = data.get("Reply")

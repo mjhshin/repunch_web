@@ -332,7 +332,12 @@ class ParseObject(object):
             return self.__dict__.get(attr)
 
         if self.__dict__.get(attr):
-            return self.__dict__.get(attr)
+            # make sure that if count constrains are
+            # present the cache does not block 
+            if not (attr[0].islower() and attr[0].upper() +\
+                attr[1:] + "_" in self.__dict__ and\
+                'count' in constraints):
+                return self.__dict__.get(attr)
 
         # Pointer cache
         if attr[0].islower() and\
@@ -368,8 +373,10 @@ class ParseObject(object):
             q = {}
             q.update({"where":dumps(where_dict)})
             # add the not where options
-            [q.update({k:v}) for k,v in constraints.iteritems() if\
-                k in NOT_WHERE_CONSTRAINTS]
+            if self.__class__.__name__ == "Store":
+                for k,v in constraints.iteritems():
+                    if k in NOT_WHERE_CONSTRAINTS:
+                        q.update({k:v})
             res = parse("GET", 'classes/' + tmp, query=q)
             if res and "error" not in res:
                 if len(res['results']) == 0:

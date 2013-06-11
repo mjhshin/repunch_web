@@ -15,6 +15,7 @@ def feedback_unread(store):
     return store.get("receivedMessages", is_read=False, 
                     count=1, limit=0)
 
+
 @register.assignment_tag
 def employees_pending(store):
     return Employee.objects().count(Store=store.objectId, 
