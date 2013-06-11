@@ -15,7 +15,9 @@ def settings(request):
     data = {'settings_nav': True}
     account = request.session['account']
     store = account.get('store')
-    settings = store.get('settings'); 
+    settings = store.get('settings')
+
+    # settings should never be none but just in case
     if settings == None:
         settings = Settings.objects().create(retailer_pin=rputils.generate_id())
         store.Settings = settings.objectId

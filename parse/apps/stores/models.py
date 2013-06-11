@@ -43,7 +43,6 @@ class Store(ParseObject):
         self.phone_number = data.get('phone_number')
         self.store_description = data.get('store_description')
         self.store_avatar = data.get('store_avatar')
-        self.active_users = data.get('active_users', 0)
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
         self.neighborhood = data.get('neighborhood')
         self.cross_streets = data.get('cross_streets')
@@ -225,8 +224,13 @@ class Settings(ParseObject):
         self.punches_employee = data.get("punches_employee") 
         self.retailer_pin = data.get("retailer_pin")
 
+        self.Store = data.get('Store')
+
         super(Settings, self).__init__(False, **data)
 
+    def get_class(self, className):
+        if className == "Store":
+            return getattr(import_module('parse.apps.stores.models'), className)
 
 class Hours(object):
     """

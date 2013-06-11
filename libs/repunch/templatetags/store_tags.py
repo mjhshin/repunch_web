@@ -18,8 +18,8 @@ def feedback_unread(store):
 
 @register.assignment_tag
 def employees_pending(store):
-    return Employee.objects().count(Store=store.objectId, 
-                        status=PENDING)
+    return store.get('employees', status=PENDING, 
+                count=1, limit=0)
 
 @register.simple_tag
 def hours(store):

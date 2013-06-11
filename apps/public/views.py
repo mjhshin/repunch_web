@@ -64,7 +64,16 @@ def sign_up(request):
             # from "sunny beach,sun dawn" TODO
             # to [{alias:"sunny", name:"sunny beach"}...]
             store.categories = categories
-            store.create()      
+            store.punches_facebook = 0
+            store.create()    
+
+            # create settings
+            settings = Settings.objects().create(retailer_pin=\
+                        rputils.generate_id(), punches_customer=1,
+                        punches_employee=5, Store=store.objectId)
+            store.Settings = settings.objectId
+            store.set('settings', settings)
+            store.update()
 
             # create account
             account = Account(**postDict)
