@@ -113,6 +113,15 @@ class ParseObject(object):
         The cache attribute name is the Pointer name with the first
         character lowercased. To get the actual object:
             e.g. self.get("milkyWay")
+
+        A pointer may also have a meta attribute which will not be saved.
+        This meta is a constant and may be provided if the class name of
+        the pointer is not the same as the pointer name.
+        Pointer meta attributes startswith _ and are all lower case.
+
+            e.g. If MilkyWay is not the class name, but rather Planet
+                self._milkyway = "Planet"
+
         -------------------------------
 
     ### Relations:
@@ -261,8 +270,11 @@ class ParseObject(object):
         Pointer caches are created if data for the Pointer is in data.
         """
         for key, value in data.iteritems():
-            if key.endswith("_") or (key not in self.__dict__ and\
-                not create):
+
+            # don't touch pointer meta and relation attrs
+            if (key.endswith("_") and key[0].isupper()) or\
+                (key.islower() and key.startswith("_")) or\
+                (key not in self.__dict__ and not create):
                 continue
 
             # Pointers attrs- store only the objectId
@@ -342,9 +354,14 @@ class ParseObject(object):
         # Pointer cache
         if attr[0].islower() and\
             self.__dict__.get(attr[0].upper() + attr[1:]):
-            className = attr[0].upper() + attr[1:]
+            # if pointer meta exist then use it
+            if "_" + attr.lower() in self.__dict__:
+                className = self.__dict__["_" + attr.lower()]
+            else:
+                className = attr[0].upper() + attr[1:]
             res = parse("GET", "classes/" + className +\
-                    "/" + self.__dict__.get(className))
+                    "/" + self.__dict__.get(attr[0].upper() +\
+                    attr[1:]))
 
             if res and "error" not in res:
                 c = self.get_class(className)
@@ -490,6 +507,9 @@ class ParseObject(object):
         data = self._get_formatted_data()
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
+            
+        if self.__class__.__name__ == "Message":
+            print data
         if res and "error" not in res:
             self.update_locally(res, True)
             return True
@@ -558,9 +578,19 @@ class ParseObject(object):
                 # to None when changing file!
                 continue
 
+            # exclude Pointer meta 
+            if key.islower() and key.startswith("_"):
+                continue
+
             # Pointers
             if key[0].isupper() and not key.endswith("_"):
-                data[key] = format_pointer(key, value)
+                # use pointer meta value as classname if exist
+                if "_" + key.lower() in self.__dict__:
+                    data[key] =\
+                      format_pointer(self.__dict__["_" + key.lower()],
+                        value)
+                else:
+                    data[key] = format_pointer(key, value)
             # Dates
             elif key.startswith("date_") or\
                 key in ("createdAt", "updatedAt"):

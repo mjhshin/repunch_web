@@ -32,7 +32,7 @@
 			<label>Subject:</label><span>{{ message|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect message">
+		<div class="sect body">
 			{{ message|get:'body' }}
 		</div>
 	</div>

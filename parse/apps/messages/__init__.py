@@ -11,7 +11,3 @@ FILTERS = ( ('all', ALL),
 FEEDBACK = "feedback"
 GIFT = "gift"
 RETAILER = "retailer"
-
-# FEEDBACK
-READ = "Read"
-UNREAD = "Unread"

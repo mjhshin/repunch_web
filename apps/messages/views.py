@@ -65,7 +65,8 @@ def edit(request, message_id):
 
             # create the message
             message = Message.objects().create(message_type=\
-                RETAILER, store_id=store.objectId)
+                RETAILER, sender_name=store.get('store_name'),
+                    store_id=store.objectId)
             message.update_locally(request.POST.dict(), False)
 
             # check if attach offer is selected
@@ -164,15 +165,13 @@ def feedback(request, feedback_id):
         data['error'] = request.GET.get("error")
     
     # there should only be at most 1 reply
-    data['reply'] = store.get('reply')
+    data['reply'] = feedback.get('reply')
     data['feedback'] = feedback
     
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
 def feedback_reply(request, feedback_id):
-    feedback_id = int(feedback_id)
-    feedback = None
     account = request.session['account']
     store = account.store
     data = {'messages_nav': True}    
@@ -182,35 +181,35 @@ def feedback_reply(request, feedback_id):
         raise Http404
     
     if request.method == 'POST':
-        message = request.POST.get('message')
-        if message == None or len(message) == 0:
-            data['error'] = 'Please enter a message.'
+        body = request.POST.get('body')
+        if body == None or len(body) == 0:
+            data['error'] = 'Please enter a message.'   
+        # double check if feedback already has a reply
+        # should not go here unless it is a hacker 
+        elif feedback.get('Reply'):
+            data['error'] = 'You cannot reply more than once to a '+\
+                                'feedback.'
         else:
-            subject = feedback.subject
-            if subject.startswith("Re: ") == False:
-                subject = 'Re: ' + subject
-                
-            parent = feedback
-            if feedback.parent != None:
-                parent = feedback.parent
-                
-            reply = Feedback(
-                             store=store, 
-                             parent=parent, 
-                             is_response=1, 
-                             patron=feedback.patron, 
-                             subject=subject,
-                             message=message,
-                             status=1)
-            reply.save();
-            return redirect(feedback.get_absolute_url() + "?%s" % urllib.urlencode({'success': 'Reply has been sent.'}))
+            # create RETAILER message
+            msg = Message.objects().create(message_type=\
+                RETAILER, sender_name=store.get('store_name'),
+                store_id=store.objectId, subject=\
+                'Re: ' + feedback.get('subject'), body=body,)
+            # add to ReceivedMessages relation
+            store.add_relation("ReceivedMessages_", [msg.objectId])
+            # set feedback Reply pointer to message
+            feedback.set('Reply', msg.objectId)
+            feedback.update()
+
+            # call cloud function TODO
+
+            return redirect(reverse('feedback_details', 
+                        args=(feedback.objectId,)) +\
+                        "?%s" % urllib.urlencode({'success':\
+                        'Reply has been sent.'}))
     else:
-        data['from_address'] = account.username
-        
-        subject = feedback.subject
-        if subject.startswith("Re: ") == False:
-            subject = 'Re: ' + subject
-        data['subject'] = subject
+        data['from_address'] = account.get('username')
+        data['subject'] = 'Re: ' + feedback.get('subject')
     
     data['feedback'] = feedback
     

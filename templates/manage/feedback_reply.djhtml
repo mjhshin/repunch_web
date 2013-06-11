@@ -29,8 +29,8 @@
 				<label>Subject:</label><span>{{ subject }}</span>
 				<div style="clear: left;"></div>
 			</div>
-			<div class="sect message">
-				<textarea id="message" name="message" style="width: 633px; height: 50px;"></textarea>
+			<div class="sect body">
+				<textarea id="body" name="body" style="width: 633px; height: 50px;"></textarea>
 			</div>
 		</div>
 		<div id="message-detail-options" class="form-options">
@@ -42,15 +42,15 @@
 	<div class="white-box">
 		<div class="sect meta">
 			<label>Date:</label><span>{{ feedback|get:'createdAt'|date:"m/d/y" }}</span>
-			<label>From:</label><span>{{ feedback|get:'patron'|get:'name' }}</span>
+			<label>From:</label><span>{{ feedback|get:'sender_name' }}</span>
 			<div style="clear: left;"></div>
 		</div>
 		<div class="sect subject">
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect message">
-			{{ feedback|get:'message' }}
+		<div class="sect body">
+			{{ feedback|get:'body' }}
 		</div>
 	</div>
 

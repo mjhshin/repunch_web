@@ -22,6 +22,8 @@ class Message(ParseObject):
         self.store_id = data.get("store_id")
     
         self.Reply = data.get("Reply")
+        # meta for Reply pointer
+        self._reply = "Message"
 
         # NOT IN SERVER SIDE
         # reward_title = string
@@ -37,5 +39,5 @@ class Message(ParseObject):
 
     def get_class(self, className):
         """ note that a reply/feedback is also a message """
-        if className == "Reply":
+        if className == "Message":
             return Message

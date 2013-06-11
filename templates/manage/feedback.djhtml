@@ -29,15 +29,11 @@
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect message">
+		<div class="sect body">
 			{{ feedback|get:'body' }}
 		</div>
 	</div>
-	<div id="message-detail-options" class="form-options">
-		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue">Reply</a>
-		<a href="{% url 'feedback_delete' feedback_id %}" id="delete-button" class="red">Delete Message</a>
-	</div>
-	
+
 	<div class="divider" style="height: 20px;"></div>
     {% if reply %}
 	<div class="white-box {% if reply.is_response == 1 %}response{% endif %}">
@@ -53,12 +49,20 @@
 			<label>Subject:</label><span>{{ reply|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect message">
-			{{ reply|get:'message' }}
+		<div class="sect body">
+			{{ reply|get:'body' }}
 		</div>
 	</div>
 	<div class="divider"></div>
     {% endif %}
+
+    <div id="message-detail-options" class="form-options">
+        {# cannot reply if already replied #}
+        {% if not reply %}
+		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue">Reply</a>
+        {% endif %}
+		<a href="{% url 'feedback_delete' feedback_id %}" id="delete-button" class="red">Delete Message</a>
+	</div>
     
 
 {% endblock %}
