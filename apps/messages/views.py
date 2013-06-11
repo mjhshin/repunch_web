@@ -8,7 +8,7 @@ import urllib, datetime
 
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
-from parse.apps.messages import RETAILER, FILTERS
+from parse.apps.messages import RETAILER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils
 
@@ -22,7 +22,10 @@ def index(request):
     store = request.session['account'].get('store')
         
     data['messages'] = store.get("sentMessages")
-    data['feedback'] = store.get("receivedMessages")
+    # when a store replies, it also gets stored in the received
+    # with message type RETAILER
+    data['feedback'] = store.get("receivedMessages", 
+                            message_type=FEEDBACK)
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -127,6 +130,8 @@ def delete(request, message_id):
         raise Http404
 
     # delete reply to message first if exist
+    # there shouldn't be any from messages sent by retailer
+    # except if it is a reply to a feedback but just to be safe
     if message.get('Reply'):
         msg_reply = message.get('reply')
         msg_reply.delete()
@@ -139,42 +144,27 @@ def delete(request, message_id):
 # FEEDBACK ------------------------------------------
 @login_required
 def feedback(request, feedback_id):
-    feedback_id = int(feedback_id)
-    feedback = None
     account = request.session['account']
     store = account.store
-    data = {'messages_nav': True, 'feedback_id': feedback_id, 'account_username': account.username}    
+    data = {'messages_nav': True, 'feedback_id':\
+            feedback_id, 'account_username':\
+            account.get('username')}    
     
-    #need to make sure this reward really belongs to this store
-    if(feedback_id > 0):
-        try:
-            feedback = Feedback.objects.filter(store=store.id).get(id=feedback_id)            
-        except Feedback.DoesNotExist:
-            raise Http404
-    else:
+    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    if not feedback:
         raise Http404
     
-    if feedback.status == 0:
-        feedback.status = 1
-        feedback.save()
+    if not feedback.is_read:
+        feedback.is_read = True
+        feedback.update()
         
-    
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
     
-    replies = Feedback.objects.filter(Q(parent_id=feedback.id) | Q(id=feedback_id)).order_by('-date_added');
-    data['replies'] = replies
-    
-    # if there are more than on message from client for this thread
-    # we need to find the most recent and show that
-    if replies != None and len(replies) > 1:
-        for reply in replies:
-            if reply.is_response == 0:
-                feedback = reply
-                break
-
+    # there should only be at most 1 reply
+    data['reply'] = store.get('reply')
     data['feedback'] = feedback
     
     return render(request, 'manage/feedback.djhtml', data)
@@ -187,13 +177,8 @@ def feedback_reply(request, feedback_id):
     store = account.store
     data = {'messages_nav': True}    
     
-    #need to make sure this reward really belongs to this store
-    if(feedback_id > 0):
-        try:
-            feedback = Feedback.objects.filter(store=store).get(id=feedback_id)            
-        except Feedback.DoesNotExist:
-            raise Http404
-    else:
+    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    if not feedback:
         raise Http404
     
     if request.method == 'POST':
@@ -233,18 +218,16 @@ def feedback_reply(request, feedback_id):
 
 @login_required
 def feedback_delete(request, feedback_id):
-    feedback_id = int(feedback_id)
-    feedback = None
     store = request.session['account'].store
     
-    #need to make sure this reward really belongs to this store
-    if(feedback_id > 0):
-        try:
-            feedback = Feedback.objects.filter(store=store.id).get(id=feedback_id)
-        except Feedback.DoesNotExist:
-            raise Http404
-    else:
+    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    if not feedback:
         raise Http404
+
+    # delete reply to message first if exist
+    if feedback.get('Reply'):
+        feedback_reply = feedback.get('reply')
+        feedback_reply.delete()
     
     feedback.delete()
     return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
