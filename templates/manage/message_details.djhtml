@@ -47,8 +47,4 @@
     </div>
     {% endif %}
 
-	<div id="message-detail-options" class="form-options">
-		<a href="{% url 'message_delete' message.objectId %}" id="delete-button" class="red">Delete Message</a>
-	</div>
-
 {% endblock %}

@@ -100,21 +100,21 @@ Parse.Cloud.define("redeem", function(request, response) {
 Parse.Cloud.define("retailer_message", function(request, response) {
     
     var PatronStore = Parse.Object.extend("PatronStore");
-    var patronStoreQuery = Parse.Query(PatronStore);
+    var patronStoreQuery = new Parse.Query(PatronStore);
     var userQuery = new Parse.Query(Parse.User);
-    var installationQuery = Parse.Query(Parse.Installation);
+    var installationQuery = new Parse.Query(Parse.Installation);
     var filter = request.params.filter;
 
     // get a subset of patrons
     if (filter === "all"){
         patronStoreQuery.equalTo("store_id", 
             request.params.store_id);
-    } else if (filter == "idle") {  
-        var idleDate = Date();
+    } else if (filter === "idle") {  
+        var idleDate = request.params.idle_date;
         // idleDate.set();
         // TODO
         patronStoreQuery.lessThan("updatedAt", idleDate);
-    } else if (filter == "most_loyal") {
+    } else if (filter === "most_loyal") {
         patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
             request.params.min_punches);
     } else {
@@ -125,16 +125,17 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     patronStoreQuery.select("Patron");
     // get a subset of users that are in the patronStoreQuery results
     userQuery.equalTo("account_type", "patron");
-    userQuery.matchesKeyInQuery("Patron", patronStoreQuery);
+    userQuery.matchesKeyInQuery("Patron", "Patron", patronStoreQuery);
     userQuery.select("username");
     // match the installation with the username in the 
     // userQuery results
-    installationQuery.matchesKeyInQuery("username", userQuery);
+    installationQuery.matchesKeyInQuery("username", "username",
+                                            userQuery);
 
     Parse.Push.send({
         where:installationQuery, 
         data: {
-            alert: "New message from " + request.params.store_name,
+            action: "com.repunch.intent.MESSAGE",
             subject: request.params.subject,
             store_id: request.params.store_id,
             store_name: request.params.store_name,

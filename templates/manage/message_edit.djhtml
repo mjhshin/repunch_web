@@ -15,7 +15,6 @@
 
 {% block content %}
 	<form action="{% url 'message_edit' message_id %}" method="post" id="message-form">{% csrf_token %}
-		<input type="hidden" name="status" id="status" value="{{ form.status.value }}" />
 		{% if limit_reached %}
 			<div class="notification">
 				<div>
@@ -34,7 +33,7 @@
 		{% endif %}
 		
 		<h2>Send New Message</h2>
-		
+		    
 		<label for="send_to">Send to </label>
         <select name="chosen_filter">
             {% for filter in filters %}

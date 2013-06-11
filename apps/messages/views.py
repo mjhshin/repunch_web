@@ -90,14 +90,17 @@ def edit(request, message_id):
             request.session['account'] = account
             success_message = "Message has been sent."
 
-            # call cloud function TODO
-            print cloud_call("retailer_message", {
+            msg_filter = request.POST['chosen_filter']
+            params = {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":message.get('subject'),
                 "message_id":message.objectId,
-                "filter":request.POST['chosen_filter'],
-            })
+                "filter":msg_filter,
+            }
+
+            # call cloud function TODO
+            cloud_call("retailer_message", params)
 
             return HttpResponseRedirect(message.get_absolute_url())
 
@@ -112,7 +115,8 @@ def edit(request, message_id):
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
             
-            message = store.get("sentMessages", objectId=message_id)[0]
+            message = store.get("sentMessages", 
+                    objectId=message_id)[0]
             data['message'] = message
             form = MessageForm(message.__dict__)
     
@@ -133,6 +137,11 @@ def details(request, message_id):
 
 @login_required
 def delete(request, message_id):
+    # entire thing is commented out just in case they try to trigger
+    # this via the url manually
+    """ this should not be used as messages, once sent, 
+    cannot be deleted. """
+    """
     store = request.session['account'].store
     
     message = store.get("sentMessages", objectId=message_id)[0]
@@ -150,6 +159,8 @@ def delete(request, message_id):
     return redirect(reverse('messages_index')+\
             "?%s" % urllib.urlencode({'success':\
             'Message has been deleted.'}))
+    """
+    return HttpResponse("sorry, this operation is not supported")
 
 # FEEDBACK ------------------------------------------
 @login_required
