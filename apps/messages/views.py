@@ -12,6 +12,7 @@ from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from libs.repunch import rputils
+from libs.dateutil.relativedelta import relativedelta
 
 from django.db import connection
 connection.queries
@@ -99,7 +100,14 @@ def edit(request, message_id):
                 "filter":msg_filter,
             }
 
-            # call cloud function TODO
+            if msg_filter == "idle":
+                d = datetime.now() + relativedelta(days=-21)
+                params.update({idle_date:d.isoformat()})
+            elif msg_filter == "most_loyal":
+                params.update({min_punches:\
+                    request.POST['min_punches']})
+
+            # push notification
             cloud_call("retailer_message", params)
 
             return HttpResponseRedirect(message.get_absolute_url())
@@ -220,7 +228,15 @@ def feedback_reply(request, feedback_id):
             feedback.set('Reply', msg.objectId)
             feedback.update()
 
-            # call cloud function TODO
+            # push notification
+            cloud_call("retailer_message", {
+                "store_id":store.objectId,
+                "store_name":store.get('store_name'),
+                "subject":message.get('subject'),
+                "message_id":msg.objectId,
+                "filter":'one',
+                "username":feedback.get('username'),
+            })
 
             return redirect(reverse('feedback_details', 
                         args=(feedback.objectId,)) +\

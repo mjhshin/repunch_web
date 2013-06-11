@@ -110,27 +110,30 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         patronStoreQuery.equalTo("store_id", 
             request.params.store_id);
     } else if (filter === "idle") {  
-        var idleDate = request.params.idle_date;
-        // idleDate.set();
-        // TODO
-        patronStoreQuery.lessThan("updatedAt", idleDate);
+        patronStoreQuery.lessThan("updatedAt", 
+            new Date(request.params.idle_date) );
     } else if (filter === "most_loyal") {
         patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
             request.params.min_punches);
+    }  
+
+    // determine the userQuery
+    if (filter === "one"){
+        // store replies to a feedback
+        installationQuery.equalTo("username", 
+                            request.params.username);
     } else {
-        response.error("filter");
-        return
+        // store sends a message
+        patronStoreQuery.select("Patron");
+        userQuery.equalTo("account_type", "patron");
+        userQuery.matchesKeyInQuery("Patron", "Patron",
+                    patronStoreQuery);
+        userQuery.select("username");
+        // match the installation with the username in the 
+        // userQuery results
+        installationQuery.matchesKeyInQuery("username", "username",
+                                                userQuery);
     }
-    
-    patronStoreQuery.select("Patron");
-    // get a subset of users that are in the patronStoreQuery results
-    userQuery.equalTo("account_type", "patron");
-    userQuery.matchesKeyInQuery("Patron", "Patron", patronStoreQuery);
-    userQuery.select("username");
-    // match the installation with the username in the 
-    // userQuery results
-    installationQuery.matchesKeyInQuery("username", "username",
-                                            userQuery);
 
     Parse.Push.send({
         where:installationQuery, 
