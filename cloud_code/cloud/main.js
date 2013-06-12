@@ -50,12 +50,34 @@ Parse.Cloud.define("punch", function(request, response) {
         }
     }, {
         success: function() {
-            // Push was successful
-            response.success("success");
+        	// Push was successful
+		var patron = Parse.Object.extend("Patron");
+		var patronQuery = new Parse.Query(patron);
+		query.equalTo("punch_code", request.params.punch_code);
+		
+		var patronStore = Parse.Object.extend("PatronStore");
+		var patronStoreQuery = new Parse.Query(patronStore);
+
+		patronStoreQuery.whereMatchesKeyInQuery("Patron", "objectId", patronQuery);
+		patronStoreQuery.first({
+  			success: function(object) {
+    				object.increment("punch_count", request.params.num_punches);
+				object.save(null, {
+  					success: function(object) {
+						response.success("success");
+  					},
+  					error: function(object, error) {
+						response.error("error");
+					}
+				});
+  			},
+  			error: function(error) {
+    				response.error("error");
+  			}
+		});
         },
         error: function(error) {
-            // Handle error
-            response.error("error");
+		response.error("error");
         }
     });
 });
