@@ -128,10 +128,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var userQuery = new Parse.Query(Parse.User);
     var installationQuery = new Parse.Query(Parse.Installation);
     var filter = request.params.filter;
-
-    var store = new Store();
-    store.objectId = request.params.store_id;
-    patronStoreQuery.equalTo("Store", store);
+   
+    function continueWithPush() {
 
     // get a subset of patrons
     if (filter === "all"){
@@ -179,6 +177,18 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 response.error("error");
             }
     }); // end Parse.Push
+
+    } // end continueWithPush();
+
+    var storeQuery = new Parse.Query(Store);
+    storeQuery.get(request.params.store_id, {
+      success: function(store) {
+        patronStoreQuery.equalTo("Store", store);
+        continueWithPush();
+      }, error: function(object, error){
+            console.log(error);
+        }
+    });
  
 }); // end Parse.Cloud.define
  
