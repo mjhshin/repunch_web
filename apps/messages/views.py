@@ -108,7 +108,7 @@ def edit(request, message_id):
                     request.POST['min_punches']})
 
             # push notification
-            cloud_call("retailer_message", params)
+            print cloud_call("retailer_message", params)
 
             return HttpResponseRedirect(message.get_absolute_url())
 
@@ -229,7 +229,7 @@ def feedback_reply(request, feedback_id):
             feedback.update()
 
             # push notification
-            cloud_call("retailer_message", {
+            print cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":message.get('subject'),

@@ -100,24 +100,24 @@ Parse.Cloud.define("redeem", function(request, response) {
 Parse.Cloud.define("retailer_message", function(request, response) {
     // note that we could also query the PatronStores in the Store 
     // relation instead of querying the PatronStore class itself.
+    var Store = Parse.Object.extend("Store");
     var PatronStore = Parse.Object.extend("PatronStore");
     var patronStoreQuery = new Parse.Query(PatronStore);
     var userQuery = new Parse.Query(Parse.User);
     var installationQuery = new Parse.Query(Parse.Installation);
     var filter = request.params.filter;
 
+    var store = new Store();
+    store.objectId = request.params.store_id;
+    patronStoreQuery.equalTo("Store", store);
+
     // get a subset of patrons
     if (filter === "all"){
-        patronStoreQuery.equalTo("Store", 
-            request.params.store_id);
+        // nothing
     } else if (filter === "idle") {     
-        patronStoreQuery.equalTo("Store", 
-            request.params.store_id);
         patronStoreQuery.lessThan("updatedAt", 
             new Date(request.params.idle_date) );
     } else if (filter === "most_loyal") {
-        patronStoreQuery.equalTo("Store", 
-            request.params.store_id);
         patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
             request.params.min_punches);
     }  

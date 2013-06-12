@@ -16,6 +16,8 @@ def login(request, username, password, account):
     This combines Django's authenticate and login functions.
     account is a new Account to prevent having to import Account.
 
+    # NOTE HASHING IS DISABLED FOR NOW FOR PARSE
+
     returns True if the hash of raw_pass == the pass in the DB.
     pass2 is the hash stored in the DB- which is hashed. 
     Returns the Account object if successful, otherwise None.
@@ -24,8 +26,11 @@ def login(request, username, password, account):
     and adds the appropriate data to the request so that the user/
     account is recognized to be logged in.
     """
+    #res = parse("GET", "login", query={"username":username,
+    #                "password":hash_password(password)} )
+    
     res = parse("GET", "login", query={"username":username,
-                    "password":hash_password(password)} )
+                    "password":password} )
 
     if res and "error" not in res:
         account.update_locally(res, False)

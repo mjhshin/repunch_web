@@ -4,7 +4,7 @@ Parse equivalence of Django apps.accounts.models
 from importlib import import_module
 
 from parse.core.models import ParseObject, ParseObjectManager
-from parse.auth import hash_password
+# from parse.auth import hash_password
 from parse.apps.accounts import sub_type, FREE, ACTIVE
 
 class Account(ParseObject):
@@ -41,7 +41,8 @@ class Account(ParseObject):
 
     def set_password(self, new_pass):
         """ sets the password to a hashed new_pass """
-        self.password = hash_password(new_pass)
+        # self.password = hash_password(new_pass)
+        self.password = new_pass
 
     def get_sents_available(self):
         """

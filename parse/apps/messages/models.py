@@ -16,6 +16,7 @@ class Message(ParseObject):
         self.date_offer_expiration = data.get('date_offer_expiration')
         self.message_type = data.get("message_type")
         self.is_read = data.get("is_read", False)
+        self.username = data.get('username')
         # store name or patron fullname
         self.sender_name = data.get("sender_name")
         # empty if message sent by patrons
