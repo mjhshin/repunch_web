@@ -51,33 +51,49 @@ Parse.Cloud.define("punch", function(request, response) {
     }, {
         success: function() {
         	// Push was successful
-		var patron = Parse.Object.extend("Patron");
-		var patronQuery = new Parse.Query(patron);
-		query.equalTo("punch_code", request.params.punch_code);
+			var patron = Parse.Object.extend("Patron");
+			var patronQuery = new Parse.Query(patron);
+			query.equalTo("punch_code", request.params.punch_code);
 		
-		var patronStore = Parse.Object.extend("PatronStore");
-		var patronStoreQuery = new Parse.Query(patronStore);
-
-		patronStoreQuery.whereMatchesKeyInQuery("Patron", "objectId", patronQuery);
-		patronStoreQuery.first({
-  			success: function(object) {
-    				object.increment("punch_count", request.params.num_punches);
-				object.save(null, {
-  					success: function(object) {
-						response.success("success");
-  					},
-  					error: function(object, error) {
-						response.error("error");
+			var patronStore = Parse.Object.extend("PatronStore");
+			var patronStoreQuery = new Parse.Query(patronStore);
+			patronStoreQuery.whereMatchesKeyInQuery("Patron.objectId", "objectId", patronQuery);
+			patronStoreQuery.first({
+				success: function(object) {
+					if(object != null) { 
+						object.increment("punch_count", request.params.num_punches);
+						object.increment("all_time_punches", request.params.num_punches);
+						object.save(null, {
+							success: function(object) {
+								response.success("success");
+							},
+							error: function(object, error) {
+								response.error("error");
+							}
+						});
+					} else { //need to create new PatronStore entry
+						//response.error("error");
+						var PatronStore = Parse.Object.extend("PatronStore");
+						var patronStore = new PatronStore();
+						patronStore.put("punch_count", request.params.num_punches);
+						patronStore.put("all_time_punches", request.params.num_punches);
+						patronStore.save(null, {
+							success: function(object) {
+								response.success("success");
+							},
+							error: function(object, error) {
+								response.error("error");
+							}
+						});
 					}
-				});
-  			},
-  			error: function(error) {
-    				response.error("error");
-  			}
-		});
+				},
+				error: function(error) {
+					response.error("error");
+				}
+			});
         },
         error: function(error) {
-		response.error("error");
+			response.error("error");
         }
     });
 });
