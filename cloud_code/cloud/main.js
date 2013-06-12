@@ -105,7 +105,7 @@ Parse.Cloud.define("punch", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("redeem", function(request, response) {
     var retailerQuery = new Parse.Query(Parse.Installation);
-    retailerQuery.equalTo('retailer_id', request.params.retailer_id);
+    retailerQuery.equalTo('store_id', request.params.retailer_id);
                     
     Parse.Push.send({
         where: retailerQuery,
