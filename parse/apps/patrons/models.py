@@ -44,13 +44,16 @@ class PatronStore(ParseObject):
     def __init__(self, **data):
         self.Patron = data.get("Patron")
         # Store's objectId as string
-        self.store_id = data.get("store_id")
+        self.Store = data.get("Store")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
 
     def get_class(self, className):
         if className == "Patron":
             return Patron
+        elif className == "Store":
+            return getattr(import_module('parse.apps.stores.models'),
+                    className)
 
 class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """

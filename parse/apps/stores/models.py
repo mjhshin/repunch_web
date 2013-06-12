@@ -230,7 +230,7 @@ class Settings(ParseObject):
 
     def get_class(self, className):
         if className == "Store":
-            return getattr(import_module('parse.apps.stores.models'), className)
+            return Store
 
 class Hours(object):
     """
