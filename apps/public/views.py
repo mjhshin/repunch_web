@@ -63,7 +63,7 @@ def sign_up(request):
             # categories need to be properly formatted 
             # from "sunny beach,sun dawn" TODO
             # to [{alias:"sunny", name:"sunny beach"}...]
-            store.categories = categories
+            # store.categories = categories
             store.punches_facebook = 0
             store.create()    
 
