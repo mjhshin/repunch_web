@@ -12,7 +12,8 @@ from libs.repunch import rputils
 from parse.auth import login
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED, ACTIVE
-from parse.apps.stores.models import Store, Subscription
+from parse.apps.stores.models import Store, Subscription,\
+Settings
 
 def index(request):
     data = {'home_nav': True}

@@ -29,7 +29,7 @@ def edit(request):
     
     if request.method == 'POST': 
         form = StoreForm(request.POST)
-        if form.is_valid() and formset.is_valid(): 
+        if form.is_valid(): 
             store = Store(**account.get("store").__dict__)
             store.update_locally(request.POST.dict(), False)
             store.update()

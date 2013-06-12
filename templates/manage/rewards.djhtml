@@ -35,6 +35,14 @@
 					</div>
 				</a>
 			</div>
+        {% empty %}
+            <div class="tr reward">
+		        <div class="td reward_punches">&nbsp;</div>
+		        <div class="td reward_summary">
+			        <span class="reward_title">No Rewards</span><br />
+			        <span class="reward_description">You have not added any rewards. Click on the &quot;Create New Reward&quot; button above.</span>
+		        </div>
+	        </div>
 		{% endfor %}
 	</div>
 

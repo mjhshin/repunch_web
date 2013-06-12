@@ -291,7 +291,8 @@ class ParseObject(object):
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
-            elif key in ("createdAt", "updatedAt"):
+            elif key in ("createdAt", "updatedAt") and\
+                type(value) in (str, unicode):
                 setattr(self, key, parser.parse(value) )
             else:
                 setattr(self, key, value)
