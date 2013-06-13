@@ -39,63 +39,89 @@ Parse.Cloud.define("assign_punch_code", function(request, response) {
 Parse.Cloud.define("punch", function(request, response) {
     var userQuery = new Parse.Query(Parse.Installation);
     userQuery.equalTo('punch_code', request.params.punch_code);
-                    
-    Parse.Push.send({
-        where: userQuery,
-        data: {
-            name: request.params.retailer_name,
-            id: request.params.retailer_id,
-            num_punches: request.params.num_punches,
-            action: "com.repunch.intent.PUNCH"
-        }
-    }, {
-        success: function() {
-        	// Push was successful
-			var patron = Parse.Object.extend("Patron");
-			var patronQuery = new Parse.Query(patron);
-			query.equalTo("punch_code", request.params.punch_code);
-		
-			var patronStore = Parse.Object.extend("PatronStore");
-			var patronStoreQuery = new Parse.Query(patronStore);
-			patronStoreQuery.whereMatchesKeyInQuery("Patron.objectId", "objectId", patronQuery);
-			patronStoreQuery.first({
-				success: function(object) {
-					if(object != null) { 
-						object.increment("punch_count", request.params.num_punches);
-						object.increment("all_time_punches", request.params.num_punches);
-						object.save(null, {
-							success: function(object) {
-								response.success("success");
-							},
-							error: function(object, error) {
-								response.error("error");
-							}
-						});
-					} else { //need to create new PatronStore entry
-						//response.error("error");
-						var PatronStore = Parse.Object.extend("PatronStore");
-						var patronStore = new PatronStore();
-						patronStore.put("punch_count", request.params.num_punches);
-						patronStore.put("all_time_punches", request.params.num_punches);
-						patronStore.save(null, {
-							success: function(object) {
-								response.success("success");
-							},
-							error: function(object, error) {
-								response.error("error");
-							}
-						});
-					}
-				},
-				error: function(error) {
+				   
+	var punchCode = request.params.punch_code;
+	var numPunches = reuqest.params.num_punches;
+	var storeId = request.params.retailer_id;
+	var storeName = request.params.retailer_name;
+   
+	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var Store = Parse.Object.extend("Store");
+   
+	var patronQuery = new Parse.Query(Patron);
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	var storeQuery = new Parse.Query(Store);
+	var installationQuery = new Parse.Query(Parse.Installation);
+   
+	patronQuery.equalTo("punch_code", punchCode);
+	storeQuery.equalTo("objectId", storeId);
+	patronStoreQuery.matchesQuery("Patron", patronQuery);
+	patronStoreQuery.matchesQuery("Store", storeQuery);
+	installationQuery.equalTo("punch_code", punchCode);
+				   
+	patronStoreQuery.first({
+		success: function(patronStoreResult) {
+			if(object == null) {//customer's first punch at this store, need new PatronStore.
+				console.log("customer's first punch at this store, need new PatronStore.");
+				var patronStore = new PatronStore();
+				patronStore.set("punch_count", numPunches);
+				patronStore.set("all_time_punches", numPunches);
+										  
+				patronQuery.first().then(function(patronResult) {
+					patronStore.set("Patron", patronResult);
+					return storeQuery.first();
+				}).then(function(storeResult) {
+					patronStore.set("Store", storeResult);
+					patronStore.save().then(function(obj) {
+						// the object was saved successfully.
+						console.log("PatronStore save was successful.");
+						executePush();
+					}, function(error) {
+						console.log("PatronStore save failed.");
+						response.error("error");
+					});
+				});
+				
+			} else {
+				console.log("updating existing PatronStore");
+				patronStoreResult.increment("punch_count", numPunches);
+				patronStoreResult.increment("all_time_punches", numPunches);
+				patronStoreResult.save().then(function(obj) {
+					// the object was saved successfully.
+					console.log("PatronStore save was successful.");
+					executePush();
+				}, function(error) {
+					console.log("PatronStore save failed.");
 					response.error("error");
-				}
-			});
-        },
-        error: function(error) {
+				});
+			}
+		},
+		error: function(error) {
+			console.log("PatronStore query failed.");
 			response.error("error");
-        }
-    });
+		}
+	});
+														
+	function executePush() {
+		Parse.Push.send({
+			where: installationQuery,
+			data: {
+				name: storeName,
+				id: storeId,
+				num_punches: numPunches,
+				action: "com.repunch.intent.PUNCH"
+			}
+		}, {
+			success: function() {
+				console.log("push was successful");
+				response.success("success");
+			},
+			error: function(error) {
+				response.error("error");
+			}
+		});
+	}
 });
  
 ////////////////////////////////////////////////////
@@ -203,7 +229,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     function proceedToPush(){
         console.log("PROCEED TO PUSH");
         Parse.Push.send({
-            where:installationQuery, 
+            where: installationQuery, 
             data: {
                 action: "com.repunch.intent.MESSAGE",
                 subject: request.params.subject,
