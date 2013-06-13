@@ -165,16 +165,15 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         }
 
         var u = users.pop();
+        var uq = new Parse.Query(Parse.User);
 
         // add message to the patron's ReceivedMessages relation
         // first we must get the user
         if (isObjectArray){
             console.log("ADD TO PATRON INBOX FOR " + u.get("username"));
-            var uq = new Parse.Query(Parse.User);
             uq.equalTo("username", u.get("username"));
         } else {
             console.log("ADD TO PATRON INBOX FOR " + username);
-            var uq = new Parse.Query(Parse.User);
             uq.equalTo("username", username);
         }
         uq.first().then(function(user){
