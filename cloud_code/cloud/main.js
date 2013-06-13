@@ -139,11 +139,38 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // note that we could also query the PatronStores in the Store 
     // relation instead of querying the PatronStore class itself.
     var Store = Parse.Object.extend("Store");
+    var Message = Parse.Object.extend("Message");
     var PatronStore = Parse.Object.extend("PatronStore");
+    var messageQuery = new Parse.Query(Message);
     var patronStoreQuery = new Parse.Query(PatronStore);
     var userQuery = new Parse.Query(Parse.User);
     var installationQuery = new Parse.Query(Parse.Installation);
     var filter = request.params.filter;
+
+    function addToPatronInbox(username) {
+        // add message to the patron's ReceivedMessages relation
+        // first we must get the user
+        userQuery.equalTo("username", username);
+        userQuery.find().then(function(user){
+            // then get the Patron pointed to by the user
+            patron = user.get("Patron");
+            patron.fetch({
+                success: function(patron){
+                    // get the Message object from the id in params
+                    messageQuery.get(request.params.message_id, {
+                      success: function(message) {
+                        // finally add the message to the patron's rel
+                        var rel = patron.relation("ReceivedMessages");
+                        rel.add(message);
+                        patron.save();
+                      }, error: function(object, error){
+                            console.log(error);
+                        }
+                    }); // end messageQuery
+                } // end success function
+            }); // end patron fetch
+        }); // end userQuery
+    }
    
     function continueWithPush() {
 
@@ -160,6 +187,10 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 
     // determine the userQuery
     if (filter === "one"){
+        addToPatronInbox(request.params.username);
+        // the below will proceed to excute while the userQuery
+        // above executes but it shouldn't matter
+
         // store replies to a feedback
         installationQuery.equalTo("username", 
                             request.params.username);
@@ -170,6 +201,13 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         userQuery.matchesKeyInQuery("Patron", "Patron",
                     patronStoreQuery);
         userQuery.select("username");
+
+        userQuery.find().then(function(users){
+            for (var i=0; i<users.length; i++){
+                addToPatronInbox(users[i].get("username"));
+            }
+        });// end userQuery
+
         // match the installation with the username in the 
         // userQuery results
         installationQuery.matchesKeyInQuery("username", "username",
