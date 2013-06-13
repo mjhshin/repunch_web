@@ -53,7 +53,11 @@ PAYPAL_MODE = "sandbox"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 'repunch.com', 'www.repunch.com']
+ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 
+'ec2-23-20-15-30.compute-1.amazonaws.com', 
+'repunch.com', 'www.repunch.com']
+# note that the first ec2 host is repunch dev.
+# The second 1 is the real repunch.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
