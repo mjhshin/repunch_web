@@ -3,7 +3,7 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
@@ -54,7 +54,7 @@ PAYPAL_MODE = "sandbox"
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 
-'ec2-23-20-15-30.compute-1.amazonaws.com', 
+'ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
 'repunch.com', 'www.repunch.com', 'vandolf.repunch.com']
 # note that the first ec2 host is repunch dev.
 # The second 1 is the real repunch.
@@ -103,6 +103,7 @@ STATIC_ROOT = FS_SITE_DIR+'/static'
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
+"""
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -112,6 +113,7 @@ STATICFILES_DIRS = (
     # os.getcwd() + '/static',
     # getcwd at aws ec2 returns '/' (the document root?)
 )
+"""
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -154,6 +156,7 @@ LOGIN_URL = '/manage/'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'repunch.wsgi.application'
 
+"""
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -161,11 +164,14 @@ TEMPLATE_DIRS = (
     FS_SITE_DIR+'/templates',
     # os.getcwd() + '/templates', 
 )
+"""
 
 if DEBUG:
-    ALLOWED_HOSTS += ('localhost', )
-    TEMPLATE_DIRS += (os.getcwd() + '/templates', )
-    STATICFILES_DIRS += (os.getcwd() + '/static', )
+    TEMPLATE_DIRS = (os.getcwd() + '/templates', )
+    STATICFILES_DIRS = (os.getcwd() + '/static', )
+else:
+    TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
+    STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
 
 AUTH_USER_MODEL = 'accounts.Account'
 
