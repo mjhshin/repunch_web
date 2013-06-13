@@ -148,15 +148,37 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var filter = request.params.filter;
     var message; // placeholder
 
-    function addToPatronInbox(username) {
+    function addToPatronsInbox(users, isObjectArray) {
+        if (users.length == 0 ){
+            // match the installation with the username in the 
+            // userQuery results
+            if (filter === "one"){
+                installationQuery.matchesKeyInQuery("username", 
+                                "username", userQuery);
+            } else {
+                installationQuery.equalTo("username", 
+                                request.params.username);
+            }
+            // all tasks are done. Push now.
+            proceedToPush();
+            return;
+        }
+
+        var u = users.pop();
+
         // add message to the patron's ReceivedMessages relation
         // first we must get the user
-        console.log("ADD TO PATRON INBOX FOR " + username);
-        var uq = new Parse.Query(Parse.User);
-        uq.equalTo("username", username);
+        if (isObjectArray){
+            console.log("ADD TO PATRON INBOX FOR " + u.get("username"));
+            var uq = new Parse.Query(Parse.User);
+            uq.equalTo("username", u.get("username"));
+        } else {
+            console.log("ADD TO PATRON INBOX FOR " + username);
+            var uq = new Parse.Query(Parse.User);
+            uq.equalTo("username", username);
+        }
         uq.first().then(function(user){
             // then get the Patron pointed to by the user
-            console.log("ADD TO PATRON INBOX FOR " + username + " 2nd.");
             var pt = user.get("Patron");
             console.log("NOW FETCHING PATRON FOR USER " + user.get("username"));
             pt.fetch({
@@ -166,6 +188,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                     // message obtained from the beginning (bottom)
                     rel.add(message);
                     pt.save();
+                    // chain method call
+                    addToPatronsInbox(users, isObjectArray);
                 }, // end success function
                 error: function(pt, error){
                     response.error(error);
@@ -213,13 +237,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 
         // determine the userQuery
         if (filter === "one"){
-            addToPatronInbox(request.params.username);
-            // the below will proceed to excute while the userQuery
-            // above executes but it shouldn't matter
-
-            // store replies to a feedback
-            installationQuery.equalTo("username", 
-                                request.params.username);
+            var arr = new Array(request.params.username);
+            addToPatronsInbox(arr, false);
         } else {
             // store sends a message
             patronStoreQuery.select("Patron");
@@ -230,17 +249,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 
             // adding relation to all patron's ReceivedMessages
             userQuery.find().then(function(users){
-                for (var i=0; i<users.length; i++){
-                    addToPatronInbox(users[i].get("username"));
-                }
-            }).then(function(){
-                // match the installation with the username in the 
-                // userQuery results
-                installationQuery.matchesKeyInQuery("username", 
-                                    "username", userQuery);
-                // all tasks are done. Push now.
-                proceedToPush();
-            });;// end userQuery
+                addToPatronsInbox(users, true);
+            });// end userQuery
         }// end else
 
     } // end continueWithPush();
