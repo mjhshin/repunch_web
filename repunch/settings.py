@@ -3,10 +3,10 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-FS_SITE_DIR = "/opt/bitnami/apps/repunch.com"
+FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -53,7 +53,7 @@ PAYPAL_MODE = "sandbox"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['stage.repunch.com', 'repunch.com', 'www.repunch.com']
+ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 'repunch.com', 'www.repunch.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -91,6 +91,8 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
+# Actually, this has been setup so that collectstatic does not have to 
+# be run. All static files are in /static for production and deployment.
 STATIC_ROOT = FS_SITE_DIR+'/static'
 
 # URL prefix for static files.
@@ -102,8 +104,9 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    #FS_SITE_DIR+"/static",
-    os.getcwd() + '/static',
+    FS_SITE_DIR+"/static",
+    # os.getcwd() + '/static',
+    # getcwd at aws ec2 returns '/' (the document root?)
 )
 
 # List of finder classes that know how to find static files in
@@ -152,8 +155,13 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     FS_SITE_DIR+'/templates',
-    os.getcwd() + '/templates', 
+    # os.getcwd() + '/templates', 
 )
+
+if DEBUG:
+    ALLOWED_HOSTS += ('localhost', )
+    TEMPLATE_DIRS += (os.getcwd() + '/templates', )
+    STATICFILES_DIRS += (os.getcwd() + '/static', )
 
 AUTH_USER_MODEL = 'accounts.Account'
 
