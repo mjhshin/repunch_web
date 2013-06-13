@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Script to setup the environment for any Django project 
+# onto AWS EC2.
+#
+# Works for Ubuntu/Debian Linux distros.
+# 
+
+PROJECT_NAME="Repunch"
+GIT_REPO="https://github.com/mjhshin/repunch_web.git"
+
+# install dependecies
+sudo apt-get install python-pip python-dev build-essential 
+sudo apt-get install git
+sudo apt-get install mysql-server mysql-client
+sudo apt-get install apache2
+sudo apt-get install libapache2-mod-python
+sudo apt-get install python-mysqldb
+sudo apt-get install libapache2-mod-wsgi
+
+sudo pip install Django
+sudo pip install -r requirements.txt
+
+mkdir $PROJECT_NAME
+cd $PROJECT_NAME
+git clone $GIT_REPO
+
