@@ -9,6 +9,9 @@
 PROJECT_NAME="Repunch"
 GIT_REPO="https://github.com/mjhshin/repunch_web.git"
 
+sudo mkdir $PROJECT_NAME
+cd $PROJECT_NAME
+
 # install dependecies
 sudo apt-get install python-pip python-dev build-essential 
 sudo apt-get install git
