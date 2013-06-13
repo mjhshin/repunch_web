@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+     ('Vandolf Estrellado', 'vandolf@repunch.com'),
 )
 
 MANAGERS = ADMINS
@@ -55,7 +55,7 @@ PAYPAL_MODE = "sandbox"
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 
 'ec2-23-20-15-30.compute-1.amazonaws.com', 
-'repunch.com', 'www.repunch.com']
+'repunch.com', 'www.repunch.com', 'vandolf.repunch.com']
 # note that the first ec2 host is repunch dev.
 # The second 1 is the real repunch.
 

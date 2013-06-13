@@ -1,0 +1,29 @@
+
+<VirtualHost *:80>
+        ServerAdmin ubuntu@ec2-54-224-39-200.compute-1.amazonaws.com
+        ServerName ec2-54-224-39-200.compute-1.amazonaws.com
+        DocumentRoot /
+
+        Alias  /static  /home/ubuntu/Repunch/repunch_web/static/
+        <Directory /home/ubuntu/Repunch/repunch_web/static>
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+        Alias  /media /home/ubuntu/Repunch/repunch_web/media/
+        <Directory /home/ubuntu/Repunch/repunch_web/media>
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+        WSGIScriptAlias / /home/ubuntu/Repunch/repunch_web/repunch/wsgi.py
+        <Directory /home/ubuntu/Repunch/repunch_web/repunch>
+        <Files wsgi.py>
+                Order allow,deny
+                Allow from all
+        </Files>
+        </Directory>
+        ErrorLog /var/log/apache2/error.log
+        LogLevel warn
+        CustomLog /var/log/apache2/access.log combined
+</VirtualHost>
