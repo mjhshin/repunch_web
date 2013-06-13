@@ -143,106 +143,130 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var PatronStore = Parse.Object.extend("PatronStore");
     var messageQuery = new Parse.Query(Message);
     var patronStoreQuery = new Parse.Query(PatronStore);
-    var userQuery = new Parse.Query(Parse.User);
     var installationQuery = new Parse.Query(Parse.Installation);
+    var userQuery = new Parse.Query(Parse.User);
     var filter = request.params.filter;
+    var message; // placeholder
 
     function addToPatronInbox(username) {
         // add message to the patron's ReceivedMessages relation
         // first we must get the user
-        userQuery.equalTo("username", username);
-        userQuery.find().then(function(user){
+        console.log("ADD TO PATRON INBOX FOR " + username);
+        var uq = new Parse.Query(Parse.User);
+        uq.equalTo("username", username);
+        uq.first().then(function(user){
             // then get the Patron pointed to by the user
-            patron = user.get("Patron");
-            patron.fetch({
-                success: function(patron){
-                    // get the Message object from the id in params
-                    messageQuery.get(request.params.message_id, {
-                      success: function(message) {
-                        // finally add the message to the patron's rel
-                        var rel = patron.relation("ReceivedMessages");
-                        rel.add(message);
-                        patron.save();
-                      }, error: function(object, error){
-                            console.log(error);
-                        }
-                    }); // end messageQuery
-                } // end success function
+            console.log("ADD TO PATRON INBOX FOR " + username + " 2nd.");
+            var pt = user.get("Patron");
+            console.log("NOW FETCHING PATRON FOR USER " + user.get("username"));
+            pt.fetch({
+                success: function(pt){
+                    console.log(pt.get("gender"));
+                    var rel = pt.relation("ReceivedMessages");
+                    // message obtained from the beginning (bottom)
+                    rel.add(message);
+                    pt.save();
+                }, // end success function
+                error: function(pt, error){
+                    response.error(error);
+                    console.log("ERROR IN FETCHING PATRON.");
+                    console.log(error);
+                }
             }); // end patron fetch
-        }); // end userQuery
+        }); // end uq 
     }
+
+    // class when all tasks are done
+    function proceedToPush(){
+        console.log("PROCEED TO PUSH");
+        Parse.Push.send({
+            where:installationQuery, 
+            data: {
+                action: "com.repunch.intent.MESSAGE",
+                subject: request.params.subject,
+                store_id: request.params.store_id,
+                store_name: request.params.store_name,
+                message_id: request.params.message_id,
+            }, 
+            }, {
+                success: function() {
+                    response.success("success");
+                },
+                error: function(error) {
+                    response.error("error");
+                }
+        }); // end Parse.Push
+    }// end proceedToPush
    
     function continueWithPush() {
+        console.log("CONTINUE WITH PUSH");
+        // get a subset of patrons
+        if (filter === "all"){
+            // nothing
+        } else if (filter === "idle") {     
+            patronStoreQuery.lessThan("updatedAt", 
+                new Date(request.params.idle_date) );
+        } else if (filter === "most_loyal") {
+            patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
+                request.params.min_punches);
+        }  
 
-    // get a subset of patrons
-    if (filter === "all"){
-        // nothing
-    } else if (filter === "idle") {     
-        patronStoreQuery.lessThan("updatedAt", 
-            new Date(request.params.idle_date) );
-    } else if (filter === "most_loyal") {
-        patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
-            request.params.min_punches);
-    }  
+        // determine the userQuery
+        if (filter === "one"){
+            addToPatronInbox(request.params.username);
+            // the below will proceed to excute while the userQuery
+            // above executes but it shouldn't matter
 
-    // determine the userQuery
-    if (filter === "one"){
-        addToPatronInbox(request.params.username);
-        // the below will proceed to excute while the userQuery
-        // above executes but it shouldn't matter
+            // store replies to a feedback
+            installationQuery.equalTo("username", 
+                                request.params.username);
+        } else {
+            // store sends a message
+            patronStoreQuery.select("Patron");
+            userQuery.equalTo("account_type", "patron");
+            userQuery.matchesKeyInQuery("Patron", "Patron",
+                        patronStoreQuery);
+            userQuery.select("username");
 
-        // store replies to a feedback
-        installationQuery.equalTo("username", 
-                            request.params.username);
-    } else {
-        // store sends a message
-        patronStoreQuery.select("Patron");
-        userQuery.equalTo("account_type", "patron");
-        userQuery.matchesKeyInQuery("Patron", "Patron",
-                    patronStoreQuery);
-        userQuery.select("username");
-
-        userQuery.find().then(function(users){
-            for (var i=0; i<users.length; i++){
-                addToPatronInbox(users[i].get("username"));
-            }
-        });// end userQuery
-
-        // match the installation with the username in the 
-        // userQuery results
-        installationQuery.matchesKeyInQuery("username", "username",
-                                                userQuery);
-    }
-
-    Parse.Push.send({
-        where:installationQuery, 
-        data: {
-            action: "com.repunch.intent.MESSAGE",
-            subject: request.params.subject,
-            store_id: request.params.store_id,
-            store_name: request.params.store_name,
-            message_id: request.params.message_id,
-        }, 
-        }, {
-            success: function() {
-                response.success("success");
-            },
-            error: function(error) {
-                response.error("error");
-            }
-    }); // end Parse.Push
+            // adding relation to all patron's ReceivedMessages
+            userQuery.find().then(function(users){
+                for (var i=0; i<users.length; i++){
+                    addToPatronInbox(users[i].get("username"));
+                }
+            }).then(function(){
+                // match the installation with the username in the 
+                // userQuery results
+                installationQuery.matchesKeyInQuery("username", 
+                                    "username", userQuery);
+                // all tasks are done. Push now.
+                proceedToPush();
+            });;// end userQuery
+        }// end else
 
     } // end continueWithPush();
 
+    console.log("STARTING SCRIPT");
+    // script actually START HERE
     var storeQuery = new Parse.Query(Store);
+    console.log("RUNNING STORE QUERY");
+    // first get the store
     storeQuery.get(request.params.store_id, {
       success: function(store) {
         patronStoreQuery.equalTo("Store", store);
-        continueWithPush();
+        // now get the message object
+        console.log("RUNNING MESSAGE QUERY");
+        messageQuery.get(request.params.message_id, {
+          success: function(msg) {
+            message = msg;
+            continueWithPush();
+          }, error: function(object, error){
+                console.log(error);
+            }
+        }); // end messageQuery
       }, error: function(object, error){
             console.log(error);
         }
-    });
+    });// end storeQuery
  
 }); // end Parse.Cloud.define
  
