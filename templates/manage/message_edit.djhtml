@@ -18,10 +18,20 @@
 		{% if limit_reached %}
 			<div class="notification">
 				<div>
-					This message cannot be sent because you have reached your maximum messages sent for this month. Please save as a draft or click on the "Upgrade Account" button to automatically upgrade your account and send the message.
-					<br/>
-					<a id="upgrade" class="button blue" style="margin-top: 10px;">Upgrade Account</a>
+				    {% if maxed_out %}
+					This message cannot be sent because you have reached your maximum messages sent for this month. 
+					You currently have the highest level of subscription. 
+					Please contact us for further support.<br/>
+					<a class="button blue" style="margin-top: 10px;"
+					    href="{% url 'messages_index' %}" >Okay</a>
 					<span style="clear: left; display: block;"></span>
+					{% else %}
+					This message cannot be sent because you have reached your maximum messages sent for this month. Click on the "Upgrade Account" button to upgrade your account to send more messages for this month.
+					<br/>
+					<a id="upgrade" class="button blue" style="margin-top: 10px;"
+					    href="{% url 'account_upgrade' %}" >Upgrade Account</a>
+					<span style="clear: left; display: block;"></span>
+					{% endif %}
 				</div>
 			</div>
 		{% else %}

@@ -3,19 +3,19 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
+from datetime import datetime
 from dateutil import parser
-import urllib, datetime
+import urllib
 
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
+from parse.apps.accounts import sub_type
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
-from django.db import connection
-connection.queries
 
 @login_required
 def index(request):
@@ -49,14 +49,13 @@ def edit(request, message_id):
     if request.method == 'POST':
         form = MessageForm(request.POST) 
         # check here if limit has been reached
-        start = datetime.now().replace(day=0, hour=0,
+        start = datetime.now().replace(day=1, hour=0,
                                     minute=0, second=0)
         subType = store.get('subscription').get('subscriptionType')
         num_sent = store.get('sentMessages', createdAt__gte=start,
                                 count=1, limit=0)
-        limit_reached = False
-        data['limit_reached'] = limit_reached
-
+        limit_reached = num_sent >= sub_type[subType]['max_messages']
+        
         if form.is_valid() and not limit_reached:
             if form.data.get('action')  == 'upgrade':
                 # TODO upgrade
@@ -116,7 +115,11 @@ def edit(request, message_id):
             cloud_call("retailer_message", params)
 
             return HttpResponseRedirect(message.get_absolute_url())
-
+        elif limit_reached and subType != 2:
+            data['limit_reached'] = limit_reached
+        elif limit_reached and subType == 2:
+            data['limit_reached'] = limit_reached
+            data['maxed_out'] = True
         else:
             data['error'] = "The form you submitted has errors."
     else:

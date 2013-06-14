@@ -111,8 +111,13 @@
     </script>
 
     <div class="form-options">
+        {% if update %}
 		<a onclick="submitSubscriptionForm('{% url 'account_update' %}'); return false;" class="button blue">Update</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
+		{% elif upgrade %}
+		<a onclick="submitSubscriptionForm('{% url 'account_upgrade' %}'); return false;" class="button blue">Upgrade</a>
+		<a href="{% url 'messages_index' %}" class="red">Back</a>
+		{% endif %}
 	</div>
 	</form>
 {% endblock %}

@@ -1,18 +1,5 @@
 $(document).ready(function(){
 	$('#send-now').click(function(){
-		$('#action').val('send');
-		$('#message-form').submit();
-		return false;
-	});
-	
-	$('#save-draft').click(function(){
-		$('#action').val('draft');
-		$('#message-form').submit();
-		return false;
-	});
-	
-	$('#upgrade').click(function(){
-		$('#action').val('upgrade');
 		$('#message-form').submit();
 		return false;
 	});

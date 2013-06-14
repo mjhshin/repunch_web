@@ -79,7 +79,7 @@ def refresh(request):
 
 @login_required
 def update(request):
-    data = {'account_nav': True}
+    data = {'account_nav': True, 'update':True}
     # I think that a copy is made here so any changes made to account
     # will not affect the account object in the session. maybe
     account = request.session['account']
@@ -121,7 +121,7 @@ def update(request):
 @login_required
 def upgrade(request):
     """ same as update expect this upgrades the subscriptionType """
-    data = {'account_nav': True}
+    data = {'account_nav': True, 'upgrade':True}
     # I think that a copy is made here so any changes made to account
     # will not affect the account object in the session. maybe
     account = request.session['account']
@@ -141,10 +141,9 @@ def upgrade(request):
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
-
             try:
                 subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv']);
+                                            form.data['cc_cvv'])
             except Exception as e:
                 form = SubscriptionForm(subscription.__dict__)
                 form.errors['__all__'] =\
