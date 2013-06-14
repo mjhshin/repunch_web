@@ -3,13 +3,27 @@
 
 {% block title %}Send New Message{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
-	<script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>
-	<script src="{% static "manage/js/message_edit.js" %}"></script>
+<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
+<script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>
+<script src="{% static "manage/js/message_edit.js" %}"></script>
+{# INIT THE SLIDER #}
+<script>
+$(document).ready(function(){
+    $( "#min_punches_slider" ).slider({
+        range: "max",
+        value: {{ mp_slider_value }},
+        min: {{ mp_slider_min }},
+        max: {{ mp_slider_max }},
+        slide: function( event, ui ) {
+        $( "#min_punches" ).val( ui.value );
+      }
+    });
+});
+</script>
 {% endblock %}
 
 
@@ -44,12 +58,20 @@
 		
 		<h2>Send New Message</h2>
 		    
-		<label for="send_to">Send to </label>
-        <select name="chosen_filter">
+		<label>Send to </label>
+        <select id="chosen_filter" name="chosen_filter">
             {% for filter in filters %}
             <option value="{{ filter.0 }}">{{ filter.1 }}</option>
             {% endfor %}
         </select>
+        
+        <span id="min_punches_span" >
+        <input type="text" id="min_punches" name="min_punches"
+            value={{ mp_slider_value }}
+            style="border: 0; color: #f6931f; font-weight: bold; width:40px;" />
+        <label id="min_punches_label">Select the minimum number punches a "loyal" customer has accumulated in his/her lifetime.</label>
+        <div id="min_punches_slider" ></div>
+        </span>
 	
 		{{ form.subject.errors }}
 		<label for="subject">Subject</label>

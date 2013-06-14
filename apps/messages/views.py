@@ -29,6 +29,9 @@ def index(request):
     data['feedback'] = store.get("receivedMessages", 
                             message_type=FEEDBACK)
     
+    if store.get("patronStores", count=1, limit=0):
+        data['has_patrons'] = True
+    
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
@@ -45,9 +48,21 @@ def edit(request, message_id):
 
     data = {'messages_nav': True, 'message_id': message_id,
         "filters": FILTERS}
+        
+    # 404 if no patrons
+    if not store.get("patronStores", count=1, limit=0):
+        raise Http404
+        
+    # for slider most_loyal min_punches
+    mp = store.get("patronStores", limit=1,
+        order="-all_time_punches")[0].get('all_time_punches')
+    data['mp_slider_value'] = int(mp*0.50)
+    data['mp_slider_min'] = int(mp*0.20)
+    data['mp_slider_max'] = int(mp*0.80)
     
     if request.method == 'POST':
         form = MessageForm(request.POST) 
+        print form.errors
         # check here if limit has been reached
         start = datetime.now().replace(day=1, hour=0,
                                     minute=0, second=0)
@@ -106,9 +121,9 @@ def edit(request, message_id):
 
             if msg_filter == "idle":
                 d = datetime.now() + relativedelta(days=-21)
-                params.update({idle_date:d.isoformat()})
+                params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
-                params.update({min_punches:\
+                params.update({"min_punches":\
                     request.POST['min_punches']})
 
             # push notification
@@ -120,6 +135,9 @@ def edit(request, message_id):
         elif limit_reached and subType == 2:
             data['limit_reached'] = limit_reached
             data['maxed_out'] = True
+        elif 'min_punches' in form.errors:
+            data['error'] = "Minimum punches must be a "+\
+                                "whole number."
         else:
             data['error'] = "The form you submitted has errors."
     else:
@@ -133,9 +151,9 @@ def edit(request, message_id):
             
             message = store.get("sentMessages", 
                     objectId=message_id)[0]
-            data['message'] = message
             form = MessageForm(message.__dict__)
-    
+            data['message'] = message
+            
     data['form'] = form
 
     return render(request, 'manage/message_edit.djhtml', data)

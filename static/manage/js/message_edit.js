@@ -22,4 +22,31 @@ $(document).ready(function(){
 	$( "#id_date_offer_expiration" ).datetimepicker({
 		timeFormat: "hh:mm tt"
 	});
+	
+	/* This is in the html so that instead of ajaxing the min and max
+	*  after page loads, the min and max are already provided at
+	*  the time the server renders the page.
+	// init the slider
+	$( "#min_punches_slider" ).slider({
+        range: "min",
+        value: 37,
+        min: 1,
+        max: 700,
+        slide: function( event, ui ) {
+        $( "#min_punches" ).val( ui.value );
+      }
+    });
+    */
+    
+    // span is hidden in the beginning
+    $( "#min_punches_span *" ).hide();
+	
+	$( "#chosen_filter" ).mouseup(function(){
+	    if ($(this).val() == "most_loyal"){
+	        $( "#min_punches_span *" ).fadeIn();
+	    } else {
+	        $( "#min_punches_span *" ).fadeOut();
+	    }
+	});
+	
 });

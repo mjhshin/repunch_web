@@ -12,12 +12,20 @@ class MessageForm(forms.Form):
     attach_offer = forms.BooleanField(required=False)
     offer_title = forms.CharField(max_length=75, required=False)
     date_offer_expiration = forms.DateTimeField(input_formats=['%m/%d/%Y %I:%M %p'], required=False)
+    min_punches = forms.CharField(max_length=7, required=False)
     
    
     def __init__(self, *args, **kwargs):   
         super(MessageForm, self).__init__(*args, **kwargs)
         self.fields['offer_title'].required = False
         self.fields['date_offer_expiration'].required = False
+        
+    def clean_min_punches(self):
+        try:
+            int(self.cleaned_data['min_punches'])
+        except ValueError:
+            raise forms.ValidationError('Punches must be"+\
+                                    " a whole number')
         
     def clean_offer_title(self):
         title = self.cleaned_data['offer_title']
