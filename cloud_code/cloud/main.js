@@ -37,13 +37,10 @@ Parse.Cloud.define("assign_punch_code", function(request, response) {
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("punch", function(request, response) {
-    var userQuery = new Parse.Query(Parse.Installation);
-    userQuery.equalTo('punch_code', request.params.punch_code);
-				   
-	var punchCode = request.params.punch_code;
-	var numPunches = reuqest.params.num_punches;
-	var storeId = request.params.retailer_id;
-	var storeName = request.params.retailer_name;
+    var punchCode = request.params.punch_code;
+	var numPunches = request.params.num_punches;
+	var storeId = request.params.store_id;
+	var storeName = request.params.store_name;
    
 	var Patron = Parse.Object.extend("Patron");
 	var PatronStore = Parse.Object.extend("PatronStore");
@@ -58,43 +55,16 @@ Parse.Cloud.define("punch", function(request, response) {
 	storeQuery.equalTo("objectId", storeId);
 	patronStoreQuery.matchesQuery("Patron", patronQuery);
 	patronStoreQuery.matchesQuery("Store", storeQuery);
+	patronStoreQuery.include("Patron");
+	patronStoreQuery.include("Store");
 	installationQuery.equalTo("punch_code", punchCode);
 				   
 	patronStoreQuery.first({
 		success: function(patronStoreResult) {
-			if(object == null) {//customer's first punch at this store, need new PatronStore.
-				console.log("customer's first punch at this store, need new PatronStore.");
-				var patronStore = new PatronStore();
-				patronStore.set("punch_count", numPunches);
-				patronStore.set("all_time_punches", numPunches);
-										  
-				patronQuery.first().then(function(patronResult) {
-					patronStore.set("Patron", patronResult);
-					return storeQuery.first();
-				}).then(function(storeResult) {
-					patronStore.set("Store", storeResult);
-					patronStore.save().then(function(obj) {
-						// the object was saved successfully.
-						console.log("PatronStore save was successful.");
-						executePush();
-					}, function(error) {
-						console.log("PatronStore save failed.");
-						response.error("error");
-					});
-				});
-				
+			if(patronStoreResult == null) {//customer's first punch at this store, need new PatronStore.
+				addPatronStore();				
 			} else {
-				console.log("updating existing PatronStore");
-				patronStoreResult.increment("punch_count", numPunches);
-				patronStoreResult.increment("all_time_punches", numPunches);
-				patronStoreResult.save().then(function(obj) {
-					// the object was saved successfully.
-					console.log("PatronStore save was successful.");
-					executePush();
-				}, function(error) {
-					console.log("PatronStore save failed.");
-					response.error("error");
-				});
+				updatePatronStore(patronStoreResult);
 			}
 		},
 		error: function(error) {
@@ -102,7 +72,43 @@ Parse.Cloud.define("punch", function(request, response) {
 			response.error("error");
 		}
 	});
-														
+	
+	function addPatronStore() {
+		console.log("customer's first punch at this store, adding new PatronStore.");
+		var patronStore = new PatronStore();
+		patronStore.set("punch_count", numPunches);
+		patronStore.set("all_time_punches", numPunches);
+								  
+		patronQuery.first().then(function(patronResult) {
+			patronStore.set("Patron", patronResult);
+			return storeQuery.first();
+		}).then(function(storeResult) {
+			patronStore.set("Store", storeResult);
+			patronStore.save().then(function(obj) {
+				console.log("PatronStore save was successful.");
+				executePush();
+				addPunchData(obj);
+			}, function(error) {
+				console.log("PatronStore save failed.");
+				response.error("error");
+			});
+		});
+	}
+	
+	function updatePatronStore(patronStoreResult) {
+		console.log("updating existing PatronStore");
+		patronStoreResult.increment("punch_count", numPunches);
+		patronStoreResult.increment("all_time_punches", numPunches);
+		patronStoreResult.save().then(function(obj) {
+			console.log("PatronStore save was successful.");
+			executePush();
+			addPunchData(obj);
+		}, function(error) {
+			console.log("PatronStore save failed.");
+			response.error("error");
+		});
+	}
+	
 	function executePush() {
 		Parse.Push.send({
 			where: installationQuery,
@@ -122,6 +128,24 @@ Parse.Cloud.define("punch", function(request, response) {
 			}
 		});
 	}
+	
+	function addPunchData(patronStore) {
+		var Punch = Parse.Object.extend("Punch");
+		var punch = new Punch();
+		var store = new Store();
+		
+		punch.set("Patron", patronStore.get("Patron"));
+		punch.set("punches", numPunches);
+		punch.save().then(function(obj) {
+			console.log("Punch save was successful.");
+			store = patronStore.get("Store");
+			store.set("Punches", obj);
+			store.save();
+		}, function(error) {
+			console.log("Punch save failed.");
+		});
+	}
+
 });
  
 ////////////////////////////////////////////////////
