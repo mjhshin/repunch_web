@@ -48,7 +48,12 @@ def edit(request, message_id):
     
     if request.method == 'POST':
         form = MessageForm(request.POST) 
-        # check here if limit has been reached TODO
+        # check here if limit has been reached
+        start = datetime.now().replace(day=0, hour=0,
+                                    minute=0, second=0)
+        subType = store.get('subscription').get('subscriptionType')
+        num_sent = store.get('sentMessages', createdAt__gte=start,
+                                count=1, limit=0)
         limit_reached = False
         data['limit_reached'] = limit_reached
 
@@ -108,7 +113,7 @@ def edit(request, message_id):
                     request.POST['min_punches']})
 
             # push notification
-            print cloud_call("retailer_message", params)
+            cloud_call("retailer_message", params)
 
             return HttpResponseRedirect(message.get_absolute_url())
 
@@ -229,7 +234,7 @@ def feedback_reply(request, feedback_id):
             feedback.update()
 
             # push notification
-            print cloud_call("retailer_message", {
+            cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":message.get('subject'),

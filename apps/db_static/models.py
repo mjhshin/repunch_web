@@ -7,4 +7,6 @@ class Category(models.Model):
     # multiple names may have same aliases
     alias = models.CharField(max_length=100, default='')
 
+    def __unicode__(self):
+        return self.name
     

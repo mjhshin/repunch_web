@@ -149,6 +149,10 @@ def delete(request, reward_id):
 
 @login_required
 def avatar(request, reward_id):
+    """
+    Unused at the moment
+    """
+    """
     data = {}
     account = request.session['account']
     store = account.get('store')
@@ -172,3 +176,5 @@ def avatar(request, reward_id):
     data['form'] = form
     data['url'] = reverse('reward_avatar', args=[reward_id])
     return render(request, 'manage/avatar_upload.djhtml', data)
+    """
+    raise  Http404

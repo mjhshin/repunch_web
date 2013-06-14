@@ -48,7 +48,7 @@
 
                     <div id="categories-box" class="ui-widget">
                           <label for="categories">Categories (limit of 2)</label>
-                          <input id="categories" />
+                          <input id="categories" name="categories" />
                     </div>
 					
 					{{ store_form.street.errors }}

@@ -61,11 +61,16 @@ def sign_up(request):
             store = Store(**postDict)
             store.store_timezone = tz.zone
             store.Subscription = subscription.objectId
-            # categories need to be properly formatted 
-            # from "sunny beach,sun dawn" TODO
-            # to [{alias:"sunny", name:"sunny beach"}...]
-            # store.categories = categories
             store.punches_facebook = 0
+            store.categories = []
+            names = request.POST.get("categories")
+            if names:
+                for name in names.split(",")[:-1]:
+                    alias = Category.objects.filter(name__iexact=\
+                                                    name)[0].alias
+                    store.categories.append({
+                        "alias":alias,
+                        "name":name })
             store.create()    
 
             # create settings
@@ -135,31 +140,14 @@ def categories(request):
     autocompletion in json format """
     # term is the key in request.GET
     if request.method == "GET" or request.is_ajax():
-        categories = Category.objects.filter(name__startswith=\
-                        request.GET['term'])[:6]
+        categories = Category.objects.filter(name__istartswith=\
+                        request.GET['term'].strip())[:8]
+                        
         data = []
-        for each in categories:
-            data.append(name)
+        for cat in categories:
+            data.append(cat.name)
 
-        # TODO remove hen data has been added
-        data = [ ("Amateur Sports Teams", 'amateursportsteams'),
-            ("Amusement Parks", 'amusementparks'),
-            ("Aquariums", 'aquariums'),
-            ('Archery', 'archery'),
-            ('Badminton', 'badminton'),
-            ('Beaches', 'beaches'),
-            ('Bike Rentals', 'bikerentals'),
-            ('Boating', 'boating'),
-            ('Bowling', 'bowling'),
-            ('Climbing', 'climbing'),
-            ('Disc Golf', 'discgolf'),
-            ('Diving', 'diving') ]
-        d = []
-        for each in data:
-            d.append(each[0])
-        # -------------------
-
-        return HttpResponse(json.dumps(d), 
+        return HttpResponse(json.dumps(data), 
                     content_type="application/json")
     else:
         return HttpResponse('')

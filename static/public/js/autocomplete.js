@@ -65,7 +65,7 @@ $(document).ready(function() {
 
         // clear the input field
         $( "#categories" ).val(" ");
-
+        return false;
       }, 
     });
 
@@ -76,7 +76,6 @@ $(document).ready(function() {
             cats = cats + $(this).text() + ',';
         });
         $( "#categories" ).val(cats);
-        alert($( "#categories" ).val());
         return true;
     });
 

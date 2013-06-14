@@ -19,11 +19,10 @@ from libs.repunch import rputils
 def index(request):
     data = {'employees_nav': True}
     account = request.session['account']
+    store = account.get("store")
     
-    data['employees'] = Employee.objects().filter(Store=\
-                        account.get('Store'), status=APPROVED)
-    data['pending'] = Employee.objects().filter(Store=\
-                        account.get('Store'), status=PENDING)
+    data['employees'] = store.get("employees", status=APPROVED)
+    data['pending'] = store.get("employees", status=PENDING)
     
     data['show_pending'] = (request.GET.get("show_pending") is not None); 
     
@@ -40,8 +39,7 @@ def edit(request, employee_id):
     data = {'employees_nav': True, 'employee_id': employee_id}
     
     #need to make sure this reward really belongs to this store
-    employee = Employee.objects().get(Store=store.objectId,
-                    objectId=employee_id)
+    employee = store.get("employees", objectId=employee_id)[0]
     acc = Account.objects().get(Employee=employee.objectId)
     if not employee or not acc:
         raise Http404
@@ -74,8 +72,7 @@ def delete(request, employee_id):
     store = request.session['account'].get('store')
 
     #need to make sure this reward really belongs to this store
-    employee = Employee.objects().get(Store=store.objectId,
-                    objectId=employee_id)
+    employee = store.get("employees", objectId=employee_id)[0]
     if not employee:
         raise Http404
 
@@ -90,8 +87,7 @@ def approve(request, employee_id):
     store = request.session['account'].get('store')
 
     #need to make sure this reward really belongs to this store
-    employee = Employee.objects().get(Store=store.objectId,
-                    objectId=employee_id)
+    employee = store.get("employees", objectId=employee_id)[0]
     if not employee:
         raise Http404
     
@@ -106,8 +102,7 @@ def deny(request, employee_id):
     store = request.session['account'].get('store')
 
     #need to make sure this reward really belongs to this store
-    employee = Employee.objects().get(Store=store.objectId,
-                    objectId=employee_id)
+    employee = store.get("employees", objectId=employee_id)[0]
     if not employee:
         raise Http404
     
@@ -118,41 +113,12 @@ def deny(request, employee_id):
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
 @login_required
-def avatar(request, employee_id):
-    employee_id = int(employee_id)
-    data = {}
-    employee = None
-    store = request.session['account'].store
-    
-    # need to make sure this reward really belongs to this store
-    if(employee_id > 0):
-        try:
-            employee = Employee.objects.filter(store=store.id).get(id=employee_id)
-        except Employee.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-    
-    if request.method == 'POST': # If the form has been submitted...
-        form = EmployeeAvatarForm(request.POST, request.FILES, instance=employee) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            form.save()
-            data['success'] = True
-    else:
-        form = EmployeeAvatarForm();
-    
-    data['form'] = form
-    data['url'] = reverse('employee_avatar', args=[employee_id])
-    return render(request, 'manage/avatar_upload.djhtml', data)
-
-@login_required
 def punches(request, employee_id):
     store = request.session['account'].get('store')
     data = {'employee_id': employee_id}
 
     # make sure that this employee belongs to this store
-    employee = Employee.objects().get(Store=\
-            store.objectId, objectId=employee_id)
+    employee = store.get("employees", objectId=employee_id)[0]
     if not employee:
         raise Http404
     
@@ -232,5 +198,37 @@ def graph(request):
 
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
 
-
+@login_required
+def avatar(request, employee_id):
+    """
+    Unused at the moment.
+    """
+    """
+    employee_id = int(employee_id)
+    data = {}
+    employee = None
+    store = request.session['account'].store
+    
+    # need to make sure this reward really belongs to this store
+    if(employee_id > 0):
+        try:
+            employee = Employee.objects.filter(store=store.id).get(id=employee_id)
+        except Employee.DoesNotExist:
+            raise Http404
+    else:
+        raise Http404
+    
+    if request.method == 'POST': # If the form has been submitted...
+        form = EmployeeAvatarForm(request.POST, request.FILES, instance=employee) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            form.save()
+            data['success'] = True
+    else:
+        form = EmployeeAvatarForm();
+    
+    data['form'] = form
+    data['url'] = reverse('employee_avatar', args=[employee_id])
+    return render(request, 'manage/avatar_upload.djhtml', data)
+    """
+    raise Http404
 

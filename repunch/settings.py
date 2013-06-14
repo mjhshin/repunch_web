@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
 
 ADMINS = (
-     ('Vandolf Estrellado', 'vandolf@repunch.com'),
+    # ('Vandolf Estrellado', 'vandolf@repunch.com'),
 )
 
 MANAGERS = ADMINS
