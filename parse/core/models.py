@@ -354,7 +354,7 @@ class ParseObject(object):
                 attr[1:] + "_" in self.__dict__ and\
                 'count' in constraints):
                 return self.__dict__.get(attr)
-
+                
         # Pointer cache
         if attr[0].islower() and\
             self.__dict__.get(attr[0].upper() + attr[1:]):
@@ -417,13 +417,18 @@ class ParseObject(object):
             if 'results' in res and res['results']:
                 setattr(self, attr, 
                     parser.parse(res.get('results')[0].get(attr)) )
-        # File type avatar
-        elif attr.endswith("_avatar_url") and attr in self.__dict__:
-            res = parse("GET", self.path(), query={"keys":attr,
+        # File types avatar
+        elif attr.endswith("_avatar_url") and\
+            attr.replace("_url", "") in self.__dict__:
+            res = parse("GET", self.path(), query={"keys":\
+                    attr.replace("_url",""),
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
                 setattr(self, attr, res['results'][0].get(\
-                    attr.split("_url")[0]).get('url'))
+                    attr.replace("_url", "")).get('url'))
+                setattr(self, attr.replace("_url",""), 
+                    res['results'][0].get(\
+                    attr.replace("_url", "")).get('name'))
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,

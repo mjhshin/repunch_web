@@ -55,7 +55,8 @@ def edit(request):
 def hours_preview(request):
     store = request.session['account'].get('store')
     
-    print request.GET # TODO
+    for key, value in request.GET.dict().iteritems():
+        print key, value # TODO
 
     return HttpResponse(HoursInterpreter([ Hours(days=["1","2","3"], open=datetime.now(), close=datetime.now(), list_order=1) ]).readable(), content_type="text/html")
     
