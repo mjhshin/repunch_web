@@ -46,9 +46,9 @@ REST_CONNECTION_META = {
 
 USER_CLASS = "Account"
 
-# PAYPAL
-PAYPAL_CLIENT_ID = "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM"
-PAYPAL_CLIENT_SECRET = "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
+# PAYPAL SANDBOX credentials need to use LIVE for the real thing
+PAYPAL_CLIENT_ID = "AaRn0BC74DY7UloGyRv8DBt8VmfK2QpDuTqQF_LYVTpejKftwlUCueD3jM7R"
+PAYPAL_CLIENT_SECRET = "ELBn1BAQJOfiELEr04BA5NQieEpUe6MjT_dbSt0Vu0lA-8iuvefJfH8tUJPX"
 PAYPAL_MODE = "sandbox"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False

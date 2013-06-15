@@ -99,14 +99,12 @@
 			{{ form.store_description }}
 		</div>
 		
-        {% comment %}
 		{{ hours_formset.management_form }}
 		{{ hours_formset.non_form_errors }}
-        {% endcomment %}
 		
 		<div class="input-container clearheight" style="width: 650px;">
 			<label>Hours</label>
-			{% for hform in None %} {# TODO for hform in hours_formset #}
+			{% for hform in hours_formset %}
 				<ul class="hours-form django-form" id="{{ hform.prefix }}-row">
 					{{ hform.id }}
 					<input type="hidden" name="{{ hform.store.html_name }}" id="{{ hform.store.auto_id }}" value="{{ store.id }}" />

@@ -23,9 +23,9 @@ def employees_pending(store):
 
 @register.simple_tag
 def hours(store):
-    #return HoursInterpreter(hours=\
-    #    Hours.objects().filter(Store=store.objectId)).readable()   
-    return None
+    # get the hours from the store TODO
+    hours = []
+    return HoursInterpreter(hours=hours).readable()  
 
 @register.simple_tag
 def time_selector(fieldid, timestamp):

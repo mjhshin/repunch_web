@@ -4,11 +4,12 @@ from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 
+from apps.stores.models import Store as dStore, Hours as dHours
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 
 from parse.utils import delete_file, create_png
-from parse.apps.stores.models import Store, Hours
+from parse.apps.stores.models import Store
 from parse.auth.decorators import login_required
 
 @login_required
@@ -27,7 +28,18 @@ def edit(request):
     data = {'account_nav': True}
     account = request.session['account']
     
+    HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
+    
+    # TODO construct dStore with store hrs
+    dstore_inst = dStore()
+    
+    for each in request.POST.getlist('hours-2-days'):
+        print each # TODO
+            
     if request.method == 'POST': 
+        formset = HoursFormSet(request.POST, prefix='hours',
+            instance=dstore_inst) 
+            
         form = StoreForm(request.POST)
         if form.is_valid(): 
             store = Store(**account.get("store").__dict__)
@@ -45,9 +57,11 @@ def edit(request):
     else:
         form = StoreForm(account.get("store").__dict__)
         form.data['email'] = account.get('email')
+        formset = HoursFormSet(prefix='hours', 
+                            instance=dstore_inst)
 
-    
     data['form'] = form
+    data['hours_formset'] = formset
 
     return render(request, 'manage/store_edit.djhtml', data)
 
@@ -55,10 +69,18 @@ def edit(request):
 def hours_preview(request):
     store = request.session['account'].get('store')
     
-    for key, value in request.GET.dict().iteritems():
-        print key, value # TODO
-
-    return HttpResponse(HoursInterpreter([ Hours(days=["1","2","3"], open=datetime.now(), close=datetime.now(), list_order=1) ]).readable(), content_type="text/html")
+    HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
+    
+    hours = []
+    formset = HoursFormSet(request.GET, prefix='hours', 
+                            instance=dStore())
+    if formset.is_valid():
+        for form in formset:
+            if(not 'DELETE' in form.changed_data):
+                hours.append(form.instance)
+    
+    return HttpResponse(HoursInterpreter(hours).readable(), 
+                        content_type="text/html")
     
     
 @login_required

@@ -48,7 +48,6 @@ def sign_up(request):
            subscription_form.is_valid():
             postDict = request.POST.dict()
 
-            # TODO: need to make this transactional
             # create subscription
             subscription = Subscription(**postDict)
             subscription.subscriptionType = 0

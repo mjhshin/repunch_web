@@ -87,7 +87,6 @@ def update(request):
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST) 
-
         if form.is_valid():       
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
@@ -115,6 +114,9 @@ def update(request):
     else:
         form = SubscriptionForm(subscription.__dict__)
     
+    # add some asterisk to cc_number
+    form.data['cc_number'] = "*" * 12 +\
+            form.data.get('cc_number')[-4:]
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
 
@@ -162,5 +164,8 @@ def upgrade(request):
     else:
         form = SubscriptionForm(subscription.__dict__)
     
+    # add some asterisk to cc_number
+    form.data['cc_number'] = "*" * 12 +\
+            form.data.get('cc_number')[-4:]
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)

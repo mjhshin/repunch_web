@@ -6,7 +6,19 @@ $(document).ready(function(){
 	$('ul.hours-form li.days div').click(function(event){
 		$this = $(this);
 		
-		$this.toggleClass('active');
+		if ($this.hasClass('active')){
+		    $this.removeClass('active');
+		} else {
+		    // can only add active class if no other row of the same
+		    // column is active. use the nth child selector!
+		    var colNum = $this.attr('id');
+		    colNum = colNum.charAt(colNum.length - 1);
+		    colNum = new String(new Number(colNum) + 1);
+		    // remove active from all the rows of the same column
+		    $( "ul.hours-form li.days div:nth-child(" +
+		        colNum + ").active" ).removeClass('active');
+		    $this.addClass('active');
+		}
 		
 		hoursPreview();
 	});

@@ -5,7 +5,8 @@ from datetime import datetime
 from importlib import import_module
 import paypalrestsdk
 
-from parse.apps.accounts import ACTIVE
+from parse.utils import parse
+from parse.apps.accounts import ACTIVE, sub_type
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
 PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
@@ -115,6 +116,7 @@ class Subscription(ParseObject):
         self.subscriptionType = data.get('subscriptionType', 0)
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
+        # only store last 4 digits
         self.cc_number = data.get('cc_number')
         self.cc_expiration_month = data.get('cc_expiration_month')
         self.cc_expiration_year = data.get('cc_expiration_year')
@@ -123,10 +125,44 @@ class Subscription(ParseObject):
         self.state = data.get('state')
         self.zip = data.get('zip')
         self.country = data.get('country')
+        # ppid only thin required to save
         self.ppid = data.get('ppid')
         self.ppvalid = data.get('ppvalid')
 
         super(Subscription, self).__init__(False, **data)
+        
+    def _trim_cc_number(self):
+        """ make sure to call this before saving this object """
+        if self.cc_number and len(self.cc_number) > 4:
+            self.cc_number = self.cc_number[-4:]
+        
+    def update(self):
+        """ 
+        Override to trim the cc_number before storing
+        """
+        # get the formated data to be put in the request
+        data = self._get_formatted_data()
+        self._trim_cc_number()
+
+        res = parse("PUT", self.path() + "/" + self.objectId, data)
+        if res and "error" not in res:
+            self.update_locally(res, True)
+            return True
+
+        return False
+
+    def create(self):
+        """ 
+        Override to trim the cc_number before storing
+        """
+        data = self._get_formatted_data()
+        self._trim_cc_number()
+        res = parse('POST', self.path(), data)
+        if res and "error" not in res:
+            self.update_locally(res, True)
+            return True
+        
+        return False
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """
@@ -207,12 +243,9 @@ class Subscription(ParseObject):
             invoice.create()
             return invoice
         else:
-            print "Error while creating payment:"
             # TODO Might want to charge curtomer 1 dollar to verify
             # account if store_cc fails to do so
-            raise Exception("Something went wrong, "+\
-                            "please make sure that you have the"+\
-                            " correct credit card information.")
+            raise Exception(payment.error)
 		
         return None
 
@@ -231,22 +264,6 @@ class Settings(ParseObject):
     def get_class(self, className):
         if className == "Store":
             return Store
-
-class Hours(object):
-    """
-    This is not an actual class in the database at Parse.
-    This class is simply for interfacing with the HoursInterpreter.
-
-    days = rpforms.MultiSelectField(max_length=250, blank=True, choices=DAYS)
-	open = models.TimeField()
-	close = models.TimeField()
-	list_order = models.IntegerField(default=0)
-    """
-    def __init__(self, days, open, close, list_order):
-        self.days = days
-        self.open = open
-        self.close = close
-        self.list_order = list_order
 
 """
 class SubscriptionType(ParseObject):
