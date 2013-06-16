@@ -48,7 +48,7 @@ def edit(request):
         ind += 1
         key = "hours-" + str(ind) + "-days"
         
-    # fake a store to construct HoursFormset
+    # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
             
     if request.method == 'POST': 
@@ -77,12 +77,13 @@ def edit(request):
         hours_map = {}
         # group up the days that aare in the same row
         # also need to shift days frm 0-6 to 1-7
-        for hour in account.get('store').get("hours"):
-            key = (hour['close_time'], hour['open_time'])
-            if key in hours_map:
-                hours_map[key].append(unicode(hour['day']+1))
-            else:
-                hours_map[key] = [unicode(hour['day']+1)]
+        if account.get('store').get("hours"):
+            for hour in account.get('store').get("hours"):
+                key = (hour['close_time'], hour['open_time'])
+                if key in hours_map:
+                    hours_map[key].append(unicode(hour['day']+1))
+                else:
+                    hours_map[key] = [unicode(hour['day']+1)]
                 
         # create the formset
         HoursFormSet = inlineformset_factory(dStore, dHours,

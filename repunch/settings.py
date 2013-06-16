@@ -147,6 +147,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
+    # https://docs.djangoproject.com/en/1.5/ref/clickjacking/
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -202,6 +203,19 @@ INSTALLED_APPS = (
     'django_extensions',
 )
 
+# Also see Cache arguments for extra options
+# https://docs.djangoproject.com/en/1.5/topics/cache/#cache-arguments
+# Dont forget to install memcached service and run a daemon!
+# Also need the python-memcached module installed.
+CACHES = {
+    'default': {
+        'BACKEND':\
+            'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211', # can be a list!
+        'TIMEOUT': 900, # 15 mins
+    }
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
