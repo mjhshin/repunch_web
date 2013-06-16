@@ -37,9 +37,9 @@ def edit(request):
         if days:
             # format time from 10:00:00 to 1000
             open_time = request.POST["hours-" + str(ind) +\
-                        "-open"].replace(":", "")[:4]
+                        "-open"].replace(":", "").zfill(6)[:4]
             close_time = request.POST["hours-" + str(ind) +\
-                        "-close"].replace(":", "")[:4]
+                        "-close"].replace(":", "").zfill(6)[:4]
             for day in days:
                 hours.append({
                     "day":int(day)-1, # days are from 0 to 6

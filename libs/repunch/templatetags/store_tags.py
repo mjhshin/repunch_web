@@ -35,9 +35,9 @@ def hours(store):
         else:
             hours_map[key] = [hour['day']]
     for i, key in enumerate(hours_map.iterkeys()):
-        hours.append(Hours(days=[str(d) for d in hours_map[key]],
-                open=datetime.datetime.strptime(key[0], "%H%M"),
-                close=datetime.datetime.strptime(key[1], "%H%M"),
+        hours.append(Hours(days=[str(d+1) for d in hours_map[key]],
+                open=datetime.datetime.strptime(key[1], "%H%M"),
+                close=datetime.datetime.strptime(key[0], "%H%M"),
                 list_order=i+1))
             
     return HoursInterpreter(hours=hours).readable()  
