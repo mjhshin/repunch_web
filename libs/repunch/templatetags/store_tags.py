@@ -3,6 +3,7 @@ import datetime
 
 from libs.repunch.rphours_util import HoursInterpreter
 
+from apps.stores.models import Hours
 from parse.apps.messages import FEEDBACK
 from parse.apps.messages.models import Message
 from parse.apps.employees import PENDING
@@ -23,8 +24,22 @@ def employees_pending(store):
 
 @register.simple_tag
 def hours(store):
-    # get the hours from the store TODO
-    hours = []
+    """ 
+    build the list of hours in proper format to render in template
+    """
+    hours_map, hours = {}, []
+    for hour in store.get("hours"):
+        key = (hour['close_time'], hour['open_time'])
+        if key in hours_map:
+            hours_map[key].append(hour['day'])
+        else:
+            hours_map[key] = [hour['day']]
+    for i, key in enumerate(hours_map.iterkeys()):
+        hours.append(Hours(days=[str(d) for d in hours_map[key]],
+                open=datetime.datetime.strptime(key[0], "%H%M"),
+                close=datetime.datetime.strptime(key[1], "%H%M"),
+                list_order=i+1))
+            
     return HoursInterpreter(hours=hours).readable()  
 
 @register.simple_tag

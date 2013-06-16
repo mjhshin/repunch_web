@@ -58,8 +58,9 @@ SHORT_DAYS = ((1, 'Sun'),
         (7, 'Sat'))
 
 class Hours(models.Model):	
-	store = models.ForeignKey(Store, blank=True)
-	days = rpforms.MultiSelectField(max_length=250, blank=True, choices=DAYS)
+	store = models.ForeignKey(Store, blank=True, null=True)
+	days = rpforms.MultiSelectField(max_length=250, blank=True, 
+	                            choices=DAYS)
 	open = models.TimeField()
 	close = models.TimeField()
 	list_order = models.IntegerField(default=0)

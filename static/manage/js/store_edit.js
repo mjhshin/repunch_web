@@ -34,6 +34,11 @@ $(document).ready(function(){
 	$('ul.hours-form li.buttons div.add').click(function(event){
 		$this = $(this);
 		
+		// only add up to 7
+		if ($('ul.hours-form').length > 7){
+		    return;
+		}
+		
 		var id = $this.attr('id');
 		var prefix = id.substring(0, id.length-4);
 		
