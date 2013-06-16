@@ -69,7 +69,7 @@ class Store(ParseObject):
 
         self.Punches_ = "Punch"
         self.PatronStores_ = "PatronStore"
-        self.Invoice_ = "Invoice"
+        self.Invoices_ = "Invoice"
         self.Employees_ = "Employee"
         self.FacebookPosts_ = "FacebookPost"
         self.SentMessages_ = "Message"
@@ -118,8 +118,7 @@ class Subscription(ParseObject):
         self.last_name = data.get('last_name')
         # only store last 4 digits
         self.cc_number = data.get('cc_number')
-        self.cc_expiration_month = data.get('cc_expiration_month')
-        self.cc_expiration_year = data.get('cc_expiration_year')
+        self.date_cc_expiration = data.get('date_cc_expiration')
         self.address = data.get('address')
         self.city = data.get('city')
         self.state = data.get('state')
@@ -127,7 +126,7 @@ class Subscription(ParseObject):
         self.country = data.get('country')
         # ppid only thin required to save
         self.ppid = data.get('ppid')
-        self.ppvalid = data.get('ppvalid')
+        self.date_ppvalid = data.get('date_ppvalid')
 
         super(Subscription, self).__init__(False, **data)
         
@@ -176,8 +175,8 @@ class Subscription(ParseObject):
 	           # used to fund a payment.
 	           "type": get_cc_type(cc_number),
 	           "number": cc_number,
-	           "expire_month": self.cc_expiration_month,
-	           "expire_year": self.cc_expiration_year,
+	           "expire_month": self.date_cc_expiration.month,
+	           "expire_year": self.date_cc_expiration.year,
 	           "cvv2": cvv,
 	           "first_name": self.first_name,
 	           "last_name": self.last_name,
@@ -198,7 +197,9 @@ class Subscription(ParseObject):
 		# in the PayPal vault.
         if credit_card.create():
             self.ppid = credit_card.id
-            self.ppvalid = credit_card.valid_until[:10]
+            self.date_ppvalid =\
+                datetime.strptime(credit_card.valid_until[:10], 
+                "%Y-%m-%d")
             self.update()
             return True
         else:
@@ -211,7 +212,14 @@ class Subscription(ParseObject):
         return False
         
 
-    def charge_cc(self):
+    def charge_cc(self, total, description):
+        """
+        For charging for monthly non-free membership fees,
+        total: sub_type[self.get('subscriptionType')].\
+                                                get('monthly_cost')
+        description: "Recurring monthly subscription "+\
+                        from repunch.com." 
+        """
         paypalrestsdk.configure(mode=PAYPAL_MODE, 
                             client_id=PAYPAL_CLIENT_ID,
                             client_secret=PAYPAL_CLIENT_SECRET)
@@ -225,22 +233,21 @@ class Subscription(ParseObject):
 
             "transactions": [{
                 "amount": {
-              		"total": sub_type[self.get('subscriptionType')].get('monthly_cost'),
+              		"total": total,
               		"currency": "USD" },
-                "description": "Recurring monthly subscription from repunch.com." 
+                "description": description
                 }] })
 
         if payment.create():
             invoice = Invoice()
-            invoice.Store = Store.objects().get(Subscription=\
-                                self.objectId).objectId
             invoice.date_charged = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':
 	            invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
-
             invoice.create()
+            st = Store.objects().get(Subscription=self.objectId)
+            invoice.add_relation("Invoices_", [invoice.objectId])
             return invoice
         else:
             # TODO Might want to charge curtomer 1 dollar to verify

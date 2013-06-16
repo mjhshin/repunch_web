@@ -137,7 +137,6 @@
 					<label for="expiration_month">Expiration</label>
 					{{ subscription_form.cc_expiration }}
 					
-					
 					<p>Billing Address</p>
 					
 				
@@ -170,9 +169,15 @@
 					</div>
 					
 					<div style="clear: left;"></div>
+					<div class="input-container" id="smartphones" style="margin-bottom: 15px;">
+						CHECKBOX INPUT HERE
+						<label for=THE ABOVE>Provide me Smartphones.</label>
+					</div>
+					
+					<div style="clear: left;"></div>
 					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
 						{{ subscription_form.recurring.errors }}
-						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
+						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a>.</label>
 					</div>
 					
 					<a class="button orange" href="#" onclick="$('#signup-form').submit(); return false;">Create Account</a>

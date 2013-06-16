@@ -1134,7 +1134,8 @@ float: right;
 	margin: 0px;
 }
 
-#signup-form #recurring_charge_container label {
+#signup-form #recurring_charge_container label,
+#signup-form #smartphones label {
 	display: inline; line-height: 12px;
 }
 

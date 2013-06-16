@@ -3,7 +3,7 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"

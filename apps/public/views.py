@@ -50,6 +50,9 @@ def sign_up(request):
 
             # create subscription
             subscription = Subscription(**postDict)
+            subscription.set("date_cc_expiration", 
+                datetime(postDict['cc_expiration_year'],
+                    postDict['cc_expiration_month'], 0))
             subscription.subscriptionType = 0
             subscription.create()
             subscription.store_cc(subscription_form.data['cc_number'],
