@@ -10,7 +10,7 @@ if Category.objects.count() < 1:
         with open("docs/categories.txt", "r") as fid:
             cats = fid.readlines()
     except IOError:
-        with open(FS_SITE_DIR + "docs/categories.txt", "r") as fid:
+        with open(FS_SITE_DIR + "/docs/categories.txt", "r") as fid:
             cats = fid.readlines()
     
     for cat in cats:
