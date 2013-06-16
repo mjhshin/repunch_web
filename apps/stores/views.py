@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 
@@ -28,8 +29,6 @@ def edit(request):
     data = {'account_nav': True}
     account = request.session['account']
     
-    HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
-    
     # build the list of hours in proper format for saving to Parse
     hours, ind, key = [], 0, "hours-0-days"
     while ind < 7:
@@ -53,9 +52,10 @@ def edit(request):
     dstore_inst = dStore()
             
     if request.method == 'POST': 
+        HoursFormSet = inlineformset_factory(dStore, dHours,
+                            max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
-            instance=dstore_inst) 
-            
+                                instance=dstore_inst) 
         form = StoreForm(request.POST)
         if form.is_valid(): 
             store = Store(**account.get("store").__dict__)
@@ -74,10 +74,30 @@ def edit(request):
     else:
         form = StoreForm(account.get("store").__dict__)
         form.data['email'] = account.get('email')
-        # TODO
-        formset = HoursFormSet(prefix='hours', 
-                            instance=dstore_inst)
-
+        hours_map = {}
+        # group up the days that aare in the same row
+        # also need to shift days frm 0-6 to 1-7
+        for hour in account.get('store').get("hours"):
+            key = (hour['close_time'], hour['open_time'])
+            if key in hours_map:
+                hours_map[key].append(unicode(hour['day']+1))
+            else:
+                hours_map[key] = [unicode(hour['day']+1)]
+                
+        # create the formset
+        HoursFormSet = inlineformset_factory(dStore, dHours,
+                            max_num=7, extra=len(hours_map))
+        formset = HoursFormSet(prefix='hours', instance=dstore_inst)
+        # set forms in formset initial data
+        for i, key in enumerate(hours_map.iterkeys()):
+            data = {'days':hours_map[key],
+                    'open':unicode(key[1][:2] +\
+                            ':' + key[1][2:4] + ':00'),
+                    'close':unicode(key[0][:2] +\
+                            ':' + key[0][2:4] + ':00'),
+                    'list_order':unicode(i+1) }
+            formset[i].initial = data
+       
     data['form'] = form
     data['hours_formset'] = formset
 
