@@ -3,7 +3,7 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
@@ -205,7 +205,7 @@ INSTALLED_APPS = (
 
 # Also see Cache arguments for extra options
 # https://docs.djangoproject.com/en/1.5/topics/cache/#cache-arguments
-# Dont forget to install memcached service and run a daemon!
+# Dont forget to install memcached service and run it.
 # Also need the python-memcached module installed.
 CACHES = {
     'default': {
