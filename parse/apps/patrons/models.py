@@ -38,6 +38,8 @@ class PunchCode(ParseObject):
         self.is_taken = data.get("is_taken", False)
         # string of _User's username
         self.username = data.get("username")
+        
+        super(PunchCode, self).__init__(False, **data)
 
 class PatronStore(ParseObject):
     """ New class not in Django """
@@ -47,6 +49,8 @@ class PatronStore(ParseObject):
         self.Store = data.get("Store")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
+        
+        super(PatronStore, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Patron":
