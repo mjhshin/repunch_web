@@ -27,7 +27,6 @@
 			
 			<form action="" method="POST" id="punch-form" >
 			    {% csrf_token %}
-			    <input type="text" id="employee_id" placeholder="Employee ID"/>
 			    <input type="text" id="punch_code" placeholder="Punch Code"/>
 			    <input type="number" id="punch_amount" placeholder="Amount" />
 			    <a class="button gray" onclick="punchit('{% url 'store_punch' %}'); return false;"><span>Punch</span></a>

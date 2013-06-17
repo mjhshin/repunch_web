@@ -398,7 +398,7 @@ div#footer{
 #ui-datepicker-div { font-size:11px; }
 
 form#punch-form{
-    position:relative;left:100px;width:450px;
+    position:relative;left:180px;width:330px;
     display:inline-block;
 }
 
@@ -422,7 +422,7 @@ form#punch-form div.notification{
 }
 
 form#punch-form div.notification div{
-    padding:0px;display:inline-block;width:440px;height:30px;
+    padding:0px;display:inline-block;width:330px;height:30px;
 }
 
 form#punch-form div.notification div span{

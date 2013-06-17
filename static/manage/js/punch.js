@@ -18,7 +18,6 @@ function punchit(url){
     
     var pc = $("#punch_code");
     var pa = $("#punch_amount");
-    var ei = $("#employee_id");
     var cont = true;
     
     // validate inputs
@@ -34,11 +33,7 @@ function punchit(url){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
             "<div><span>Amount of punches must be greater than 0.<span></div></div>");
         cont = false;
-    } else if (!ei.val().length>0){
-        $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Please enter the your employee ID.<span></div></div>");
-        cont = false;
-    }
+    } 
     
     if (!cont){
         // make sure that the divs are being hidden
@@ -53,7 +48,6 @@ function punchit(url){
     var data = {
         "punch_code":pc.val(),
         "num_punches":pa.val(),
-        "employee_id":ei.val(),
         "csrfmiddlewaretoken":$("#punch-form input[name=csrfmiddlewaretoken]").val(),
     };
     
@@ -70,6 +64,9 @@ function punchit(url){
                 
         // set button to ready state (sets display to none)
         $("#punch-loading").hide();
+        // clear the punch code and amount
+        pc.val('');
+        pa.val('');
     }
     
     // make the ajax call

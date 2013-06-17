@@ -24,7 +24,6 @@ def punch(request):
             "store_name":str(store.get('store_name')),
             "punch_code":str(request.POST['punch_code']),
             "num_punches":int(request.POST['num_punches']),
-            "employee_id":str(request.POST['employee_id']),
         }
         res = cloud_call("punch", data)
         return HttpResponse(json.dumps(res), 
