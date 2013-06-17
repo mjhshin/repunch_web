@@ -175,9 +175,13 @@ Parse.Cloud.define("punch", function(request, response) {
 				
 		}).then(function(store) {
 				console.log("Store save was successful.");
-				
-				var employeeQuery = new Parse.Query(Employee);
-				return employeeQuery.get(employeeId);
+				if(employeeId != null) {
+					var employeeQuery = new Parse.Query(Employee);
+					return employeeQuery.get(employeeId);
+				} else {
+					console.log("Employee ID is null, punch was from dashboard.");
+					response.success("success");
+				}
 						
 		}, function(error) {
 				console.log("Employee fetch failed.");
