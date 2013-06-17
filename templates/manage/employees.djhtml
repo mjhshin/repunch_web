@@ -28,7 +28,7 @@
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
-	{% employees_pending request.session.account|get:'store' as epcount %}
+	{% employees_pending request.session as epcount %}
 	{% if epcount > 0  %}
 	<div class="notification">
 		<div>You have {{ epcount }} employee{{ epcount|pluralize }} pending approval</div>

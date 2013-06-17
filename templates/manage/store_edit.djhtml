@@ -20,7 +20,7 @@
 
 
 {% block content %}
-{% with store=request.session.account|get:'store' %}
+{% with store=request.session.store %}
 	
 	<form action="{% url 'store_edit' %}" method="post" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}

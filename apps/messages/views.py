@@ -7,6 +7,7 @@ from datetime import datetime
 from dateutil import parser
 import urllib
 
+from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
@@ -21,15 +22,12 @@ from libs.dateutil.relativedelta import relativedelta
 def index(request):
     rputils.set_timezone(request)
     data = {'messages_nav': True}
-    store = request.session['account'].get('store')
         
-    data['messages'] = store.get("sentMessages")
-    # when a store replies, it also gets stored in the received
-    # with message type BASIC or OFFER
-    data['feedback'] = store.get("receivedMessages", 
-                            message_type=FEEDBACK)
+    data['messages'] = SESSION.get_messages_sent_list(request.session)
+    data['feedback'] =\
+                SESSION.get_messages_received_list(request.session)
     
-    if store.get("patronStores", count=1, limit=0):
+    if SESSION.get_patronStore_count(request.session):
         data['has_patrons'] = True
     
     if request.GET.get("success"):

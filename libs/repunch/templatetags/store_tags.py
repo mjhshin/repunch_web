@@ -8,28 +8,41 @@ from parse.apps.messages import FEEDBACK
 from parse.apps.messages.models import Message
 from parse.apps.employees import PENDING
 from parse.apps.employees.models import Employee
+from parse import session as SESSION
 
 register = template.Library()
 
 @register.assignment_tag
-def feedback_unread(store):
-    return store.get("receivedMessages", is_read=False, 
-                    message_type=FEEDBACK, count=1, limit=0)
+def feedback_unread(session):
+    if 'unread_feedback' not in session:
+        unread_feedback = SESSION.get_store(session).get(\
+            "receivedMessages", is_read=False, 
+            message_type=FEEDBACK, count=1, limit=0)
+        session['unread_feedback'] = unread_feedback
+    else:
+        unread_feedback = session['unread_feedback']
+    return unread_feedback
 
 
 @register.assignment_tag
-def employees_pending(store):
-    return store.get('employees', status=PENDING, 
-                count=1, limit=0)
+def employees_pending(session):
+    if 'employees_pending' not in session:
+        employees_pending = SESSION.get_store(session).get(\
+                'employees', status=PENDING, count=1, limit=0)
+        session['employees_pending'] = employees_pending
+    else:
+        employees_pending = session['employees_pending']
+    return employees_pending
 
 @register.simple_tag
-def hours(store):
+def hours(session):
     """ 
     build the list of hours in proper format to render in template
     """
     hours_map, hours = {}, []
-    if store.get("hours"):
-        for hour in store.get("hours"):
+    hrs = SESSION.get_store(session).get("hours")
+    if hrs:
+        for hour in hrs:
             key = (hour['close_time'], hour['open_time'])
             if key in hours_map:
                 hours_map[key].append(hour['day'])

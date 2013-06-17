@@ -351,8 +351,8 @@ class ParseObject(object):
         # assuming all objects have these by default
         if attr in ("createdAt", "updatedAt"):
             return self.__dict__.get(attr)
-
-        if self.__dict__.get(attr):
+            
+        if self.__dict__.get(attr) is not None:
             # make sure that if count constrains are
             # present the cache does not block 
             if not (attr[0].islower() and attr[0].upper() +\

@@ -27,7 +27,7 @@
 		
 		<div class="tab-container">
 			<div class="tab active" id="tab-sent">Sent</div>
-			{% feedback_unread request.session.account|get:'store' as fcount %}
+			{% feedback_unread request.session as fcount %}
 						
 			<div class="tab" id="tab-feedback">Feedback{% if fcount > 0 %} ({{ fcount }}){% endif %}</div>
 		</div>

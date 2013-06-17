@@ -40,10 +40,13 @@ def login(request, username, password, account):
         settings.fetchAll()
         subscription = store.get("subscription")
         subscription.fetchAll()
-        store.set("settings", settings)
-        store.set("subscription", subscription)
         
-        account.set('store', store)
+        # this does not work. See see cache notes.
+        # store.set("settings", settings)
+        # store.set("subscription", subscription)
+        request.session['subscription'] = subscription
+        request.session['settings'] = settings
+        request.session['store'] = store
         request.session['account'] = account
         return account
     else:

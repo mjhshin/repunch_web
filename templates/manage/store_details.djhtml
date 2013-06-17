@@ -5,8 +5,7 @@
 
 
 {% block content %}
-{% with account=request.session.account %}
-	{% with store=account|get:"store" %}
+{% with store=request.session.store %}
 	<!-- possibly move to header -->
 	{% account_alert request.session as alert %}
 	{% if alert %}
@@ -38,13 +37,13 @@
 						{{ store|get:'street' }}<br />
 						{{ store|get:'city' }}, {{ store|get:'state' }} {{ store|get:'zip' }}<br />
 						{{ store|get:'phone_number' }}<br />
-						{{ account|get:'email' }}
+						{{ request.session.account|get:'email' }}
 					</p>
 				</div>
 				<div id="hours">
 					<span class="bold">Hours:</span>
 					<p>
-						{% hours store %}
+						{% hours request.session %}
 						<!--
 						Mon-Fri: 11:00 am - 11:00 pm<br />
 						Closed Saturday &amp; Sunday
@@ -63,7 +62,7 @@
 	</div>
 	
 	<div class="section">
-		{% with tmp=account|get:'store'|get:'subscription'|get:'subscriptionType' %}
+		{% with tmp=request.session.subscription.subscriptionType %}
         {% with type=tmp|get_sub_type %}
 		<div class="section-title">
 			Current Subscription: 
@@ -77,15 +76,15 @@
 				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>
 				<div class="description">
 					<div class="label">USERS</div>
-					<div class="count">{% account_user_count account %}</div>
+					<div class="count">{% account_user_count request.session %}</div>
 					<div class="limit">of {% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="limit-details right">
-				<div class="bar-graph"><div style="height: {% account_message_usage account 52 %}px"></div></div>
+				<div class="bar-graph"><div style="height: {% account_message_usage request.session 52 %}px"></div></div>
 				<div class="description">
 					<div class="label">SENT MESSAGES</div>
-					<div class="count">{% account_message_count account %}</div>
+					<div class="count">{% account_message_count request.session %}</div>
 					<div class="limit">of {{ type.max_messages }}</div>
 				</div>
 			</div>
@@ -100,6 +99,5 @@
 		</div>
 	</div>
     {% endwith %}
-	{% endwith %}
 {% endwith %}
 {% endblock %}

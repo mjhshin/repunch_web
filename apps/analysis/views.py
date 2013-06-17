@@ -6,7 +6,7 @@ import datetime, json
 
 
 from parse.apps.patrons.models import Patron
-
+from parse import session as SESSION
 from parse.core.advanced_queries import relational_query
 from parse.auth.decorators import login_required
 from libs.repunch import rputils
@@ -15,15 +15,13 @@ from libs.dateutil.relativedelta import relativedelta
 @login_required
 def index(request):
     data = {'analysis_nav': True}
-    account = request.session['account']
-    store = account.get('store')
-    data['rewards'] = store.get('rewards')
+    data['rewards'] =\
+            SESSION.get_store(request.session).get("rewards")
     return render(request, 'manage/analysis.djhtml', data)
 
 @login_required
 def trends_graph(request, data_type=None, start=None, end=None ):
-    account = request.session['account']
-    store = account.get('store')
+    store = SESSION.get_store(request.session)
     
     start = datetime.datetime.strptime(start, "%Y-%m-%d")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -116,8 +114,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 
 @login_required
 def breakdown_graph(request, data_type=None, filter=None, range=None):
-    account = request.session['account'] 
-    store = account.get('store')
+    store = SESSION.get_store(request.session)
     (start, end) = rputils.calculate_daterange(range)
     
     results = [] 

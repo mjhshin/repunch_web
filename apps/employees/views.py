@@ -6,9 +6,10 @@ from django.db.models import Sum
 from datetime import datetime
 import urllib, json
 
+from parse.apps.employees import DENIED
+from parse import session as SESSION
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
-from parse.apps.employees import PENDING, APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
@@ -18,11 +19,11 @@ from libs.repunch import rputils
 @login_required
 def index(request):
     data = {'employees_nav': True}
-    account = request.session['account']
-    store = account.get("store")
     
-    data['employees'] = store.get("employees", status=APPROVED)
-    data['pending'] = store.get("employees", status=PENDING)
+    data['pending'] =\
+            SESSION.get_employees_pending_list(request.session)
+    data['employees'] =\
+            SESSION.get_employees_approved_list(request.session)
     
     data['show_pending'] = (request.GET.get("show_pending") is not None); 
     

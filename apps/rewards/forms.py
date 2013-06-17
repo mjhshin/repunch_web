@@ -7,7 +7,8 @@ from repunch import settings
 
 class RewardForm(forms.Form):
     reward_name = forms.CharField(max_length=255)
-    description = forms.CharField(widget=forms.Textarea())
+    description = forms.CharField(widget=forms.Textarea(), 
+                        required=False)
     punches = forms.IntegerField(min_value=1)
         
 class RewardAvatarForm(forms.Form):

@@ -3,35 +3,22 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 import urllib
 
+from parse import session as SESSION
 from parse.auth.decorators import login_required
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
 @login_required
 def index(request):
     data = {'rewards_nav': True}
-    account = request.session['account']
-    store = account.get('store')
-    
-    rewards, lst = store.get('rewards'), []
+    store = SESSION.get_store(request.session)
+    lst, rewards = [], SESSION.get_store(request.session).get('rewards')
     # create a reward map
     if rewards:
         reward_map = {int(reward['punches']):reward for reward in rewards}
         # get a sorted list of punches in descending order
         punches = [p for p in reward_map.iterkeys()]
-        # clone punches before sorting to see if order changed
-        punches_b4sort = punches[:]
         punches.sort()
-        # if reordered then update the list on Parse
-        if punches_b4sort != punches:
-            reordered_rewards = [reward_map[p] for p in punches]
-            store.set('rewards', reordered_rewards)
-            store.update()
-            account.set('store', store)
-            request.session['account'] = account
-        else:
-            reordered_rewards = rewards
-    
-        data['rewards'] = reordered_rewards
+        data['rewards'] = [reward_map[p] for p in punches]
     else:
         data['rewards'] = []
     
