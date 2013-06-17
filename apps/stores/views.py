@@ -21,17 +21,17 @@ def punch(request):
         store = request.session['account'].get('store')
         data = {
             "store_id":store.objectId,
-            "store_name":store.get('store_name'),
-            "punch_code":request.POST['punch_code'],
-            "num_punches":request.POST['num_punches'],
-            "employee_id":request.POST['employee_id'],
+            "store_name":str(store.get('store_name')),
+            "punch_code":str(request.POST['punch_code']),
+            "num_punches":int(request.POST['num_punches']),
+            "employee_id":str(request.POST['employee_id']),
         }
         res = cloud_call("punch", data)
-        print data, res
         return HttpResponse(json.dumps(res), 
                 content_type="application/json")
     else:
-        return HttpResponse("error")
+        return HttpResponse(json.dumps({u'code': 141,
+                u'error': u'error'}), content_type="application/json")
 
 @login_required
 def index(request):

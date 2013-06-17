@@ -429,5 +429,10 @@ form#punch-form div.notification div span{
     position:relative;top:-18px;
 }
 
+img#punch-loading {
+    display:none;
+    position:absolute; right:-34px; top:18px;
+}
+
 
 

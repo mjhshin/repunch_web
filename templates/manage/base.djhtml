@@ -31,6 +31,8 @@
 			    <input type="text" id="punch_code" placeholder="Punch Code"/>
 			    <input type="number" id="punch_amount" placeholder="Amount" />
 			    <a class="button gray" onclick="punchit('{% url 'store_punch' %}'); return false;"><span>Punch</span></a>
+			    <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
+			        id="punch-loading" />
 			</form>
 			
 			<div id="header-right" >
