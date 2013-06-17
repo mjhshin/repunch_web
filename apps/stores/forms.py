@@ -3,6 +3,7 @@ import os, re, datetime
 
 from models import Store
 from libs.repunch import rputils, rpforms, rpccutils
+from libs.repunch.validators import alphanumeric
 from repunch import settings
 
 class StoreSignUpForm(forms.Form):
@@ -45,14 +46,20 @@ class SubscriptionForm2(forms.Form):
     """ 
     2s are appended at each attr name because of name confllicts at
     signup with StoreSignUpForm. """
-    first_name2 = forms.CharField(max_length=30)
-    last_name2 = forms.CharField(max_length=100)
+    first_name2 = forms.CharField(max_length=30,
+                    validators=[alphanumeric])
+    last_name2 = forms.CharField(max_length=100,
+                    validators=[alphanumeric])
     cc_number = forms.CharField(max_length=255)
     cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
-    address = forms.CharField(max_length=255)
-    city2 = forms.CharField(max_length=255)
-    state2 = forms.CharField(max_length=255)
-    zip2 = forms.CharField(max_length=255)
+    address = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    city2 = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    state2 = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    zip2 = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
     country2 = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
                                     
@@ -108,14 +115,20 @@ class SubscriptionForm2(forms.Form):
         return data
         
 class SubscriptionForm(forms.Form):
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=100)
+    first_name = forms.CharField(max_length=30,
+                    validators=[alphanumeric])
+    last_name = forms.CharField(max_length=100,
+                    validators=[alphanumeric])
     cc_number = forms.CharField(max_length=255)
     cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
-    address = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=255)
-    state = forms.CharField(max_length=255)
-    zip = forms.CharField(max_length=255)
+    address = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    city = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    state = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
+    zip = forms.CharField(max_length=255,
+                    validators=[alphanumeric])
     country = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
 

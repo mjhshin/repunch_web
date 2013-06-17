@@ -112,11 +112,12 @@ def update(request):
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm(subscription.__dict__)
+        form = SubscriptionForm()
+        form.initial = subscription.__dict__
+        # add some asterisk to cc_number
+        form.initial['cc_number'] = "*" * 12 +\
+            form.initial.get('cc_number')[-4:]
     
-    # add some asterisk to cc_number
-    form.data['cc_number'] = "*" * 12 +\
-            form.data.get('cc_number')[-4:]
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
 

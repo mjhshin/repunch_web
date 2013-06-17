@@ -72,7 +72,8 @@ def edit(request):
             request.session['account'] = account
             data['success'] = "Store details have been saved."
     else:
-        form = StoreForm(account.get("store").__dict__)
+        form = StoreForm()
+        form.initial = account.get("store").__dict__
         form.data['email'] = account.get('email')
         hours_map = {}
         # group up the days that aare in the same row
