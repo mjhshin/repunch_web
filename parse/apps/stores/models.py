@@ -96,7 +96,6 @@ class Store(ParseObject):
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, **data):
-        self.date_charged = data.get('date_charged')
         self.status = data.get('status')
         self.response = data.get('response')
         self.response_code = data.get('response_code')
@@ -207,7 +206,7 @@ class Subscription(ParseObject):
             # raise Exception(credit_card.error)
             # TODO does not check if information is correct
             # only if the fields are in correct format!
-            raise Exception("Incorrect credit card information.")
+            # may go here because of non-alphanumeric inputs to name,
             
         return False
         
@@ -240,7 +239,6 @@ class Subscription(ParseObject):
 
         if payment.create():
             invoice = Invoice()
-            invoice.date_charged = datetime.now()
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':

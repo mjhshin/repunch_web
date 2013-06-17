@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from datetime import datetime
 import json
 
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
-from apps.stores.forms import StoreSignUpForm, SubscriptionForm
+from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
 from forms import ContactForm
 from libs.repunch import rputils
 
@@ -40,9 +41,10 @@ def sign_up(request):
     data = {'sign_up_nav': True}
     
     if request.method == 'POST':
+        # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
-        subscription_form = SubscriptionForm(request.POST)
+        subscription_form = SubscriptionForm2(request.POST)
 
         if store_form.is_valid() and account_form.is_valid() and\
            subscription_form.is_valid():
@@ -51,9 +53,16 @@ def sign_up(request):
             # create subscription
             subscription = Subscription(**postDict)
             subscription.set("date_cc_expiration", 
-                datetime(postDict['cc_expiration_year'],
-                    postDict['cc_expiration_month'], 0))
+                datetime(int(postDict['cc_expiration_year']),
+                    int(postDict['cc_expiration_month']), 1))
             subscription.subscriptionType = 0
+            # make sure to use the correct POST info
+            subscription.first_name = request.POST['first_name2']
+            subscription.last_name  = request.POST['last_name2']
+            subscription.city = request.POST['city2']
+            subscription.state = request.POST['state2']
+            subscription.zip = request.POST['zip2']
+            subscription.country = request.POST['country2']
             subscription.create()
             subscription.store_cc(subscription_form.data['cc_number'],
                             subscription_form.data['cc_cvv'])
@@ -107,7 +116,7 @@ def sign_up(request):
     else:
         store_form = StoreSignUpForm()
         account_form = AccountForm()
-        subscription_form = SubscriptionForm()
+        subscription_form = SubscriptionForm2()
 
     data['store_form'] = store_form
     data['account_form'] = account_form

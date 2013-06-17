@@ -75,20 +75,20 @@
 					
 					<p>Account Information</p>
 					<div class="floated">
-						{{ account_form.first_name.errors }}
+						{{ store_form.first_name.errors }}
 						<label for="id_first_name">Your First Name</label>
-						{{ account_form.first_name }}
+						{{ store_form.first_name }}
 					</div>
 					<div class="floated">
-						{{ account_form.last_name.errors }}
+						{{ store_form.last_name.errors }}
 						<label for="id_last_name">Your Last Name</label>
-						{{ account_form.last_name }}
+						{{ store_form.last_name }}
 					</div>
 					
 					<div class="clear-both"></div>
-					{{ account_form.phone_number.errors }}
+					{{ store_form.phone_number.errors }}
 					<label for="id_phone_number">Your Phone Number</label>
-					{{ account_form.phone_number }}
+					{{ store_form.phone_number }}
 					
 					{{ account_form.email.errors }}
 					<label for="id_email">Your Email Address</label>
@@ -108,13 +108,13 @@
 					<div class="clear-both"></div>
 					
 					<p>Credit Card Information<p>
-					{{ subscription_form.first_name.errors }}
+					{{ subscription_form.first_name2.errors }}
 					<label for="first_name">First Name</label>
-					{{ subscription_form.first_name }}
+					{{ subscription_form.first_name2 }}
 					
-					{{ subscription_form.last_name.errors }}
+					{{ subscription_form.last_name2.errors }}
 					<label for="last_name">Last Name</label>
-					{{ subscription_form.last_name }}
+					{{ subscription_form.last_name2 }}
 					
 					<div class="input-container" id="card_number_container">
 						{{ subscription_form.cc_number.errors }}
@@ -147,37 +147,37 @@
 					
 					<div class="clear-both"></div>
 					<div class="floated">
-						{{ subscription_form.city.errors }}
+						{{ subscription_form.city2.errors }}
 						<label for="city">City</label>
-						{{ subscription_form.city }}
+						{{ subscription_form.city2 }}
 					</div>
 					<div class="floated">					
-						{{ subscription_form.state.errors }}
+						{{ subscription_form.state2.errors }}
 						<label for="state">State</label>
-						{{ subscription_form.state }}
+						{{ subscription_form.state2 }}
 					</div>
 					<div class="floated">
-						{{ subscription_form.zip.errors }}
+						{{ subscription_form.zip2.errors }}
 						<label for="id_zip">Zip</label>
-						{{ subscription_form.zip }}
+						{{ subscription_form.zip2 }}
 					</div>
 					<div class="clear-both"></div>
 					
 					<div class="input-container">
 						<label for="country">Country</label>
-						{{ subscription_form.country }}
+						{{ subscription_form.country2 }}
 					</div>
 					
 					<div style="clear: left;"></div>
-					<div class="input-container" id="smartphones" style="margin-bottom: 15px;">
-						CHECKBOX INPUT HERE
-						<label for=THE ABOVE>Provide me Smartphones.</label>
+					<div class="input-container" id="place_order" style="margin-bottom: 15px;">
+						<input type="checkbox" name="place_order" value="yes" />
+						<label for="place_order">Order Smartphones</label>
 					</div>
 					
 					<div style="clear: left;"></div>
 					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
 						{{ subscription_form.recurring.errors }}
-						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a>.</label>
+						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					
 					<a class="button orange" href="#" onclick="$('#signup-form').submit(); return false;">Create Account</a>

@@ -16,9 +16,6 @@ class AccountForm(forms.Form):
     confirm_password = forms.CharField(min_length=6,
             widget=forms.PasswordInput())
     email = forms.EmailField()
-    first_name = forms.CharField(max_length=100)
-    last_name = forms.CharField(max_length=100)
-    phone_number = forms.CharField()
 
     def clean_password(self):
         """ make sure that password is same as confirm_password """

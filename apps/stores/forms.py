@@ -12,7 +12,9 @@ class StoreSignUpForm(forms.Form):
     state = forms.CharField(max_length=255)
     zip = forms.CharField(max_length=255)
     country = forms.CharField(max_length=255)
-    email = forms.EmailField(max_length=255)
+    first_name = forms.CharField(max_length=100)
+    last_name = forms.CharField(max_length=100)
+    phone_number = forms.CharField()
 
 class StoreForm(StoreSignUpForm):
     phone_number = forms.CharField(max_length=255)
@@ -39,6 +41,71 @@ class StoreAvatarForm(forms.Form):
         return store
     
 
+class SubscriptionForm2(forms.Form):
+    """ 
+    2s are appended at each attr name because of name confllicts at
+    signup with StoreSignUpForm. """
+    first_name2 = forms.CharField(max_length=30)
+    last_name2 = forms.CharField(max_length=100)
+    cc_number = forms.CharField(max_length=255)
+    cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
+    address = forms.CharField(max_length=255)
+    city2 = forms.CharField(max_length=255)
+    state2 = forms.CharField(max_length=255)
+    zip2 = forms.CharField(max_length=255)
+    country2 = forms.ChoiceField(choices=[('US', 
+                                    'United States of America')])
+                                    
+    cc_cvv = forms.CharField()
+    recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
+    
+    def clean(self, *args, **kwargs):
+        super(SubscriptionForm2, self).clean()
+        cleaned_data = self.cleaned_data
+        
+        # if cc_number doesn't exists, it is because we already 
+        # have an error
+        if 'cc_number' in cleaned_data:
+            cc = cleaned_data['cc_number']
+            mask = (len(cc)-4)*'*'
+            mask += cc[-4:]
+            cleaned_data['cc_number'] = mask
+        
+            # credit card processing will go here
+            # raise forms.ValidationError("Error processing credit"+\
+            #                            " card!")
+        
+        return cleaned_data
+    
+    def clean_recurring(self):
+        data = self.cleaned_data['recurring']
+        if not data:
+            raise forms.ValidationError("You must accept the Terms"+\
+                                    " & Conditions to continue.")
+        return data
+    
+    def clean_cc_expiration(self):
+        data = self.cleaned_data['cc_expiration']
+        now = datetime.datetime.now()
+        if data.year == now.year:
+            if data.month < now.month:
+                raise forms.ValidationError("Your credit card has"+\
+                                            " expired!")
+            
+        return data
+    
+    def clean_cc_number(self):
+        data = self.cleaned_data['cc_number']
+        data = re.sub("[^0-9]", "", data) 
+
+        if rpccutils.validate_checksum(data) == False:
+            raise forms.ValidationError("Enter a valid credit card"+\
+                                        " number.")
+        if rpccutils.validate_cc_type(data) == False:
+            raise forms.ValidationError("Credit card type is not"+\
+                                        " accepted.")
+        
+        return data
         
 class SubscriptionForm(forms.Form):
     first_name = forms.CharField(max_length=30)

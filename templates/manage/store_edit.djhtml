@@ -86,14 +86,7 @@
 			<label for="phone_number">Phone Number</label>
 			{{ form.phone_number }}
 		</div>
-		
 		<div class="input-container clearheight">
-			{{ form.email.errors }}
-			<label for="email">Email</label>
-			{{ form.email }}
-		</div>
-		
-		<div class="input-container">
 			{{ form.store_description.errors }}
 			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">200 character limit</label>
 			{{ form.store_description }}
