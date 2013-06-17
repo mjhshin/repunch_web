@@ -175,12 +175,12 @@ Parse.Cloud.define("punch", function(request, response) {
 				
 		}).then(function(store) {
 				console.log("Store save was successful.");
+				
 				if(employeeId != null) {
 					var employeeQuery = new Parse.Query(Employee);
 					return employeeQuery.get(employeeId);
 				} else {
 					console.log("Employee ID is null, punch was from dashboard.");
-					response.success("success");
 				}
 						
 		}, function(error) {
@@ -188,10 +188,12 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");	
 				
 		}).then(function(employee) {
-				console.log("Employee fetched.");
-				employee.relation("Punches").add(punch);
-				employee.increment("lifetime_punches", numPunches);
-				return employee.save();
+				if(employeeId != null) {
+					console.log("Employee fetched.");
+					employee.relation("Punches").add(punch);
+					employee.increment("lifetime_punches", numPunches);
+					return employee.save();
+				}
 				
 		}, function(error) {
 				console.log("Employee save failed.");
