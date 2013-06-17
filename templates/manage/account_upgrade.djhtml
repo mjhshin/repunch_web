@@ -145,7 +145,7 @@
             {% endif %}
             if (a.hasClass('blue')){
                 a.removeClass('blue');
-                a.addClass('grey');
+                a.addClass('gray');
                 f.submit();
             }
             return false;

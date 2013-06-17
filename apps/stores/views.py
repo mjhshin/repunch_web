@@ -2,16 +2,36 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.request import QueryDict
+from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
 from datetime import datetime
+import json
 
 from apps.stores.models import Store as dStore, Hours as dHours
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 
-from parse.utils import delete_file, create_png
+from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
 from parse.auth.decorators import login_required
+
+@login_required
+def punch(request):
+    if request.method == "POST" or request.is_ajax():
+        store = request.session['account'].get('store')
+        data = {
+            "store_id":store.objectId,
+            "store_name":store.get('store_name'),
+            "punch_code":request.POST['punch_code'],
+            "num_punches":request.POST['num_punches'],
+            "employee_id":request.POST['employee_id'],
+        }
+        res = cloud_call("punch", data)
+        print data, res
+        return HttpResponse(json.dumps(res), 
+                content_type="application/json")
+    else:
+        return HttpResponse("error")
 
 @login_required
 def index(request):

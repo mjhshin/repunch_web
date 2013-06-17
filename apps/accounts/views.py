@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.contrib.auth import SESSION_KEY
+from datetime import datetime
 import json, urllib
 
 from apps.stores.forms import SettingsForm, SubscriptionForm
@@ -87,12 +88,15 @@ def update(request):
     subscription = account.get("store").get('subscription')
     
     if request.method == 'POST':
-        form = SubscriptionForm(request.POST) 
+        form = SubscriptionForm(request.POST)
         if form.is_valid():       
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
             try:
+                subscription.set("date_cc_expiration", 
+                    datetime(int(request.POST['cc_expiration_year']),
+                        int(request.POST['cc_expiration_month']), 1))
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
@@ -151,6 +155,9 @@ def upgrade(request):
             subscription.update_locally(request.POST.dict(), False)
             
             try:
+                subscription.set("date_cc_expiration", 
+                datetime(int(request.POST['cc_expiration_year']),
+                    int(request.POST['cc_expiration_month']), 1))
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
@@ -177,9 +184,10 @@ def upgrade(request):
                             'Your account has been updated.'}))
     else:
         form = SubscriptionForm(subscription.__dict__)
-    
-    # add some asterisk to cc_number
-    form.data['cc_number'] = "*" * 12 +\
-            form.data.get('cc_number')[-4:]
+        # add some asterisk to cc_number
+        form.initial['cc_number'] = "*" * 12 +\
+            form.initial.get('cc_number')[-4:]
+            
+            
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
