@@ -7,6 +7,7 @@ import json, urllib
 from apps.stores.forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 
+from parse.apps.accounts import order_placed
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings
 
@@ -93,7 +94,7 @@ def update(request):
             
             try:
                 subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv']);
+                                            form.data['cc_cvv'])
             except Exception as e:
                 form = SubscriptionForm(subscription.__dict__)
                 form.errors['__all__'] =\
@@ -101,13 +102,18 @@ def update(request):
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                        
+            if request.POST.get("place_order") and\
+                request.POST.get("place_order_amount").isdigit():
+                amount = int(request.POST.get("place_order_amount"))
+                if amount > 0:
+                    account.store.fetchAll()
+                    order_placed(amount, account.store)
 
             # just in case account is a copy as noted above
             account.store.subscription = subscription
             request.session['account'] = account
-
             
-
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
@@ -154,6 +160,13 @@ def upgrade(request):
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                        
+            if request.POST.get("place_order") and\
+                request.POST.get("place_order_amount").isdigit():
+                amount = int(request.POST.get("place_order_amount"))
+                if amount > 0:
+                    account.store.fetchAll()
+                    order_placed(amount, account.store)
 
             # just in case account is a copy as noted above
             account.store.subscription = subscription

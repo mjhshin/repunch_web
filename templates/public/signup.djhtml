@@ -7,6 +7,10 @@
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
 {% endblock %}
 
+{% block javascript %}
+<script src="{% static 'public/js/place-order.js' %}"></script>
+{% endblock %}
+
 {% block pageblock %}
 <section id="page-wrapper">
 	<div id="page-content">
@@ -169,9 +173,20 @@
 					</div>
 					
 					<div style="clear: left;"></div>
-					<div class="input-container" id="place_order" style="margin-bottom: 15px;">
-						<input type="checkbox" name="place_order" value="yes" />
-						<label for="place_order">Order Smartphones</label>
+					<div class="input-container"
+					        id="place_order_container"
+					        style="margin-bottom: 15px;">
+						<input type="checkbox" name="place_order"
+						        value="yes" id="place_order" />
+						<label for="place_order">Order Smartphones
+						    </label>
+						<span style="display:none;"
+						        id="place_order_span">
+						    <label>: amount&nbsp;&nbsp;</label>
+						    <input type="number" min="1"  step="1" 
+						        name="place_order_amount" 
+						        style="width:40px;" />
+						</span>
 					</div>
 					
 					<div style="clear: left;"></div>

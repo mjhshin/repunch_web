@@ -4,6 +4,9 @@
 {% block title %}Account Upgrade{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/upgradeaccount.css" %}" />{% endblock %}
 
+{% block javascript %}
+<script src="{% static 'public/js/place-order.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 	{% if error or success %}
@@ -97,27 +100,58 @@
 		</div>
 		
 		<div style="clear: left;"></div>
+		<div class="input-container"
+		        id="place_order_container">
+			<input type="checkbox" name="place_order"
+			        value="yes" id="place_order" />
+			<label for="place_order">Order Smartphones
+			    </label>
+			<span style="display:none;"
+			        id="place_order_span">
+			    <label>: amount&nbsp;&nbsp;</label>
+			    <input type="number" min="1"  step="1" 
+			        name="place_order_amount" 
+			        style="width:40px;" />
+			</span>
+		</div>
+		
+		<div style="clear: left;"></div>
 		<div class="input-container" id="recurring_charge_container">
 			{{ form.recurring.errors }}
 			{{ form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'manage_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
 		</div>
 	</div>
 
-    <script>
-    function submitSubscriptionForm(action){
-        var f = $('#upgrade-form').attr("action", action);
-        f.submit()
-    }
-    </script>
-
     <div class="form-options">
         {% if update %}
-		<a onclick="submitSubscriptionForm('{% url 'account_update' %}'); return false;" class="button blue">Update</a>
+		<a class="button blue" id="upgrade-form-submit">Update</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 		{% elif upgrade %}
-		<a onclick="submitSubscriptionForm('{% url 'account_upgrade' %}'); return false;" class="button blue">Upgrade</a>
+		<a class="button blue" id="upgrade-form-submit">Upgrade</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
 	</div>
+	
+	<script>
+    $(document).ready(function(){
+        var a = $("#upgrade-form-submit");
+        a.click(function(){
+            {% if update %}
+            var f = $('#upgrade-form').attr("action",
+                "{% url 'account_update' %}");
+            {% elif upgrade %}
+            var f = $('#upgrade-form').attr("action",
+                "{% url 'account_upgrade' %}");
+            {% endif %}
+            if (a.hasClass('blue')){
+                a.removeClass('blue');
+                a.addClass('grey');
+                f.submit();
+            }
+            return false;
+        });
+    });
+    </script>
+	
 	</form>
 {% endblock %}

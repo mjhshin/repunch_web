@@ -1128,7 +1128,7 @@ float: right;
 }
 
 #signup-form #recurring_charge_container input,
-#signup-form #place_order input {
+#signup-form #place_order_container input {
 	width: auto;
 	height: auto;
 	border: none; 
@@ -1136,7 +1136,7 @@ float: right;
 }
 
 #signup-form #recurring_charge_container label,
-#signup-form #place_order label {
+#signup-form #place_order_container label {
 	display: inline; line-height: 12px;
 }
 

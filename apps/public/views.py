@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from datetime import datetime
 import json
 
+from parse.apps.accounts import order_placed
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
@@ -83,6 +84,12 @@ def sign_up(request):
                         "alias":alias,
                         "name":name })
             store.create()    
+            
+            if request.POST.get("place_order") and\
+                request.POST.get("place_order_amount").isdigit():
+                amount = int(request.POST.get("place_order_amount"))
+                if amount > 0:
+                    order_placed(amount, store)
 
             # create settings
             settings = Settings.objects().create(retailer_pin=\
@@ -110,7 +117,7 @@ def sign_up(request):
                 rputils.set_timezone(request, tz)
                 return redirect(reverse('store_index'))
             else:
-                # TODO: should never go here though
+                # should never go here 
                 pass
                     
     else:

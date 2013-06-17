@@ -31,12 +31,14 @@ input#id_address{
 	width:300px;
 }
 
-div#recurring_charge_container {
+div#place_order_container {
 	margin-top:20px;
 }
 
-div#recurring_charge_container input { height: auto; padding: 0px; margin: 0px 5px 0px 0px; border: 0px; vertical-align: middle;}
-div#recurring_charge_container label { font-size: 12px; font-weight: normal; margin: 0px; display: inline;}
+div#recurring_charge_container input,
+div#place_order_container input { height: auto; padding: 0px; margin: 0px 5px 0px 0px; border: 0px; vertical-align: middle;}
+div#recurring_charge_container label,
+div#place_order_container label { font-size: 12px; font-weight: normal; padding: 0px; margin: 0px; display: inline;}
 div#recurring_charge_container .errorlist { margin-top: 0px; }
 div#recurring_charge_container .errorlist li { top: 0px; }
 

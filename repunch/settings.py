@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
 
 ADMINS = (
-    # ('Vandolf Estrellado', 'vandolf@repunch.com'),
+    ('Vandolf Estrellado', 'vandolf@repunch.com'),
 )
 
 MANAGERS = ADMINS
@@ -29,9 +29,11 @@ DATABASES = {
 # configuration for SMTP
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'testuser@cambiolabs.com'
-EMAIL_HOST_PASSWORD = 'T3st1T2013!'
+EMAIL_HOST_USER = 'acmnotify@gmail.com'
+EMAIL_HOST_PASSWORD = 'yfitonmca'
 EMAIL_USE_TLS = True
+# for order_placed event
+ORDER_PLACED_EMAILS = ['vandolf@repunch.com', ]
 
 # PARSE 
 PARSE_VERSION = '1'
@@ -182,6 +184,8 @@ if DEBUG:
 else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
+    
+PHONE_COST_UNIT_COST = 130
 
 AUTH_USER_MODEL = 'accounts.Account'
 

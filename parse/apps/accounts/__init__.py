@@ -1,3 +1,8 @@
+from django.core.mail import send_mail
+
+from repunch.settings import PHONE_COST_UNIT_COST, EMAIL_HOST_USER,\
+ORDER_PLACED_EMAILS
+
 """
 DEFAULT_ACC_SETTINGS = {
     'punches_customer':1,
@@ -41,8 +46,27 @@ sub_type = {
     1:middle_type,
     2:heavy_type,
 }
-    
 
-
-
+def order_placed(amount, store):
+    """
+    Handle event where an order for phones are placed by a store
+    at signup or update account.
+    """
+    store.get('subscription').charge_cc(\
+        PHONE_COST_UNIT_COST*amount,
+        "Repunch Inc. Order placed on " +\
+        str(amount) + " phones")
+    rtlr = 'ORDER PLACED by ' +  store.store_name
+    msg = "Business name: " + store.get('store_name') + "\n" +\
+        "Owner name: " + store.get('first_name') + " " +\
+        store.get('last_name') + "\n" +\
+        "Store ID: " + store.objectId + "\n" +\
+        "Phone number: " + store.get('phone_number') + "\n" +\
+        "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
+        "Subscription Status: " + store.get('subscription').get('status') + "\n" +\
+        "Amount Ordered: " + str(amount) + "\n" +\
+        "Total charged: "  + str(PHONE_COST_UNIT_COST*amount) + "\n"
+        
+    send_mail(rtlr, msg, EMAIL_HOST_USER, 
+        ORDER_PLACED_EMAILS, fail_silently=True)
 

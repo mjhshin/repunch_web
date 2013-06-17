@@ -238,14 +238,14 @@ class Subscription(ParseObject):
                 }] })
 
         if payment.create():
-            invoice = Invoice()
+            invoice = Invoice(amount=total)
             invoice.response_code = payment.id
             invoice.status = payment.state
             if invoice.status == 'approved':
 	            invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
             invoice.create()
             st = Store.objects().get(Subscription=self.objectId)
-            invoice.add_relation("Invoices_", [invoice.objectId])
+            st.add_relation("Invoices_", [invoice.objectId])
             return invoice
         else:
             # TODO Might want to charge curtomer 1 dollar to verify
