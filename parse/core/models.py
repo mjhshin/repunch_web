@@ -308,11 +308,16 @@ class ParseObject(object):
     def fetchAll(self):
         """
         Gets all of this object's data from parse and update all
-        of its value locally.
+        of its value locally. This includes pulling each pointer for
+        caching. # TODO optimize using include
         """
         res = parse("GET", self.path() + "/" + self.objectId)
         if res and "error" not in res:
             self.update_locally(res, False)
+            # fill up the cache attributes
+            for key, value in self.__dict__.iteritems():
+                if key[0].isupper() and not key.endswith("_"):
+                    self.get(key[0].upper() + key[1:])
             return True
         return False
 

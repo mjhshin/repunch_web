@@ -10,7 +10,8 @@ from parse.apps.accounts import sub_type
 register = template.Library()
 
 @register.simple_tag
-def account_user_usage(account, percent_of=None):
+def account_user_usage(session, percent_of=None):
+    account = session.get('account')
     store = account.get('store')
     atype = sub_type[store.get('subscription').get('subscriptionType')]
     num_patrons = store.get('patronStores', count=1, limit=0)
@@ -25,16 +26,23 @@ def account_user_usage(account, percent_of=None):
     
     if percent_of != None:
         return int(percent * percent_of)
+        
+    account.set('store', store)
+    session['account'] = account
     
     return percent;
 
 @register.assignment_tag
-def account_alert(account):
+def account_alert(session):
+    account = session.get('account')
     store = account.get('store')
     atype = sub_type[store.get('subscription').get('subscriptionType')]
     num_patrons = store.get('patronStores', count=1, limit=0)
     # may cause division by 0!!!
     percent = num_patrons / atype['max_users']
+    
+    account.set('store', store)
+    session['account'] = account
     
     #if they are at 80 percent of their users, alert
     return (percent >= .8)

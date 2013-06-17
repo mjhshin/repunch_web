@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>re:punch | {% block title %}{% endblock %}</title>
+	<title>Repunch | {% block title %}{% endblock %}</title>
 	
 	<!-- include page specific css -->
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
@@ -22,13 +22,13 @@
 	<div id="site-frame">
 		<div id="header">
 			<div id="header-left">
-				<img src="{% static "manage/images/logo_header.png" %}" alt="re:punch" id="logo-header" />&nbsp;
+				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</div>
 			
 			<form action="" method="POST" id="punch-form" >
 			    {% csrf_token %}
 			    <input type="text" id="punch_code" placeholder="Punch Code"/>
-			    <input type="number" id="punch_amount" placeholder="Amount" />
+			    <input type="number" id="punch_amount" placeholder="Amount" min="1" />
 			    <a class="button gray" onclick="punchit('{% url 'store_punch' %}'); return false;"><span>Punch</span></a>
 			    <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
 			        id="punch-loading" />
@@ -57,7 +57,7 @@
 					<a href="{% url 'store_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
 						<span class="nav-item-title">My Account</span>
-						{% account_alert request.session.account as alert %}
+						{% account_alert request.session as alert %}
 						{% if alert %}
 						<div class="nav-item-badge">!</div>
 						{% endif %}
@@ -107,7 +107,7 @@
 		</div><!-- close content-frame -->
 	</div><!-- close site-frame -->
 	<div id="footer">
-		<img src="{% static "manage/images/logo_footer.png" %}" alt="re:punch" id="logo-footer" />
+		<img src="{% static "manage/images/logo_footer.png" %}" alt="Repunch" id="logo-footer" />
 	</div>
 </body>
 </html>

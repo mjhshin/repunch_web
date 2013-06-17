@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>re:punch | Login</title>
+	<title>Repunch | Login</title>
 	
 	<!-- include page specific css -->
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
@@ -14,7 +14,7 @@
 	<div id="site-frame">
 		<div id="header">
 			<div id="header-left">
-				<img src="{% static "manage/images/logo_header.png" %}" alt="re:punch" id="logo-header" />&nbsp;
+				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</div>
 		</div>
 		<div id="content-frame">
@@ -34,7 +34,7 @@
 		</div><!-- close content-frame -->
 	</div><!-- close site-frame -->
 	<div id="footer">
-		<img src="{% static "manage/images/logo_footer.png" %}" alt="re:punch" id="logo-footer" />
+		<img src="{% static "manage/images/logo_footer.png" %}" alt="Repunch" id="logo-footer" />
 	</div>
 </body>
 </html>

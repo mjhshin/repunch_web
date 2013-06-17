@@ -8,7 +8,7 @@
 {% with account=request.session.account %}
 	{% with store=account|get:"store" %}
 	<!-- possibly move to header -->
-	{% account_alert account as alert %}
+	{% account_alert request.session as alert %}
 	{% if alert %}
 	<div class="notification">
 		<div>Alert! You are reaching your subscription max.</div>
@@ -74,7 +74,7 @@
 		
 		<div class="white-box" id="limits-box">
 			<div class="limit-details">
-				<div class="bar-graph"><div style="height: {% account_user_usage account 52 %}px"></div></div>
+				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count account %}</div>

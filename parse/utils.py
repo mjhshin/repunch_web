@@ -71,6 +71,7 @@ def parse(method, path, data=None, query=None,
         return None
 
     conn.close()
+    print path
     return result
 
 def rescale(image_path, img_format, width=dim[0], height=dim[1]):
