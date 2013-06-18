@@ -6,12 +6,12 @@ from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK
 
 SESSION_CACHE = [
-    'num_patrons',
+    'num_patrons', # need push notification
     'message_count',
-    'user_count',
+    'user_count', # merge with num_patrons?
     'unread_feedback',
     'employees_pending',
-    'patronStore_count',
+    'patronStore_count', # merge with num_patrons?
     
     # actual objects
     'account',
@@ -32,15 +32,6 @@ def get_store(session):
     else:
         return session['store']
         
-def get_messages_sent_list(session):
-    if 'messages_sent_list' not in session:
-        messages_sent_list = get_store(session).get(\
-                                    "sentMessages")
-        session['messages_sent_list'] = messages_sent_list
-        return messages_sent_list
-    else:
-        return session['messages_sent_list']
-        
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:
         patronStore_count =\
@@ -50,13 +41,40 @@ def get_patronStore_count(session):
     else:
         return session['patronStore_count']
         
+def get_messages_sent_list(session):
+    if 'messages_sent_list' not in session:
+        store = get_store(session)
+        messages_sent_list = store.get("sentMessages")
+        # make sure that the list is a list and not none
+        if messages_sent_list is None:
+            messages_sent_list = []
+        session['messages_sent_list'] = messages_sent_list
+        
+        # make sure that the store's cache is None, otherwise bad!
+        store.sentMessages = None
+        session['store'] = store
+        
+        return messages_sent_list
+    else:
+        return session['messages_sent_list']
+        
 def get_messages_received_list(session):
     # when a store replies, it also gets stored in the received
     # with message type BASIC or OFFER
     if 'messages_received_list' not in session:
-        messages_received_list = get_store(session).get(\
+        store = get_store(session)
+        messages_received_list = store.get(\
                     "receivedMessages", message_type=FEEDBACK)
+        
+        # make sure that the list is a list and not none
+        if messages_received_list is None:
+            messages_received_list = []
         session['messages_received_list'] = messages_received_list
+        
+        # make sure that the store's cache is None, otherwise bad!
+        store.receivedMessages = None
+        session['store'] = store
+        
         return messages_received_list
     else:
         return session['messages_received_list']

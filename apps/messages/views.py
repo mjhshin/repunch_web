@@ -40,9 +40,9 @@ def index(request):
 
 @login_required
 def edit(request, message_id):
+    # TODO USE LIST IN SESSION
     rputils.set_timezone(request)
-    account = request.session['account']
-    store = account.get('store')
+    store = SESSION.get_store(request.session)
 
     data = {'messages_nav': True, 'message_id': message_id,
         "filters": FILTERS}
@@ -54,24 +54,28 @@ def edit(request, message_id):
     # for slider most_loyal min_punches
     mp = store.get("patronStores", limit=1,
         order="-all_time_punches")[0].get('all_time_punches')
+    # make sure cache attr is None for future queries!
+    store.patronStores = None
+    
     data['mp_slider_value'] = int(mp*0.50)
     data['mp_slider_min'] = int(mp*0.20)
     data['mp_slider_max'] = int(mp*0.80)
     
     if request.method == 'POST':
         form = MessageForm(request.POST) 
-        print form.errors
         # check here if limit has been reached
         start = datetime.now().replace(day=1, hour=0,
                                     minute=0, second=0)
-        subType = store.get('subscription').get('subscriptionType')
+        subType = SESSION.get_subscription(\
+                    request.session).get('subscriptionType')
         num_sent = store.get('sentMessages', createdAt__gte=start,
                                 count=1, limit=0)
+        request.session['message_count'] = num_sent
+                                
         limit_reached = num_sent >= sub_type[subType]['max_messages']
         
         if form.is_valid() and not limit_reached:
             if form.data.get('action')  == 'upgrade':
-                # TODO upgrade
                 pass
                 """
                 if account.upgrade():
@@ -103,10 +107,14 @@ def edit(request, message_id):
             data['message'] = message
             # add to the store's relation
             store.add_relation("SentMessages_", [message.objectId]) 
-            # update the session
-            account.set('store', store)
-            request.session['account'] = account
             success_message = "Message has been sent."
+            
+            # update messages_sent_list in session cache
+            messages_sent_list = SESSION.get_messages_sent_list(\
+                request.session)
+            messages_sent_list.append(message)
+            request.session['messages_sent_list'] =\
+                messages_sent_list
 
             msg_filter = request.POST['chosen_filter']
             params = {
@@ -126,8 +134,12 @@ def edit(request, message_id):
 
             # push notification
             cloud_call("retailer_message", params)
+            
+            # update store session cache
+            request.session['store'] = store
 
             return HttpResponseRedirect(message.get_absolute_url())
+            
         elif limit_reached and subType != 2:
             data['limit_reached'] = limit_reached
         elif limit_reached and subType == 2:
@@ -149,8 +161,14 @@ def edit(request, message_id):
             
             message = store.get("sentMessages", 
                     objectId=message_id)[0]
+            # make sure cache attr is None for future queries!
+            store.sentMessages = None
+                    
             form = MessageForm(message.__dict__.copy())
             data['message'] = message
+            
+    # update store session cache
+    request.session['store'] = store
             
     data['form'] = form
 
@@ -158,11 +176,18 @@ def edit(request, message_id):
 
 @login_required
 def details(request, message_id):
-    store = request.session['account'].get('store')
+    # TODO USE LIST IN SESSION
+    store = SESSION.get_store(request.session)
 
     message = store.get("sentMessages", objectId=message_id)[0]
+    # make sure cache attr is None for future queries!
+    store.sentMessages = None
+    
     if not message:
         raise Http404
+        
+    # update store session cache
+    request.session['store'] = store
 
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True})
@@ -197,13 +222,16 @@ def delete(request, message_id):
 # FEEDBACK ------------------------------------------
 @login_required
 def feedback(request, feedback_id):
+    # TODO USE LIST IN SESSION
     account = request.session['account']
-    store = account.store
+    store = SESSION.get_store(request.session)
     data = {'messages_nav': True, 'feedback_id':\
             feedback_id, 'account_username':\
             account.get('username')}    
     
     feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    # make sure cache attr is None for future queries!
+    store.receivedMessages = None
     if not feedback:
         raise Http404
     
@@ -215,6 +243,9 @@ def feedback(request, feedback_id):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
+        
+    # update store session cache
+    request.session['store'] = store
     
     # there should only be at most 1 reply
     data['reply'] = feedback.get('reply')
@@ -224,11 +255,14 @@ def feedback(request, feedback_id):
 
 @login_required
 def feedback_reply(request, feedback_id):
+    # TODO USE LIST IN SESSION
     account = request.session['account']
-    store = account.store
+    store = SESSION.get_store(request.session)
     data = {'messages_nav': True}    
     
     feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    # make sure cache attr is None for future queries!
+    store.receivedMessages = None
     if not feedback:
         raise Http404
     
@@ -269,6 +303,9 @@ def feedback_reply(request, feedback_id):
     else:
         data['from_address'] = account.get('username')
         data['subject'] = 'Re: ' + feedback.get('subject')
+        
+    # update store session cache
+    request.session['store'] = store
     
     data['feedback'] = feedback
     
@@ -276,9 +313,12 @@ def feedback_reply(request, feedback_id):
 
 @login_required
 def feedback_delete(request, feedback_id):
-    store = request.session['account'].store
+    # TODO USE LIST IN SESSION
+    store = SESSION.get_store(request.session)
     
     feedback = store.get("receivedMessages", objectId=feedback_id)[0]
+    # make sure cache attr is None for future queries!
+    store.receivedMessages = None
     if not feedback:
         raise Http404
 
@@ -286,6 +326,10 @@ def feedback_delete(request, feedback_id):
     if feedback.get('Reply'):
         feedback_reply = feedback.get('reply')
         feedback_reply.delete()
+        
+    
+    # update store session cache
+    request.session['store'] = store
     
     feedback.delete()
     return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
