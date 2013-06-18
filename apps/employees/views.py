@@ -6,7 +6,7 @@ from django.db.models import Sum
 from datetime import datetime
 import urllib, json
 
-from parse.apps.employees import DENIED
+from parse.apps.employees import DENIED, APPROVED
 from parse import session as SESSION
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
@@ -36,11 +36,13 @@ def index(request):
 
 @login_required
 def edit(request, employee_id):
-    store = request.session['account'].get('store')
+    store = SESSION.get_store(request.session)
     data = {'employees_nav': True, 'employee_id': employee_id}
     
     #need to make sure this reward really belongs to this store
     employee = store.get("employees", objectId=employee_id)[0]
+    # need to make sure that cache attr is empty!
+    store.employees = None
     acc = Account.objects().get(Employee=employee.objectId)
     if not employee or not acc:
         raise Http404
@@ -62,6 +64,9 @@ def edit(request, employee_id):
             
         form = EmployeeForm(employee.__dict__.copy())
         form.data['email'] = acc.get('email')
+        
+    # update session cache store
+    request.session['store'] = store
     
     data['form'] = form
     data['employee'] = employee
@@ -70,56 +75,119 @@ def edit(request, employee_id):
 
 @login_required
 def delete(request, employee_id):
-    store = request.session['account'].get('store')
+    store = SESSION.get_store(request.session)
 
     #need to make sure this reward really belongs to this store
     employee = store.get("employees", objectId=employee_id)[0]
+    # need to make sure that cache attr is empty!
+    store.employees = None
     if not employee:
         raise Http404
+        
+    # update session cache for employees_approved_list
+    employees_approved_list =\
+        request.session['employees_approved_list']
+    i_remove = 0
+    for i, emp in enumerate(employees_approved_list):
+        if emp.objectId == employee.objectId:
+            i_remove = i
+    employees_approved_list.pop(i_remove)   
+    request.session['employees_approved_list'] =\
+        employees_approved_list
 
-    # TODO delete Punches and Rewards Pointers to this employee?
+    # delete Punches Pointers to this employee?
     employee.delete()
+    
+    # update session cache store
+    request.session['store'] = store
 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
 @login_required
 def approve(request, employee_id):
-    store = request.session['account'].get('store')
+    store = SESSION.get_store(request.session)
 
     #need to make sure this reward really belongs to this store
     employee = store.get("employees", objectId=employee_id)[0]
+    # need to make sure that cache attr is empty!
+    store.employees = None
     if not employee:
         raise Http404
     
     employee.set('status', APPROVED)
     employee.update()
     
+    # update session cache for employees_pending
+    request.session['employees_pending'] =\
+        int(request.session['employees_pending']) - 1
+    # update session cache for employees_pending_list
+    i_remove = 0
+    employees_pending_list =\
+        request.session['employees_pending_list']
+    for i, emp in enumerate(employees_pending_list):
+        if emp.objectId == employee.objectId:
+            i_remove = i
+    employees_pending_list.pop(i_remove)
+    request.session['employees_pending_list'] =\
+        employees_pending_list
+    
+    # update session cache for employees_approved_list
+    employees_approved_list =\
+        request.session['employees_approved_list']
+    employees_approved_list.append(employee)
+    request.session['employees_approved_list'] =\
+        employees_approved_list
+    
+    # update session cache store
+    request.session['store'] = store
+    
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
 @login_required
 def deny(request, employee_id):
-    store = request.session['account'].get('store')
+    store = SESSION.get_store(request.session)
 
     #need to make sure this reward really belongs to this store
     employee = store.get("employees", objectId=employee_id)[0]
+    # need to make sure that cache attr is empty!
+    store.employees = None
     if not employee:
         raise Http404
     
     employee.status = DENIED;
     employee.update();
     
+    # update session cache for employees_pending
+    request.session['employees_pending'] =\
+        int(request.session['employees_pending']) - 1
+    # update session cache for employees_pending_list
+    i_remove = 0
+    employees_pending_list =\
+        request.session['employees_pending_list']
+    for i, emp in enumerate(employees_pending_list):
+        if emp.objectId == employee.objectId:
+            i_remove = i
+    employees_pending_list.pop(i_remove)
+    request.session['employees_pending_list'] =\
+        employees_pending_list
+    
+    # update session cache store
+    request.session['store'] = store
+    
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
 @login_required
 def punches(request, employee_id):
-    store = request.session['account'].get('store')
+    store = SESSION.get_store(request.session)
     data = {'employee_id': employee_id}
 
     # make sure that this employee belongs to this store
     employee = store.get("employees", objectId=employee_id)[0]
+    # need to make sure that cache attr is empty!
+    store.employees = None
     if not employee:
         raise Http404
     
@@ -142,6 +210,9 @@ def punches(request, employee_id):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         punches = paginator.page(paginator.num_pages)
+        
+    # update session cache store
+    request.session['store'] = store
     
     data['punches'] = punches
     

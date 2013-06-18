@@ -63,18 +63,40 @@ def get_messages_received_list(session):
         
 def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:
+        store = get_store(session)
         employees_pending_list = get_store(session).get(\
                                 "employees", status=PENDING)
+                                
+        # make sure that the list is a list and not none
+        if employees_pending_list is None:
+            employees_pending_list = []
         session['employees_pending_list'] = employees_pending_list
+        
+        # make sure that the store's cache is None, otherwise
+        # getting pending_list might return the approved_list!
+        store.employees = None
+        session['store'] = store
+        
         return employees_pending_list
     else:
         return session['employees_pending_list']
         
 def get_employees_approved_list(session):
     if 'employees_approved_list' not in session:
-        employees_approved_list = get_store(session).get(\
-                                "employees", status=APPROVED)
+        store = get_store(session)
+        employees_approved_list = store.get(\
+                                "employees", status=APPROVED)      
+        
+        # make sure that the list is a list and not none
+        if employees_approved_list is None:
+            employees_approved_list = []  
         session['employees_approved_list'] = employees_approved_list
+            
+        # make sure that the store's cache is None, otherwise
+        # getting pending_list might return the approved_list!
+        store.employees = None
+        session['store'] = store
+        
         return employees_approved_list
     else:
         return session['employees_approved_list']
