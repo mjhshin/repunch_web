@@ -88,7 +88,7 @@ def edit(request):
             data['success'] = "Store details have been saved."
     else:
         form = StoreForm()
-        form.initial = store.__dict__
+        form.initial = store.__dict__.copy()
         
     hours_map = {}
     # group up the days that aare in the same row

@@ -149,7 +149,7 @@ def edit(request, message_id):
             
             message = store.get("sentMessages", 
                     objectId=message_id)[0]
-            form = MessageForm(message.__dict__)
+            form = MessageForm(message.__dict__.copy())
             data['message'] = message
             
     data['form'] = form

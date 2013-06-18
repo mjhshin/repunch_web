@@ -60,7 +60,7 @@ def edit(request, employee_id):
         if request.GET.get("error"):
             data['error'] = request.GET.get("error")
             
-        form = EmployeeForm(employee.__dict__)
+        form = EmployeeForm(employee.__dict__.copy())
         form.data['email'] = acc.get('email')
     
     data['form'] = form
