@@ -11,14 +11,16 @@ from apps.rewards.forms import RewardForm, RewardAvatarForm
 def index(request):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
-    lst, rewards = [], SESSION.get_store(request.session).get('rewards')
+    lst, rewards = [], store.get('rewards')
     # create a reward map
     if rewards:
         reward_map = {int(reward['punches']):reward for reward in rewards}
         # get a sorted list of punches in descending order
         punches = [p for p in reward_map.iterkeys()]
         punches.sort()
-        data['rewards'] = [reward_map[p] for p in punches]
+        sorted_rewards = [reward_map[p] for p in punches]
+        store.rewards = sorted_rewards
+        data['rewards'] = sorted_rewards
     else:
         data['rewards'] = []
     
@@ -26,6 +28,9 @@ def index(request):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
+        
+    # update session cache
+    request.session['store'] = store
     
     return render(request, 'manage/rewards.djhtml', data)
 
@@ -33,9 +38,7 @@ def index(request):
 @login_required
 def edit(request, reward_id):
     data = {'rewards_nav': True}
-    # reward key is now just an array key
-    account = request.session['account']
-    store = account.get('store')
+    store = SESSION.get_store(request.session)
     rewards = store.get('rewards')
     if rewards:
         init_count = len(rewards)
@@ -81,9 +84,6 @@ def edit(request, reward_id):
             if now_count > init_count:
                 reward_id = now_count - 1
             
-            #reload the store and put it in the session
-            account.store = store
-            request.session['account'] = account
             data['reward_id'] = len(store.get('rewards'))
             if not is_new:
                 data['success'] = "Reward has been updated."
@@ -103,6 +103,9 @@ def edit(request, reward_id):
                 data['success'] = request.GET.get("success")
             if request.GET.get("error"):
                 data['error'] = request.GET.get("error")
+                
+    # update session cache
+    request.session['store'] = store
 
     data['is_new'] = is_new;
     data['reward'] = reward
@@ -113,7 +116,7 @@ def edit(request, reward_id):
 @login_required
 def delete(request, reward_id):
     account = request.session['account']
-    store = account.get('store')
+    store = SESSION.get_store(request.session)
     rewards = store.get('rewards')
 
     try:
@@ -127,8 +130,10 @@ def delete(request, reward_id):
         raise Http404
     
     store.array_remove('rewards', [reward])
-    account.store = store
-    request.session['account'] = account
+    
+    # update session cache
+    request.session['store'] = store
+    
     return redirect(reverse('rewards_index')+\
                 "?%s" % urllib.urlencode({'success':\
                 'Reward has been removed.'}))
