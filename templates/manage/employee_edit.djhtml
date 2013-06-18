@@ -34,13 +34,15 @@
 		{% if employee.objectId %}
 		<div id="photo-edit">
 			<div id="edit-employees-options" class="form-options">
-			    <a onclick="$('#employee-form').submit(); return false;" class="button blue">Delete Employee</a>
+			    <a onclick="$('#employee-form').submit(); return false;" class="button blue" style="position:relative;top:-32px;">Delete Employee</a>
 		    </div>
 		</div>
 		{% endif %}
 		
 		<h2>{{ form.data.last_name }}, {{ form.data.first_name }}</h2>
-        <p>{{ form.data.email }}<p>	    
+		<div class="input-container info">
+        <span>{{ form.data.email }}</span>	    
+        </div><br /><br />
     
 		<div class="input-container info" id="date_added">
 			<label>Date Added</label>
@@ -52,7 +54,7 @@
 			<span>{{ employee|get:'lifetime_punches' }}</span>
 		</div>
 		
-		<div class="section">
+		<div class="section" style="margin-top:20px;">
 			<div class="section-title">Punch History</div>
 			<div class="white-box table" id="tab-body-punches">
 				<div class="table-header">

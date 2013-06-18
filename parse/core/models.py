@@ -308,7 +308,7 @@ class ParseObject(object):
             # GeoPoint
             elif key == "coordinates" and type(value) is dict:
                 setattr(self, key, 
-                    (value.get('latitude'),value.get('longtitude') )
+                    (value.get('latitude'),value.get('longtitude')) )
             else:
                 setattr(self, key, value)
 
@@ -452,11 +452,11 @@ class ParseObject(object):
                     
         # attr is a geopoint
         elif attr == "coordinates" and attr in self.__dict__:
-            res = parse("GET", self.path(), query={"keys":attr),
+            res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
                 setattr(self, attr, 
-                    (value.get('latitude'),value.get('longtitude') )
+                    (value.get('latitude'),value.get('longtitude')) )
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,

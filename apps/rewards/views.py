@@ -85,14 +85,14 @@ def edit(request, reward_id):
                 reward_id = now_count - 1
             
             data['reward_id'] = len(store.get('rewards'))
-            if not is_new:
-                data['success'] = "Reward has been updated."
-            else:
-            # Since this is new we need to redirect the page
-                return HttpResponseRedirect(\
-                    reverse('reward_edit', args=[reward_id])+ "?%s" %\
-                     urllib.urlencode({'success':\
-                    'Reward has been added.'}))
+            data['success'] = "Reward has been updated."
+            
+            # update session cache
+            request.session['store'] = store
+            
+            return redirect(reverse('rewards_index')+\
+                "?%s" % urllib.urlencode({'success':\
+                'Reward has been added.'}))
     else:
         if reward_id >= 0 :
             form = RewardForm(rewards[reward_id])
