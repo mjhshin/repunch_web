@@ -8,6 +8,7 @@ import json, urllib
 from apps.stores.forms import SettingsForm, SubscriptionForm
 from libs.repunch import rputils
 
+from parse import session as SESSION
 from parse.apps.accounts import order_placed
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings
@@ -16,8 +17,8 @@ from parse.apps.stores.models import Settings
 def settings(request):
     data = {'settings_nav': True}
     account = request.session['account']
-    store = account.get('store')
-    settings = store.get('settings')
+    store = SESSION.get_store(request.session)
+    settings = SESSION.get_settings(request.session)
 
     # settings should never be none but just in case
     if settings == None:
@@ -25,8 +26,7 @@ def settings(request):
         store.Settings = settings.objectId
         store.settings = settings
         store.update()
-        account.store = store
-        request.session['account'] = account
+        request.session['settings'] = settings
 
     if request.method == 'POST':
         form = SettingsForm(request.POST)
@@ -39,8 +39,6 @@ def settings(request):
             store.Settings = settings.objectId
             store.settings = settings
             store.update()
-            account.store = store
-            request.session['account'] = account
 
             data['success'] = "Settings have been saved."
         else:

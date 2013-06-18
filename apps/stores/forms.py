@@ -17,7 +17,13 @@ class StoreSignUpForm(forms.Form):
     last_name = forms.CharField(max_length=100)
     phone_number = forms.CharField()
 
-class StoreForm(StoreSignUpForm):
+class StoreForm(forms.Form):
+    store_name = forms.CharField(max_length=255)
+    street = forms.CharField(max_length=255)
+    city = forms.CharField(max_length=255)
+    state = forms.CharField(max_length=255)
+    zip = forms.CharField(max_length=255)
+    country = forms.CharField(max_length=255)
     phone_number = forms.CharField(max_length=255)
     store_description = forms.CharField(max_length=200, 
                                     widget=forms.Textarea())

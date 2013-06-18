@@ -47,26 +47,6 @@ def index(request):
 def edit(request):
     data = {'account_nav': True}
     account = request.session['account']
-    
-    # build the list of hours in proper format for saving to Parse
-    hours, ind, key = [], 0, "hours-0-days"
-    while ind < 7:
-        days = request.POST.getlist(key)
-        if days:
-            # format time from 10:00:00 to 1000
-            open_time = request.POST["hours-" + str(ind) +\
-                        "-open"].replace(":", "").zfill(6)[:4]
-            close_time = request.POST["hours-" + str(ind) +\
-                        "-close"].replace(":", "").zfill(6)[:4]
-            for day in days:
-                hours.append({
-                    "day":int(day)-1, # days are from 0 to 6
-                    "open_time":open_time,
-                    "close_time":close_time,
-                })
-        ind += 1
-        key = "hours-" + str(ind) + "-days"
-        
     # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
             
@@ -76,16 +56,33 @@ def edit(request):
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
         form = StoreForm(request.POST)
+        print form.is_valid()
         if form.is_valid(): 
             store = Store(**account.get("store").__dict__)
             store.update_locally(request.POST.dict(), False)
+            
+            # build the list of hours in proper format for saving 
+            # to Parse
+            hours, ind, key = [], 0, "hours-0-days"
+            while ind < 7:
+                days = request.POST.getlist(key)
+                if days:
+                    # format time from 10:00:00 to 1000
+                    open_time = request.POST["hours-" + str(ind) +\
+                                "-open"].replace(":", "").zfill(6)[:4]
+                    close_time = request.POST["hours-" + str(ind) +\
+                                "-close"].replace(":", 
+                                                "").zfill(6)[:4]
+                    for day in days:
+                        hours.append({
+                            "day":int(day)-1, # days are from 0 to 6
+                            "open_time":open_time,
+                            "close_time":close_time,
+                        })
+                ind += 1
+                key = "hours-" + str(ind) + "-days"
             store.set("hours", hours)
             store.update()
-
-            # store no longer has email field. Email now exclusive to
-            # Accounts (_User) class
-            account.email = request.POST['email']
-            account.update()
 
             account.store = store
             request.session['account'] = account
