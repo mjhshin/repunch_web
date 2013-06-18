@@ -50,7 +50,12 @@
 				    <label for="id_store_name">Business Name</label>
 				    {{ store_form.store_name }}
 
-                    <div id="categories-box" class="ui-widget">
+                    <div id="categories-box" class="ui-widget"
+                        {# offset issues #}
+                        {% if store_form.errors or account_form.errors or subscription_form.errors %}
+                        style="position:absolute;top:583px;"
+                        {% endif %}
+                    >
                           <label for="categories">Categories (limit of 2)</label>
                           <input id="categories" name="categories" />
                     </div>
@@ -195,12 +200,32 @@
 						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					
-					<a class="button orange" href="#" onclick="$('#signup-form').submit(); return false;">Create Account</a>
+					<a class="button orange" href="#" 
+					    id="signup-form-submit">Create Account</a>
+		            <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
+	                    id="processing-form" 
+	                    style="display:none;position:relative;top:14px;left:6px;"/>
 					<br>
 					<br>
 					<br>
 				</form>
 			</aside>
+			
+			<script>
+            $(document).ready(function(){
+                var pf = $("#processing-form");
+                $("#signup-form-submit").click(function(){
+                    var sForm = $('#signup-form');
+                    // only proceed if not processing a form
+                    if (pf.css("display") == "none"){
+                        pf.show();
+                        sForm.submit();
+                    }
+                    return false;
+                });
+            });
+            </script>
+			
 			<div class="clear-both"></div>
 		</div>
 	</div>

@@ -130,23 +130,26 @@
 		<a class="button blue" id="upgrade-form-submit">Upgrade</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
+			        id="processing-form" style="display:none;"/>
 	</div>
 	
 	<script>
     $(document).ready(function(){
-        var a = $("#upgrade-form-submit");
-        a.click(function(){
+        var pf = $("#processing-form");
+        $("#upgrade-form-submit").click(function(){
+            var uForm = $('#upgrade-form');
             {% if update %}
-            var f = $('#upgrade-form').attr("action",
+            uForm.attr("action",
                 "{% url 'account_update' %}");
             {% elif upgrade %}
-            var f = $('#upgrade-form').attr("action",
+            uForm.attr("action",
                 "{% url 'account_upgrade' %}");
             {% endif %}
-            if (a.hasClass('blue')){
-                a.removeClass('blue');
-                a.addClass('gray');
-                f.submit();
+            // only proceed if not processing a form
+            if (pf.css("display") == "none"){
+                pf.show();
+                uForm.submit();
             }
             return false;
         });

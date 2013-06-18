@@ -5,7 +5,8 @@
 	{% block meta %}{% endblock %}
 	
 	<title>Repunch | {% block title %}{% endblock %}</title>
-	
+	<link rel="shortcut icon" 
+	    href="{% static 'public/images/favicon.png' %}" />
 	
 	
 	<!-- include page specific css -->
