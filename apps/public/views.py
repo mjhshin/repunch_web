@@ -97,6 +97,11 @@ def sign_up(request):
                         punches_employee=5, Store=store.objectId)
             store.Settings = settings.objectId
             store.set('settings', settings)
+            # set defaults for these guys to prevent 
+            # ParseObjects from making parse calls repeatedly
+            store.set("description", "The " + store.store_name)
+            store.set("hours", [])
+            store.set("rewards", [])
             store.update()
 
             # create account

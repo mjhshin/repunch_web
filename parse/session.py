@@ -2,26 +2,28 @@
 Use to keep track of all the cache object names in the session.
 """
 
+from datetime import date
+
+from libs.dateutil.extras import start_month, end_month
+
 from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK
 
 SESSION_CACHE = [
-    'num_patrons', # need push notification
     'message_count',
-    'user_count', # merge with num_patrons?
-    'unread_feedback',
-    'employees_pending',
-    'patronStore_count', # merge with num_patrons?
+    'feedback_unread', # need push notification
+    'employees_pending', # need push notification
+    'patronStore_count', # need push notification
     
     # actual objects
     'account',
-    'store',
+    'store', # need push notification (for rewards)
     'subscription',
     'settings',
-    'employees_pending_list',
+    'employees_pending_list', # need push notification
     'employees_approved_list',
     'messages_sent_list',
-    'messages_received_list',
+    'messages_received_list', # need push notification
 ]
 
 def get_store(session):
@@ -79,6 +81,38 @@ def get_messages_received_list(session):
     else:
         return session['messages_received_list']
         
+def get_message_count(session):
+    if 'message_count' not in session:
+        today = date.today()
+        message_count = get_store(session).get(\
+            'sentMessages', 
+            createdAt__gte=start_month(today),
+            createdAt__lte=end_month(today),
+            count=1, limit=0)
+        session['message_count'] = message_count
+    else:
+        message_count = session['message_count']
+    return message_count
+        
+def get_feedback_unread(session):
+    if 'feedback_unread' not in session:
+        feedback_unread = get_store(session).get(\
+            "receivedMessages", is_read=False, 
+            message_type=FEEDBACK, count=1, limit=0)
+        session['feedback_unread'] = feedback_unread
+    else:
+        feedback_unread = session['feedback_unread']
+    return feedback_unread
+    
+def get_employees_pending(session):
+    if 'employees_pending' not in session:
+        employees_pending = get_store(session).get(\
+                'employees', status=PENDING, count=1, limit=0)
+        session['employees_pending'] = employees_pending
+    else:
+        employees_pending = session['employees_pending']
+    return employees_pending
+       
 def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:
         store = get_store(session)

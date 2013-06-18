@@ -14,25 +14,13 @@ register = template.Library()
 
 @register.assignment_tag
 def feedback_unread(session):
-    if 'unread_feedback' not in session:
-        unread_feedback = SESSION.get_store(session).get(\
-            "receivedMessages", is_read=False, 
-            message_type=FEEDBACK, count=1, limit=0)
-        session['unread_feedback'] = unread_feedback
-    else:
-        unread_feedback = session['unread_feedback']
-    return unread_feedback
+    """ this is just a count of # of unread feedbacks """
+    return SESSION.get_feedback_unread(session)
 
 
 @register.assignment_tag
 def employees_pending(session):
-    if 'employees_pending' not in session:
-        employees_pending = SESSION.get_store(session).get(\
-                'employees', status=PENDING, count=1, limit=0)
-        session['employees_pending'] = employees_pending
-    else:
-        employees_pending = session['employees_pending']
-    return employees_pending
+    return SESSION.get_employees_pending(session)
 
 @register.simple_tag
 def hours(session):
@@ -40,7 +28,8 @@ def hours(session):
     build the list of hours in proper format to render in template
     """
     hours_map, hours = {}, []
-    hrs = SESSION.get_store(session).get("hours")
+    store = SESSION.get_store(session)
+    hrs = store.get("hours")
     if hrs:
         for hour in hrs:
             key = (hour['close_time'], hour['open_time'])
@@ -54,6 +43,9 @@ def hours(session):
                     open=datetime.datetime.strptime(key[1], "%H%M"),
                     close=datetime.datetime.strptime(key[0], "%H%M"),
                     list_order=i+1))
+                    
+    # update the session cache
+    session['store'] = store
             
     return HoursInterpreter(hours=hours).readable()  
 

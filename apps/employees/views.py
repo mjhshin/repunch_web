@@ -91,6 +91,7 @@ def delete(request, employee_id):
     for i, emp in enumerate(employees_approved_list):
         if emp.objectId == employee.objectId:
             i_remove = i
+            break
     employees_approved_list.pop(i_remove)   
     request.session['employees_approved_list'] =\
         employees_approved_list
@@ -128,6 +129,7 @@ def approve(request, employee_id):
     for i, emp in enumerate(employees_pending_list):
         if emp.objectId == employee.objectId:
             i_remove = i
+            break
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
@@ -169,6 +171,7 @@ def deny(request, employee_id):
     for i, emp in enumerate(employees_pending_list):
         if emp.objectId == employee.objectId:
             i_remove = i
+            break
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list

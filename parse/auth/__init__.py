@@ -29,7 +29,7 @@ def login(request, username, password, account):
     
     res = parse("GET", "login", query={"username":username,
                     "password":password} )
-
+    # TODO maybe share the session with same user on different browser
     if res and "error" not in res:
         request.session[SESSION_KEY] = res.get('sessionToken')
         account.update_locally(res, False)

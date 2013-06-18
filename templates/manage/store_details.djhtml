@@ -20,9 +20,7 @@
 	{% endif %}
 	
 	<div class="section first" id="store-details">
-		<div class="section-title">
-			Store Details
-		</div>
+		<h2>Store Details</h2><br/>
 		
 		<div class="white-box" id="store-details-content">
 			{% if store|get:'store_avatar'  %}

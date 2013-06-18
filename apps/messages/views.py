@@ -40,16 +40,11 @@ def index(request):
 
 @login_required
 def edit(request, message_id):
-    # TODO USE LIST IN SESSION
     rputils.set_timezone(request)
     store = SESSION.get_store(request.session)
 
     data = {'messages_nav': True, 'message_id': message_id,
         "filters": FILTERS}
-        
-    # 404 if no patrons
-    if not store.get("patronStores", count=1, limit=0):
-        raise Http404
         
     # for slider most_loyal min_punches
     mp = store.get("patronStores", limit=1,
@@ -62,6 +57,9 @@ def edit(request, message_id):
     data['mp_slider_max'] = int(mp*0.80)
     
     if request.method == 'POST':
+        # 404 if no patrons 
+        if not store.get("patronStores", count=1, limit=0):
+            raise Http404
         form = MessageForm(request.POST) 
         # check here if limit has been reached
         start = datetime.now().replace(day=1, hour=0,
@@ -176,7 +174,6 @@ def edit(request, message_id):
 
 @login_required
 def details(request, message_id):
-    # TODO USE LIST IN SESSION
     store = SESSION.get_store(request.session)
 
     message = store.get("sentMessages", objectId=message_id)[0]
@@ -222,7 +219,6 @@ def delete(request, message_id):
 # FEEDBACK ------------------------------------------
 @login_required
 def feedback(request, feedback_id):
-    # TODO USE LIST IN SESSION
     account = request.session['account']
     store = SESSION.get_store(request.session)
     data = {'messages_nav': True, 'feedback_id':\
@@ -255,7 +251,6 @@ def feedback(request, feedback_id):
 
 @login_required
 def feedback_reply(request, feedback_id):
-    # TODO USE LIST IN SESSION
     account = request.session['account']
     store = SESSION.get_store(request.session)
     data = {'messages_nav': True}    
@@ -313,7 +308,6 @@ def feedback_reply(request, feedback_id):
 
 @login_required
 def feedback_delete(request, feedback_id):
-    # TODO USE LIST IN SESSION
     store = SESSION.get_store(request.session)
     
     feedback = store.get("receivedMessages", objectId=feedback_id)[0]
@@ -327,6 +321,18 @@ def feedback_delete(request, feedback_id):
         feedback_reply = feedback.get('reply')
         feedback_reply.delete()
         
+    
+    # update messages_received_list in session cache
+    messages_received_list = SESSION.get_received_sent_list(\
+        request.session)
+    i_remove = 0
+    for i, m in enumerate(messages_received_list):
+        if m.objectId == feedback.objectId:
+            i_remove = i
+            break
+    messages_received_list.pop(i_remove)
+    request.session['messages_received_list'] =\
+        messages_received_list
     
     # update store session cache
     request.session['store'] = store

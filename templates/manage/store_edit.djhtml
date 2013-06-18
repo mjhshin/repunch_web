@@ -32,7 +32,7 @@
 		<div id="photo-edit">
 			<div class="white-box">
 				{% if store|get:'store_avatar'  %}
-					<img src="{{ store|get:'store_avatar_url' }}" class="avatar-big" />
+					<img src="{{ store|get:'store_avatar_url' }}" class="avatar-big" width="200px" height="200px" />
 				{% else %}
 					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
 				{% endif %}
@@ -42,6 +42,7 @@
 	
 		
 		<h2>Edit Store Details</h2>	
+		<br><br><br>
 		{{ form.non_field_errors }}
 		<div class="input-container">
 			{{ form.store_name.errors }}

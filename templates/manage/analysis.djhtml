@@ -26,7 +26,7 @@
 {% block content %}
 
 	<div class="section" id="trends">
-		<div class="section-title">Trends</div>
+		<h2 style="margin-bottom:10px;">Trends</h2>
 		<div class="white-box" id="trends-container">
 			<div class="graph-options-container">
 				<div class="graph-type-options">
@@ -48,7 +48,7 @@
 	</div>
 	
 	<div class="section" id="breakdown">
-		<div class="section-title">Breakdown</div>
+		<h2 style="margin-bottom:10px;">Breakdown</h2>
 		<div class="white-box" id="breakdown-container">
 			<div class="graph-options-container">
 				<div class="graph-type-options">
@@ -81,7 +81,7 @@
 	</div>
 	
 	<div class="section" id="rewards">
-		<div class="section-title">Rewards</div>
+		<h2 style="margin-bottom:10px;">Rewards</h2>
 		<div class="white-box table tab-body" style="display: block;">
 			<div class="table-header">
 				<div class="th sorted asc" id="header-reward_name">Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>

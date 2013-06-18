@@ -11,6 +11,8 @@ PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as dim
 
 BAD_FILE_CHR = re.compile('[\W_]+')
 
+import traceback
+
 def parse(method, path, data=None, query=None,
             cMeta='json'):
     """
@@ -69,9 +71,8 @@ def parse(method, path, data=None, query=None,
         if method == "POST" and cMeta == "png" and d:
             conn.close()
         return None
-
+        
     conn.close()
-    print path # TODO REMOVE
     return result
 
 def rescale(image_path, img_format, width=dim[0], height=dim[1]):
