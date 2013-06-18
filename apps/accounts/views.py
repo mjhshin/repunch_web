@@ -16,10 +16,8 @@ from parse.apps.stores.models import Settings
 @login_required
 def settings(request):
     data = {'settings_nav': True}
-    account = request.session['account']
     store = SESSION.get_store(request.session)
     settings = SESSION.get_settings(request.session)
-
     # settings should never be none but just in case
     if settings == None:
         settings = Settings.objects().create(retailer_pin=rputils.generate_id())
@@ -31,11 +29,15 @@ def settings(request):
     if request.method == 'POST':
         form = SettingsForm(request.POST)
         if form.is_valid(): 
-            settings.update_locally(request.POST.dict(), False)
+            # expect numbers so cast to int
+            dct = request.POST.dict().copy()
+            dct['punches_employee'] = int(dct['punches_employee'])
+            dct['punches_customer'] = int(dct['punches_customer'])
+            settings.update_locally(dct, False)
             settings.update()
             # Shin chose to move punches_facebook to Store...
             store.set("punches_facebook", 
-                        request.POST["punches_facebook"])
+                        int(request.POST["punches_facebook"]))
             store.Settings = settings.objectId
             store.settings = settings
             store.update()
@@ -48,6 +50,10 @@ def settings(request):
         # shin chose to move punches_facebook to Store...
         form.data['punches_facebook'] = store.get('punches_facebook')
     
+    # update the session cache
+    request.session['store'] = store
+    request.session['settings'] = settings
+    
     data['form'] = form
     data['settings'] = settings
     return render(request, 'manage/settings.djhtml', data)
@@ -57,18 +63,16 @@ def refresh(request):
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):
         data = {'success': False}
-        account = request.session['account']
-        store = account.get('store')
-        settings = store.get('settings');
+        settings = SESSION.get_settings(request.session)
         
         if settings == None:
             raise Http404
         else:
             settings.set('retailer_pin', rputils.generate_id())
             settings.update()
-            store.settings = settings
-            account.store = store
-            request.session['account'] = account
+            
+            # update the session cache
+            request.session['settings'] = settings
             
             data['success'] = True
             data['retailer_pin'] = settings.retailer_pin
@@ -80,10 +84,8 @@ def refresh(request):
 @login_required
 def update(request):
     data = {'account_nav': True, 'update':True}
-    # I think that a copy is made here so any changes made to account
-    # will not affect the account object in the session. maybe
-    account = request.session['account']
-    subscription = account.get("store").get('subscription')
+    store = SESSION.get_store(request.session)
+    subscription = SESSION.get_subscription(request.session)
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST)
@@ -109,12 +111,12 @@ def update(request):
                 request.POST.get("place_order_amount").isdigit():
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
-                    account.store.fetchAll()
-                    order_placed(amount, account.store)
-
-            # just in case account is a copy as noted above
-            account.store.subscription = subscription
-            request.session['account'] = account
+                    store.fetchAll()
+                    order_placed(amount, store)   
+            
+            # update the session cache
+            request.session['store'] = store
+            request.session['subscription'] = subscription
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -125,6 +127,10 @@ def update(request):
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
             form.initial.get('cc_number')[-4:]
+            
+    # update the session cache
+    request.session['store'] = store
+    request.session['subscription'] = subscription
     
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
@@ -133,10 +139,8 @@ def update(request):
 def upgrade(request):
     """ same as update expect this upgrades the subscriptionType """
     data = {'account_nav': True, 'upgrade':True}
-    # I think that a copy is made here so any changes made to account
-    # will not affect the account object in the session. maybe
-    account = request.session['account']
-    subscription = account.get("store").get('subscription')
+    store = SESSION.get_store(request.session)
+    subscription = SESSION.get_subscription(request.session)
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST) 
@@ -170,22 +174,27 @@ def upgrade(request):
                 request.POST.get("place_order_amount").isdigit():
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
-                    account.store.fetchAll()
-                    order_placed(amount, account.store)
-
-            # just in case account is a copy as noted above
-            account.store.subscription = subscription
-            request.session['account'] = account
+                    store.fetchAll()
+                    order_placed(amount, store)
+                    
+            
+            # update the session cache
+            request.session['store'] = store
+            request.session['subscription'] = subscription
 
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm(subscription.__dict__)
+        form = SubscriptionForm()
+        form.initial = subscription.__dict__
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
             form.initial.get('cc_number')[-4:]
             
-            
+    # update the session cache
+    request.session['store'] = store
+    request.session['subscription'] = subscription
+    
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)

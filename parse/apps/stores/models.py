@@ -139,8 +139,8 @@ class Subscription(ParseObject):
         Override to trim the cc_number before storing
         """
         # get the formated data to be put in the request
-        data = self._get_formatted_data()
         self._trim_cc_number()
+        data = self._get_formatted_data()
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
         if res and "error" not in res:
