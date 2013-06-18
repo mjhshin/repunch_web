@@ -1,5 +1,9 @@
 """
-Parse models corresponding to Django models
+Parse models corresponding to Django models.
+
+TODO: create a proper meta class to store info like which attributes
+are dates, or coordinates, etc. instead of restricting to attribute
+name prefixes and postfixes.
 """
 from json import dumps
 from dateutil import parser
@@ -7,7 +11,7 @@ from dateutil import parser
 from repunch.settings import USER_CLASS
 from parse.utils import parse
 from parse.core.formatter import query,\
-format_date, format_pointer, format_file,\
+format_date, format_pointer, format_file, format_geopoint,\
 NOT_WHERE_CONSTRAINTS
 
 class ParseObjectManager(object):
@@ -177,6 +181,13 @@ class ParseObject(object):
         e.g. 
             self.employee_avatar
             self.get('employee_avatar_url')
+            
+    ### GeoPoints:
+    
+        Attribute whose name is coordinates is considered a geo point.
+        I will change this (maybe) in the future if I plan to release
+        the source code. 
+        coordinates are cached as a tuple (latitude, longtitude)
 
     Instance Methods
     -----------------------------------------------------------
@@ -294,6 +305,10 @@ class ParseObject(object):
             elif key in ("createdAt", "updatedAt") and\
                 type(value) in (str, unicode):
                 setattr(self, key, parser.parse(value) )
+            # GeoPoint
+            elif key == "coordinates" and type(value) is dict:
+                setattr(self, key, 
+                    (value.get('latitude'),value.get('longtitude') )
             else:
                 setattr(self, key, value)
 
@@ -314,7 +329,7 @@ class ParseObject(object):
         res = parse("GET", self.path() + "/" + self.objectId)
         if res and "error" not in res:
             self.update_locally(res, False)
-            # fill up the cache attributes
+            # fill up the Pointer cache attributes 
             for key, value in self.__dict__.iteritems():
                 if key[0].isupper() and not key.endswith("_"):
                     self.get(key[0].upper() + key[1:])
@@ -353,7 +368,7 @@ class ParseObject(object):
             return self.__dict__.get(attr)
             
         if self.__dict__.get(attr) is not None:
-            # make sure that if count constrains are
+            # make sure that if count constraints are
             # present the cache does not block 
             if not (attr[0].islower() and attr[0].upper() +\
                 attr[1:] + "_" in self.__dict__ and\
@@ -434,6 +449,14 @@ class ParseObject(object):
                 setattr(self, attr.replace("_url",""), 
                     res['results'][0].get(\
                     attr.replace("_url", "")).get('name'))
+                    
+        # attr is a geopoint
+        elif attr == "coordinates" and attr in self.__dict__:
+            res = parse("GET", self.path(), query={"keys":attr),
+                    "where":dumps({"objectId":self.objectId})})
+            if 'results' in res and res['results']:
+                setattr(self, attr, 
+                    (value.get('latitude'),value.get('longtitude') )
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
@@ -609,6 +632,9 @@ class ParseObject(object):
             # File avatars
             elif key.endswith("_avatar"):
                 data[key] = format_file(value)
+            # GeoPoint
+            elif key == "coordinates":
+                data[key] = format_geopoint(value[0], value[1])
             # regular attributes
             else:
                 data[key] = value

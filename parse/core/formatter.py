@@ -44,10 +44,20 @@ def format_file(name):
     if name:
         return { "__type": "File",
                 "name": name }
+                
+def format_geopoint(latitude, longtitude):
+    """
+    Returns the Parse GeoPoint __type or None.
+    """
+    return { "__type": "GeoPoint",
+                "latitude": latitude,
+                "longtitude": longtitude }
 
 def query(constraints, where_only=False):
     """
     Returns the formatted constraints in Parse format.
+    Does not yet include Relations. 
+    Use parse.core.advanced_queries for Relation queries.
     """
     where, q, ignore = {}, {}, []
     # ignore is a list for keys to skip because it has a partner
@@ -105,10 +115,13 @@ def query(constraints, where_only=False):
                     ind += 1
                 where["$or"] = cts
 
-            # dates built-ins
+            # dates and date built-ins
             elif key in ("createdAt", "updatedAt") or\
                 key.startswith("date_"):
                 where[key] = format_date(value)
+            # GeoPoint
+            elif key == "coordinates":
+                where[key] = format_geopoint(value[0], value[1])
             # Pointer __type
             elif key[0].isupper() and not key.endswith('_'): 
                 where[key] = format_pointer(key, value)

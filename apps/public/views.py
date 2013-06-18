@@ -13,7 +13,7 @@ from libs.repunch import rputils
 
 from parse.auth import login
 from parse.apps.accounts.models import Account
-from parse.apps.accounts import sub_type, UNLIMITED, ACTIVE
+from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores.models import Store, Subscription,\
 Settings
 
@@ -73,8 +73,15 @@ def sign_up(request):
             store = Store(**postDict)
             store.store_timezone = tz.zone
             store.Subscription = subscription.objectId
+            # set defaults for these guys to prevent 
+            # ParseObjects from making parse calls repeatedly
             store.punches_facebook = 0
-            store.categories = []
+            store.set("description", "The " + store.store_name)
+            store.set("hours", [])
+            store.set("rewards", [])
+            # TODO get geopoint from google API call
+            store.set("coordinates", (40.42, -73.59)) 
+            store.set("categories", [])
             names = request.POST.get("categories")
             if names:
                 for name in names.split(",")[:-1]:
@@ -97,11 +104,6 @@ def sign_up(request):
                         punches_employee=5, Store=store.objectId)
             store.Settings = settings.objectId
             store.set('settings', settings)
-            # set defaults for these guys to prevent 
-            # ParseObjects from making parse calls repeatedly
-            store.set("description", "The " + store.store_name)
-            store.set("hours", [])
-            store.set("rewards", [])
             store.update()
 
             # create account

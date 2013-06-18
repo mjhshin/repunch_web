@@ -6,7 +6,7 @@ from importlib import import_module
 import paypalrestsdk
 
 from parse.utils import parse
-from parse.apps.accounts import ACTIVE, sub_type
+from parse.apps.accounts import sub_type
 from repunch.settings import PAYPAL_CLIENT_SECRET,\
 PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
@@ -110,7 +110,7 @@ class Invoice(ParseObject):
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
     def __init__(self, **data):
-        self.status = data.get('status', ACTIVE)
+        self.active = data.get('active', False)
         # stores the level in sub_type
         self.subscriptionType = data.get('subscriptionType', 0)
         self.first_name = data.get('first_name')
@@ -270,17 +270,3 @@ class Settings(ParseObject):
         if className == "Store":
             return Store
 
-"""
-class SubscriptionType(ParseObject):
-    # Equivalence class of apps.accounts.models.SubscriptionType
-    def __init__(self, **data):
-        self.name = data.get('name', FREE)
-        self.description = data.get('description')
-        self.monthly_cost = data.get('monthly_cost', 0)
-        # use UNLIMITED below for heavywight type
-        self.max_users = data.get('max_users', 50)
-        self.max_messages = data.get('max_messages', 1)
-        self.status = data.get('status', ACTIVE)
-
-        super(SubscriptionType, self).__init__(False, **data)
-"""

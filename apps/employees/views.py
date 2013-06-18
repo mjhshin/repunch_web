@@ -44,6 +44,7 @@ def edit(request, employee_id):
     # need to make sure that cache attr is empty!
     store.employees = None
     acc = Account.objects().get(Employee=employee.objectId)
+    print employee, acc # TODO
     if not employee or not acc:
         raise Http404
     
