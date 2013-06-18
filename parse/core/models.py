@@ -522,7 +522,7 @@ class ParseObject(object):
 
         res = parse("PUT", self.path() + "/" + self.objectId, data)
         if res and "error" not in res:
-            self.update_locally(res, True)
+            self.update_locally(res, False)
             return True
 
         return False
@@ -545,7 +545,7 @@ class ParseObject(object):
         data = self._get_formatted_data()
         res = parse('POST', self.path(), data)
         if res and "error" not in res:
-            self.update_locally(res, True)
+            self.update_locally(res, False)
             return True
         
         return False

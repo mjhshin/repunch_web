@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import SESSION_KEY
 import pytz
 
+from parse import session as SESSION
 from apps.accounts.forms import LoginForm
 from libs.repunch import rputils
 
@@ -24,8 +25,8 @@ def manage_login(request):
     return render(request, 'manage/login.djhtml', data)
 
 def manage_logout(request):
-    request.session['account'] = None
-    request.session[SESSION_KEY] = None
+    # need to clear the session
+    request.session.flush()
     return redirect(reverse('public_home'))
 
 def manage_terms(request):

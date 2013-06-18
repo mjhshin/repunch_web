@@ -3,14 +3,6 @@ from django.core.mail import send_mail
 from repunch.settings import PHONE_COST_UNIT_COST, EMAIL_HOST_USER,\
 ORDER_PLACED_EMAILS
 
-"""
-DEFAULT_ACC_SETTINGS = {
-    'punches_customer':1,
-    'punches_employee':50,
-    'punches_facebook':20,
-}
-"""
-
 # Value must be the same as parse.apps.accounts.models constants
 # cannot import it here since it will cause cyclic imports
 ACTIVE = 'Active'

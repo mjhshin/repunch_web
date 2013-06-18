@@ -18,14 +18,6 @@ def settings(request):
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)
     settings = SESSION.get_settings(request.session)
-    # settings should never be none but just in case
-    if settings == None:
-        settings = Settings.objects().create(retailer_pin=rputils.generate_id())
-        store.Settings = settings.objectId
-        store.settings = settings
-        store.update()
-        request.session['settings'] = settings
-
     if request.method == 'POST':
         form = SettingsForm(request.POST)
         if form.is_valid(): 
@@ -46,9 +38,11 @@ def settings(request):
         else:
             data['error'] = 'Error saving settings.';
     else:
-        form = SettingsForm(settings.__dict__);
+        form = SettingsForm()
+        form.initial = settings.__dict__.copy()
         # shin chose to move punches_facebook to Store...
-        form.data['punches_facebook'] = store.get('punches_facebook')
+        form.initial['punches_facebook'] =\
+            store.get('punches_facebook')
     
     # update the session cache
     request.session['store'] = store
@@ -100,7 +94,7 @@ def update(request):
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
-                form = SubscriptionForm(subscription.__dict__)
+                form = SubscriptionForm(subscription.__dict__.copy())
                 form.errors['__all__'] =\
                     form.error_class([e])
                 data['form'] = form
@@ -123,7 +117,7 @@ def update(request):
                             'Your account has been updated.'}))
     else:
         form = SubscriptionForm()
-        form.initial = subscription.__dict__
+        form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
             form.initial.get('cc_number')[-4:]
@@ -163,7 +157,7 @@ def upgrade(request):
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
-                form = SubscriptionForm(subscription.__dict__)
+                form = SubscriptionForm(subscription.__dict__.copy())
                 form.errors['__all__'] =\
                     form.error_class([e])
                 data['form'] = form
@@ -187,7 +181,7 @@ def upgrade(request):
                             'Your account has been updated.'}))
     else:
         form = SubscriptionForm()
-        form.initial = subscription.__dict__
+        form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
             form.initial.get('cc_number')[-4:]
