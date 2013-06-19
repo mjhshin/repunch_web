@@ -22,6 +22,7 @@
 	<script src="{% static "manage/js/global.js" %}"></script>
     {# AUTO COMPLETE Categories #}
     <script src="{% static 'public/js/autocomplete.js' %}" type="text/javascript"></script>
+    <script src="{% static 'public/js/dialog-login.js' %}" type="text/javascript"></script>
 	
 	{% block javascript %}{% endblock %}
 
@@ -75,7 +76,11 @@ jQuery(document).ready(function() {
 	
 	
 	//login dialog
-	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, title: "Business Sign In", width: 250 });
+	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
+	    title: "Business Sign In",
+	    minWidth: 330, minHeight: 310,
+	    maxWidth: 330, maxHeight: 310, });
+	    
 	$( "#header-signin-btn" ).click(function() {
 		$( "#dialog-login" ).dialog( "open" );
 		return false;
@@ -119,16 +124,34 @@ jQuery(document).ready(function() {
 			</div>
 		</div>
 	</footer>
+	
 	<div id="dialog-login" style="display: none;">
-		<form action="{% url 'repunch.views.manage_login' %}" method="post">{% csrf_token %}
+		<div id="dialog-login-form" >
+		    {% csrf_token %}
+		    <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
+			<input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
+		
 			<p><label for="id_username">Username:</label> 
+			{# the redirect url to prevent hard-coding anything #}
 			<input type="text" name="username" id="id_username"></p>
 			
 			<p><label for="id_password">Password:</label> 
 			<input type="password" name="password" id="id_password"></p>
 			
-			<input type="submit" value="Submit" />
-		</form>
+			<div id="dialog-login-message"></div>
+			
+			<input type="submit" value="Sign in" />
+			<div id="stay-signed-in">
+			<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label for="stay_in">&nbsp;Stay signed in?</label>
+			</div>
+			
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="logging in..."
+		        id="logging-in" />
+			
+			<br />
+			<a>Forgot your password?</a>
+		</div>
 	</div>
+	
 </body>
 </html>

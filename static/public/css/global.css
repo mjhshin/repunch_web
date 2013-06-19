@@ -134,6 +134,11 @@ a.button.orange{
 	background: url("../images/bkg_content.png") repeat scroll left top white;
 }
 
+#dialog-login form {
+    padding:10px;
+    padding-top:2px;
+}
+
 .ui-widget-header.ui-dialog-titlebar {
 	background: url("../images/bkg_header.png") repeat-x scroll left bottom white;
     border-bottom: 1px solid #CCCCCC;
@@ -152,12 +157,55 @@ a.button.orange{
 }
 
 #dialog-login input{
-	height:28px;
+	height:28px; width:274px;
 	border:1px solid #CCC;
 	border-radius: 4px;
 	padding: 0 6px;
 	font-size:14px;
 	color:#666;
+}
+
+#dialog-login input[type=submit] {
+    position:relative; top:10px;
+    width:80px;
+    font-weight:bold;
+    background-color: #4c8ffb; color: white;
+    border:1px solid #3079ed;
+}
+
+#dialog-login input[type=submit]:hover{
+    background-color: #427edd;
+}
+
+#stay-signed-in input[type=checkbox]{
+    width:14px; height:14px;
+}
+
+#stay-signed-in {
+    display:inline-block;
+    position:relative; top:13px; left:20px;
+}
+
+#stay-signed-in label{
+    position:relative; top:-2px;
+    color:gray;
+    font-size:1em;
+	display:inline;
+	font-weight:normal;
+}
+
+#dialog-login a {
+    color:#0040FF;
+    position:relative; top:24px;
+}
+
+#logging-in {
+    display:none;
+    position:relative;top:20px;left:40px;
+}
+
+#dialog-login-message span{
+    color:#dd4b39;
 }
 	
 /*** page styles ***/

@@ -6,7 +6,6 @@ import datetime, re, pytz
 from libs.repunch import rpforms, rpccutils, rputils
 
 from parse.apps.accounts.models import Account
-from parse.auth import login
 
 class AccountForm(forms.Form):   
     username = forms.CharField(min_length=3, max_length=30,
@@ -43,12 +42,4 @@ class AccountForm(forms.Form):
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput())
-    
-    def do_login(self, request):
-        account = login(request, request.POST.get('username'), 
-                            request.POST.get("password"), Account())
-        if account:
-            rputils.set_timezone(request, 
-            pytz.timezone(account.get('store').get('store_timezone')))
-        return account
 
