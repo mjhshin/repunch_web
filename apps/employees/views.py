@@ -239,24 +239,27 @@ def graph(request):
                 {"id":"", "label":"Date", "type":"string"}
                ]
     employees = store.get('employees', objectId__in=employee_ids)
-    for emp in employees:
-        columns.append({"id":"", "label":emp.get('first_name')+\
-                ' '+emp.get('last_name'), "type":"number"})
+    if employees:
+        for emp in employees:
+            columns.append({"id":"", "label":emp.get('first_name')+\
+                    ' '+emp.get('last_name'), "type":"number"})
   
     punch_map = {}
     # since a punch no longer contains a pointer to an employee
     # the query must be made in the punches for each employee...
     if employees:
         for emp in employees:
-            for punch in emp.get('punches', createdAt__gte=start, 
-                createdAt__lte=end):
-                key = punch.createdAt.strftime("%m/%d")+'-'+\
-                    emp.objectId
-                if key in punch_map: 
-                    punch_map[key] = punch_map[key] +\
-                                punch.get('punches')
-                else:
-                    punch_map[key] = punch.get('punches')
+            ps =  emp.get('punches', createdAt__gte=start, 
+                createdAt__lte=end)
+            if ps:
+                for punch in ps:
+                    key = punch.createdAt.strftime("%m/%d")+'-'+\
+                        emp.objectId
+                    if key in punch_map: 
+                        punch_map[key] = punch_map[key] +\
+                                    punch.get('punches')
+                    else:
+                        punch_map[key] = punch.get('punches')
 
 
     rows = []

@@ -7,6 +7,7 @@ import json
 from parse.apps.accounts import order_placed
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
+from parse.apps.stores import format_phone_number
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
 from forms import ContactForm
 from libs.repunch import rputils
@@ -46,7 +47,7 @@ def sign_up(request):
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
-
+        
         if store_form.is_valid() and account_form.is_valid() and\
            subscription_form.is_valid():
             postDict = request.POST.dict()
@@ -76,10 +77,15 @@ def sign_up(request):
             # set defaults for these guys to prevent 
             # ParseObjects from making parse calls repeatedly
             store.punches_facebook = 0
+            # format the phone number
+            store.phone_number =\
+                format_phone_number(request.POST['phone_number'])
             store.set("description", "The " + store.store_name)
             store.set("hours", [])
             store.set("rewards", [])
             # TODO get geopoint from google API call
+            # also fill up cross streets and validate address
+            # TODO html address auto complete?
             store.set("coordinates", (40.42, -73.59)) 
             store.set("categories", [])
             names = request.POST.get("categories")
@@ -113,7 +119,6 @@ def sign_up(request):
             account.set_password(request.POST.get('password'))
             account.create()
 
-            # set for storing in session
             account.set("store", store)
 
             # auto login

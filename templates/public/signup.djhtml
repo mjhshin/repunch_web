@@ -98,7 +98,40 @@
 					<div class="clear-both"></div>
 					{{ store_form.phone_number.errors }}
 					<label for="id_phone_number">Your Phone Number</label>
-					{{ store_form.phone_number }}
+					<input id="id_phone_number" name="phone_number" type="hidden" />
+					<span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
+					    style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
+					    <span style="font-size:22px;position:relative;top:2px;left:2px;margin-right:8px;">)</span>
+                    <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />-
+                    <input type = "text" id = "Ph3" style="width:70px;" maxlength = "4" onkeyup = "validate(this,3)" />
+					
+					<script type = "text/javascript">
+					// fill in the values of the 3 input boxes
+			        $(document).ready(function(){
+			            var p_num = "{{ store_form.phone_number.value }}";
+			            if (p_num == "None"){
+			                return;
+			            }
+			            $("#Ph1").val(p_num.substring(0,3));
+			            $("#Ph2").val(p_num.substring(3,6));
+			            $("#Ph3").val(p_num.substring(6,10));
+			        });
+			
+								// stolen from http://www.codingforums.com/showthread.php?t=202208
+					// laziness ftw!
+                    function validate(which, next) {
+                        var val = which.value;
+                        val = val.replace(/[^0-9]/g,"");  // strip non-digits
+                        which.value = val;
+                        next = "Ph" + next;
+                        if (val.length == 3) {  // field completed
+                            document.getElementById(next).focus();
+                        }
+                        // update the phone number's value
+                        $("#id_phone_number").val(new String($("#Ph1").val()) + 
+                            new String($("#Ph2").val()) + new String($("#Ph3").val()));
+                    }
+                    </script>
 					
 					{{ account_form.email.errors }}
 					<label for="id_email">Your Email Address</label>

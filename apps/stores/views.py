@@ -14,6 +14,7 @@ from libs.repunch.rphours_util import HoursInterpreter
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
+from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required
 
 @login_required
@@ -60,7 +61,9 @@ def edit(request):
         if form.is_valid(): 
             store = Store(**store.__dict__)
             store.update_locally(request.POST.dict(), False)
-            
+            # format the phone number
+            store.phone_number =\
+                format_phone_number(request.POST['phone_number'])
             # build the list of hours in proper format for saving 
             # to Parse
             hours, ind, key = [], 0, "hours-0-days"
@@ -86,6 +89,7 @@ def edit(request):
             store.update()
 
             data['success'] = "Store details have been saved."
+                
     else:
         form = StoreForm()
         form.initial = store.__dict__.copy()

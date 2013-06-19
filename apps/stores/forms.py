@@ -16,6 +16,13 @@ class StoreSignUpForm(forms.Form):
     first_name = forms.CharField(max_length=100)
     last_name = forms.CharField(max_length=100)
     phone_number = forms.CharField()
+    
+    def clean_phone_number(self):
+        data = self.cleaned_data['phone_number']
+        if len(data) < 10:
+            raise forms.ValidationError("Enter a valid phone number.")
+            
+        return data
 
 class StoreForm(forms.Form):
     store_name = forms.CharField(max_length=255)
@@ -27,6 +34,13 @@ class StoreForm(forms.Form):
     phone_number = forms.CharField(max_length=255)
     store_description = forms.CharField(max_length=200, 
                                     widget=forms.Textarea())
+                                    
+    def clean_phone_number(self):
+        data = self.cleaned_data['phone_number']
+        if len(data) < 10:
+            raise forms.ValidationError("Enter a valid phone number.")
+            
+        return data
         
 class StoreAvatarForm(forms.Form):
     store_avatar = forms.FileField()
