@@ -7,8 +7,6 @@ import paypalrestsdk
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
-from repunch.settings import PAYPAL_CLIENT_SECRET,\
-PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 from libs.repunch.rpccutils import get_cc_type
 
 from repunch.settings import TIME_ZONE
@@ -50,8 +48,8 @@ class Store(ParseObject):
         
         self.punches_facebook = data.get("punches_facebook")  
 
-        # [{"day":0,"open_time":"0900","close_time":"2200"}, 
-        #    ... up to day 6]
+        # [{"day":1,"open_time":"0900","close_time":"2200"}, 
+        #    ... up to day 7]
         self.hours = data.get("hours")
         # [{"reward_name":"Free bottle of wine", "description":
         # "Must be under $25 in value",
@@ -123,9 +121,11 @@ class Subscription(ParseObject):
         self.state = data.get('state')
         self.zip = data.get('zip')
         self.country = data.get('country')
-        # ppid only thin required to save
-        self.ppid = data.get('ppid')
-        self.date_ppvalid = data.get('date_ppvalid')
+        # credit card id for paypal
+        # note that the objectId of this object will be used as the
+        # payer_id for paypal since it is guaranteed to be unique
+        self.pp_cc_id = data.get('pp_cc_id')
+        self.date_pp_valid = data.get('date_pp_valid')
 
         super(Subscription, self).__init__(False, **data)
         
@@ -164,39 +164,35 @@ class Subscription(ParseObject):
     
     def store_cc(self, cc_number, cvv):
         """ store credit card info """
-        paypalrestsdk.configure(mode=PAYPAL_MODE, 
-                                client_id=PAYPAL_CLIENT_ID, 
-                                client_secret=PAYPAL_CLIENT_SECRET)
-		
         credit_card = paypalrestsdk.CreditCard({
-	           # ###CreditCard
-	           # A resource representing a credit card that can be
-	           # used to fund a payment.
-	           "type": get_cc_type(cc_number),
-	           "number": cc_number,
-	           "expire_month": self.date_cc_expiration.month,
-	           "expire_year": self.date_cc_expiration.year,
-	           "cvv2": cvv,
-	           "first_name": self.first_name,
-	           "last_name": self.last_name,
-	
-	            # ###Address
-	            # Base Address object used as shipping or billing
-	            # address in a payment. [Optional]
-	           "billing_address": {
-	             "line1": self.address,
-	             "city": self.city,
-	             "state": self.state,
-	             "postal_code": self.zip,
-	             "country_code": self.country }})
-		
-		# Make API call & get response status
-		# ###Save
-		# Creates the credit card as a resource
-		# in the PayPal vault.
+               # ###CreditCard
+               # A resource representing a credit card that can be
+               # used to fund a payment.
+               "type": get_cc_type(cc_number),
+               "number": cc_number,
+               "expire_month": self.date_cc_expiration.month,
+               "expire_year": self.date_cc_expiration.year,
+               "cvv2": cvv,
+               "first_name": self.first_name,
+               "last_name": self.last_name,
+
+                # ###Address
+                # Base Address object used as shipping or billing
+                # address in a payment. [Optional]
+               "billing_address": {
+                 "line1": self.address,
+                 "city": self.city,
+                 "state": self.state,
+                 "postal_code": self.zip,
+                 "country_code": self.country }})
+                 
+        # Make API call & get response status
+        # ###Save
+        # Creates the credit card as a resource
+        # in the PayPal vault.
         if credit_card.create():
-            self.ppid = credit_card.id
-            self.date_ppvalid =\
+            self.pp_cc_id = credit_card.id
+            self.date_pp_valid =\
                 datetime.strptime(credit_card.valid_until[:10], 
                 "%Y-%m-%d")
             self.update()
@@ -219,16 +215,13 @@ class Subscription(ParseObject):
         description: "Recurring monthly subscription "+\
                         from repunch.com." 
         """
-        paypalrestsdk.configure(mode=PAYPAL_MODE, 
-                            client_id=PAYPAL_CLIENT_ID,
-                            client_secret=PAYPAL_CLIENT_SECRET)
         payment = paypalrestsdk.Payment({
             "intent": "sale",
             "payer": {
             "payment_method": "credit_card",
             "funding_instruments": [{
               	"credit_card_token": {
-                	"credit_card_id": self.ppid }}]},
+                	"credit_card_id": self.pp_cc_id }}]},
 
             "transactions": [{
                 "amount": {

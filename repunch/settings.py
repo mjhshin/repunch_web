@@ -48,19 +48,19 @@ REST_CONNECTION_META = {
 
 USER_CLASS = "Account"
 
-"""
 # PAYPAL SANDBOX credentials need to use LIVE for the real thing
 # endpoint = api.sandbox.paypal.com
 PAYPAL_CLIENT_ID = "AaRn0BC74DY7UloGyRv8DBt8VmfK2QpDuTqQF_LYVTpejKftwlUCueD3jM7R"
 PAYPAL_CLIENT_SECRET = "ELBn1BAQJOfiELEr04BA5NQieEpUe6MjT_dbSt0Vu0lA-8iuvefJfH8tUJPX"
-PAYPAL_MODE = "sandbox"
-"""
+PAYPAL_ENDPOINT = "api.sandbox.paypal.com"
 
+"""
 # PAYPAL LIVE credentials
 # endpoint = api.paypal.com
 PAYPAL_CLIENT_ID = "AfVmThAEY5V081CmZwFMRiCE642CT5lYeV9Yb3E2SNXC1Ru1L_I0IuZqewwZ"
 PAYPAL_CLIENT_SECRET = "ECNDuRAEYaO8YPFu2pGkoetFEN1tZ0qL1ACuZfKzsECTYV1RxTbB14l9WCdR"
-PAYPAL_MODE = "live"
+PAYPAL_ENDPOINT = "api.paypal.com"
+"""
 
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False

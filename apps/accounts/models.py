@@ -6,8 +6,6 @@ import paypalrestsdk
 from libs.repunch import rpccutils
 from apps.stores.models import Store
 from libs.repunch.rpccutils import get_cc_type
-from repunch.settings import PAYPAL_CLIENT_SECRET,\
-PAYPAL_CLIENT_SECRET, PAYPAL_MODE, PAYPAL_CLIENT_ID
 
 class Account(AbstractUser):
 	store = models.OneToOneField(Store,null=True,blank=True)
@@ -82,11 +80,6 @@ class Subscription(models.Model):
 	
 	# store credit card information
 	def store_cc(self, cc_number, cvv):
-		
-		paypalrestsdk.configure(mode=PAYPAL_MODE,
-                                client_id=PAYPAL_CLIENT_ID,
-                                client_secret=PAYPAL_CLIENT_SECRET)
-		
 		credit_card = paypalrestsdk.CreditCard({
 		# ###CreditCard
 		   # A resource representing a credit card that can be
@@ -126,9 +119,6 @@ class Subscription(models.Model):
 	
 	
 	def charge_cc(self):
-		paypalrestsdk.configure(mode=PAYPAL_MODE, 
-                            client_id=PAYPAL_CLIENT_ID,
-                            client_secret=PAYPAL_CLIENT_SECRET)
 		payment = paypalrestsdk.Payment({
 				"intent": "sale",
 			  	"payer": {

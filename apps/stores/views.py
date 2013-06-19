@@ -79,7 +79,7 @@ def edit(request):
                                                 "").zfill(6)[:4]
                     for day in days:
                         hours.append({
-                            "day":int(day)-1, # days are from 0 to 6
+                            "day":int(day), 
                             "open_time":open_time,
                             "close_time":close_time,
                         })
@@ -96,14 +96,13 @@ def edit(request):
         
     hours_map = {}
     # group up the days that aare in the same row
-    # also need to shift days frm 0-6 to 1-7
     if store.get("hours"):
         for hour in store.get("hours"):
             key = (hour['close_time'], hour['open_time'])
             if key in hours_map:
-                hours_map[key].append(unicode(hour['day']+1))
+                hours_map[key].append(unicode(hour['day']))
             else:
-                hours_map[key] = [unicode(hour['day']+1)]
+                hours_map[key] = [unicode(hour['day'])]
             
     # create the formset
     HoursFormSet = inlineformset_factory(dStore, dHours,
