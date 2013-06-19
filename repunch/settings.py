@@ -33,7 +33,7 @@ EMAIL_HOST_USER = 'acmnotify@gmail.com'
 EMAIL_HOST_PASSWORD = 'yfitonmca'
 EMAIL_USE_TLS = True
 # for order_placed event
-ORDER_PLACED_EMAILS = ['vandolf@repunch.com', ]
+ORDER_PLACED_EMAILS = ['matt@repunch.com', ]
 
 # PARSE 
 PARSE_VERSION = '1'
@@ -186,7 +186,7 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
-PHONE_COST_UNIT_COST = 130
+PHONE_COST_UNIT_COST = 5
 PAGINATION_THRESHOLD = 20
 AUTH_USER_MODEL = 'accounts.Account'
 
