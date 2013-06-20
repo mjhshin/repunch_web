@@ -33,7 +33,7 @@ EMAIL_HOST_USER = 'acmnotify@gmail.com'
 EMAIL_HOST_PASSWORD = 'yfitonmca'
 EMAIL_USE_TLS = True
 # for order_placed event
-ORDER_PLACED_EMAILS = ['matt@repunch.com', ]
+ORDER_PLACED_EMAILS = ['vandolf@repunch.com', ]
 
 # PARSE 
 PARSE_VERSION = '1'

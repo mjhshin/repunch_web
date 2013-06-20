@@ -45,6 +45,7 @@ def order_placed(amount, store):
         PHONE_COST_UNIT_COST*amount,
         "Repunch Inc. Order placed on " +\
         str(amount) + " phones")
+        
     rtlr = 'ORDER PLACED by ' +  store.store_name
     msg = "Business name: " + store.get('store_name') + "\n" +\
         "Owner name: " + store.get('first_name') + " " +\
@@ -52,9 +53,9 @@ def order_placed(amount, store):
         "Store ID: " + store.objectId + "\n" +\
         "Phone number: " + store.get('phone_number') + "\n" +\
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
-        "Subscription is Active: " + store.get('subscription').get('active') + "\n" +\
+        "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n" +\
         "Amount Ordered: " + str(amount) + "\n" +\
-        "Total charged: "  + str(PHONE_COST_UNIT_COST*amount) + "\n"
+        "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n"
         
     send_mail(rtlr, msg, EMAIL_HOST_USER, 
         ORDER_PLACED_EMAILS, fail_silently=True)

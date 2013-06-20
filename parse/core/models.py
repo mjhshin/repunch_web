@@ -187,7 +187,7 @@ class ParseObject(object):
         Attribute whose name is coordinates is considered a geo point.
         I will change this (maybe) in the future if I plan to release
         the source code. 
-        coordinates are cached as a list [latitude, longtitude]
+        coordinates are cached as a list [latitude, longitude]
 
     Instance Methods
     -----------------------------------------------------------
@@ -308,7 +308,7 @@ class ParseObject(object):
             # GeoPoint
             elif key == "coordinates" and type(value) is dict:
                 setattr(self, key, 
-                    [value.get('latitude'),value.get('longtitude')] )
+                    [value.get('latitude'),value.get('longitude')] )
             else:
                 setattr(self, key, value)
 
@@ -456,7 +456,7 @@ class ParseObject(object):
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
                 setattr(self, attr, 
-                    [value.get('latitude'),value.get('longtitude')] )
+                    [value.get('latitude'),value.get('longitude')] )
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
@@ -542,7 +542,6 @@ class ParseObject(object):
         """
         # get the formated data to be put in the request
         data = self._get_formatted_data()
-
         res = parse("PUT", self.path() + "/" + self.objectId, data)
         if res and "error" not in res:
             self.update_locally(res, False)
@@ -567,8 +566,6 @@ class ParseObject(object):
         """
         data = self._get_formatted_data()
         res = parse('POST', self.path(), data)
-        if self.__class__.__name__ == "Store":
-            print res
         if res and "error" not in res:
             self.update_locally(res, False)
             return True

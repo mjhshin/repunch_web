@@ -45,13 +45,13 @@ def format_file(name):
         return { "__type": "File",
                 "name": name }
                 
-def format_geopoint(latitude, longtitude):
+def format_geopoint(latitude, longitude):
     """
     Returns the Parse GeoPoint __type or None.
     """
     return { "__type": "GeoPoint",
                 "latitude": float(latitude),
-                "longtitude": float(longtitude) }
+                "longitude": float(longitude) }
 
 def query(constraints, where_only=False):
     """

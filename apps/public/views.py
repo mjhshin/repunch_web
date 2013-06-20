@@ -40,9 +40,12 @@ def about(request):
     return render(request, 'public/about.djhtml', data)
 
 def sign_up(request):
+    """ 
+    renders the signup page on GET and returns a json object on POST.
+    """
     data = {'sign_up_nav': True}
     
-    if request.method == 'POST':
+    if request.method == 'POST' or request.is_ajax():
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
@@ -92,10 +95,12 @@ def sign_up(request):
             if names:
                 for name in names.split(",")[:-1]:
                     alias = Category.objects.filter(name__iexact=\
-                                                    name)[0].alias
-                    store.categories.append({
-                        "alias":alias,
-                        "name":name })
+                                                    name)
+                    if len(alias) > 0:
+                        alias = alias[0].alias
+                        store.categories.append({
+                            "alias":alias,
+                            "name":name })
             store.create()    
             
             if request.POST.get("place_order") and\
@@ -122,12 +127,21 @@ def sign_up(request):
             account.set("store", store)
 
             # auto login
-            user_login = login(request, account.username, 
-                            request.POST.get("password"), account)
+            user_login = login(request)
             if user_login != None:
-                # need to set this for the auto long
-                rputils.set_timezone(request, tz)
-                return redirect(reverse('store_index'))
+                data = {"code":-1}
+                # -1 - invalid request
+                # 0 - invalid form input
+                # 1 - bad login credentials
+                # 2 - subscription is not active
+                # 3 - success
+                if type(user_login) is int: # subscription not active
+                    data['code'] = 2
+                else:
+                    rputils.set_timezone(request, tz)
+                    data['code'] = 3
+                return HttpResponse(json.dumps(data), 
+                            content_type="application/json")
             else:
                 # should never go here 
                 pass
