@@ -20,7 +20,7 @@
 	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Message Inbox</a>
 
     <div class="notification success">
-		<div>Sent: {{ message.createdAt }} to X recipients in the group "some group"</div>
+		<div>Sent: {{ message.createdAt|date:'m/d/y h:m A' }} to X recipients in the group "some group"</div>
 	</div>
 	
 	<div class="white-box">
@@ -41,7 +41,7 @@
     <div class="white-box">
         <div class="sect meta">
 		    <label>Offer Title: </label><span>{{ message|get:'offer_title' }}</span>
-            <label>Expiration Date: </label><span>{{ message|get:'date_offer_expiration' }}</span>
+            <label>Expiration Date: </label><span>{{ date_offer_expiration }}</span>
 		    <div style="clear: left;"></div>
 	    </div>
     </div>

@@ -194,10 +194,13 @@ def details(request, message_id):
         raise Http404
     from_zone = tz.gettz('UTC')
     to_zone = tz.gettz('America/New_York')
-    message.date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
-    message.date_offer_expiration = message.date_offer_expiration.astimezone(to_zone)
+    date_offer_expiration = None 
+    if message.date_offer_expiration:
+        date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
+        date_offer_expiration = date_offer_expiration.astimezone(to_zone)
     return render(request, 'manage/message_details.djhtml', 
-            {'message':message, 'messages_nav': True})
+            {'message':message, 'messages_nav': True,
+                'date_offer_expiration':date_offer_expiration})
 
 @login_required
 def delete(request, message_id):
