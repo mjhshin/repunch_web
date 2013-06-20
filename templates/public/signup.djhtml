@@ -9,6 +9,7 @@
 
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
+<script src="{% static 'public/js/signup.js' %}"></script>
 {% endblock %}
 
 {% block pageblock %}
@@ -42,7 +43,13 @@
 						There was an error processing your information. Please fix the erros below and click "Create Account" again.
 					</div>
 				{% endif %}
-				<form id="signup-form" action="{% url 'public_signup' %}" method="post">{% csrf_token %}
+				
+				{# SIGNUP-FORM DIV #}
+				<form id="signup-form">
+				{% csrf_token %}
+	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
+		        <input type="hidden" name="redirect-url" value="{% url 'public_home' %}" />
+				
 				    {# currently only supports countries in the US #}
 					<input type="hidden" name="country" id="id_country" value="US" />
 
@@ -234,7 +241,7 @@
 						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					
-					<a class="button orange" href="#" 
+					<a class="button orange"
 					    id="signup-form-submit">Create Account</a>
 		            <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
 	                    id="processing-form" 
@@ -245,23 +252,20 @@
 				</form>
 			</aside>
 			
-			<script>
-            $(document).ready(function(){
-                var pf = $("#processing-form");
-                $("#signup-form-submit").click(function(){
-                    var sForm = $('#signup-form');
-                    // only proceed if not processing a form
-                    if (pf.css("display") == "none"){
-                        pf.show();
-                        sForm.submit();
-                    }
-                    return false;
-                });
-            });
-            </script>
-			
 			<div class="clear-both"></div>
 		</div>
 	</div>
 </section>
+{% endblock %}
+
+{% block dialogs %}
+<div id="dialog-signup" style="display:none;">
+    <img src="{% static 'manage/images/ajax-loader.gif' %}"
+            alt="processing signup form..." id="signing-up"
+            style="position:relative;top:7px;margin-right:8px;"/>
+    <div id="dialog-signup-message" 
+        style="display:inline-block;position:relative;top:-2px;">
+    Processing your information. Please wait.
+    </div>
+</div>
 {% endblock %}

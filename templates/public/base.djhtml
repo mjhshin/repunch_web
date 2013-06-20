@@ -126,7 +126,7 @@ jQuery(document).ready(function() {
 	</footer>
 	
 	<div id="dialog-login" style="display: none;">
-		<div id="dialog-login-form" >
+		<form id="dialog-login-form" >
 		    {% csrf_token %}
 		    <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
 			<input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
@@ -150,8 +150,10 @@ jQuery(document).ready(function() {
 			
 			<br />
 			<a>Forgot your password?</a>
-		</div>
+		</form>
 	</div>
+	
+	{% block dialogs %}{% endblock %}
 	
 </body>
 </html>

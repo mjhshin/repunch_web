@@ -12,17 +12,13 @@ $(document).ready(function(){
         
         var url = $("#dialog-login input[name=action]").val();
         var url_redirect = $("#dialog-login-form input[name=redirect-url]").val();
-        var data = {
-            username:$("#dialog-login-form input[name=username]").val(),
-            password:$("#dialog-login-form input[name=password]").val(),
-            "csrfmiddlewaretoken":$("#dialog-login-form input[name=csrfmiddlewaretoken]").val(),
-        };
+        var data = $("#dialog-login-form").serialize();
         
         var messageContainer = $("#dialog-login-message");
         
         function finish(){
             $( "#dialog-login" ).dialog({
-	        minHeight: 320, maxHeight: 320, });
+	        minHeight: 330, maxHeight: 330, });
             loading.hide();
         }
         
@@ -37,6 +33,7 @@ $(document).ready(function(){
                 2 - subscription is not active
                 3 - success */
             if (res.code == 3){
+                messageContainer.html("<span style='color:green;'>Redirecting to dashboard.</span>");
                 window.location.replace(url_redirect);
             } else if (res.code == 2){
                 messageContainer.html("<span>Your account is not yet active.<br/>" +
