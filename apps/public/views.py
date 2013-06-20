@@ -73,7 +73,8 @@ def sign_up(request):
                             subscription_form.data['cc_cvv'])
 
             # create store
-            tz = rputils.get_timezone('93003')
+            tz = rputils.get_timezone(request.POST.get(\
+                    "store_timezone"))
             store = Store(**postDict)
             store.store_timezone = tz.zone
             store.Subscription = subscription.objectId
@@ -140,6 +141,7 @@ def sign_up(request):
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:
+                    # required for datetime awareness!
                     rputils.set_timezone(request, tz)
                     data['code'] = 3
                 return HttpResponse(json.dumps(data), 

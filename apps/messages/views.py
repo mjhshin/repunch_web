@@ -8,6 +8,7 @@ from dateutil import parser
 import urllib
 
 from parse import session as SESSION
+from parse.session import get_time_now
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
@@ -62,7 +63,7 @@ def edit(request, message_id):
             raise Http404
         form = MessageForm(request.POST) 
         # check here if limit has been reached
-        start = datetime.now().replace(day=1, hour=0,
+        start = get_time_now(request.session).replace(day=1, hour=0,
                                     minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
@@ -127,7 +128,7 @@ def edit(request, message_id):
             }
 
             if msg_filter == "idle":
-                d = datetime.now() + relativedelta(days=-21)
+                d = get_time_now(request.session) + relativedelta(days=-21)
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\
@@ -160,14 +161,16 @@ def edit(request, message_id):
             if request.GET.get("success"):
                 data['success'] = request.GET.get("success")
             
-            message = store.get("sentMessages", 
-                    objectId=message_id)[0]
-            # make sure cache attr is None for future queries!
-            store.sentMessages = None
-                    
-            form = MessageForm(message.__dict__.copy())
-            data['message'] = message
-            
+            # get from the messages_sent_list in session cache
+            messages_sent_list = SESSION.get_messages_sent_list(\
+                request.session)
+            request.session['messages_sent_list'] =\
+                messages_sent_list
+            for m in messages_sent_list:
+                if m.objectId == message_id:
+                    data['message'] = m
+            form = MessageForm(data['message'].__dict__.copy())
+           
     # update store session cache
     request.session['store'] = store
             
@@ -177,17 +180,17 @@ def edit(request, message_id):
 
 @login_required
 def details(request, message_id):
-    store = SESSION.get_store(request.session)
-
-    message = store.get("sentMessages", objectId=message_id)[0]
-    # make sure cache attr is None for future queries!
-    store.sentMessages = None
+    # get from the messages_sent_list in session cache
+    messages_sent_list = SESSION.get_messages_sent_list(\
+        request.session)
+    request.session['messages_sent_list'] =\
+        messages_sent_list
+    for m in messages_sent_list:
+        if m.objectId == message_id:
+            message = m
     
     if not message:
         raise Http404
-        
-    # update store session cache
-    request.session['store'] = store
 
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True})

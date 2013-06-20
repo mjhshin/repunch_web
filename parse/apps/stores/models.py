@@ -1,7 +1,6 @@
 """
 Parse equivalence of Django apps.stores.models
 """ 
-from datetime import datetime
 from urllib2 import HTTPError
 from importlib import import_module
 from dateutil import parser

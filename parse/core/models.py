@@ -160,10 +160,11 @@ class ParseObject(object):
         Dates are attributes whose name starts with date_.
         These attributes can be set to datetime.datetime 
         or datetime.date
+        Need to use timezone when using datetime.
         
         e.g. 
             from datetime import datetime
-            self.set("date_born", datetime.now())
+            self.set("date_born", datetime.now(tz=X))
             self.set("date_born", date.today())
 
         Getting these attributes using the get method will return a 

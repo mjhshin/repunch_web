@@ -133,7 +133,3 @@ def cloud_call(func_name, params):
     return parse("POST", "functions/" + func_name, params)
 
 
-
-
-
-

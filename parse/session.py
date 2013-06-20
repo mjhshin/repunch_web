@@ -2,7 +2,8 @@
 Use to keep track of all the cache object names in the session.
 """
 
-from datetime import date
+import pytz
+from datetime import datetime
 
 from libs.dateutil.extras import start_month, end_month
 
@@ -14,6 +15,8 @@ SESSION_CACHE = [
     'feedback_unread', # need push notification
     'employees_pending', # need push notification
     'patronStore_count', # need push notification
+    
+    'store_timezone', # very important for use with date and datetime!
     
     # actual objects
     'account',
@@ -33,6 +36,25 @@ def get_store(session):
         return store
     else:
         return session['store']
+        
+def get_store_timezone(session):
+    """ returns an actual pytz timezone object! """
+    if "store_timezone" not in session:
+        store_timezone = get_store(session).get('store_timezone')
+        store_timezone = pytz.timezone(store_timezone)
+        session['store_timezone'] = store_timezone
+        return store_timezone
+    else:
+        return session['store_timezone']
+        
+
+def get_time_now(session):
+    """
+    Call this instead of datetime.now which is not guaranteed to be
+    timezone aware.
+    This will ensure that datetime.now() returns the correct time.
+    """
+    return datetime.now(tz=get_store_timezone(session))
         
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:
@@ -81,13 +103,13 @@ def get_messages_received_list(session):
     else:
         return session['messages_received_list']
         
-def get_message_count(session):
+def get_message_count(session, time_now):
     if 'message_count' not in session:
-        today = date.today()
+        now = time_now
         message_count = get_store(session).get(\
             'sentMessages', 
-            createdAt__gte=start_month(today),
-            createdAt__lte=end_month(today),
+            createdAt__gte=start_month(now),
+            createdAt__lte=end_month(now),
             count=1, limit=0)
         session['message_count'] = message_count
     else:
