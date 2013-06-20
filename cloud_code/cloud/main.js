@@ -387,6 +387,76 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     });// end storeQuery
  
 }); // end Parse.Cloud.define
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("send_feedback", function(request, response) {
+	var patronId = request.params.patron_id;
+	var storeId = request.params.store_id;
+	var body = request.params.body;
+	var subject = request.params.subject;
+	var senderName = request.params.sender_name;
+	
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var Message = Parse.Object.extend("Message");
+	
+	var message = new Message();
+	message.set("message_type", "feedback");
+	message.set("is_read", false);
+	message.set("sender_name", senderName);
+	message.set("store_id", storeId);
+	message.set("subject", subject);
+	message.set("body", body);
+	
+	message.save().then(function(message) {
+		console.log("Message save was successful.");
+		var storeQuery = new Parse.Query(Store);
+		return storeQuery.get(storeId);
+		
+	}, function(error) {
+		console.log("Message save failed.");
+		response.error("error");
+				
+	}).then(function(store) {
+		console.log("Store fetch was successful.");
+		store.relation("ReceivedMessages").add(message);
+		return store.save();
+		
+	}, function(error) {
+		console.log("Store fetch failed.");
+		response.error("error");
+						
+	}).then(function(store) {
+		console.log("Store save was successful.");
+		var patronQuery = new Parse.Query(Patron);
+		return patronQuery.get(patronId);
+		
+	}, function(error) {
+		console.log("Store save failed.");
+		response.error("error");
+					
+	}).then(function(patron) {
+		console.log("Patron fetch was successful.");
+		patron.relation("SentMessages").add(message);
+		return patron.save();	
+		
+	}, function(error) {
+		console.log("Patron fetch failed.");
+		response.error("error");
+					
+	}).then(function(patron) {
+		console.log("Patron save was successful.");
+		response.success("success");	
+		
+	}, function(error) {
+		console.log("Patron save failed.");
+		response.error("error");			
+	})
+});
  
 ////////////////////////////////////////////////////
 //
