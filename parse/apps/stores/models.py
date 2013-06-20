@@ -2,13 +2,13 @@
 Parse equivalence of Django apps.stores.models
 """ 
 from datetime import datetime
+from urllib2 import HTTPError
 from importlib import import_module
-import paypalrestsdk
+from dateutil import parser
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
-from libs.repunch.rpccutils import get_cc_type
-
+from parse.paypal import store_cc
 from repunch.settings import TIME_ZONE
 from parse.core.models import ParseObject
 
@@ -162,50 +162,17 @@ class Subscription(ParseObject):
         
         return False
     
-    def store_cc(self, cc_number, cvv):
-        """ store credit card info """
-        credit_card = paypalrestsdk.CreditCard({
-               # ###CreditCard
-               # A resource representing a credit card that can be
-               # used to fund a payment.
-               "type": get_cc_type(cc_number),
-               "number": cc_number,
-               "expire_month": self.date_cc_expiration.month,
-               "expire_year": self.date_cc_expiration.year,
-               "cvv2": cvv,
-               "first_name": self.first_name,
-               "last_name": self.last_name,
-
-                # ###Address
-                # Base Address object used as shipping or billing
-                # address in a payment. [Optional]
-               "billing_address": {
-                 "line1": self.address,
-                 "city": self.city,
-                 "state": self.state,
-                 "postal_code": self.zip,
-                 "country_code": self.country }})
-                 
-        # Make API call & get response status
-        # ###Save
-        # Creates the credit card as a resource
-        # in the PayPal vault.
-        if credit_card.create():
-            self.pp_cc_id = credit_card.id
-            self.date_pp_valid =\
-                datetime.strptime(credit_card.valid_until[:10], 
-                "%Y-%m-%d")
-            self.update()
-            return True
+    def store_cc(self, cc_number, cvv2):
+        """ store credit card info. returns True if successful """
+        try:
+            res = store_cc(self, cc_number, cvv2)
+        except HTTPError: # wrong credit card info BAD REQUEST (400)
+            return False
         else:
-            print "Error while creating CreditCard:"
-            # raise Exception(credit_card.error)
-            # TODO does not check if information is correct
-            # only if the fields are in correct format!
-            # may go here because of non-alphanumeric inputs to name,
-            
-        return False
-        
+            self.pp_cc_id = res['id']
+            self.date_pp_valid = parser.parse(res['valid_until'])
+            self.update()
+            return True      
 
     def charge_cc(self, total, description):
         """

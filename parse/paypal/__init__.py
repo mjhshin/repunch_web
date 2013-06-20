@@ -5,18 +5,19 @@ https://github.com/paypal/rest-api-sdk-python
 Reason being unreliable.
 """
 
-import pycurl, json
+import pycurl, json, urllib2
+from datetime import datetime
 from StringIO import StringIO
 
 from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET,\
 PAYPAL_ENDPOINT
+from libs.repunch.rpccutils import get_cc_type
 
 # to be safe, use the getter methods instead of importing these
 ACCESS_TOKEN = None
 # datetime objects
 ACCESS_TOKEN_EXPIRES_IN = None
-LAST_ACCESS_TIME = None
 
 def get_access_token():
     """ 
@@ -25,11 +26,10 @@ def get_access_token():
     
     returns the ACCESS_TOKEN 
     """
-    if not ACCESS_TOKEN or 
-    
+    if not ACCESS_TOKEN or datetime.now() > ACCESS_TOKEN_EXPIRES_IN:
+        _refresh_access_token()
     return ACCESS_TOKEN
 
-# TODO set up celery to call this method every x seconds
 def _refresh_access_token():
     """
     Must be called after every x seconds. x is acquired from the 
@@ -53,15 +53,47 @@ def _refresh_access_token():
     c.perform()
     res = json.loads(res.getvalue())
     
+    global ACCESS_TOKEN, ACCESS_TOKEN_EXPIRES_IN
     # update 
     ACCESS_TOKEN = res['access_token']
-    # need to convert to datetime object from seconds 28800 to
-    # 
-    ACCESS_TOKEN_EXPIRES_IN = res['expires_in']
-    LAST_ACCESS_TIME = datetime.now()
+    # subtract 5 mins (300 seconds) to be safe
+    ACCESS_TOKEN_EXPIRES_IN = datetime.now() +\
+                    relativedelta(seconds=res['expires_in']-300)
 
-def store_cc(subscription, cc_number, ):
+def store_cc(subscription, cc_number, cvv2):
     """
     Stores a paypal credit card id to the subscription's ppid.
+    This uses urllib2 instead of pycurl because pycurl does not work 
+    here for some reason.
+    
+    returns the result of the api call.
+    """
+    url = 'https://' + PAYPAL_ENDPOINT + '/v1/vault/credit-card'
+    data = json.dumps({
+        "payer_id": "%s" % str(subscription.objectId),
+        "type": "%s" % str(get_cc_type(cc_number)),
+        "number": "%s" % str(cc_number),
+        "cvv2": "%s" % str(cvv2),
+        "expire_month":\
+            "%s" % str(subscription.date_cc_expiration.month),
+        "expire_year":\
+            "%s" % str(subscription.date_cc_expiration.year),
+        "first_name": "%s" % str(subscription.first_name),
+        "last_name": "%s" % str(subscription.last_name),
+    })
+    
+    req = urllib2.Request(url,
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + str(get_access_token())
+        }, data=data)
+
+    return json.loads(urllib2.urlopen(req).read())
+    
+def delete_cc(subscription):
+    """
+    Delete the stored credit card in paypal.
+    This should be called upon creation of a new credit card for the 
+    same user.
     """
     pass
