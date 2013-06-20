@@ -8,7 +8,7 @@ from dateutil import parser
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
-from parse.paypal import store_cc
+from parse.paypal import store_cc, charge_cc
 from repunch.settings import TIME_ZONE
 from parse.core.models import ParseObject
 
@@ -60,7 +60,7 @@ class Store(ParseObject):
         self.categories = data.get('categories')
 
         # GeoPoint TODO
-        # self.coordinates = data.get('coordinates')
+        self.coordinates = data.get('coordinates')
    
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
@@ -94,13 +94,10 @@ class Store(ParseObject):
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, **data):
-        self.status = data.get('status')
-        self.response = data.get('response')
-        self.response_code = data.get('response_code')
-        self.auth_code = data.get('auth_code')
-        self.avs_response = data.get('avs_response')
-        self.trans_id = data.get('trans_id')
-        self.amount = data.get('amount')
+        self.state = data.get('state')
+        self.payment_id = data.get('payment_id')
+        self.sale_id = data.get('sale_id')
+        self.total = data.get('total')
         
         super(Invoice, self).__init__(False, **data)
         
@@ -172,7 +169,7 @@ class Subscription(ParseObject):
             self.pp_cc_id = res['id']
             self.date_pp_valid = parser.parse(res['valid_until'])
             self.update()
-            return True      
+            return True       
 
     def charge_cc(self, total, description):
         """
@@ -181,40 +178,30 @@ class Subscription(ParseObject):
                                                 get('monthly_cost')
         description: "Recurring monthly subscription "+\
                         from repunch.com." 
+                        
+        Returns True if success.
         """
-        payment = paypalrestsdk.Payment({
-            "intent": "sale",
-            "payer": {
-            "payment_method": "credit_card",
-            "funding_instruments": [{
-              	"credit_card_token": {
-                	"credit_card_id": self.pp_cc_id }}]},
-
-            "transactions": [{
-                "amount": {
-              		"total": total,
-              		"currency": "USD" },
-                "description": description
-                }] })
-
-        if payment.create():
-            invoice = Invoice(amount=total)
-            invoice.response_code = payment.id
-            invoice.status = payment.state
-            if invoice.status == 'approved':
-	            invoice.trans_id = payment.transactions[0].related_resources[0].sale.id
+        try:
+            res = charge_cc(self, total, description)
+        except HTTPError: # wrong credit card info BAD REQUEST (400)
+            return False
+        else:
+            invoice = Invoice(
+                state = res['state'],
+                payment_id = res['id'],
+                total = total,
+            )
+            if invoice.state == 'approved':
+                try:
+	                invoice.sale_id =\
+	                    res['transactions'][0]['related_resources'][0]['sale']['id']
+                except Exception:
+                    pass # key error or something
             invoice.create()
             st = Store.objects().get(Subscription=self.objectId)
             st.add_relation("Invoices_", [invoice.objectId])
-            return invoice
-        else:
-            # TODO Might want to charge curtomer 1 dollar to verify
-            # account if store_cc fails to do so
-            raise Exception(payment.error)
-		
-        return None
-
-
+            return True
+            
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """
     def __init__(self, **data):

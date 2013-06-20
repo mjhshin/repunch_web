@@ -86,7 +86,7 @@ def sign_up(request):
             # TODO get geopoint from google API call
             # also fill up cross streets and validate address
             # TODO html address auto complete?
-            store.set("coordinates", (40.42, -73.59)) 
+            store.set("coordinates", [40.42, -73.59]) 
             store.set("categories", [])
             names = request.POST.get("categories")
             if names:

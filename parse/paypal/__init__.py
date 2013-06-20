@@ -90,6 +90,44 @@ def store_cc(subscription, cc_number, cvv2):
 
     return json.loads(urllib2.urlopen(req).read())
     
+def charge_cc(subscription, total, description):
+    """
+    Uses that stored credit card via the subscription's pp_cc_id.
+    Returns the result of the payment.
+    """
+    url = 'https://' + PAYPAL_ENDPOINT + '/v1/payments/payment'
+    data = json.dumps({
+        "intent": "sale",
+        "payer": {
+            "payment_method": "credit_card",
+            "funding_instruments": [
+                {
+                    "credit_card_token": {
+                        "credit_card_id": subscription.pp_cc_id,
+                        "payer_id": subscription.objectId,
+                    }
+                }
+            ]
+        },
+        "transactions": [
+            {
+                "amount": {
+                    "total": "%.2f" % float(total),
+                    "currency": "USD"
+                },
+                "description": description
+            }
+        ]
+    })
+    
+    req = urllib2.Request(url,
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + str(get_access_token())
+        }, data=data)
+
+    return json.loads(urllib2.urlopen(req).read())
+    
 def delete_cc(subscription):
     """
     Delete the stored credit card in paypal.
