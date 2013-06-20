@@ -48,7 +48,8 @@
 				<form id="signup-form">
 				{% csrf_token %}
 	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
-		        <input type="hidden" name="redirect-url" value="{% url 'public_home' %}" />
+		        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
+		        <input type="hidden" name="home-url" value="{% url 'public_home' %}" />
 				
 				    {# currently only supports countries in the US #}
 					<input type="hidden" name="country" id="id_country" value="US" />
@@ -261,11 +262,14 @@
 {% block dialogs %}
 <div id="dialog-signup" style="display:none;">
     <img src="{% static 'manage/images/ajax-loader.gif' %}"
-            alt="processing signup form..." id="signing-up"
-            style="position:relative;top:7px;margin-right:8px;"/>
+    alt="processing signup form..." id="signing-up"
+    style="position:relative;top:7px;margin-right:8px;"/>
     <div id="dialog-signup-message" 
         style="display:inline-block;position:relative;top:-2px;">
     Processing your information. Please wait.
     </div>
+    <img src="{% static 'public/images/icon_clock-orange.png' %}"
+    alt="processing signup form..." id="signing-up-time"
+    style="position:relative;top:-11px;margin-left:70px;display:none;"/>
 </div>
 {% endblock %}

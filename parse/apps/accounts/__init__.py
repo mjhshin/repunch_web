@@ -57,6 +57,8 @@ def order_placed(amount, store):
         "Amount Ordered: " + str(amount) + "\n" +\
         "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n"
         
+    # TODO send user pretty receipt
+        
     send_mail(rtlr, msg, EMAIL_HOST_USER, 
         ORDER_PLACED_EMAILS, fail_silently=True)
 

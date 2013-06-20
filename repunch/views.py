@@ -31,6 +31,7 @@ def manage_login(request):
     """
     Handle s ajax request from login-dialog.
     returns a json object with a code.
+    Or renders the dedicated login page if manually enterd url.
     code 
        -1 - invalid request
         0 - invalid form input
@@ -54,7 +55,9 @@ def manage_login(request):
         else:
             data['code'] =  0        
     else:
-        data['code'] = -1
+        data['form'] = LoginForm()
+        # TODO ajax manage/login like the login dialog!
+        return render(request, 'manage/login.djhtml', data)
 
     return HttpResponse(json.dumps(data), content_type="application/json")
 

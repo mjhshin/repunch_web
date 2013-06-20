@@ -125,6 +125,8 @@ def sign_up(request):
             account.create()
 
             account.set("store", store)
+            
+            # TODO send matt and new user a pretty email.
 
             # auto login
             user_login = login(request)
