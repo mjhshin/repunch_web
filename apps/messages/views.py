@@ -93,7 +93,7 @@ def edit(request, message_id):
             if 'attach_offer' in request.POST.dict():
                 # make sure that date is a date and not string
                 message.set('date_offer_expiration', 
-                    parser.parse(request.POST['attach_offer']) )
+                    parser.parse(request.POST['date_offer_expiration']) )
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
             else:
