@@ -6,10 +6,11 @@ from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
 import urllib
+from dateutil import tz
 
 from parse import session as SESSION
 from parse.session import get_time_now
-from parse.utils import cloud_call
+from parse.utils import cloud_call, datetime_to_utc
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -94,7 +95,7 @@ def edit(request, message_id):
             if 'attach_offer' in request.POST.dict():
                 # make sure that date is a date and not string
                 message.set('date_offer_expiration', 
-                    parser.parse(request.POST['date_offer_expiration']) )
+                    datetime_to_utc(parser.parse(request.POST['date_offer_expiration'])) )
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
             else:
@@ -191,7 +192,10 @@ def details(request, message_id):
     
     if not message:
         raise Http404
-
+    from_zone = tz.gettz('UTC')
+    to_zone = tz.gettz('America/New_York')
+    message.date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
+    message.date_offer_expiration = message.date_offer_expiration.astimezone(to_zone)
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True})
 

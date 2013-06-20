@@ -2,7 +2,7 @@
 Use to keep track of all the cache object names in the session.
 """
 
-import pytz
+import pytz, time
 from datetime import datetime
 
 from libs.dateutil.extras import start_month, end_month
@@ -54,7 +54,7 @@ def get_time_now(session):
     timezone aware.
     This will ensure that datetime.now() returns the correct time.
     """
-    return datetime.now(tz=get_store_timezone(session))
+    return datetime.utcfromtimestamp(time.mktime(datetime.now(tz=get_store_timezone(session)).timetuple()))
         
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:

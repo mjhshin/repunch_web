@@ -2,6 +2,8 @@
 Helpers methods for parse.apps to enfore the DRY principle.
 """
 
+import time
+from datetime import datetime
 import json, httplib, urllib, tempfile, re
 from PIL import Image
 
@@ -132,4 +134,9 @@ def cloud_call(func_name, params):
     the parameters params. """
     return parse("POST", "functions/" + func_name, params)
 
+def datetime_to_utc(dtime):
+    """
+    Returns a utc datetime from dtime
+    """
+    return datetime.utcfromtimestamp(time.mktime(dtime.timetuple()))
 

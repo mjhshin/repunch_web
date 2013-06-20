@@ -20,7 +20,7 @@
 	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Message Inbox</a>
 
     <div class="notification success">
-		<div>Sent: {{ message.createdAt|date:'m/d/y h:m A' }} to X recipients in the group "some group"</div>
+		<div>Sent: {{ message.createdAt }} to X recipients in the group "some group"</div>
 	</div>
 	
 	<div class="white-box">
