@@ -55,8 +55,9 @@ def login(request):
             request.session['store'] = store
             request.session['account'] = account
             
-            rputils.set_timezone(request, 
-                pytz.timezone(store.get('store_timezone')))
+            if store.get('store_timezone'):
+                rputils.set_timezone(request, 
+                    pytz.timezone(store.get('store_timezone')))
             
             return account
         else:

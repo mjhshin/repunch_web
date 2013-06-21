@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-from django.db.models import Q
 from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
+from dateutil.tz import tzutc
 import urllib
-from dateutil import tz
 
 from parse import session as SESSION
 from parse.utils import cloud_call
@@ -89,12 +88,17 @@ def edit(request, message_id):
             message = Message.objects().create(sender_name=\
                     store.get('store_name'), store_id=store.objectId)
             message.update_locally(request.POST.dict(), False)
-
+            
             # check if attach offer is selected
             if 'attach_offer' in request.POST.dict():
-                # make sure that date is a date and not string
-                message.set('date_offer_expiration', 
-                    parser.parse(request.POST['date_offer_expiration']) )
+                d = parser.parse(\
+                    request.POST['date_offer_expiration'])
+                # make aware
+                d = timezone.make_aware(d, 
+                    SESSION.get_store_timezone(request.session))
+                # then convert to utc format
+                d = timezone.localtime(d, tzutc())
+                message.set('date_offer_expiration', d)
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
             else:
@@ -180,6 +184,7 @@ def edit(request, message_id):
 
 @login_required
 def details(request, message_id):
+    rputils.set_timezone(request)
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
         request.session)
@@ -191,17 +196,16 @@ def details(request, message_id):
     
     if not message:
         raise Http404
+    """
     from_zone = tz.gettz('UTC')
     to_zone = tz.gettz('America/New_York')
-    date_offer_expiration = None 
-    print message.createdAt
+    date_offer_expiration = None
     if message.date_offer_expiration:
         date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
         date_offer_expiration = date_offer_expiration.astimezone(to_zone)
-        print date_offer_expiration
+    """
     return render(request, 'manage/message_details.djhtml', 
-            {'message':message, 'messages_nav': True,
-                'date_offer_expiration':date_offer_expiration})
+            {'message':message, 'messages_nav': True})
 
 @login_required
 def delete(request, message_id):

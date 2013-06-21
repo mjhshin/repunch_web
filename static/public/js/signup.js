@@ -12,6 +12,10 @@ $(document).ready(function(){
 
     var messageContainer = $("#dialog-signup-message");
     $("#signup-form-submit").click(function(){
+        // update the phone number's value
+        $("#id_phone_number").val(new String($("#Ph1").val()) + 
+            new String($("#Ph2").val()) + new String($("#Ph3").val()));
+            
         // open the dialog with the loading message
         $( "#dialog-signup" ).dialog( "open" );
         // make sure the time icon is hidden

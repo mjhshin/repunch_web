@@ -2,8 +2,7 @@
 Helpers methods for parse.apps to enfore the DRY principle.
 """
 
-from datetime import datetime
-import json, httplib, urllib, tempfile, re, time
+import json, httplib, urllib, tempfile, re
 from PIL import Image
 
 from repunch.settings import PARSE_VERSION,\

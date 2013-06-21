@@ -82,9 +82,9 @@ def calculate_daterange(type):
 
 def set_timezone(request, tz=None):
     if tz == None:
-        tz = request.session.get('django_timezone') # if this isn't set, just default to default
+        tz = request.session.get('store_timezone') 
     else:
-        request.session['django_timezone'] = tz
+        request.session['store_timezone'] = tz
         
     if tz:
         timezone.activate(tz)

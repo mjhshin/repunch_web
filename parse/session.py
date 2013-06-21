@@ -1,9 +1,7 @@
 """
 Use to keep track of all the cache object names in the session.
 """
-
-import pytz, time
-from datetime import datetime
+import pytz
 
 from libs.dateutil.extras import start_month, end_month
 
@@ -16,7 +14,7 @@ SESSION_CACHE = [
     'employees_pending', # need push notification
     'patronStore_count', # need push notification
     
-    'store_timezone', # very important for use with date and datetime!
+    'store_timezone', # DO NOT USE DATETIME! ALWAYS USE TIMEZONE!
     
     # actual objects
     'account',
@@ -37,28 +35,15 @@ def get_store(session):
     else:
         return session['store']
         
-"""
 def get_store_timezone(session):
-returns an actual pytz timezone object
+    """ returns the pytz.timezone object """
     if "store_timezone" not in session:
-        store_timezone = get_store(session).get('store_timezone')
-        store_timezone = pytz.timezone(store_timezone)
+        store_timezone =\
+            pytz.timezone(get_store(session).get('store_timezone'))
         session['store_timezone'] = store_timezone
         return store_timezone
     else:
         return session['store_timezone']
-        
-
-def get_time_now(session):
-
-    Call this instead of datetime.now which is not guaranteed to be
-    timezone aware.
-    This will ensure that datetime.now() returns the correct time.
-
-    now = datetime.utcfromtimestamp(time.mktime(datetime.now(tz=\
-        get_store_timezone(session)).timetuple()))
-    return now.replace(tzinfo=get_store_timezone(session))
-"""
         
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:

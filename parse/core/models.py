@@ -150,7 +150,7 @@ class ParseObject(object):
             e.g. self.milkyWay
 
         To get the actual list of objects:
-
+    
             e.g. self.get("milkyWay")
 
         -------------------------------
@@ -161,6 +161,9 @@ class ParseObject(object):
         These attributes can be set to datetime.datetime 
         or datetime.date
         Need to use timezone when using datetime.
+        Note that dates are always stored in utz isoformat!
+        Datetime objects must be aware!
+        ALL DATE OBJECTS IN THIS CLASS ARE/MUST BE IN UTC FORMAT!
         
         e.g. 
             from datetime import datetime

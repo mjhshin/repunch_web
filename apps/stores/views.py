@@ -10,6 +10,7 @@ import json
 from apps.stores.models import Store as dStore, Hours as dHours
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
+from libs.repunch.rputils import get_timezone
 
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
@@ -61,6 +62,11 @@ def edit(request):
         if form.is_valid(): 
             store = Store(**store.__dict__)
             store.update_locally(request.POST.dict(), False)
+            # set the timezone
+            if store.get('zip'):
+                store.store_timezone =\
+                    get_timezone(store.get('zip')).zone
+                    
             # format the phone number
             store.phone_number =\
                 format_phone_number(request.POST['phone_number'])

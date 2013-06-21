@@ -125,7 +125,7 @@
 			            $("#Ph3").val(p_num.substring(6,10));
 			        });
 			
-								// stolen from http://www.codingforums.com/showthread.php?t=202208
+					// stolen from http://www.codingforums.com/showthread.php?t=202208
 					// laziness ftw!
                     function validate(which, next) {
                         var val = which.value;
@@ -135,9 +135,6 @@
                         if (val.length == 3) {  // field completed
                             document.getElementById(next).focus();
                         }
-                        // update the phone number's value
-                        $("#id_phone_number").val(new String($("#Ph1").val()) + 
-                            new String($("#Ph2").val()) + new String($("#Ph3").val()));
                     }
                     </script>
 					
