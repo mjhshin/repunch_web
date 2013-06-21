@@ -6,7 +6,10 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
+if DEBUG:
+    FS_SITE_DIR = os.getcwd()
+else:
+    FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
 
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),
@@ -34,6 +37,9 @@ EMAIL_HOST_PASSWORD = 'yfitonmca'
 EMAIL_USE_TLS = True
 # for order_placed event
 ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com']
+# for template rendering
+ABSOLUTE_HOST = 'ec2-23-20-15-30.compute-1.amazonaws.com'
+ABSOLUTE_HOST_ALIAS = "vandolf.repunch.com"
 
 # PARSE 
 PARSE_VERSION = '1'
@@ -67,8 +73,7 @@ PAYPAL_ENDPOINT = "api.paypal.com"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['ec2-54-224-39-200.compute-1.amazonaws.com', 
-'ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
+ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
 'repunch.com', 'www.repunch.com', 'vandolf.repunch.com']
 # note that the first ec2 host is repunch dev.
 # The second 1 is the real repunch.
