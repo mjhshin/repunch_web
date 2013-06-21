@@ -15,7 +15,7 @@ class Patron(ParseObject):
         self.gender = data.get("gender", UNKNOWN)
         self.date_of_birth = data.get("date_of_birth")
         self.facebook_id = data.get('facebook_id')
-        # string
+        # string unique in Parse
         self.punch_code = data.get('punch_code')
 
         self.Feedbacks_ = "Feedback"

@@ -30,7 +30,8 @@ def login(request):
     
     Returns an Account object if the account subscription is active 
     and username and passwords are good. Otherwise, 0 if bad login 
-    credentials and 1 if subscription is not active.
+    credentials (wrong pass or account_type) 
+    and 1 if subscription is not active.
     """
     res = parse("GET", "login", query=\
                 {"username":request.POST['username'],
@@ -39,28 +40,31 @@ def login(request):
     # TODO maybe share the session with same user on different browser
     if res and "error" not in res:
         account = Account(**res)
-        store = account.get('store')
-        settings = store.get("settings")
-        subscription = store.get("subscription")
-    
-        if subscription.get('active'):
-            request.session[SESSION_KEY] = res.get('sessionToken')
-            settings.fetchAll()
+        if account.get("account_type") == "store":
+            store = account.get('store')
+            settings = store.get("settings")
             subscription = store.get("subscription")
-            subscription.fetchAll()
-            
-            # store in session cache
-            request.session['subscription'] = subscription
-            request.session['settings'] = settings
-            request.session['store'] = store
-            request.session['account'] = account
-            
-            if store.get('store_timezone'):
-                rputils.set_timezone(request, 
-                    pytz.timezone(store.get('store_timezone')))
-            
-            return account
+        
+            if subscription.get('active'):
+                request.session[SESSION_KEY] = res.get('sessionToken')
+                settings.fetchAll()
+                subscription = store.get("subscription")
+                subscription.fetchAll()
+                
+                # store in session cache
+                request.session['subscription'] = subscription
+                request.session['settings'] = settings
+                request.session['store'] = store
+                request.session['account'] = account
+                
+                if store.get('store_timezone'):
+                    rputils.set_timezone(request, 
+                        pytz.timezone(store.get('store_timezone')))
+                
+                return account
+            else:
+                return 1
         else:
-            return 1
+            return 0
     else:
         return 0

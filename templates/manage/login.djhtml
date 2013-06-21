@@ -6,28 +6,46 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
-	<link href="{% static "manage/css/login.css" %}" rel="stylesheet" />
-	
+	<link href="{% static "manage/css/login.css" %}" rel="stylesheet" />   
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="{% static 'public/js/dialog-login.js' %}" type="text/javascript"></script>
 	
 </head>
 <body>
-	<div id="site-frame">
-		<div id="header">
+	<div id="site-frame" style="width:330px;">
+		<div id="header" style="width:330px;margin-left:auto; margin-right:auto;">
 			<div id="header-left">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</div>
 		</div>
 		<div id="content-frame">
-			<div id="main-content">
-				{% if error or success %}
-				<div class="notification {% if success %}success{% endif %} hide">
-					<div>{{ error }}{{ success }}</div>
-				</div>
-				{% endif %}
+			<div id="main-content" style="width:310px;margin-left:auto; margin-right:auto;">
 				
-				<form action="{% url 'repunch.views.manage_login' %}" method="post">{% csrf_token %}
-				{{ form.as_p }}
-				<input type="submit" value="Submit" />
+				<form id="dialog-login-form">
+		            {% csrf_token %}
+		            <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
+			        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
+		
+			        <p><label for="id_username">Username:</label> 
+			        {# the redirect url to prevent hard-coding anything #}
+			        <input type="text" name="username" id="id_username"></p>
+			
+			        <p><label for="id_password">Password:</label> 
+			        <input type="password" name="password" id="id_password"></p>
+			
+			        <div id="dialog-login-message"></div>
+			
+			        <input type="submit" value="Sign in" />
+			        <div id="stay-signed-in">
+			        <input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label for="stay_in">&nbsp;Stay signed in?</label>
+			        </div>
+			
+		            <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="logging in..."
+		                id="logging-in" />
+			
+			        <br />
+			        <a>Forgot your password?</a>
 				</form>
 			</div><!-- close main-content -->
 			<div class="clear">&nbsp;</div>

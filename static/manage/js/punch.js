@@ -78,8 +78,7 @@ function punchit(url){
             "<div><span>Failed to punch customer.<span></div></div>");
         } else {
             $("#punch-form").append("<div id='punch-notification' class='notification success hide'>"+
-                "<div><span>Successfully gave " + pa.val() + " punches to " + pc.val() + ".<span></div></div>");
-            
+                "<div><span>Successfully gave " + pa.val() + " punches to " + res.patron_name + ".<span></div></div>");
         }
         finishPunching();
     }).fail(function(){ 

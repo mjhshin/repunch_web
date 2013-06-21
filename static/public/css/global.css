@@ -146,9 +146,9 @@ a.button.orange{
     line-height: 25px;
     padding: 0 15px;
 }
-#dialog-login p{ margin: 0px 0px 10px 0px; }
+#dialog-login-form p{ margin: 0px 0px 10px 0px; }
 
-#dialog-login label{
+#dialog-login-form label{
 	display:block;
 	font-weight:bold;
 	font-size:14px;
@@ -156,8 +156,8 @@ a.button.orange{
 	margin: 15px 0 10px;
 }
 
-#dialog-login input{
-	height:28px; width:274px;
+#dialog-login-form input{
+	height:28px; width:268px;
 	border:1px solid #CCC;
 	border-radius: 4px;
 	padding: 0 6px;
@@ -165,7 +165,7 @@ a.button.orange{
 	color:#666;
 }
 
-#dialog-login input[type=submit] {
+#dialog-login-form input[type=submit] {
     position:relative; top:10px;
     width:80px;
     font-weight:bold;
@@ -173,7 +173,7 @@ a.button.orange{
     border:1px solid #3079ed;
 }
 
-#dialog-login input[type=submit]:hover{
+#dialog-login-form input[type=submit]:hover{
     background-color: #427edd;
 }
 
@@ -194,7 +194,7 @@ a.button.orange{
 	font-weight:normal;
 }
 
-#dialog-login a {
+#dialog-login-form a {
     color:#0040FF;
     position:relative; top:24px;
 }

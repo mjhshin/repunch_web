@@ -12,6 +12,7 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone
 
+from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
@@ -29,6 +30,10 @@ def punch(request):
             "num_punches":int(request.POST['num_punches']),
         }
         res = cloud_call("punch", data)
+        patron = Patron.objects().get(punch_code=\
+            str(request.POST['punch_code']))
+        res['patron_name'] = patron.first_name.capitalize() + " " +\
+            patron.last_name.capitalize()
         return HttpResponse(json.dumps(res), 
                 content_type="application/json")
     else:

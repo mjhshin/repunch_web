@@ -4,7 +4,7 @@
 {% block title %}Feedback Details{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/feedback.js" %}"></script>
 {% endblock %}
 
