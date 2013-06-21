@@ -4,6 +4,27 @@
 
 $(document).ready(function(){
 
+    // same as address button
+    $("#same_address").click(function(){
+        if (this.checked){ // copy field values and make uneditable
+            $("#id_address").val($("#id_street").val());
+            $("#id_city2").val($("#id_city").val());
+            $("#id_state2").val($("#id_state").val());
+            $("#id_zip2").val($("#id_zip").val());
+            
+            $("#id_address").attr("disabled", true);
+            $("#id_city2").attr("disabled", true);
+            $("#id_state2").attr("disabled", true);
+            $("#id_zip2").attr("disabled", true);
+        } else { // make editable
+            $("#id_address").attr("disabled", false);
+            $("#id_city2").attr("disabled", false);
+            $("#id_state2").attr("disabled", false);
+            $("#id_zip2").attr("disabled", false);
+        }
+    });
+
+    // prepare the dialog
     $( "#dialog-signup" ).dialog({ autoOpen: false, modal: true, 
         title: "Signing up",
         resizable: false,

@@ -1111,6 +1111,18 @@ float: right;
 	-webkit-border-radius:5px;
 }
 
+#signup-form label#same_address_span{
+	color:#ababab;
+	font-size:15px;
+	display:inline;
+	font-weight:bold;
+	margin:0 0 7px;
+}
+
+#signup-form input#same_address{
+    position:relative; top:3px; left:2px;
+}
+
 #signup-form textarea{
 	resize:none;
 	height:148px;
@@ -1124,15 +1136,15 @@ float: right;
 	width:338px;
 }
 
-#signup-form #id_city{
+#signup-form #id_city, #signup-form #id_city2{
 	width:196px;
 }
 
-#signup-form #id_state{
+#signup-form #id_state, #signup-form #id_state2{
 	width:96px;
 }
 
-#signup-form #id_zip{
+#signup-form #id_zip, #signup-form #id_zip2{
 	width:96px;
 }
 
@@ -1140,6 +1152,7 @@ float: right;
 	width:196px;
 }
 
+#signup-form #id_first_name, #signup-form #id_last_name,
 #signup-form #id_first_name, #signup-form #id_last_name{
 	width:248px;
 }
@@ -1154,6 +1167,10 @@ float: right;
 
 #signup-form #phone {
 	width:200px;
+}
+
+#signup-form input[type=checkbox]{
+    width:14px; height:14px;
 }
 
 #card_number_container {

@@ -66,7 +66,7 @@ class SubscriptionForm2(forms.Form):
     """ 
     2s are appended at each attr name because of name confllicts at
     signup with StoreSignUpForm. """
-    first_name2 = forms.CharField(max_length=30,
+    first_name2 = forms.CharField(max_length=100,
                     validators=[alphanumeric])
     last_name2 = forms.CharField(max_length=100,
                     validators=[alphanumeric])
@@ -135,7 +135,7 @@ class SubscriptionForm2(forms.Form):
         return data
         
 class SubscriptionForm(forms.Form):
-    first_name = forms.CharField(max_length=30,
+    first_name = forms.CharField(max_length=100,
                     validators=[alphanumeric])
     last_name = forms.CharField(max_length=100,
                     validators=[alphanumeric])

@@ -156,17 +156,21 @@
 					<div class="clear-both"></div>
 					
 					<p>Credit Card Information</p>
+					<div class="floated">
 					{{ subscription_form.first_name2.errors }}
 					<label for="id_first_name2">First Name</label>
 					{{ subscription_form.first_name2 }}
+					</div>
 					
+					<div class="floated">
 					{{ subscription_form.last_name2.errors }}
 					<label for="id_last_name2">Last Name</label>
 					{{ subscription_form.last_name2 }}
+					</div>
 					
 					<div class="input-container" id="card_number_container">
 						{{ subscription_form.cc_number.errors }}
-						<label for="id_card_number">Card Number</label>
+						<label for="id_card_number" style="clear:left;">Card Number</label>
 						{{ subscription_form.cc_number }}
 						<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
 						<img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
@@ -185,11 +189,14 @@
 					<label for="id_expiration_month">Expiration</label>
 					{{ subscription_form.cc_expiration }}
 					
-					<p>Billing Address</p>
+					<br />
+					<p style="display:inline-block">Billing Address</p>
+					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as store address</label>
+					<input type="checkbox" id="same_address" />
 					
 				
 					{{ subscription_form.address.errors }}
-					<label for="id_street">Street</label>
+					<label for="id_address">Address</label>
 					{{ subscription_form.address }}
 					
 					
