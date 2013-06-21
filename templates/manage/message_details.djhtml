@@ -41,7 +41,7 @@
     <div class="white-box">
         <div class="sect meta">
 		    <label>Offer Title: </label><span>{{ message|get:'offer_title' }}</span>
-            <label>Expiration Date: </label><span>{{ date_offer_expiration }}</span>
+            <label>Expiration Date: </label><span>{{ message|get:'date_offer_expiration'|date:'m/d/y h:m A' }}</span>
 		    <div style="clear: left;"></div>
 	    </div>
     </div>

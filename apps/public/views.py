@@ -104,12 +104,6 @@ def sign_up(request):
                             "name":name })
             store.create()    
             
-            if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
-                amount = int(request.POST.get("place_order_amount"))
-                if amount > 0:
-                    order_placed(amount, store)
-
             # create settings
             settings = Settings.objects().create(retailer_pin=\
                         rputils.generate_id(), punches_customer=1,
@@ -126,6 +120,13 @@ def sign_up(request):
             account.create()
 
             account.set("store", store)
+            
+            ####
+            if request.POST.get("place_order") and\
+                request.POST.get("place_order_amount").isdigit():
+                amount = int(request.POST.get("place_order_amount"))
+                if amount > 0:
+                    order_placed(amount, store, account)
             
             # TODO send matt and new user a pretty email.
 

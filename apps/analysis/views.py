@@ -6,7 +6,6 @@ import json
 
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
-from parse.session import get_time_now
 from parse.core.advanced_queries import relational_query
 from parse.auth.decorators import login_required
 from libs.repunch import rputils
@@ -146,7 +145,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
         elif filter == 'age':
             results.append(["Range", "<20", "20-29", "30-39", "40-49", ">50"]);
            
-            now = get_time_now(request.session)
+            now = datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
             age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -40), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
@@ -192,7 +191,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
         elif filter == 'age':
             results.append(["Range", "<20", "20-29", "30-39", "40-49", ">50"]);
            
-            now = get_time_now(request.session)
+            now = datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
             age_ranges = [(1, 0, -20), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
@@ -235,7 +234,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
         elif filter == 'age':
             results.append(["Range", "<20", "20-29", "30-39", "40-49", ">50"]);
             
-            now = get_time_now(request.session)
+            now = datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
             age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -39), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:

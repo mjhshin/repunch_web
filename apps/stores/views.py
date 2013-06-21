@@ -93,6 +93,10 @@ def edit(request):
     else:
         form = StoreForm()
         form.initial = store.__dict__.copy()
+        # make sure that the phone number is unformatted
+        form.initial['phone_number'] =\
+            form.initial['phone_number'].replace("(",
+                "").replace(")","").replace(" ", "").replace("-","")
         
     hours_map = {}
     # group up the days that aare in the same row

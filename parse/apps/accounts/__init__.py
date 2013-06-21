@@ -34,7 +34,7 @@ sub_type = {
     2:heavy_type,
 }
 
-def order_placed(amount, store):
+def order_placed(amount, store, account):
     """
     Handle event where an order for phones are placed by a store
     at signup or update account.
@@ -44,13 +44,15 @@ def order_placed(amount, store):
     store.get('subscription').charge_cc(\
         PHONE_COST_UNIT_COST*amount,
         "Repunch Inc. Order placed on " +\
-        str(amount) + " phones")
+        str(amount) + " phones", "smartphone")
         
     rtlr = 'ORDER PLACED by ' +  store.store_name
     msg = "Business name: " + store.get('store_name') + "\n" +\
         "Owner name: " + store.get('first_name') + " " +\
         store.get('last_name') + "\n" +\
         "Store ID: " + store.objectId + "\n" +\
+        "Username: " + account.get('username') + "\n" +\
+        "Email: " + account.get('email') + "\n" +\
         "Phone number: " + store.get('phone_number') + "\n" +\
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
         "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n" +\

@@ -93,6 +93,9 @@ class Store(ParseObject):
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, **data):
+        # use type to distinguish between different types of payments
+        # monthly, smartphone
+        self.type = data.get("type")
         self.state = data.get('state')
         self.payment_id = data.get('payment_id')
         self.sale_id = data.get('sale_id')
@@ -170,7 +173,7 @@ class Subscription(ParseObject):
             self.update()
             return True       
 
-    def charge_cc(self, total, description):
+    def charge_cc(self, total, description, type):
         """
         For charging for monthly non-free membership fees,
         total: sub_type[self.get('subscriptionType')].\
@@ -189,6 +192,7 @@ class Subscription(ParseObject):
                 state = res['state'],
                 payment_id = res['id'],
                 total = total,
+                type = type,
             )
             if invoice.state == 'approved':
                 try:

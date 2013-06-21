@@ -37,8 +37,9 @@ def get_store(session):
     else:
         return session['store']
         
+"""
 def get_store_timezone(session):
-    """ returns an actual pytz timezone object! """
+returns an actual pytz timezone object
     if "store_timezone" not in session:
         store_timezone = get_store(session).get('store_timezone')
         store_timezone = pytz.timezone(store_timezone)
@@ -49,12 +50,15 @@ def get_store_timezone(session):
         
 
 def get_time_now(session):
-    """
+
     Call this instead of datetime.now which is not guaranteed to be
     timezone aware.
     This will ensure that datetime.now() returns the correct time.
-    """
-    return datetime.utcfromtimestamp(time.mktime(datetime.now(tz=get_store_timezone(session)).timetuple()))
+
+    now = datetime.utcfromtimestamp(time.mktime(datetime.now(tz=\
+        get_store_timezone(session)).timetuple()))
+    return now.replace(tzinfo=get_store_timezone(session))
+"""
         
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:

@@ -114,7 +114,7 @@ a.button.orange{
 	border-top:2px #E36E28 solid;
 }
 	
-#header-signin-btn{
+#header-signin-btn, #header-dashboard-btn{
 	height:24px;
 	color:white;
 	float:right;

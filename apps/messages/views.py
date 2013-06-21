@@ -9,8 +9,7 @@ import urllib
 from dateutil import tz
 
 from parse import session as SESSION
-from parse.session import get_time_now
-from parse.utils import cloud_call, datetime_to_utc
+from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -64,7 +63,7 @@ def edit(request, message_id):
             raise Http404
         form = MessageForm(request.POST) 
         # check here if limit has been reached
-        start = get_time_now(request.session).replace(day=1, hour=0,
+        start = datetime.now().replace(day=1, hour=0,
                                     minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
@@ -95,7 +94,7 @@ def edit(request, message_id):
             if 'attach_offer' in request.POST.dict():
                 # make sure that date is a date and not string
                 message.set('date_offer_expiration', 
-                    datetime_to_utc(parser.parse(request.POST['date_offer_expiration'])) )
+                    parser.parse(request.POST['date_offer_expiration']) )
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
             else:
@@ -129,7 +128,7 @@ def edit(request, message_id):
             }
 
             if msg_filter == "idle":
-                d = get_time_now(request.session) + relativedelta(days=-21)
+                d = datetime.now() + relativedelta(days=-21)
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\
@@ -195,9 +194,11 @@ def details(request, message_id):
     from_zone = tz.gettz('UTC')
     to_zone = tz.gettz('America/New_York')
     date_offer_expiration = None 
+    print message.createdAt
     if message.date_offer_expiration:
         date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
         date_offer_expiration = date_offer_expiration.astimezone(to_zone)
+        print date_offer_expiration
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True,
                 'date_offer_expiration':date_offer_expiration})
@@ -284,7 +285,7 @@ def feedback_reply(request, feedback_id):
             data['error'] = 'You cannot reply more than once to a '+\
                                 'feedback.'
         else:
-            # create BASIC message
+            # create BASIC message no subject
             msg = Message.objects().create(message_type=\
                 BASIC, sender_name=store.get('store_name'),
                 store_id=store.objectId, body=body)
@@ -298,7 +299,7 @@ def feedback_reply(request, feedback_id):
             cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
-                "subject":message.get('subject'),
+                "subject":feedback.get('subject'),
                 "message_id":msg.objectId,
                 "filter":'one',
                 "username":feedback.get('username'),
@@ -333,10 +334,9 @@ def feedback_delete(request, feedback_id):
     if feedback.get('Reply'):
         feedback_reply = feedback.get('reply')
         feedback_reply.delete()
-        
     
     # update messages_received_list in session cache
-    messages_received_list = SESSION.get_received_sent_list(\
+    messages_received_list = SESSION.get_received_list(\
         request.session)
     i_remove = 0
     for i, m in enumerate(messages_received_list):

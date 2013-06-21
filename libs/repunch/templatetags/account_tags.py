@@ -1,11 +1,11 @@
 from __future__ import division
 from django import template
 from dateutil import parser
+from datetime import datetime
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
 from parse import session as SESSION
-from parse.session import get_time_now
 
 register = template.Library()
 
@@ -48,7 +48,7 @@ def account_message_usage(session, percent_of=None):
                 session).get('subscriptionType')]
     
     message_count = SESSION.get_message_count(session,
-                        get_time_now(session))
+                        datetime.now())
     
     percent = message_count/atype['max_messages']
     if(percent > 1): #don't go past 1
@@ -65,5 +65,4 @@ def account_user_count(session):
     
 @register.simple_tag
 def account_message_count(session):
-   return SESSION.get_message_count(session,
-            get_time_now(session))
+   return SESSION.get_message_count(session, datetime.now())

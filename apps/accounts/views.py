@@ -106,7 +106,8 @@ def update(request):
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
                     store.fetchAll()
-                    order_placed(amount, store)   
+                    order_placed(amount, store,
+                        request.session['account'])   
             
             # update the session cache
             request.session['store'] = store
@@ -169,7 +170,8 @@ def upgrade(request):
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
                     store.fetchAll()
-                    order_placed(amount, store)
+                    order_placed(amount, store, 
+                        request.session['account'])
                     
             
             # update the session cache

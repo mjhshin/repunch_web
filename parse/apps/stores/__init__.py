@@ -1,4 +1,8 @@
 
+# payment types
+MONTHLY = "monthly"
+SMARTPHONE = "smartphone"
+
 def format_phone_number(num_str):
     """
     Takes in a string 7187371994 and outputs (718) 737-1994.
