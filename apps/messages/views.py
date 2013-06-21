@@ -188,24 +188,164 @@ def details(request, message_id):
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
         request.session)
-    request.session['messages_sent_list'] =\
-        messages_sent_list
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
     
     if not message:
         raise Http404
-    """
-    from_zone = tz.gettz('UTC')
-    to_zone = tz.gettz('America/New_York')
-    date_offer_expiration = None
-    if message.date_offer_expiration:
-        date_offer_expiration = message.date_offer_expiration.replace(tzinfo=from_zone)
-        date_offer_expiration = date_offer_expiration.astimezone(to_zone)
-    """
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True})
+
+
+# FEEDBACK ------------------------------------------
+@login_required
+def feedback(request, feedback_id):
+    account = request.session['account']
+    data = {'messages_nav': True, 'feedback_id':\
+            feedback_id, 'account_username':\
+            account.get('username')}    
+    
+    # get from the messages_received_list in session cache
+    messages_received_list = SESSION.get_messages_received_list(\
+        request.session)
+    i_remove, feedback_unread, feedback = 0, 0, None
+    for ind, m in enumerate(messages_received_list):
+        if m.objectId == feedback_id:
+            feedback = m
+            i_remove = ind
+        if not m.get('is_read'):
+            feedback_unread += 1
+            
+    if not feedback:
+        raise Http404
+    
+    if not feedback.is_read:
+        feedback.is_read = True
+        feedback.update()
+        
+    # make sure that the message stored in the list is the updated 1
+    messages_received_list.pop(i_remove)
+    messages_received_list.append(feedback)
+    request.session['messages_received_list'] = messages_received_list
+    
+    # update the feedback_unread count
+    request.session['feedback_unread'] = feedback_unread - 1
+        
+    if request.GET.get("success"):
+        data['success'] = request.GET.get("success")
+    if request.GET.get("error"):
+        data['error'] = request.GET.get("error")
+    
+    # there should only be at most 1 reply
+    data['reply'] = feedback.get('reply')
+    data['feedback'] = feedback
+    
+    return render(request, 'manage/feedback.djhtml', data)
+
+@login_required
+def feedback_reply(request, feedback_id):
+    account = request.session['account']
+    store = SESSION.get_store(request.session)
+    data = {'messages_nav': True}    
+    
+    # get from the messages_received_list in session cache
+    messages_received_list = SESSION.get_messages_received_list(\
+        request.session)
+    i_remove, feedback = 0, None
+    for ind, m in enumerate(messages_received_list):
+        if m.objectId == feedback_id:
+            feedback = m
+            i_remove = ind
+            break
+            
+    if not feedback:
+        raise Http404
+    
+    if request.method == 'POST':
+        body = request.POST.get('body')
+        if body == None or len(body) == 0:
+            data['error'] = 'Please enter a message.'   
+        # double check if feedback already has a reply
+        # should not go here unless it is a hacker 
+        elif feedback.get('Reply'):
+            data['error'] = 'You cannot reply more than once to a '+\
+                                'feedback.'
+        else:
+            # create BASIC message no subject
+            msg = Message.objects().create(message_type=\
+                BASIC, sender_name=store.get('store_name'),
+                store_id=store.objectId, body=body)
+            # add to ReceivedMessages relation
+            store.add_relation("ReceivedMessages_", [msg.objectId])
+            # set feedback Reply pointer to message
+            feedback.set('Reply', msg.objectId)
+            feedback.update()
+            
+            # make sure that the message stored in the list is the updated 1
+            messages_received_list.pop(i_remove)
+            messages_received_list.append(feedback)
+            request.session['messages_received_list'] = messages_received_list
+
+            # push notification
+            print cloud_call("retailer_message", {
+                "store_id":store.objectId,
+                "store_name":store.get('store_name'),
+                "subject":feedback.get('subject'),
+                "message_id":msg.objectId,
+                "filter":'one',
+                "username":feedback.get('username'),
+            })
+
+            return redirect(reverse('feedback_details', 
+                        args=(feedback.objectId,)) +\
+                        "?%s" % urllib.urlencode({'success':\
+                        'Reply has been sent.'}))
+    else:
+        data['from_address'] = account.get('username')
+        data['subject'] = 'Re: ' + feedback.get('subject')
+        
+    # update store session cache
+    request.session['store'] = store
+    
+    data['feedback'] = feedback
+    
+    return render(request, 'manage/feedback_reply.djhtml', data)
+
+@login_required
+def feedback_delete(request, feedback_id):
+    # get from the messages_received_list in session cache
+    messages_received_list = SESSION.get_messages_received_list(\
+        request.session)
+    i_remove, feedback = 0, None
+    for ind, m in enumerate(messages_received_list):
+        if m.objectId == feedback_id:
+            feedback = m
+            i_remove = ind
+            break
+            
+    if not feedback:
+        raise Http404
+
+    # delete reply to message first if exist
+    if feedback.get('Reply'):
+        feedback_reply = feedback.get('reply')
+        feedback_reply.delete()
+    
+    # update messages_received_list in session cache
+    messages_received_list = SESSION.get_messages_received_list(\
+        request.session)
+    i_remove = 0
+    for i, m in enumerate(messages_received_list):
+        if m.objectId == feedback.objectId:
+            i_remove = i
+            break
+    messages_received_list.pop(i_remove)
+    request.session['messages_received_list'] =\
+        messages_received_list
+    
+    feedback.delete()
+    return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
 
 @login_required
 def delete(request, message_id):
@@ -233,127 +373,4 @@ def delete(request, message_id):
             'Message has been deleted.'}))
     """
     return HttpResponse("sorry, this operation is not supported")
-
-# FEEDBACK ------------------------------------------
-@login_required
-def feedback(request, feedback_id):
-    account = request.session['account']
-    store = SESSION.get_store(request.session)
-    data = {'messages_nav': True, 'feedback_id':\
-            feedback_id, 'account_username':\
-            account.get('username')}    
-    
-    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
-    # make sure cache attr is None for future queries!
-    store.receivedMessages = None
-    if not feedback:
-        raise Http404
-    
-    if not feedback.is_read:
-        feedback.is_read = True
-        feedback.update()
-        
-    if request.GET.get("success"):
-        data['success'] = request.GET.get("success")
-    if request.GET.get("error"):
-        data['error'] = request.GET.get("error")
-        
-    # update store session cache
-    request.session['store'] = store
-    
-    # there should only be at most 1 reply
-    data['reply'] = feedback.get('reply')
-    data['feedback'] = feedback
-    
-    return render(request, 'manage/feedback.djhtml', data)
-
-@login_required
-def feedback_reply(request, feedback_id):
-    account = request.session['account']
-    store = SESSION.get_store(request.session)
-    data = {'messages_nav': True}    
-    
-    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
-    # make sure cache attr is None for future queries!
-    store.receivedMessages = None
-    if not feedback:
-        raise Http404
-    
-    if request.method == 'POST':
-        body = request.POST.get('body')
-        if body == None or len(body) == 0:
-            data['error'] = 'Please enter a message.'   
-        # double check if feedback already has a reply
-        # should not go here unless it is a hacker 
-        elif feedback.get('Reply'):
-            data['error'] = 'You cannot reply more than once to a '+\
-                                'feedback.'
-        else:
-            # create BASIC message no subject
-            msg = Message.objects().create(message_type=\
-                BASIC, sender_name=store.get('store_name'),
-                store_id=store.objectId, body=body)
-            # add to ReceivedMessages relation
-            store.add_relation("ReceivedMessages_", [msg.objectId])
-            # set feedback Reply pointer to message
-            feedback.set('Reply', msg.objectId)
-            feedback.update()
-
-            # push notification
-            cloud_call("retailer_message", {
-                "store_id":store.objectId,
-                "store_name":store.get('store_name'),
-                "subject":feedback.get('subject'),
-                "message_id":msg.objectId,
-                "filter":'one',
-                "username":feedback.get('username'),
-            })
-
-            return redirect(reverse('feedback_details', 
-                        args=(feedback.objectId,)) +\
-                        "?%s" % urllib.urlencode({'success':\
-                        'Reply has been sent.'}))
-    else:
-        data['from_address'] = account.get('username')
-        data['subject'] = 'Re: ' + feedback.get('subject')
-        
-    # update store session cache
-    request.session['store'] = store
-    
-    data['feedback'] = feedback
-    
-    return render(request, 'manage/feedback_reply.djhtml', data)
-
-@login_required
-def feedback_delete(request, feedback_id):
-    store = SESSION.get_store(request.session)
-    
-    feedback = store.get("receivedMessages", objectId=feedback_id)[0]
-    # make sure cache attr is None for future queries!
-    store.receivedMessages = None
-    if not feedback:
-        raise Http404
-
-    # delete reply to message first if exist
-    if feedback.get('Reply'):
-        feedback_reply = feedback.get('reply')
-        feedback_reply.delete()
-    
-    # update messages_received_list in session cache
-    messages_received_list = SESSION.get_received_list(\
-        request.session)
-    i_remove = 0
-    for i, m in enumerate(messages_received_list):
-        if m.objectId == feedback.objectId:
-            i_remove = i
-            break
-    messages_received_list.pop(i_remove)
-    request.session['messages_received_list'] =\
-        messages_received_list
-    
-    # update store session cache
-    request.session['store'] = store
-    
-    feedback.delete()
-    return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
 

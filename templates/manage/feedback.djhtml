@@ -36,7 +36,7 @@
 
 	<div class="divider" style="height: 20px;"></div>
     {% if reply %}
-	<div class="white-box {% if reply.is_response == 1 %}response{% endif %}">
+	<div class="white-box response">
 		<div class="sect meta">
 			<label>Date:</label><span>{{ reply|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label>
