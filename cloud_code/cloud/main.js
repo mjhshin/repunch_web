@@ -201,7 +201,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				
 		}).then(function(employee) {
 				console.log("Employee save was successful.");
-				response.success("success");
+				response.success(patron.get("first_name") + " " + patron.get("last_name"));
 		});
 	}
 
