@@ -103,6 +103,16 @@ class Invoice(ParseObject):
         
         super(Invoice, self).__init__(False, **data)
         
+    def to_message_plain(self):
+        """
+        Returns this invoice object as a string in message format.
+        """
+        return "Type: " + str(self.type) + "\n" +\
+            "State: " + str(self.state) + "\n" +\
+            "Payment Id: " + str(self.payment_id) + "\n" +\
+            "Sale Id: " + str(self.sale_id) + "\n" +\
+            "Total: (USD)" + str(self.total) + "\n"
+        
     
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
@@ -181,12 +191,12 @@ class Subscription(ParseObject):
         description: "Recurring monthly subscription "+\
                         from repunch.com." 
                         
-        Returns True if success.
+        Returns the Invoice if success. Or not if not.
         """
         try:
             res = charge_cc(self, total, description)
         except HTTPError: # wrong credit card info BAD REQUEST (400)
-            return False
+            return
         else:
             invoice = Invoice(
                 state = res['state'],
@@ -203,7 +213,7 @@ class Subscription(ParseObject):
             invoice.create()
             st = Store.objects().get(Subscription=self.objectId)
             st.add_relation("Invoices_", [invoice.objectId])
-            return True
+            return invoice
             
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """

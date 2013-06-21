@@ -3,6 +3,7 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
+# SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -103,7 +104,10 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = FS_SITE_DIR+'/media'
+if DEBUG:
+    MEDIA_ROOT = '/media'
+else:
+    MEDIA_ROOT = FS_SITE_DIR+'/media'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -116,8 +120,11 @@ MEDIA_URL = '/media/'
 # Example: "/var/www/example.com/static/"
 # Actually, this has been setup so that collectstatic does not have to 
 # be run. All static files are in /static for production and deployment.
-STATIC_ROOT = FS_SITE_DIR+'/static'
-
+if DEBUG:
+    STATIC_ROOT = '/static'
+else:
+    STATIC_ROOT = FS_SITE_DIR+'/static'
+    
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
@@ -193,7 +200,7 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
-PHONE_COST_UNIT_COST = 5
+PHONE_COST_UNIT_COST = 130
 PAGINATION_THRESHOLD = 20
 AUTH_USER_MODEL = 'accounts.Account'
 

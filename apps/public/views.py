@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from datetime import datetime
 import json
 
-from parse.apps.accounts import order_placed
+from parse.notifications import send_email_signup
+from parse.apps.accounts import order_placed, user_signup
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
@@ -128,7 +129,11 @@ def sign_up(request):
                 if amount > 0:
                     order_placed(amount, store, account)
             
-            # TODO send matt and new user a pretty email.
+            # send matt and new user a pretty email.
+            # new user
+            send_email_signup(account)
+            # matt
+            user_signup(account)
 
             # auto login
             user_login = login(request)

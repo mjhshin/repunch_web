@@ -10,7 +10,13 @@ from django.template import Template, Context
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG
 
-def send_email_signup(account):
+def send_email_receipt(account, data):
+    """
+    Sends the user a pretty receipt.
+    """
+    pass
+
+def send_email_signup(account, connection=None):
     """
     Sends a welcome notification to the account.
     """
@@ -37,7 +43,13 @@ def send_email_signup(account):
     emails.append(email)
         
     # prep and send the email
-    conn = mail.get_connection(fail_silently=(not DEBUG))
-    conn.open()
+    if connection:
+        conn = connection
+    else:
+        conn = mail.get_connection(fail_silently=(not DEBUG))
+        conn.open()
+        
     conn.send_messages(emails)
-    conn.close()
+    
+    if not connection:
+        conn.close()
