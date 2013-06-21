@@ -122,6 +122,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		console.log("updating existing PatronStore");
 		patronStoreResult.increment("punch_count", numPunches);
 		patronStoreResult.increment("all_time_punches", numPunches);
+		patron = patronStoreResult.get("Patron");
 		patronStoreResult.save().then(function(patronStoreResult) {
 			console.log("PatronStore save was successful.");
 			executePush();
@@ -201,7 +202,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				
 		}).then(function(employee) {
 				console.log("Employee save was successful.");
-				response.success("success");
+				response.success(patron.get("first_name") + " " + patron.get("last_name"));
 		});
 	}
 
