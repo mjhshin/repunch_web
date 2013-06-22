@@ -300,6 +300,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	
 	var patronId;
+	var numPunches;
+	var rewardTitle;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -309,7 +311,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	redeemRewardQuery.get(redeemId).then(function(redeemReward) {
 		console.log("RedeemReward fetch success.");
 		var patronStore = redeemReward.get("PatronStore");
-		var numPunches = redeemReward.get("num_punches");
+		numPunches = redeemReward.get("num_punches");
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
@@ -353,12 +355,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		Parse.Push.send({
 	        where: installationQuery,
 	        data: {
-	            alert: request.params.name + " wants to redeem a reward.",
-				redeem_id: redeemReward.id,
-	            badge: "Increment",
-	            name: customerName,
+	            title: rewardTitle,
 	            num_punches: numPunches,
-	            title: rewardTitle
+				action: "com.repunch.intent.REDEEM"
 	        }
 	    }, {
 	        success: function() {
