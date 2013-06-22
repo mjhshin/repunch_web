@@ -16,11 +16,13 @@ class Message(ParseObject):
         self.date_offer_expiration = data.get('date_offer_expiration')
         self.message_type = data.get("message_type")
         self.is_read = data.get("is_read", False)
-        self.username = data.get('username')
         # store name or patron fullname
         self.sender_name = data.get("sender_name")
-        # empty if message sent by patrons
+        # empty if message sent by patron
         self.store_id = data.get("store_id")
+        # empty if message sent by store NEW
+        self.patron_id = data.get('patron_id')
+        
         # boolean - need to be set to False on message creation if 
         # there is an offer
         self.offer_redeemed = data.get("offer_redeemed")

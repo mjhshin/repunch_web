@@ -251,62 +251,42 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var Store = Parse.Object.extend("Store");
     var Message = Parse.Object.extend("Message");
     var PatronStore = Parse.Object.extend("PatronStore");
+    var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
+    var patronQuery = new Parse.Query(Patron);
     var patronStoreQuery = new Parse.Query(PatronStore);
-    var installationQuery = new Parse.Query(Parse.Installation);
-    var userQuery = new Parse.Query(Parse.User);
+    var installationQuery = new Parse.Query(Parse.Installation)
     var filter = request.params.filter;
-    var message; // placeholder
+    var message, patron_ids = new Array(); // placeholder
 
-    function addToPatronsInbox(users, isObjectArray) {
-        if (users.length == 0 ){
+    function addToPatronsInbox(patronStores) {
+        if (patronStores.length == 0 ){
             // match the installation with the username in the 
-            // userQuery results
             if (filter === "one"){
-                installationQuery.matchesKeyInQuery("username", 
-                                "username", userQuery);
+                installationQuery.equalTo("patron_id", 
+                                request.params.patron_id);
             } else {
-                installationQuery.equalTo("username", 
-                                request.params.username);
+                console.log(patron_ids);
+                installationQuery.containedIn("patron_id", patron_ids);
             }
             // all tasks are done. Push now.
             proceedToPush();
             return;
         }
-
-        var u = users.pop();
-        var uq = new Parse.Query(Parse.User);
-
-        // add message to the patron's ReceivedMessages relation
-        // first we must get the user
-        if (isObjectArray){
-            console.log("ADD TO PATRON INBOX FOR " + u.get("username"));
-            uq.equalTo("username", u.get("username"));
-        } else {
-            console.log("ADD TO PATRON INBOX FOR " + username);
-            uq.equalTo("username", username);
-        }
-        uq.first().then(function(user){
-            // then get the Patron pointed to by the user
-            var pt = user.get("Patron");
-            console.log("NOW FETCHING PATRON FOR USER " + user.get("username"));
-            pt.fetch({
-                success: function(pt){
-                    console.log(pt.get("gender"));
-                    var rel = pt.relation("ReceivedMessages");
-                    // message obtained from the beginning (bottom)
-                    rel.add(message);
-                    pt.save();
-                    // chain method call
-                    addToPatronsInbox(users, isObjectArray);
-                }, // end success function
-                error: function(pt, error){
-                    response.error(error);
-                    console.log("ERROR IN FETCHING PATRON.");
-                    console.log(error);
-                }
-            }); // end patron fetch
-        }); // end uq 
+        
+        var pt = patronStores.pop();
+        var pat = pt.get("Patron");
+        
+        // keep track of atron ids for the installationQuery
+        patron_ids.push(pat.id);
+        
+        console.log("NOW FETCHING PATRON FOR patronStore " + pt.id);
+        var rel = pat.relation("ReceivedMessages"); 
+        // message obtained from the beginning (bottom)
+        rel.add(message);
+        pat.save();
+        // chain method call
+        addToPatronsInbox(patronStores);
     }
 
     // class when all tasks are done
@@ -344,22 +324,23 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 request.params.min_punches);
         }  
 
-        // determine the userQuery
         if (filter === "one"){
-            var arr = new Array(request.params.username);
-            addToPatronsInbox(arr, false);
+            // first get the patron
+            patronQuery.get(request.params.patron_id).then(function(patron){
+                patronStoreQuery.matchesQuery("Patron", patron);
+                patronStoreQuery.first().then(function(pst){
+                    var arr = new Array(pst);
+                    addToPatronsInbox(arr);
+                });
+            });
         } else {
-            // store sends a message
             patronStoreQuery.select("Patron");
-            userQuery.equalTo("account_type", "patron");
-            userQuery.matchesKeyInQuery("Patron", "Patron",
-                        patronStoreQuery);
-            userQuery.select("username");
-
+            patronStoreQuery.include("Patron");
+            
             // adding relation to all patron's ReceivedMessages
-            userQuery.find().then(function(users){
-                addToPatronsInbox(users, true);
-            });// end userQuery
+            patronStoreQuery.find().then(function(patronStores){
+                addToPatronsInbox(patronStores);
+            });
         }// end else
 
     } // end continueWithPush();

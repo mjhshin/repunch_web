@@ -288,7 +288,7 @@ def feedback_reply(request, feedback_id):
             request.session['messages_received_list'] = messages_received_list
 
             # push notification
-            print cloud_call("retailer_message", {
+            cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":feedback.get('subject'),
