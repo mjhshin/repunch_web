@@ -34,7 +34,7 @@
 		{% if employee.objectId %}
 		<div id="photo-edit">
 			<div id="edit-employees-options" class="form-options">
-			    <a onclick="$('#employee-form').submit(); return false;" class="button blue" style="position:relative;top:-32px;">Delete Employee</a>
+			    <a href="{% url 'employee_delete' employee_id %}" id="delete-button" style="color:red;">Delete Employee</a>
 		    </div>
 		</div>
 		{% endif %}

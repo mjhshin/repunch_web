@@ -6,7 +6,7 @@ from django.db.models import Sum
 from datetime import datetime
 import urllib, json
 
-from parse.apps.employees import DENIED, APPROVED
+from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
@@ -36,17 +36,23 @@ def index(request):
 
 @login_required
 def edit(request, employee_id):
-    store = SESSION.get_store(request.session)
     data = {'employees_nav': True, 'employee_id': employee_id}
     
-    #need to make sure this reward really belongs to this store
-    employee = store.get("employees", objectId=employee_id)[0]
-    # need to make sure that cache attr is empty!
-    store.employees = None
+    # get from the employees_approved_list in session cache
+    employees_approved_list = SESSION.get_employees_approved_list(\
+        request.session)
+    employee = None
+    for m in employees_approved_list:
+        if m.objectId == employee_id:
+            employee = m
+            break
+            
     acc = Account.objects().get(Employee=employee.objectId)
+            
     if not employee or not acc:
         raise Http404
     
+    """
     if request.method == 'POST': 
         # shouldn't go here, shin scrapped editing employee info
         form = EmployeeForm(request.POST)
@@ -57,16 +63,14 @@ def edit(request, employee_id):
             acc.update()
             data['success'] = "Employee has been updated."
     else:
-        if request.GET.get("success"):
-            data['success'] = request.GET.get("success")
-        if request.GET.get("error"):
-            data['error'] = request.GET.get("error")
-            
-        form = EmployeeForm(employee.__dict__.copy())
-        form.data['email'] = acc.get('email')
+    """
+    if request.GET.get("success"):
+        data['success'] = request.GET.get("success")
+    if request.GET.get("error"):
+        data['error'] = request.GET.get("error")
         
-    # update session cache store
-    request.session['store'] = store
+    form = EmployeeForm(employee.__dict__.copy())
+    form.data['email'] = acc.get('email')
     
     data['form'] = form
     data['employee'] = employee
@@ -75,86 +79,80 @@ def edit(request, employee_id):
 
 @login_required
 def delete(request, employee_id):
-    store = SESSION.get_store(request.session)
-
-    #need to make sure this reward really belongs to this store
-    employee = store.get("employees", objectId=employee_id)[0]
-    # need to make sure that cache attr is empty!
-    store.employees = None
+    # get from the employees_approved_list in session cache
+    employees_approved_list = SESSION.get_employees_approved_list(\
+        request.session)
+    i_remove, employee = 0, None
+    for ind, m in enumerate(employees_approved_list):
+        if m.objectId == employee_id:
+            employee = m
+            i_remove = ind
+            break
+            
     if not employee:
         raise Http404
-        
-    # update session cache for employees_approved_list
-    employees_approved_list =\
-        request.session['employees_approved_list']
-    i_remove = 0
-    for i, emp in enumerate(employees_approved_list):
-        if emp.objectId == employee.objectId:
-            i_remove = i
-            break
+
     employees_approved_list.pop(i_remove)   
     request.session['employees_approved_list'] =\
         employees_approved_list
 
     # delete Punches Pointers to this employee?
     employee.delete()
-    
-    # update session cache store
-    request.session['store'] = store
 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
 @login_required
 def approve(request, employee_id):
-    store = SESSION.get_store(request.session)
-
-    #need to make sure this reward really belongs to this store
-    employee = store.get("employees", objectId=employee_id)[0]
-    # need to make sure that cache attr is empty!
-    store.employees = None
+    # get from the employees_pending_list in session cache
+    employees_pending_list = SESSION.get_employees_pending_list(\
+        request.session)
+    i_remove, employee = 0, None
+    for ind, m in enumerate(employees_pending_list):
+        if m.objectId == employee_id:
+            employee = m
+            i_remove = ind
+            break
+        if emp.get('status') == PENDING:
+            pcount += 1
+            
     if not employee:
         raise Http404
     
     employee.set('status', APPROVED)
     employee.update()
-    
-    # update session cache for employees_pending
-    request.session['employees_pending'] =\
-        int(request.session['employees_pending']) - 1
-    # update session cache for employees_pending_list
-    i_remove = 0
-    employees_pending_list =\
-        request.session['employees_pending_list']
-    for i, emp in enumerate(employees_pending_list):
-        if emp.objectId == employee.objectId:
-            i_remove = i
-            break
+            
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
     
     # update session cache for employees_approved_list
-    employees_approved_list =\
-        request.session['employees_approved_list']
+    employees_approved_list = SESSION.get_employees_approved_list(\
+        request.session)
     employees_approved_list.append(employee)
     request.session['employees_approved_list'] =\
         employees_approved_list
-    
-    # update session cache store
-    request.session['store'] = store
+        
+    # update session cache for employees_pending
+    request.session['employees_pending'] = pcount - 1
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
 @login_required
 def deny(request, employee_id):
-    store = SESSION.get_store(request.session)
-
-    #need to make sure this reward really belongs to this store
-    employee = store.get("employees", objectId=employee_id)[0]
-    # need to make sure that cache attr is empty!
-    store.employees = None
+    # get from the employees_pending_list in session cache
+    employees_pending_list = SESSION.get_employees_pending_list(\
+        request.session)
+    i_remove, employee = 0, None
+    for ind, m in enumerate(employees_pending_list):
+        if m.objectId == employee_id:
+            employee = m
+            i_remove = ind
+            break
+        if emp.get('status') == PENDING:
+            pcount += 1
+            
     if not employee:
         raise Http404
     
@@ -162,35 +160,29 @@ def deny(request, employee_id):
     employee.update();
     
     # update session cache for employees_pending
-    request.session['employees_pending'] =\
-        int(request.session['employees_pending']) - 1
-    # update session cache for employees_pending_list
-    i_remove = 0
-    employees_pending_list =\
-        request.session['employees_pending_list']
-    for i, emp in enumerate(employees_pending_list):
-        if emp.objectId == employee.objectId:
-            i_remove = i
-            break
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
-    
-    # update session cache store
-    request.session['store'] = store
+       
+    # update session cache for employees_pending
+    request.session['employees_pending'] = pcount - 1
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
 @login_required
 def punches(request, employee_id):
-    store = SESSION.get_store(request.session)
     data = {'employee_id': employee_id}
-
-    # make sure that this employee belongs to this store
-    employee = store.get("employees", objectId=employee_id)[0]
-    # need to make sure that cache attr is empty!
-    store.employees = None
+    
+    # get from the employees_approved_list in session cache
+    employees_approved_list = SESSION.get_employees_approved_list(\
+        request.session)
+    employee = None
+    for ind, m in enumerate(employees_approved_list):
+        if m.objectId == employee_id:
+            employee = m
+            break
+            
     if not employee:
         raise Http404
     
@@ -202,7 +194,10 @@ def punches(request, employee_id):
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
     
-    paginator = Paginator(employee.get('punches', order=order_by), 12)
+    ps = employee.get('punches', order=order_by)
+    if not ps:
+        ps = []
+    paginator = Paginator(ps, 12)
     
     page = request.GET.get('page')
     try:
@@ -213,9 +208,6 @@ def punches(request, employee_id):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         punches = paginator.page(paginator.num_pages)
-        
-    # update session cache store
-    request.session['store'] = store
     
     data['punches'] = punches
     
@@ -226,9 +218,6 @@ def graph(request):
     employee_ids = request.GET.getlist('employee[]')
     start = request.GET.get('start')
     end = request.GET.get('end');
-
-    # store has a relation so lets take it from there
-    store = request.session['account'].get('store')
     
     start = datetime.strptime(start, "%m/%d/%Y")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -238,7 +227,15 @@ def graph(request):
     columns = [
                 {"id":"", "label":"Date", "type":"string"}
                ]
-    employees = store.get('employees', objectId__in=employee_ids)
+               
+    # build the list of employees from the list in the session cache
+    employees_approved_list = SESSION.get_employees_approved_list(\
+        request.session)
+    employees = []
+    for ind, m in enumerate(employees_approved_list):
+        if m.objectId in employee_ids:
+            employees.append(m)
+    
     if employees:
         for emp in employees:
             columns.append({"id":"", "label":emp.get('first_name')+\

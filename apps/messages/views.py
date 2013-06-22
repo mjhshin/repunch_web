@@ -294,7 +294,7 @@ def feedback_reply(request, feedback_id):
                 "subject":feedback.get('subject'),
                 "message_id":msg.objectId,
                 "filter":'one',
-                "username":feedback.get('username'),
+                "patron_id":feedback.get('patron_id'),
             })
 
             return redirect(reverse('feedback_details', 
