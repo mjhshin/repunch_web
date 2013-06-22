@@ -21,8 +21,8 @@
 		<h2 style="margin-bottom:10px;">Rewards</h2>
 		
 		<div class="table-header">
-			<div class="th">Punches</div>
-			<div class="th">Name</div>
+			<div class="th" id="header-reward_punches">Punches</div>
+			<div class="th" id="header-reward_summary">Name</div>
 		</div>
 		
 		{% for reward in rewards %}

@@ -9,7 +9,6 @@
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>

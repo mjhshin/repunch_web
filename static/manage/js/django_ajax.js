@@ -1,3 +1,5 @@
+/* currently unused */
+
 $.ajaxSetup({ 
      beforeSend: function(xhr, settings) {
          function getCookie(name) {

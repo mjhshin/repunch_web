@@ -1,3 +1,5 @@
+/* unused now. Replaced y tinysort. just preload all in server. */
+
 $(document).ready(function(){
 	// move to onclick to stopPropagation works?
 	$('a#delete-button').click(function(event){

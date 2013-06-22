@@ -9,16 +9,8 @@
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/employee_edit.js" %}"></script>
-	
 	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
-	<script type="text/javascript">
-		var _order_by = 'createdAt';
-		var _order_dir = 'desc';
-		var _page_url = '{% url 'employee_punches' employee_id %}';
-	</script>
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 {% endblock %}
 
 
@@ -30,7 +22,6 @@
 	</div>
 	{% endif %}
 		
-	<form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
 		{% if employee.objectId %}
 		<div id="photo-edit">
 			<div id="edit-employees-options" class="form-options">
@@ -59,9 +50,9 @@
 			<div class="white-box table" id="tab-body-punches">
 				<div class="table-header">
 					<div class="th sorted desc" id="header-createdAt">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-					<div class="th not-sortable" id="header-time">Time</div>
-					<div class="th not-sortable" id="header-patron">Customer <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-					<div class="th sortable" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+					<div class="th" id="header-time">Time</div>
+					<div class="th" id="header-patron">Customer <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+					<div class="th" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				</div>
 				<div id="table-body">
 					<div class="tr" id="load-row">
@@ -73,6 +64,5 @@
 				</div>
 			</div>
 		</div>
-	</form>
 
 {% endblock %}
