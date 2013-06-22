@@ -107,7 +107,7 @@ def approve(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
-    i_remove, employee = 0, None
+    i_remove, pcount, employee = 0, 0, None
     for ind, m in enumerate(employees_pending_list):
         if m.objectId == employee_id:
             employee = m
@@ -144,7 +144,7 @@ def deny(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
-    i_remove, employee = 0, None
+    i_remove, pcount, employee = 0, None
     for ind, m in enumerate(employees_pending_list):
         if m.objectId == employee_id:
             employee = m
@@ -187,13 +187,15 @@ def punches(request, employee_id):
         raise Http404
     
     order_by = request.POST.get('order_by')
-    if order_by == None:
-        order_by = 'createdAt'
     
+    if order_by in (None, "date_punched"):
+        order_by = 'createdAt'
+        
     order_dir = request.POST.get('order_dir')
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
     
+    # TODO HANDLE PAGINATION    
     ps = employee.get('punches', order=order_by)
     if not ps:
         ps = []

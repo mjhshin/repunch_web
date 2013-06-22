@@ -17,7 +17,7 @@
 	{% endif %}
 {% empty %}
 	<div class="tr {% cycle 'odd' '' %}">
-		<div class="td date">No punches</div>
+		<div class="td date_punched">No punches</div>
 		<div class="td time">&nbsp;</div>
 		<div class="td customer">&nbsp;</div>
 		<div class="td punches">&nbsp;</div>

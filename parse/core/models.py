@@ -418,10 +418,9 @@ class ParseObject(object):
             q = {}
             q.update({"where":dumps(where_dict)})
             # add the not where options
-            if self.__class__.__name__ == "Store":
-                for k,v in constraints.iteritems():
-                    if k in NOT_WHERE_CONSTRAINTS:
-                        q.update({k:v})
+            for k,v in constraints.iteritems():
+                if k in NOT_WHERE_CONSTRAINTS:
+                    q.update({k:v})
             res = parse("GET", 'classes/' + tmp, query=q)
             if res and "error" not in res:
                 if len(res['results']) == 0:

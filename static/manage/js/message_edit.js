@@ -19,8 +19,9 @@ $(document).ready(function(){
 		}
 	})
 	
+	
 	$( "#id_date_offer_expiration" ).datetimepicker({
-		timeFormat: "hh:mm tt"
+	    timeFormat: "hh:mm tt"
 	});
 	
 	/* This is in the html so that instead of ajaxing the min and max
