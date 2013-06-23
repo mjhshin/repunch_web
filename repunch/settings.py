@@ -204,6 +204,14 @@ PHONE_COST_UNIT_COST = 130
 PAGINATION_THRESHOLD = 20
 AUTH_USER_MODEL = 'accounts.Account'
 
+# SESSION POLICIES
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Note about clearing the session store. We do not need to manually
+# clear the session because "caches automatically delete stale data"
+# https://docs.djangoproject.com/en/dev/topics/http/sessions/
+# #clearing-the-session-store
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',

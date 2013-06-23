@@ -2,6 +2,8 @@
 #
 # Script to setup the environment for Repunch Django project 
 # onto AWS EC2.
+#
+# THIS IS FAR FROM COMPLETE.
 
 PROJECT_NAME="Repunch"
 GIT_REPO="https://github.com/mjhshin/repunch_web.git"

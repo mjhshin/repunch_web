@@ -60,6 +60,15 @@ def login(request):
                 if store.get('store_timezone'):
                     rputils.set_timezone(request, 
                         pytz.timezone(store.get('store_timezone')))
+                        
+                # If value is None, the session reverts to using 
+                # the global session expiry policy.
+                if "stay_in" in request.POST:
+                    request.session.set_expiry(None)
+                # If value is 0, the user's session cookie will 
+                # expire when the user's Web browser is closed.
+                else:
+                    request.session.set_expiry(0)
                 
                 return account
             else:

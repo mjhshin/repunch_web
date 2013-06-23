@@ -20,6 +20,9 @@ from parse.apps.stores.models import Store, Subscription,\
 Settings
 
 def index(request):
+    if request.session.get('account'):
+        return redirect(reverse('store_index'))
+        
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)
 
@@ -39,6 +42,46 @@ def faq(request):
 def about(request):
     data = {'about_nav': True}
     return render(request, 'public/about.djhtml', data)
+    
+def terms(request):
+    return render(request, 'public/terms.djhtml')
+
+def privacy(request):
+    return render(request, 'public/privacy.djhtml')
+
+def contact(request):
+    if request.method == 'POST': 
+        form = ContactForm(request.POST) 
+        if form.is_valid(): 
+            form.send()
+            return redirect(reverse('public_thank_you'))
+    else:
+        form = ContactForm()
+
+    return render(request, 'public/contact.djhtml', {'form': form, })
+
+def thank_you(request):
+    return render(request, 'public/thank_you.djhtml')
+
+def jobs(request):
+    return render(request, 'public/jobs.djhtml')
+
+def categories(request):
+    """ takes in ajax requests and returns a list of choices for
+    autocompletion in json format """
+    # term is the key in request.GET
+    if request.method == "GET" or request.is_ajax():
+        categories = Category.objects.filter(name__istartswith=\
+                        request.GET['term'].strip())[:8]
+                        
+        data = []
+        for cat in categories:
+            data.append(cat.name)
+
+        return HttpResponse(json.dumps(data), 
+                    content_type="application/json")
+    else:
+        return HttpResponse('')
 
 def sign_up(request):
     """ 
@@ -165,49 +208,4 @@ def sign_up(request):
     data['account_form'] = account_form
     data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)
-
-def terms(request):
-    return render(request, 'public/terms.djhtml')
-
-def privacy(request):
-    return render(request, 'public/privacy.djhtml')
-
-def contact(request):
-    if request.method == 'POST': 
-        form = ContactForm(request.POST) 
-        if form.is_valid(): 
-            form.send()
-            return redirect(reverse('public_thank_you'))
-    else:
-        form = ContactForm()
-
-    return render(request, 'public/contact.djhtml', {'form': form, })
-
-def thank_you(request):
-    return render(request, 'public/thank_you.djhtml')
-
-def jobs(request):
-    return render(request, 'public/jobs.djhtml')
-
-def categories(request):
-    """ takes in ajax requests and returns a list of choices for
-    autocompletion in json format """
-    # term is the key in request.GET
-    if request.method == "GET" or request.is_ajax():
-        categories = Category.objects.filter(name__istartswith=\
-                        request.GET['term'].strip())[:8]
-                        
-        data = []
-        for cat in categories:
-            data.append(cat.name)
-
-        return HttpResponse(json.dumps(data), 
-                    content_type="application/json")
-    else:
-        return HttpResponse('')
-
-
-
-
-
 
