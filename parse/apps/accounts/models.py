@@ -4,7 +4,6 @@ Parse equivalence of Django apps.accounts.models
 from importlib import import_module
 
 from parse.core.models import ParseObject, ParseObjectManager
-# from parse.auth import hash_password
 from parse.apps.accounts import sub_type, FREE
 
 class Account(ParseObject):

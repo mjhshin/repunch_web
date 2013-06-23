@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from datetime import datetime
 import json
 
+from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup
 from parse.apps.accounts import order_placed, user_signup
 from apps.db_static.models import Category
@@ -82,7 +83,15 @@ def categories(request):
                     content_type="application/json")
     else:
         return HttpResponse('')
-
+        
+def password_reset(request):
+    """
+    Calls Parse's requestPasswordReset
+    """
+    return HttpResponse(json.dumps({"res":\
+        request_password_reset(request.POST['forgot-pass-email'])}), 
+        content_type="application/json")
+    
 def sign_up(request):
     """ 
     renders the signup page on GET and returns a json object on POST.

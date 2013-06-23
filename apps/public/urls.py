@@ -14,4 +14,5 @@ urlpatterns = patterns('apps.public.views',
     url(r'^jobs/$', 'jobs', name='public_jobs'),
     url(r'^categories/$', 'categories', name='public_categories'),
     
+    url(r'^requestPasswordReset/$', 'password_reset', name='public_request_password_reset'),
 )

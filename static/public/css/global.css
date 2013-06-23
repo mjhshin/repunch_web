@@ -194,9 +194,14 @@ a.button.orange{
 	font-weight:normal;
 }
 
-#dialog-login-form a {
+#forgot-pass-form a {
     color:#0040FF;
-    position:relative; top:24px;
+    cursor:pointer;
+    text-decoration:none;
+}
+
+#forgot-pass-form a:hover {
+    text-decoration:underline;
 }
 
 #logging-in {
@@ -204,8 +209,12 @@ a.button.orange{
     position:relative;top:20px;left:40px;
 }
 
-#dialog-login-message span{
+#dialog-login-message span, #forgot-pass-form a span{
     color:#dd4b39;
+}
+
+#forgot-pass-form {
+    margin-top:16px;
 }
 	
 /*** page styles ***/

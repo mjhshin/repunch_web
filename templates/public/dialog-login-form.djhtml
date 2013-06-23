@@ -1,0 +1,35 @@
+{% load static %}
+
+<form id="dialog-login-form" >
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
+	<input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
+
+	<p><label for="id_username">Username:</label> 
+	{# the redirect url to prevent hard-coding anything #}
+	<input type="text" name="username" id="id_username"></p>
+	
+	<p><label for="id_password">Password:</label> 
+	<input type="password" name="password" id="id_password"></p>
+	
+	<div id="dialog-login-message"></div>
+	
+	<input type="submit" value="Sign in" />
+	<div id="stay-signed-in">
+	<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label for="stay_in">&nbsp;Stay signed in?</label>
+	</div>
+	
+    <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="logging in..."
+        id="logging-in" />
+</form>
+
+<form id="forgot-pass-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="{% url 'public_request_password_reset' %}"/>
+    <a>Forgot your password?</a>
+    <div style="display:none;" id="forgot-pass-form-div">
+	    <input type="email" name="forgot-pass-email" placeholder="Enter your email."/>
+        <input type="submit" value="Submit" />
+        <div id="forgot-pass-message"></div>
+    </div>
+</form>

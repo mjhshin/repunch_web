@@ -496,9 +496,14 @@ img#punch-loading {
 	font-weight:normal;
 }
 
-#dialog-login-form a {
+#forgot-pass-form a {
     color:#0040FF;
-    position:relative; top:24px;
+    cursor:pointer;
+    text-decoration:none;
+}
+
+#forgot-pass-form a:hover {
+    text-decoration:underline;
 }
 
 #logging-in {
@@ -506,7 +511,11 @@ img#punch-loading {
     position:relative;top:20px;left:40px;
 }
 
-#dialog-login-message span{
+#forgot-pass-form {
+    margin-top:28px;
+}
+
+#dialog-login-message span, #forgot-pass-form a span{
     color:#dd4b39;
 }
 
