@@ -9,23 +9,13 @@ from parse.auth import login
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
 
-""" Replaced with an ajax version for now.
-def manage_login(request):
-    data = {}
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid(): 
-            if form.do_login(request):
-                return redirect(reverse('store_index'))
-            else:
-                data['message'] = "Bad Login!"       
-    else:
-        form = LoginForm() # An unbound form
-
-    
-    data['form'] = form;
-    return render(request, 'manage/login.djhtml', data)
-"""
+def manage_refresh(request):
+    """
+    This is where the comet approach is put into play.
+    This handles ajax requests from clients, holding on to the 
+    request
+    """
+    pass
 
 def manage_login(request):
     """
@@ -55,8 +45,9 @@ def manage_login(request):
         else:
             data['code'] =  0        
     else:
+        if request.session.get('account'):
+            return redirect(reverse('store_index'))
         data['form'] = LoginForm()
-        # TODO ajax manage/login like the login dialog!
         return render(request, 'manage/login.djhtml', data)
 
     return HttpResponse(json.dumps(data), content_type="application/json")

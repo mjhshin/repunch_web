@@ -373,6 +373,30 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 });
  
 ////////////////////////////////////////////////////
+// This is called by the server to check if the store has any new
+// incoming data every X seconds.
+// 
+//  Input:
+//      store objectId (to process rewards array redemption_count)
+//      patronStore_count (count)
+//      feedback_unread (count)
+//      employees_pending (count)
+//
+//  Output: 
+//      patronStore_count (if changed)
+//      feedback_unread (if changed)
+//      feedbacks (new objects) (if feedback_unread changed)
+//      employees_pending (if changed)
+//      employees (new objects) (if employees_pending changed)
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("retailer_refresh", function(request, response) {
+    var data;
+    
+    response.success(data);
+});
+ 
+////////////////////////////////////////////////////
 //
 //
 //

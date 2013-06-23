@@ -207,6 +207,14 @@ AUTH_USER_MODEL = 'accounts.Account'
 # SESSION POLICIES
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
+# COMET APPROACH
+
+# force responding to requests and getting a new request from the
+# client every 4 minutes at most of inactivity (in seconds)
+REQUEST_TIMEOUT = 248 # 4 mins
+# check for new activity in Parse every X seconds
+COMENT_REFRESH_RATE = 10
+
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"
 # https://docs.djangoproject.com/en/dev/topics/http/sessions/
@@ -233,6 +241,7 @@ INSTALLED_APPS = (
 	'apps.messages',
     'apps.analysis',
     'apps.db_static',
+    'apps.workbench',
     'libs.repunch',
     
 

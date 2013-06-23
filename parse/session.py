@@ -21,10 +21,10 @@ SESSION_CACHE = [
     'store', # need push notification (for rewards)
     'subscription',
     'settings',
-    'employees_pending_list', # need push notification
+    'employees_pending_list', # sync with employees_pending
     'employees_approved_list',
     'messages_sent_list',
-    'messages_received_list', # need push notification
+    'messages_received_list', # sync with feedback_unread
 ]
 
 def get_store(session):
