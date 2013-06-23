@@ -377,10 +377,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 // incoming data every X seconds.
 // 
 //  Input:
-//      store objectId (to process rewards array redemption_count)
+//      store objectId (for comparison with given values)
+//      rewards_array (array object)
 //      patronStore_count (count)
 //      feedback_unread (count)
+//      feedback_unread_ids (String array)
 //      employees_pending (count)
+//      employees_pending_ids (String array)
 //
 //  Output: 
 //      patronStore_count (if changed)
@@ -391,9 +394,14 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_refresh", function(request, response) {
+    var Store = Parse.Object.extend("Store");
+    var PatronStore = Parse.Object.extend("PatronStore");
     var data;
     
-    response.success(data);
+    var userQuery = Parse.Query(Parse.User);
+    userQuery.equalTo("objectId", request.params.store_id);
+    userQuery.first().then(function(){response.success(data);});
+    
 });
  
 ////////////////////////////////////////////////////

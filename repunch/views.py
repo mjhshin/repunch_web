@@ -3,19 +3,32 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth import SESSION_KEY
+from time import sleep
 import json
 
+from libs.dateutil.relativedelta import relativedelta
+from parse.utils import cloud_call
 from parse.auth import login
+from parse.auth.decorators import login_required
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
+from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
 
+@login_required
 def manage_refresh(request):
     """
     This is where the comet approach is put into play.
     This handles ajax requests from clients, holding on to the 
-    request
+    request while checking Parse for new activity.
     """
-    pass
+    def comet():
+        # execute only after a certain time
+        sleep(COMET_REFRESH_RATE)
+        res = cloud_call("retailer_refresh", {
+            "store_id": SESSION.get_store(request.session).objectId
+        })
+        print res
+    comet()
 
 def manage_login(request):
     """
