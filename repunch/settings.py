@@ -55,21 +55,22 @@ REST_CONNECTION_META = {
 
 USER_CLASS = "Account"
 
-
+"""
 # TODO USE LIVE
 # PAYPAL SANDBOX credentials need to use LIVE for the real thing
 # endpoint = api.sandbox.paypal.com
 PAYPAL_CLIENT_ID = "AaRn0BC74DY7UloGyRv8DBt8VmfK2QpDuTqQF_LYVTpejKftwlUCueD3jM7R"
 PAYPAL_CLIENT_SECRET = "ELBn1BAQJOfiELEr04BA5NQieEpUe6MjT_dbSt0Vu0lA-8iuvefJfH8tUJPX"
 PAYPAL_ENDPOINT = "api.sandbox.paypal.com"
-
 """
+
 # PAYPAL LIVE credentials
 # endpoint = api.paypal.com
 PAYPAL_CLIENT_ID = "AfVmThAEY5V081CmZwFMRiCE642CT5lYeV9Yb3E2SNXC1Ru1L_I0IuZqewwZ"
 PAYPAL_CLIENT_SECRET = "ECNDuRAEYaO8YPFu2pGkoetFEN1tZ0qL1ACuZfKzsECTYV1RxTbB14l9WCdR"
 PAYPAL_ENDPOINT = "api.paypal.com"
-"""
+
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -199,8 +200,7 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
-# TODO CHANGE BACK TO 130
-PHONE_COST_UNIT_COST = 2
+PHONE_COST_UNIT_COST = 130
 PAGINATION_THRESHOLD = 20
 AUTH_USER_MODEL = 'accounts.Account'
 
