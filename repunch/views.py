@@ -9,8 +9,10 @@ import json
 from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.auth import login
+from parse.apps.employees import PENDING
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
+from parse.apps.employees.models import Employee
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
 from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
@@ -27,13 +29,18 @@ def manage_refresh(request):
         
         # prep the params
         store = SESSION.get_store(request.session)
-        feedback_unread_ids = []
+        feedback_unread_ids, employees_pending_ids = [], []
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
         for fb in messages_received_list:
             if not fb.get('is_read'):
                 feedback_unread_ids.append(fb.objectId)
-        
+        employees_pending_list =\
+            SESSION.get_employees_pending_list(request.session)
+        for emp in employees_pending_list:
+            if emp.get('status') == PENDING:
+                employees_pending_ids.append(emp.objectId)
+                
         # make the call
         res = cloud_call("retailer_refresh", {
             "store_id": store.objectId,
@@ -43,6 +50,9 @@ def manage_refresh(request):
             "feedback_unread": SESSION.get_feedback_unread(\
                                     request.session),
             "feedback_unread_ids": feedback_unread_ids,
+            "employees_pending": SESSION.get_employees_pending(\
+                                    request.session),
+            "employees_pending_ids": employees_pending_ids,
         })   
          
         # process results
@@ -57,7 +67,7 @@ def manage_refresh(request):
                     if reward['reward_name']==mreward['reward_name']:
                         mod_rewards[i]['redemption_count'] =\
                             reward['redemption_count']
-                        break;
+                        break
             data['rewards'] = rewards
             store.rewards = mod_rewards
             request.session['store'] = store
@@ -79,10 +89,24 @@ def manage_refresh(request):
                 for feedback in feedbacks:
                     m = Message(**feedback)
                     messages_received_list.append(m)
-                    data['feedbacks'].append(m.__dict__.copy())
+                    data['feedbacks'].append(m.jsonify())
                 request.session['messages_received_list'] =\
                     messages_received_list
-            
+        # employees_pending
+        employees_pending = results.get("employees_pending")
+        if employees_pending:
+            data['employees_pending'] = employees_pending
+            request.session["employees_pending"] = employees_pending
+            employees = results.get("employees")
+            if employees:
+                data['employees'] = []
+                for emp in employees:
+                    e = Employee(**emp)
+                    employees_pending_list.append(e)
+                    data['employees'].append(e.jsonify())
+                request.session['employees_pending_list'] =\
+                    employees_pending_list
+                    
         #if len(data) == 0:
         #    comet()
         

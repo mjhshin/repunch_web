@@ -315,6 +315,19 @@ class ParseObject(object):
                     [value.get('latitude'),value.get('longitude')] )
             else:
                 setattr(self, key, value)
+                
+    def jsonify(self):
+        """
+        Returns a json (dict) object representation of this object.
+        This is crutial for portability to ajax since datetime
+        objects is not JSON serializable.
+        """
+        data = self.__dict__.copy()
+        for key, val in data.copy().iteritems():
+            if key.startswith("date_") or\
+                key in ("createdAt", "updatedAt"):
+                data[key] = str(val)
+        return data
 
     def get_class(self, className):
         """

@@ -402,10 +402,8 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var patronStore_count = request.params.patronStore_count;
     var feedback_unread = request.params.feedback_unread;
     var feedback_unread_ids = request.params.feedback_unread_ids;
-    /*
     var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
-    */
     var store, result = new Object();
     
     var storeQuery = new Parse.Query(Store);
@@ -443,7 +441,8 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         rmrq.equalTo("is_read", false);
         return rmrq.find();
     }).then(function(newFeedbacks){
-        if(newFeedbacks.length != feedback_unread){
+        if(newFeedbacks.length != feedback_unread &&
+            newFeedbacks.length > 0){
             result.feedbacks = new Array();
             result.feedback_unread = newFeedbacks.length;
             for (var i=0; i<newFeedbacks.length; i++){
@@ -454,6 +453,22 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             }
         }
     
+        // employees_pending
+        var eprq = store.relation("Employees").query();
+        eprq.equalTo("status", "Pending");
+        return eprq.find();
+    }).then(function(pendingEmployees){
+        if(pendingEmployees.length != employees_pending &&
+            pendingEmployees.length > 0){
+            result.employees = new Array();
+            result.employees_pending = pendingEmployees.length;
+            for (var i=0; i<pendingEmployees.length; i++){
+             if (employees_pending_ids.indexOf(pendingEmployees[i].id)
+                        < 0){
+                      result.employees.push(pendingEmployees[i]);
+                }
+            } 
+        }
         response.success(result);
         return;
     });
