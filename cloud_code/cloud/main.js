@@ -378,7 +378,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 // 
 //  Input:
 //      store objectId (for comparison with given values)
-//      rewards_array (array object)
+//      rewards (array object)
 //      patronStore_count (count)
 //      feedback_unread (count)
 //      feedback_unread_ids (String array)
@@ -386,6 +386,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      employees_pending_ids (String array)
 //
 //  Output: 
+//      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
 //      feedback_unread (if changed)
 //      feedbacks (new objects) (if feedback_unread changed)
@@ -396,11 +397,46 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 Parse.Cloud.define("retailer_refresh", function(request, response) {
     var Store = Parse.Object.extend("Store");
     var PatronStore = Parse.Object.extend("PatronStore");
-    var data;
     
-    var userQuery = Parse.Query(Parse.User);
-    userQuery.equalTo("objectId", request.params.store_id);
-    userQuery.first().then(function(){response.success(data);});
+    var store_id = request.params.store_id;
+    var rewards_old = request.params.rewards;
+    /*
+    var patronStore_count = request.params.patronStore_count;
+    var feedback_unread = request.params.feedback_unread;
+    var feedback_unread_ids = request.params.feedback_unread_ids;
+    var employees_pending = request.params.employees_pending;
+    var employees_pending_ids = request.params.employees_pending_ids;
+    */
+    var store, result = new Object();
+    
+    var storeQuery = new Parse.Query(Store);
+    storeQuery.get(store_id).then(function(stor){
+        // rewards_old redemption_count
+        store = stor;
+        result.rewards = new Array();
+        var rewards = store.get("rewards");
+        function redemptionCount(reward){
+            for (var i=0; i<rewards_old.length; i++){
+                if(rewards_old[i].reward_name == reward.reward_name
+                    && rewards_old[i].redemption_count !=
+                        reward.redemption_count){
+                    console.log(rewards_old[i].redemption_count);
+                    console.log(reward.redemption_count);
+                    result.rewards.push({
+                        "reward_name":reward.reward_name,
+                        "redemption_count":reward.redemption_count});
+                    break;
+                }
+            }
+        }
+        for (var i=0; i<rewards.length; i++){
+            redemptionCount(rewards[i]);
+        }
+        
+        response.success(result);
+        return;
+    });
+    
     
 });
  
