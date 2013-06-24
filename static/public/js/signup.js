@@ -47,6 +47,11 @@ $(document).ready(function(){
         var url_redirect = $("#signup-form input[name=redirect-url]").val();
         var url_home = $("#signup-form input[name=home-url]").val();
         
+        // need to enable again to serialize
+        $("#id_address").attr("disabled", false);
+        $("#id_city2").attr("disabled", false);
+        $("#id_state2").attr("disabled", false);
+        $("#id_zip2").attr("disabled", false);
         var data = $("#signup-form").serialize();
         $.post(url, data, function(res, status, xhr) {
             $("#signing-up").hide();
