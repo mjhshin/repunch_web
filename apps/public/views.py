@@ -140,10 +140,6 @@ def sign_up(request):
             store.set("description", "The " + store.store_name)
             store.set("hours", [])
             store.set("rewards", [])
-            # TODO get geopoint from google API call
-            # also fill up cross streets and validate address
-            # TODO html address auto complete?
-            store.set("coordinates", [40.42, -73.59]) 
             store.set("categories", [])
             names = request.POST.get("categories")
             if names:
@@ -155,11 +151,20 @@ def sign_up(request):
                         store.categories.append({
                             "alias":alias,
                             "name":name })
-            store.create()    
+            # coordinates
+            full_address = " ".join(\
+                store.get_full_address().split(", "))
+            map_data = rputils.get_map_data(full_adress)
+            store.set("coordinates", map_data.get("coordinates"))
+            store.set("neighborhood", 
+                store.get_best_fit_neighborhood(\
+                    map_data.get("neighborhood")))
+            # Create and save store up to Parse    
+            store.create()
             
             # create settings
             settings = Settings.objects().create(retailer_pin=\
-                        rputils.generate_id(),
+                        Settings.generate_id(),
                         punches_employee=5, Store=store.objectId)
             store.Settings = settings.objectId
             store.set('settings', settings)

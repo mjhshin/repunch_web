@@ -77,7 +77,7 @@
 			{{ form.country.errors }}
 			<label for="country">Country</label>
 			<select name="country" id="country">
-				<option>United States of America</option>
+				<option value="US">United States of America</option>
 			</select>
 		</div>
 		

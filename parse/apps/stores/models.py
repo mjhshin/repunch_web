@@ -4,12 +4,14 @@ Parse equivalence of Django apps.stores.models
 from urllib2 import HTTPError
 from importlib import import_module
 from dateutil import parser
+import string, random
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
 from parse.paypal import store_cc, charge_cc
-from repunch.settings import TIME_ZONE
 from parse.core.models import ParseObject
+from repunch.settings import TIME_ZONE
+from libs.repunch import rputils
 
 DAYS = ((1, 'Sunday'),
 		(2, 'Monday'),
@@ -58,7 +60,7 @@ class Store(ParseObject):
         # {"alias":"coffee","name":"Coffee & Tea"}]
         self.categories = data.get('categories')
 
-        # GeoPoint 
+        # GeoPoint [latitude, longtitude]
         self.coordinates = data.get('coordinates')
    
         self.Subscription = data.get("Subscription")
@@ -73,6 +75,56 @@ class Store(ParseObject):
         self.ReceivedMessages_ = "Message"
         
         super(Store, self).__init__(False, **data)
+        
+    def get_full_address(self):
+        """
+        Returns street, city, state, zip, country
+        """
+        return self.street + ", " + self.city  + ", " +\
+            self.state + ", " + self.zip  + ", " + self.country
+            
+    def get_best_fit_neighborhood(self, exact_neighborhood):
+        """
+        neighborhood of exact address may sometimes be incorrect.
+        exact_neighborhood is the neighborhood of the exact address.
+        
+        e.g. http://maps.googleapis.com/maps/api/geocode/json?
+                address=155+water+st+brooklyn+ny&sensor=false
+                
+            outputs neighborhood as Vinegar Hill instead of Dumbo
+        """
+        
+        # 1 above e.g. 155 water st -> 156 water st
+        neighborhoods = [exact_neighborhood]
+        full_address = " ".join(self.get_full_address().split(", "))
+        pieces = full_address.split(" ")
+        st_num = pieces[0]
+        if st_num.isdigit():
+            pieces[0] = str(int(st_num)+1)
+            neighborhoods.append(rputils.get_map_data(\
+                " ".join(pieces)).get("neighborhood"))
+            pieces = full_address.split(" ")
+            st_num = pieces[0]
+            
+        # 1 below e.g. 155 water st -> 154 water st
+        pieces = full_address.split(" ")
+        st_num = pieces[0]
+        if st_num.isdigit():
+            pieces[0] = str(int(st_num)-1)
+            neighborhoods.append(rputils.get_map_data(\
+                " ".join(pieces)).get("neighborhood"))
+            pieces = full_address.split(" ")
+            st_num = pieces[0]
+            
+        # now choose the best fit
+        max_count, best_fit = 0, None
+        for n in neighborhoods:
+            count = neighborhoods.count(n)
+            if count > max_count:
+                max_count = count
+                best_fit = n
+        
+        return best_fit
 
     def get_class(self, className):
         if className in ("PatronStore", "FacebookPost") :
@@ -137,6 +189,13 @@ class Subscription(ParseObject):
         self.date_pp_valid = data.get('date_pp_valid')
 
         super(Subscription, self).__init__(False, **data)
+    
+    def get_full_address(self):
+        """
+        Returns address, city, state, zip, country
+        """
+        return self.address + ", " + self.city  + ", " +\
+            self.state + ", " + self.zip  + ", " + self.country
         
     def _trim_cc_number(self):
         """ make sure to call this before saving this object """
@@ -224,6 +283,17 @@ class Settings(ParseObject):
         self.Store = data.get('Store')
 
         super(Settings, self).__init__(False, **data)
+    
+    @staticmethod
+    def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
+        """ Returns a new retailer_id """
+        gid = ''.join(random.choice(chars) for x in range(size))
+
+        #make sure this is a unique ID
+        if Settings.objects().count(retailer_pin=gid) == 0:
+            return gid
+
+        return generate_id()
 
     def get_class(self, className):
         if className == "Store":

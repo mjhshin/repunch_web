@@ -6,7 +6,6 @@ from datetime import datetime
 import json, urllib
 
 from apps.stores.forms import SettingsForm, SubscriptionForm
-from libs.repunch import rputils
 
 from parse import session as SESSION
 from parse.apps.accounts import order_placed
@@ -61,7 +60,7 @@ def refresh(request):
         if settings == None:
             raise Http404
         else:
-            settings.set('retailer_pin', rputils.generate_id())
+            settings.set('retailer_pin', Settings.generate_id())
             settings.update()
             
             # update the session cache

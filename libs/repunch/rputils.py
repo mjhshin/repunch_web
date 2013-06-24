@@ -1,22 +1,9 @@
 #file use for helper functions for the repunch class
-import string, random, calendar
+import calendar
 from datetime import timedelta, datetime
 from django.utils import timezone
 from PIL import Image
-import json, time, pytz
-
-from parse.apps.stores.models import Settings
-
-# function for generating unique ID for retailer
-def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
-    gid = ''.join(random.choice(chars) for x in range(size))
-    
-    #make sure this is a unique ID
-    if Settings.objects().count(retailer_pin=gid) == 0:
-        return gid
-    
-    return generate_id()
-    
+import json, time, pytz, httplib, urllib
 
 def rescale(image_path, width=400, height=400):
     max_width = width
@@ -89,9 +76,38 @@ def set_timezone(request, tz=None):
     if tz:
         timezone.activate(tz)
         
-def get_timezone(zip_code):
-    import httplib
+def get_map_data(address):
+    """
+    Expects address to be separated by spaces with no commas.
     
+    Returns {"coordinates":(lat, lng), "neighborhood":"XXX"}
+    Neighborhood may not be available.
+    """
+    conn = httplib.HTTPConnection("maps.googleapis.com")
+    conn.request("GET", "/maps/api/geocode/json?%s&sensor=false" %\
+        urllib.urlencode({"address":address}))
+    map_data = {}
+    resp = conn.getresponse()
+    if resp.status == 200:
+        data = json.loads(resp.read())
+        
+        if data['status'] == 'OK':
+            location = data['results'][0]['geometry']['location']
+            map_data['coordinates'] =\
+                [location['lat'], location['lng']]
+            # get the neighborhood if available
+            for comp in\
+                data['results'][0]["address_components"]:
+                if "neighborhood" in comp['types']:
+                    map_data['neighborhood'] = comp["short_name"]
+                    break
+        
+    conn.close()
+        
+    return map_data
+        
+        
+def get_timezone(zip_code):
     # first need to get the lat, lng
     conn = httplib.HTTPConnection("maps.googleapis.com")
     conn.request("GET", "/maps/api/geocode/json?address=%s&sensor=false" % zip_code)
