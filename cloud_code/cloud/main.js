@@ -396,14 +396,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_refresh", function(request, response) {
     var Store = Parse.Object.extend("Store");
-    var PatronStore = Parse.Object.extend("PatronStore");
     
     var store_id = request.params.store_id;
     var rewards_old = request.params.rewards;
-    /*
     var patronStore_count = request.params.patronStore_count;
     var feedback_unread = request.params.feedback_unread;
     var feedback_unread_ids = request.params.feedback_unread_ids;
+    /*
     var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
     */
@@ -420,8 +419,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
                 if(rewards_old[i].reward_name == reward.reward_name
                     && rewards_old[i].redemption_count !=
                         reward.redemption_count){
-                    console.log(rewards_old[i].redemption_count);
-                    console.log(reward.redemption_count);
                     result.rewards.push({
                         "reward_name":reward.reward_name,
                         "redemption_count":reward.redemption_count});
@@ -433,10 +430,33 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             redemptionCount(rewards[i]);
         }
         
+        // patronStore_count
+        var psrq = store.relation("PatronStores").query();
+        return psrq.count();
+    }).then(function(newPatronStore_count){
+        if (newPatronStore_count != patronStore_count){
+            result.patronStore_count = newPatronStore_count;
+        }
+    
+        // feedback_unread
+        var rmrq = store.relation("ReceivedMessages").query();
+        rmrq.equalTo("is_read", false);
+        return rmrq.find();
+    }).then(function(newFeedbacks){
+        if(newFeedbacks.length != feedback_unread){
+            result.feedbacks = new Array();
+            result.feedback_unread = newFeedbacks.length;
+            for (var i=0; i<newFeedbacks.length; i++){
+                if (feedback_unread_ids.indexOf(newFeedbacks[i].id)
+                        < 0){
+                      result.feedbacks.push(newFeedbacks[i]);
+                }
+            }
+        }
+    
         response.success(result);
         return;
     });
-    
     
 });
  
