@@ -109,12 +109,11 @@ def approve(request, employee_id):
         request.session)
     i_remove, pcount, employee = 0, 0, None
     for ind, m in enumerate(employees_pending_list):
+        if m.get('status') == PENDING:
+            pcount += 1
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
-            break
-        if emp.get('status') == PENDING:
-            pcount += 1
             
     if not employee:
         raise Http404
@@ -144,14 +143,13 @@ def deny(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
-    i_remove, pcount, employee = 0, None
+    i_remove, pcount, employee = 0, 0, None
     for ind, m in enumerate(employees_pending_list):
+        if m.get('status') == PENDING:
+            pcount += 1
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
-            break
-        if emp.get('status') == PENDING:
-            pcount += 1
             
     if not employee:
         raise Http404
