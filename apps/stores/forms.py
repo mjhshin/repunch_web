@@ -204,9 +204,6 @@ class SubscriptionForm(forms.Form):
         return data
                
 class SettingsForm(forms.Form):
-    punches_customer = forms.IntegerField(label=\
-                        'Number of separate times a customer can'+\
-                        ' receive punches per day', min_value=0)
     punches_employee = forms.IntegerField(label=\
                         'Number of punches allowed by an employee'+\
                         ' at one time', min_value=0)

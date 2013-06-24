@@ -24,7 +24,6 @@ def settings(request):
             # expect numbers so cast to int
             dct = request.POST.dict().copy()
             dct['punches_employee'] = int(dct['punches_employee'])
-            dct['punches_customer'] = int(dct['punches_customer'])
             settings.update_locally(dct, False)
             settings.update()
             # Shin chose to move punches_facebook to Store...
@@ -52,7 +51,7 @@ def settings(request):
     data['settings'] = settings
     return render(request, 'manage/settings.djhtml', data)
 
-
+@login_required
 def refresh(request):
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):

@@ -159,7 +159,7 @@ def sign_up(request):
             
             # create settings
             settings = Settings.objects().create(retailer_pin=\
-                        rputils.generate_id(), punches_customer=1,
+                        rputils.generate_id(),
                         punches_employee=5, Store=store.objectId)
             store.Settings = settings.objectId
             store.set('settings', settings)

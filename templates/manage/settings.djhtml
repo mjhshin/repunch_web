@@ -17,10 +17,6 @@
 		{% endif %}
 		
 		<h2>Settings</h2>
-	
-		{{ form.punches_customer.errors }}
-		<label for="punches_per_day">Number of separate times a customer can receive punches per day</label>
-		{{ form.punches_customer }}
 		
 		{{ form.punches_employee.errors }}
 		<label for="employee_punches">Number of punches allowed by an employee at one time</label>
@@ -35,6 +31,8 @@
 		{% if settings  %}
 		<label for="retailer_pin">Retailer PIN</label>
 		<div id="retailer_pin">{{ settings|get:'retailer_pin'  }}</div> <a href="{% url 'refresh_retailer_pin' %}" id="link_refresh_retailer_pin"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_pin" /></a>
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
+			        id="retailer-pin-loading" style="display:none;position:relative;top:-10px;"/>
 		{% endif %}
 		
 		<div id="settings-options" class="form-options">

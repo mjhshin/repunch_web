@@ -218,7 +218,6 @@ class Subscription(ParseObject):
 class Settings(ParseObject):
     """ Equivalence class of apps.accounts.models.Settings """
     def __init__(self, **data):
-        self.punches_customer = data.get("punches_customer")
         self.punches_employee = data.get("punches_employee") 
         self.retailer_pin = data.get("retailer_pin")
 
