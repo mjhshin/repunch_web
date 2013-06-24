@@ -75,7 +75,7 @@ PAYPAL_ENDPOINT = "api.paypal.com"
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
-'repunch.com', 'www.repunch.com', 'vandolf.repunch.com']
+'repunch.com', 'www.repunch.com', 'vandolf.repunch.com', '23.20.15.30']
 # note that the first ec2 host is repunch dev.
 # The second 1 is the real repunch.
 
