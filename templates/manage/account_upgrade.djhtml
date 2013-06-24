@@ -113,6 +113,10 @@
 			        name="place_order_amount" 
 			        style="width:40px;" />
 			</span>
+			<img class="question_mark"
+			    src="{% static 'public/images/question_mark.png' %}" 
+			    style="position:relative;top:4px;left:4px;"
+			    title="You can order smartphones from us. We will charge you $130 for each smartphone." />
 		</div>
 		
 		<div style="clear: left;"></div>

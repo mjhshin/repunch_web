@@ -10,13 +10,23 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+	<link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="stylesheet" />
 	
 	{% block styles %}{% endblock %}
 	
 	
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="{% static "manage/js/global.js" %}"></script>
 	<script src="{% static "manage/js/punch.js" %}"></script>
+	<script>
+    // other
+    $(document).ready(function(){
+        $( document ).tooltip({
+          track: true
+        });
+    });
+    </script>
 	{% block javascript %}{% endblock %}
 	
 </head>

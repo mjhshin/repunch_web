@@ -10,6 +10,30 @@
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
 <script src="{% static 'public/js/signup.js' %}"></script>
+<script type = "text/javascript">
+// fill in the values of the 3 input boxes
+$(document).ready(function(){
+    var p_num = "{{ store_form.phone_number.value }}";
+    if (p_num == "None"){
+        return;
+    }
+    $("#Ph1").val(p_num.substring(0,3));
+    $("#Ph2").val(p_num.substring(3,6));
+    $("#Ph3").val(p_num.substring(6,10));
+});
+
+// stolen from http://www.codingforums.com/showthread.php?t=202208
+// laziness ftw!
+function validate(which, next) {
+    var val = which.value;
+    val = val.replace(/[^0-9]/g,"");  // strip non-digits
+    which.value = val;
+    next = "Ph" + next;
+    if (val.length == 3) {  // field completed
+        document.getElementById(next).focus();
+    }
+}
+</script>
 {% endblock %}
 
 {% block pageblock %}
@@ -113,31 +137,6 @@
                     <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />-
                     <input type = "text" id = "Ph3" style="width:70px;" maxlength = "4" onkeyup = "validate(this,3)" />
 					
-					<script type = "text/javascript">
-					// fill in the values of the 3 input boxes
-			        $(document).ready(function(){
-			            var p_num = "{{ store_form.phone_number.value }}";
-			            if (p_num == "None"){
-			                return;
-			            }
-			            $("#Ph1").val(p_num.substring(0,3));
-			            $("#Ph2").val(p_num.substring(3,6));
-			            $("#Ph3").val(p_num.substring(6,10));
-			        });
-			
-					// stolen from http://www.codingforums.com/showthread.php?t=202208
-					// laziness ftw!
-                    function validate(which, next) {
-                        var val = which.value;
-                        val = val.replace(/[^0-9]/g,"");  // strip non-digits
-                        which.value = val;
-                        next = "Ph" + next;
-                        if (val.length == 3) {  // field completed
-                            document.getElementById(next).focus();
-                        }
-                    }
-                    </script>
-					
 					{{ account_form.email.errors }}
 					<label for="id_email">Your Email Address</label>
 					{{ account_form.email }}
@@ -191,7 +190,7 @@
 					
 					<br />
 					<p style="display:inline-block">Billing Address</p>
-					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as store address</label>
+					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as business address</label>
 					<input type="checkbox" id="same_address" />
 					
 				
@@ -238,6 +237,11 @@
 						        name="place_order_amount" 
 						        style="width:40px;" />
 						</span>
+						
+						<img class="question_mark"
+						    src="{% static 'public/images/question_mark.png' %}" 
+						    style="position:relative;top:4px;left:4px;"
+						    title="You can order smartphones from us. We will charge you $130 for each smartphone." />
 					</div>
 					
 					<div style="clear: left;"></div>

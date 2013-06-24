@@ -213,7 +213,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # client every 4 minutes at most of inactivity (in seconds)
 REQUEST_TIMEOUT = 248 # 4 mins
 # check for new activity in Parse every X seconds
-COMET_REFRESH_RATE = 10
+COMET_REFRESH_RATE = 15
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"

@@ -10,6 +10,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.auth import login
 from parse.auth.decorators import login_required
+from parse.apps.messages.models import Message
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
 from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
@@ -22,13 +23,74 @@ def manage_refresh(request):
     request while checking Parse for new activity.
     """
     def comet():
-        # execute only after a certain time
-        sleep(COMET_REFRESH_RATE)
+        sleep(1)#COMET_REFRESH_RATE)
+        
+        # prep the params
+        store = SESSION.get_store(request.session)
+        feedback_unread_ids = []
+        messages_received_list =\
+            SESSION.get_messages_received_list(request.session)
+        for fb in messages_received_list:
+            if not fb.get('is_read'):
+                feedback_unread_ids.append(fb.objectId)
+        
+        # make the call
         res = cloud_call("retailer_refresh", {
-            "store_id": SESSION.get_store(request.session).objectId
-        })
+            "store_id": store.objectId,
+            "rewards": store.get('rewards'),
+            "patronStore_count": SESSION.get_patronStore_count(\
+                                    request.session),
+            "feedback_unread": SESSION.get_feedback_unread(\
+                                    request.session),
+            "feedback_unread_ids": feedback_unread_ids,
+        })   
+         
+        # process results
+        data = {}
+        results = res['result']
+        # rewards redemption_count
+        rewards = results.get('rewards')
+        mod_rewards = store.get('rewards')
+        if rewards and len(rewards) > 0:
+            for reward in rewards:
+                for i, mreward in enumerate(mod_rewards):
+                    if reward['reward_name']==mreward['reward_name']:
+                        mod_rewards[i]['redemption_count'] =\
+                            reward['redemption_count']
+                        break;
+            data['rewards'] = rewards
+            store.rewards = mod_rewards
+            request.session['store'] = store
+        # patronStore_count
+        patronStore_count = results.get('patronStore_count')
+        if patronStore_count:
+            data['patronStore_count'] = patronStore_count
+            request.session['patronStore_count'] = patronStore_count
+        # feedback_unread
+        feedback_unread = results.get('feedback_unread')
+        if feedback_unread:
+            data['feedback_unread'] = feedback_unread
+            request.session['feedback_unread'] = feedback_unread
+            feedbacks = results.get('feedbacks')
+            # should not be none! If so, the the count was changed
+            # without adding the feedback to the store's relation
+            if feedbacks:
+                data['feedbacks'] = []
+                for feedback in feedbacks:
+                    m = Message(**feedback)
+                    messages_received_list.append(m)
+                    data['feedbacks'].append(m.__dict__.copy())
+                request.session['messages_received_list'] =\
+                    messages_received_list
+            
+        #if len(data) == 0:
+        #    comet()
+        
         print res
-    comet()
+        return HttpResponse(json.dumps(data), 
+            content_type="application/json")
+        
+    return comet()
 
 def manage_login(request):
     """
@@ -63,7 +125,8 @@ def manage_login(request):
         data['form'] = LoginForm()
         return render(request, 'manage/login.djhtml', data)
 
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return HttpResponse(json.dumps(data), 
+        content_type="application/json")
 
 def manage_logout(request):
     # need to clear the session

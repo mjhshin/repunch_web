@@ -35,7 +35,7 @@ sub_type = {
     2:heavy_type,
 }
 
-def user_signup(account):
+def user_signup(account, connection=None):
     """
     Send an email to ORDER_PLACED_EMAILS about the new user.
     """
@@ -51,10 +51,11 @@ def user_signup(account):
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
         "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n"
     
+    # use EmailMessage Instead
     send_mail(subject, msg, EMAIL_HOST_USER, 
         ORDER_PLACED_EMAILS, fail_silently=True)
 
-def order_placed(amount, store, account):
+def order_placed(amount, store, account, connection=None):
     """
     Handle event where an order for phones are placed by a store
     at signup or update account.
@@ -80,6 +81,7 @@ def order_placed(amount, store, account):
         "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n" +\
         "\nPAYPAL INFO: \n" + invoice.to_message_plain()
         
+    # use EmailMessage Instead
     # send_email_receipt TODO
         
     send_mail(subject, msg, EMAIL_HOST_USER, 
