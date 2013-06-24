@@ -10,11 +10,50 @@ from django.template import Template, Context
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG
 
-def send_email_receipt(account, data):
+def _send_emails(emails, connection=None):
+    """
+    Proceed to send the emails.
+    """
+    # prep and send the email
+    if connection:
+        conn = connection
+    else:
+        conn = mail.get_connection(fail_silently=(not DEBUG))
+        conn.open()
+        
+    conn.send_messages(emails)
+    
+    if not connection:
+        conn.close()
+
+def send_email_receipt(account, invoice, amount, connection=None):
     """
     Sends the user a pretty receipt.
     """
-    pass
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-receipt.html", 'r') as f:
+        template = Template(f.read())
+        
+    entity = account.get(account.get('account_type'))
+    subject = "Repunch Inc. transaction receipt."
+    body = template.render(Context({
+            'ABSOLUTE_HOST_ALIAS':ABSOLUTE_HOST_ALIAS,
+            'ABSOLUTE_HOST':ABSOLUTE_HOST,
+            'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
+            'STORE_INDEX':reverse('store_index'),
+            'EMAIL_HOST_USER': EMAIL_HOST_USER,
+            'entity':entity,
+            'amount': amount,
+            'invoice': invoice,
+            })).__str__()
+            
+    emails = []
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=[account.get('email')])
+    email.attach_alternative(body, 'text/html')
+    emails.append(email)
+    
+    _send_emails(emails, connection)
 
 def send_email_signup(account, connection=None):
     """
@@ -41,15 +80,6 @@ def send_email_signup(account, connection=None):
                 strip_tags(body), to=[account.get('email')])
     email.attach_alternative(body, 'text/html')
     emails.append(email)
-        
-    # prep and send the email
-    if connection:
-        conn = connection
-    else:
-        conn = mail.get_connection(fail_silently=(not DEBUG))
-        conn.open()
-        
-    conn.send_messages(emails)
     
-    if not connection:
-        conn.close()
+    _send_emails(emails, connection)
+   

@@ -1,8 +1,8 @@
-from django.core.mail import send_mail
+from django.core import mail
 
 from parse.notifications import send_email_receipt
 from repunch.settings import PHONE_COST_UNIT_COST, EMAIL_HOST_USER,\
-ORDER_PLACED_EMAILS
+ORDER_PLACED_EMAILS, DEBUG
 
 FREE = "FREE"
 MIDDLEWEIGHT = "MIDDLEWEIGHT"
@@ -35,6 +35,22 @@ sub_type = {
     2:heavy_type,
 }
 
+def _send_emails(emails, connection=None):
+    """
+    Proceed to send the emails.
+    """
+    # prep and send the email
+    if connection:
+        conn = connection
+    else:
+        conn = mail.get_connection(fail_silently=(not DEBUG))
+        conn.open()
+        
+    conn.send_messages(emails)
+    
+    if not connection:
+        conn.close()
+
 def user_signup(account, connection=None):
     """
     Send an email to ORDER_PLACED_EMAILS about the new user.
@@ -50,10 +66,10 @@ def user_signup(account, connection=None):
         "Phone number: " + store.get('phone_number') + "\n" +\
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
         "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n"
-    
-    # use EmailMessage Instead
-    send_mail(subject, msg, EMAIL_HOST_USER, 
-        ORDER_PLACED_EMAILS, fail_silently=True)
+        
+    m = mail.EmailMessage(subject, msg, EMAIL_HOST_USER,
+                ORDER_PLACED_EMAILS)
+    _send_emails([m], connection)
 
 def order_placed(amount, store, account, connection=None):
     """
@@ -81,9 +97,10 @@ def order_placed(amount, store, account, connection=None):
         "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n" +\
         "\nPAYPAL INFO: \n" + invoice.to_message_plain()
         
-    # use EmailMessage Instead
-    # send_email_receipt TODO
-        
-    send_mail(subject, msg, EMAIL_HOST_USER, 
-        ORDER_PLACED_EMAILS, fail_silently=True)
+    # send receipt to recipient
+    send_email_receipt(account, invoice, amount, connection)
+    # send to us
+    m = mail.EmailMessage(subject, msg, EMAIL_HOST_USER,
+            ORDER_PLACED_EMAILS)
+    _send_emails([m], connection)
 

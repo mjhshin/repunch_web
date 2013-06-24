@@ -1,0 +1,21 @@
+{% extends "manage/notification.html" %}
+
+{% block title %}
+Thank you for your purchase of {{ amount }} smartphones.
+{% endblock %}
+
+{% block content %}
+<p style="">
+{{ entity.first_name|capfirst }} {{ entity.last_name|capfirst }},
+</p>
+
+<p style="">
+<strong>Merchandise:</strong> smartphone{% if amount > 1 %}s{% endif %}<br/>
+<strong>Quantity:</strong> {{ amount }}<br/>
+<strong>Total:</strong> {{ invoice.total }}<br/><br/>
+
+{% if invoice.sale_id %}
+<strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
+{% endif %}
+</p>
+{% endblock %}
