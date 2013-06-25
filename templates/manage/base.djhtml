@@ -108,7 +108,7 @@
 						<span class="nav-item-title">Analysis</span>
 					</a>
 				</div>
-				<div class="nav-item {% if employees_nav %}active{% endif %}">
+				<div class="nav-item {% if employees_nav %}active{% endif %}" id="employees-nav">
 					<a href="{% url 'employees_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_employees.png" %}" alt="" />
 						<span class="nav-item-title">Employees</span>

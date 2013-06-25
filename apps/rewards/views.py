@@ -81,7 +81,8 @@ def edit(request, reward_id):
                 store.array_remove('rewards', [old_reward])
 
             store.array_add_unique('rewards', [reward])
-
+            store.rewards = None
+            store.get('rewards')
             
             now_count = len(store.get('rewards'))
             if now_count > init_count:
@@ -134,6 +135,8 @@ def delete(request, reward_id):
         raise Http404
     
     store.array_remove('rewards', [reward])
+    store.rewards = None
+    store.get('rewards')
     
     # update session cache
     request.session['store'] = store

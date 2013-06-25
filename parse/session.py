@@ -60,12 +60,12 @@ def get_patronStore_count(session):
 def get_messages_sent_list(session):
     if 'messages_sent_list' not in session:
         store = get_store(session)
-        messages_sent_list = store.get("sentMessages")
+        messages_sent_list = store.get("sentMessages",
+                                order="-createdAt")
         # make sure that the list is a list and not none
         if messages_sent_list is None:
             messages_sent_list = []
         session['messages_sent_list'] = messages_sent_list
-        
         # make sure that the store's cache is None, otherwise bad!
         store.sentMessages = None
         session['store'] = store
@@ -80,7 +80,8 @@ def get_messages_received_list(session):
     if 'messages_received_list' not in session:
         store = get_store(session)
         messages_received_list = store.get(\
-                    "receivedMessages", message_type=FEEDBACK)
+                    "receivedMessages", message_type=FEEDBACK,
+                    order="-createdAt")
         
         # make sure that the list is a list and not none
         if messages_received_list is None:
@@ -131,7 +132,8 @@ def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:
         store = get_store(session)
         employees_pending_list = get_store(session).get(\
-                                "employees", status=PENDING)
+                                "employees", status=PENDING,
+                                order="-createdAt")
                                 
         # make sure that the list is a list and not none
         if employees_pending_list is None:
@@ -151,7 +153,8 @@ def get_employees_approved_list(session):
     if 'employees_approved_list' not in session:
         store = get_store(session)
         employees_approved_list = store.get(\
-                                "employees", status=APPROVED)      
+                                "employees", status=APPROVED,
+                                order="-createdAt")     
         
         # make sure that the list is a list and not none
         if employees_approved_list is None:

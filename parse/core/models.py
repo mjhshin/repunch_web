@@ -489,6 +489,7 @@ class ParseObject(object):
         setattr(self, attr, val)
         return True
 
+    # NOTE array operations do not affect the array cache!
     def array_add_unique(self, arrName, vals):
         """ adds the list of vals to the array with the given name
         If the array in Parse is currently null, this sets the 
