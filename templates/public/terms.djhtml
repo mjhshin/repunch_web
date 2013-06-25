@@ -13,7 +13,7 @@
 
 {% block pageblock %}
 <section id="page-wrapper">
-	<div id="page-content" style="height:5600px;">
+	<div id="page-content" style="height:5550px;">
 		<h1 id="about-header"  >Terms &amp; Conditions</h1>
 		<div id="about-content">
 			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
@@ -47,7 +47,7 @@ You may not use the Services for illegal purposes or for the transmission of mat
 <br />
 You agree not to access, copy, or otherwise use Services unless such use is authorized by this Agreement or otherwise authorized in writing. You agree that any information you provide to, or enter in order to use, the Services will complete and accurate. You will not use the Services is any illegal, abusive, interfering or otherwise unacceptable or inappropriate manner, including:
 
-<ol>
+<ul>
 <li>to violate any law, regulation or other published policy;</li>
 <li>to violate or infringe on intellectual property, privacy, or rights of another;</li>
 <li>to violate any agreement, rules or policies that govern the use of your mobile device;</li>
@@ -59,7 +59,7 @@ You agree not to access, copy, or otherwise use Services unless such use is auth
 <li>to violate any applicable third party policies or requirements that Repunch has communicated to you, or;</li>
 <li>to engage in fraudulent activity with respect to third parties or otherwise;</li>
 <li>engaging in spamming or other unsolicited advertising, marketing or other activities.</li>
-</ol>
+</ul>
 </p>
 <br />
 <h3>No Charge</h3><p>
