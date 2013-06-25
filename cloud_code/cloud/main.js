@@ -384,6 +384,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      feedback_unread_ids (String array)
 //      employees_pending (count)
 //      employees_pending_ids (String array)
+//      redemption_ids (String array)
+//      past_hour (UTC datetime for redemptions)
 //
 //  Output: 
 //      rewards (empty if no redemption_count changed)
@@ -392,6 +394,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      feedbacks (new objects) (if feedback_unread changed)
 //      employees_pending (if changed)
 //      employees (new objects) (if employees_pending changed)
+//      redemptions (latest redemptions the past hour limit of 20)
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_refresh", function(request, response) {
@@ -404,6 +407,8 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var feedback_unread_ids = request.params.feedback_unread_ids;
     var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
+    var redemption_ids = request.params.redemption_ids;
+    var past_hour = request.params.past_hour;
     var store, result = new Object();
     
     var storeQuery = new Parse.Query(Store);
@@ -445,6 +450,8 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         if(newFeedbacks.length != feedback_unread &&
             newFeedbacks.length > 0){
             result.feedbacks = new Array();
+            // TODO just use notContainedIn and check for the length
+            // serverside!
             result.feedback_unread = newFeedbacks.length;
             for (var i=0; i<newFeedbacks.length; i++){
                 if (feedback_unread_ids.indexOf(newFeedbacks[i].id)
@@ -462,6 +469,8 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         if(pendingEmployees.length != employees_pending &&
             pendingEmployees.length > 0){
             result.employees = new Array();
+            // TODO just use notContainedIn and check for the length
+            // serverside!
             result.employees_pending = pendingEmployees.length;
             for (var i=0; i<pendingEmployees.length; i++){
              if (employees_pending_ids.indexOf(pendingEmployees[i].id)
@@ -470,6 +479,22 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
                 }
             } 
         }
+        
+        // redemptions
+        var rrq = store.relation("RedeemRewards").query();
+        rrq.descending("createdAt");
+        rrq.greaterThanOrEqualTo("createdAt", new Date(past_hour));
+        rrq.limit(20);
+        // TODO remove this
+        rrq.notContainedIn("objectId", redemption_ids);
+        return rrq.find();
+    }).then(function(redemptions){
+        // TODO check for changes- not just new ones
+        if (redemptions.length > 0){
+            console.log(redemptions.length);
+            result.redemptions = redemptions;
+        }
+    
         response.success(result);
         return;
     });

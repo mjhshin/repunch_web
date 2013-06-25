@@ -8,7 +8,7 @@
 // TODO actually implement comet approach
 $(document).ready(function(){
 
-    var url = $("#comet input[name=comet_url]").val();
+    var url = $("#comet_url").val();
     
     function mainComet(res, status, xhr) {
         // Messages nav
@@ -135,7 +135,7 @@ $(document).ready(function(){
             
         }// end pending employees nav
         
-        // reward redemptions 
+        // reward redemption count
         if (res.hasOwnProperty('rewards') && res.rewards.length > 0){
             var reSection = $("#rewards");
             // analysis page
@@ -147,6 +147,37 @@ $(document).ready(function(){
                   reward.next().text(res.rewards[i].redemption_count);
                     }
                 }
+            }
+        }
+        
+        // incoming redemptions
+        if (res.hasOwnProperty('redemptions') &&
+                res.redemptions.length > 0){
+            // remove placeholder when empty
+            if ($("#no-redemptions").length > 0){
+                $("#no-redemptions").remove();
+            }
+            // workbench page
+            var redemptions = res.redemptions;
+            for (var i=0; i<redemptions.length; i++){
+                var odd = "";
+                var first=$("#redemption div.tab-body div.tr").first();
+                if (!first.hasClass("odd")){
+                    odd = "odd";
+                }
+                $("#redemption div.tab-body div.table-header").after(
+                    "<div class='tr " + odd + "'>" +
+		            "<div class='td redemption_title'>" +
+				    redemptions[i].title + "</div>" +
+				    "<div class='td redemption_punches'>" +
+				    redemptions[i].num_punches + "</div>" +
+				    "<div class='td redemption_customer_name'>" +
+				    redemptions[i].customer_name + "</div>" +
+		            "</div>" );
+		        // remove the last if greater than 20
+		        while ($("#redemption div.tab-body div.tr").length > 20){
+		            $("#redemption div.tab-body div.tr").last().remove();
+		        }
             }
         }
                

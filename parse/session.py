@@ -3,6 +3,8 @@ Use to keep track of all the cache object names in the session.
 """
 import pytz
 
+from django.utils import timezone
+from libs.dateutil.relativedelta import relativedelta
 from libs.dateutil.extras import start_month, end_month
 
 from parse.apps.employees import PENDING, APPROVED
@@ -26,6 +28,8 @@ SESSION_CACHE = [
     'messages_sent_list',
     'messages_received_list', # sync with feedback_unread
     
+    'redemptions',
+    
     # time in which all comet processes for the request will die
     # 'stop_comet_time', unused at the moment
 ]
@@ -37,6 +41,24 @@ def get_store(session):
         return store
     else:
         return session['store']
+        
+def get_redemptions(session):
+    """ 
+    initially returns the 20 latest redemptions the past hour. 
+    """
+    if "redemptions" not in session:
+        past = timezone.now() + relativedelta(hours=-1)
+        store = get_store(session)
+        redemptions = store.get('redeemRewards',
+            createdAt__gte=past, order="-createdAt", limit=20)
+        if redemptions is None:
+            redemptions = []
+            
+        store.redeemRewards = None
+        session['redemptions'] = redemptions
+        return redemptions
+    else:
+        return session['redemptions']
         
 def get_store_timezone(session):
     """ returns the pytz.timezone object """

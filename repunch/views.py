@@ -14,6 +14,7 @@ from parse.apps.employees import PENDING
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.employees.models import Employee
+from parse.apps.rewards.models import RedeemReward
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
 from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
@@ -33,6 +34,8 @@ def manage_refresh(request):
         # sleep(COMET_REFRESH_RATE)
         # prep the params
         store = SESSION.get_store(request.session)
+        redemptions = SESSION.get_redemptions(request.session)
+        redemption_ids = []
         feedback_unread_ids, employees_pending_ids = [], []
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
@@ -44,6 +47,8 @@ def manage_refresh(request):
         for emp in employees_pending_list:
             if emp.get('status') == PENDING:
                 employees_pending_ids.append(emp.objectId)
+        for red in redemptions:
+            redemption_ids.append(red.objectId)
                 
         # make the call
         res = cloud_call("retailer_refresh", {
@@ -57,6 +62,8 @@ def manage_refresh(request):
             "employees_pending": SESSION.get_employees_pending(\
                                     request.session),
             "employees_pending_ids": employees_pending_ids,
+            "redemption_ids": redemption_ids,
+            "past_hour": str(timezone.now()+relativedelta(hours=-1)),
         }, timeout=RETAILER_REFRESH_TIMEOUT)
         
         # process results
@@ -110,7 +117,18 @@ def manage_refresh(request):
                     data['employees'].append(e.jsonify())
                 request.session['employees_pending_list'] =\
                     employees_pending_list
-                 
+        # redemptions
+        reds, redemps = results.get("redemptions"), []
+        if reds:
+            for r in reds:
+                rr = RedeemReward(**r)
+                redemptions.insert(0, rr)
+                request.session['redemptions'] = redemptions
+                redemps.append(rr.jsonify())
+                # make sure redemptions don't go past 20
+                while len(redemptions) > 20:
+                    redemptions.pop()
+            data['redemptions'] = redemps
         """
         print results, timezone.now()
         if timezone.now() < request.session.get('comet_dead_time'):

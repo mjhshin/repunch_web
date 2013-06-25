@@ -4,6 +4,22 @@ form#punch-form{
     display:inline-block;
 }
 
+#header-redemption_title, .redemption_title{
+    width:190px;
+}
+
+#header-redemption_punches, .redemption_punches{
+    width:110px;
+}
+
+#header-redemption_customer_name, .redemption_customer_name{
+    width:180px;
+}
+
+#header-redemption_is_redeemed, .redemption_is_redeemed{
+    width:120px;
+}
+
 form#punch-form input{
     width:100px;
 }

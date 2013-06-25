@@ -34,7 +34,10 @@
 				<div class="th sorted asc" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				
+		    {% comment %}
 			<div class="th" id="header-redemption_is_redeemed">Redeemed? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			{% endcomment %}
 			</div>
 			
 			{% for redemp in redemptions %}
@@ -45,11 +48,15 @@
 				{{ redemp.num_punches }}</div>
 				<div class="td redemption_customer_name">
 				{{ redemp.customer_name }}</div>
+				
+				{% comment %}
 				<div class="td redemption_is_redeemed">
 				{{ redemp.is_redeemed|yesno:"Yes,No" }}</div>
+				{% endcomment %}
+				
 			</div>
 			{% empty %}
-			<div class="tr ">
+			<div class="tr " id="no-redemptions">
 				<div class="td">No Redemptions</div>
 			</div>
 			{% endfor %}			
