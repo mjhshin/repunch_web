@@ -133,25 +133,31 @@ $(document).ready(function(){
 		        }
             }
             
-        }         
+        }// end pending employees nav
+        
+        // reward redemptions 
+        if (res.hasOwnProperty('rewards') && res.rewards.length > 0){
+            var reSection = $("#rewards");
+            // analysis page
+            if (reSection.length > 0){
+                for (var i=0; i<res.rewards.length; i++){
+                    var reward = $("#rewards div.tab-body div.tr div.td.reward_name").filter(function(){return $(this).text() == res.rewards[i].reward_name;});
+                    
+                 if (reward.length > 0){
+                  reward.next().text(res.rewards[i].redemption_count);
+                    }
+                }
+            }
+        }
                
-    }
+    } // end mainComet
     
-    function startLoop(){
-        setInterval(function(){
-            $.ajax({
-                url: url,
-                type: "GET",
-                success: mainComet,
-            });
-        }, 10000);
-    }
-    
-    // make the initial call and set the interval here!
-    $.ajax({
-        url: url,
-        type: "GET",
-        success: startLoop,
-    });
+    setInterval(function(){
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: mainComet,
+        });
+    }, 10000);
 
 });

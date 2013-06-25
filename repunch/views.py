@@ -120,7 +120,7 @@ def manage_refresh(request):
             # will force to ping back request after out_time!
             return comet()
         """
-            
+        
         try:
             resp = HttpResponse(json.dumps(data), 
                         content_type="application/json")
