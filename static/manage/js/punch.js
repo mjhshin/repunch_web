@@ -13,6 +13,7 @@ function punchit(url){
     
     var pc = $("#punch_code");
     var pa = $("#punch_amount");
+    var mp = new Number($("#max_punches").val());
     var cont = true;
     
     // validate inputs
@@ -27,6 +28,11 @@ function punchit(url){
     } else if (!(new Number(pa.val())>0)){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
             "<div><span>Amount of punches must be greater than 0.<span></div></div>");
+        cont = false;
+    } else if ((new Number(pa.val())>mp)){
+        $("#punch-form").append("<div id='punch-notification' class='notification hide'>" +
+            "<div><span>Amount of punches must be less than "+
+            new String(mp+1) + ".<span></div></div>");
         cont = false;
     } 
     

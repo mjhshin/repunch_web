@@ -14,6 +14,9 @@
 
 
 {% block content %}
+    {# NEEDED FOR punch.js #}
+    <input type="hidden" id="max_punches"
+        value="{{ settings.punches_employee }}" />
 
     <div class="section" style="margin-top:0px;">
 		<h2 style="margin-bottom:10px;">Punch Customers</h2>

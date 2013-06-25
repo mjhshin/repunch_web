@@ -16,13 +16,23 @@ def index(request):
     lst, rewards = [], store.get('rewards')
     # create a reward map
     if rewards:
+        # record the pre-sorted reward
+        presorted = [int(reward['punches']) for reward in rewards]
+        
         reward_map = {int(reward['punches']):reward for reward in rewards}
         # get a sorted list of punches in descending order
-        punches = [p for p in reward_map.iterkeys()]
+        punches = presorted[:]
         punches.sort()
+        
         sorted_rewards = [reward_map[p] for p in punches]
         store.rewards = sorted_rewards
-        store.update() # push up the sorted rewards
+        
+        # do not just update needlessly
+        # check if order has changed.
+        for i, pre in enumerate(presorted):
+            if pre != punches[i]:
+                store.update()
+        
         data['rewards'] = sorted_rewards
     else:
         data['rewards'] = []
