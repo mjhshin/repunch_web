@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth import SESSION_KEY
 from time import sleep
-import json
+from datetime import datetime
+import json, thread
 
 from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
@@ -24,9 +25,10 @@ def manage_refresh(request):
     This handles ajax requests from clients, holding on to the 
     request while checking Parse for new activity.
     """
+    in_time = datetime.now()
+    out_time = in_time + relativedelta(seconds=3)
     def comet():
-        sleep(1)#COMET_REFRESH_RATE)
-        
+        sleep(3)
         # prep the params
         store = SESSION.get_store(request.session)
         feedback_unread_ids, employees_pending_ids = [], []
@@ -54,7 +56,7 @@ def manage_refresh(request):
                                     request.session),
             "employees_pending_ids": employees_pending_ids,
         })   
-         
+        
         # process results
         data = {}
         results = res['result']
@@ -107,12 +109,22 @@ def manage_refresh(request):
                 request.session['employees_pending_list'] =\
                     employees_pending_list
                     
-        #if len(data) == 0:
-        #    comet()
-        
-        print res
-        return HttpResponse(json.dumps(data), 
-            content_type="application/json")
+        print results
+        if len(results) < 2 and datetime.now() < out_time:
+            # will force to ping back request after out_time!
+            return comet()
+        elif request.session.get('stop_comet'):
+            print "STOPPED! =)"
+            thread.exit()
+            return # unreachable code
+            
+        try:
+            resp = HttpResponse(json.dumps(data), 
+                        content_type="application/json")
+            return resp
+        except IOError: # broken pipe or something. 
+            # exit silently
+            thread.exit()
         
     return comet()
 

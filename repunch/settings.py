@@ -70,8 +70,6 @@ PAYPAL_CLIENT_ID = "AfVmThAEY5V081CmZwFMRiCE642CT5lYeV9Yb3E2SNXC1Ru1L_I0IuZqewwZ
 PAYPAL_CLIENT_SECRET = "ECNDuRAEYaO8YPFu2pGkoetFEN1tZ0qL1ACuZfKzsECTYV1RxTbB14l9WCdR"
 PAYPAL_ENDPOINT = "api.paypal.com"
 
-
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 

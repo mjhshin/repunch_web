@@ -1,3 +1,4 @@
+from datetime import datetime
 
 def session_comet(view_func):
     """
@@ -5,11 +6,11 @@ def session_comet(view_func):
     for each client between view transitions by simply checking
     the request.session.
     
-    Use with all views except ajax only views and public views.
-    Must be called after the login_required decorator!
+    Use with ALL views EXCEPT ajax only views.
     """
     def view(request, *args, **kwargs):
-        
+        print "session_comet"
+        request.session['comet_dead_time'] = timezone.now()
         return view_func(request, *args, **kwargs)
 
     return view

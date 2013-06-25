@@ -6,13 +6,14 @@ from datetime import datetime
 import json, urllib
 
 from apps.stores.forms import SettingsForm, SubscriptionForm
-
+from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.apps.accounts import order_placed
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings
 
 @login_required
+@session_comet
 def settings(request):
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)
@@ -74,6 +75,7 @@ def refresh(request):
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 @login_required
+@session_comet
 def update(request):
     data = {'account_nav': True, 'update':True}
     store = SESSION.get_store(request.session)
@@ -129,6 +131,7 @@ def update(request):
     return render(request, 'manage/account_upgrade.djhtml', data)
 
 @login_required
+@session_comet
 def upgrade(request):
     """ same as update expect this upgrades the subscriptionType """
     data = {'account_nav': True, 'upgrade':True}

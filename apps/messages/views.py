@@ -7,6 +7,7 @@ from dateutil import parser
 from dateutil.tz import tzutc
 import urllib
 
+from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
@@ -19,6 +20,7 @@ from libs.dateutil.relativedelta import relativedelta
 
 
 @login_required
+@session_comet  
 def index(request):
     rputils.set_timezone(request)
     data = {'messages_nav': True}
@@ -39,6 +41,7 @@ def index(request):
 
 
 @login_required
+@session_comet  
 def edit(request, message_id):
     rputils.set_timezone(request)
     store = SESSION.get_store(request.session)
@@ -183,6 +186,7 @@ def edit(request, message_id):
     return render(request, 'manage/message_edit.djhtml', data)
 
 @login_required
+@session_comet  
 def details(request, message_id):
     rputils.set_timezone(request)
     # get from the messages_sent_list in session cache
@@ -200,6 +204,7 @@ def details(request, message_id):
 
 # FEEDBACK ------------------------------------------
 @login_required
+@session_comet  
 def feedback(request, feedback_id):
     account = request.session['account']
     data = {'messages_nav': True, 'feedback_id':\
@@ -244,6 +249,7 @@ def feedback(request, feedback_id):
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
+@session_comet  
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -313,6 +319,7 @@ def feedback_reply(request, feedback_id):
     return render(request, 'manage/feedback_reply.djhtml', data)
 
 @login_required
+@session_comet  
 def feedback_delete(request, feedback_id):
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\

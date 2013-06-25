@@ -7,6 +7,7 @@ from django.forms.models import inlineformset_factory
 from datetime import datetime
 import json
 
+from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
@@ -41,6 +42,7 @@ def punch(request):
                 u'error': u'error'}), content_type="application/json")
 
 @login_required
+@session_comet
 def index(request):
     data = {'account_nav': True}
     
@@ -52,6 +54,7 @@ def index(request):
     return render(request, 'manage/store_details.djhtml', data)
 
 @login_required
+@session_comet
 def edit(request):
     data = {'account_nav': True}
     store = SESSION.get_store(request.session)

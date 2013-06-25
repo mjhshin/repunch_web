@@ -19,6 +19,7 @@
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="{% static "manage/js/global.js" %}"></script>
 	<script src="{% static "manage/js/punch.js" %}"></script>
+	<script src="{% static "manage/js/comet.js" %}"></script>
 	<script>
     // other
     $(document).ready(function(){
@@ -31,6 +32,16 @@
 	
 </head>
 <body>
+
+    {# an initial hidden csrf token for chaining with the ajax side #}
+    {# to avoid making ajax_setup global #} 
+    <form id="comet" style="display:none;">
+    {% csrf_token %}
+    <input name="comet_url" 
+            type="hidden" value="{% url 'manage_refresh' %}" />
+    </form>
+
+
 	<div id="site-frame">
 		<div id="header">
 			<div id="header-left">
@@ -81,7 +92,7 @@
 						<span class="nav-item-title">Rewards</span>
 					</a>
 				</div>
-				<div class="nav-item {% if messages_nav %}active{% endif %}">
+				<div class="nav-item {% if messages_nav %}active{% endif %}" id="messages-nav">
 					<a href="{% url 'messages_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_messages.png" %}" alt="" />
 						<span class="nav-item-title">Messages</span>

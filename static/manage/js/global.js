@@ -1,3 +1,8 @@
+Object.prototype.hasOwnProperty = function(property) {
+    return this[property] !== undefined;
+};
+
+
 $(document).ready(function(){
 	$('div.th').click(function(){
 		var el = $(this);

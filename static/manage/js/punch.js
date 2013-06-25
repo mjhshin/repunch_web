@@ -1,11 +1,6 @@
 /*
     Script for a punch event.
 */
-
-Object.prototype.hasOwnProperty = function(property) {
-    return this[property] !== undefined;
-};
-
 function punchit(url){
 
     // only proceed if not processing a punch
