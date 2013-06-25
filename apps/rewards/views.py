@@ -22,6 +22,7 @@ def index(request):
         punches.sort()
         sorted_rewards = [reward_map[p] for p in punches]
         store.rewards = sorted_rewards
+        store.update() # push up the sorted rewards
         data['rewards'] = sorted_rewards
     else:
         data['rewards'] = []
