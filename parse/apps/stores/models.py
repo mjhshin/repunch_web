@@ -73,6 +73,7 @@ class Store(ParseObject):
         self.FacebookPosts_ = "FacebookPost"
         self.SentMessages_ = "Message"
         self.ReceivedMessages_ = "Message"
+        self.RedeemRewards_ = "RedeemReward"
         
         super(Store, self).__init__(False, **data)
         
@@ -135,7 +136,7 @@ class Store(ParseObject):
             return Invoice
         elif className == "Subscription":
             return Subscription
-        elif className == "Punch":
+        elif className in ("Punch", "RedeemReward"):
             return getattr(import_module('parse.apps.rewards.models'), className)
         elif className == "Employee":
             return getattr(import_module('parse.apps.employees.models'), className)

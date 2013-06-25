@@ -9,4 +9,4 @@ from parse import session as SESSION
 def index(request):
     data = {"workbench_nav":True}
     
-    return HttpResponse("TODO")
+    return render(request, 'manage/workbench.djhtml', data)

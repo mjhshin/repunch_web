@@ -397,43 +397,6 @@ div#footer{
 
 #ui-datepicker-div { font-size:11px; }
 
-form#punch-form{
-    position:relative;left:180px;width:330px;
-    display:inline-block;
-}
-
-form#punch-form input{
-    width:100px;
-}
-
-form#punch-form a{
-    display:inline-block;
-    float:right;
-    position:relative;top:18px;
-    width:20px;height:30px;
-}
-
-form#punch-form a span{
-    position:relative;left:-8px;top:-3px;
-}
-
-form#punch-form div.notification{
-    padding:0px;display:inline-block;text-align:center;
-}
-
-form#punch-form div.notification div{
-    padding:0px;display:inline-block;width:330px;height:30px;
-}
-
-form#punch-form div.notification div span{
-    position:relative;top:-18px;
-}
-
-img#punch-loading {
-    display:none;
-    position:absolute; right:-34px; top:18px;
-}
-
 /** login dialog styles - also used in public! **/
 
 #dialog-login form {

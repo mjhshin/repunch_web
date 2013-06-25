@@ -1,0 +1,58 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load util_tags %}{% load parse_tags %}
+
+{% block title %}Analysis{% endblock %}
+{% block styles %}	
+	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
+	<link href="{% static "manage/css/workbench.css" %}" rel="stylesheet" />
+{% endblock %}
+{% block javascript %}
+	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
+	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/punch.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="section" style="margin-top:0px;">
+		<h2 style="margin-bottom:10px;">Punch Customers</h2>
+        <form action="" method="POST" id="punch-form" >
+	        {% csrf_token %}
+	        <input type="text" id="punch_code" placeholder="Punch Code"/>
+	        <input type="number" id="punch_amount" placeholder="Amount" min="1" />
+	        <a class="button blue" onclick="punchit('{% url 'store_punch' %}'); return false;"><span>Punch</span></a>
+	        <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
+	            id="punch-loading" />
+	    </form> 
+    </div>
+	
+	<div class="section" id="redemption">
+		<h2 style="margin-bottom:10px;">Latest Redemptions</h2>
+		<div class="white-box table tab-body" style="display: block;">
+			<div class="table-header">
+				<div class="th sorted asc" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th" id="header-redemption_is_redeemed">Redeemed? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			</div>
+			
+			{% for redemp in redemptions %}
+		    <div class="tr  {% cycle '' 'odd' %}">
+				<div class="td redemption_title">
+				{{ redemp.title }}</div>
+				<div class="td redemption_punches">
+				{{ redemp.num_punches }}</div>
+				<div class="td redemption_customer_name">
+				{{ redemp.customer_name }}</div>
+				<div class="td redemption_is_redeemed">
+				{{ redemp.is_redeemed|yesno:"Yes,No" }}</div>
+			</div>
+			{% empty %}
+			<div class="tr ">
+				<div class="td">No Redemptions</div>
+			</div>
+			{% endfor %}			
+		</div>
+	</div>
+{% endblock %}
