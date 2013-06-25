@@ -92,7 +92,7 @@ def manage_refresh(request):
                 data['feedbacks'] = []
                 for feedback in feedbacks:
                     m = Message(**feedback)
-                    messages_received_list.append(m)
+                    messages_received_list.insert(0, m)
                     data['feedbacks'].append(m.jsonify())
                 request.session['messages_received_list'] =\
                     messages_received_list
@@ -106,7 +106,7 @@ def manage_refresh(request):
                 data['employees'] = []
                 for emp in employees:
                     e = Employee(**emp)
-                    employees_pending_list.append(e)
+                    employees_pending_list.insert(0, e)
                     data['employees'].append(e.jsonify())
                 request.session['employees_pending_list'] =\
                     employees_pending_list

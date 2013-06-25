@@ -121,7 +121,7 @@ def edit(request, message_id):
             # update messages_sent_list in session cache
             messages_sent_list = SESSION.get_messages_sent_list(\
                 request.session)
-            messages_sent_list.append(message)
+            messages_sent_list.insert(0, message)
             request.session['messages_sent_list'] =\
                 messages_sent_list
 
@@ -231,7 +231,7 @@ def feedback(request, feedback_id):
         
     # make sure that the message stored in the list is the updated 1
     messages_received_list.pop(i_remove)
-    messages_received_list.append(feedback)
+    messages_received_list.insert(i_remove, feedback)
     request.session['messages_received_list'] = messages_received_list
     
     # update the feedback_unread count
@@ -290,7 +290,7 @@ def feedback_reply(request, feedback_id):
             
             # make sure that the message stored in the list is the updated 1
             messages_received_list.pop(i_remove)
-            messages_received_list.append(feedback)
+            messages_received_list.insert(i_remove, feedback)
             request.session['messages_received_list'] = messages_received_list
 
             # push notification
