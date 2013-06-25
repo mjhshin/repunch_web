@@ -234,8 +234,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	
 	var Store = Parse.Object.extend("Store");
     var storeQuery = new Parse.Query(Store);
-	storeQuery.include("RedeemRewards");
-    storeQuery.equalTo("store_id", request.params.retailer_id);
+    storeQuery.equalTo("store_id", storeId);
 	
 	redeemReward.save().then(function(redeemReward) {
 		console.log("RedeemReward save success.");
