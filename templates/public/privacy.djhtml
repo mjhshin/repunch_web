@@ -13,8 +13,8 @@
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <h1 class="page-title">Privacy Policy</h1>
 	<div id="page-content" style="height:2530px;">
-		<h1 id="about-header"  >Privacy Policy</h1>
 		<div id="about-content">
 			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
 			

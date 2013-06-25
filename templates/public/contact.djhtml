@@ -15,8 +15,8 @@
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <h1 class="page-title">Contact Us</h1>
 	<div id="page-content">
-		<h1 id="contact-header">Contact Us</h1>
 		<div id="contact-content">
 			<aside class="col1">				
 				<form id="contact-form" action="{% url 'public_contact' %}" method="POST">{% csrf_token %}
@@ -27,9 +27,9 @@
 				<br/>
 			</aside>
 			<aside class="col2">
-				<img id="about-map" src="{% static "public/images/about-map.jpg" %}" alt="">
+				<img id="about-map" src="{% static "public/images/about-map.png" %}" alt="">
                 <br/>
-				<span id="map-address">123 Main Street<br>Somewhere, US</span>
+				<span id="map-address">155 Water St Brooklyn NY, 11201</span>
 				<br/>
 				<br/>
 			</aside>

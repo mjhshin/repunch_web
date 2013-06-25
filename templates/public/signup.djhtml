@@ -38,8 +38,8 @@ function validate(which, next) {
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <h1 class="page-title">Sign Up</h1>
 	<div id="page-content">
-		<h1 id="signup-header">Sign Up</h1>
 		<div id="signup-content">
 			<aside class="col1">
 				<h2>Sign-up below and a dedicated account manager will contact you within 24 hours to get you up and running.</h2>

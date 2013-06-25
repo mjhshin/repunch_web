@@ -33,8 +33,8 @@ DATABASES = {
 # configuration for SMTP
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'acmnotify@gmail.com'
-EMAIL_HOST_PASSWORD = 'yfitonmca'
+EMAIL_HOST_USER = 'support@repunch.com'
+EMAIL_HOST_PASSWORD = 'REPunch7575'
 EMAIL_USE_TLS = True
 # for order_placed event
 ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com']

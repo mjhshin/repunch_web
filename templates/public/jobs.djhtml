@@ -6,8 +6,8 @@
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <h1 class="page-title">Jobs</h1>
 	<div id="page-content">
-		<h1 id="about-header">Jobs</h1>
 		<div id="about-content">
 			<aside class="col1">
 				<h3>Mauris pretium luctus semper. Praesent laoreet vestibulum odio a sillicitudin. Duis risus est, blandit volutpat volutpat at, adispiscing vitae arcu. Suspendisse ullamcorper libero quis lacus fringilla posuere.</h3>
