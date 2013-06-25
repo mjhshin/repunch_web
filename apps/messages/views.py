@@ -291,6 +291,7 @@ def feedback_reply(request, feedback_id):
             # make sure that the message stored in the list is the updated 1
             messages_received_list.pop(i_remove)
             messages_received_list.insert(i_remove, feedback)
+            print messages_received_list
             request.session['messages_received_list'] = messages_received_list
 
             # push notification

@@ -30,7 +30,7 @@
 	{% endif %}
 	{% employees_pending request.session as epcount %}
 	{% if epcount > 0  %}
-	<div class="notification">
+	<div class="notification" id="notification-pending">
 		<div>You have {{ epcount }} employee{{ epcount|pluralize }} pending approval</div>
 	</div>
 	{% endif %}
@@ -90,8 +90,8 @@
 				</div>
 			</div>
 			{% empty %}
-			<div class="tr odd">
-				<div class="td">No Pending Employees</div>
+			<div class="tr odd" id="no-pending">
+				<div class="td" >No Pending Employees</div>
 			</div>
 			{% endfor %}
 		</div>

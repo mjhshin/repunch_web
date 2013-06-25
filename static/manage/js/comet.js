@@ -25,8 +25,14 @@ $(document).ready(function(){
             // Messages page
             var feedbackTab = $("#tab-feedback");
             if (feedbackTab.length > 0){
+                // tab
                 feedbackTab.html("Feedback (" + 
                             new String(res.feedback_unread) + ")");
+                // remove placeholder when empty
+                if ($("#no-feedback").length > 0){
+                    $("#no-feedback").remove();
+                }
+                // table content
                 var feedbacks = res.feedbacks;
                 for (var i=0; i<feedbacks.length; i++){
                     var odd = "";
@@ -69,8 +75,64 @@ $(document).ready(function(){
                 mBadge.text(new String(res.employees_pending));
             } else {
                 diva.append("<div class='nav-item-badge'>" +
-                    new String(res.employees_peding) + "</div>");
+                    new String(res.employees_pending) + "</div>");
             }
+            
+            // Employees page
+            var pendingTab = $("#tab-pending");
+            if (pendingTab.length > 0){
+                // notification header
+                var notific = $("#notification-pending");
+                if (notific.length > 0){
+                    var s = "";
+                    if (res.employees_pending > 1){s="s";}
+                    notific.html("<div>You have " +
+                        res.employees_pending + 
+                        " employee" + s + " pending approval</div>");
+                }
+                // tab
+                pendingTab.html("Pending (" + 
+                            new String(res.employees_pending) + ")");
+                // remove placeholder when empty
+                if ($("#no-pending").length > 0){
+                    $("#no-pending").remove();
+                }
+                // table content
+                var employees = res.employees;
+                for (var i=0; i<employees.length; i++){
+                    var odd = "";
+                    var first=$("#tab-body-pending div.tr").first();
+                    if (!first.hasClass("odd")){
+                        odd = "odd";
+                    }
+                    var d = new Date(employees[i].createdAt);
+                    var year = new String(d.getYear());
+                    year = year.substring(1, year.length);
+                    var month = new String(d.getMonth()+1);
+                    if (month.length == 1){
+                        month = "0" + month;
+                    }
+                    var day = new String(d.getDate());
+                    if (day.length == 1){
+                        day = "0" + day;
+                    }
+                    var dStr = month + "/" + day + "/" + year;
+                    $("#tab-body-pending div.table-header").after(
+                        "<div class='tr " + odd + " unread'>" +
+				        
+				        "<div class='td first_name_pending'>" + employees[i].first_name + "</div>" +
+				        "<div class='td last_name_pending'>" + employees[i].last_name + "</div>" +
+				        "<div class='td date_added_pending'>" + dStr + "</div>" +
+				        "<div class='td approve'>" +
+					    "<a href='/manage/employees/" + employees[i].objectId + "/approve' class='employee approve'>" +
+					        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
+					    "<a href='/manage/employees/" + employees[i].objectId + "/deny' class='employee deny'>" +
+					        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
+				        "</div>" +
+				        "</div>" );
+		        }
+            }
+            
         }         
                
     }

@@ -69,7 +69,7 @@
 				</a>
 			</div>
 			{% empty %}
-			<div class="tr">
+			<div class="tr" id="no-feedback">
 				<div class="td feedback-date">No Feedback</div>
 				<div class="td feedback-from">&nbsp;</div>
 				<div class="td feedback-subject">&nbsp;</div>

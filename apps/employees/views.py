@@ -133,7 +133,7 @@ def approve(request, employee_id):
     # update session cache for employees_approved_list
     employees_approved_list = SESSION.get_employees_approved_list(\
         request.session)
-    employees_approved_list.append(employee)
+    employees_approved_list.insert(0, employee)
     request.session['employees_approved_list'] =\
         employees_approved_list
         
