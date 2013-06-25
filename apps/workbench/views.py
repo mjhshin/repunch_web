@@ -7,4 +7,6 @@ from parse import session as SESSION
 
 @login_required
 def index(request):
+    data = {"workbench_nav":True}
+    
     return HttpResponse("TODO")

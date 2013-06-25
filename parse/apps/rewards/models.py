@@ -19,6 +19,21 @@ class Punch(ParseObject):
     def get_class(self, className):
         if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'), className)
+            
+class RedeemReward(ParseObject):
+    def __init__(self, **data):
+        self.title = data.get("title")
+        self.customer_name = data.get("customer_name")
+        self.is_redeemed = data.get("is_redeemed")
+        self.num_punches = data.get("num_punches")
+        
+        self.PatronStore = data.get('PatronStore')
+        
+        super(RedeemReward, self).__init__(False, **data)
+
+    def get_class(self, className):
+        if className == "PatronStore":
+            return getattr(import_module('parse.apps.patrons.models'), className)
 
 """
 class Reward(ParseObject):

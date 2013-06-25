@@ -124,6 +124,14 @@
 						<span class="nav-item-title">Settings</span>
 					</a>
 				</div>
+				
+				<div class="nav-item {% if workbench_nav %}active{% endif %}">
+					<a href="{% url 'workbench_index' %}">
+						<img class="nav-item-icon" src="{% static "manage/images/icon_workbench.png" %}" alt="" />
+						<span class="nav-item-title">Workbench</span>
+					</a>
+				</div>
+				
 			</div>
 			<div id="main-content">{% block content %}{% endblock %}</div><!-- close main-content -->
 			<div class="clear">&nbsp;</div>
