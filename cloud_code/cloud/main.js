@@ -439,6 +439,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         // feedback_unread
         var rmrq = store.relation("ReceivedMessages").query();
         rmrq.equalTo("is_read", false);
+        rmrq.equalTo("message_type", "feedback");
         return rmrq.find();
     }).then(function(newFeedbacks){
         if(newFeedbacks.length != feedback_unread &&
