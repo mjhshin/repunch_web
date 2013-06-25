@@ -27,7 +27,7 @@ SESSION_CACHE = [
     'messages_received_list', # sync with feedback_unread
     
     # time in which all comet processes for the request will die
-    'stop_comet',
+    # 'stop_comet_time', unused at the moment
 ]
 
 def get_store(session):

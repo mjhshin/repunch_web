@@ -3,8 +3,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth import SESSION_KEY
+from django.utils import timezone
 from time import sleep
-from datetime import datetime
 import json, thread
 
 from libs.dateutil.relativedelta import relativedelta
@@ -16,8 +16,10 @@ from parse.apps.messages.models import Message
 from parse.apps.employees.models import Employee
 from parse import session as SESSION
 from apps.accounts.forms import LoginForm
-from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
+from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
+RETAILER_REFRESH_TIMEOUT
 
+# TODO implement comet approach properly   
 @login_required
 def manage_refresh(request):
     """
@@ -25,10 +27,10 @@ def manage_refresh(request):
     This handles ajax requests from clients, holding on to the 
     request while checking Parse for new activity.
     """
-    in_time = datetime.now()
-    out_time = in_time + relativedelta(seconds=3)
+    # in_time = timezone.now()
+    # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
     def comet():
-        sleep(3)
+        # sleep(COMET_REFRESH_RATE)
         # prep the params
         store = SESSION.get_store(request.session)
         feedback_unread_ids, employees_pending_ids = [], []
@@ -55,7 +57,7 @@ def manage_refresh(request):
             "employees_pending": SESSION.get_employees_pending(\
                                     request.session),
             "employees_pending_ids": employees_pending_ids,
-        })   
+        }, timeout=RETAILER_REFRESH_TIMEOUT)
         
         # process results
         data = {}
@@ -108,15 +110,16 @@ def manage_refresh(request):
                     data['employees'].append(e.jsonify())
                 request.session['employees_pending_list'] =\
                     employees_pending_list
-                    
-        print results
-        if len(results) < 2 and datetime.now() < out_time:
-            # will force to ping back request after out_time!
-            return comet()
-        elif request.session.get('stop_comet'):
-            print "STOPPED! =)"
+                 
+        """
+        print results, timezone.now()
+        if timezone.now() < request.session.get('comet_dead_time'):
             thread.exit()
             return # unreachable code
+        elif len(results) < 2 and timezone.now() < out_time:
+            # will force to ping back request after out_time!
+            return comet()
+        """
             
         try:
             resp = HttpResponse(json.dumps(data), 

@@ -3,10 +3,10 @@
     constant communication with manage_refresh
 */
 
+// TODO actually implement comet approach
 $(document).ready(function(){
 
     var url = $("#comet input[name=comet_url]").val();
-    var fakeComet;
     
     function mainComet(res, status, xhr) {
         // feedback_unread nav
@@ -21,29 +21,16 @@ $(document).ready(function(){
             }
         }        
         // pending employees nav
-
-        fakeComet();
+        
     }
     
-    function delayedComet(){
-        setTimeout(chainComet, 5000);
-    }
-    
-    function chainComet(){
+    setInterval(function(){
         $.ajax({
             url: url,
             type: "GET",
             timeout: 300000, // 5 mins > serverside request timeout
             success: mainComet,
-            // server killed the request but this page is still open
-            // so try again after 5 seconds
-            error: delayedComet, 
         });
-        
-    }
-    
-    fakeComet = chainComet;
-
-    chainComet();
+    }, 15000);
 
 });

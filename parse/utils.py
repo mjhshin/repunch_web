@@ -14,7 +14,7 @@ BAD_FILE_CHR = re.compile('[\W_]+')
 import traceback
 
 def parse(method, path, data=None, query=None,
-            cMeta='json'):
+            cMeta='json', timeout=None):
     """
     sends a request to parse using specified method, url, data,
     and optionally a query.
@@ -25,7 +25,11 @@ def parse(method, path, data=None, query=None,
 
     Returns None if request does not return a json object.
     """
-    conn = httplib.HTTPSConnection('api.parse.com', 443)
+    if timeout:
+        conn = httplib.HTTPSConnection('api.parse.com',
+                                        443, timeout=timeout)
+    else:
+        conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
 
     rcm = REST_CONNECTION_META.copy()
@@ -127,8 +131,9 @@ def delete_file(name, fType):
     """ deletes the given file """   
     parse("DELETE", 'files/' + name, cMeta=fType)
 
-def cloud_call(func_name, params):
+def cloud_call(func_name, params, timeout=None):
     """ Calls a cloud function with the name func_name and with
     the parameters params. """
-    return parse("POST", "functions/" + func_name, params)
+    return parse("POST", "functions/" + func_name,
+            params, timeout=timeout)
 
