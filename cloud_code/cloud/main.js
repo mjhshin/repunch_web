@@ -443,7 +443,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         rmrq.notContainedIn("objectId", feedback_unread_ids);
         return rmrq.find();
     }).then(function(newFeedbacks){
-        if(newFeedbacksnewFeedbacks.length > 0){
+        if(newFeedbacks.length > 0){
             result.feedbacks = newFeedbacks;
         }
     
