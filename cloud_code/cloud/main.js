@@ -38,7 +38,7 @@ Parse.Cloud.define("assign_punch_code", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("punch", function(request, response) {
     var punchCode = request.params.punch_code;
-	var numPunches = request.params.num_punches;
+	var numPunches = parseInt(request.params.num_punches);
 	var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
 	var employeeId = request.params.employee_id;
@@ -216,9 +216,10 @@ Parse.Cloud.define("punch", function(request, response) {
 Parse.Cloud.define("request_redeem", function(request, response) {
 	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
-	var rewardTitle = request.params.title;
+	var rewardId = request.params.reward_id;
 	var numPunches = parseInt(request.params.num_punches); //comes in as string!
 	var customerName = request.params.name;
+	var rewardTitle;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStore = new PatronStore();
@@ -227,7 +228,6 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemReward = new RedeemReward();
 	redeemReward.set("customer_name", customerName);
-	redeemReward.set("title", rewardTitle);
 	redeemReward.set("num_punches", numPunches);
 	redeemReward.set("is_redeemed", false);
 	redeemReward.set("PatronStore", patronStore);
@@ -239,6 +239,18 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	storeQuery.get(storeId).then(function(storeResult) {
 		console.log("Store fetch success.");
 		store = storeResult;
+		var rewards = store.get("rewards");
+		// update the store's rewards redemption_count
+		for (var i=0; i<rewards.length; i++){
+		    if (new String(rewards[i].reward_id) == rewardId){
+		        rewards[i].redemption_count += 1;
+		        rewardTitle = rewards[i].reward_name;
+	            redeemReward.set("title", rewardTitle);
+		        break;
+		    }
+		}
+		store.set("rewards", rewards);
+		
 		return redeemReward.save();
 		
 	}, function(error) {
@@ -248,6 +260,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	}).then(function(redeemReward) {
 			console.log("RedeemReward save success.");
 			store.relation("RedeemRewards").add(redeemReward);
+			
 			return store.save();
 					
 	}, function(error) {
@@ -304,12 +317,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
-	redeemRewardQuery.include("PatronStore");
+	redeemRewardQuery.include(["PatronStore.Patron"]);
 	
 	redeemRewardQuery.get(redeemId).then(function(redeemReward) {
-		console.log("RedeemReward fetch success.");
 		var patronStore = redeemReward.get("PatronStore");
+		console.log("RedeemReward fetch success.");
 		numPunches = redeemReward.get("num_punches");
+		rewardTitle = redeemReward.get("title");
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
@@ -320,15 +334,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			response.error("error");
 		} else{
 			console.log("PatronStore has enough punches.");
-			patronId = patronStore.get("Patron.id");
-			console.log(patronId);
+			patronId = patronStore.get("Patron").id;
 			patronStore.increment("punch_count", -1*numPunches);
 			redeemReward.set("is_redeemed", true);
-			// TODO increment redemption_count in store rewards array
-			// may want a reward_id in the array for this since
-			// comparing by title/reward_name is bad.
-			// what if store changes name of reward before 
-			// the validation occurs?
 			
 			var promises = [];
 			promises.push( patronStore.save() );
@@ -352,10 +360,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	
 	function executePush() {
 		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("store_id", storeId);
+		installationQuery.equalTo("patron_id", patronId);
 		
-		////below this is TODO.
-	    
 		Parse.Push.send({
 	        where: installationQuery,
 	        data: {
@@ -535,7 +541,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         addToPatronsInbox(patronStores);
     }
 
-    // class when all tasks are done
+    // call when all tasks are done
     function proceedToPush(){
         console.log("PROCEED TO PUSH");
         Parse.Push.send({

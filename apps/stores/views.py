@@ -38,11 +38,7 @@ def punch(request):
         }
         res = cloud_call("punch", data)
         if 'error' not in res:
-            patron = Patron.objects().get(punch_code=\
-                str(request.POST['punch_code']))
-            res['patron_name'] = patron.first_name.capitalize() +\
-                                " " +\
-                patron.last_name.capitalize()
+            res['patron_name'] = res['result']
             return HttpResponse(json.dumps(res), 
                     content_type="application/json")
 

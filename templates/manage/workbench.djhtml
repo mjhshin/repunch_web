@@ -75,4 +75,44 @@
 			{% endfor %}			
 		</div>
 	</div>
+	
+	<div class="section" id="redemption-past">
+		<h2 style="margin-bottom:10px;">Past Redemptions</h2>
+		<div class="white-box table tab-body" style="display: block;">
+			<div class="table-header">
+				<div class="th sorted desc not-sortable" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th not-sortable" id="header-redemption_redeem"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			
+			</div>
+			
+			{% for redemp in past_redemptions %}
+		    <div id="{{redemp.objectId}}" 
+		        class="tr  {% cycle '' 'odd' %}">
+				<div class="td redemption_time">
+				{% if redemp.createdAt <= yesterday %}
+				{{ redemp.createdAt|date:"F t" }}
+				{% else %}
+				{{ redemp.createdAt|date:"h:i a" }}
+				{% endif %}</div>
+				<div class="td redemption_customer_name">
+				{{ redemp.customer_name }}</div>
+				<div class="td redemption_title">
+				{{ redemp.title }}</div>
+				<div class="td redemption_punches">
+				{{ redemp.num_punches }}</div>
+				<div class="td redemption_redeem">
+				</div>
+			</div>
+			{% empty %}
+			<div class="tr " id="no-redemptions">
+				<div class="td">No Redemptions</div>
+			</div>
+			{% endfor %}			
+		</div>
+	</div>
+	
+	
 {% endblock %}

@@ -29,6 +29,7 @@ SESSION_CACHE = [
     'messages_received_list', # sync with feedback_unread
     
     'redemptions',
+    'remptions_past',
     
     # time in which all comet processes for the request will die
     # 'stop_comet_time', unused at the moment
@@ -59,6 +60,24 @@ def get_redemptions(session):
         return redemptions
     else:
         return session['redemptions']
+        
+def get_redemptions_past(session):
+    """ 
+    returns all the redeemed redemptions.
+    """
+    if "redemptions_past" not in session:
+        store = get_store(session)
+        redemptions = store.get('redeemRewards', is_redeemed=True,
+                        order="-createdAt")
+        if redemptions is None:
+            redemptions = []
+            
+        store.redeemRewards = None
+        session['store'] = store
+        session['redemptions_past'] = redemptions
+        return redemptions
+    else:
+        return session['redemptions_past']
         
 def get_store_timezone(session):
     """ returns the pytz.timezone object """

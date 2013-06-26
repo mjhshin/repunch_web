@@ -22,6 +22,8 @@ def index(request):
     data = {"workbench_nav":True,
         "redemptions":SESSION.get_redemptions(request.session),
         "settings":SESSION.get_settings(request.session),
+        "past_redemptions":\
+            SESSION.get_redemptions_past(request.session),
         "yesterday":yesterday}
     return render(request, 'manage/workbench.djhtml', data)
     
@@ -36,13 +38,20 @@ def redeem(request):
         if 'error' not in res:
             redemptions = SESSION.get_redemptions(request.session)
             i_remove = -1
+            # remove from redemptions
             for i, red in enumerate(redemptions):
                 if red.objectId == redeemId:
                     i_remove = i
                     break
             if i_remove != -1:
-                redemptions.pop(i_remove)
+                redemptions_past =\
+                    SESSION.get_redemptions_past(request.session)
+                redemption = redemptions.pop(i_remove)
+                redemption.is_redeemed = True
+                redemptions_past.append(redemption)
+                request.session['redemptions_past'] = redemptions_past
                 request.session['redemptions'] = redemptions
+            
                     
             return HttpResponse(json.dumps({"result":1}), 
                         content_type="application/json")
