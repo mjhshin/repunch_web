@@ -4,19 +4,24 @@ form#punch-form{
     display:inline-block;
 }
 
+
+#header-redemption_time, .redemption_time{
+    width:80px;
+}
+
 #header-redemption_title, .redemption_title{
-    width:190px;
+    width:160px;
 }
 
 #header-redemption_punches, .redemption_punches{
-    width:110px;
+    width:80px;
 }
 
 #header-redemption_customer_name, .redemption_customer_name{
     width:180px;
 }
 
-#header-redemption_is_redeemed, .redemption_is_redeemed{
+#header-redemption_is_redeemed, .redemption_redeem{
     width:120px;
 }
 

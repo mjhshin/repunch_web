@@ -10,6 +10,8 @@ $(document).ready(function(){
 
     var url = $("#comet_url").val();
     
+    // TODO on click redeem function & initial bind
+    
     function mainComet(res, status, xhr) {
         // Messages nav
         if (res.hasOwnProperty('feedback_unread')){
@@ -161,24 +163,31 @@ $(document).ready(function(){
             var redemptions = res.redemptions;
             for (var i=0; i<redemptions.length; i++){
                 var odd = "";
-                var first=$("#redemption div.tab-body div.tr").first();
-                if (!first.hasClass("odd")){
+	            // TODO check if asc or desc
+                var x=$("#redemption div.tab-body div.tr").first();
+                if (!x.hasClass("odd")){
                     odd = "odd";
                 }
                 $("#redemption div.tab-body div.table-header").after(
                     "<div class='tr " + odd + "'>" +
+				    "<div class='td redemption_customer_name'>" +
+				    redemptions[i].customer_name + "</div>" +
 		            "<div class='td redemption_title'>" +
 				    redemptions[i].title + "</div>" +
 				    "<div class='td redemption_punches'>" +
 				    redemptions[i].num_punches + "</div>" +
-				    "<div class='td redemption_customer_name'>" +
-				    redemptions[i].customer_name + "</div>" +
+				    "<div class='td redemption_redeem'>" +
+				    // TODO button
 		            "</div>" );
-		        // remove the last if greater than 20
-		        while ($("#redemption div.tab-body div.tr").length > 20){
-		            $("#redemption div.tab-body div.tr").last().remove();
-		        }
             }
+            
+            // TODO rebind on click function
+            
+            // remove the last if greater than 40
+	      // while ($("#redemption div.tab-body div.tr").length > 40){
+	            // TODO check if asc or desc
+	         //$("#redemption div.tab-body div.tr").last().remove();
+	        //}
         }
                
     } // end mainComet

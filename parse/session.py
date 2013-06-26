@@ -44,17 +44,17 @@ def get_store(session):
         
 def get_redemptions(session):
     """ 
-    initially returns the 20 latest redemptions the past hour. 
+    returns all the unredeemed redemptions.
     """
     if "redemptions" not in session:
-        past = timezone.now() + relativedelta(hours=-1)
         store = get_store(session)
-        redemptions = store.get('redeemRewards',
-            createdAt__gte=past, order="-createdAt", limit=20)
+        redemptions = store.get('redeemRewards', is_redeemed=false,
+                        order="-createdAt")
         if redemptions is None:
             redemptions = []
             
         store.redeemRewards = None
+        session['store'] = store
         session['redemptions'] = redemptions
         return redemptions
     else:

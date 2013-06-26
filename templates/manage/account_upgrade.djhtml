@@ -111,7 +111,7 @@
 			    <label>: amount&nbsp;&nbsp;</label>
 			    <input type="number" min="1"  step="1" 
 			        name="place_order_amount" 
-			        style="width:40px;" />
+			        style="width:40px;" value="1" />
 			</span>
 			<img class="question_mark"
 			    src="{% static 'public/images/question_mark.png' %}" 

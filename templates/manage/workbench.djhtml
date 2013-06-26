@@ -10,6 +10,11 @@
 	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/punch.js" %}"></script>
+	<script>
+	$(document).ready(function(){
+	    $(".th.not-sortable").unbind("click");
+	});
+	</script>
 {% endblock %}
 
 
@@ -34,29 +39,26 @@
 		<h2 style="margin-bottom:10px;">Latest Redemptions</h2>
 		<div class="white-box table tab-body" style="display: block;">
 			<div class="table-header">
-				<div class="th sorted asc" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				
-		    {% comment %}
-			<div class="th" id="header-redemption_is_redeemed">Redeemed? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			{% endcomment %}
+				<div class="th sorted desc" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th not-sortable" id="header-redemption_redeem">Redeem <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			
 			</div>
 			
 			{% for redemp in redemptions %}
 		    <div class="tr  {% cycle '' 'odd' %}">
+				<div class="td redemption_time">
+				{{ redemp.createdAt }}</div>
+				<div class="td redemption_customer_name">
+				{{ redemp.customer_name }}</div>
 				<div class="td redemption_title">
 				{{ redemp.title }}</div>
 				<div class="td redemption_punches">
 				{{ redemp.num_punches }}</div>
-				<div class="td redemption_customer_name">
-				{{ redemp.customer_name }}</div>
-				
-				{% comment %}
-				<div class="td redemption_is_redeemed">
+				<div class="td redemption_redeem">
 				{{ redemp.is_redeemed|yesno:"Yes,No" }}</div>
-				{% endcomment %}
-				
 			</div>
 			{% empty %}
 			<div class="tr " id="no-redemptions">

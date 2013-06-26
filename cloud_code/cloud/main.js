@@ -384,6 +384,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      employees_pending (count)
 //      employees_pending_ids (String array)
 //      redemption_ids (String array)
+//      // past_hour (UTC datetime for redemptions)
 //
 //  Output: 
 //      rewards (empty if no redemption_count changed)
@@ -404,6 +405,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
     var redemption_ids = request.params.redemption_ids;
+    // var past_hour = request.params.past_hour;
     var store, result = new Object();
     
     var storeQuery = new Parse.Query(Store);
@@ -459,15 +461,17 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         
         // redemptions
         var rrq = store.relation("RedeemRewards").query();
+        // rrq.greaterThanOrEqualTo("createdAt", new Date(past_hour));
+        rrq.equalTo("is_redeemed", false);
         rrq.descending("createdAt");
-        rrq.limit(20);
+        // rrq.limit(40);
         // TODO remove this
         rrq.notContainedIn("objectId", redemption_ids);
         return rrq.find();
     }).then(function(redemptions){
         // TODO check for changes- not just new ones
+        // to remove the redeemed ones in the store's cache
         if (redemptions.length > 0){
-            console.log(redemptions.length);
             result.redemptions = redemptions;
         }
     
