@@ -4,13 +4,36 @@
 */
 
 
-
 // TODO actually implement comet approach
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
+    var urlRedeem = $("#redeem-url").val();
     
-    // TODO on click redeem function & initial bind
+    // TODO on click redeem function
+    function onRedeem(rowId){
+        $.ajax({
+            url: urlRedeem,
+            data: {"redeemRewardId":rowId}, 
+            type: "GET",
+            success: function(res){
+                row = $("#" + rowId);
+                row.css("background", "#CCFF99");
+                row.html("Successfully validated redemption.");
+                row.fadeOut(3000, function(){
+                    $(this).remove();
+                });
+            },
+            error: function(res){
+                // TODO
+            },
+        });
+    }
+    
+    // bind
+    $("#redemption div.tr div.td a").click(function(){
+        onRedeem($(this).attr("id"));
+    });
     
     function mainComet(res, status, xhr) {
         // Messages nav
@@ -162,14 +185,17 @@ $(document).ready(function(){
             // workbench page
             var redemptions = res.redemptions;
             for (var i=0; i<redemptions.length; i++){
-                var odd = "";
-	            // TODO check if asc or desc
-                var x=$("#redemption div.tab-body div.tr").first();
+                var odd = "", x, 
+                   desc=$("#header-redemption_time").hasClass("desc");
+                if (desc){
+                    x=$("#redemption div.tab-body div.tr").first();
+                } else {
+                    x=$("#redemption div.tab-body div.tr").last();
+                }
                 if (!x.hasClass("odd")){
                     odd = "odd";
                 }
-                $("#redemption div.tab-body div.table-header").after(
-                    "<div class='tr " + odd + "'>" +
+                var content = "<div class='tr " + odd + "'>" +
 				    "<div class='td redemption_customer_name'>" +
 				    redemptions[i].customer_name + "</div>" +
 		            "<div class='td redemption_title'>" +
@@ -177,15 +203,23 @@ $(document).ready(function(){
 				    "<div class='td redemption_punches'>" +
 				    redemptions[i].num_punches + "</div>" +
 				    "<div class='td redemption_redeem'>" +
-				    // TODO button
-		            "</div>" );
+				    "<a id='" + redemptions[i].objectId +
+				        "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
+		            "</div>";
+		        if (desc){
+		            x.before(content);
+		        } else {
+		            x.after(content);
+		        }
             }
             
-            // TODO rebind on click function
+            // bind
+            $("#redemption div.tr div.td a").click(function(){
+                onRedeem($(this).attr("id"));
+            });
             
             // remove the last if greater than 40
 	      // while ($("#redemption div.tab-body div.tr").length > 40){
-	            // TODO check if asc or desc
 	         //$("#redemption div.tab-body div.tr").last().remove();
 	        //}
         }

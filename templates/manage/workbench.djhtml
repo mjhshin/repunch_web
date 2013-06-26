@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load util_tags %}{% load parse_tags %}
 
-{% block title %}Analysis{% endblock %}
+{% block title %}Workbench{% endblock %}
 {% block styles %}	
 	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link href="{% static "manage/css/workbench.css" %}" rel="stylesheet" />
@@ -22,6 +22,9 @@
     {# NEEDED FOR punch.js #}
     <input type="hidden" id="max_punches"
         value="{{ settings.punches_employee }}" />
+    {# FOR comet.js #}
+    <input type="hidden" id="redeem-url"
+        value="{% url 'workbench_redeem' %}" />
 
     <div class="section" style="margin-top:0px;">
 		<h2 style="margin-bottom:10px;">Punch Customers</h2>
@@ -36,19 +39,20 @@
     </div>
 	
 	<div class="section" id="redemption">
-		<h2 style="margin-bottom:10px;">Latest Redemptions</h2>
+		<h2 style="margin-bottom:10px;">Pending Redemptions</h2>
 		<div class="white-box table tab-body" style="display: block;">
 			<div class="table-header">
 				<div class="th sorted desc" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			<div class="th not-sortable" id="header-redemption_redeem">Redeem <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th not-sortable" id="header-redemption_redeem"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			
 			</div>
 			
 			{% for redemp in redemptions %}
-		    <div class="tr  {% cycle '' 'odd' %}">
+		    <div id="{{redemp.objectId}}" 
+		        class="tr  {% cycle '' 'odd' %}">
 				<div class="td redemption_time">
 				{{ redemp.createdAt }}</div>
 				<div class="td redemption_customer_name">
@@ -58,7 +62,7 @@
 				<div class="td redemption_punches">
 				{{ redemp.num_punches }}</div>
 				<div class="td redemption_redeem">
-				{{ redemp.is_redeemed|yesno:"Yes,No" }}</div>
+				<a id="{{redemp.objectId}}" style="color:blue;cursor:pointer;">redeem</a></div>
 			</div>
 			{% empty %}
 			<div class="tr " id="no-redemptions">

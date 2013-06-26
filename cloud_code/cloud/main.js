@@ -324,6 +324,11 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			patronId = patronStore.get("Patron.id");
 			patronStore.increment("punch_count", -1*numPunches);
 			redeemReward.set("is_redeemed", true);
+			// TODO increment redemption_count in store rewards array
+			// may want a reward_id in the array for this since
+			// comparing by title/reward_name is bad.
+			// what if store changes name of reward before 
+			// the validation occurs?
 			
 			var promises = [];
 			promises.push( patronStore.save() );

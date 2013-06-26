@@ -48,7 +48,7 @@ def get_redemptions(session):
     """
     if "redemptions" not in session:
         store = get_store(session)
-        redemptions = store.get('redeemRewards', is_redeemed=false,
+        redemptions = store.get('redeemRewards', is_redeemed=False,
                         order="-createdAt")
         if redemptions is None:
             redemptions = []

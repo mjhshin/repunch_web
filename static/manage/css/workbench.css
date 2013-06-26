@@ -21,8 +21,8 @@ form#punch-form{
     width:180px;
 }
 
-#header-redemption_is_redeemed, .redemption_redeem{
-    width:120px;
+#header-redemption_redeem, .redemption_redeem{
+    width:80px;
 }
 
 form#punch-form input{

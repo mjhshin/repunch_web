@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import json
 
+from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
 
@@ -11,3 +12,28 @@ def index(request):
         "redemptions":SESSION.get_redemptions(request.session),
         "settings":SESSION.get_settings(request.session)}
     return render(request, 'manage/workbench.djhtml', data)
+    
+@login_required
+def redeem(request):
+    if request.METHOD == "GET" or request.is_ajax():
+        redeemId = request.GET.get('redeemRewardId')
+        res = cloud_call("validate_redeem", {"redeem_id":\
+                redeemId})
+        print res
+        if 'error' not in res:
+            redemptions = SESSION.get_redemptions(request.session)
+            i_remove = -1
+            for i, red in enumerate(redemptions):
+                if red.objectId == redeemId:
+                    i_remove = i
+                    break
+            if i_remove != -1:
+                redemptions.pop(i_remove)
+                request.session['redemptions'] = redemptions
+                    
+            return HttpResponse(json.dumps({"result":"success"}), 
+                        content_type="application/json")
+                        
+    return HttpResponse(json.dumps({"result":"error"}), 
+                    content_type="application/json")
+                       
