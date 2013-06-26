@@ -110,39 +110,21 @@ ul.orangy li:before {
 					<aside class="col1" style="width:100%; padding-top:0;">
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
-							<li>No hardware or POS integration required!</li>
-							<li>Your employees can download the Repunch Retailer App - Once you grant them permission, they can begin dishing out punches and validating rewards.</li>
-							<li>You can monitor each employee's punch behavior to prevent fraud and to analyze employee.</li>
+							<li>Repunch is completely free to start.</li>
+							<ul>
+								<li>You only begin paying a modest monthly fee once you have a significant number of users getting punched at your store.</li>
+								<li>As you enter into paid tiers, you gain access to special services like premium marketing campaigns.</li>
+							</ul>
+							<li>No hardware or POS integration required. You can be up and running in minutes!</li>
+							<li>You can grant punches and validate redeemed rewards in a couple of ways.</li>
+							<ul>
+								<li>Input consumers' Punch Codes right into the dashboard, which you can have open on your internet-enabled POS, computer, or tablet.</li>
+								<li>Use our Retailer Mobile App. Your employees can download the app onto their devices and then begin granting punches once you grant them permission.</li>
+								<li>If you would prefer to have Smartphone(s) specifically to run the Retailer App, we can supply these to you at cost.</li>
+							</ul>
+							<li>We perform automatic fraud monitoring that let's you know whenever there is suspicious activity. Details include the name of the employee and the abnormal quantity or time of the punches.</li>
+			    			<li>If you would prefer to have Smartphone(s) specifically to run the Repunch retailer app, we can supply these to you at cost.</li>
 						</ul>
-						<section id="learn-plans" style="margin-top:40px;">
-			<h1>Plans &amp; Pricing</h1>
-	        	<div id="price-plan-boxes">
-	        	{% for type in types %}
-	              <div class="bkg_price-plan-box">
-	                  <h3>{{ type.name }} </h3>
-	                  <p class="orange-text">
-	                  		{% if type.monthly_cost == 0 %}
-	                  	FREE
-	                  	{% else %}
-	                  		${{ type.monthly_cost }}/mo
-	                  	{% endif %}
-	                  </p>
-	                  <span>
-	                  	{% if type.max_users == unlimited %}
-	                  		Unlimited Users
-	                  	{% else %}
-	                  		up to {{ type.max_users }} user{{ type.max_users|pluralize }}
-	                  	{% endif %}<br>
-	                  	{{ type.max_messages }} message{{ type.max_messages|pluralize }}/month
-	                  </span>
-	              </div>
-	              {% endfor %}
-	           </div>
-			<p style="clear:both;padding-top:50px; text-align:center;">
-			<ul class="orangy">
-			    <li>Free of charge, we will supply you with marketing materials and a dock to hold your Smartphone.</li>
-			    <li>If you would prefer to have Smartphone(s) specifically to run the Repunch retailer app, we can supply these to you at cost.</li>
-			</ul>
 			</p>
 	    </section>
 				</div>						
