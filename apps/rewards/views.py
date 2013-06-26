@@ -85,12 +85,21 @@ def edit(request, reward_id):
                 "description":form.data['description'], 
                 "punches":form.data['punches'],
                 "redemption_count":0}
+                
+            # assign a new reward_id
+            ids = []
+            for r in rewards:
+                ids.append(r.get("reward_id"))
+            ids.sort()           
   
             if not is_new:
                 reward["redemption_count"] =\
                     old_reward["redemption_count"]
+                reward['reward_id'] = old_reward['reward_id']   
                 store.array_remove('rewards', [old_reward])
-
+            else:
+                reward['reward_id'] = ids[-1] + 1   
+            
             store.array_add_unique('rewards', [reward])
             store.rewards = None
             store.get('rewards')

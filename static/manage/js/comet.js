@@ -17,12 +17,16 @@ $(document).ready(function(){
             data: {"redeemRewardId":rowId}, 
             type: "GET",
             success: function(res){
-                row = $("#" + rowId);
-                row.css("background", "#CCFF99");
-                row.html("Successfully validated redemption.");
-                row.fadeOut(3000, function(){
-                    $(this).remove();
-                });
+                var row = $("#" + rowId);
+                if (res.result == 1){
+                    row.css("background", "#CCFF99");
+                    row.html("Successfully validated redemption.");
+                    row.fadeOut(3000, function(){
+                        $(this).remove();
+                    });
+                } else {
+                    alert("Redemption failed");
+                }
             },
             error: function(res){
                 // TODO

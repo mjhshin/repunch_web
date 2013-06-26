@@ -15,7 +15,8 @@ def index(request):
     
 @login_required
 def redeem(request):
-    if request.METHOD == "GET" or request.is_ajax():
+    """ returns json object. result is 0 if fail, 1 if success """
+    if request.method == "GET" or request.is_ajax():
         redeemId = request.GET.get('redeemRewardId')
         res = cloud_call("validate_redeem", {"redeem_id":\
                 redeemId})
@@ -31,9 +32,9 @@ def redeem(request):
                 redemptions.pop(i_remove)
                 request.session['redemptions'] = redemptions
                     
-            return HttpResponse(json.dumps({"result":"success"}), 
+            return HttpResponse(json.dumps({"result":1}), 
                         content_type="application/json")
                         
-    return HttpResponse(json.dumps({"result":"error"}), 
+    return HttpResponse(json.dumps({"result":0}), 
                     content_type="application/json")
                        

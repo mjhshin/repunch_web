@@ -32,6 +32,7 @@ SHORT_DAYS = ((1, 'Sun'),
 class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
     def __init__(self, **data):
+        self.active = data.get('active', False)
         self.store_name = data.get('store_name')
         self.street = data.get("street")
         self.city = data.get('city')
@@ -54,7 +55,7 @@ class Store(ParseObject):
         self.hours = data.get("hours")
         # [{"reward_name":"Free bottle of wine", "description":
         # "Must be under $25 in value",
-        # "punches":10,"redemption_count":0},]
+        # "punches":10,"redemption_count":0, reward_id:0},]
         self.rewards = data.get("rewards")
         # [{"alias":"bakery","name":"Bakeries"},
         # {"alias":"coffee","name":"Coffee & Tea"}]
@@ -170,7 +171,6 @@ class Invoice(ParseObject):
 class Subscription(ParseObject):
     """ Equivalence class of apps.accounts.models.Subscription """
     def __init__(self, **data):
-        self.active = data.get('active', False)
         # stores the level in sub_type
         self.subscriptionType = data.get('subscriptionType', 0)
         self.first_name = data.get('first_name')

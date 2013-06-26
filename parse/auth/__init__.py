@@ -45,7 +45,7 @@ def login(request):
             settings = store.get("settings")
             subscription = store.get("subscription")
         
-            if subscription.get('active'):
+            if store.get('active'):
                 request.session[SESSION_KEY] = res.get('sessionToken')
                 settings.fetchAll()
                 subscription = store.get("subscription")

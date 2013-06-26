@@ -298,9 +298,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	
-	var patronId;
-	var numPunches;
-	var rewardTitle;
+	var patronId, numPunches, rewardTitle;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -322,6 +320,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		} else{
 			console.log("PatronStore has enough punches.");
 			patronId = patronStore.get("Patron.id");
+			console.log(patronId);
 			patronStore.increment("punch_count", -1*numPunches);
 			redeemReward.set("is_redeemed", true);
 			// TODO increment redemption_count in store rewards array

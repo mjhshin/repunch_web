@@ -14,20 +14,17 @@ ERROR = "Billing Error"
 # FREE
 free_type = {"name":FREE,
                 "monthly_cost":0, "max_users":50,
-                "max_messages":1, "level":0, 
-                "active": True }
+                "max_messages":1, "level":0}
 
 # MIDDLE
 middle_type = {"name":MIDDLEWEIGHT, 
                 "monthly_cost":39, "max_users":150,
-                "max_messages":4, "level":1, 
-                "active": True }
+                "max_messages":4, "level":1}
 
 # HEAVY
 heavy_type = {"name":HEAVYWEIGHT, 
                 "monthly_cost":59, "max_users":UNLIMITED,
-                "max_messages":8, "level":2, 
-                "active": True }
+                "max_messages":8, "level":2}
 
 sub_type = {
     0:free_type,
@@ -65,7 +62,7 @@ def user_signup(account, connection=None):
         "Email: " + account.get('email') + "\n" +\
         "Phone number: " + store.get('phone_number') + "\n" +\
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
-        "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n"
+        "Account is Active: " + str(store.get('active')) + "\n"
         
     m = mail.EmailMessage(subject, msg, EMAIL_HOST_USER,
                 ORDER_PLACED_EMAILS)
@@ -92,7 +89,7 @@ def order_placed(amount, store, account, connection=None):
         "Email: " + account.get('email') + "\n" +\
         "Phone number: " + store.get('phone_number') + "\n" +\
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
-        "Subscription is Active: " + str(store.get('subscription').get('active')) + "\n" +\
+        "Account is Active: " + str(store.get('active')) + "\n" +\
         "Amount Ordered: " + str(amount) + "\n" +\
         "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n" +\
         "\nPAYPAL INFO: \n" + invoice.to_message_plain()
