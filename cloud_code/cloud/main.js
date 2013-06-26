@@ -216,9 +216,9 @@ Parse.Cloud.define("punch", function(request, response) {
 Parse.Cloud.define("request_redeem", function(request, response) {
 	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
-	var rewardTitle = request.params.reward_title;
-	var numPunches = request.params.num_punches;
-	var customerName = request.params.customer_name;
+	var rewardTitle = request.params.title;
+	var numPunches = parseInt(request.params.num_punches); //comes in as string!
+	var customerName = request.params.name;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStore = new PatronStore();
@@ -227,30 +227,31 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemReward = new RedeemReward();
 	redeemReward.set("customer_name", customerName);
-	redeemReward.set("title", title);
+	redeemReward.set("title", rewardTitle);
 	redeemReward.set("num_punches", numPunches);
 	redeemReward.set("is_redeemed", false);
 	redeemReward.set("PatronStore", patronStore);
 	
 	var Store = Parse.Object.extend("Store");
+	var store;
     var storeQuery = new Parse.Query(Store);
-    storeQuery.equalTo("store_id", storeId);
 	
-	redeemReward.save().then(function(redeemReward) {
-		console.log("RedeemReward save success.");
-		return storeQuery.get(storeId);
+	storeQuery.get(storeId).then(function(storeResult) {
+		console.log("Store fetch success.");
+		store = storeResult;
+		return redeemReward.save();
 		
 	}, function(error) {
-			console.log("RedeemReward save failed.");
+			console.log("Store fetch failed.");
 			response.error("error");
 			
-	}).then(function(store) {
-			console.log("Store fetch success.");
+	}).then(function(redeemReward) {
+			console.log("RedeemReward save success.");
 			store.relation("RedeemRewards").add(redeemReward);
 			return store.save();
 					
 	}, function(error) {
-			console.log("Store fetch failed.");
+			console.log("RedeemReward save failed.");
 			response.error("error");	
 			
 	}).then(function(store) {

@@ -42,23 +42,23 @@ function validate(which, next) {
 	<div id="page-content">
 		<div id="signup-content">
 			<aside class="col1">
-				<h2>Sign-up below and a dedicated account manager will contact you within 24 hours to get you up and running.</h2>
+				<h2>Fill out the form below and a dedicated account manager will contact you within 24 hours to get you up and running.</h2>
 				<div id="signup-steps-box">
 					<div id="steps-double-line"></div>
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_one.png" %}" alt=""></div>
-						<p class="step-des">Once you fill out this form, we will contact you whitin 24 hours.</p>
+						<p class="step-des">Fill in the information below.</p>
 					</div>
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_two.png" %}" alt=""></div>
-						<p class="step-des">We will activate your Dashboard and help you customize your rewards (if you'd like our input).</p>
+						<p class="step-des">An account manager will reach out to you within a few hours to answer all of your questions. He will activate your dashboard and help you set up your rewards (if you'd like his input).</p>
 					</div>
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_three.png" %}" alt=""></div>
-						<p class="step-des">Your employees will be able to download the Retailer App and start punching right away.</p>
+						<p class="step-des">You'll be ready roll! Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
 					</div>
 				</div>
 				
