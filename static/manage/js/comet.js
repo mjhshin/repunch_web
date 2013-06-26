@@ -182,10 +182,6 @@ $(document).ready(function(){
         // incoming redemptions
         if (res.hasOwnProperty('redemptions') &&
                 res.redemptions.length > 0){
-            // remove placeholder when empty
-            if ($("#no-redemptions").length > 0){
-                $("#no-redemptions").remove();
-            }
             // workbench page
             var redemptions = res.redemptions;
             for (var i=0; i<redemptions.length; i++){
@@ -199,7 +195,29 @@ $(document).ready(function(){
                 if (!x.hasClass("odd")){
                     odd = "odd";
                 }
+                var d = new Date(redemptions[i].createdAt);
+                var hour = d.getHours();
+                var minute = new String(d.getMinutes());
+                var ampm;
+                if (hour > 12){
+                    ampm = "p.m.";
+                } else {
+                    ampm = "a.m.";
+                }
+                if (hour > 12){
+                    hour = hour - 12;
+                }
+                hour = new String(hour);
+                if (hour.length < 2){
+                    hour = "0" + hour;
+                }
+                if (minute.length < 2){
+                    minute = "0" + minute;
+                }
+                d = hour + ":" + minute + " " + ampm;
                 var content = "<div class='tr " + odd + "'>" +
+				    "<div class='td redemption_time'>" +
+				    d + "</div>" +
 				    "<div class='td redemption_customer_name'>" +
 				    redemptions[i].customer_name + "</div>" +
 		            "<div class='td redemption_title'>" +
@@ -215,6 +233,12 @@ $(document).ready(function(){
 		        } else {
 		            x.after(content);
 		        }
+		        
+            }
+            
+            // remove placeholder when empty
+            if ($("#no-redemptions").length > 0){
+                $("#no-redemptions").remove();
             }
             
             // bind
