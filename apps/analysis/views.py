@@ -195,7 +195,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
            
             now = datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
-            age_ranges = [(1, 0, -20), (2, -20,-29), (3, -30, -39), (4, -40, -49), (5, -50, -200)]
+            age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -40), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
                 start_dob = start_dob.replace(hour=0, minute=0, 
@@ -238,7 +238,7 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             
             now = datetime.now()
             rows = [start.strftime("%m/%d/%Y")+' - '+end.strftime("%m/%d/%Y"), 0, 0, 0, 0, 0]
-            age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -39), (4, -40, -50), (5, -50, -200)]
+            age_ranges = [(1, 0, -20), (2, -20,-30), (3, -30, -40), (4, -40, -50), (5, -50, -200)]
             for (idx, start_age, end_age) in age_ranges:
                 start_dob = now + relativedelta(years=end_age)
                 start_dob = start_dob.replace(hour=0, minute=0, 
