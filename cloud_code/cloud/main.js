@@ -384,14 +384,11 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      employees_pending (count)
 //      employees_pending_ids (String array)
 //      redemption_ids (String array)
-//      past_hour (UTC datetime for redemptions)
 //
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
-//      feedback_unread (if changed)
 //      feedbacks (new objects) (if feedback_unread changed)
-//      employees_pending (if changed)
 //      employees (new objects) (if employees_pending changed)
 //      redemptions (latest redemptions the past hour limit of 20)
 //
@@ -407,7 +404,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
     var redemption_ids = request.params.redemption_ids;
-    var past_hour = request.params.past_hour;
     var store, result = new Object();
     
     var storeQuery = new Parse.Query(Store);
@@ -444,45 +440,26 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         var rmrq = store.relation("ReceivedMessages").query();
         rmrq.equalTo("is_read", false);
         rmrq.equalTo("message_type", "feedback");
+        rmrq.notContainedIn("objectId", feedback_unread_ids);
         return rmrq.find();
     }).then(function(newFeedbacks){
-        if(newFeedbacks.length != feedback_unread &&
-            newFeedbacks.length > 0){
-            result.feedbacks = new Array();
-            // TODO just use notContainedIn and check for the length
-            // serverside!
-            result.feedback_unread = newFeedbacks.length;
-            for (var i=0; i<newFeedbacks.length; i++){
-                if (feedback_unread_ids.indexOf(newFeedbacks[i].id)
-                        < 0){
-                      result.feedbacks.push(newFeedbacks[i]);
-                }
-            }
+        if(newFeedbacksnewFeedbacks.length > 0){
+            result.feedbacks = newFeedbacks;
         }
     
         // employees_pending
         var eprq = store.relation("Employees").query();
         eprq.equalTo("status", "Pending");
+        eprq.notContainedIn("objectId", employees_pending_ids);
         return eprq.find();
     }).then(function(pendingEmployees){
-        if(pendingEmployees.length != employees_pending &&
-            pendingEmployees.length > 0){
-            result.employees = new Array();
-            // TODO just use notContainedIn and check for the length
-            // serverside!
-            result.employees_pending = pendingEmployees.length;
-            for (var i=0; i<pendingEmployees.length; i++){
-             if (employees_pending_ids.indexOf(pendingEmployees[i].id)
-                        < 0){
-                      result.employees.push(pendingEmployees[i]);
-                }
-            } 
+        if(pendingEmployees.length > 0){
+            result.employees = pendingEmployees;
         }
         
         // redemptions
         var rrq = store.relation("RedeemRewards").query();
         rrq.descending("createdAt");
-        rrq.greaterThanOrEqualTo("createdAt", new Date(past_hour));
         rrq.limit(20);
         // TODO remove this
         rrq.notContainedIn("objectId", redemption_ids);

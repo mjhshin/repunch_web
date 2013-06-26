@@ -63,7 +63,6 @@ def manage_refresh(request):
                                     request.session),
             "employees_pending_ids": employees_pending_ids,
             "redemption_ids": redemption_ids,
-            "past_hour": str(timezone.now()+relativedelta(hours=-1)),
         }, timeout=RETAILER_REFRESH_TIMEOUT)
         
         # process results
@@ -88,35 +87,34 @@ def manage_refresh(request):
             data['patronStore_count'] = patronStore_count
             request.session['patronStore_count'] = patronStore_count
         # feedback_unread
-        feedback_unread = results.get('feedback_unread')
-        if feedback_unread:
+        feedbacks = results.get('feedbacks')
+        if feedbacks:
+            data['feedbacks'] = []
+            for feedback in feedbacks:
+                m = Message(**feedback)
+                messages_received_list.insert(0, m)
+                data['feedbacks'].append(m.jsonify())
+            request.session['messages_received_list'] =\
+                messages_received_list
+            feedback_unread = 0
+            for each in messages_received_list:
+                if not each.is_read:
+                    feedback_unread += 1
             data['feedback_unread'] = feedback_unread
             request.session['feedback_unread'] = feedback_unread
-            feedbacks = results.get('feedbacks')
-            # should not be none! If so, the the count was changed
-            # without adding the feedback to the store's relation
-            if feedbacks:
-                data['feedbacks'] = []
-                for feedback in feedbacks:
-                    m = Message(**feedback)
-                    messages_received_list.insert(0, m)
-                    data['feedbacks'].append(m.jsonify())
-                request.session['messages_received_list'] =\
-                    messages_received_list
         # employees_pending
-        employees_pending = results.get("employees_pending")
-        if employees_pending:
+        employees = results.get("employees")
+        if employees:
+            data['employees'] = []
+            for emp in employees:
+                e = Employee(**emp)
+                employees_pending_list.insert(0, e)
+                data['employees'].append(e.jsonify())
+            request.session['employees_pending_list'] =\
+                employees_pending_list
+            employees_pending = len(employees_pending_list)
             data['employees_pending'] = employees_pending
             request.session["employees_pending"] = employees_pending
-            employees = results.get("employees")
-            if employees:
-                data['employees'] = []
-                for emp in employees:
-                    e = Employee(**emp)
-                    employees_pending_list.insert(0, e)
-                    data['employees'].append(e.jsonify())
-                request.session['employees_pending_list'] =\
-                    employees_pending_list
         # redemptions
         reds, redemps = results.get("redemptions"), []
         if reds:
