@@ -3,6 +3,33 @@
 //
 //
 ////////////////////////////////////////////////////
+Parse.Cloud.define("register_patron", function(request, response) {
+    
+});
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("register_patron_facebook", function(request, response) {
+    
+});
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("register_employee", function(request, response) {
+    
+});
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
 Parse.Cloud.define("assign_punch_code", function(request, response) {
     var PunchCode = Parse.Object.extend("PunchCode");
     var query = new Parse.Query(PunchCode);
@@ -657,6 +684,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	message.set("is_read", false);
 	message.set("sender_name", senderName);
 	message.set("store_id", storeId);
+	message.set("patron_id", patronId);
 	message.set("subject", subject);
 	message.set("body", body);
 	
