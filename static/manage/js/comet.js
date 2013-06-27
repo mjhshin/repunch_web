@@ -14,10 +14,9 @@ $(document).ready(function(){
     function onRedeem(rowId){
         var row = $("#" + rowId);
         var rewardId = $("#" + rowId + " input[type=hidden]").val();
-        var customerName = $("#" + rowId + " div:nth-child(2)").text();
-        var title = $("#" + rowId + " div:nth-child(3)").text();
-        var numPunches = $("#" + rowId + " div:nth-child(4)").text();
-        alert(rewardId + customerName + title + numPunches);
+        var customerName = $("#" + rowId + " div:nth-child(3)").text();
+        var title = $("#" + rowId + " div:nth-child(4)").text();
+        var numPunches = $("#" + rowId + " div:nth-child(5)").text();
         $.ajax({
             url: urlRedeem,
             data: {"redeemRewardId":rowId,
@@ -92,7 +91,7 @@ $(document).ready(function(){
     
     // bind
     $("#redemption div.tr div.td a").click(function(){
-        onRedeem($(this).attr("id"));
+        onRedeem($(this).attr("name"));
     });
     
     function mainComet(res, status, xhr) {
@@ -278,7 +277,7 @@ $(document).ready(function(){
 				    "<div class='td redemption_punches'>" +
 				    redemptions[i].num_punches + "</div>" +
 				    "<div class='td redemption_redeem'>" +
-				    "<a id='" + redemptions[i].objectId +
+				    "<a name='" + redemptions[i].objectId +
 				        "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
 		            "</div>";
 		        x.before(content);
@@ -292,7 +291,7 @@ $(document).ready(function(){
             
             // bind
             $("#redemption div.tr div.td a").click(function(){
-                onRedeem($(this).attr("id"));
+                onRedeem($(this).attr("name"));
             });
             
             // remove the last if greater than 40

@@ -26,6 +26,8 @@ def index(request):
     
 @login_required
 def redeem(request):
+    return HttpResponse(json.dumps({"result":1}), 
+                        content_type="application/json")
     """ returns json object. result is 0 if fail, 1 if success """
     if request.method == "GET" or request.is_ajax():
         redeemId = request.GET.get('redeemRewardId')

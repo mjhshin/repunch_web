@@ -37,10 +37,16 @@
 	            id="punch-loading" />
 	    </form> 
     </div>
+    
+    <div class="section" style="margin-top:50px;">
+		<h2 style="margin-bottom:10px;">Redemptions</h2>
+		<div class="tab-container">
+			<div class="tab active" id="tab-pending">Pending</div>
+			<div class="tab" id="tab-history">History</div>
+		</div>
 	
-	<div class="section" id="redemption">
-		<h2 style="margin-bottom:10px;">Pending Redemptions</h2>
-		<div class="white-box table tab-body" style="display: block;">
+	<div id="redemption">
+		<div class="white-box table tab-body active" id="tab-body-pending">
 			<div class="table-header">
 				<div class="th sorted desc not-sortable" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
@@ -67,7 +73,7 @@
 				<div class="td redemption_punches">
 				{{ redemp.num_punches }}</div>
 				<div class="td redemption_redeem">
-				<a id="{{redemp.objectId}}" style="color:blue;cursor:pointer;">redeem</a></div>
+				<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">redeem</a></div>
 			</div>
 			{% empty %}
 			<div class="tr " id="no-redemptions">
@@ -77,9 +83,8 @@
 		</div>
 	</div>
 	
-	<div class="section" id="redemption-past">
-		<h2 style="margin-bottom:10px;">Past Redemptions</h2>
-		<div class="white-box table tab-body" style="display: block;">
+	<div id="redemption-past">
+		<div class="white-box table tab-body" id="tab-body-history">
 			<div class="table-header">
 				<div class="th sorted desc not-sortable" id="header-redemption_time-past">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_customer_name-past">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
@@ -116,5 +121,6 @@
 		</div>
 	</div>
 	
+	</div> {# end section class #}
 	
 {% endblock %}
