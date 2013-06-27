@@ -97,8 +97,10 @@ def edit(request, reward_id):
                     old_reward["redemption_count"]
                 reward['reward_id'] = old_reward['reward_id']   
                 store.array_remove('rewards', [old_reward])
+            elif len(ids) == 0:
+                reward['reward_id'] = 0
             else:
-                reward['reward_id'] = ids[-1] + 1   
+                reward['reward_id'] = ids[-1] + 1
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None

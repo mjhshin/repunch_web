@@ -649,7 +649,8 @@ class ParseObject(object):
             elif key.endswith("_avatar"):
                 data[key] = format_file(value)
             # GeoPoint
-            elif self.__dict__.get("coordinates"):
+            elif self.__dict__.get("coordinates") and\
+                value and len(value) == 2:
                 data[key] = format_geopoint(value[0], value[1])
             # regular attributes
             else:
