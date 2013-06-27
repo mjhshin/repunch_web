@@ -16,15 +16,12 @@ def index(request):
     # utc time. We need the local time and then convert it to utc
     today = timezone.make_aware(datetime.now(), 
                     SESSION.get_store_timezone(request.session))
-    yesterday = today + relativedelta(days=-1)
-    yesterday = yesterday.replace(hour=0, minute=0, second=0)
-    yesterday = timezone.localtime(yesterday, tzutc())
     data = {"workbench_nav":True,
         "redemptions":SESSION.get_redemptions(request.session),
         "settings":SESSION.get_settings(request.session),
         "past_redemptions":\
             SESSION.get_redemptions_past(request.session),
-        "yesterday":yesterday}
+        "today":today}
     return render(request, 'manage/workbench.djhtml', data)
     
 @login_required

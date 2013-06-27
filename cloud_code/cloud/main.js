@@ -75,7 +75,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			response.error("error");
 		}
 	});
-	// TODO ADD to store relation
+	// TEST ADD to store relation
 	function addPatronStore() {
 		console.log("customer's first punch at this store, adding new PatronStore.");
 		var patronStore = new PatronStore();
@@ -92,6 +92,9 @@ Parse.Cloud.define("punch", function(request, response) {
 			console.log("Store query failed.");
 			response.error("error");	
 			
+		}).then(function(storeResult){
+		    storeResult.relation("PatronStores").add(patron);
+		    return storeResult.save();
 		}).then(function(storeResult) { //get Store
 			console.log("Store fetched");
 			patronStore.set("Store", storeResult);

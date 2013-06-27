@@ -64,6 +64,7 @@ def get_redemptions(session):
 def get_redemptions_past(session):
     """ 
     returns all the redeemed redemptions.
+    Ordered based on updatedAt attr.
     """
     if "redemptions_past" not in session:
         store = get_store(session)
@@ -71,7 +72,8 @@ def get_redemptions_past(session):
                         order="-createdAt")
         if redemptions is None:
             redemptions = []
-            
+        else:
+            redemptions.sort(key=lambda k: k.updatedAt, reverse=True)
         store.redeemRewards = None
         session['store'] = store
         session['redemptions_past'] = redemptions

@@ -55,8 +55,8 @@
 		        class="tr  {% cycle '' 'odd' %}">
 		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time">
-				{% if redemp.createdAt <= yesterday %}
-				{{ redemp.createdAt|date:"F t" }}
+				{% if redemp.createdAt <= today %}
+				{{ redemp.createdAt|date:"F d" }}
 				{% else %}
 				{{ redemp.createdAt|date:"h:i a" }}
 				{% endif %}</div>
@@ -81,11 +81,11 @@
 		<h2 style="margin-bottom:10px;">Past Redemptions</h2>
 		<div class="white-box table tab-body" style="display: block;">
 			<div class="table-header">
-				<div class="th sorted desc not-sortable" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			<div class="th not-sortable" id="header-redemption_redeem"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th sorted desc not-sortable" id="header-redemption_time-past">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_customer_name-past">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_title-past">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-redemption_punches-past">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th not-sortable" id="header-redemption_redeem-past"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			
 			</div>
 			
@@ -93,19 +93,19 @@
 		    <div id="{{redemp.objectId}}" 
 		        class="tr  {% cycle '' 'odd' %}">
 		        <input type="hidden" value="{{redemp.reward_id}}" />
-				<div class="td redemption_time">
-				{% if redemp.createdAt <= yesterday %}
-				{{ redemp.createdAt|date:"F t" }}
+				<div class="td redemption_time-past">
+				{% if redemp.updatedAt.day < today.day %}
+				{{ redemp.updatedAt|date:"F d" }}
 				{% else %}
-				{{ redemp.createdAt|date:"h:i a" }}
+				{{ redemp.updatedAt|date:"h:i a" }}
 				{% endif %}</div>
-				<div class="td redemption_customer_name">
+				<div class="td redemption_customer_name-past">
 				{{ redemp.customer_name }}</div>
-				<div class="td redemption_title">
+				<div class="td redemption_title-past">
 				{{ redemp.title }}</div>
-				<div class="td redemption_punches">
+				<div class="td redemption_punches-past">
 				{{ redemp.num_punches }}</div>
-				<div class="td redemption_redeem">
+				<div class="td redemption_redeem-past">
 				</div>
 			</div>
 			{% empty %}

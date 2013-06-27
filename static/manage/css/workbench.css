@@ -25,6 +25,26 @@ form#punch-form{
     width:80px;
 }
 
+#header-redemption_time-past, .redemption_time-past{
+    width:80px;
+}
+
+#header-redemption_title-past, .redemption_title-past{
+    width:160px;
+}
+
+#header-redemption_punches-past, .redemption_punches-past{
+    width:80px;
+}
+
+#header-redemption_customer_name-past, .redemption_customer_name-past{
+    width:180px;
+}
+
+#header-redemption_redeem-past, .redemption_redeem-past{
+    width:80px;
+}
+
 form#punch-form input{
     width:100px;
 }

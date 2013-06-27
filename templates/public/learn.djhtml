@@ -25,6 +25,24 @@ ul.orangy li:before {
     font-size:2em;
     color:orange;
 }
+
+ul.not-orangy {
+    list-style-type:none;
+    position:relative;left:0px;
+}
+
+ul.not-orangy li { 
+    margin:10px 10px;
+    position:relative;l
+}
+
+ul.not-orangy li:before {
+    content: "*";
+    position:relative; top:4px;
+    margin-right:8px;
+    font-size:1em;
+    color:orange;
+}
 </style>
 {% endblock %}
 
@@ -111,13 +129,13 @@ ul.orangy li:before {
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
 							<li>Repunch is completely free to start.</li>
-							<ul>
+							<ul class="not-orangy">
 								<li>You only begin paying a modest monthly fee once you have a significant number of users getting punched at your store.</li>
 								<li>As you enter into paid tiers, you gain access to special services like premium marketing campaigns.</li>
 							</ul>
 							<li>No hardware or POS integration required. You can be up and running in minutes!</li>
 							<li>You can grant punches and validate redeemed rewards in a couple of ways.</li>
-							<ul>
+							<ul class="not-orangy">
 								<li>Input consumers' Punch Codes right into the dashboard, which you can have open on your internet-enabled POS, computer, or tablet.</li>
 								<li>Use our Retailer Mobile App. Your employees can download the app onto their devices and then begin granting punches once you grant them permission.</li>
 								<li>If you would prefer to have Smartphone(s) specifically to run the Retailer App, we can supply these to you at cost.</li>
@@ -125,8 +143,7 @@ ul.orangy li:before {
 							<li>We perform automatic fraud monitoring that let's you know whenever there is suspicious activity. Details include the name of the employee and the abnormal quantity or time of the punches.</li>
 			    			<li>If you would prefer to have Smartphone(s) specifically to run the Repunch retailer app, we can supply these to you at cost.</li>
 						</ul>
-			</p>
-	    </section>
+                    </aside>						
 				</div>						
 			</div>
 		</section>

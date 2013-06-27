@@ -5,6 +5,7 @@
 
 
 // TODO actually implement comet approach
+// TODO cleanup code (appending to pending and present same code!)
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
@@ -13,6 +14,10 @@ $(document).ready(function(){
     function onRedeem(rowId){
         var row = $("#" + rowId);
         var rewardId = $("#" + rowId + " input[type=hidden]").val();
+        var customerName = $("#" + rowId + " div:nth-child(2)").text();
+        var title = $("#" + rowId + " div:nth-child(3)").text();
+        var numPunches = $("#" + rowId + " div:nth-child(4)").text();
+        alert(rewardId + customerName + title + numPunches);
         $.ajax({
             url: urlRedeem,
             data: {"redeemRewardId":rowId,
@@ -23,6 +28,50 @@ $(document).ready(function(){
                     row.css("background", "#CCFF99");
                     row.html("Successfully validated redemption.");
                     row.fadeOut(3000, function(){
+                        // append to past
+                        var odd = "", 
+                            x=$("#redemption-past div.tab-body div.tr").first();
+                        if (!x.hasClass("odd")){
+                            odd = "odd";
+                        }
+                        var d = new Date();
+                        var hour = d.getHours();
+                        var minute = new String(d.getMinutes());
+                        var ampm;
+                        if (hour > 12){
+                            ampm = "p.m.";
+                        } else {
+                            ampm = "a.m.";
+                        }
+                        if (hour > 12){
+                            hour = hour - 12;
+                        }
+                        hour = new String(hour);
+                        if (hour.length < 2){
+                            hour = "0" + hour;
+                        }
+                        if (minute.length < 2){
+                            minute = "0" + minute;
+                        }
+                        d = hour + ":" + minute + " " + ampm;
+                        var content = "<div class='tr " + odd + "' " + 
+                            "id='"+ rowId + "'>" +
+		                    "<input type='hidden'" + 
+		                    " value='" + rewardId + "'/>" + 
+				            "<div class='td redemption_time-past'>" +
+				            d + "</div>" +
+				            "<div class='td redemption_customer_name-past'>" +
+				            customerName + "</div>" +
+		                    "<div class='td redemption_title-past'>" +
+				            title + "</div>" +
+				            "<div class='td redemption_punches-past'>" +
+				            numPunches + "</div>" +
+				            "<div class='td redemption_redeem-past'>" +
+				            "</div>" +
+		                    "</div>";
+		                x.before(content);
+                        
+                        // then remove
                         $(this).remove();
                         if ($("#redemption div.tab-body div.tr").length < 1){
                             $("#redemption div.tab-body div.table-header").after(
@@ -192,13 +241,7 @@ $(document).ready(function(){
             // workbench page
             var redemptions = res.redemptions;
             for (var i=0; i<redemptions.length; i++){
-                var odd = "", x, 
-                   desc=$("#header-redemption_time").hasClass("desc");
-                if (desc){
-                    x=$("#redemption div.tab-body div.tr").first();
-                } else {
-                    x=$("#redemption div.tab-body div.tr").last();
-                }
+                var odd = "", x=$("#redemption div.tab-body div.tr").first();
                 if (!x.hasClass("odd")){
                     odd = "odd";
                 }
@@ -224,9 +267,9 @@ $(document).ready(function(){
                 d = hour + ":" + minute + " " + ampm;
                 var content = "<div class='tr " + odd + "' " + 
                     "id='"+ redemptions[i].objectId+ "'>" +
-				    "<div class='td redemption_time'>" +
 		            "<input type='hidden'" + 
 		            " value='" + redemptions[i].reward_id + "'/>" + 
+				    "<div class='td redemption_time'>" +
 				    d + "</div>" +
 				    "<div class='td redemption_customer_name'>" +
 				    redemptions[i].customer_name + "</div>" +
@@ -238,11 +281,7 @@ $(document).ready(function(){
 				    "<a id='" + redemptions[i].objectId +
 				        "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
 		            "</div>";
-		        if (desc){
-		            x.before(content);
-		        } else {
-		            x.after(content);
-		        }
+		        x.before(content);
 		        
             }
             

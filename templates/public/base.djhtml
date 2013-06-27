@@ -128,8 +128,8 @@ $(document).ready(function(){
 				<li class="menuitem"><a href="{% url 'public_jobs' %}">Jobs</a></li>
 				<li class="menuitem">
 					<span>follow us:</span>
-					<a href="#"><img src="{% static "public/images/icon_facebook.png" %}" alt="Follow Us in Facebook"></a>
-					<a href="#"><img src="{% static "public/images/icon_twitter.png" %}" alt="Follow Us in twitter"></a>
+					<a href="https://www.facebook.com/Repunch"><img src="{% static "public/images/icon_facebook.png" %}" alt="Follow Us in Facebook"></a>
+					<a href="https://twitter.com/repunchapp"><img src="{% static "public/images/icon_twitter.png" %}" alt="Follow Us in twitter"></a>
 				</li>
 			</ul>
 			<div id="footer-links">
