@@ -3,36 +3,16 @@
 
 {% block title %}Sign-up{% endblock %}
 
-{% block styles %}
-<link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
-{% endblock %}
-
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
 <script src="{% static 'public/js/signup.js' %}"></script>
-<script type = "text/javascript">
-// fill in the values of the 3 input boxes
+<script>
+// other
 $(document).ready(function(){
-    var p_num = "{{ store_form.phone_number.value }}";
-    if (p_num == "None"){
-        return;
-    }
-    $("#Ph1").val(p_num.substring(0,3));
-    $("#Ph2").val(p_num.substring(3,6));
-    $("#Ph3").val(p_num.substring(6,10));
+    $( ".question_mark" ).tooltip({
+      track: true
+    });
 });
-
-// stolen from http://www.codingforums.com/showthread.php?t=202208
-// laziness ftw!
-function validate(which, next) {
-    var val = which.value;
-    val = val.replace(/[^0-9]/g,"");  // strip non-digits
-    which.value = val;
-    next = "Ph" + next;
-    if (val.length == 3) {  // field completed
-        document.getElementById(next).focus();
-    }
-}
 </script>
 {% endblock %}
 
@@ -176,7 +156,7 @@ function validate(which, next) {
 						        style="width:40px;" value="1" />
 						</span>
 						
-						<img class="question_mark"
+						<img class="question_mark" 
 						    src="{% static 'public/images/question_mark.png' %}" 
 						    style="position:relative;top:4px;left:4px;"
 						    title="You can order smartphones from us. We will charge you $130 for each smartphone.You can order these within the Dashboard at any time." />

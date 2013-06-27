@@ -160,8 +160,7 @@ def upgrade(request):
                                             form.data['cc_cvv'])
             except Exception as e:
                 form = SubscriptionForm(subscription.__dict__.copy())
-                form.errors['__all__'] =\
-                    form.error_class([e])
+                form.errors['__all__'] = form.error_class([e])
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)

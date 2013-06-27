@@ -60,7 +60,6 @@ $(document).ready(function(){
             } else {
                 dl.dialog( "option", "height", dim );
             }
-            loading.hide();
         }
         
         // make the login request to the server
@@ -74,24 +73,27 @@ $(document).ready(function(){
                 2 - subscription is not active
                 3 - success */
             if (res.code == 3){
-                messageContainer.html("<span style='color:green;'>Redirecting to dashboard.</span>");
                 window.location.replace(url_redirect);
                 finish(320);
             } else if (res.code == 2){
                 messageContainer.html("<span>Your account is not yet active.<br/>" +
                                 " We will get in touch with you soon.</span>");
                 finish(340);
+                loading.hide();
             } else if (res.code == 1){
                 messageContainer.html("<span>The username or password you entered is incorrect.</span>");
                 finish(340);
+                loading.hide();
             } else {
                 // same as 1 but may want to change later
                 messageContainer.html("<span>The username or password you entered is incorrect.</span>");
                 finish(340);
+                loading.hide();
             }
         }).fail(function(){  // should not go here unless server error
             messageContainer.html("<span>Server Error</span>");
             finish(320);
+            loading.hide();
         });
         
         return false;

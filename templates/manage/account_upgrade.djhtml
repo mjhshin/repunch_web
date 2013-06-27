@@ -6,6 +6,14 @@
 
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
+<script>
+// other
+$(document).ready(function(){
+    $( ".question_mark" ).tooltip({
+      track: true
+    });
+});
+</script>
 {% endblock %}
 
 {% block content %}

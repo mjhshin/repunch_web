@@ -17,6 +17,22 @@ class StoreSignUpForm(forms.Form):
     last_name = forms.CharField(max_length=100)
     phone_number = forms.CharField()
     
+    def get_full_address(self):
+        return self.data['street'] + ", " + self.data['city']  + ", " +\
+            self.data['state'] + ", " + self.data['zip']  + ", " +\
+            self.data['country']
+                                    
+    def clean_street(self):
+        data = self.cleaned_data['street']
+        full_address = " ".join(\
+            self.get_full_address().split(", "))
+        map_data = rputils.get_map_data(full_address)
+        if not map_data.get('coordinates'):
+            raise forms.ValidationError("Enter a valid adress, city, "+\
+                    "state, and/or zip.")
+            
+        return data
+    
     def clean_phone_number(self):
         data = self.cleaned_data['phone_number']
         if len(data) < 10:
@@ -34,6 +50,22 @@ class StoreForm(forms.Form):
     phone_number = forms.CharField(max_length=255)
     store_description = forms.CharField(max_length=200, 
                                     widget=forms.Textarea())
+                                    
+    def get_full_address(self):
+        return self.data['street'] + ", " + self.data['city']  + ", " +\
+            self.data['state'] + ", " + self.data['zip']  + ", " +\
+            self.data['country']
+                                    
+    def clean_street(self):
+        data = self.cleaned_data['street']
+        full_address = " ".join(\
+            self.get_full_address().split(", "))
+        map_data = rputils.get_map_data(full_address)
+        if not map_data.get('coordinates'):
+            raise forms.ValidationError("Enter a valid adress, city, "+\
+                    "state, and/or zip.")
+            
+        return data
                                     
     def clean_phone_number(self):
         data = self.cleaned_data['phone_number']

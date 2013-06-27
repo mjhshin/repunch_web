@@ -90,15 +90,6 @@ jQuery(document).ready(function() {
 });
 </script>
 <!---Accordion Javascript--->
-
-<script>
-// other
-$(document).ready(function(){
-    $( document ).tooltip({
-      track: true
-    });
-});
-</script>
 </head>
 <body>
 	<header id="header-wrapper">

@@ -224,7 +224,6 @@ def sign_up(request):
                     "store_timezone"))
             store = Store(**postDict)
             store.store_timezone = tz.zone
-            # store.Subscription = subscription.objectId TODO
             # set defaults for these guys to prevent 
             # ParseObjects from making parse calls repeatedly
             store.punches_facebook = 0
@@ -246,8 +245,7 @@ def sign_up(request):
                             "alias":alias,
                             "name":name })
             # coordinates
-            ## do and validate this in address
-            """
+            # the call to get map data is actually also in the clean 
             full_address = " ".join(\
                 store.get_full_address().split(", "))
             map_data = rputils.get_map_data(full_address)
@@ -255,7 +253,6 @@ def sign_up(request):
             store.set("neighborhood", 
                 store.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
-            """
             
             # create settings
             settings = Settings(retailer_pin=\

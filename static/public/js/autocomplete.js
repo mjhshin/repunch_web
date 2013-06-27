@@ -69,6 +69,7 @@ $(document).ready(function() {
       }, 
     });
 
+    /* Done in signup.js
     // format value of categories before submition
     $("#signup-form").submit(function(){
         var cats = ''
@@ -78,5 +79,6 @@ $(document).ready(function() {
         $( "#categories" ).val(cats);
         return true;
     });
+    */
 
 });

@@ -53,6 +53,12 @@ $(document).ready(function(){
         $("#id_city2").attr("disabled", false);
         $("#id_state2").attr("disabled", false);
         $("#id_zip2").attr("disabled", false);
+        // format the cats first
+        var cats = '';
+        $(".closable-box").each(function(){
+            cats = cats + $(this).text() + ',';
+        });
+        $( "#categories" ).val(cats);
         var data = $("#signup-form").serialize();
         
         $.post(url, data, function(res, status, xhr) {

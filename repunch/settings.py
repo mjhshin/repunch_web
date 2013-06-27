@@ -56,7 +56,7 @@ REST_CONNECTION_META = {
 USER_CLASS = "Account"
 
 
-# TODO USE LIVE
+# TODO USE LIVE and set price back to 130!!!!!
 # PAYPAL SANDBOX credentials need to use LIVE for the real thing
 # endpoint = api.sandbox.paypal.com
 PAYPAL_CLIENT_ID = "AaRn0BC74DY7UloGyRv8DBt8VmfK2QpDuTqQF_LYVTpejKftwlUCueD3jM7R"
