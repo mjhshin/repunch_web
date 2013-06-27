@@ -53,6 +53,7 @@
 			{% for redemp in redemptions %}
 		    <div id="{{redemp.objectId}}" 
 		        class="tr  {% cycle '' 'odd' %}">
+		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time">
 				{% if redemp.createdAt <= yesterday %}
 				{{ redemp.createdAt|date:"F t" }}
@@ -91,6 +92,7 @@
 			{% for redemp in past_redemptions %}
 		    <div id="{{redemp.objectId}}" 
 		        class="tr  {% cycle '' 'odd' %}">
+		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time">
 				{% if redemp.createdAt <= yesterday %}
 				{{ redemp.createdAt|date:"F t" }}

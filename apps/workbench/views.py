@@ -32,9 +32,14 @@ def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success """
     if request.method == "GET" or request.is_ajax():
         redeemId = request.GET.get('redeemRewardId')
-        res = cloud_call("validate_redeem", {"redeem_id":\
-                redeemId})
-                
+        rewardId = request.GET.get('rewardId') # as string
+        store = SESSION.get_store(request.session)
+        res = cloud_call("validate_redeem", {
+                "redeem_id":redeemId,
+                "store_id":store.get("objectId"),
+                "reward_id":rewardId,
+                })
+            
         if 'error' not in res:
             redemptions = SESSION.get_redemptions(request.session)
             i_remove = -1

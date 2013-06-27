@@ -26,6 +26,7 @@ class RedeemReward(ParseObject):
         self.customer_name = data.get("customer_name")
         self.is_redeemed = data.get("is_redeemed")
         self.num_punches = data.get("num_punches")
+        self.reward_id = data.get("reward_id")
         
         self.PatronStore = data.get('PatronStore')
         

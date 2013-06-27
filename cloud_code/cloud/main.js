@@ -75,7 +75,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			response.error("error");
 		}
 	});
-	
+	// TODO ADD to store relation
 	function addPatronStore() {
 		console.log("customer's first punch at this store, adding new PatronStore.");
 		var patronStore = new PatronStore();
@@ -216,10 +216,10 @@ Parse.Cloud.define("punch", function(request, response) {
 Parse.Cloud.define("request_redeem", function(request, response) {
 	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
-	var rewardId = request.params.reward_id;
+	var rewardTitle = request.params.title;
+	var rewardId = parseInt(request.params.reward_id);
 	var numPunches = parseInt(request.params.num_punches); //comes in as string!
 	var customerName = request.params.name;
-	var rewardTitle;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStore = new PatronStore();
@@ -231,6 +231,8 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	redeemReward.set("num_punches", numPunches);
 	redeemReward.set("is_redeemed", false);
 	redeemReward.set("PatronStore", patronStore);
+	redeemReward.set("reward_id", rewardId);
+	redeemReward.set("title", rewardTitle);
 	
 	var Store = Parse.Object.extend("Store");
 	var store;
@@ -239,17 +241,6 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	storeQuery.get(storeId).then(function(storeResult) {
 		console.log("Store fetch success.");
 		store = storeResult;
-		var rewards = store.get("rewards");
-		// update the store's rewards redemption_count
-		for (var i=0; i<rewards.length; i++){
-		    if (new String(rewards[i].reward_id) == rewardId){
-		        rewards[i].redemption_count += 1;
-		        rewardTitle = rewards[i].reward_name;
-	            redeemReward.set("title", rewardTitle);
-		        break;
-		    }
-		}
-		store.set("rewards", rewards);
 		
 		return redeemReward.save();
 		
@@ -288,7 +279,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	            badge: "Increment",
 	            name: customerName,
 	            num_punches: numPunches,
-	            title: rewardTitle
+	            title: rewardTitle,
 	        }
 	    }, {
 	        success: function() {
@@ -311,19 +302,38 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
+	var storeId = request.params.store_id;
+	var rewardId = parseInt(request.params.reward_id);
 	
-	var patronId, numPunches, rewardTitle;
+	var patronId, numPunches, rewardTitle, storeName;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
+	var Store = Parse.Object.extend("Store");
+	var storeQuery = new Parse.Query(Store);
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	redeemRewardQuery.include(["PatronStore.Patron"]);
 	
-	redeemRewardQuery.get(redeemId).then(function(redeemReward) {
+	storeQuery.get(storeId).then(function(store){
+	    var rewards = store.get("rewards");
+	    storeName = store.get("store_name");
+		// update the store's rewards redemption_count
+		for (var i=0; i<rewards.length; i++){
+		    if (rewards[i].reward_id == rewardId){
+		        rewards[i].redemption_count += 1;
+		        rewardTitle = rewards[i].reward_name;
+		        break;
+		    }
+		}
+		store.set("rewards", rewards);
+		
+		return store.save();
+	}).then(function(){
+	    return redeemRewardQuery.get(redeemId);
+	}).then(function(redeemReward) {
 		var patronStore = redeemReward.get("PatronStore");
 		console.log("RedeemReward fetch success.");
 		numPunches = redeemReward.get("num_punches");
-		rewardTitle = redeemReward.get("title");
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
@@ -361,11 +371,12 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	function executePush() {
 		var installationQuery = new Parse.Query(Parse.Installation);
 		installationQuery.equalTo("patron_id", patronId);
-		
 		Parse.Push.send({
 	        where: installationQuery,
 	        data: {
 	            title: rewardTitle,
+	            id: storeId, 
+	            name: storeName, 
 	            num_punches: numPunches,
 				action: "com.repunch.intent.REDEEM"
 	        }

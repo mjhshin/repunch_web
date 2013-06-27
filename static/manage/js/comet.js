@@ -10,19 +10,26 @@ $(document).ready(function(){
     var url = $("#comet_url").val();
     var urlRedeem = $("#redeem-url").val();
     
-    // TODO on click redeem function
     function onRedeem(rowId){
+        var row = $("#" + rowId);
+        var rewardId = $("#" + rowId + " input[type=hidden]").val();
         $.ajax({
             url: urlRedeem,
-            data: {"redeemRewardId":rowId}, 
+            data: {"redeemRewardId":rowId,
+                    "rewardId":rewardId }, 
             type: "GET",
             success: function(res){
-                var row = $("#" + rowId);
                 if (res.result == 1){
                     row.css("background", "#CCFF99");
                     row.html("Successfully validated redemption.");
                     row.fadeOut(3000, function(){
                         $(this).remove();
+                        if ($("#redemption div.tab-body div.tr").length < 1){
+                            $("#redemption div.tab-body div.table-header").after(
+                                "<div class='tr' id='no-redemptions'>" +
+				                "<div class='td'>No Redemptions</div>" +
+			                    "</div>");
+                        }
                     });
                 } else {
                     alert("Redemption failed");
@@ -215,8 +222,11 @@ $(document).ready(function(){
                     minute = "0" + minute;
                 }
                 d = hour + ":" + minute + " " + ampm;
-                var content = "<div class='tr " + odd + "'>" +
+                var content = "<div class='tr " + odd + "' " + 
+                    "id='"+ redemptions[i].objectId+ "'>" +
 				    "<div class='td redemption_time'>" +
+		            "<input type='hidden'" + 
+		            " value='" + redemptions[i].reward_id + "'/>" + 
 				    d + "</div>" +
 				    "<div class='td redemption_customer_name'>" +
 				    redemptions[i].customer_name + "</div>" +
