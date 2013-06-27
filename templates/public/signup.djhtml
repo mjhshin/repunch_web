@@ -241,7 +241,7 @@ function validate(which, next) {
 						<img class="question_mark"
 						    src="{% static 'public/images/question_mark.png' %}" 
 						    style="position:relative;top:4px;left:4px;"
-						    title="You can order smartphones from us. We will charge you $130 for each smartphone." />
+						    title="You can order smartphones from us. We will charge you $130 for each smartphone. You can order these within the Dashboard at any time." />
 					</div>
 					
 					<div style="clear: left;"></div>

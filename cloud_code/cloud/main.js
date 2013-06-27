@@ -549,7 +549,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var patronQuery = new Parse.Query(Patron);
     var patronStoreQuery = new Parse.Query(PatronStore);
     var installationQuery = new Parse.Query(Parse.Installation)
-    var filter = request.params.filter;
+    var filter = request.params.filter; // one means a reply
     var message, patron_ids = new Array(); // placeholder
 
     function addToPatronsInbox(patronStores) {
