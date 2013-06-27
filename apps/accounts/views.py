@@ -44,6 +44,7 @@ def settings(request):
             store.get('punches_facebook')
     
     # update the session cache
+    print store.__dict__
     request.session['store'] = store
     request.session['settings'] = settings
     

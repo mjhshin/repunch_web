@@ -88,7 +88,7 @@ def edit(request, message_id):
                 """
 
             # create the message
-            message = Message.objects().create(sender_name=\
+            message = Message(sender_name=\
                     store.get('store_name'), store_id=store.objectId)
             message.update_locally(request.POST.dict(), False)
             
@@ -111,8 +111,8 @@ def edit(request, message_id):
                 # already defaults to None but whatever.
                 message.set("offer_redeemed", None)
                 message.set('message_type', BASIC)
-
-            message.update()
+                
+            message.create()
             data['message'] = message
             # add to the store's relation
             store.add_relation("SentMessages_", [message.objectId]) 
