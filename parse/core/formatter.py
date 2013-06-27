@@ -49,9 +49,12 @@ def format_geopoint(latitude, longitude):
     """
     Returns the Parse GeoPoint __type or None.
     """
-    return { "__type": "GeoPoint",
+    try:
+        return { "__type": "GeoPoint",
                 "latitude": float(latitude),
                 "longitude": float(longitude) }
+    except ValueError:
+        return None
 
 def query(constraints, where_only=False):
     """
