@@ -16,7 +16,7 @@ def hash_password(password):
     # NOT USED ATM
     return hashlib.sha1(password).hexdigest()
 
-def login(request):
+def login(request, requestDict):
     """ 
     This combines Django's authenticate and login functions.
     The request.POST must contain a username and password.
@@ -34,8 +34,8 @@ def login(request):
     and 1 if subscription is not active.
     """
     res = parse("GET", "login", query=\
-                {"username":request.POST['username'],
-                 "password":request.POST['password']} )
+                {"username":requestDict.get('username'),
+                 "password":requestDict.get('password')} )
                     
     # TODO maybe share the session with same user on different browser
     if res and "error" not in res:
@@ -46,6 +46,9 @@ def login(request):
             subscription = store.get("subscription")
         
             if store.get('active'):
+                # flush the session first!
+                request.session.flush()
+            
                 request.session[SESSION_KEY] = res.get('sessionToken')
                 settings.fetchAll()
                 subscription = store.get("subscription")
@@ -63,7 +66,7 @@ def login(request):
                         
                 # If value is None, the session reverts to using 
                 # the global session expiry policy.
-                if "stay_in" in request.POST:
+                if "stay_in" in requestDict:
                     request.session.set_expiry(None)
                 # If value is 0, the user's session cookie will 
                 # expire when the user's Web browser is closed.

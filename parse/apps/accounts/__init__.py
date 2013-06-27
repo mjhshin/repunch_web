@@ -91,7 +91,7 @@ def order_placed(amount, store, account, connection=None):
         "Subscription Type: " + sub_type[store.get("subscription").get('subscriptionType')]['name'] + "\n" +\
         "Account is Active: " + str(store.get('active')) + "\n" +\
         "Amount Ordered: " + str(amount) + "\n" +\
-        "Total charged: $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n" +\
+        "Total charged (USD): $"  + str(PHONE_COST_UNIT_COST*int(amount)) + "\n" +\
         "\nPAYPAL INFO: \n" + invoice.to_message_plain()
         
     # send receipt to recipient

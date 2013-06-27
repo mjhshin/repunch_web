@@ -163,7 +163,7 @@ def manage_login(request):
     if request.method == 'POST' or request.is_ajax():
         form = LoginForm(request.POST)
         if form.is_valid(): 
-            c = login(request)
+            c = login(request, request.POST.dict().copy())
             c_type = type(c)
             if c_type is int:
                 if c == 0:

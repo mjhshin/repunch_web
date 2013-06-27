@@ -46,6 +46,7 @@ $(document).ready(function(){
         var url = $("#signup-form input[name=action]").val();
         var url_redirect = $("#signup-form input[name=redirect-url]").val();
         var url_home = $("#signup-form input[name=home-url]").val();
+        var url_signup2 = $("#signup-form input[name=signup2]").val();
         
         // need to enable again to serialize
         $("#id_address").attr("disabled", false);
@@ -53,6 +54,7 @@ $(document).ready(function(){
         $("#id_state2").attr("disabled", false);
         $("#id_zip2").attr("disabled", false);
         var data = $("#signup-form").serialize();
+        
         $.post(url, data, function(res, status, xhr) {
             $("#signing-up").hide();
             respType = xhr.getResponseHeader("content-type");
@@ -74,6 +76,9 @@ $(document).ready(function(){
                     $("#signing-up-time").show();
                     messageContainer.html("<span style='color:#DF7401;position:relative;top:4px;'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
+                } else if (res.code == 4){
+                    // go to part 2
+                    window.location.replace(url_signup2);
                 }
                 // active subscription. redirect to dashboard.
                 else if (res.code == 3){

@@ -165,7 +165,7 @@ class Invoice(ParseObject):
             "State: " + str(self.state) + "\n" +\
             "Payment Id: " + str(self.payment_id) + "\n" +\
             "Sale Id: " + str(self.sale_id) + "\n" +\
-            "Total: (USD)" + str(self.total) + "\n"
+            "Total (USD):" + str(self.total) + "\n"
         
     
 class Subscription(ParseObject):

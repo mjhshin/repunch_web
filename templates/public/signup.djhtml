@@ -42,7 +42,7 @@ function validate(which, next) {
 	<div id="page-content">
 		<div id="signup-content">
 			<aside class="col1">
-				<h2>Fill out the form below and a dedicated account manager will contact you within 24 hours to get you up and running.</h2>
+				<h2>Please fill out the form bellow to get started.</h2>
 				<div id="signup-steps-box">
 					<div id="steps-double-line"></div>
 					<div class="step-box">
@@ -74,6 +74,7 @@ function validate(which, next) {
 	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
 		        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
 		        <input type="hidden" name="home-url" value="{% url 'public_home' %}" />
+		        <input type="hidden" name="signup2" value="{% url 'public_signup2' %}" />
 				
 				    {# currently only supports countries in the US #}
 					<input type="hidden" name="country" id="id_country" value="US" />
@@ -82,16 +83,6 @@ function validate(which, next) {
 				    {{ store_form.store_name.errors }}
 				    <label for="id_store_name">Business Name</label>
 				    {{ store_form.store_name }}
-
-                    <div id="categories-box" class="ui-widget"
-                        {# offset issues #}
-                        {% if store_form.errors or account_form.errors or subscription_form.errors %}
-                        style="position:absolute;top:583px;"
-                        {% endif %}
-                    >
-                          <label for="categories">Categories (limit of 2)</label>
-                          <input id="categories" name="categories" />
-                    </div>
 					
 					{{ store_form.street.errors }}
 					<label for="id_street">Business Address</label>
@@ -114,6 +105,12 @@ function validate(which, next) {
 						{{ store_form.zip }}
 					</div>
 					<div class="clear-both"></div>
+					
+					<p>Store Data</p>
+					<div id="categories-box" class="ui-widget" >
+                          <label for="categories">Categories (limit of 2)</label>
+                          <input id="categories" name="categories" />
+                    </div>
 					
 					<p>Account Information</p>
 					<div class="floated">
@@ -153,102 +150,6 @@ function validate(which, next) {
 					<label for="id_confirm_password">Confirm Password</label>
 					{{ account_form.confirm_password }}					
 					<div class="clear-both"></div>
-					
-					<p>Credit Card Information</p>
-					<div class="floated">
-					{{ subscription_form.first_name2.errors }}
-					<label for="id_first_name2">First Name</label>
-					{{ subscription_form.first_name2 }}
-					</div>
-					
-					<div class="floated">
-					{{ subscription_form.last_name2.errors }}
-					<label for="id_last_name2">Last Name</label>
-					{{ subscription_form.last_name2 }}
-					</div>
-					
-					<div class="input-container" id="card_number_container">
-						{{ subscription_form.cc_number.errors }}
-						<label for="id_card_number" style="clear:left;">Card Number</label>
-						{{ subscription_form.cc_number }}
-						<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
-						<img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
-						<img src="{% static "manage/images/icon_discover.png" %}" alt="Discover" />
-						<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
-					</div>
-					
-					
-					{{ subscription_form.cc_cvv.errors }}
-					<label for="id_cvc">CVC</label>
-					{{ subscription_form.cc_cvv }}
-				
-				
-				
-					{{ subscription_form.cc_expiration.errors }}
-					<label for="id_expiration_month">Expiration</label>
-					{{ subscription_form.cc_expiration }}
-					
-					<br />
-					<p style="display:inline-block">Billing Address</p>
-					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as business address</label>
-					<input type="checkbox" id="same_address" />
-					
-				
-					{{ subscription_form.address.errors }}
-					<label for="id_address">Address</label>
-					{{ subscription_form.address }}
-					
-					
-					<div class="clear-both"></div>
-					<div class="floated">
-						{{ subscription_form.city2.errors }}
-						<label for="id_city2">City</label>
-						{{ subscription_form.city2 }}
-					</div>
-					<div class="floated">					
-						{{ subscription_form.state2.errors }}
-						<label for="id_state2">State</label>
-						{{ subscription_form.state2 }}
-					</div>
-					<div class="floated">
-						{{ subscription_form.zip2.errors }}
-						<label for="id_zip2">Zip</label>
-						{{ subscription_form.zip2 }}
-					</div>
-					<div class="clear-both"></div>
-					
-					<div class="input-container">
-						<label for="id_country2">Country</label>
-						{{ subscription_form.country2 }}
-					</div>
-					
-					<div style="clear: left;"></div>
-					<div class="input-container"
-					        id="place_order_container"
-					        style="margin-bottom: 15px;">
-						<input type="checkbox" name="place_order"
-						        value="yes" id="place_order" />
-						<label for="place_order">Order Smartphones
-						    </label>
-						<span style="display:none;"
-						        id="place_order_span">
-						    <label>: amount&nbsp;&nbsp;</label>
-						    <input type="number" min="1"  step="1" 
-						        name="place_order_amount" 
-						        style="width:40px;" value="1" />
-						</span>
-						
-						<img class="question_mark"
-						    src="{% static 'public/images/question_mark.png' %}" 
-						    style="position:relative;top:4px;left:4px;"
-						    title="You can order smartphones from us. We will charge you $130 for each smartphone. You can order these within the Dashboard at any time." />
-					</div>
-					
-					<div style="clear: left;"></div>
-					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
-						{{ subscription_form.recurring.errors }}
-						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
-					</div>
 					
 					<a class="button orange"
 					    id="signup-form-submit">Create Account</a>

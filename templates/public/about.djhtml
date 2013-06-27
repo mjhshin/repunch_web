@@ -66,6 +66,15 @@
 					<h2 class="member-name">First Last</h2>
 					<div class="member-title">Job Title</div>
 				</div>
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><div style='margin:10px;'><h4>This could be you.</h4></div></div>">
+				    <a href="{% url 'public_jobs' %}">
+					<div class="member-picture-border">
+						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.png');"></div>
+					</div>
+					</a>
+					<h2 class="member-name">You</h2>
+					<div class="member-title">Job Title</div>
+				</div>
 			</div>
 		</div>
 	</div>

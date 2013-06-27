@@ -101,22 +101,23 @@ def password_reset(request):
     return HttpResponse(json.dumps({"res":\
         request_password_reset(request.POST['forgot-pass-email'])}), 
         content_type="application/json")
-
-@session_comet  
-def sign_up(request):
-    """ 
-    renders the signup page on GET and returns a json object on POST.
+        
+@session_comet
+def sign_up2(request):
+    """
+    Second part of the signup process.
     """
     data = {'sign_up_nav': True}
     
     if request.method == 'POST' or request.is_ajax():
-        # some keys are repeated so must catch this at init
-        store_form = StoreSignUpForm(request.POST)
-        account_form = AccountForm(request.POST)
+        # some keys are (were) repeated so must catch this at init
         subscription_form = SubscriptionForm2(request.POST)
         
-        if store_form.is_valid() and account_form.is_valid() and\
-           subscription_form.is_valid():
+        if subscription_form.is_valid() and\
+            request.session['store-tmp'] and\
+            request.session['settings-tmp'] and\
+            request.session['account-tmp']:
+            
             postDict = request.POST.dict()
 
             # create subscription
@@ -137,58 +138,25 @@ def sign_up(request):
                             subscription_form.data['cc_cvv'])
 
             # create store
-            tz = rputils.get_timezone(request.POST.get(\
-                    "store_timezone"))
-            store = Store(**postDict)
-            store.store_timezone = tz.zone
-            store.Subscription = subscription.objectId
-            # set defaults for these guys to prevent 
-            # ParseObjects from making parse calls repeatedly
-            store.punches_facebook = 0
-            # format the phone number
-            store.phone_number =\
-                format_phone_number(request.POST['phone_number'])
-            store.set("description", "The " + store.store_name)
-            store.set("hours", [])
-            store.set("rewards", [])
-            store.set("categories", [])
-            names = request.POST.get("categories")
-            if names:
-                for name in names.split(",")[:-1]:
-                    alias = Category.objects.filter(name__iexact=\
-                                                    name)
-                    if len(alias) > 0:
-                        alias = alias[0].alias
-                        store.categories.append({
-                            "alias":alias,
-                            "name":name })
-            # coordinates
-            full_address = " ".join(\
-                store.get_full_address().split(", "))
-            map_data = rputils.get_map_data(full_adress)
-            store.set("coordinates", map_data.get("coordinates"))
-            store.set("neighborhood", 
-                store.get_best_fit_neighborhood(\
-                    map_data.get("neighborhood")))
-            # Create and save store up to Parse    
-            store.create()
+            store = request.session['store-tmp']
+            settings = request.session['settings-tmp']
+            account = request.session['account-tmp']
             
-            # create settings
-            settings = Settings.objects().create(retailer_pin=\
-                        Settings.generate_id(),
-                        punches_employee=5, Store=store.objectId)
+            store.Subscription = subscription.objectId
+            
+            # finally create everything
+            settings.create()
             store.Settings = settings.objectId
-            store.set('settings', settings)
-            store.update()
-
-            # create account
-            account = Account(**postDict)
+            store.create()
+            settings.Store = store.objectId
+            settings.update()
             account.Store = store.objectId
-            account.account_type = "store"
-            account.set_password(request.POST.get('password'))
             account.create()
-
-            account.set("store", store)
+            
+            # need to put username and pass in request
+            requestDict = request.POST.dict().copy()
+            requestDict['username'] = account.username
+            requestDict['password'] = account.password
             
             ####
             if request.POST.get("place_order") and\
@@ -204,14 +172,15 @@ def sign_up(request):
             user_signup(account)
 
             # auto login
-            user_login = login(request)
+            user_login = login(request, requestDict)
             if user_login != None:
                 data = {"code":-1}
                 # -1 - invalid request
                 # 0 - invalid form input
                 # 1 - bad login credentials
                 # 2 - subscription is not active
-                # 3 - success
+                # 3 - success (login now)
+                # 4 - go to part 2
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:
@@ -223,14 +192,103 @@ def sign_up(request):
             else:
                 # should never go here 
                 pass
-                    
+    elif not (request.session['store-tmp'] and\
+            request.session['settings-tmp'] and\
+            request.session['account-tmp']):
+        return render(request, 'public/signup.djhtml', data)
+    else:
+        subscription_form = SubscriptionForm2()
+
+    data['store_form'] = StoreSignUpForm(\
+        request.session['store-tmp'].__dict__.copy())
+    data['subscription_form'] = subscription_form
+    return render(request, 'public/signup2.djhtml', data)
+
+@session_comet  
+def sign_up(request):
+    """ 
+    renders the signup page on GET and returns a json object on POST.
+    """
+    data = {'sign_up_nav': True}
+    
+    if request.method == 'POST' or request.is_ajax():
+        # some keys are repeated so must catch this at init
+        store_form = StoreSignUpForm(request.POST)
+        account_form = AccountForm(request.POST)
+        
+        if store_form.is_valid() and account_form.is_valid():
+            postDict = request.POST.dict()
+
+            # create store
+            tz = rputils.get_timezone(request.POST.get(\
+                    "store_timezone"))
+            store = Store(**postDict)
+            store.store_timezone = tz.zone
+            # store.Subscription = subscription.objectId TODO
+            # set defaults for these guys to prevent 
+            # ParseObjects from making parse calls repeatedly
+            store.punches_facebook = 0
+            # format the phone number
+            store.phone_number =\
+                format_phone_number(request.POST['phone_number'])
+            store.set("store_description", "The " + store.store_name)
+            store.set("hours", [])
+            store.set("rewards", [])
+            store.set("categories", [])
+            names = request.POST.get("categories")
+            if names:
+                for name in names.split(",")[:-1]:
+                    alias = Category.objects.filter(name__iexact=\
+                                                    name)
+                    if len(alias) > 0:
+                        alias = alias[0].alias
+                        store.categories.append({
+                            "alias":alias,
+                            "name":name })
+            # coordinates
+            ## do and validate this in address
+            """
+            full_address = " ".join(\
+                store.get_full_address().split(", "))
+            map_data = rputils.get_map_data(full_address)
+            store.set("coordinates", map_data.get("coordinates"))
+            store.set("neighborhood", 
+                store.get_best_fit_neighborhood(\
+                    map_data.get("neighborhood")))
+            """
+            
+            # create settings
+            settings = Settings(retailer_pin=\
+                        Settings.generate_id(),
+                        punches_employee=5, Store=store.objectId)
+            store.set('settings', settings)
+
+            # create account
+            account = Account(**postDict)
+            account.account_type = "store"
+            account.set_password(request.POST.get('password'))
+            account.set("store", store)
+            
+            # Create and save store up to Parse (do in part 2)
+            # store.create()
+            request.session['store-tmp'] = store
+            request.session['settings-tmp'] = settings
+            request.session['account-tmp'] = account
+            
+            # -1 - invalid request
+            # 0 - invalid form input
+            # 1 - bad login credentials
+            # 2 - subscription is not active
+            # 3 - success (login now)
+            # 4 - go to part 2
+            return HttpResponse(json.dumps({"code":4}), 
+                            content_type="application/json")
+           
     else:
         store_form = StoreSignUpForm()
         account_form = AccountForm()
-        subscription_form = SubscriptionForm2()
-
+        
     data['store_form'] = store_form
     data['account_form'] = account_form
-    data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)
 
