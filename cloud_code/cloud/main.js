@@ -166,6 +166,7 @@ Parse.Cloud.define("punch", function(request, response) {
 	}
 	
 	function executePush() {
+		installationQuery.equalTo('deviceType', 'android');
 		Parse.Push.send({
 			where: installationQuery,
 			data: {
@@ -173,6 +174,23 @@ Parse.Cloud.define("punch", function(request, response) {
 				id: storeId,
 				num_punches: numPunches,
 				action: "com.repunch.intent.PUNCH"
+			}
+		}, {
+			success: function() {
+				console.log("push was successful");
+			},
+			error: function(error) {
+				response.error("error");
+			}
+		});
+		installationQuery.equalTo('deviceType', 'ios');
+		Parse.Push.send({
+			where: installationQuery,
+			data: {
+				name: storeName,
+				id: storeId,
+				num_punches: numPunches,
+				punch_type: "receive_punch"
 			}
 		}, {
 			success: function() {
@@ -593,6 +611,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // call when all tasks are done
     function proceedToPush(){
         console.log("PROCEED TO PUSH");
+        installationQuery.equalTo('deviceType', 'android');
         Parse.Push.send({
             where: installationQuery, 
             data: {
@@ -601,6 +620,25 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_id: request.params.store_id,
                 store_name: request.params.store_name,
                 message_id: request.params.message_id,
+            }, 
+            }, {
+                success: function() {
+                    response.success("success");
+                },
+                error: function(error) {
+                    response.error("error");
+                }
+        }); // end Parse.Push
+
+        installationQuery.equalTo('deviceType', 'ios');
+        Parse.Push.send({
+            where: installationQuery, 
+            data: {
+                subject: request.params.subject,
+                store_id: request.params.store_id,
+                store_name: request.params.store_name,
+                message_id: request.params.message_id,
+                punch_type: "receive_message"
             }, 
             }, {
                 success: function() {
