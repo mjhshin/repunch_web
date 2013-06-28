@@ -41,7 +41,7 @@
     <div class="section" style="margin-top:50px;">
 		<h2 style="margin-bottom:10px;">Redemptions</h2>
 		<div class="tab-container">
-			<div class="tab active" id="tab-pending-redemptions">Pending</div>
+			<div class="tab active" id="tab-pending-redemptions">Pending {% if redcount > 0 %}({{ redcount }}){% endif %}</div>
 			<div class="tab" id="tab-history-redemptions">History</div>
 		</div>
 	
@@ -61,7 +61,7 @@
 		        class="tr  {% cycle '' 'odd' %}">
 		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time">
-				{% if redemp.createdAt <= today %}
+				{% if redemp.createdAt.day < today.day %}
 				{{ redemp.createdAt|date:"F d" }}
 				{% else %}
 				{{ redemp.createdAt|date:"h:i a" }}

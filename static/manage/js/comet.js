@@ -11,6 +11,7 @@ $(document).ready(function(){
     var url = $("#comet_url").val();
     var urlRedeem = $("#redeem-url").val();
     
+    // for the workbench page
     function onRedeem(rowId){
         var row = $("#" + rowId);
         var rewardId = $("#" + rowId + " input[type=hidden]").val();
@@ -72,12 +73,39 @@ $(document).ready(function(){
                         
                         // then remove
                         $(this).remove();
-                        if ($("#redemption div.tab-body div.tr").length < 1){
+                                                
+                        // update the counts
+                        var rBadge = $("#redemptions-nav a div.nav-item-badge");
+                        var diva = $("#redemptions-nav a");
+                        var rcount = new String($("#redemption div.tab-body div.tr").length);
+                        if (rcount < 1){
+                            // workbench nav badge
+                            if (rBadge.length == 1){
+                                rBadge.fadeOut('slow');
+                            }
+                            
+                            // pending tab
+                            $("#tab-pending-redemptions").html("Pending");
+                            
+                            // place the placeholder if now empty
                             $("#redemption div.tab-body div.table-header").after(
                                 "<div class='tr' id='no-redemptions'>" +
 				                "<div class='td'>No Redemptions</div>" +
 			                    "</div>");
+                        } else {
+                            // workbench nav badge
+                            if (rBadge.length == 1){
+                                rBadge.text(rcount);
+                            } else {
+                                diva.append("<div class='nav-item-badge'>" +
+                                    rcount + "</div>");
+                            }
+                            
+                            // pending tab
+                            $("#tab-pending-redemptions").html("Pending (" + rcount + ")");
+                            
                         }
+                        
                     });
                 } else {
                     alert("Redemption failed");
@@ -109,45 +137,48 @@ $(document).ready(function(){
             }
             // tab
             var feedbackTab = $("#tab-feedback");
-            feedbackTab.html("Feedback (" + feedback_unread + ")");
             if (feedbackTab.length > 0){
+                feedbackTab.html("Feedback (" + feedback_unread + ")");
+            
+                // table content
+                var feedbacks = res.feedbacks;
+                for (var i=0; i<feedbacks.length; i++){
+                    var odd = "";
+                    var first=$("#tab-body-feedback div.tr").first();
+                    if (!first.hasClass("odd")){
+                        odd = "odd";
+                    }
+                    var d = new Date(feedbacks[i].createdAt);
+                    var year = new String(d.getYear());
+                    year = year.substring(1, year.length);
+                    var month = new String(d.getMonth()+1);
+                    if (month.length == 1){
+                        month = "0" + month;
+                    }
+                    var day = new String(d.getDate());
+                    if (day.length == 1){
+                        day = "0" + day;
+                    }
+                    var dStr = month + "/" + day + "/" + year;
+                    $("#tab-body-feedback div.table-header").after(
+                        "<div class='tr " + odd + " unread'>" +
+			            "<a href='/manage/messages/feedback/" + 
+			            feedbacks[i].objectId + "'>" +
+				        "<div class='td feedback-date'>"+
+                        dStr + "</div>" +
+				        "<div class='td feedback-from'>" +
+				        feedbacks[i].sender_name + "</div>" +
+				        "<div class='td feedback-subject'>" +
+				        feedbacks[i].subject + "</div>" +
+			            "</a></div>" );
+	            }
+	            
                 // remove placeholder when empty
                 if ($("#no-feedback").length > 0){
                     $("#no-feedback").remove();
                 }
             }
-            // table content
-            var feedbacks = res.feedbacks;
-            for (var i=0; i<feedbacks.length; i++){
-                var odd = "";
-                var first=$("#tab-body-feedback div.tr").first();
-                if (!first.hasClass("odd")){
-                    odd = "odd";
-                }
-                var d = new Date(feedbacks[i].createdAt);
-                var year = new String(d.getYear());
-                year = year.substring(1, year.length);
-                var month = new String(d.getMonth()+1);
-                if (month.length == 1){
-                    month = "0" + month;
-                }
-                var day = new String(d.getDate());
-                if (day.length == 1){
-                    day = "0" + day;
-                }
-                var dStr = month + "/" + day + "/" + year;
-                $("#tab-body-feedback div.table-header").after(
-                    "<div class='tr " + odd + " unread'>" +
-			        "<a href='/manage/messages/feedback/" + 
-			        feedbacks[i].objectId + "'>" +
-				    "<div class='td feedback-date'>"+
-                    dStr + "</div>" +
-				    "<div class='td feedback-from'>" +
-				    feedbacks[i].sender_name + "</div>" +
-				    "<div class='td feedback-subject'>" +
-				    feedbacks[i].subject + "</div>" +
-			        "</a></div>" );
-	        }
+            
         } 
         
         if (res.hasOwnProperty('employees')){
@@ -168,10 +199,6 @@ $(document).ready(function(){
                 // tab
                 pendingTab.html("Pending (" + 
                             employees_pending + ")");
-                // remove placeholder when empty
-                if ($("#no-pending").length > 0){
-                    $("#no-pending").remove();
-                }
                 // table content
                 var employees = res.employees;
                 for (var i=0; i<employees.length; i++){
@@ -206,9 +233,14 @@ $(document).ready(function(){
 				        "</div>" +
 				        "</div>" );
 		        }
+		        
+                // remove placeholder when empty
+                if ($("#no-pending").length > 0){
+                    $("#no-pending").remove();
+                }
             }
             
-        }// end pending employees nav
+        }// end employees
         
         // reward redemption count
         if (res.hasOwnProperty('rewards') && res.rewards.length > 0){
@@ -243,16 +275,7 @@ $(document).ready(function(){
             if (pendingTab.length >0){
                 // tab
                 pendingTab.html("Pending (" + redemption_count + ")");
-                // remove placeholder when empty
-                if ($("#no-redemptions").length > 0){
-                    $("#no-redemptions").remove();
-                }
                 
-                // bind
-                $("#redemption div.tr div.td a").click(function(){
-                    onRedeem($(this).attr("name"));
-                });
-            
                 // table content
                 var redemptions = res.redemptions;
                 for (var i=0; i<redemptions.length; i++){
@@ -299,12 +322,18 @@ $(document).ready(function(){
 		            x.before(content);   
                 }
                 
+                // remove placeholder when empty
+                if ($("#no-redemptions").length > 0){
+                    $("#no-redemptions").remove();
+                }
+                
             }
             
-            // remove the last if greater than 40
-	      // while ($("#redemption div.tab-body div.tr").length > 40){
-	         //$("#redemption div.tab-body div.tr").last().remove();
-	        //}
+            // bind
+            $("#redemption div.tr div.td a").click(function(){
+                onRedeem($(this).attr("name"));
+            });
+            
         }
                
     } // end mainComet

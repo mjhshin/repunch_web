@@ -1,8 +1,10 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from datetime import datetime
 from dateutil.tz import tzutc
+from math import ceil
 import json
 
 from libs.dateutil.relativedelta import relativedelta
@@ -12,17 +14,33 @@ from parse import session as SESSION
 
 @login_required
 def index(request):
+    """
+    Renders the first 20 most recent pending and approved/denied
+    redemptions.
+    """
     # do not just use timezone.now(). that will just get the current
     # utc time. We need the local time and then convert it to utc
     today = timezone.make_aware(datetime.now(), 
                     SESSION.get_store_timezone(request.session))
+    redemps = SESSION.get_redemptions(request.session)[:20]
+    past_redemps = SESSION.get_redemptions_past(request.session)[:20]
     data = {"workbench_nav":True,
-        "redemptions":SESSION.get_redemptions(request.session),
+        "redemp_pages":ceil(float(len(redemps))/20.0),
+        "past_redemp_pages":ceil(float(len(past_redemps))/20.0),
+        "redemptions":redemps,
         "settings":SESSION.get_settings(request.session),
-        "past_redemptions":\
-            SESSION.get_redemptions_past(request.session),
+        "past_redemptions":past_redemps,
         "today":today}
     return render(request, 'manage/workbench.djhtml', data)
+    
+@login_required
+def get_redemp_page(request):
+    """
+    Returns a generated html to plug in the tables.
+    """
+    if request.method == "GET" and request.is_ajax():
+        pass
+    return render(request, 'manage/redemptions.djhtml', data)
     
 @login_required
 def redeem(request):

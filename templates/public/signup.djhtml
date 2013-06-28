@@ -42,7 +42,7 @@ function validate(which, next) {
 	<div id="page-content">
 		<div id="signup-content">
 			<aside class="col1">
-				<h2>Please fill out the form bellow to get started.</h2>
+				<h2>Please fill out the form below to get started.</h2>
 				<div id="signup-steps-box">
 					<div id="steps-double-line"></div>
 					<div class="step-box">

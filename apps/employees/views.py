@@ -188,8 +188,7 @@ def punches(request, employee_id):
     order_dir = request.POST.get('order_dir')
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
-    
-    # TODO HANDLE PAGINATION    
+     
     ps = employee.get('punches', order=order_by)
     if not ps:
         ps = []
