@@ -278,28 +278,26 @@ def feedback_reply(request, feedback_id):
             data['error'] = 'You cannot reply more than once to a '+\
                                 'feedback.'
         else:
-            # create BASIC message no subject
             msg = Message.objects().create(message_type=\
-                BASIC, sender_name=store.get('store_name'),
+                FEEDBACK, sender_name=store.get('store_name'),
                 store_id=store.objectId, body=body)
-            # add to ReceivedMessages relation
-            store.add_relation("ReceivedMessages_", [msg.objectId])
+            store.add_relation("SentMessages_", [msg.objectId])
             # set feedback Reply pointer to message
             feedback.set('Reply', msg.objectId)
             feedback.update()
             
-            # make sure that the message stored in the list is the updated 1
+            # store the updated feedback
             messages_received_list.pop(i_remove)
             messages_received_list.insert(i_remove, feedback)
-            print messages_received_list
-            request.session['messages_received_list'] = messages_received_list
+            request.session['messages_received_list'] =\
+                messages_received_list
 
             # push notification
             cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":feedback.get('subject'),
-                "message_id":msg.objectId,
+                "message_id":feedback.objectId,
                 "filter":'one',
                 "patron_id":feedback.get('patron_id'),
             })

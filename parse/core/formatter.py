@@ -113,8 +113,8 @@ def query(constraints, where_only=False):
                 while True:
                     if key[:-1] + str(ind) not in constraints:
                         break                    
-                    cts.append({ key[:-1] + str(ind):\
-                        contraints.get( [key[:-1] + str(ind)] ) })
+                    cts.append({ key[:-1]:\
+                        constraints.get(key[:-1] + str(ind)) })
                     ind += 1
                 where["$or"] = cts
 

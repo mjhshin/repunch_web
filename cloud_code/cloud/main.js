@@ -539,8 +539,12 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
 });
  
 ////////////////////////////////////////////////////
-//
-//
+//  Sends the store's message to a selected group of patrons
+//  in the Store's PatronStore Relation. 
+//  
+//  This adds the message to each Patron's ReceivedMessages.
+//  Replies to feedback does not add the reply itself to the
+//  Patron's ReceivedMessages but rather the original message itself.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
@@ -582,9 +586,10 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         var rel = pat.relation("ReceivedMessages"); 
         // message obtained from the beginning (bottom)
         rel.add(message);
-        pat.save();
-        // chain method call
-        addToPatronsInbox(patronStores);
+        pat.save().then(function(){
+            // chain method call
+            addToPatronsInbox(patronStores);
+        });
     }
 
     // call when all tasks are done
@@ -626,6 +631,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             // first get the patron
             patronQuery.get(request.params.patron_id).then(function(patron){
                 patronStoreQuery.matchesQuery("Patron", patron);
+                patronStoreQuery.include("Patron");
                 patronStoreQuery.first().then(function(pst){
                     var arr = new Array(pst);
                     addToPatronsInbox(arr);

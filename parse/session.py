@@ -8,7 +8,7 @@ from libs.dateutil.relativedelta import relativedelta
 from libs.dateutil.extras import start_month, end_month
 
 from parse.apps.employees import PENDING, APPROVED
-from parse.apps.messages import FEEDBACK
+from parse.apps.messages import FEEDBACK, BASIC, OFFER
 
 SESSION_CACHE = [
     'message_count',
@@ -101,10 +101,16 @@ def get_patronStore_count(session):
         return session['patronStore_count']
         
 def get_messages_sent_list(session):
+    """ 
+    This is what will be displayed in the Message tab in the dashboard
+    so this does not include replies to feedbacks, which have the
+    message_type of FEEDBACK.
+    """
     if 'messages_sent_list' not in session:
         store = get_store(session)
         messages_sent_list = store.get("sentMessages",
-                                order="-createdAt")
+                            message_type1=BASIC, message_type2=OFFER,
+                            order="-createdAt")
         # make sure that the list is a list and not none
         if messages_sent_list is None:
             messages_sent_list = []
@@ -118,8 +124,6 @@ def get_messages_sent_list(session):
         return session['messages_sent_list']
         
 def get_messages_received_list(session):
-    # when a store replies, it also gets stored in the received
-    # with message type BASIC or OFFER
     if 'messages_received_list' not in session:
         store = get_store(session)
         messages_received_list = store.get(\
