@@ -110,10 +110,14 @@
 					</a>
 				</div>
 				
-				<div class="nav-item {% if workbench_nav %}active{% endif %}">
+				<div class="nav-item {% if workbench_nav %}active{% endif %}" id="redemptions-nav">
 					<a href="{% url 'workbench_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_workbench.png" %}" alt="" />
 						<span class="nav-item-title">Workbench</span>
+						{% redemptions_pending request.session as redcount %}
+						{% if redcount > 0 %}
+						<div class="nav-item-badge">{{ redcount }}</div>
+						{% endif %}
 					</a>
 				</div>
 				

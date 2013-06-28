@@ -10,7 +10,7 @@ class MessageForm(forms.Form):
         widget=forms.Textarea(attrs={"cols":40, "rows":10}))
 
     attach_offer = forms.BooleanField(required=False)
-    offer_title = forms.CharField(max_length=75, required=False)
+    offer_title = forms.CharField(max_length=30, required=False)
     date_offer_expiration = forms.DateTimeField(input_formats=['%m/%d/%Y %I:%M %p'], required=False)
     min_punches = forms.CharField(max_length=7, required=False)
     

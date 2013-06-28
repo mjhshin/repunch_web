@@ -97,7 +97,7 @@ $(document).ready(function(){
     function mainComet(res, status, xhr) {
         // Messages page
         if(res.hasOwnProperty("feedbacks")){
-            var feedback_unread = new String(res.feebacks.length);
+            var feedback_unread = new String(res.feedback_unread);
             // Messages nav
             var mBadge = $("#messages-nav a div.nav-item-badge");
             var diva = $("#messages-nav a");
@@ -152,7 +152,7 @@ $(document).ready(function(){
         
         if (res.hasOwnProperty('employees')){
             // pending employees nav
-            var employees_pending = new String(res.employees.length);
+            var employees_pending = new String(res.employees_pending);
             var mBadge = $("#employees-nav a div.nav-item-badge");
             var diva = $("#employees-nav a");
             if (mBadge.length == 1){
@@ -165,15 +165,6 @@ $(document).ready(function(){
             // Employees page
             var pendingTab = $("#tab-pending");
             if (pendingTab.length > 0){
-                // notification header
-                var notific = $("#notification-pending");
-                if (notific.length > 0){
-                    var s = "";
-                    if (employees_pending > 1){s="s";}
-                    notific.html("<div>You have " +
-                        employees_pending + 
-                        " employee" + s + " pending approval</div>");
-                }
                 // tab
                 pendingTab.html("Pending (" + 
                             employees_pending + ")");
@@ -235,64 +226,80 @@ $(document).ready(function(){
         }
         
         // incoming redemptions
-        if (res.hasOwnProperty('redemptions') &&
-                res.redemptions.length > 0){
+        if (res.hasOwnProperty('redemptions')){
+            // Workbench nav
+            var redemption_count = res.redemption_count;
+            var rBadge = $("#redemptions-nav a div.nav-item-badge");
+            var diva = $("#redemptions-nav a");
+            if (rBadge.length == 1){
+                rBadge.text(new String(redemption_count));
+            } else {
+                diva.append("<div class='nav-item-badge'>" +
+                    new String(redemption_count) + "</div>");
+            }
+        
             // workbench page
-            var redemptions = res.redemptions;
-            for (var i=0; i<redemptions.length; i++){
-                var odd = "", x=$("#redemption div.tab-body div.tr").first();
-                if (!x.hasClass("odd")){
-                    odd = "odd";
+            var pendingTab = $("#tab-pending-redemptions");
+            if (pendingTab.length >0){
+                // tab
+                pendingTab.html("Pending (" + redemption_count + ")");
+                // remove placeholder when empty
+                if ($("#no-redemptions").length > 0){
+                    $("#no-redemptions").remove();
                 }
-                var d = new Date(redemptions[i].createdAt);
-                var hour = d.getHours();
-                var minute = new String(d.getMinutes());
-                var ampm;
-                if (hour > 12){
-                    ampm = "p.m.";
-                } else {
-                    ampm = "a.m.";
-                }
-                if (hour > 12){
-                    hour = hour - 12;
-                }
-                hour = new String(hour);
-                if (hour.length < 2){
-                    hour = "0" + hour;
-                }
-                if (minute.length < 2){
-                    minute = "0" + minute;
-                }
-                d = hour + ":" + minute + " " + ampm;
-                var content = "<div class='tr " + odd + "' " + 
-                    "id='"+ redemptions[i].objectId+ "'>" +
-		            "<input type='hidden'" + 
-		            " value='" + redemptions[i].reward_id + "'/>" + 
-				    "<div class='td redemption_time'>" +
-				    d + "</div>" +
-				    "<div class='td redemption_customer_name'>" +
-				    redemptions[i].customer_name + "</div>" +
-		            "<div class='td redemption_title'>" +
-				    redemptions[i].title + "</div>" +
-				    "<div class='td redemption_punches'>" +
-				    redemptions[i].num_punches + "</div>" +
-				    "<div class='td redemption_redeem'>" +
-				    "<a name='" + redemptions[i].objectId +
-				        "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
-		            "</div>";
-		        x.before(content);
-		        
-            }
+                
+                // bind
+                $("#redemption div.tr div.td a").click(function(){
+                    onRedeem($(this).attr("name"));
+                });
             
-            // remove placeholder when empty
-            if ($("#no-redemptions").length > 0){
-                $("#no-redemptions").remove();
+                // table content
+                var redemptions = res.redemptions;
+                for (var i=0; i<redemptions.length; i++){
+                    var odd = "", x=$("#redemption div.tab-body div.tr").first();
+                    if (!x.hasClass("odd")){
+                        odd = "odd";
+                    }
+                    var d = new Date(redemptions[i].createdAt);
+                    var hour = d.getHours();
+                    var minute = new String(d.getMinutes());
+                    var ampm;
+                    if (hour > 12){
+                        ampm = "p.m.";
+                    } else {
+                        ampm = "a.m.";
+                    }
+                    if (hour > 12){
+                        hour = hour - 12;
+                    }
+                    hour = new String(hour);
+                    if (hour.length < 2){
+                        hour = "0" + hour;
+                    }
+                    if (minute.length < 2){
+                        minute = "0" + minute;
+                    }
+                    d = hour + ":" + minute + " " + ampm;
+                    var content = "<div class='tr " + odd + "' " + 
+                        "id='"+ redemptions[i].objectId+ "'>" +
+		                "<input type='hidden'" + 
+		                " value='" + redemptions[i].reward_id + "'/>" + 
+				        "<div class='td redemption_time'>" +
+				        d + "</div>" +
+				        "<div class='td redemption_customer_name'>" +
+				        redemptions[i].customer_name + "</div>" +
+		                "<div class='td redemption_title'>" +
+				        redemptions[i].title + "</div>" +
+				        "<div class='td redemption_punches'>" +
+				        redemptions[i].num_punches + "</div>" +
+				        "<div class='td redemption_redeem'>" +
+				        "<a name='" + redemptions[i].objectId +
+				            "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
+		                "</div>";
+		            x.before(content);   
+                }
+                
             }
-            
-            // bind
-            $("#redemption div.tr div.td a").click(function(){
-                onRedeem($(this).attr("name"));
-            });
             
             // remove the last if greater than 40
 	      // while ($("#redemption div.tab-body div.tr").length > 40){

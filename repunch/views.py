@@ -92,6 +92,11 @@ def manage_refresh(request):
                 data['feedbacks'].append(m.jsonify())
             request.session['messages_received_list'] =\
                 messages_received_list
+            fb_count = 0
+            for fb in messages_received_list:
+                if not fb.get("is_read"):
+                    fb_count += 1
+            data['feedback_unread'] = fb_count
         # employees
         employees = results.get("employees")
         if employees:
@@ -102,6 +107,7 @@ def manage_refresh(request):
                 data['employees'].append(e.jsonify())
             request.session['employees_pending_list'] =\
                 employees_pending_list
+            data['employees_pending'] = len(employees_pending_list)
         # redemptions
         reds, redemps = results.get("redemptions"), []
         if reds:
@@ -110,9 +116,7 @@ def manage_refresh(request):
                 redemptions.insert(0, rr)
                 request.session['redemptions'] = redemptions
                 redemps.append(rr.jsonify())
-                # make sure redemptions don't go past 20
-                while len(redemptions) > 20:
-                    redemptions.pop()
+            data['redemption_count'] = len(redemptions)
             data['redemptions'] = redemps
         """
         print results, timezone.now()

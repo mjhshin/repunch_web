@@ -21,10 +21,13 @@ def feedback_unread(session):
             count += 1
     return count
 
-
 @register.assignment_tag
 def employees_pending(session):
     return len(SESSION.get_employees_pending_list(session))
+    
+@register.assignment_tag
+def redemptions_pending(session):
+    return len(SESSION.get_redemptions(session))
 
 @register.simple_tag
 def hours(session):
