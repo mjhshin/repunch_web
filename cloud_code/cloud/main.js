@@ -453,7 +453,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		for (var i=0; i<rewards.length; i++){
 		    if (rewards[i].reward_id == rewardId){
 		        rewards[i].redemption_count += 1;
-		        rewardTitle = rewards[i].reward_name;
 		        break;
 		    }
 		}
@@ -466,6 +465,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		var patronStore = redeemReward.get("PatronStore");
 		console.log("RedeemReward fetch success.");
 		numPunches = redeemReward.get("num_punches");
+		rewardTitle = redeemReward.get("title");
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
