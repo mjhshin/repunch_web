@@ -4,7 +4,90 @@
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_patron", function(request, response) {
-    
+    var userObjectId = request.params.user_id;
+	var birthday = request.params.birthday;
+	var gender = request.params.gender;
+	var firstName = request.params.first_name;
+	var lastName = request.params.last_name;
+	var facebookId = request.params.facebook_id;
+	var email = request.params.email;
+	
+	var Patron = Parse.Object.extend("Patron");
+	var PunchCode = Parse.Object.extend("PunchCode");
+	var patron;
+	
+	var userQuery = new Parse.Query(Parse.User);
+	var punchCodeQuery = new Parse.Query(PunchCode);
+	punchCodeQuery.equalTo("is_taken", false);
+	
+	punchCodeQuery.first().then(function(punchCode) {
+		console.log("PunchCode fetch success.");
+        punchCode.set("is_taken", true);
+        punchCode.set("username", username);
+		return punchCode.save();
+			
+	}, function(error) {
+		console.log("PunchCode fetch failed.");
+		response.error("error");
+		return;	
+					
+	}).then(function(punchCode) {
+		console.log("PunchCode save success.");
+		patron.set("first_name", firstName);
+		patron.set("last_name", lastName);
+		patron.set("date_of_birth", birthday);
+		patron.set("gender", gender);
+		patron.set("punch_code", punchCode.get("punch_code"));
+		
+		if(facebookId != null) {
+			patron.set("facebook_id", facebookId);
+		}
+        
+		return patron.save();
+			
+	}, function(error) {
+		console.log("PunchCode save failed.");
+		response.error("error");
+		return;
+				
+	}).then(function(patronResult) {
+		console.log("Patron save success.");
+		patron = patronResult;
+		return userQuery.get(userObjectId);
+			
+	}, function(error) {
+		console.log("Patron save failed.");
+		response.error("error");
+		return;
+				
+	}).then(function(user) {
+		console.log("User fetch success.");
+		user.set("Patron", patron);
+		user.set("account_type", "patron");
+		
+		if(email != null) {
+			user.set("email", email);
+		}
+		  
+		return user.save();
+			
+	}, function(error) {
+		console.log("User fetch failed.");
+		response.error("error");
+		return;	
+				
+	}).then(function(user) {
+		console.log("User save success. Registration complete!");
+		response.success(patron.id);
+		return;
+			
+	}, function(error) {
+		console.log("User save failed.");
+		response.error("error");
+		return;			
+	})
+	
+	
 });
 
 ////////////////////////////////////////////////////
@@ -452,9 +535,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      store objectId (for comparison with given values)
 //      rewards (array object)
 //      patronStore_count (count)
-//      feedback_unread (count)
 //      feedback_unread_ids (String array)
-//      employees_pending (count)
 //      employees_pending_ids (String array)
 //      redemption_ids (String array)
 //      // past_hour (UTC datetime for redemptions)
@@ -462,8 +543,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
-//      feedbacks (new objects) (if feedback_unread changed)
-//      employees (new objects) (if employees_pending changed)
+//      feedbacks (new objects) (if new stuff)
+//      employees (new objects) (if new employees)
 //      redemptions (latest redemptions the past hour limit of 20)
 //
 ////////////////////////////////////////////////////
@@ -473,9 +554,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var store_id = request.params.store_id;
     var rewards_old = request.params.rewards;
     var patronStore_count = request.params.patronStore_count;
-    var feedback_unread = request.params.feedback_unread;
     var feedback_unread_ids = request.params.feedback_unread_ids;
-    var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
     var redemption_ids = request.params.redemption_ids;
     // var past_hour = request.params.past_hour;
@@ -513,7 +592,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             result.patronStore_count = newPatronStore_count;
         }
     
-        // feedback_unread
+        // feedbacks
         var rmrq = store.relation("ReceivedMessages").query();
         rmrq.equalTo("is_read", false);
         rmrq.equalTo("message_type", "feedback");
@@ -525,7 +604,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             result.feedbacks = newFeedbacks;
         }
     
-        // employees_pending
+        // employees
         var eprq = store.relation("Employees").query();
         eprq.equalTo("status", "Pending");
         eprq.notContainedIn("objectId", employees_pending_ids);

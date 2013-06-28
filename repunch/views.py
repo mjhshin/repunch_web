@@ -56,11 +56,7 @@ def manage_refresh(request):
             "rewards": store.get('rewards'),
             "patronStore_count": SESSION.get_patronStore_count(\
                                     request.session),
-            "feedback_unread": SESSION.get_feedback_unread(\
-                                    request.session),
             "feedback_unread_ids": feedback_unread_ids,
-            "employees_pending": SESSION.get_employees_pending(\
-                                    request.session),
             "employees_pending_ids": employees_pending_ids,
             "redemption_ids": redemption_ids,
         }, timeout=RETAILER_REFRESH_TIMEOUT)
@@ -86,7 +82,7 @@ def manage_refresh(request):
         if patronStore_count:
             data['patronStore_count'] = patronStore_count
             request.session['patronStore_count'] = patronStore_count
-        # feedback_unread
+        # feedbacks
         feedbacks = results.get('feedbacks')
         if feedbacks:
             data['feedbacks'] = []
@@ -96,13 +92,7 @@ def manage_refresh(request):
                 data['feedbacks'].append(m.jsonify())
             request.session['messages_received_list'] =\
                 messages_received_list
-            feedback_unread = 0
-            for each in messages_received_list:
-                if not each.is_read:
-                    feedback_unread += 1
-            data['feedback_unread'] = feedback_unread
-            request.session['feedback_unread'] = feedback_unread
-        # employees_pending
+        # employees
         employees = results.get("employees")
         if employees:
             data['employees'] = []
@@ -112,9 +102,6 @@ def manage_refresh(request):
                 data['employees'].append(e.jsonify())
             request.session['employees_pending_list'] =\
                 employees_pending_list
-            employees_pending = len(employees_pending_list)
-            data['employees_pending'] = employees_pending
-            request.session["employees_pending"] = employees_pending
         # redemptions
         reds, redemps = results.get("redemptions"), []
         if reds:
