@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_patron", function(request, response) {
     var userObjectId = request.params.user_id;
+	var username = request.params.username;
 	var birthday = request.params.birthday;
 	var gender = request.params.gender;
 	var firstName = request.params.first_name;
@@ -14,7 +15,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	
 	var Patron = Parse.Object.extend("Patron");
 	var PunchCode = Parse.Object.extend("PunchCode");
-	var patron;
+	var patron = new Patron();
 	
 	var userQuery = new Parse.Query(Parse.User);
 	var punchCodeQuery = new Parse.Query(PunchCode);
@@ -35,9 +36,14 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		console.log("PunchCode save success.");
 		patron.set("first_name", firstName);
 		patron.set("last_name", lastName);
-		patron.set("date_of_birth", birthday);
 		patron.set("gender", gender);
 		patron.set("punch_code", punchCode.get("punch_code"));
+		
+		var year = birthday.substring(6, 10);
+		var month = parseInt(birthday.substring(0, 2)) - 1;
+		var day = birthday.substring(3, 5);
+		var dateOfBirth = new Date(year, month, day);
+		patron.set("date_of_birth", dateOfBirth);
 		
 		if(facebookId != null) {
 			patron.set("facebook_id", facebookId);
