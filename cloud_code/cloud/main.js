@@ -435,7 +435,10 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
-	var rewardId = parseInt(request.params.reward_id);
+	var rewardId = request.params.reward_id;
+	if (rewardId != null){
+	    rewardId = parseInt(rewardId);
+	}
 	
 	var patronId, numPunches, rewardTitle, storeName;
 	
@@ -447,18 +450,20 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	redeemRewardQuery.include(["PatronStore.Patron"]);
 	
 	storeQuery.get(storeId).then(function(store){
-	    var rewards = store.get("rewards");
 	    storeName = store.get("store_name");
-		// update the store's rewards redemption_count
-		for (var i=0; i<rewards.length; i++){
-		    if (rewards[i].reward_id == rewardId){
-		        rewards[i].redemption_count += 1;
-		        break;
+	    if (rewardId != null){
+	        var rewards = store.get("rewards");
+		    // update the store's rewards redemption_count
+		    for (var i=0; i<rewards.length; i++){
+		        if (rewards[i].reward_id == rewardId){
+		            rewards[i].redemption_count += 1;
+		            break;
+		        }
 		    }
-		}
-		store.set("rewards", rewards);
+		    store.set("rewards", rewards);
 		
-		return store.save();
+		    return store.save();
+		} 
 	}).then(function(){
 	    return redeemRewardQuery.get(redeemId);
 	}).then(function(redeemReward) {

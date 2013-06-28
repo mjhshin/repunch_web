@@ -69,11 +69,9 @@ def edit(request, message_id):
                                     minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
-        num_sent = store.get('sentMessages', createdAt__gte=start,
-                                count=1, limit=0)
-        request.session['message_count'] = num_sent
+        message_count = SESSION.get_message_count(request.session)
                                 
-        limit_reached = num_sent >= sub_type[subType]['max_messages']
+        limit_reached = message_count >= sub_type[subType]['max_messages']
         
         if form.is_valid() and not limit_reached:
             if form.data.get('action')  == 'upgrade':
@@ -124,6 +122,10 @@ def edit(request, message_id):
             messages_sent_list.insert(0, message)
             request.session['messages_sent_list'] =\
                 messages_sent_list
+                
+            # update the message_count
+            message_count += 1
+            request.session['message_count'] = message_count
 
             msg_filter = request.POST['chosen_filter']
             params = {

@@ -48,7 +48,7 @@ def get_redemptions(session):
     if "redemptions" not in session:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=False,
-                        order="createdAt")
+                        order="-createdAt")
         if redemptions is None:
             redemptions = []
             
@@ -67,7 +67,7 @@ def get_redemptions_past(session):
     if "redemptions_past" not in session:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=True,
-                        order="createdAt")
+                        order="-createdAt")
         if redemptions is None:
             redemptions = []
         #else:

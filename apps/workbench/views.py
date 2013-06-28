@@ -72,7 +72,6 @@ def redeem(request):
                 request.session['redemptions_past'] = redemptions_past
                 request.session['redemptions'] = redemptions
             
-                    
             return HttpResponse(json.dumps({"result":1}), 
                         content_type="application/json")
                         
