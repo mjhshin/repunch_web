@@ -642,7 +642,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_id: request.params.store_id,
                 store_name: request.params.store_name,
                 message_id: request.params.message_id,
-                punchType: "receive_message"
+                punch_type: "receive_message"
             }, 
             }, {
                 success: function() {
