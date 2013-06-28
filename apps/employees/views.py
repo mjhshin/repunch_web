@@ -112,10 +112,8 @@ def approve(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
-    i_remove, pcount, employee = 0, 0, None
+    i_remove, employee = 0, None
     for ind, m in enumerate(employees_pending_list):
-        if m.get('status') == PENDING:
-            pcount += 1
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
@@ -136,9 +134,6 @@ def approve(request, employee_id):
     employees_approved_list.insert(0, employee)
     request.session['employees_approved_list'] =\
         employees_approved_list
-        
-    # update session cache for employees_pending
-    request.session['employees_pending'] = pcount - 1
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
@@ -149,10 +144,8 @@ def deny(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
-    i_remove, pcount, employee = 0, 0, None
+    i_remove, employee = 0, None
     for ind, m in enumerate(employees_pending_list):
-        if m.get('status') == PENDING:
-            pcount += 1
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
@@ -163,13 +156,10 @@ def deny(request, employee_id):
     employee.status = DENIED;
     employee.update();
     
-    # update session cache for employees_pending
+    # update session cache for employees_pending_list
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
-       
-    # update session cache for employees_pending
-    request.session['employees_pending'] = pcount - 1
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))

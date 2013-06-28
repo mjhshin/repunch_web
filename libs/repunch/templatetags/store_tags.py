@@ -15,12 +15,16 @@ register = template.Library()
 @register.assignment_tag
 def feedback_unread(session):
     """ this is just a count of # of unread feedbacks """
-    return SESSION.get_feedback_unread(session)
+    count = 0
+    for fb in SESSION.get_messages_received_list(session):
+        if not fb.get("is_read"):
+            count += 1
+    return count
 
 
 @register.assignment_tag
 def employees_pending(session):
-    return SESSION.get_employees_pending(session)
+    return len(SESSION.get_employees_pending_list(session))
 
 @register.simple_tag
 def hours(session):

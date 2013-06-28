@@ -214,13 +214,12 @@ def feedback(request, feedback_id):
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
         request.session)
-    i_remove, feedback_unread, feedback = 0, 0, None
+    i_remove, feedback = 0, None
     for ind, m in enumerate(messages_received_list):
         if m.objectId == feedback_id:
             feedback = m
             i_remove = ind
-        if not m.get('is_read'):
-            feedback_unread += 1
+            break
             
     if not feedback:
         raise Http404
@@ -233,9 +232,6 @@ def feedback(request, feedback_id):
     messages_received_list.pop(i_remove)
     messages_received_list.insert(i_remove, feedback)
     request.session['messages_received_list'] = messages_received_list
-    
-    # update the feedback_unread count
-    request.session['feedback_unread'] = feedback_unread - 1
         
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
