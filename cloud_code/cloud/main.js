@@ -4,7 +4,90 @@
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_patron", function(request, response) {
-    
+    var userObjectId = request.params.user_id;
+	var birthday = request.params.birthday;
+	var gender = request.params.gender;
+	var firstName = request.params.first_name;
+	var lastName = request.params.last_name;
+	var facebookId = request.params.facebook_id;
+	var email = request.params.email;
+	
+	var Patron = Parse.Object.extend("Patron");
+	var PunchCode = Parse.Object.extend("PunchCode");
+	var patron;
+	
+	var userQuery = new Parse.Query(Parse.User);
+	var punchCodeQuery = new Parse.Query(PunchCode);
+	punchCodeQuery.equalTo("is_taken", false);
+	
+	punchCodeQuery.first().then(function(punchCode) {
+		console.log("PunchCode fetch success.");
+        punchCode.set("is_taken", true);
+        punchCode.set("username", username);
+		return punchCode.save();
+			
+	}, function(error) {
+		console.log("PunchCode fetch failed.");
+		response.error("error");
+		return;	
+					
+	}).then(function(punchCode) {
+		console.log("PunchCode save success.");
+		patron.set("first_name", firstName);
+		patron.set("last_name", lastName);
+		patron.set("date_of_birth", birthday);
+		patron.set("gender", gender);
+		patron.set("punch_code", punchCode.get("punch_code"));
+		
+		if(facebookId != null) {
+			patron.set("facebook_id", facebookId);
+		}
+        
+		return patron.save();
+			
+	}, function(error) {
+		console.log("PunchCode save failed.");
+		response.error("error");
+		return;
+				
+	}).then(function(patronResult) {
+		console.log("Patron save success.");
+		patron = patronResult;
+		return userQuery.get(userObjectId);
+			
+	}, function(error) {
+		console.log("Patron save failed.");
+		response.error("error");
+		return;
+				
+	}).then(function(user) {
+		console.log("User fetch success.");
+		user.set("Patron", patron);
+		user.set("account_type", "patron");
+		
+		if(email != null) {
+			user.set("email", email);
+		}
+		  
+		return user.save();
+			
+	}, function(error) {
+		console.log("User fetch failed.");
+		response.error("error");
+		return;	
+				
+	}).then(function(user) {
+		console.log("User save success. Registration complete!");
+		response.success(patron.id);
+		return;
+			
+	}, function(error) {
+		console.log("User save failed.");
+		response.error("error");
+		return;			
+	})
+	
+	
 });
 
 ////////////////////////////////////////////////////
