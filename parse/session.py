@@ -12,21 +12,19 @@ from parse.apps.messages import FEEDBACK, BASIC, OFFER
 
 SESSION_CACHE = [
     'message_count',
-    'feedback_unread', # need push notification
-    'employees_pending', # need push notification
-    'patronStore_count', # need push notification
+    'patronStore_count', # PUSH
     
     'store_timezone', # DO NOT USE DATETIME! ALWAYS USE TIMEZONE!
     
     # actual objects
     'account',
-    'store', # need push notification (for rewards)
+    'store', # PUSH (for rewards)
     'subscription',
     'settings',
-    'employees_pending_list', # sync with employees_pending
+    'employees_pending_list', # PUSH
     'employees_approved_list',
     'messages_sent_list',
-    'messages_received_list', # sync with feedback_unread
+    'messages_received_list', # PUSH
     
     'redemptions',
     'remptions_past',
@@ -150,30 +148,13 @@ def get_message_count(session, time_now):
             'sentMessages', 
             createdAt__gte=start_month(now),
             createdAt__lte=end_month(now),
+            message_type1=BASIC,
+            message_type2=OFFER,
             count=1, limit=0)
         session['message_count'] = message_count
     else:
         message_count = session['message_count']
     return message_count
-        
-def get_feedback_unread(session):
-    if 'feedback_unread' not in session:
-        feedback_unread = get_store(session).get(\
-            "receivedMessages", is_read=False, 
-            message_type=FEEDBACK, count=1, limit=0)
-        session['feedback_unread'] = feedback_unread
-    else:
-        feedback_unread = session['feedback_unread']
-    return feedback_unread
-    
-def get_employees_pending(session):
-    if 'employees_pending' not in session:
-        employees_pending = get_store(session).get(\
-                'employees', status=PENDING, count=1, limit=0)
-        session['employees_pending'] = employees_pending
-    else:
-        employees_pending = session['employees_pending']
-    return employees_pending
        
 def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:

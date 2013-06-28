@@ -276,6 +276,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		Parse.Push.send({
 			where: installationQuery,
 			data: {
+				alert:request.params.store_name + " has punched you. BAM.",
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
@@ -540,9 +541,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      store objectId (for comparison with given values)
 //      rewards (array object)
 //      patronStore_count (count)
-//      feedback_unread (count)
 //      feedback_unread_ids (String array)
-//      employees_pending (count)
 //      employees_pending_ids (String array)
 //      redemption_ids (String array)
 //      // past_hour (UTC datetime for redemptions)
@@ -550,8 +549,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
-//      feedbacks (new objects) (if feedback_unread changed)
-//      employees (new objects) (if employees_pending changed)
+//      feedbacks (new objects) (if new stuff)
+//      employees (new objects) (if new employees)
 //      redemptions (latest redemptions the past hour limit of 20)
 //
 ////////////////////////////////////////////////////
@@ -561,9 +560,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var store_id = request.params.store_id;
     var rewards_old = request.params.rewards;
     var patronStore_count = request.params.patronStore_count;
-    var feedback_unread = request.params.feedback_unread;
     var feedback_unread_ids = request.params.feedback_unread_ids;
-    var employees_pending = request.params.employees_pending;
     var employees_pending_ids = request.params.employees_pending_ids;
     var redemption_ids = request.params.redemption_ids;
     // var past_hour = request.params.past_hour;
@@ -601,7 +598,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             result.patronStore_count = newPatronStore_count;
         }
     
-        // feedback_unread
+        // feedbacks
         var rmrq = store.relation("ReceivedMessages").query();
         rmrq.equalTo("is_read", false);
         rmrq.equalTo("message_type", "feedback");
@@ -613,7 +610,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             result.feedbacks = newFeedbacks;
         }
     
-        // employees_pending
+        // employees
         var eprq = store.relation("Employees").query();
         eprq.equalTo("status", "Pending");
         eprq.notContainedIn("objectId", employees_pending_ids);
@@ -727,6 +724,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         Parse.Push.send({
             where: installationQuery, 
             data: {
+            	alert:request.params.store_name + " sent you a message: " + request.params.subject,
                 subject: request.params.subject,
                 store_id: request.params.store_id,
                 store_name: request.params.store_name,
