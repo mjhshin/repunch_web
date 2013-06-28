@@ -148,6 +148,8 @@ def get_message_count(session, time_now):
             'sentMessages', 
             createdAt__gte=start_month(now),
             createdAt__lte=end_month(now),
+            message_type1=BASIC,
+            message_type2=OFFER,
             count=1, limit=0)
         session['message_count'] = message_count
     else:

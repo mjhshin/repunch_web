@@ -28,12 +28,6 @@
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
-	{% employees_pending request.session as epcount %}
-	{% if epcount > 0  %}
-	<div class="notification" id="notification-pending">
-		<div>You have {{ epcount }} employee{{ epcount|pluralize }} pending approval</div>
-	</div>
-	{% endif %}
 	
 	<div class="section">
 		
