@@ -472,17 +472,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			response.error("error");
 			return;
 			
-		} else if(redeemReward.get("is_offer") == true) {
-			console.log("This is an offer.");
-			patronId = patronStore.get("Patron").id;
-			redeemReward.set("is_redeemed", true);
-			
-			var promises = [];
-			promises.push( patronStore.save() );
-			promises.push( redeemReward.save() );
-			
-			return Parse.Promise.when(promises);
-			
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
 			response.error("error");
