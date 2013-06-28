@@ -187,6 +187,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		Parse.Push.send({
 			where: installationQuery,
 			data: {
+				alert:request.params.store_name + " has punched you. BAM.",
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
@@ -638,6 +639,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         Parse.Push.send({
             where: installationQuery, 
             data: {
+            	alert:request.params.store_name + " sent you a message: " + request.params.subject,
                 subject: request.params.subject,
                 store_id: request.params.store_id,
                 store_name: request.params.store_name,
