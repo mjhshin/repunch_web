@@ -50,7 +50,7 @@ def index(request):
 
 @login_required
 @session_comet
-def edit(request, reward_index):
+def edit(request, reward_id):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
     rewards = store.get('rewards')
@@ -60,21 +60,21 @@ def edit(request, reward_index):
         init_count = 0
 
     try:
-        reward_index = int(reward_index)
+        reward_id = int(reward_id)
     except ValueError:
         raise Http404
  
     # reward id being -1 is a flag for new reward which don't exist
     is_new, reward = False, None
-    if reward_index < init_count and reward_index > -2:
-        if reward_index == -1:
+    if reward_id < init_count and reward_id > -2:
+        if reward_id == -1:
             is_new = True
             # a reward is now just a dictionary to be added to 
             # the rewards array
             reward = {'reward_name':None, "description":None, 
                         "punches":None, 'redemption_count':0}
         else: # reward exists
-            old_reward = rewards[reward_index]
+            old_reward = rewards[reward_id]
     else: 
         raise Http404
     
@@ -87,35 +87,41 @@ def edit(request, reward_index):
                 "redemption_count":0}
                 
             # assign a new reward_id
-            ids, msg = [], ""
+            ids = []
             for r in rewards:
                 ids.append(r.get("reward_id"))
             ids.sort()           
   
             if not is_new:
-                msg = 'Reward has been updated.'
                 reward["redemption_count"] =\
                     old_reward["redemption_count"]
-                reward['reward_id'] = old_reward['reward_id']
+                reward['reward_id'] = old_reward['reward_id']   
                 store.array_remove('rewards', [old_reward])
             elif len(ids) == 0:
-                msg = 'Reward has been added.'
                 reward['reward_id'] = 0
             else:
-                msg = 'Reward has been added.'
                 reward['reward_id'] = ids[-1] + 1
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None
+            store.get('rewards')
+            
+            now_count = len(store.get('rewards'))
+            if now_count > init_count:
+                reward_id = now_count - 1
+            
+            data['reward_id'] = len(store.get('rewards'))
+            data['success'] = "Reward has been updated."
             
             # update session cache
             request.session['store'] = store
             
             return redirect(reverse('rewards_index')+\
-                "?%s" % urllib.urlencode({'success':msg}))
+                "?%s" % urllib.urlencode({'success':\
+                'Reward has been added.'}))
     else:
-        if reward_index >= 0 :
-            form = RewardForm(rewards[reward_index])
+        if reward_id >= 0 :
+            form = RewardForm(rewards[reward_id])
         else:
             form = RewardForm()
         if not is_new:
@@ -129,24 +135,24 @@ def edit(request, reward_index):
 
     data['is_new'] = is_new;
     data['reward'] = reward
-    data['reward_index'] = reward_index
+    data['reward_id'] = reward_id
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
 @login_required
 @session_comet
-def delete(request, reward_index):
+def delete(request, reward_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
     rewards = store.get('rewards')
 
     try:
-        reward_index = int(reward_index)
+        reward_id = int(reward_id)
     except ValueError:
         raise Http404
     
     #need to make sure this reward really belongs to this store
-    reward = rewards[reward_index]
+    reward = rewards[reward_id]
     if not reward:
         raise Http404
     
@@ -163,8 +169,33 @@ def delete(request, reward_index):
 
 
 @login_required
-def avatar(request, reward_index):
+def avatar(request, reward_id):
     """
     Unused at the moment
+    """
+    """
+    data = {}
+    account = request.session['account']
+    store = account.get('store')
+    
+    #need to make sure this reward really belongs to this store
+    reward = Reward.objects().get(Store=\
+                        store.objectId, objectId=reward_id)
+    if not reward:
+        raise Http404
+    
+    if request.method == 'POST':
+        # request.FILES ?
+        form = RewardAvatarForm(request.POST) 
+        if form.is_valid():
+            # TODO delete previous file
+            # TODO uploadd new file
+            data['success'] = True
+    else:
+        form = RewardAvatarForm();
+    
+    data['form'] = form
+    data['url'] = reverse('reward_avatar', args=[reward_id])
+    return render(request, 'manage/avatar_upload.djhtml', data)
     """
     raise  Http404

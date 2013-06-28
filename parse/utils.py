@@ -75,7 +75,6 @@ def parse(method, path, data=None, query=None,
         if method == "POST" and cMeta == "png" and d:
             conn.close()
         return None
-    print path
     conn.close()
     return result
 

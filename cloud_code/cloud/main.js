@@ -462,6 +462,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     
     var storeQuery = new Parse.Query(Store);
     storeQuery.get(store_id).then(function(stor){
+        console.log("Retrieved store");
         // rewards_old redemption_count
         store = stor;
         result.rewards = new Array();
@@ -486,6 +487,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         var psrq = store.relation("PatronStores").query();
         return psrq.count();
     }).then(function(newPatronStore_count){
+        console.log("Retrieved PatronStore count");
         if (newPatronStore_count != patronStore_count){
             result.patronStore_count = newPatronStore_count;
         }
@@ -497,6 +499,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         rmrq.notContainedIn("objectId", feedback_unread_ids);
         return rmrq.find();
     }).then(function(newFeedbacks){
+        console.log("Retrieved Feedbacks");
         if(newFeedbacks.length > 0){
             result.feedbacks = newFeedbacks;
         }
@@ -507,6 +510,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         eprq.notContainedIn("objectId", employees_pending_ids);
         return eprq.find();
     }).then(function(pendingEmployees){
+        console.log("Retrieved PendingEmployees");
         if(pendingEmployees.length > 0){
             result.employees = pendingEmployees;
         }
@@ -521,6 +525,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         rrq.notContainedIn("objectId", redemption_ids);
         return rrq.find();
     }).then(function(redemptions){
+        console.log("Retrieved Redemptions");
         // TODO check for changes- not just new ones
         // to remove the redeemed ones in the store's cache
         if (redemptions.length > 0){
