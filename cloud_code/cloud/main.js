@@ -365,7 +365,6 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	redeemReward.set("title", rewardTitle);
 	redeemReward.set("num_punches", numPunches);
 	redeemReward.set("PatronStore", patronStore);
-	redeemReward.set("is_offer", (patronStoreId == null));
 	
 	var Store = Parse.Object.extend("Store");
 	var store;
