@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from django.http import HttpResponse
+from django.utils import timezone
 from datetime import timedelta, datetime
 import json
 
+from parse.utils import make_aware_to_utc
 from parse.decorators import session_comet
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
@@ -23,14 +25,17 @@ def index(request):
 @login_required
 def trends_graph(request, data_type=None, start=None, end=None ):
     store = SESSION.get_store(request.session)
-    
+    store_timezone = SESSION.get_store_timezone(request.session)
     start = datetime.strptime(start, "%Y-%m-%d")
-    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
     end = datetime.strptime(end, "%Y-%m-%d")
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
     end = end.replace(hour=23, minute=59, second=59, microsecond=0)
+    # need to make aware and then convert to utc for querying
+    start_aware = make_aware_to_utc(start, store_timezone)
+    end_aware = make_aware_to_utc(end, store_timezone)
+    
     columns = []
     rows = []
-    
     if data_type == 'punches':
         columns = [
                     {"id":"", "label":"Date", "type":"string"},
@@ -38,13 +43,17 @@ def trends_graph(request, data_type=None, start=None, end=None ):
                    ]
             
         punch_map = {}
-        punches = store.get('punches', createdAt__lte=end,
-                    createdAt__gte=start,order='createdAt')
+        punches = store.get('punches', createdAt__lte=end_aware,
+                    createdAt__gte=start_aware,order='createdAt')
+        # have to clear the cache attr
+        store.punches = None
         
         #create dictionary for easy search
         if punches:
             for punch in punches:
-                key = punch.createdAt.strftime("%m/%d")
+                # first need to convert to local time
+                key = timezone.localtime(punch.createdAt, 
+                        store_timezone).strftime("%m/%d")
                 if key in punch_map:
                     punch_map[key] = punch_map[key]+\
                                         punch.get('punches')
@@ -71,10 +80,12 @@ def trends_graph(request, data_type=None, start=None, end=None ):
         post_map = {}
         posts = store.get("facebookPosts", createdAt__lte=end,
                     createdAt__gte=start)
+        store.facebookPosts = None
         #create dictionary for easy search
         if posts:
             for post in posts:
-                key = post.createdAt.strftime("%m/%d")
+                key = timezone.localtime(\
+                    post.createdAt.strftime("%m/%d"), store_timezone)
                 if key in post_map:
                     post_map[key] = post_map[key] + 1
                 else:
@@ -102,9 +113,11 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             str_date = single_date.strftime("%m/%d")
             # need to set single_date's hours, mins, sec to max
             d = single_date.replace(hour=23, minute=59, second=59)
+            d_aware = make_aware_to_utc(d, store_timezone)
             c = [{"v": str_date}]
             patron_count = store.get('patronStores', count=1,
-                                limit=0, createdAt__lte=d)
+                                limit=0, createdAt__lte=d_aware)
+            store.patronStores = None # not necessary since count only
                     
             c.append({"v": patron_count})
             rows.append({'c': c})
@@ -116,7 +129,13 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 @login_required
 def breakdown_graph(request, data_type=None, filter=None, range=None):
     store = SESSION.get_store(request.session)
+    store_timezone = SESSION.get_store_timezone(request.session)
     (start, end) = rputils.calculate_daterange(range)
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = end.replace(hour=23, minute=59, second=59, microsecond=0)
+    # need to make aware and then convert to utc for querying
+    start_aware = make_aware_to_utc(start, store_timezone)
+    end_aware = make_aware_to_utc(end, store_timezone)
     
     results = [] 
     if data_type == 'punches':
@@ -127,12 +146,12 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             unknown, male, female = 0, 0, 0 
             male_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
-                {"gender": "male"}, {'createdAt__lte':end,
-                    'createdAt__gte':start})['results']
+                {"gender": "male"}, {'createdAt__lte':end_aware,
+                    'createdAt__gte':start_aware})['results']
             female_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
-                {"gender": "female"}, {'createdAt__lte':end,
-                    'createdAt__gte':start})['results']
+                {"gender": "female"}, {'createdAt__lte':end_aware,
+                    'createdAt__gte':start_aware})['results']
             # aggregate the punches
             for p in male_punches:
                 male += p.get('punches')
@@ -158,12 +177,17 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                 end_dob = end_dob + relativedelta(days=-1)
                 end_dob = end_dob.replace(hour=23, minute=59, 
                                         second=59)
+                
+                # need to make aware and then convert to utc for querying
+                start_dob_aware = make_aware_to_utc(start_dob, store_timezone)
+                end_dob_aware = make_aware_to_utc(end_dob, store_timezone)
+                
                 punches = relational_query(store.objectId, "Store",
                     "Punches", "Punch", "Patron", "Patron", 
-                    {'date_of_birth__lte':end_dob,
-                     'date_of_birth__gte':start_dob},
-                    {'createdAt__lte':end, 
-                     'createdAt__gte':start})['results']
+                    {'date_of_birth__lte':end_dob_aware,
+                     'date_of_birth__gte':start_dob_aware},
+                    {'createdAt__lte':end_aware, 
+                     'createdAt__gte':start_aware})['results']
                 punch_count = 0
                 if punches: 
                     for punch in punches:
@@ -181,13 +205,13 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                     relational_query(store.objectId, "Store",
                         "FacebookPosts", "FacebookPost", 
                         "Patron", "Patron", 
-                        {"gender": "male"}, {'createdAt__lte':end,
-                        'createdAt__gte':start}, count=True), 
+                        {"gender": "male"}, {'createdAt__lte':end_aware,
+                        'createdAt__gte':start_aware}, count=True), 
                     relational_query(store.objectId, "Store",
                         "FacebookPosts", "FacebookPost", 
                         "Patron", "Patron", 
-                        {"gender": "female"}, {'createdAt__lte':end,
-                        'createdAt__gte':start}, count=True), 
+                        {"gender": "female"}, {'createdAt__lte':end_aware,
+                        'createdAt__gte':start_aware}, count=True), 
             ])
         
         elif filter == 'age':
@@ -204,13 +228,18 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                 end_dob = end_dob + relativedelta(days=-1)
                 end_dob = end_dob.replace(hour=23, minute=59, 
                                         second=59)
+                                        
+                # need to make aware and then convert to utc for querying
+                start_dob_aware = make_aware_to_utc(start_dob, store_timezone)
+                end_dob_aware = make_aware_to_utc(end_dob, store_timezone)
+                
                 rows[idx] = relational_query(store.objectId, "Store",
                     "FacebookPosts", "FacebookPost", 
                     "Patron", "Patron", 
-                    {'date_of_birth__lte':end_dob,
-                     'date_of_birth__gte':start_dob},
-                    {'createdAt__lte':end, 
-                     'createdAt__gte':start}, count=True)
+                    {'date_of_birth__lte':end_dob_aware,
+                     'date_of_birth__gte':start_dob_aware},
+                    {'createdAt__lte':end_aware, 
+                     'createdAt__gte':start_aware}, count=True)
                     
             results.append(rows)
             
@@ -224,13 +253,13 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                     relational_query(store.objectId, "Store",
                         "PatronStores", "PatronStore", 
                         "Patron", "Patron", 
-                        {"gender": "male"}, {'createdAt__lte':end,
-                        'createdAt__gte':start}, count=True), 
+                        {"gender": "male"}, {'createdAt__lte':end_aware,
+                        'createdAt__gte':start_aware}, count=True), 
                     relational_query(store.objectId, "Store",
                         "PatronStores", "PatronStore", 
                         "Patron", "Patron", 
-                        {"gender": "female"}, {'createdAt__lte':end,
-                        'createdAt__gte':start}, count=True), 
+                        {"gender": "female"}, {'createdAt__lte':end_aware,
+                        'createdAt__gte':start_aware}, count=True), 
             ])
             
         elif filter == 'age':
@@ -247,13 +276,18 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                 end_dob = end_dob + relativedelta(days=-1)
                 end_dob = end_dob.replace(hour=23, minute=59, 
                                         second=59)
+                                        
+                # need to make aware and then convert to utc for querying
+                start_dob_aware = make_aware_to_utc(start_dob, store_timezone)
+                end_dob_aware = make_aware_to_utc(end_dob, store_timezone)
+                
                 rows[idx] = relational_query(store.objectId, "Store",
                     "PatronStores", "PatronStore", 
                     "Patron", "Patron", 
-                    {'date_of_birth__lte':end_dob,
-                     'date_of_birth__gte':start_dob},
-                    {'createdAt__lte':end, 
-                     'createdAt__gte':start}, count=True)
+                    {'date_of_birth__lte':end_dob_aware,
+                     'date_of_birth__gte':start_dob_aware},
+                    {'createdAt__lte':end_aware, 
+                     'createdAt__gte':start_aware}, count=True)
             results.append(rows)
         
     return HttpResponse(json.dumps(results), content_type="application/json")
