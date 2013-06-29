@@ -3,9 +3,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.db.models import Sum
+from django.utils import timezone
 from datetime import datetime
 import urllib, json
 
+from parse.utils import make_aware_to_utc
 from parse.decorators import session_comet
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
@@ -210,6 +212,8 @@ def punches(request, employee_id):
 
 @login_required
 def graph(request):
+    store_timezone = SESSION.get_store_timezone(request.session)
+    
     employee_ids = request.GET.getlist('employee[]')
     start = request.GET.get('start')
     end = request.GET.get('end');
@@ -218,6 +222,10 @@ def graph(request):
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
     end = datetime.strptime(end, "%m/%d/%Y")
     end = end.replace(hour=23, minute=59, second=59, microsecond=0)
+    
+    # need to make aware and then convert to utc for querying
+    start_aware = make_aware_to_utc(start, store_timezone)
+    end_aware = make_aware_to_utc(end, store_timezone)
     
     columns = [
                 {"id":"", "label":"Date", "type":"string"}
@@ -241,11 +249,12 @@ def graph(request):
     # the query must be made in the punches for each employee...
     if employees:
         for emp in employees:
-            ps =  emp.get('punches', createdAt__gte=start, 
-                createdAt__lte=end)
+            ps =  emp.get('punches', createdAt__gte=start_aware, 
+                createdAt__lte=end_aware)
             if ps:
                 for punch in ps:
-                    key = punch.createdAt.strftime("%m/%d")+'-'+\
+                    key = timezone.localtime(punch.createdAt,
+                        store_timezone).strftime("%m/%d")+'-'+\
                         emp.objectId
                     if key in punch_map: 
                         punch_map[key] = punch_map[key] +\
@@ -256,7 +265,8 @@ def graph(request):
 
     rows = []
     for single_date in rputils.daterange(start, end):
-        str_date = single_date.strftime("%m/%d")
+        str_date =  make_aware_to_utc(single_date,
+            store_timezone).strftime("%m/%d")
         c = [{"v": str_date}]
         for emp in employees:
             try:
