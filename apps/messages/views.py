@@ -69,7 +69,7 @@ def edit(request, message_id):
                                     minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
-        message_count = SESSION.get_message_count(request.session)
+        message_count = SESSION.get_message_count(request.session, datetime.now())
                                 
         limit_reached = message_count >= sub_type[subType]['max_messages']
         
