@@ -23,7 +23,9 @@ Settings
 
 @session_comet
 def index(request):
-    if request.session.get('account'):
+    if request.session.get('account') is not None and\
+        request.session.get('store') is not None and\
+        request.session.get('subscription') is not None:
         return redirect(reverse('store_index'))
         
     data = {'home_nav': True}

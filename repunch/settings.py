@@ -40,7 +40,7 @@ EMAIL_USE_TLS = True
 ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com']
 # for template rendering
 ABSOLUTE_HOST = 'ec2-23-20-15-30.compute-1.amazonaws.com'
-ABSOLUTE_HOST_ALIAS = "vandolf.repunch.com"
+ABSOLUTE_HOST_ALIAS = "repunch.com"
 
 # PARSE 
 PARSE_VERSION = '1'

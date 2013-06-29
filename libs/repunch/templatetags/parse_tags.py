@@ -14,7 +14,8 @@ def get(parseObject, attr):
     This simply calls the get method of the parseObject with the
     parameter attr.
     """
-    return parseObject.get(attr)
+    if parseObject: # prevent server error
+        return parseObject.get(attr)
 
     
 @register.filter
