@@ -246,7 +246,7 @@ Parse.Cloud.define("punch", function(request, response) {
 	}
 	
 	function executePush() {
-	    // TODO sync ios push recption with android?
+	    // TODO sync ios push reception with android?
 		installationQuery.equalTo('deviceType', 'android');
 		Parse.Push.send({
 			where: installationQuery,
