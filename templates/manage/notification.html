@@ -16,10 +16,13 @@ http://www.htmlgoodies.com/beyond/css/article.php/3679231/How-to-Create-Great-HT
     <meta charset='utf-8'>
 </head>
 
+
+{% comment %}
 <!--IMPORTANT---------------------------
 These styles are copied from emails from meetup.com
 No theft intended.
 ----------------->
+{% endcomment %}
 
 <body style="margin: 0;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -72,15 +75,16 @@ Repunch Inc.
 <div style="background-color:#eee;border-top:10px solid #fff;
             background:#fff;">
 {% block content %}
+
 <p style="">
-Dear {{ entity.first_name|capfirst }} {{ entity.last_name|capfirst }},
+Dear {{ store.get_owner_fullname }},
 </p>
 
 <p style="">
 We will get in touch with you as soon as we can to help you get started. 
 </p>
-{% endblock %}
 
+{% endblock %}
 <div style="margin-bottom:30px;border-top:2px solid #fff;border-bottom:6px solid #fff; background:#fff;color:#ccc;font-size:18px;">- The Repunch Team</div>
 </div>
 </div>

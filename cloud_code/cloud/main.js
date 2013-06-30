@@ -182,7 +182,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			response.error("error");
 		}
 	});
-	// TEST ADD to store relation
+	
 	function addPatronStore() {
 		console.log("customer's first punch at this store, adding new PatronStore.");
 		var patronStore = new PatronStore(), store;
@@ -246,6 +246,7 @@ Parse.Cloud.define("punch", function(request, response) {
 	}
 	
 	function executePush() {
+	    // TODO sync ios push recption with android?
 		installationQuery.equalTo('deviceType', 'android');
 		Parse.Push.send({
 			where: installationQuery,

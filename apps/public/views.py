@@ -1,18 +1,19 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.core import mail 
 from datetime import datetime
 import json
 
+from forms import ContactForm
+from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.decorators import session_comet
 from parse.auth.utils import request_password_reset
-from parse.notifications import send_email_signup
-from parse.apps.accounts import order_placed, user_signup
+from parse.notifications import send_email_signup, send_email_receipt
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
-from forms import ContactForm
 from libs.repunch import rputils
 
 from parse.auth import login
@@ -161,17 +162,22 @@ def sign_up2(request):
             requestDict['password'] = account.password
             
             ####
+            conn = mail.get_connection(fail_silently=(not DEBUG))
+            
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit():
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
-                    order_placed(amount, store, account)
+                    invoice = subscription.charge_cc(\
+                        PHONE_COST_UNIT_COST*amount,
+                        "Repunch Inc. Order placed on " +\
+                        str(amount) + " phones", "smartphone")
+                    send_email_receipt(account, invoice, amount)
             
             # send matt and new user a pretty email.
-            # new user
-            send_email_signup(account)
-            # matt
-            user_signup(account)
+            send_email_signup(account, request=request)
+            
+            conn.close()
 
             # auto login
             user_login = login(request, requestDict)

@@ -12,6 +12,15 @@ from parse.apps.accounts import order_placed
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings
 
+def activate(request):
+    """
+    Handles account activation from email form sent at user sign up.
+    """
+    if request.method == "POST":
+        pass
+    
+    return HttpResponse("Bad request")
+
 @login_required
 @session_comet
 def settings(request):

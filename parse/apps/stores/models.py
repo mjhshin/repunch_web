@@ -78,6 +78,10 @@ class Store(ParseObject):
         
         super(Store, self).__init__(False, **data)
         
+    def get_owner_fullname(self):
+        return self.first_name.capitalize()+\
+                " " + self.last_name.capitalize()
+   
     def get_full_address(self):
         """
         Returns street, city, state, zip, country
@@ -157,15 +161,21 @@ class Invoice(ParseObject):
         
         super(Invoice, self).__init__(False, **data)
         
-    def to_message_plain(self):
+    def as_ul(self):
         """
-        Returns this invoice object as a string in message format.
+        Returns this invoice object as an html ul.
         """
-        return "Type: " + str(self.type) + "\n" +\
-            "State: " + str(self.state) + "\n" +\
-            "Payment Id: " + str(self.payment_id) + "\n" +\
-            "Sale Id: " + str(self.sale_id) + "\n" +\
-            "Total (USD):" + str(self.total) + "\n"
+        return "<ul>" + 
+            "<li><strong>Type:</strong> " + str(self.type) +\
+                "</li>" +\
+            "<li><strong>State:</strong> " + str(self.state) +\
+                "</li>" +\
+            "<li><strong>Payment Id:</strong> " +\
+                str(self.payment_id) + "</li>" +\
+            "<li><strong>Sale Id:</strong> " + str(self.sale_id) +\
+                "</li>" +\
+            "<li><strong>Total (USD):</strong> " + str(self.total) +\
+                "</li></ul>"
         
     
 class Subscription(ParseObject):

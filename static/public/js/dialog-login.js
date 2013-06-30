@@ -2,12 +2,12 @@
     Script for everythin in the dialog-logjn box.
 */
 
-// TODO clean up code lol
 $(document).ready(function(){
 
     var dl = $( "#dialog-login" );
     var loadingHeight = 10;
     var fpdiv = $("#forgot-pass-form-div");
+    var messageContainer = $("#dialog-login-message");
     
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
@@ -52,8 +52,6 @@ $(document).ready(function(){
         var url_redirect = $("#dialog-login-form input[name=redirect-url]").val();
         var data = $("#dialog-login-form").serialize();
         
-        var messageContainer = $("#dialog-login-message");
-        
         function finish(dim){
             if (fpdiv.css("display") != "none"){
                 dl.dialog( "option", "height", dim + 30 );
@@ -74,24 +72,28 @@ $(document).ready(function(){
                 3 - success */
             if (res.code == 3){
                 window.location.replace(url_redirect);
-                finish(320);
+                var dim = 320;
+                if ($("#dialog-login-message span[name=incorrect]").length > 0){
+                    dim += 20;
+                }
+                finish(dim);
             } else if (res.code == 2){
                 messageContainer.html("<span>Your account is not yet active.<br/>" +
                                 " We will get in touch with you soon.</span>");
                 finish(340);
                 loading.hide();
             } else if (res.code == 1){
-                messageContainer.html("<span>The username or password you entered is incorrect.</span>");
+                messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
                 finish(340);
                 loading.hide();
             } else {
                 // same as 1 but may want to change later
-                messageContainer.html("<span>The username or password you entered is incorrect.</span>");
+                messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
                 finish(340);
                 loading.hide();
             }
         }).fail(function(){  // should not go here unless server error
-            messageContainer.html("<span>Server Error</span>");
+            messageContainer.html("<span name='incorrect'>Server Error</span>");
             finish(320);
             loading.hide();
         });
