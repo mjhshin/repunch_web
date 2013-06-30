@@ -1,8 +1,9 @@
 {% extends "manage/notification.html" %}
+{% load parse_tags %}
 
 {% block title %}
 {% if for_customer %}
-Thank you for your purchase of {{ amount }} smartphones.
+Thank you for your purchase of {{ amount }} smartphone{% if amount > 1 %}s{% endif %}.
 {% else %}
 Purchase made by 
 {{ store.first_name|capfirst }} {{ store.last_name|capfirst }},
@@ -12,7 +13,10 @@ Purchase made by
 {% block content %}
 {% if for_customer %}
 <p style="">
-{{ store.first_name|capfirst }} {{ store.last_name|capfirst }},
+Hey {{ store.get_owner_fullname }},
+</p>
+<p>
+Here is your receipt for your recent purchase of smartphones.
 </p>
 {% endif %}
 
@@ -21,11 +25,12 @@ Purchase made by
 <strong>Quantity:</strong> {{ amount }}<br/>
 <strong>Total (USD):</strong> ${{ invoice.total }}<br/><br/>
 
-{% if invoice.sale_id %}
+{% if invoice.sale_id and for_customer %}
 <strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
 {% endif %}
 </p>
 {% if not for_customer %}
+<strong>ACCOUNT INFO</strong>
 <ul>
     <li><strong>Business name:</strong>
     {{ store|get:"store_name" }}
@@ -52,9 +57,10 @@ Purchase made by
     <li><strong>Phone number:</strong>
     {{ store|get:"phone_number" }}
     </li>
-</ul><br />
+</ul>
 <strong>PAYPAL INVOICE</strong>
-{{ invoice.as_ul }}
+{{ invoice.as_ul|safe }}
+<br/>
 {% endif %}
 
 {% endblock %}

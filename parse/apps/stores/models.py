@@ -165,7 +165,7 @@ class Invoice(ParseObject):
         """
         Returns this invoice object as an html ul.
         """
-        return "<ul>" + 
+        return "<ul>" +\
             "<li><strong>Type:</strong> " + str(self.type) +\
                 "</li>" +\
             "<li><strong>State:</strong> " + str(self.state) +\

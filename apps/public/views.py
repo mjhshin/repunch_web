@@ -170,7 +170,7 @@ def sign_up2(request):
                 if amount > 0:
                     invoice = subscription.charge_cc(\
                         PHONE_COST_UNIT_COST*amount,
-                        "Repunch Inc. Order placed on " +\
+                        "Order placed for " +\
                         str(amount) + " phones", "smartphone")
                     send_email_receipt(account, invoice, amount)
             

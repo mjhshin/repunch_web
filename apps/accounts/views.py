@@ -5,10 +5,10 @@ from django.contrib.auth import SESSION_KEY
 from datetime import datetime
 import json, urllib
 
+from repunch.settings import PHONE_COST_UNIT_COST
 from apps.stores.forms import SettingsForm, SubscriptionForm
 from parse.decorators import session_comet
 from parse import session as SESSION
-from parse.apps.accounts import order_placed
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings
 
@@ -113,10 +113,13 @@ def update(request):
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit():
                 amount = int(request.POST.get("place_order_amount"))
+                account = request.session['account']
+                invoice = subscription.charge_cc(\
+                    PHONE_COST_UNIT_COST*amount,
+                    "Order placed for " +\
+                    str(amount) + " phones", "smartphone")
                 if amount > 0:
-                    store.fetchAll()
-                    order_placed(amount, store,
-                        request.session['account'])   
+                    send_email_receipt(account, invoice, amount) 
             
             # update the session cache
             request.session['store'] = store
@@ -177,12 +180,14 @@ def upgrade(request):
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit():
                 amount = int(request.POST.get("place_order_amount"))
+                account = request.session['account']
+                invoice = subscription.charge_cc(\
+                    PHONE_COST_UNIT_COST*amount,
+                    "Order placed for " +\
+                    str(amount) + " phones", "smartphone")
                 if amount > 0:
-                    store.fetchAll()
-                    order_placed(amount, store, 
-                        request.session['account'])
+                    send_email_receipt(account, invoice, amount)
                     
-            
             # update the session cache
             request.session['store'] = store
             request.session['subscription'] = subscription

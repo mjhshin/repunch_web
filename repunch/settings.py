@@ -37,7 +37,7 @@ EMAIL_HOST_USER = 'support@repunch.com'
 EMAIL_HOST_PASSWORD = 'REPunch7575'
 EMAIL_USE_TLS = True
 # for order_placed event
-ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com']
+ORDER_PLACED_EMAILS = ['vandolf@repunch.com']#, 'matt@repunch.com']
 # for template rendering
 ABSOLUTE_HOST = 'ec2-23-20-15-30.compute-1.amazonaws.com'
 ABSOLUTE_HOST_ALIAS = "repunch.com"

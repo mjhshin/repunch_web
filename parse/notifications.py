@@ -2,6 +2,8 @@
 Emails notifications
 """
 
+from importlib import import_module
+
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
@@ -11,13 +13,17 @@ from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
 ORDER_PLACED_EMAILS
 
-NOTIFIC_CTX = {
-    'ABSOLUTE_HOST_ALIAS':ABSOLUTE_HOST_ALIAS,
-    'ABSOLUTE_HOST':ABSOLUTE_HOST,
-    'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
-    'STORE_INDEX':reverse('store_index'),
-    'EMAIL_HOST_USER': EMAIL_HOST_USER,
-}
+def get_notification_ctx():
+    """
+    Cannot declare as a constant. The reverse method crashes the app.
+    """
+    return {
+        'ABSOLUTE_HOST_ALIAS':ABSOLUTE_HOST_ALIAS,
+        'ABSOLUTE_HOST':ABSOLUTE_HOST,
+        'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
+        'STORE_INDEX':reverse('store_index'),
+        'EMAIL_HOST_USER': EMAIL_HOST_USER,
+    }
 
 def _send_emails(emails, connection=None):
     """
@@ -46,7 +52,7 @@ def send_email_receipt(account, invoice, amount, connection=None):
     store = account.get("store")
     # for account
     subject = "Repunch Inc. transaction receipt."
-    ctx = NOTIFIC_CTX.copy()
+    ctx = get_notification_ctx()
     ctx.update({
             'store': store,
             'amount': amount,
@@ -61,8 +67,9 @@ def send_email_receipt(account, invoice, amount, connection=None):
     emails.append(email)
     
     # for admins
-    subject = "Smartphone(s) purchased by " + ."
-    ctx = NOTIFIC_CTX.copy()
+    subject = "Smartphone(s) purchased by " +\
+         store.get_owner_fullname() + "."
+    ctx = get_notification_ctx()
     ctx.update({
             'account': account,
             'store': store,
@@ -86,9 +93,9 @@ def send_email_signup(account, request=None, connection=None):
         "/templates/manage/notification.html", 'r') as f:
         template = Template(f.read())
         
-    store = account.get(account.get('account_type'))
+    store = account.get("store")
     subject = "Welcome to Repunch " + store.get_owner_fullname() + "."
-    ctx = NOTIFIC_CTX.copy()
+    ctx = get_notification_ctx()
     ctx.update({'store':store})
     body = template.render(Context(ctx)).__str__()
     emails = []
@@ -108,13 +115,16 @@ def send_email_signup(account, request=None, connection=None):
         template = Template(f.read())
     
     subject = "New business: "+account.get("store").get("store_name")
-    ctx = NOTIFIC_CTX.copy()
+    AccountActivate = getattr(import_module('apps.accounts.models'),
+                                "AccountActivate")
+    ctx = get_notification_ctx()
     ctx.update({
         'account': account,
         'store': account.get("store"),
-        'activate': TODO,
+        'activate': AccountActivate.objects.create(\
+        				store_id=store.objectId),
     })
-    body = template.render(RequestContext(ctx)).__str__()
+    body = template.render(RequestContext(request, ctx)).__str__()
     
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=ORDER_PLACED_EMAILS)

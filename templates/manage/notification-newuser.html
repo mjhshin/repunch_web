@@ -30,13 +30,13 @@ A new business has signed up!
 
 <form method="POST" 
     action="http://{{ ABSOLUTE_HOST }}{% url 'account_activate' %}">
-{% csrf_token %}
-<input type="hidden" name="username" 
-    value="{{ activate.username }}" />
-<input type="hidden" name="id" 
-    value="{{ activate.id }}" />
-Click the button below to activate this user's account.<br/>
-This can only be used once.<br/>
-<input type="submit" value="Activate" />
-</form>
+	{% csrf_token %}
+	<input type="hidden" name="username" 
+		value="{{ activate.store_id }}" />
+	<input type="hidden" name="id" 
+		value="{{ activate.id }}" />
+	Click the button below to activate this user's account.<br/>
+	This can only be used once.<br/>
+	<input type="submit" value="Activate" />
+</form><br/>
 {% endblock %}

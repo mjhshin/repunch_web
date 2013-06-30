@@ -33,6 +33,8 @@ $(document).ready(function(){
 
     var messageContainer = $("#dialog-signup-message");
     $("#signup-form-submit").click(function(){
+        // make sure that this has default message
+        messageContainer.text("Processing your information. Please wait.");
         // update the phone number's value
         $("#id_phone_number").val(new String($("#Ph1").val()) + 
             new String($("#Ph2").val()) + new String($("#Ph3").val()));
