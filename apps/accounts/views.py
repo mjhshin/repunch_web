@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -5,19 +6,41 @@ from django.contrib.auth import SESSION_KEY
 from datetime import datetime
 import json, urllib
 
+from apps.accounts.models import AccountActivate
 from repunch.settings import PHONE_COST_UNIT_COST
 from apps.stores.forms import SettingsForm, SubscriptionForm
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
-from parse.apps.stores.models import Settings
+from parse.apps.stores.models import Settings, Store
 
+@csrf_exempt
 def activate(request):
     """
     Handles account activation from email form sent at user sign up.
     """
     if request.method == "POST":
-        pass
+        store_id = request.POST['store_id']
+        act_id = request.POST['act_id']
+        act = AccountActivate.objects.filter(id=act_id,
+                store_id=store_id)
+        if len(act) > 0:
+            act = act[0]
+            if not act.is_used: # exist and unused!
+                act.is_used = True
+                act.save()
+                store = Store.objects().get(objectId=store_id)
+                if store:
+                    store.active = True
+                    store.update()
+                    return HttpResponse(store.get(\
+                        "store_name").capitalize() +\
+                        " has been activated.")
+                else:
+                    return HttpResponse("Account/store not found.")    
+            else: # used
+                return HttpResponse("This form has already "+\
+                    "been used.")                
     
     return HttpResponse("Bad request")
 

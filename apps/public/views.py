@@ -175,7 +175,7 @@ def sign_up2(request):
                     send_email_receipt(account, invoice, amount)
             
             # send matt and new user a pretty email.
-            send_email_signup(account, request=request)
+            send_email_signup(account)
             
             conn.close()
 

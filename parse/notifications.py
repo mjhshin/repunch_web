@@ -7,7 +7,7 @@ from importlib import import_module
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
-from django.template import Template, Context, RequestContext
+from django.template import Template, Context
 
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
@@ -84,7 +84,7 @@ def send_email_receipt(account, invoice, amount, connection=None):
     
     _send_emails(emails, connection)
 
-def send_email_signup(account, request=None, connection=None):
+def send_email_signup(account, connection=None):
     """
     Sends a welcome notification to the account and admins.
     """
@@ -105,10 +105,6 @@ def send_email_signup(account, request=None, connection=None):
     email.attach_alternative(body, 'text/html')
     emails.append(email)
     
-    if not request:
-        _send_emails(emails, connection)
-        return 
-    
     # for admins
     with open(FS_SITE_DIR +\
         "/templates/manage/notification-newuser.html", 'r') as f:
@@ -124,7 +120,7 @@ def send_email_signup(account, request=None, connection=None):
         'activate': AccountActivate.objects.create(\
         				store_id=store.objectId),
     })
-    body = template.render(RequestContext(request, ctx)).__str__()
+    body = template.render(Context(ctx)).__str__()
     
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=ORDER_PLACED_EMAILS)
