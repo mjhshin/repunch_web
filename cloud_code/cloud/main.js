@@ -519,7 +519,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        data: {
 	            title: rewardTitle,
 	            id: storeId, 
-	            name: storeName, 
+	            store: storeName, 
 	            num_punches: numPunches,
 				action: "com.repunch.intent.REDEEM"
 	        }
