@@ -22,6 +22,8 @@ def index(request):
     # utc time. We need the local time and then convert it to utc
     today = timezone.make_aware(datetime.now(), 
                     SESSION.get_store_timezone(request.session))
+    today = today + relativedelta(days=-1)
+    today = today.replace(hour=23, minute=59, second=59) # midnight
     redemps = SESSION.get_redemptions(request.session)[:20]
     past_redemps = SESSION.get_redemptions_past(request.session)[:20]
     data = {"workbench_nav":True,

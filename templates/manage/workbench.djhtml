@@ -61,7 +61,7 @@
 		        class="tr  {% cycle '' 'odd' %}">
 		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time">
-				{% if redemp.createdAt.day < today.day %}
+				{% if redemp.createdAt < today %}
 				{{ redemp.createdAt|date:"F d" }}
 				{% else %}
 				{{ redemp.createdAt|date:"h:i a" }}
@@ -99,7 +99,7 @@
 		        class="tr  {% cycle '' 'odd' %}">
 		        <input type="hidden" value="{{redemp.reward_id}}" />
 				<div class="td redemption_time-past">
-				{% if redemp.updatedAt.day < today.day %}
+				{% if redemp.updatedAt < today %}
 				{{ redemp.updatedAt|date:"F d" }}
 				{% else %}
 				{{ redemp.updatedAt|date:"h:i a" }}
