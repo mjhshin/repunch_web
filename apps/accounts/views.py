@@ -8,7 +8,8 @@ import json, urllib
 
 from apps.accounts.models import AccountActivate
 from repunch.settings import PHONE_COST_UNIT_COST
-from apps.stores.forms import SettingsForm, SubscriptionForm
+from apps.stores.forms import SettingsForm, SubscriptionForm,\
+SubscriptionForm3
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
@@ -114,15 +115,16 @@ def update(request):
     subscription = SESSION.get_subscription(request.session)
     
     if request.method == 'POST':
-        form = SubscriptionForm(request.POST)
+        form = SubscriptionForm3(request.POST)
+        form.subscription = subscription # to validate cc_number
         if form.is_valid():       
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
             try:
                 subscription.set("date_cc_expiration", 
-                    datetime(int(request.POST['cc_expiration_year']),
-                        int(request.POST['cc_expiration_month']), 1))
+                    datetime(int(request.POST['date_cc_expiration_year']),
+                        int(request.POST['date_cc_expiration_month']), 1))
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
@@ -152,7 +154,7 @@ def update(request):
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm()
+        form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
@@ -174,8 +176,8 @@ def upgrade(request):
     subscription = SESSION.get_subscription(request.session)
     
     if request.method == 'POST':
-        form = SubscriptionForm(request.POST) 
-
+        form = SubscriptionForm3(request.POST)
+        form.subscription = subscription # to validate cc_number
         if form.is_valid(): 
             # consult accounts.__init__
             level = subscription.get("subscriptionType")
@@ -189,8 +191,8 @@ def upgrade(request):
             
             try:
                 subscription.set("date_cc_expiration", 
-                datetime(int(request.POST['cc_expiration_year']),
-                    int(request.POST['cc_expiration_month']), 1))
+                datetime(int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1))
                 subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
             except Exception as e:
@@ -219,7 +221,7 @@ def upgrade(request):
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm()
+        form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\

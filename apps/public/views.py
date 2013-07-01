@@ -126,8 +126,8 @@ def sign_up2(request):
             # create subscription
             subscription = Subscription(**postDict)
             subscription.set("date_cc_expiration", 
-                datetime(int(postDict['cc_expiration_year']),
-                    int(postDict['cc_expiration_month']), 1))
+                datetime(int(postDict['date_cc_expiration_year']),
+                    int(postDict['date_cc_expiration_month']), 1))
             subscription.subscriptionType = 0
             # make sure to use the correct POST info
             subscription.first_name = request.POST['first_name2']
