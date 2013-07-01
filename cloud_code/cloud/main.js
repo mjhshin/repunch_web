@@ -756,7 +756,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 new Date(request.params.idle_date) );
         } else if (filter === "most_loyal") {
             patronStoreQuery.greaterThanOrEqualTo("all_time_punches", 
-                request.params.min_punches);
+                parseInt(request.params.min_punches));
         }  
 
         if (filter === "one"){
