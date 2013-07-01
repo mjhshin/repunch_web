@@ -451,58 +451,58 @@ Parse.Cloud.define("request_redeem", function(request, response) {
     var storeQuery = new Parse.Query(Store);
 	var patronStoreQuery = new Parse.Query(PatronStore);
 	
-	redeemReward.save().then(function(redeemReward) {
-		console.log("RedeemReward save success.");
-		return storeQuery.get(storeId).save();
-		
-	}, function(error) {
-			console.log("RedeemReward save failed.");
-			response.error("error");
+	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
+		console.log("PatronStore fetch success.");
+		if(patronStore.get("redeem_pending") == true) {
+			response.success("pending");
 			return;
-			
-	}).then(function(store) {
-			console.log("Store fetch success.");
-			store.relation("RedeemRewards").add(redeemReward);
-			return store.save();
-					
-	}, function(error) {
-			console.log("Store fetch failed.");
-			response.error("error");
-			return;	
-			
-	}).then(function(store) {
-			console.log("Store save success.");
-			return patronStoreQuery.get(patronStoreId);
-					
-	}, function(error) {
-			console.log("Store save failed.");
-			response.error("error");
-			return;
-			
-	}).then(function(patronStore) {
-			console.log("PatronStore fetch success.");
-			if(patronStore.get("redeem_pending") == true) {
-				response.error("pending");
-				return;
 				
-			} else {
-				patronStore.set("redeem_pending", true);
-				return patronStore.save();
-			}
+		} else {
+			patronStore.set("redeem_pending", true);
+			return patronStore.save();
+		}
 					
 	}, function(error) {
 			console.log("PatronStore fetch failed.");
 			response.error("error");
 			return;
 			
+	}).then(function(patronStore) {
+		console.log("PatronStore save success.");
+		return redeemReward.save();
+		
+	}, function(error) {
+		console.log("PatronStore save failed.");
+		response.error("error");
+		return;
+			
+	}).then(function(redeemReward) {
+		console.log("RedeemReward save success.");
+		return storeQuery.get(storeId);
+		
+	}, function(error) {
+		console.log("RedeemReward save failed.");
+		response.error("error");
+		return;
+			
 	}).then(function(store) {
-			console.log("PatronStore save success.");
-			executePush();
+		console.log("Store fetch success.");
+		store.relation("RedeemRewards").add(redeemReward);
+		return store.save();
 					
 	}, function(error) {
-			console.log("PatronStore save failed.");
-			response.error("error");
-			return;		
+		console.log("Store fetch failed.");
+		response.error("error");
+		return;	
+			
+	}).then(function(store) {
+		console.log("Store save success.");
+		executePush();
+				
+	}, function(error) {
+		console.log("Store save failed.");
+		response.error("error");
+		return;			
 	});
 	
 	function executePush() {
