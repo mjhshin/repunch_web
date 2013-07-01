@@ -110,6 +110,85 @@ Parse.Cloud.define("register_employee", function(request, response) {
 //
 //
 ////////////////////////////////////////////////////
+Parse.Cloud.define("add_to_my_places", function(request, response) {
+    var patronId = request.params.request_id;
+	var storeId = request.params.store_id;
+	
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	
+	var patronStore = new PatronStore();
+	var store = new Store();
+	var patron = new Patron();
+	
+	var storeQuery = new Parse.Query(Store);
+	var patronQuery = new Parse.Query(Patron);
+	
+	store.id = storeId;
+	patron.id = patronId;
+	
+	patronStore.set("all_time_punches", 0);
+	patronStore.set("punch_count", 0);
+	patronStore.set("Store", store);
+	patronStore.set("Patron", patron);
+	
+	patronStore.save().then(function(patronStore) {
+		console.log("PatronStore save success.");
+		return patronQuery.get(patronId);
+		
+	}, function(error) {
+		console.log("PatronStore save failed.");
+		response.error("error");
+		return;
+		
+	}).then(function(patron) {
+		console.log("Patron fetch success.");
+		patron.relation("PatronStores").add(patronStore);
+		return patron.save(patronId);
+		
+	}, function(error) {
+		console.log("Patron fetch failed.");
+		response.error("error");
+		return;
+		
+	}).then(function(patron) {
+		console.log("Patron save success.");
+		return storeQuery.get(storeId);
+		
+	}, function(error) {
+		console.log("Patron save failed.");
+		response.error("error");
+		return;
+		
+	}).then(function(store) {
+		console.log("Store fetch success.");
+		store.relation("PatronStores").add(patronStore);
+		return store.save();
+		
+	}, function(error) {
+		console.log("Store fetch failed.");
+		response.error("error");
+		return;
+		
+	}).then(function(patron) {
+		console.log("Store save success.");
+		response.success("success");
+		return;
+		
+	}, function(error) {
+		console.log("Store save failed.");
+		response.error("error");
+		return;
+	});
+	
+});
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
 Parse.Cloud.define("assign_punch_code", function(request, response) {
     var PunchCode = Parse.Object.extend("PunchCode");
     var query = new Parse.Query(PunchCode);
