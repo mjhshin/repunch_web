@@ -110,8 +110,8 @@ Parse.Cloud.define("register_employee", function(request, response) {
 //
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("add_to_my_places", function(request, response) {
-    var patronId = request.params.request_id;
+Parse.Cloud.define("add_patronstore", function(request, response) {
+    var patronId = request.params.patron_id;
 	var storeId = request.params.store_id;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
@@ -130,6 +130,7 @@ Parse.Cloud.define("add_to_my_places", function(request, response) {
 	
 	patronStore.set("all_time_punches", 0);
 	patronStore.set("punch_count", 0);
+	patronStore.set("redeem_pending", false);
 	patronStore.set("Store", store);
 	patronStore.set("Patron", patron);
 	
@@ -347,7 +348,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		Parse.Push.send({
 			where: installationQuery,
 			data: {
-				alert:request.params.store_name + " has punched you. BAM.",
+				alert: storeName + " has punched you. BAM.",
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
@@ -447,36 +448,61 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	redeemReward.set("PatronStore", patronStore);
 	
 	var Store = Parse.Object.extend("Store");
-	var store;
     var storeQuery = new Parse.Query(Store);
+	var patronStoreQuery = new Parse.Query(PatronStore);
 	
-	storeQuery.get(storeId).then(function(storeResult) {
-		console.log("Store fetch success.");
-		store = storeResult;
-		
-		return redeemReward.save();
+	redeemReward.save().then(function(redeemReward) {
+		console.log("RedeemReward save success.");
+		return storeQuery.get(storeId).save();
 		
 	}, function(error) {
-			console.log("Store fetch failed.");
+			console.log("RedeemReward save failed.");
 			response.error("error");
+			return;
 			
-	}).then(function(redeemReward) {
-			console.log("RedeemReward save success.");
+	}).then(function(store) {
+			console.log("Store fetch success.");
 			store.relation("RedeemRewards").add(redeemReward);
-			
 			return store.save();
 					
 	}, function(error) {
-			console.log("RedeemReward save failed.");
-			response.error("error");	
+			console.log("Store fetch failed.");
+			response.error("error");
+			return;	
 			
 	}).then(function(store) {
 			console.log("Store save success.");
-			executePush();
+			return patronStoreQuery.get(patronStoreId);
 					
 	}, function(error) {
 			console.log("Store save failed.");
-			response.error("error");			
+			response.error("error");
+			return;
+			
+	}).then(function(patronStore) {
+			console.log("PatronStore fetch success.");
+			if(patronStore.get("redeem_pending") == true) {
+				response.error("pending");
+				return;
+				
+			} else {
+				patronStore.set("redeem_pending", true);
+				return patronStore.save();
+			}
+					
+	}, function(error) {
+			console.log("PatronStore fetch failed.");
+			response.error("error");
+			return;
+			
+	}).then(function(store) {
+			console.log("PatronStore save success.");
+			executePush();
+					
+	}, function(error) {
+			console.log("PatronStore save failed.");
+			response.error("error");
+			return;		
 	});
 	
 	function executePush() {
@@ -497,10 +523,12 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	        success: function() {
 				console.log("Push success.");
 	            response.success("success");
+				return;
 	        },
 	        error: function(error) {
 				console.log("Push failed.");
 	            response.error("error");
+				return;
 	        }
 	    });
 	}
@@ -566,6 +594,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			console.log("PatronStore has enough punches.");
 			patronId = patronStore.get("Patron").id;
 			patronStore.increment("punch_count", -1*numPunches);
+			patronStore.set("redeem_pending", false);
 			redeemReward.set("is_redeemed", true);
 			
 			var promises = [];
