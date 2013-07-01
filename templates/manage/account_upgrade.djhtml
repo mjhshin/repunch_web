@@ -67,9 +67,9 @@ $(document).ready(function(){
 		</div>
 		
 		<div class="input-container">
-			{{ form.cc_expiration.errors }}
+			{{ form.date_cc_expiration.errors }}
 			<label for="expiration_month">Expiration</label>
-			{{ form.cc_expiration }}
+			{{ form.date_cc_expiration }}
 		</div>
 	</div>
 	

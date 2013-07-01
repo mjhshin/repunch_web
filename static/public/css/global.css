@@ -1201,7 +1201,7 @@ float: right;
 	margin-bottom: 0px;
 }
 
-#signup-form #id_cc_expiration_month, #signup-form #id_cc_expiration_year {
+#signup-form #id_date_cc_expiration_month, #signup-form #id_date_cc_expiration_year {
 	width: 100px;
 }
 

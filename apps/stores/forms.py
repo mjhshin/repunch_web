@@ -103,7 +103,7 @@ class SubscriptionForm2(forms.Form):
     last_name2 = forms.CharField(max_length=100,
                     validators=[alphanumeric])
     cc_number = forms.CharField(max_length=255)
-    cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
+    date_cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
     address = forms.CharField(max_length=255,
                     validators=[alphanumeric])
     city2 = forms.CharField(max_length=255,
@@ -143,8 +143,8 @@ class SubscriptionForm2(forms.Form):
                                     " & Conditions to continue.")
         return data
     
-    def clean_cc_expiration(self):
-        data = self.cleaned_data['cc_expiration']
+    def clean_date_cc_expiration(self):
+        data = self.cleaned_data['date_cc_expiration']
         now = datetime.datetime.now()
         if data.year == now.year:
             if data.month < now.month:
@@ -172,7 +172,7 @@ class SubscriptionForm(forms.Form):
     last_name = forms.CharField(max_length=100,
                     validators=[alphanumeric])
     cc_number = forms.CharField(max_length=255)
-    cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
+    date_cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
     address = forms.CharField(max_length=255,
                     validators=[alphanumeric])
     city = forms.CharField(max_length=255,
@@ -212,8 +212,8 @@ class SubscriptionForm(forms.Form):
                                     " & Conditions to continue.")
         return data
     
-    def clean_cc_expiration(self):
-        data = self.cleaned_data['cc_expiration']
+    def clean_date_cc_expiration(self):
+        data = self.cleaned_data['date_cc_expiration']
         now = datetime.datetime.now()
         if data.year == now.year:
             if data.month < now.month:
@@ -234,6 +234,24 @@ class SubscriptionForm(forms.Form):
                                         " accepted.")
         
         return data
+        
+class SubscriptionForm3(SubscriptionForm):
+    """
+    Use for existing subscriptions. Reason is to not validate credit
+    card number but rather just check if it matches the one on record.
+    """
+    def clean_cc_number(self):
+        """ do not validate_checksum """
+        # take the last 4 digits
+        data = self.cleaned_data['cc_number'][-4:]
+        if data != self.subscription.cc_number:
+            raise forms.ValidationError("Enter a valid credit card"+\
+                                        " number.")
+                                        
+    def clean(self, *args, **kwargs):
+        """ override the clean method. """
+        return self.cleaned_data
+        
                
 class SettingsForm(forms.Form):
     punches_employee = forms.IntegerField(label=\
