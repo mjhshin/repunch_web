@@ -592,7 +592,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
-			response.error("error");
+			response.success("insufficient");
 			return;
 			
 		} else{
@@ -606,22 +606,18 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			promises.push( patronStore.save() );
 			promises.push( redeemReward.save() );
 			
-			return Parse.Promise.when(promises);
+			Parse.Promise.when(promises).then(function(){
+			    console.log("PatronStore and RedeemReward save success (in parallel).");
+			    executePush();
+			}, function(error) {
+			    console.log("PatronStore and RedeemReward save fail (in parallel).");
+			    response.error("error");
+	        });
 		}
 		
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
 			response.error("error");
-			return;
-			
-	}).then(function() {
-			console.log("PatronStore and RedeemReward save success (in parallel).");
-			executePush();
-					
-	}, function(error) {
-			console.log("PatronStore and RedeemReward save fail (in parallel).");
-			response.error("error");
-			return;		
 	});
 	
 	function executePush() {
@@ -662,14 +658,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      feedback_unread_ids (String array)
 //      employees_pending_ids (String array)
 //      redemption_ids (String array)
-//      // past_hour (UTC datetime for redemptions)
 //
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
 //      feedbacks (new objects) (if new stuff)
 //      employees (new objects) (if new employees)
-//      redemptions (latest redemptions the past hour limit of 20)
+//      redemptions
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_refresh", function(request, response) {

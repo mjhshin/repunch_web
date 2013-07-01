@@ -49,7 +49,7 @@ class PatronStore(ParseObject):
         self.Store = data.get("Store")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
-        self.redeem_pending = data.get("redeem_pending", false)
+        self.redeem_pending = data.get("redeem_pending", False)
         
         super(PatronStore, self).__init__(False, **data)
 
