@@ -242,11 +242,24 @@ class SubscriptionForm3(SubscriptionForm):
     """
     def clean_cc_number(self):
         """ do not validate_checksum """
-        # take the last 4 digits
-        data = self.cleaned_data['cc_number'][-4:]
-        if data != self.subscription.cc_number:
-            raise forms.ValidationError("Enter a valid credit card"+\
-                                        " number.")
+        data = str(self.cleaned_data['cc_number'])
+        # completely new card number (no asterisks)
+        if str(data).isdigit():
+            if rpccutils.validate_checksum(data) == False:
+                raise forms.ValidationError(\
+                    "Enter a valid credit card number.")
+            if rpccutils.validate_cc_type(data) == False:
+                raise forms.ValidationError(\
+                    "Credit card type is not accepted.")
+        
+        else: # old card number
+            data = data[-4:]
+            if data != self.subscription.cc_number[-4:]:
+                # also check if number changed 
+                raise forms.ValidationError(\
+                    "Enter a valid credit card number.")
+                                            
+        return self.cleaned_data['cc_number']
                                         
     def clean(self, *args, **kwargs):
         """ override the clean method. """

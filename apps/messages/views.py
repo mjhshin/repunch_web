@@ -74,17 +74,6 @@ def edit(request, message_id):
         limit_reached = message_count >= sub_type[subType]['max_messages']
         
         if form.is_valid() and not limit_reached:
-            if form.data.get('action')  == 'upgrade':
-                pass
-                """
-                if account.upgrade():
-                    message.status = 'Sent'
-                    message.date_sent = datetime.date.today()
-                    request.session['account'] = account 
-                else:
-                    data['error'] = "Error upgrading your account."
-                """
-
             # create the message
             message = Message(sender_name=\
                     store.get('store_name'), store_id=store.objectId)
@@ -153,6 +142,9 @@ def edit(request, message_id):
             
         elif limit_reached and subType != 2:
             data['limit_reached'] = limit_reached
+            # save the dict to the session
+            request.session['message_b4_upgrade'] =\
+                request.POST.dict().copy()
         elif limit_reached and subType == 2:
             data['limit_reached'] = limit_reached
             data['maxed_out'] = True
@@ -162,6 +154,15 @@ def edit(request, message_id):
         else:
             data['error'] = "The form you submitted has errors."
     else:
+        # check if the incoming request is for an account upgrade
+        do_upgrade = request.GET.get("account_upgrade") 
+        if do_upgrade and do_upgrade.isdigit() and\
+            int(do_upgrade) == 1:
+            # flag the upgrade view
+            request.session["from_limit_reached"] = True
+            # redirect to upgrade account 
+            return HttpResponseRedirect(reverse("account_upgrade"))
+            
         if message_id in (0, '0'):
             form = MessageForm()
         else:

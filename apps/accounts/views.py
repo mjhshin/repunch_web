@@ -125,9 +125,15 @@ def update(request):
                 subscription.set("date_cc_expiration", 
                     datetime(int(request.POST['date_cc_expiration_year']),
                         int(request.POST['date_cc_expiration_month']), 1))
-                subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv'])
+                # only store_cc if it is a digit
+                if str(form.data['cc_number']).isdigit():
+                    subscription.store_cc(form.data['cc_number'],
+                                                form.data['cc_cvv'])
+                else:
+                    subscription.update()
+                    
             except Exception as e:
+                # DOES NOT GO HERE! store_cc catches the exception!
                 form = SubscriptionForm(subscription.__dict__.copy())
                 form.errors['__all__'] =\
                     form.error_class([e])
@@ -170,7 +176,9 @@ def update(request):
 @login_required
 @session_comet
 def upgrade(request):
-    """ same as update expect this upgrades the subscriptionType """
+    """ 
+    same as update except this also handles redirects from message
+    """
     data = {'account_nav': True, 'upgrade':True}
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
@@ -191,10 +199,15 @@ def upgrade(request):
             
             try:
                 subscription.set("date_cc_expiration", 
-                datetime(int(request.POST['date_cc_expiration_year']),
-                    int(request.POST['date_cc_expiration_month']), 1))
-                subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv'])
+                    datetime(int(request.POST['date_cc_expiration_year']),
+                        int(request.POST['date_cc_expiration_month']), 1))
+                # only store_cc if it is a digit
+                if str(form.data['cc_number']).isdigit():
+                    subscription.store_cc(form.data['cc_number'],
+                                                form.data['cc_cvv'])
+                else:
+                    subscription.update()
+                    
             except Exception as e:
                 form = SubscriptionForm(subscription.__dict__.copy())
                 form.errors['__all__'] = form.error_class([e])
@@ -216,6 +229,19 @@ def upgrade(request):
             # update the session cache
             request.session['store'] = store
             request.session['subscription'] = subscription
+            
+            message_b4_upgrade =\   
+                request.session.get('message_b4_upgrade')
+            if request.session.get('from_limit_reached') and\
+                message_b4_upgrade:
+                
+                
+                # cleanup temp vars in session
+                del request.session['from_limit_reached']
+                
+                return redirect(reverse('store_index')+ "?%s" %\
+                        urllib.urlencode({'success':\
+                            'Your account has been updated.'}))
 
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -226,6 +252,10 @@ def upgrade(request):
         # add some asterisk to cc_number
         form.initial['cc_number'] = "*" * 12 +\
             form.initial.get('cc_number')[-4:]
+            
+        from_limit_reached = request.session.get("from_limit_reached")
+        if from_limit_reached:
+            data['from_limit_reached'] = from_limit_reached
             
     # update the session cache
     request.session['store'] = store

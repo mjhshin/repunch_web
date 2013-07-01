@@ -27,6 +27,11 @@ $(document).ready(function(){
 		<div>{{ form.non_field_errors }}</div>
 	</div>
 	{% endif %}
+	{% if from_limit_reached %}
+    <div class="notification">
+		<div>Your message will be sent after you succesfully upgrade your account.</div>
+	</div>
+	{% endif %}
 	
 
 	<h2>{% if account.is_free %}Upgrade Account{% else %}{% endif %}</h2>
