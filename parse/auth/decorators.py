@@ -4,21 +4,30 @@ A modified version of django.contrib.auth.decorators.login_required
 
 import urlparse
 from functools import wraps
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
 from django.utils.decorators import available_attrs
+
+from parse import session as SESSION
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
     that takes the user object and returns True if the user passes.
+    
+    This also sets the timezone to the store's timezone.
     """
 
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             if test_func(request):
+                # may not want to import parse.session here due
+                # to cyclic imports
+                timezone.activate(SESSION.get_store_timezone(\
+                    request.session))
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
             # If the login url is the same scheme and net location then just
@@ -43,6 +52,8 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     The key difference b/w this and the original Django implementation
     is that the test for authentication is now using the sessionToken
     retrieved from Parse.
+    
+    This also sets the timezone to the store's timezone.
     """
     actual_decorator = user_passes_test(
         lambda req: req.session.get('account') and\

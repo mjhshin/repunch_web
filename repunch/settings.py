@@ -90,8 +90,11 @@ ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost',
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = "America/New_York"
-
+if DEBUG:
+    TIME_ZONE = "Africa/Maseru" # set for debugging purposes
+else:
+    TIME_ZONE = "America/New_York"
+    
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.djhtml
 LANGUAGE_CODE = 'en-us'

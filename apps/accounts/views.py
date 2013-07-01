@@ -230,18 +230,13 @@ def upgrade(request):
             request.session['store'] = store
             request.session['subscription'] = subscription
             
-            message_b4_upgrade =\   
-                request.session.get('message_b4_upgrade')
+            # if coming from the message edit limit reached
             if request.session.get('from_limit_reached') and\
-                message_b4_upgrade:
-                
-                
-                # cleanup temp vars in session
-                del request.session['from_limit_reached']
-                
-                return redirect(reverse('store_index')+ "?%s" %\
-                        urllib.urlencode({'success':\
-                            'Your account has been updated.'}))
+                request.session.get('message_b4_upgrade'):
+                # redirect back to message_edit view to process the 
+                return redirect(reverse('message_edit', 
+                        args=(0,)) + "?%s" %\
+                        urllib.urlencode({'send_message': '1'}))
 
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\

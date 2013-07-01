@@ -1,5 +1,6 @@
 #file use for helper functions for the repunch class
 import calendar
+from libs.dateutil.relativedelta import relativedelta
 from datetime import timedelta, datetime
 from django.utils import timezone
 from PIL import Image
@@ -45,30 +46,25 @@ def calculate_daterange(type):
     end = end.replace(hour=23, minute=59, second=59, microsecond=0)
     
     if type == 'month-to-date':
-        start = start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        start = start.replace(day=1, hour=0, minute=0, second=0)
     elif type == 'week-to-date':
-        day = calendar.weekday(start.year, start.month, start.day)
-        start = start - timedelta(days=day)
+        # from monday to sunday!
+        start = start + relativedelta(days=-1*start.weekday())
     elif type == 'last-week':
-        #get the day of te week
-        day = calendar.weekday(start.year, start.month, start.day)
-        start = start - timedelta(days=(day+7)) #go back to the start of last week
-        end = start + timedelta(days=6) # now go to the end of the week
+        start = start + relativedelta(days=-1*start.weekday() - 7)
+        end = start + relativedelta(days=7)
     elif type == 'last-month':
-        #first day of current month
-        start = start.replace(day=1)
-        start = start - timedelta(days=1) # go back one day to previous month
-        start = start.replace(day=1) # first day of the month
-        
-        #calculate last day of mont
-        (_, last_day) = calendar.monthrange(start.year, start.month)
-        end = start #need to start from her in case it is a different year
-        end = end.replace(day=last_day, hour=23, minute=59, second=59, microsecond=0)
+        start = start + relativedelta(days=-1*start.day)
+        month_maxday = start.day
+        # get first day of the month
+        start = start + relativedelta(days=-1*start.day + 1)
+        end = start.replace(day=month_maxday,
+            hour=23, minute=59, second=59)
     
     return (start, end)
 
 def set_timezone(request, tz=None):
-    if tz == None:
+    if not tz:
         tz = request.session.get('store_timezone') 
     else:
         request.session['store_timezone'] = tz

@@ -22,7 +22,6 @@ from libs.dateutil.relativedelta import relativedelta
 @login_required
 @session_comet  
 def index(request):
-    rputils.set_timezone(request)
     data = {'messages_nav': True}
         
     data['messages'] = SESSION.get_messages_sent_list(request.session)
@@ -43,7 +42,6 @@ def index(request):
 @login_required
 @session_comet  
 def edit(request, message_id):
-    rputils.set_timezone(request)
     store = SESSION.get_store(request.session)
 
     data = {'messages_nav': True, 'message_id': message_id,
@@ -59,11 +57,22 @@ def edit(request, message_id):
     data['mp_slider_min'] = int(mp*0.20)
     data['mp_slider_max'] = int(mp*0.80)
     
-    if request.method == 'POST':
+    if request.method == 'POST' or (request.method == "GET" and\
+        request.GET.get("send_message")):
+        
         # 404 if no patrons 
         if not store.get("patronStores", count=1, limit=0):
             raise Http404
-        form = MessageForm(request.POST) 
+            
+        if (request.method == "GET" and request.GET.get("send_message")):
+            postDict = request.session['message_b4_upgrade'].copy()
+            # cleanup temp vars in session
+            del request.session['message_b4_upgrade']
+            del request.session['from_limit_reached']
+        else:
+            postDict = request.POST.dict().copy()
+        
+        form = MessageForm(postDict) 
         # check here if limit has been reached
         start = datetime.now().replace(day=1, hour=0,
                                     minute=0, second=0)
@@ -77,12 +86,11 @@ def edit(request, message_id):
             # create the message
             message = Message(sender_name=\
                     store.get('store_name'), store_id=store.objectId)
-            message.update_locally(request.POST.dict(), False)
+            message.update_locally(postDict, False)
             
             # check if attach offer is selected
-            if 'attach_offer' in request.POST.dict():
-                d = parser.parse(\
-                    request.POST['date_offer_expiration'])
+            if 'attach_offer' in postDict:
+                d = parser.parse(postDict['date_offer_expiration'])
                 # make aware
                 d = timezone.make_aware(d, 
                     SESSION.get_store_timezone(request.session))
@@ -116,7 +124,7 @@ def edit(request, message_id):
             message_count += 1
             request.session['message_count'] = message_count
 
-            msg_filter = request.POST['chosen_filter']
+            msg_filter = postDict['chosen_filter']
             params = {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
@@ -130,7 +138,7 @@ def edit(request, message_id):
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\
-                    request.POST['min_punches']})
+                    postDict['min_punches']})
 
             # push notification
             cloud_call("retailer_message", params)
@@ -191,14 +199,13 @@ def edit(request, message_id):
 @login_required
 @session_comet  
 def details(request, message_id):
-    rputils.set_timezone(request)
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
         request.session)
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
-    
+    print message.createdAt
     if not message:
         raise Http404
     return render(request, 'manage/message_details.djhtml', 
