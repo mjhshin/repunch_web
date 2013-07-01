@@ -464,51 +464,54 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 				
 		} else {
 			patronStore.set("redeem_pending", true);
-			return patronStore.save();
+			executeRedeemRequest();
 		}
 					
 	}, function(error) {
 			console.log("PatronStore fetch failed.");
 			response.error("error");
+			return;		
+	});
+	
+	function executeRedeemRequest() {
+		patronStore.save().then(function(patronStore) {
+			console.log("PatronStore save success.");
+			return redeemReward.save();
+
+		}, function(error) {
+			console.log("PatronStore save failed.");
+			response.error("error");
 			return;
 			
-	}).then(function(patronStore) {
-		console.log("PatronStore save success.");
-		return redeemReward.save();
+		}).then(function(redeemReward) {
+			console.log("RedeemReward save success.");
+			return storeQuery.get(storeId);
 		
-	}, function(error) {
-		console.log("PatronStore save failed.");
-		response.error("error");
-		return;
+		}, function(error) {
+			console.log("RedeemReward save failed.");
+			response.error("error");
+			return;
 			
-	}).then(function(redeemReward) {
-		console.log("RedeemReward save success.");
-		return storeQuery.get(storeId);
-		
-	}, function(error) {
-		console.log("RedeemReward save failed.");
-		response.error("error");
-		return;
-			
-	}).then(function(store) {
-		console.log("Store fetch success.");
-		store.relation("RedeemRewards").add(redeemReward);
-		return store.save();
+		}).then(function(store) {
+			console.log("Store fetch success.");
+			store.relation("RedeemRewards").add(redeemReward);
+			return store.save();
 					
-	}, function(error) {
-		console.log("Store fetch failed.");
-		response.error("error");
-		return;	
+		}, function(error) {
+			console.log("Store fetch failed.");
+			response.error("error");
+			return;	
 			
-	}).then(function(store) {
-		console.log("Store save success.");
-		executePush();
+		}).then(function(store) {
+			console.log("Store save success.");
+			executePush();
 				
-	}, function(error) {
-		console.log("Store save failed.");
-		response.error("error");
-		return;			
-	});
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+			return;			
+		});
+	}
 	
 	function executePush() {
 		var installationQuery = new Parse.Query(Parse.Installation);
