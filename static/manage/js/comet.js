@@ -123,6 +123,13 @@ $(document).ready(function(){
     });
     
     function mainComet(res, status, xhr) {
+        // goes here if there are no changes
+        if (res.hasOwnProperty("result")){
+            if (res.result == "none"){
+                return
+            }
+        }
+        
         // Messages page
         if(res.hasOwnProperty("feedbacks")){
             var feedback_unread = new String(res.feedback_unread);

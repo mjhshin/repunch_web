@@ -313,7 +313,7 @@ def feedback_reply(request, feedback_id):
                         "?%s" % urllib.urlencode({'success':\
                         'Reply has been sent.'}))
     else:
-        data['from_address'] = account.get('username')
+        data['from_address'] = store.get("store_name")
         data['subject'] = 'Re: ' + feedback.get('subject')
         
     # update store session cache

@@ -26,7 +26,7 @@
 
 {# NEEDED FOR comet.js #}
 <input id="comet_url" type="hidden" 
-    value="{% url 'manage_refresh' %}" />
+    value="{% url 'comet_refresh' %}" />
 
 	<div id="site-frame">
 		<div id="header">

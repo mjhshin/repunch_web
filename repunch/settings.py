@@ -255,6 +255,7 @@ INSTALLED_APPS = (
     'apps.analysis',
     'apps.db_static',
     'apps.workbench',
+    'apps.comet',
     'libs.repunch',
     
 

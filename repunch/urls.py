@@ -19,10 +19,10 @@ urlpatterns = patterns('',
     url(r'^manage/employees/', include('apps.employees.urls')),
     url(r'^manage/analysis/', include('apps.analysis.urls')),
     url(r'^manage/workbench/', include('apps.workbench.urls')),
+    url(r'^manage/comet/', include('apps.comet.urls')),
     url(r'^manage/$', views.manage_login, name='manage_login'),
     url(r'^manage/terms/$', views.manage_terms, name='manage_terms'),
     url(r'^manage/logout$', views.manage_logout, name='manage_logout'),
-    url(r'^manage/refresh$', views.manage_refresh, name='manage_refresh'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

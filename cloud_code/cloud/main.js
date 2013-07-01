@@ -792,7 +792,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             }
             // all tasks are done. Push now.
             proceedToPush();
-            return;
+            return
         }
         
         var pt = patronStores.pop();
@@ -801,7 +801,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         // keep track of atron ids for the installationQuery
         patron_ids.push(pat.id);
         
-        console.log("NOW FETCHING PATRON FOR patronStore " + pt.id);
+        console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
         var rel = pat.relation("ReceivedMessages"); 
         // message obtained from the beginning (bottom)
         rel.add(message);
@@ -824,14 +824,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_name: request.params.store_name,
                 message_id: request.params.message_id,
             }, 
-            }, {
-                success: function() {
-                    response.success("success");
-                },
-                error: function(error) {
-                    response.error("error");
-                }
-        }); // end Parse.Push
+            }); // end Parse.Push
 
         installationQuery.equalTo('deviceType', 'ios');
         Parse.Push.send({
@@ -870,7 +863,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         if (filter === "one"){
             // first get the patron
             patronQuery.get(request.params.patron_id).then(function(patron){
-                patronStoreQuery.matchesQuery("Patron", patron);
+                patronStoreQuery.equalTo("Patron", patron);
                 patronStoreQuery.include("Patron");
                 patronStoreQuery.first().then(function(pst){
                     var arr = new Array(pst);

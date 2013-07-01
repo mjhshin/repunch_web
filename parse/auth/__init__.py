@@ -2,8 +2,7 @@
 Authentication backend for Parse
 """
 
-import hashlib, uuid
-import pytz
+import hashlib, uuid, pytz
 from django.contrib.auth import SESSION_KEY
 
 from repunch.settings import PAGINATION_THRESHOLD
