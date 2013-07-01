@@ -464,7 +464,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 				
 		} else {
 			patronStore.set("redeem_pending", true);
-			executeRedeemRequest();
+			executeRedeemRequest(patronStore);
 		}
 					
 	}, function(error) {
@@ -473,7 +473,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			return;		
 	});
 	
-	function executeRedeemRequest() {
+	function executeRedeemRequest(patronStore) {
 		patronStore.save().then(function(patronStore) {
 			console.log("PatronStore save success.");
 			return redeemReward.save();
@@ -582,6 +582,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		} 
 	}).then(function(){
 	    return redeemRewardQuery.get(redeemId);
+		
 	}).then(function(redeemReward) {
 		var patronStore = redeemReward.get("PatronStore");
 		console.log("RedeemReward fetch success.");
@@ -612,6 +613,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			Parse.Promise.when(promises).then(function(){
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePush();
+				
 			}, function(error) {
 			    console.log("PatronStore and RedeemReward save fail (in parallel).");
 			    response.error("error");
