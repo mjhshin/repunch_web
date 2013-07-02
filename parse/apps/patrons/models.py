@@ -45,17 +45,20 @@ class PatronStore(ParseObject):
     """ New class not in Django """
     def __init__(self, **data):
         self.Patron = data.get("Patron")
-        # Store's objectId as string
         self.Store = data.get("Store")
+        self.FacebookPost = data.get("FacebookPost")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
         self.redeem_pending = data.get("redeem_pending", False)
+        
         
         super(PatronStore, self).__init__(False, **data)
 
     def get_class(self, className):
         if className == "Patron":
             return Patron
+        elif className = "FacebookPost":
+            return FacebookPost
         elif className == "Store":
             return getattr(import_module('parse.apps.stores.models'),
                     className)

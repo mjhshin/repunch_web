@@ -838,17 +838,17 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
 //  Replies to feedback does not add the reply itself to the
 //  Patron's ReceivedMessages but rather the original message itself.
 //
+//  This looks at the store's PatronStore relation!!!
+//
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
-    // note that we could also query the PatronStores in the Store 
-    // relation instead of querying the PatronStore class itself.
+   
     var Store = Parse.Object.extend("Store");
     var Message = Parse.Object.extend("Message");
-    var PatronStore = Parse.Object.extend("PatronStore");
     var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
-    var patronStoreQuery = new Parse.Query(PatronStore);
+    var patronStoreQuery; // retrieved below
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation)
 	
@@ -882,6 +882,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         
         var pt = patronStores.pop();
         var pat = pt.get("Patron");
+        
+        // just in case that there is a null patron
+        if (pat == null){
+            addToPatronsInbox(patronStores);
+        }
         
         // keep track of atron ids for the installationQuery
         patron_ids.push(pat.id);
@@ -972,7 +977,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // first get the store
     storeQuery.get(storeId, {
       success: function(store) {
-        patronStoreQuery.equalTo("Store", store);
+        patronStoreQuery = store.relation("PatronStores").query();
         // now get the message object
         console.log("RUNNING MESSAGE QUERY");
         messageQuery.get(messageId, {

@@ -142,7 +142,7 @@ def refresh(request):
                 request.session._session_key,
                 store_id=SESSION.get_store(request.session).objectId)
         return comet()
-    else: 
+    else: # should never go here
         return comet()
         
 @csrf_exempt  
