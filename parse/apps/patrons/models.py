@@ -57,7 +57,7 @@ class PatronStore(ParseObject):
     def get_class(self, className):
         if className == "Patron":
             return Patron
-        elif className = "FacebookPost":
+        elif className == "FacebookPost":
             return FacebookPost
         elif className == "Store":
             return getattr(import_module('parse.apps.stores.models'),
