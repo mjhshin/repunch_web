@@ -82,7 +82,7 @@ def edit(request, message_id):
                                 
         limit_reached = message_count >= sub_type[subType]['max_messages']
         
-        if form.is_valid() and not limit_reached:
+        if form.is_valid(): #and not limit_reached:
             # create the message
             message = Message(sender_name=\
                     store.get('store_name'), store_id=store.objectId)

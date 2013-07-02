@@ -130,6 +130,8 @@ def refresh(request):
         scomet = CometSession.objects.get(session_key=\
             request.session._session_key)
         if scomet.ok:
+            scomet.ok = False
+            scomet.save()
             return comet()
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
