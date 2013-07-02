@@ -56,26 +56,34 @@ def redeem(request):
                 "store_id":store.get("objectId"),
                 "reward_id":rewardId,
                 })
-            
+        print res
         if 'error' not in res:
             redemptions = SESSION.get_redemptions(request.session)
-            i_remove = -1
+            i_remove, result = -1, res.get("result")
             # remove from redemptions
             for i, red in enumerate(redemptions):
                 if red.objectId == redeemId:
-                    i_remove = i
+                    i_remove = i 
                     break
             if i_remove != -1:
                 redemptions_past =\
                     SESSION.get_redemptions_past(request.session)
-                redemption = redemptions.pop(i_remove)
-                redemption.is_redeemed = True
-                redemptions_past.append(redemption)
-                request.session['redemptions_past'] = redemptions_past
+                if result and result == "insufficient":
+                    redemptions.pop(i_remove).delete()
+                else:
+                    redemption = redemptions.pop(i_remove)
+                    redemption.is_redeemed = True
+                    redemptions_past.append(redemption)
+                    request.session['redemptions_past'] =\
+                        redemptions_past
                 request.session['redemptions'] = redemptions
             
-            return HttpResponse(json.dumps({"result":1}), 
-                        content_type="application/json")
+            if result and result == "insufficient":
+                return HttpResponse(json.dumps({"result":2}), 
+                            content_type="application/json")
+            else:
+                return HttpResponse(json.dumps({"result":1}), 
+                            content_type="application/json")
                         
     return HttpResponse(json.dumps({"result":0}), 
                     content_type="application/json")
