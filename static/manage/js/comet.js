@@ -30,7 +30,7 @@ $(document).ready(function(){
                         row.html("Successfully validated redemption.");
                     } else {
                         row.css("background", "#ffffcb");
-                        row.html("Patron does not have enough punches!");
+                        row.html("Customer does not have enough punches!");
                         alert("Customer does not have enough punches!");
                     }
                     row.fadeOut(3000, function(){
