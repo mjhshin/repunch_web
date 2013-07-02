@@ -125,17 +125,19 @@ def refresh(request):
         """ returns a new session comet with new expiration """
         pass
     
+    # the above is different from SESSION_KEY (which is not unique)
     try: # attempt to get a used CometSession first
         scomet = CometSession.objects.get(session_key=\
-            request.session[SESSION_KEY])
+            request.session._session_key)
         if scomet.ok:
             return comet()
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except CometSession.DoesNotExist:
+        print SESSION.get_store(request.session).objectId
         # create it here and call comet
         scomet = CometSession.objects.create(session_key=\
-                request.session[SESSION_KEY],
+                request.session._session_key,
                 store_id=SESSION.get_store(request.session).objectId)
         return comet()
     else: 
@@ -148,8 +150,7 @@ def receive(request, store_id):
     CometSessions that have the given store Id.
     """
     if request.method == "GET" or request.is_ajax():
-        for scomet in CometSession.objects.filter(store_id=\
-            store_id):
+        for scomet in CometSession.objects.filter(store_id=store_id):
             scomet.ok = True
             scomet.save()
         return HttpResponse("success")

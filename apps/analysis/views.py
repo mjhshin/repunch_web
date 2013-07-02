@@ -84,8 +84,8 @@ def trends_graph(request, data_type=None, start=None, end=None ):
         #create dictionary for easy search
         if posts:
             for post in posts:
-                key = timezone.localtime(\
-                    post.createdAt.strftime("%m/%d"), store_timezone)
+                key = timezone.localtime(post.createdAt, 
+                    store_timezone).strftime("%m/%d")
                 if key in post_map:
                     post_map[key] = post_map[key] + 1
                 else:

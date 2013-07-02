@@ -6,7 +6,7 @@ from models import Message
 
 class MessageForm(forms.Form):
     subject = forms.CharField(max_length=50)
-    body = forms.CharField(max_length=255, 
+    body = forms.CharField(max_length=750, 
         widget=forms.Textarea(attrs={"cols":40, "rows":10}))
 
     attach_offer = forms.BooleanField(required=False)
