@@ -167,7 +167,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(patron) {
 		console.log("Patron fetch success.");
 		patron.relation("PatronStores").add(patronStore);
-		return patron.save(patronId);
+		return patron.save();
 		
 	}, function(error) {
 		console.log("Patron fetch failed.");
@@ -215,32 +215,66 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 //
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("assign_punch_code", function(request, response) {
-    var PunchCode = Parse.Object.extend("PunchCode");
-    var query = new Parse.Query(PunchCode);
-    query.equalTo("is_taken", false);
-    query.first({
-        success: function(object) {
-            // The object was retrieved successfully.
-            object.set("is_taken", true);
-            object.set("username", request.params.username);
-                       
-            object.save(null, {
-                success: function(object) {
-                    // The object was saved successfully.
-                    response.success( object.get("punch_code") );
-                },
-                error: function(object, error) {
-                    // The save failed.
-                    response.error("Error: " + error.code + " " + error.message);
-                }
-            });
-        },
-        error: function(error) {
-            // The object was not retrieved successfully.
-            response.error("Error: " + error.code + " " + error.message);
-        }
-    });
+Parse.Cloud.define("facebook_post", function(request, response) {
+	var storeId = request.params.store_id;
+	var patronStoreId = request.params.patron_store_id;
+	var patronId = request.params.patron_id;
+	var numPunches = request.params.num_punches;
+	
+    var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var Store = Parse.Object.extend("Store");
+	var FacebookPost = Parse.Object.extend("FacebookPost");
+	
+	var patron = new Patron();
+	patron.id = patronId;
+	
+	var facebookPost = new FacebookPost();
+	facebookPost.set("Patron", patron);
+	
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	
+	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
+		console.log("PatronStore fetch success.");
+		patronStore.increment("all_time_punches", numPunches);
+		patronStore.increment("punch_count", numPunches);
+		return patronStore.save();
+		
+		var promises = [];
+		promises.push( patronStore.save() );
+		promises.push( facebookPost.save() );
+	
+		Parse.Promise.when(promises).then(function(facebookPost) {
+		console.log("PatronStore and FacebookPost save success (in parallel).");
+		var storeQuery = new Parse.Query(Store);
+		return storeQuery.get(storeId);
+		
+	}, function(error) {
+		console.log("PatronStore and FacebookPost save fail (in parallel).");
+		response.error("error");
+		return;
+		
+	}).then(function(store) {
+		console.log("Store fetch success.");
+		store.relation("FacebookPosts").add(facebookPost);
+		return store.save();
+		
+	}, function(error) {
+		console.log("Store fetch failed.");
+		response.error("error");
+		return;
+		
+	}).then(function(patron) {
+		console.log("Store save success.");
+		response.success("success");
+		
+	}, function(error) {
+		console.log("Store save failed.");
+		response.error("error");
+		return;
+		
+	});
+	
 });
  
 ////////////////////////////////////////////////////
@@ -820,7 +854,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var iosInstallationQuery = new Parse.Query(Parse.Installation)
 	
 	var subject = request.params.subject;
-	var messageId = request.params.subject;
+	var messageId = request.params.message_id;
 	var patronId = request.params.patron_id;
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
