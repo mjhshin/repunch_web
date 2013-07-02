@@ -344,7 +344,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		patron = patronStoreResult.get("Patron");
 		patronStoreResult.save().then(function(patronStoreResult) {
 			console.log("PatronStore save was successful.");
-			executePush();
+			executePush(patronStoreResult);
 			saveDataForAnalytics(patronStoreResult, false);
 		}, function(error) {
 			console.log("PatronStore save failed.");
@@ -352,7 +352,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		});
 	}
 	
-	function executePush() {
+	function executePush(patronStore) {
 	    // TODO sync ios push reception with android?
 		Parse.Push.send({
 			where: androidInstallationQuery,
