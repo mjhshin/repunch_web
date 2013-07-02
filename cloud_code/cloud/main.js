@@ -238,7 +238,6 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 		console.log("PatronStore fetch success.");
 		patronStore.increment("all_time_punches", numPunches);
 		patronStore.increment("punch_count", numPunches);
-		return patronStore.save();
 		
 		var promises = [];
 		promises.push( patronStore.save() );
