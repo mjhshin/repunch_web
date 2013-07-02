@@ -111,7 +111,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		    console.log("Patron and User delete success (in parallel).");
 			
 		}, function(error) {
-		    console.log("atron and User delete fail (in parallel).");
+		    console.log("Patron and User delete fail (in parallel).");
         });
 	}
 	
@@ -326,7 +326,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		
 			Parse.Promise.when(promises).then(function(){
 			    console.log("Store and Patron save success (in parallel).");
-				executePush();
+				executePush(patronStore);
 				saveDataForAnalytics(patronStore, true);
 			
 			}, function(error) {
@@ -359,7 +359,8 @@ Parse.Cloud.define("punch", function(request, response) {
 			data: {
 				name: storeName,
 				id: storeId,
-				num_punches: numPunches,
+				punches: numPunches,
+				total_punches: patronStore.get("punch_count"),
 				action: "com.repunch.intent.PUNCH"
 			}
 		}, {
@@ -1008,55 +1009,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		response.error("error");			
 	})
 });
- 
-////////////////////////////////////////////////////
-//
-//
-//
-////////////////////////////////////////////////////
-Parse.Cloud.define("coupon_message", function(request, response) {
-    response.success("Hello world!");
-});
-/*
-function sendInfoMessage(audience, subject, body)
-{
-    Parse.Push.send({
-        channels: [ "default" ],
-        data: {
-            alert: "Testing push notifications.",
-            title: "Android system tray notification here"
-        }
-    }, {
-        success: function() {
-            // Push was successful
-        },
-        error: function(error) {
-            // Handle error
-        }
-    });
-}
- 
-////////////////////////////////////////////////////
-//
-//
-//
-////////////////////////////////////////////////////
-function sendCouponMessage(audience, subject, body, couponTitle, couponExpireDate)
-{
-    Parse.Push.send({
-        channels: [ "Giants", "Mets" ],
-        data: {
-            alert: "The Giants won against the Mets 2-3."
-        }
-    }, {
-        success: function() {
-            // Push was successful
-        },
-        error: function(error) {
-            // Handle error
-        }
-    });
-}
- 
-//function sendFeedbackReply(audience, )
-*/
+
+
+
+
+
+
