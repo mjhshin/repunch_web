@@ -1,3 +1,4 @@
+from django.contrib.auth import SESSION_KEY
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
@@ -129,7 +130,7 @@ def refresh(request):
             request.session[SESSION_KEY])
         if scomet.ok:
             return comet()
-        return HttpResponse(json.dumps({"result":"none"}), 
+        return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except CometSession.DoesNotExist:
         # create it here and call comet
