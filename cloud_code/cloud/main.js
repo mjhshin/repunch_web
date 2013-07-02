@@ -234,43 +234,42 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 	
 	var patronStoreQuery = new Parse.Query(PatronStore);
 	
-	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
-		console.log("PatronStore fetch success.");
-		patronStore.increment("all_time_punches", numPunches);
-		patronStore.increment("punch_count", numPunches);
+	facebookPost.save().then(function(facebookPost) {
+		console.log("Store fetch success.");
 		
-		var promises = [];
-		promises.push( patronStore.save() );
-		promises.push( facebookPost.save() );
-	
-		Parse.Promise.when(promises).then(function(facebookPost) {
-			console.log("PatronStore and FacebookPost save success (in parallel).");
-			var storeQuery = new Parse.Query(Store);
-			return storeQuery.get(storeId);
+		var queryPromises = [];
+		queryPromises.push( patronStoreQuery.get(patronStoreId) );
+		queryPromises.push( storeQuery.get(storeId) );
 		
-		}, function(error) {
-			console.log("PatronStore and FacebookPost save fail (in parallel).");
-			response.error("error");
-			return;
-		
-		}).then(function(store) {
-			console.log("Store fetch success.");
+		Parse.Promise.when(queryPromises).then(function(patronStore, store) {
+			console.log("PatronStore and Store fetch success (in parallel).");
+			patronStore.set("FacebookPost", facebookPost);
+			patronStore.increment("all_time_punches", numPunches);
+			patronStore.increment("punch_count", numPunches);
+			
 			store.relation("FacebookPosts").add(facebookPost);
-			return store.save();
+			
+			var savePromises = [];
+			savePromises.push( patronStore.save() );
+			savePromises.push( store.save() );		
+		
+			Parse.Promise.when(savePromises).then(function() {
+				console.log("PatronStore and Store save success (in parallel).");
+				response.success("success");
+				return;
+		
+			}, function(error) {
+				console.log("PatronStore and Store save fail (in parallel).");
+				response.error("error");
+				return;
+		
+			});		
 		
 		}, function(error) {
-			console.log("Store fetch failed.");
+			console.log("PatronStore and Store fetch fail (in parallel).");
 			response.error("error");
 			return;
 		
-		}).then(function(patron) {
-			console.log("Store save success.");
-			response.success("success");
-		
-		}, function(error) {
-			console.log("Store save failed.");
-			response.error("error");
-			return;	
 		});
 	});
 	
@@ -620,7 +619,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var rewardId = request.params.reward_id;
 	if (rewardId != null){ rewardId = parseInt(rewardId); }
 	
-	var patronId, numPunches, rewardTitle, storeName, patronStore;
+	var numPunches, rewardTitle, store, patron, patronStore;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -629,10 +628,10 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	redeemRewardQuery.include(["PatronStore.Patron"]);
 	
-	storeQuery.get(storeId).then(function(store){
-	    storeName = store.get("store_name");
+	storeQuery.get(storeId).then(function(storeResult) {
+	    store = storeResult;
 	    if (rewardId != null){
-	        var rewards = store.get("rewards");
+	        var rewards = storeResult.get("rewards");
 		    // update the store's rewards redemption_count
 		    for (var i=0; i<rewards.length; i++){
 		        if (rewards[i].reward_id == rewardId){
@@ -640,11 +639,11 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		            break;
 		        }
 		    }
-		    store.set("rewards", rewards);
+		    storeResult.set("rewards", rewards);
 		
-		    return store.save();
+		    return storeResult.save();
 		} 
-	}).then(function(){
+	}).then(function() {
 	    return redeemRewardQuery.get(redeemId);
 		
 	}).then(function(redeemReward) {
@@ -665,7 +664,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			
 		} else{
 			console.log("PatronStore has enough punches.");
-			patronId = patronStore.get("Patron").id;
+			patron = patronStore.get("Patron");
 			patronStore.increment("punch_count", -1*numPunches);
 			patronStore.set("redeem_pending", false);
 			redeemReward.set("is_redeemed", true);
@@ -674,7 +673,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			promises.push( patronStore.save() );
 			promises.push( redeemReward.save() );
 			
-			Parse.Promise.when(promises).then(function(){
+			Parse.Promise.when(promises).then(function() {
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePush();
 				
@@ -687,7 +686,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
 			response.error("error");
-	}).then(function(){
+			
+	}).then(function() {
 	    // Since there may be multiple dashboards open and the mobile
 	    // apps may validate redeems, dashboard needs to know about this
         Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
@@ -695,13 +695,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	
 	function executePush() {
 		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("patron_id", patronId);
+		installationQuery.equalTo("patron_id", patron.id);
 		Parse.Push.send({
 	        where: installationQuery,
 	        data: {
 	            title: rewardTitle,
 	            id: storeId, 
-	            store: storeName, 
+	            store: store.get("store_name"), 
 	            punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
 				action: "com.repunch.intent.REDEEM"
@@ -709,8 +709,12 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	    }, {
 	        success: function() {
 				console.log("Push success.");
-	            response.success("success");
-				return;
+				if(patron.get("facebook_id") != null) {
+					addFacebookPostToPatron();
+				} else {
+					response.success("success");
+					return;
+				}
 	        },
 	        error: function(error) {
 				console.log("Push failed.");
@@ -718,6 +722,42 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 				return;
 	        }
 	    });
+	}
+	
+	function addFacebookPostToPatron() {
+		var freeFacebookPunches = store.get("punches_facebook");
+	
+		var FacebookPost = Parse.Object.extend("FacebookPost");
+		var facebookPost = new FacebookPost();
+		facebookPost.set("Patron", patron);
+		facebookPost.set("posted", false);
+	
+		facebookPost.save().then(function(facebookPost) {
+			console.log("FacebookPost save success.");
+			patronStore.set("FacebookPost", facebookPost);
+			store.relation("FacebookPosts").add(facebookPost);
+		
+			var savePromises = [];
+			savePromises.push( patronStore.save() );
+			savePromises.push( store.save() );		
+	
+			Parse.Promise.when(savePromises).then(function() {
+				console.log("PatronStore and Store save success (in parallel).");
+				response.success("success");
+				return;
+	
+			}, function(error) {
+				console.log("PatronStore and Store save fail (in parallel).");
+				response.error("error");
+				return;
+	
+			});
+		}, function(error) {
+				console.log("FacebookPost save failed.");
+				response.error("error");
+				return;
+	
+		});
 	}
 });
  
