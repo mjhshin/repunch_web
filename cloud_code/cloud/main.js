@@ -219,7 +219,7 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
 	var patronId = request.params.patron_id;
-	var numPunches = request.params.num_punches;
+	var numPunches = parseInt(request.params.num_punches);
 	
     var Patron = Parse.Object.extend("Patron");
 	var PatronStore = Parse.Object.extend("PatronStore");
