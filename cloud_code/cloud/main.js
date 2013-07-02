@@ -620,7 +620,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var rewardId = request.params.reward_id;
 	if (rewardId != null){ rewardId = parseInt(rewardId); }
 	
-	var patronId, numPunches, rewardTitle, storeName;
+	var patronId, numPunches, rewardTitle, storeName, patronStore;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -644,11 +644,11 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		
 		    return store.save();
 		} 
-	}).then(function(){
+	}).then(function() {
 	    return redeemRewardQuery.get(redeemId);
 		
 	}).then(function(redeemReward) {
-		var patronStore = redeemReward.get("PatronStore");
+		patronStore = redeemReward.get("PatronStore");
 		console.log("RedeemReward fetch success.");
 		numPunches = redeemReward.get("num_punches");
 		rewardTitle = redeemReward.get("title");
@@ -674,7 +674,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			promises.push( patronStore.save() );
 			promises.push( redeemReward.save() );
 			
-			Parse.Promise.when(promises).then(function(){
+			Parse.Promise.when(promises).then(function() {
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePush();
 				
@@ -702,7 +702,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	            title: rewardTitle,
 	            id: storeId, 
 	            store: storeName, 
-	            num_punches: numPunches,
+	            punches: numPunches,
+				totalPunches: patronStore.get("punch_count");
 				action: "com.repunch.intent.REDEEM"
 	        }
 	    }, {
