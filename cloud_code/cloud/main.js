@@ -111,7 +111,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		    console.log("Patron and User delete success (in parallel).");
 			
 		}, function(error) {
-		    console.log("atron and User delete fail (in parallel).");
+		    console.log("Patron and User delete fail (in parallel).");
         });
 	}
 	
@@ -330,7 +330,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		
 			Parse.Promise.when(promises).then(function(){
 			    console.log("Store and Patron save success (in parallel).");
-				executePush();
+				executePush(patronStore);
 				saveDataForAnalytics(patronStore, true);
 			
 			}, function(error) {
@@ -348,7 +348,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		patron = patronStoreResult.get("Patron");
 		patronStoreResult.save().then(function(patronStoreResult) {
 			console.log("PatronStore save was successful.");
-			executePush();
+			executePush(patronStoreResult);
 			saveDataForAnalytics(patronStoreResult, false);
 		}, function(error) {
 			console.log("PatronStore save failed.");
@@ -356,14 +356,15 @@ Parse.Cloud.define("punch", function(request, response) {
 		});
 	}
 	
-	function executePush() {
+	function executePush(patronStore) {
 	    // TODO sync ios push reception with android?
 		Parse.Push.send({
 			where: androidInstallationQuery,
 			data: {
 				name: storeName,
 				id: storeId,
-				num_punches: numPunches,
+				punches: numPunches,
+				total_punches: patronStore.get("punch_count"),
 				action: "com.repunch.intent.PUNCH"
 			}
 		}, {
@@ -1026,55 +1027,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	    Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
 	});
 });
- 
-////////////////////////////////////////////////////
-//
-//
-//
-////////////////////////////////////////////////////
-Parse.Cloud.define("coupon_message", function(request, response) {
-    response.success("Hello world!");
-});
-/*
-function sendInfoMessage(audience, subject, body)
-{
-    Parse.Push.send({
-        channels: [ "default" ],
-        data: {
-            alert: "Testing push notifications.",
-            title: "Android system tray notification here"
-        }
-    }, {
-        success: function() {
-            // Push was successful
-        },
-        error: function(error) {
-            // Handle error
-        }
-    });
-}
- 
-////////////////////////////////////////////////////
-//
-//
-//
-////////////////////////////////////////////////////
-function sendCouponMessage(audience, subject, body, couponTitle, couponExpireDate)
-{
-    Parse.Push.send({
-        channels: [ "Giants", "Mets" ],
-        data: {
-            alert: "The Giants won against the Mets 2-3."
-        }
-    }, {
-        success: function() {
-            // Push was successful
-        },
-        error: function(error) {
-            // Handle error
-        }
-    });
-}
- 
-//function sendFeedbackReply(audience, )
-*/
+
+
+
+
+
+
