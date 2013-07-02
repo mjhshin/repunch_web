@@ -818,26 +818,28 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var patronStoreQuery = new Parse.Query(PatronStore);
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation)
-
+	
+	var subject = request.params.subject;
+	var messageId = request.params.subject;
+	var patronId = request.params.patron_id;
     var storeId = request.params.store_id;
+	var storeName = request.params.store_name;
     var filter = request.params.filter; // one means a reply
     var message, patron_ids = new Array(); // placeholder
 
-
-    androidInstallationQuery.equalTo("punch_code", punchCode);
 	androidInstallationQuery.equalTo('deviceType', 'android');
-	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0 ){
             // match the installation with the username in the 
             if (filter === "one"){
-                installationQuery.equalTo("patron_id", 
-                                request.params.patron_id);
+                androidInstallationQuery.equalTo("patron_id", patronId);
+				iosInstallationQuery.equalTo("patron_id", patronId);
             } else {
                 console.log(patron_ids);
-                installationQuery.containedIn("patron_id", patron_ids);
+                androidInstallationQuery.containedIn("patron_id", patron_ids);
+				iosInstallationQuery.containedIn("patron_id", patron_ids);
             }
             Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
             // all tasks are done. Push now.
@@ -868,32 +870,32 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             where: androidInstallationQuery, 
             data: {
                 action: "com.repunch.intent.MESSAGE",
-                subject: request.params.subject,
-                store_id: request.params.store_id,
-                store_name: request.params.store_name,
-                message_id: request.params.message_id,
+                subject: subject,
+                store_id: storeId,
+                store_name: storeName,
+                message_id: messageId,
             }, 
-            }); // end Parse.Push
+		}); // end Parse.Push
 
         Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
             	alert:request.params.store_name + " sent you a message: " + request.params.subject,
-                subject: request.params.subject,
+                subject: subject,
                 store_id: storeId,
-                store_name: request.params.store_name,
-                message_id: request.params.message_id,
+                store_name: storeName,
+                message_id: messageId,
                 punch_type: "receive_message"
             }, 
-            }, {
-                success: function() {
-                    response.success("success");
-                },
-                error: function(error) {
-                    response.error("error");
-                }
-        }); // end Parse.Push
-    }// end proceedToPush
+		}, {
+			success: function() {
+				response.success("success");
+			},
+			error: function(error) {
+				response.error("error");
+			}
+		}); // end Parse.Push
+	}// end proceedToPush
    
     function continueWithPush() {
         console.log("CONTINUE WITH PUSH");
@@ -940,18 +942,18 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         patronStoreQuery.equalTo("Store", store);
         // now get the message object
         console.log("RUNNING MESSAGE QUERY");
-        messageQuery.get(request.params.message_id, {
-          success: function(msg) {
-            message = msg;
-            continueWithPush();
-          }, error: function(object, error){
+        messageQuery.get(messageId, {
+			success: function(msg) {
+            	message = msg;
+            	continueWithPush();
+			}, error: function(object, error) {
                 console.log(error);
-            }
+			}
         }); // end messageQuery
-      }, error: function(object, error){
+	}, error: function(object, error) {
             console.log(error);
-        }
-    });// end storeQuery
+		}
+	});// end storeQuery
  
 }); // end Parse.Cloud.define
 
