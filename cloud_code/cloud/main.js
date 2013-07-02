@@ -216,61 +216,45 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("facebook_post", function(request, response) {
-	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
-	var patronId = request.params.patron_id;
 	var numPunches = parseInt(request.params.num_punches);
 	
-    var Patron = Parse.Object.extend("Patron");
-	var PatronStore = Parse.Object.extend("PatronStore");
-	var Store = Parse.Object.extend("Store");
-	var FacebookPost = Parse.Object.extend("FacebookPost");
-	
-	var patron = new Patron();
-	patron.id = patronId;
-	
-	var facebookPost = new FacebookPost();
-	facebookPost.set("Patron", patron);
-	
+    var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStoreQuery = new Parse.Query(PatronStore);
+	patronStoreQuery.include("Store");
+	patronStoreQuery.include("Patron");
 	
-	facebookPost.save().then(function(facebookPost) {
-		console.log("Store fetch success.");
+	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
+		console.log("PatronStore fetch success.");
+		var store = patronStore.get("Store");
+		var freePunches = store.get("punches_facebook");
 		
-		var queryPromises = [];
-		queryPromises.push( patronStoreQuery.get(patronStoreId) );
-		queryPromises.push( storeQuery.get(storeId) );
+		store.relation("FacebookPosts").add( patronStore.get("FacebookPost") );
 		
-		Parse.Promise.when(queryPromises).then(function(patronStore, store) {
-			console.log("PatronStore and Store fetch success (in parallel).");
-			patronStore.set("FacebookPost", facebookPost);
-			patronStore.increment("all_time_punches", numPunches);
-			patronStore.increment("punch_count", numPunches);
-			
-			store.relation("FacebookPosts").add(facebookPost);
-			
-			var savePromises = [];
-			savePromises.push( patronStore.save() );
-			savePromises.push( store.save() );		
+		patronStore.increment("all_time_punches", freePunches);
+		patronStore.increment("punch_count", freePunches);
+		patronStore.set("FacebookPost", null);
 		
-			Parse.Promise.when(savePromises).then(function() {
-				console.log("PatronStore and Store save success (in parallel).");
-				response.success("success");
-				return;
-		
-			}, function(error) {
-				console.log("PatronStore and Store save fail (in parallel).");
-				response.error("error");
-				return;
-		
-			});		
-		
-		}, function(error) {
-			console.log("PatronStore and Store fetch fail (in parallel).");
-			response.error("error");
+		var promises = [];
+		promises.push( store.save() );
+		promises.push( patronStore.save() );
+	
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Store and PatronStore save success (in parallel).");
+			response.success("success");
 			return;
 		
-		});
+		}, function(error) {
+		    console.log("Store and PatronStore save fail (in parallel).");
+		    response.error("error");
+			return;
+        });
+		
+		
+	}, function(error) {
+		console.log("PatronStore fetch fail.");
+		response.error("error");
+		return;
 	});
 	
 });
@@ -735,28 +719,22 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		facebookPost.save().then(function(facebookPost) {
 			console.log("FacebookPost save success.");
 			patronStore.set("FacebookPost", facebookPost);
-			store.relation("FacebookPosts").add(facebookPost);
-		
-			var savePromises = [];
-			savePromises.push( patronStore.save() );
-			savePromises.push( store.save() );		
+			return patronStore.save();
+			
+		}, function(error) {
+			console.log("FacebookPost save failed.");
+			response.error("error");
+			return;
 	
-			Parse.Promise.when(savePromises).then(function() {
-				console.log("PatronStore and Store save success (in parallel).");
-				response.success("success");
-				return;
+		}).then(function() {
+			console.log("PatronStore save success.");
+			response.success("success");
+			return;
 	
 			}, function(error) {
-				console.log("PatronStore and Store save fail (in parallel).");
-				response.error("error");
-				return;
-	
-			});
-		}, function(error) {
-				console.log("FacebookPost save failed.");
-				response.error("error");
-				return;
-	
+			console.log("PatronStore save failed.");
+			response.error("error");
+			return;
 		});
 	}
 });
