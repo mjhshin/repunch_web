@@ -245,34 +245,34 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 		promises.push( facebookPost.save() );
 	
 		Parse.Promise.when(promises).then(function(facebookPost) {
-		console.log("PatronStore and FacebookPost save success (in parallel).");
-		var storeQuery = new Parse.Query(Store);
-		return storeQuery.get(storeId);
+			console.log("PatronStore and FacebookPost save success (in parallel).");
+			var storeQuery = new Parse.Query(Store);
+			return storeQuery.get(storeId);
 		
-	}, function(error) {
-		console.log("PatronStore and FacebookPost save fail (in parallel).");
-		response.error("error");
-		return;
+		}, function(error) {
+			console.log("PatronStore and FacebookPost save fail (in parallel).");
+			response.error("error");
+			return;
 		
-	}).then(function(store) {
-		console.log("Store fetch success.");
-		store.relation("FacebookPosts").add(facebookPost);
-		return store.save();
+		}).then(function(store) {
+			console.log("Store fetch success.");
+			store.relation("FacebookPosts").add(facebookPost);
+			return store.save();
 		
-	}, function(error) {
-		console.log("Store fetch failed.");
-		response.error("error");
-		return;
+		}, function(error) {
+			console.log("Store fetch failed.");
+			response.error("error");
+			return;
 		
-	}).then(function(patron) {
-		console.log("Store save success.");
-		response.success("success");
+		}).then(function(patron) {
+			console.log("Store save success.");
+			response.success("success");
 		
-	}, function(error) {
-		console.log("Store save failed.");
-		response.error("error");
-		return;
-		
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+			return;	
+		});
 	});
 	
 });
