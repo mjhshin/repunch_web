@@ -644,7 +644,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		
 		    return store.save();
 		} 
-	}).then(function() {
+	}).then(function(){
 	    return redeemRewardQuery.get(redeemId);
 		
 	}).then(function(redeemReward) {
@@ -674,7 +674,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			promises.push( patronStore.save() );
 			promises.push( redeemReward.save() );
 			
-			Parse.Promise.when(promises).then(function() {
+			Parse.Promise.when(promises).then(function(){
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePush();
 				
