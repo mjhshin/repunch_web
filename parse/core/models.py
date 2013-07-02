@@ -326,7 +326,7 @@ class ParseObject(object):
         for key, val in data.copy().iteritems():
             if key.startswith("date_") or\
                 key in ("createdAt", "updatedAt"):
-                data[key] = str(val)
+                data[key] = val.isoformat()
         return data
 
     def get_class(self, className):

@@ -202,6 +202,10 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		console.log("Store save failed.");
 		response.error("error");
 		return;
+	}).then(function(){
+	    // note that since memcached is used as the cache backend,
+	    // the cache can be shared among all instances
+        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
 	});
 	
 });
@@ -440,6 +444,10 @@ Parse.Cloud.define("punch", function(request, response) {
 		}).then(function(employee) {
 				console.log("Employee save was successful.");
 				response.success(patron.get("first_name") + " " + patron.get("last_name"));
+		}).then(function(){
+	        // note that since memcached is used as the cache backend,
+	        // the cache can be shared among all instances
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
 		});
 	}
 
@@ -530,6 +538,10 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			console.log("Store save failed.");
 			response.error("error");
 			return;			
+		}).then(function(){
+	        // note that since memcached is used as the cache backend,
+	        // the cache can be shared among all instances
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
 		});
 	}
 	
@@ -572,9 +584,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	var rewardId = request.params.reward_id;
-	if (rewardId != null){
-	    rewardId = parseInt(rewardId);
-	}
+	if (rewardId != null){ rewardId = parseInt(rewardId); }
 	
 	var patronId, numPunches, rewardTitle, storeName;
 	
@@ -643,6 +653,10 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
 			response.error("error");
+	}).then(function(){
+	    // Since there may be multiple dashboards open and the mobile
+	    // apps may validate redeems, dashboard needs to know about this
+        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
 	});
 	
 	function executePush() {
@@ -804,6 +818,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation)
 
+    var storeId = request.params.store_id;
     var filter = request.params.filter; // one means a reply
     var message, patron_ids = new Array(); // placeholder
 
@@ -823,6 +838,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 console.log(patron_ids);
                 installationQuery.containedIn("patron_id", patron_ids);
             }
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
             // all tasks are done. Push now.
             proceedToPush();
             return
@@ -863,7 +879,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             data: {
             	alert:request.params.store_name + " sent you a message: " + request.params.subject,
                 subject: request.params.subject,
-                store_id: request.params.store_id,
+                store_id: storeId,
                 store_name: request.params.store_name,
                 message_id: request.params.message_id,
                 punch_type: "receive_message"
@@ -918,7 +934,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeQuery = new Parse.Query(Store);
     console.log("RUNNING STORE QUERY");
     // first get the store
-    storeQuery.get(request.params.store_id, {
+    storeQuery.get(storeId, {
       success: function(store) {
         patronStoreQuery.equalTo("Store", store);
         // now get the message object
@@ -1006,7 +1022,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	}, function(error) {
 		console.log("Patron save failed.");
 		response.error("error");			
-	})
+	}).then(function(){
+	    Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+	});
 });
  
 ////////////////////////////////////////////////////

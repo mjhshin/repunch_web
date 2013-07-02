@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -5,17 +6,14 @@ import json
 
 from parse import session as SESSION
 from parse.utils import cloud_call
-from parse.apps.messages.models import Message
-from parse.apps.employees.models import Employee
 from parse.auth.decorators import login_required
+from apps.comet.models import CometSession
 from parse.apps.messages.models import Message
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
 from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
 RETAILER_REFRESH_TIMEOUT
-
-
-# TODO implement comet approach properly   
+   
 @login_required
 def refresh(request):
     """
@@ -113,15 +111,6 @@ def refresh(request):
                 redemps.append(rr.jsonify())
             data['redemption_count'] = len(redemptions)
             data['redemptions'] = redemps
-        """
-        print results, timezone.now()
-        if timezone.now() < request.session.get('comet_dead_time'):
-            thread.exit()
-            return # unreachable code
-        elif len(results) < 2 and timezone.now() < out_time:
-            # will force to ping back request after out_time!
-            return comet()
-        """
         
         try:
             resp = HttpResponse(json.dumps(data), 
@@ -134,18 +123,52 @@ def refresh(request):
     def new_session_comet():
         """ returns a new session comet with new expiration """
         pass
-    """ 
-    try:
-        scomet = SessionComet.objects().get(sessionId=\
+    
+    try: # attempt to get a used CometSession first
+        scomet = CometSession.objects.get(session_key=\
             request.session[SESSION_KEY])
-        if scomet.changes:
+        if scomet.ok:
             return comet()
         return HttpResponse(json.dumps({"result":"none"}), 
                         content_type="application/json")
-    except SessionComet.DoesNotExist:
+    except CometSession.DoesNotExist:
         # create it here and call comet
-        
+        scomet = CometSession.objects.create(session_key=\
+            request.session[SESSION_KEY])
         return comet()
-    else:  
-    """ 
-    return comet()
+    else: 
+        return comet()
+        
+@csrf_exempt  
+def receive(request, store_id):
+    """
+    Receives a get request from a foreign site and sets all of the 
+    CometSessions that have the given store Id.
+    """
+    if request.method == "GET" or request.is_ajax():
+        for scomet in CometSession.objects.filter(store_id=\
+            store_id):
+            scomet.ok = True
+            scomet.save()
+        return HttpResponse("success")
+        
+    return HttpResponse("error")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
