@@ -24,52 +24,60 @@ $(document).ready(function(){
                     "rewardId":rewardId }, 
             type: "GET",
             success: function(res){
-                if (res.result == 1){
-                    row.css("background", "#CCFF99");
-                    row.html("Successfully validated redemption.");
+                if (res.result == 1 || res.result == 2){
+                    if (res.result == 1){
+                        row.css("background", "#CCFF99");
+                        row.html("Successfully validated redemption.");
+                    } else {
+                        row.css("background", "#ffffcb");
+                        row.html("Patron does not have enough punches!");
+                        alert("Customer does not have enough punches!");
+                    }
                     row.fadeOut(3000, function(){
-                        // append to past
-                        var odd = "", 
-                            x=$("#redemption-past div.tab-body div.tr").first();
-                        if (!x.hasClass("odd")){
-                            odd = "odd";
+                        if (res.result == 1){
+                            // append to past
+                            var odd = "", 
+                                x=$("#redemption-past div.tab-body div.tr").first();
+                            if (!x.hasClass("odd")){
+                                odd = "odd";
+                            }
+                            var d = new Date();
+                            var hour = d.getHours();
+                            var minute = new String(d.getMinutes());
+                            var ampm;
+                            if (hour > 12){
+                                ampm = "p.m.";
+                            } else {
+                                ampm = "a.m.";
+                            }
+                            if (hour > 12){
+                                hour = hour - 12;
+                            }
+                            hour = new String(hour);
+                            if (hour.length < 2){
+                                hour = "0" + hour;
+                            }
+                            if (minute.length < 2){
+                                minute = "0" + minute;
+                            }
+                            d = hour + ":" + minute + " " + ampm;
+                            var content = "<div class='tr " + odd + "' " + 
+                                "id='"+ rowId + "'>" +
+		                        "<input type='hidden'" + 
+		                        " value='" + rewardId + "'/>" + 
+				                "<div class='td redemption_time-past'>" +
+				                d + "</div>" +
+				                "<div class='td redemption_customer_name-past'>" +
+				                customerName + "</div>" +
+		                        "<div class='td redemption_title-past'>" +
+				                title + "</div>" +
+				                "<div class='td redemption_punches-past'>" +
+				                numPunches + "</div>" +
+				                "<div class='td redemption_redeem-past'>" +
+				                "</div>" +
+		                        "</div>";
+		                    x.before(content);
                         }
-                        var d = new Date();
-                        var hour = d.getHours();
-                        var minute = new String(d.getMinutes());
-                        var ampm;
-                        if (hour > 12){
-                            ampm = "p.m.";
-                        } else {
-                            ampm = "a.m.";
-                        }
-                        if (hour > 12){
-                            hour = hour - 12;
-                        }
-                        hour = new String(hour);
-                        if (hour.length < 2){
-                            hour = "0" + hour;
-                        }
-                        if (minute.length < 2){
-                            minute = "0" + minute;
-                        }
-                        d = hour + ":" + minute + " " + ampm;
-                        var content = "<div class='tr " + odd + "' " + 
-                            "id='"+ rowId + "'>" +
-		                    "<input type='hidden'" + 
-		                    " value='" + rewardId + "'/>" + 
-				            "<div class='td redemption_time-past'>" +
-				            d + "</div>" +
-				            "<div class='td redemption_customer_name-past'>" +
-				            customerName + "</div>" +
-		                    "<div class='td redemption_title-past'>" +
-				            title + "</div>" +
-				            "<div class='td redemption_punches-past'>" +
-				            numPunches + "</div>" +
-				            "<div class='td redemption_redeem-past'>" +
-				            "</div>" +
-		                    "</div>";
-		                x.before(content);
                         
                         // then remove
                         $(this).remove();
