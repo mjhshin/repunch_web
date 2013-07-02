@@ -730,7 +730,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		var FacebookPost = Parse.Object.extend("FacebookPost");
 		var facebookPost = new FacebookPost();
 		facebookPost.set("Patron", patron);
-		facebookPost.set("posted", false);
 		facebookPost.set("reward", rewardTitle);
 	
 		facebookPost.save().then(function(facebookPost) {
