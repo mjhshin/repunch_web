@@ -205,7 +205,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(){
 	    // note that since memcached is used as the cache backend,
 	    // the cache can be shared among all instances
-        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 	});
 	
 });
@@ -448,7 +448,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		}).then(function(){
 	        // note that since memcached is used as the cache backend,
 	        // the cache can be shared among all instances
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 		});
 	}
 
@@ -542,7 +542,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 		}).then(function(){
 	        // note that since memcached is used as the cache backend,
 	        // the cache can be shared among all instances
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 		});
 	}
 	
@@ -657,7 +657,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	}).then(function(){
 	    // Since there may be multiple dashboards open and the mobile
 	    // apps may validate redeems, dashboard needs to know about this
-        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 	});
 	
 	function executePush() {
@@ -839,7 +839,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 console.log(patron_ids);
                 installationQuery.containedIn("patron_id", patron_ids);
             }
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
             // all tasks are done. Push now.
             proceedToPush();
             return
@@ -1024,7 +1024,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		console.log("Patron save failed.");
 		response.error("error");			
 	}).then(function(){
-	    Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/' + storeId});
+	    Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 	});
 });
 
