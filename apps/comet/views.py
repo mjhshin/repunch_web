@@ -135,7 +135,8 @@ def refresh(request):
     except CometSession.DoesNotExist:
         # create it here and call comet
         scomet = CometSession.objects.create(session_key=\
-            request.session[SESSION_KEY])
+                request.session[SESSION_KEY],
+                store_id=SESSION.get_store(request.session).objectId)
         return comet()
     else: 
         return comet()
