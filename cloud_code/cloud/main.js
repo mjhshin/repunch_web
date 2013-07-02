@@ -16,6 +16,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	var Patron = Parse.Object.extend("Patron");
 	var PunchCode = Parse.Object.extend("PunchCode");
 	var patron = new Patron();
+	var user = new Parse.User();
 	
 	var userQuery = new Parse.Query(Parse.User);
 	var punchCodeQuery = new Parse.Query(PunchCode);
@@ -66,16 +67,17 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		response.error("error");
 		return;
 				
-	}).then(function(user) {
+	}).then(function(userResult) {
 		console.log("User fetch success.");
-		user.set("Patron", patron);
-		user.set("account_type", "patron");
+		user = userResult;
+		userResult.set("Patron", patron);
+		userResult.set("account_type", "patron");
 		
 		if(email != null) {
-			user.set("email", email);
+			userResult.set("email", email);
 		}
 		  
-		return user.save();
+		return userResult.save();
 			
 	}, function(error) {
 		console.log("User fetch failed.");
@@ -89,10 +91,29 @@ Parse.Cloud.define("register_patron", function(request, response) {
 			
 	}, function(error) {
 		console.log("User save failed.");
-		response.error("error");
-		return;			
-	})
+		
+		if(error.code == Parse.Error.EMAIL_TAKEN) {
+			console.log("User save failed because this email is already taken.");
+			response.error(error.message);
+			deleteAccount();
+			
+		} else {
+			response.error("error");
+		}	
+	});
 	
+	function deleteAccount() {
+		var promises = [];
+		promises.push( user.destroy() );
+		promises.push( patron.destroy() );
+		
+		Parse.Promise.when(promises).then(function(){
+		    console.log("Patron and User delete success (in parallel).");
+			
+		}, function(error) {
+		    console.log("atron and User delete fail (in parallel).");
+        });
+	}
 	
 });
 
