@@ -30,11 +30,9 @@
 		
 		<div id="photo-edit">
 			<div class="white-box">
-				{% if store|get:'store_avatar'  %}
-					<img src="{{ store|get:'store_avatar_url' }}" class="avatar-big" width="200px" height="200px" />
-				{% else %}
-					<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-big" />
-				{% endif %}
+	        {% if request.session.has_store_avatar and store|get:'store_avatar' %}
+	            <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px"/>
+            {% endif %}
 			</div>
 			<a href="{% url 'store_avatar' %}" id="upload-avatar">Add/Change Photo</a>
 		</div>
@@ -216,6 +214,10 @@
 		<div id="edit-store-options" class="form-options">
 			<a class="button blue" id="save-button">Save Changes</a>
 			<a href="{% url 'store_index' %}" class="red">Cancel</a>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="store-save-loading" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
 	</form>
 {% endwith %}

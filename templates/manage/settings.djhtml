@@ -36,8 +36,13 @@
 		{% endif %}
 		
 		<div id="settings-options" class="form-options">
-			<a onclick="$('#settings-form').submit(); return false;" class="button blue">Save Settings</a>
+			<a id="settings-form-submit"
+			    class="button blue">Save Settings</a>
 			<a href="{% url 'store_index' %}" class="red">Cancel changes</a>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="settings-saving" 
+            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
 
 	</form>

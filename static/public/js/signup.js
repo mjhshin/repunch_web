@@ -26,6 +26,7 @@ $(document).ready(function(){
 
     // prepare the dialog
     $( "#dialog-signup" ).dialog({ autoOpen: false, modal: true, 
+        beforeClose: function(event, ui) { return false; }, 
         title: "Signing up",
         resizable: false,
         minWidth: 330, minHeight: 100,
@@ -78,6 +79,7 @@ $(document).ready(function(){
                     // subscription not active. Tell them.
                     $( "#dialog-signup" ).dialog({ 
                         minHeight: 95, maxHeight: 95,
+                        beforeClose: function(event, ui) { return true; }, 
                         close: function(){
                             window.location.replace(url_home);
                         } });
