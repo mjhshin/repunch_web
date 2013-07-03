@@ -1,10 +1,16 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load parse_tags %}
+{% load static %}{% load store_tags %}
 
 {% block title %}Messages{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+	<script src="{% static "manage/js/messages.js" %}"></script>
+	<script>
+    $(document).ready(function(){
+        $(".not-sortable").unbind("click");
+    });
+	</script>
 {% endblock %}
 
 
@@ -35,48 +41,34 @@
 		<div class="white-box table tab-body active" id="tab-body-sent">
 			<div class="table-header">
 				<div class="th sorted desc" id="header-date">Date sent <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
-			{% for message in messages %}
-			<div class="tr {% cycle '' 'odd' %}">
-				<a href="{% url 'message_details' message.objectId %}">
-					<div class="td date">{{ message|get:'createdAt'|date:"m/d/y" }}</div>
-					<div class="td subject">{{ message|get:'subject' }}</div>
-				</a>
-			</div>
-			{% empty %}
-			<div class="tr">
-				<div class="td date">No Messages</div>
-				<div class="td subject">&nbsp;</div>
-			</div>
-			{% endfor %}
+			{% include 'manage/message_chunk.djhtml' %}
+			
 		</div>
-		
+	
 		<div class="white-box table tab-body" id="tab-body-feedback">
 			<div class="table-header">
 				<div class="th sorted desc" id="header-feedback-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-feedback-from">From <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-feedback-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-feedback-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
-			{% for fb in feedback %}
-			<div class="tr {% cycle '' 'odd' %} {% if not fb.is_read %}unread{% endif %}">
-				<a href="{% url 'feedback_details' fb.objectId %}">
-					<div class="td feedback-date">{{ fb|get:'createdAt'|date:"m/d/y" }}</div>
-					<div class="td feedback-from">{{ fb|get:'sender_name' }}</div>
-					<div class="td feedback-subject">{{ fb|get:'subject' }}</div>
-				</a>
-			</div>
-			{% empty %}
-			<div class="tr" id="no-feedback">
-				<div class="td feedback-date">No Feedback</div>
-				<div class="td feedback-from">&nbsp;</div>
-				<div class="td feedback-subject">&nbsp;</div>
-			</div>
-			{% endfor %}
+			{% include 'manage/feedback_chunk.djhtml' %}
 			
 		</div>
-	</div>
+		
+		<input type="hidden" id="pag-threshold" value="{{ pag_threshold }}" />
+		<input type="hidden" id="pag-page" value="{{ pag_page }}" />
+		<input type="hidden" id="sent-count" value="{{ sent_count }}" />
+		<input type="hidden" id="feedback-count" value="{{ feedback_count }}" />
+		<input type="hidden" id="get-page-url" value="{% url 'message_page' %}" />
+		
+		
+		<div id="pag-container"> {# let client process this #}
+		</div>
+		
+	</div> {# END SECTION #}
 
 {% endblock %}

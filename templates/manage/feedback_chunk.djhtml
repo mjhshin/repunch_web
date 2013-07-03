@@ -1,0 +1,17 @@
+{% load parse_tags %}
+
+{% for fb in feedback %}
+<div class="tr {% cycle '' 'odd' %} {% if not fb.is_read %}unread{% endif %}">
+	<a href="{% url 'feedback_details' fb.objectId %}">
+		<div class="td feedback-date">{{ fb|get:'createdAt'|date:"m/d/y" }}</div>
+		<div class="td feedback-from">{{ fb|get:'sender_name' }}</div>
+		<div class="td feedback-subject">{{ fb|get:'subject' }}</div>
+	</a>
+</div>
+{% empty %}
+<div class="tr" id="no-feedback">
+	<div class="td feedback-date">No Feedback</div>
+	<div class="td feedback-from">&nbsp;</div>
+	<div class="td feedback-subject">&nbsp;</div>
+</div>
+{% endfor %}

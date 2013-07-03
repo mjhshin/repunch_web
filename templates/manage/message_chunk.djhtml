@@ -1,0 +1,15 @@
+{% load parse_tags %}
+
+{% for message in messages %}
+<div class="tr {% cycle '' 'odd' %}">
+	<a href="{% url 'message_details' message.objectId %}">
+		<div class="td date">{{ message|get:'createdAt'|date:"m/d/y" }}</div>
+		<div class="td subject">{{ message|get:'subject' }}</div>
+	</a>
+</div>
+{% empty %}
+<div class="tr">
+	<div class="td date">No Messages</div>
+	<div class="td subject">&nbsp;</div>
+</div>
+{% endfor %}

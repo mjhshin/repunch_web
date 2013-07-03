@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
@@ -15,18 +15,56 @@ from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
+from repunch.settings import PAGINATION_THRESHOLD
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
+
+
+@login_required
+def get_page(request):
+    """
+    Returns the corresponding chunk of rows in html to plug into
+    the sent/feedback table.
+    """
+    if request.method == "GET" or request.is_ajax():
+        type = request.GET.get("type")
+        page = int(request.GET.get("page")) - 1
+        if type == "sent":
+            template = "manage/message_chunk.djhtml"
+            messages = SESSION.get_messages_sent_list(request.session)
+            
+            start = page * PAGINATION_THRESHOLD
+            end = start + PAGINATION_THRESHOLD
+            data = {"messages":messages[start:end]}
+        elif type == "feedback":
+            template = "manage/feedback_chunk.djhtml"
+            feedbacks = SESSION.get_messages_received_list(request.session)
+            
+            start = page * PAGINATION_THRESHOLD
+            end = start + PAGINATION_THRESHOLD
+            data = {"feedback":feedbacks[start:end]}
+        
+        return render(request, template, data)
+        
+    return HttpResponse("Bad request")
 
 
 @login_required
 @session_comet  
 def index(request):
     data = {'messages_nav': True}
+    
+    messages = SESSION.get_messages_sent_list(request.session)
+    feedbacks = SESSION.get_messages_received_list(request.session)
         
-    data['messages'] = SESSION.get_messages_sent_list(request.session)
-    data['feedback'] =\
-                SESSION.get_messages_received_list(request.session)
+    # initially display the first 20 messages/feedback chronologically
+    data['messages'] = messages[:PAGINATION_THRESHOLD]
+    data['feedback'] = feedbacks[:PAGINATION_THRESHOLD]
+        
+    data["pag_threshold"] = PAGINATION_THRESHOLD
+    data["pag_page"] = 1
+    data["sent_count"] = len(messages)
+    data["feedback_count"] = len(feedbacks)
     
     if SESSION.get_patronStore_count(request.session):
         data['has_patrons'] = True
@@ -187,7 +225,10 @@ def edit(request, message_id):
             for m in messages_sent_list:
                 if m.objectId == message_id:
                     data['message'] = m
-            form = MessageForm(data['message'].__dict__.copy())
+            if data['message']:
+                form = MessageForm(data['message'].__dict__.copy())
+            else:
+                form = MessageForm()
            
     # update store session cache
     request.session['store'] = store
@@ -202,6 +243,7 @@ def details(request, message_id):
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
         request.session)
+    message = None
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
@@ -316,10 +358,16 @@ def feedback_reply(request, feedback_id):
     else:
         data['from_address'] = store.get("store_name")
         data['subject'] = 'Re: ' + feedback.get('subject')
+        # if the user manually tweaks the url, then s/he might be
+        # able to reply to a feedback that already has a reply.
+        if feedback.get("Reply"):
+            return redirect(reverse('feedback_details', 
+                        args=(feedback.objectId,)) +\
+                        "?%s" % urllib.urlencode({'error':\
+                        'Cannot reply more than once.'})) 
         
     # update store session cache
     request.session['store'] = store
-    
     data['feedback'] = feedback
     
     return render(request, 'manage/feedback_reply.djhtml', data)
