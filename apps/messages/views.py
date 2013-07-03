@@ -205,7 +205,6 @@ def details(request, message_id):
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
-    print message.createdAt
     if not message:
         raise Http404
     return render(request, 'manage/message_details.djhtml', 
@@ -216,10 +215,9 @@ def details(request, message_id):
 @login_required
 @session_comet  
 def feedback(request, feedback_id):
-    account = request.session['account']
-    data = {'messages_nav': True, 'feedback_id':\
-            feedback_id, 'account_username':\
-            account.get('username')}    
+    data = {'messages_nav': True, 'feedback_id':feedback_id,
+             "store_name":\
+                SESSION.get_store(request.session).get("store_name")}    
     
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\

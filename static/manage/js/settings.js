@@ -1,4 +1,15 @@
 $(document).ready(function(){
+
+    $("#settings-form-submit").click(function(){
+        if ($("#settings-saving").css("display") != "none"){
+	        return false;
+	    }
+	    $("#settings-saving").show();
+    
+        $('#settings-form').submit();
+        return false;
+    });
+
 	$('#link_refresh_retailer_pin').click(function(){
 	
 	    var loading = $("#retailer-pin-loading");
@@ -30,4 +41,5 @@ $(document).ready(function(){
 		}
 		return false;
 	});
+	
 });

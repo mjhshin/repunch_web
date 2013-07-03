@@ -56,7 +56,7 @@ def redeem(request):
                 "store_id":store.get("objectId"),
                 "reward_id":rewardId,
                 })
-        print res
+                
         if 'error' not in res:
             redemptions = SESSION.get_redemptions(request.session)
             i_remove, result = -1, res.get("result")

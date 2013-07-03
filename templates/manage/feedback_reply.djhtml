@@ -4,7 +4,19 @@
 {% block title %}Feedback Reply{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
+<script>
+$(document).ready(function(){
+    $("#reply-form-submit").click(function(){
+        if ($("#reply-sending").css("display") != "none"){
+	            return false;
+	        }   
+        $("#reply-sending").show();
+        
+        $('#message-form').submit(); 
+        return false;
+    });
+});
+</script>
 {% endblock %}
 
 
@@ -35,8 +47,12 @@
 			</div>
 		</div>
 		<div id="message-detail-options" class="form-options">
-			<a onclick="$('#message-form').submit(); return false;" class="button blue">Reply</a>
-			<a href="{{ feedback.get_absolute_url }}" class="red">Cancel</a>
+			<a id="reply-form-submit" class="button blue">Reply</a>
+			<a href="{% url 'feedback_details' feedback.objectId %}" class="red">Cancel</a>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="reply-sending" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
 	</form>
 	<div class="divider"></div>

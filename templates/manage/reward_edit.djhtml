@@ -14,8 +14,20 @@
 	
 	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+	<script>
+    $(document).ready(function(){
+        $('#submit-reward-form').click(function(){
+            if ($("#reward-saving").css("display") != "none"){
+                return false;
+            }
+            $("#reward-saving").show();
+            
+            $('#reward-form').submit(); 
+            return false;
+        }); 
+    });
+    </script>
 {% endblock %}
-
 
 {% block content %}
 	
@@ -47,13 +59,18 @@
 		</div>
 		
 		<div id="edit-reward-options" class="form-options">
-			<a  class="button blue" onclick="$('#reward-form').submit(); return false;">Save Reward</a>
+			<a  class="button blue" id="submit-reward-form">Save Reward</a>
 			{% if is_new %}
 				<a href="{% url 'rewards_index' %}" class="red">Cancel</a>
 			{% else %}
 				<a id="delete-link" href="{% url 'reward_delete' reward_index %}" class="red">Delete Reward</a>
 			{% endif %}
+			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="reward-saving" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
+		
 	</form>
 
 {% endblock %}

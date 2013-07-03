@@ -1,6 +1,6 @@
 /*
     Comet approach.
-    constant communication with manage_refresh
+    constant communication with comet_refresh
 */
 
 
@@ -133,7 +133,7 @@ $(document).ready(function(){
         // goes here if there are no changes
         if (res.hasOwnProperty("result")){
             if (res.result == 0){
-                return
+                return;
             }
         }
         // Messages page

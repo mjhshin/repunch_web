@@ -83,8 +83,12 @@ $(document).ready(function(){
 	});
 	
 	$('a#save-button').click(function(){
+	    if ($("#store-save-loading").css("display") != "none"){
+	        return false;
+	    }
+	    $("#store-save-loading").show();
+	    
 		var form = $('#account-edit-form');
-		
 		var count = 0;
 		$('ul.hours-form').each(function(index){
 			var row = $(this);

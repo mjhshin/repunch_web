@@ -21,6 +21,11 @@
 				}
 				else
 				{
+				    if ($("#img-upload-loading").css("display") != "none"){
+				        return false;
+				    }
+				    
+				    $("#img-upload-loading").show();
 					$('#avatar-form').submit();
 				}
 			});
@@ -39,6 +44,10 @@
 		<div id="edit-store-options" class="form-options">
 			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
 			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="img-upload-loading" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
 	</form>
 </body>

@@ -230,8 +230,7 @@ class ParseObject(object):
 
         e.g. To get the number of Persons whose name is jason:
 
-            class Person(ParseObject):
-                pass
+            class Person(ParseObject): pass
             Person.objects().count(name="jason")
 
 
@@ -252,14 +251,12 @@ class ParseObject(object):
         All data are inserted if the create parameter is not set to 
         False (default is True).
         e.g. 
-            class Person(ParseObject):
-                pass
+            class Person(ParseObject): pass
             person = Person(create=True, name="nick", age=9)
 
         Otherwise, only the data that is in __dict__ is inserted.
         e.g. 
-            class Person(ParseObject):
-                pass
+            class Person(ParseObject): pass
             person = Person(create=False, name="nick", age=9)
         In the above example name is inserted but not age.
 

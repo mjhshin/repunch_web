@@ -37,11 +37,11 @@
 			<div id="header-right" >
 				<div id="account-info">
 					<a href="{% url 'store_index' %}">
+					{% if request.session.has_store_avatar %}
 						{% if request.session.store|get:'store_avatar'  %}
 							<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" />
-						{% else %}
-							<img src="{{ MEDIA_URL }}images/avatars/avatar-blank.jpg" class="avatar-small" />
 						{% endif %}
+					{% endif %}
 						<span id="account-name">{{ request.session.account|get:'username' }}</span>
 					</a>
 				</div>

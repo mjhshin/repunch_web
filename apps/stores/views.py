@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.request import QueryDict
 from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
 from datetime import datetime
-import json
+import json, urllib
 
 from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours
@@ -105,8 +105,12 @@ def edit(request):
                 key = "hours-" + str(ind) + "-days"
             store.set("hours", hours)
             store.update()
-
-            data['success'] = "Store details have been saved."
+            # update the session cache
+            request.session['store'] = store
+            
+            return redirect(reverse('store_index')+ "?%s" %\
+                        urllib.urlencode({'success':\
+                            'Store details has been updated.'}))
                 
     else:
         form = StoreForm()
@@ -180,6 +184,7 @@ def avatar(request):
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
+                request.session['has_store_avatar'] = True
             store.update()
             
             data['success'] = True

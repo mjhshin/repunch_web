@@ -11,10 +11,11 @@ from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK, BASIC, OFFER
 
 SESSION_CACHE = [
+    # temps
     'message_count',
     'patronStore_count', # PUSH
-    
-    'store_timezone', # DO NOT USE DATETIME! ALWAYS USE TIMEZONE!
+    'store_timezone',
+    "has_store_avatar", 
     
     # actual objects
     'account',
@@ -25,9 +26,10 @@ SESSION_CACHE = [
     'employees_approved_list',
     'messages_sent_list',
     'messages_received_list', # PUSH
+    'redemptions', # PUSH
+    'remptions_past', # PUSH
     
-    'redemptions',
-    'remptions_past',
+    
     
     # time in which all comet processes for the request will die
     # 'stop_comet_time', unused at the moment

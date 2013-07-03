@@ -1,5 +1,10 @@
 $(document).ready(function(){
 	$('#send-now').click(function(){
+	    if ($("#message-sending").css("display") != "none"){
+	        return false;
+	    }
+	    $("#message-sending").show();
+	    
 		$('#message-form').submit();
 		return false;
 	});

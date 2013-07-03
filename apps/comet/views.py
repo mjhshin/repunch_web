@@ -120,10 +120,6 @@ def refresh(request):
         except IOError: # broken pipe or something. 
             # exit silently
             thread.exit()
-            
-    def new_session_comet():
-        """ returns a new session comet with new expiration """
-        pass
     
     # the above is different from SESSION_KEY (which is not unique)
     try: # attempt to get a used CometSession first
@@ -136,7 +132,6 @@ def refresh(request):
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except CometSession.DoesNotExist:
-        print SESSION.get_store(request.session).objectId
         # create it here and call comet
         scomet = CometSession.objects.create(session_key=\
                 request.session._session_key,

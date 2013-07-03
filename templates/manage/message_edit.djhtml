@@ -99,6 +99,10 @@ $(document).ready(function(){
 		<div id="message-detail-options" class="form-options">
             <a id="send-now" class="button blue">Send Now</a>
 			<a href="{% url 'messages_index' %}" id="delete-button" class="red">Cancel</a>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            alt="processing punch request..." 
+		            id="message-sending" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
 	</form>
 

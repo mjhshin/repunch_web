@@ -7,13 +7,33 @@
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
 <script>
-// other
 $(document).ready(function(){
     $( ".question_mark" ).tooltip({
       track: true
     });
 });
 </script>
+<script>
+    $(document).ready(function(){
+        var pf = $("#processing-form");
+        $("#upgrade-form-submit").click(function(){
+            var uForm = $('#upgrade-form');
+            {% if update %}
+            uForm.attr("action",
+                "{% url 'account_update' %}");
+            {% elif upgrade %}
+            uForm.attr("action",
+                "{% url 'account_upgrade' %}");
+            {% endif %}
+            // only proceed if not processing a form
+            if (pf.css("display") == "none"){
+                pf.show();
+                uForm.submit();
+            }
+            return false;
+        });
+    });
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -150,28 +170,6 @@ $(document).ready(function(){
 		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
 			        id="processing-form" style="display:none;"/>
 	</div>
-	
-	<script>
-    $(document).ready(function(){
-        var pf = $("#processing-form");
-        $("#upgrade-form-submit").click(function(){
-            var uForm = $('#upgrade-form');
-            {% if update %}
-            uForm.attr("action",
-                "{% url 'account_update' %}");
-            {% elif upgrade %}
-            uForm.attr("action",
-                "{% url 'account_upgrade' %}");
-            {% endif %}
-            // only proceed if not processing a form
-            if (pf.css("display") == "none"){
-                pf.show();
-                uForm.submit();
-            }
-            return false;
-        });
-    });
-    </script>
 	
 	</form>
 {% endblock %}

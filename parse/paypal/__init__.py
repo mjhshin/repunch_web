@@ -6,8 +6,8 @@ Reason being unreliable.
 """
 
 import pycurl, json, urllib2
-from datetime import datetime
 from StringIO import StringIO
+from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET,\
@@ -16,7 +16,7 @@ from libs.repunch.rpccutils import get_cc_type
 
 # to be safe, use the getter methods instead of importing these
 ACCESS_TOKEN = None
-# datetime objects
+# datetime objects in UTC
 ACCESS_TOKEN_EXPIRES_IN = None
 
 def get_access_token():
@@ -26,7 +26,7 @@ def get_access_token():
     
     returns the ACCESS_TOKEN 
     """
-    if not ACCESS_TOKEN or datetime.now() > ACCESS_TOKEN_EXPIRES_IN:
+    if not ACCESS_TOKEN or timezone.now() > ACCESS_TOKEN_EXPIRES_IN:
         _refresh_access_token()
     return ACCESS_TOKEN
 
@@ -57,7 +57,7 @@ def _refresh_access_token():
     # update 
     ACCESS_TOKEN = res['access_token']
     # subtract 5 mins (300 seconds) to be safe
-    ACCESS_TOKEN_EXPIRES_IN = datetime.now() +\
+    ACCESS_TOKEN_EXPIRES_IN = timezone.now() +\
                     relativedelta(seconds=res['expires_in']-300)
 
 def store_cc(subscription, cc_number, cvv2):
