@@ -86,7 +86,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 				
 	}).then(function(user) {
 		console.log("User save success. Registration complete!");
-		response.success(patron.id);
+		response.success(patron);
 		return;
 			
 	}, function(error) {
