@@ -180,6 +180,7 @@ def avatar(request):
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
+                request.session['has_store_avatar'] = True
             store.update()
             
             data['success'] = True

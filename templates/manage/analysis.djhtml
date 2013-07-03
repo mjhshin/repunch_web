@@ -26,7 +26,9 @@
 {% block content %}
 
 	<div class="section" id="trends">
-		<h2 style="margin-bottom:10px;">Trends</h2>
+		<h2 style="margin-bottom:10px;display:inline-block;">Trends</h2>
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..." id="trends-loading" 
+		    width="22px" height="22px"/>
 		<div class="white-box" id="trends-container">
 			<div class="graph-options-container">
 				<div class="graph-type-options">
@@ -48,7 +50,9 @@
 	</div>
 	
 	<div class="section" id="breakdown">
-		<h2 style="margin-bottom:10px;">Breakdown</h2>
+		<h2 style="margin-bottom:10px;display:inline-block">Breakdown</h2>
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..." id="breakdown-loading" 
+		    width="22px" height="22px"/>
 		<div class="white-box" id="breakdown-container">
 			<div class="graph-options-container">
 				<div class="graph-type-options">

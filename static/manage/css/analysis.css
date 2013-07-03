@@ -40,3 +40,13 @@
 	height: 22px;
 	line-height: 22px;
 }
+
+img#trends-loading {
+    display:none;
+    position:relative; left:10px; top:2px;
+}
+
+img#breakdown-loading {
+    display:none;
+    position:relative; left:10px; top:2px;
+}

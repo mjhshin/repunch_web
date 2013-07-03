@@ -10,6 +10,8 @@ $(document).ready(function(){
 var breakdownGraph = null;
 function updateBreakdownGraph()
 {	
+    $("#breakdown-loading").show();
+
 	var url = _breakdown_graph_url + $('#breakdown-type').val() + '/' + 
 	$('#breakdown-filter').val() + '/' + 
 	$('#breakdown-range').val() + '/';
@@ -40,12 +42,16 @@ function updateBreakdownGraph()
       breakdownGraph = new google.visualization.ColumnChart(document.getElementById('breakdown-graph'));
       breakdownGraph.draw(new google.visualization.arrayToDataTable(jsonData), options);
 
+    $("#breakdown-loading").hide();
+
 }
 
 
 var trendsGraph = null;
 function updateTrendsGraph()
 {
+    $("#trends-loading").show();
+
 	var start = $('#trends-start-date').val();
 	var end = $('#trends-end-date').val();
 	
@@ -80,5 +86,7 @@ function updateTrendsGraph()
       // Instantiate and draw our chart, passing in some options.
       trendsGraph = new google.visualization.LineChart(document.getElementById('trends-graph'));
       trendsGraph.draw(new google.visualization.DataTable(jsonData), options);
+      
+    $("#trends-loading").hide();
 
 }
