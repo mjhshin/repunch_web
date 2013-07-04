@@ -17,7 +17,7 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="{% static "manage/js/global.js" %}"></script>
-	{# <script src="{% static "manage/js/comet.js" %}"></script>  TODO UNCOMMENT! #}
+	<script src="{% static "manage/js/comet.js" %}"></script>
 	{% block javascript %}{% endblock %}
 	
 </head>
