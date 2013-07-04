@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load util_tags %}{% load parse_tags %}
 
-{% block title %}Workbench{% endblock %}
+{% block title %}({{ redcount }}) Workbench{% endblock %}
 {% block styles %}	
 	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link href="{% static "manage/css/workbench.css" %}" rel="stylesheet" />

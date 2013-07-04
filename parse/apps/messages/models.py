@@ -22,10 +22,6 @@ class Message(ParseObject):
         self.store_id = data.get("store_id")
         # empty if message sent by store NEW
         self.patron_id = data.get('patron_id')
-        
-        # boolean - need to be set to False on message creation if 
-        # there is an offer
-        self.offer_redeemed = data.get("offer_redeemed")
     
         self.Reply = data.get("Reply")
         # meta for Reply pointer

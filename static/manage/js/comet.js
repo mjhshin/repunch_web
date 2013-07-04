@@ -32,7 +32,7 @@ $(document).ready(function(){
                         row.html("Customer does not have enough punches!");
                         alert("Customer does not have enough punches!");
                     }
-                    row.fadeOut(3000, function(){
+                    row.fadeOut(2000, function(){
                         if (res.result == 1){
                             // append to past
                             var odd = "", 
@@ -88,7 +88,7 @@ $(document).ready(function(){
                         if (rcount < 1){
                             // workbench nav badge
                             if (rBadge.length == 1){
-                                rBadge.fadeOut('slow');
+                                rBadge.fadeOut(2000);
                             }
                             
                             // pending tab
@@ -155,39 +155,80 @@ $(document).ready(function(){
             
                 // table content
                 var feedbacks = res.feedbacks;
-                for (var i=0; i<feedbacks.length; i++){
-                    var odd = "";
-                    var first=$("#tab-body-feedback div.tr").first();
-                    if (!first.hasClass("odd")){
-                        odd = "odd";
-                    }
-                    var d = new Date(feedbacks[i].createdAt);
-                    var year = new String(d.getYear());
-                    year = year.substring(1, year.length);
-                    var month = new String(d.getMonth()+1);
-                    if (month.length == 1){
-                        month = "0" + month;
-                    }
-                    var day = new String(d.getDate());
-                    if (day.length == 1){
-                        day = "0" + day;
-                    }
-                    var dStr = month + "/" + day + "/" + year;
-                    $("#tab-body-feedback div.table-header").after(
-                        "<div class='tr " + odd + " unread'>" +
-			            "<a href='/manage/messages/feedback/" + 
-			            feedbacks[i].objectId + "'>" +
-				        "<div class='td feedback-date'>"+
-                        dStr + "</div>" +
-				        "<div class='td feedback-from'>" +
-				        feedbacks[i].sender_name + "</div>" +
-				        "<div class='td feedback-subject'>" +
-				        feedbacks[i].subject + "</div>" +
-			            "</a></div>" );
-	            }
+                var pagPage = $("#pag-page");
+                var pagThreshold = $("#pag-threshold");
+                var feedbackCount = $("#feedback-count");
+                var feedbackPageCount = $("#pag-page-feedback-count");
+                // only append if we are on the first or last page and if the feedbacks tab is the active tab
+                var inLastPage = parseInt(pagPage.val()) == parseInt(feedbackPageCount.val());
+                var inFirstPage = parseInt(pagPage.val()) == 1;
+                var tabFeedbackActive = $("#tab-feedback").hasClass("active");
+                var is_desc = $("#header-feedback-date").hasClass("desc");
+                // remember that paginate is called when switching tabs so those rows come from the server!
+                if (tabFeedbackActive && (inLastPage||inFirstPage)) {
+                    for (var i=0; i<feedbacks.length; i++){
+                        // determine if date is asc or desc
+                        var odd = "", row;
+                        if (is_desc){
+                            row = $("#tab-body-feedback div.tr").first();
+                        } else {
+                            row = $("#tab-body-feedback div.tr").last();
+                        }
+                        if (!row.hasClass("odd")){
+                                odd = "odd";
+                            }
+                        var d = new Date(feedbacks[i].createdAt);
+                        var year = new String(d.getYear());
+                        year = year.substring(1, year.length);
+                        var month = new String(d.getMonth()+1);
+                        if (month.length == 1){
+                            month = "0" + month;
+                        }
+                        var day = new String(d.getDate());
+                        if (day.length == 1) {
+                            day = "0" + day;
+                        }
+                        var dStr = month + "/" + day + "/" + year;
+                        var rowStr = "<div class='tr " + odd + " unread'>" +
+			                "<a href='/manage/messages/feedback/" + 
+			                feedbacks[i].objectId + "'>" +
+				            "<div class='td feedback-date'>"+
+                            dStr + "</div>" +
+				            "<div class='td feedback-from'>" +
+				            feedbacks[i].sender_name + "</div>" +
+				            "<div class='td feedback-subject'>" +
+				            feedbacks[i].subject + "</div>" +
+			                "</a></div>";
+			            // prepend if in page 1 and desc
+                        if (is_desc && inFirstPage) {
+                            row.before(rowStr);
+                        // append if in last page and asc
+                        } else if (!is_desc && inLastPage) {
+                            row.after(rowStr);                        
+                        }
+	                } // end for loop
+	                
+	                // update the pagination variables (feedbackPageCount is updated in paginate)
+	                feedbackCount.val(feedbacks.length + parseInt(feedbackCount.val()));
+	                // respect the pagination threshold (trim the last rows that overflow)
+	                var rows = $("#tab-body-feedback div.tr");
+	                var rowCount = rows.length;
+	                var overflow = parseInt(pagThreshold.val()) - rowCount;
+	                if (overflow < 0) {
+	                    overflow = Math.abs(overflow);
+	                    while (overflow > 0){
+	                        rows.last().remove();
+	                        overflow -= 1;
+	                    }
+	                }
+	                
+	                // repaginate
+                    paginator($("#get-page-url").val(), ["sent", "feedback"], "feedback");                
+	                
+	            } // end if feedback tab is active
 	            
-                // remove placeholder when empty
-                if ($("#no-feedback").length > 0){
+                // remove placeholder when no longer empty
+                if ($("#no-feedback").length > 0) {
                     $("#no-feedback").remove();
                 }
             }

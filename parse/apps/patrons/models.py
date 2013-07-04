@@ -18,7 +18,8 @@ class Patron(ParseObject):
         # string unique in Parse
         self.punch_code = data.get('punch_code')
 
-        self.Feedbacks_ = "Feedback"
+        
+        self.ReceivedMessages_ = "Feedback"
         self.PatronStores_ = "PatronStore"
 
         super(Patron, self).__init__(False, **data)
@@ -49,8 +50,10 @@ class PatronStore(ParseObject):
         self.FacebookPost = data.get("FacebookPost")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
-        self.redeem_pending = data.get("redeem_pending", False)
-        
+        # this is for rewards only! not offers!
+        self.pending_reward = data.get("pending_reward", False)
+        # array of object IDs of Message objectIds
+        self.pending_offer_gift = data.get("pending_offer_gift", [])
         
         super(PatronStore, self).__init__(False, **data)
 
@@ -67,6 +70,8 @@ class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """
     def __init__(self, **data):
         self.Patron = data.get("Patron")
+        self.posted = data.get("posted")
+        self.reward = data.get("reward")
 
         super(FacebookPost, self).__init__(False, **data)
 
