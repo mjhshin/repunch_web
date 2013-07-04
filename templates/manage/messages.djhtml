@@ -2,9 +2,11 @@
 {% load static %}{% load store_tags %}
 
 {% block title %}({{ fcount }}) Messages{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
+{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/messages.js" %}"></script>
 	<script src="{% static "manage/js/paginator.js" %}"></script>
 	<script>
     $(document).ready(function(){

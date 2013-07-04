@@ -33,13 +33,12 @@ def get_page(request):
             template = "manage/message_chunk.djhtml" 
             messages = SESSION.get_messages_sent_list(request.session)
             # sort
+            header_map = {"date":"createdAt"}
             header = request.GET.get("header")
             if header: # header can only be date
-                order = request.GET.get("order")
-                if order == "desc":
-                    messages.sort(key=lambda r: r.createdAt, reverse=True)
-                else:
-                    messages.sort(key=lambda r: r.createdAt)
+                reverse = request.GET.get("order") == "desc"
+                messages.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
             
             # set the chunk
             start = page * PAGINATION_THRESHOLD
@@ -52,24 +51,20 @@ def get_page(request):
             template = "manage/feedback_chunk.djhtml"
             feedbacks = SESSION.get_messages_received_list(request.session)
             # sort
+            header_map = {
+                "feedback-date": "createdAt",
+                "feedback-from": "sender_name", 
+            }
             header = request.GET.get("header")
-            if header == "feedback-date":
-                order = request.GET.get("order")
-                if order == "desc":
-                    feedbacks.sort(key=lambda r: r.createdAt, reverse=True)
-                else:
-                    feedbacks.sort(key=lambda r: r.createdAt)
-            elif header == "feedback-from":
-                order = request.GET.get("order")
-                if order == "desc":
-                    feedbacks.sort(key=lambda r: r.sender_name, reverse=True)
-                else:
-                    feedbacks.sort(key=lambda r: r.sender_name)
+            if header:
+                reverse = request.GET.get("order") == "desc"
+                feedbacks.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
                     
             request.session["messages_received_list"] = feedbacks
             
             # set the chunk
-            start = page * PAGINATION_THRESHOLD
+            start = page * PAGINATION_THRESHOLD 
             end = start + PAGINATION_THRESHOLD
             data = {"feedback":feedbacks[start:end]}
         

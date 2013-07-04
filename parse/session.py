@@ -27,7 +27,7 @@ SESSION_CACHE = [
     'messages_sent_list',
     'messages_received_list', # PUSH
     'redemptions', # PUSH
-    'remptions_past', # PUSH
+    'redemptions_past', # PUSH
     
     
     

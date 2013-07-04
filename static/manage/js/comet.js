@@ -272,7 +272,7 @@ $(document).ready(function(){
             }
         }
         
-        // incoming redemptions
+        // incoming redemptions TODO asc/desc
         if (res.hasOwnProperty('redemptions')){
             // Workbench nav
             var redemption_count = res.redemption_count;

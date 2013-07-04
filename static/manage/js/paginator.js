@@ -64,8 +64,11 @@ function paginator(pagUrl, tabs, activeTab){
     // bind the tabs
     // $("#tab-sent").click(function(){ paginate("sent"); });
     $.each(tabs, function(index, tab){
+        // always goes back to page 1, first header, desc
         $("#tab-" + tab).click(function(){
             paginate(tab);
+            getPage(1, tab, $("#tab-body-" + tab +
+            " div.table-header div.th:not(.not-sortable)").first().attr("id").substring("header-".length), "desc");
         });
     });
 
@@ -74,16 +77,15 @@ function paginator(pagUrl, tabs, activeTab){
         var self = $(this);
         self.click(function(){
             var el = self.attr("id").substring("header-".length);
-            var activeTab = $(".tab.active").attr("id").split("-");
+            var activeTab = $(".tab.active").attr("id").substring("tab-".length);
             var order;
             if (self.hasClass("desc")){ order = "desc"; } 
             else { order = "asc"; }
             var page = $("#pag-container a.pag-unit.active");
             if (page.length > 0){
-                getPage(parseInt(page.text()), activeTab[activeTab.length-1],
-                    el, order);
+                getPage(parseInt(page.text()), activeTab, el, order);
             } else {
-                getPage(1, activeTab[activeTab.length-1], el, order);
+                getPage(1, activeTab, el, order);
             }
         });
     });
