@@ -4,7 +4,6 @@
 {% block title %}Messages{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/messages.js" %}"></script>
 	<script>
     $(document).ready(function(){

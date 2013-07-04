@@ -24,10 +24,11 @@ $(document).ready(function(){
 		}
 	})
 	
-	
-	$( "#id_date_offer_expiration" ).datetimepicker({
-	    timeFormat: "hh:mm tt"
-	});
+	if($( "#id_date_offer_expiration" ).length >0){
+	    $( "#id_date_offer_expiration" ).datetimepicker({
+	        timeFormat: "hh:mm tt"
+	    });
+    }
 	
 	/* This is in the html so that instead of ajaxing the min and max
 	*  after page loads, the min and max are already provided at

@@ -30,16 +30,45 @@ def get_page(request):
         type = request.GET.get("type")
         page = int(request.GET.get("page")) - 1
         if type == "sent":
-            template = "manage/message_chunk.djhtml"
+            template = "manage/message_chunk.djhtml" 
             messages = SESSION.get_messages_sent_list(request.session)
+            # sort
+            header = request.GET.get("header")
+            if header: # header can only be date
+                order = request.GET.get("order")
+                if order == "desc":
+                    messages.sort(key=lambda r: r.createdAt, reverse=True)
+                else:
+                    messages.sort(key=lambda r: r.createdAt)
             
+            # set the chunk
             start = page * PAGINATION_THRESHOLD
             end = start + PAGINATION_THRESHOLD
             data = {"messages":messages[start:end]}
+            
+            request.session["messages_sent_list"] = messages
+            
         elif type == "feedback":
             template = "manage/feedback_chunk.djhtml"
             feedbacks = SESSION.get_messages_received_list(request.session)
+            # sort
+            header = request.GET.get("header")
+            if header == "feedback-date":
+                order = request.GET.get("order")
+                if order == "desc":
+                    feedbacks.sort(key=lambda r: r.createdAt, reverse=True)
+                else:
+                    feedbacks.sort(key=lambda r: r.createdAt)
+            elif header == "feedback-from":
+                order = request.GET.get("order")
+                if order == "desc":
+                    feedbacks.sort(key=lambda r: r.sender_name, reverse=True)
+                else:
+                    feedbacks.sort(key=lambda r: r.sender_name)
+                    
+            request.session["messages_received_list"] = feedbacks
             
+            # set the chunk
             start = page * PAGINATION_THRESHOLD
             end = start + PAGINATION_THRESHOLD
             data = {"feedback":feedbacks[start:end]}
@@ -58,6 +87,9 @@ def index(request):
     feedbacks = SESSION.get_messages_received_list(request.session)
         
     # initially display the first 20 messages/feedback chronologically
+    messages.sort(key=lambda r: r.createdAt, reverse=True)
+    feedbacks.sort(key=lambda r: r.createdAt, reverse=True)
+    
     data['messages'] = messages[:PAGINATION_THRESHOLD]
     data['feedback'] = feedbacks[:PAGINATION_THRESHOLD]
         
@@ -299,7 +331,7 @@ def feedback(request, feedback_id):
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
-    data = {'messages_nav': True}    
+    data = {'messages_nav': True}
     
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
@@ -313,6 +345,10 @@ def feedback_reply(request, feedback_id):
             
     if not feedback:
         raise Http404
+        
+    # first fetch the feedback - make sure that we have the updated
+    # one - not the one in the cache
+    feedback.fetchAll()
     
     if request.method == 'POST':
         body = request.POST.get('body')
@@ -324,8 +360,7 @@ def feedback_reply(request, feedback_id):
         # double check if feedback already has a reply
         # should not go here unless it is a hacker 
         elif feedback.get('Reply'):
-            data['error'] = 'You cannot reply more than once to a '+\
-                                'feedback.'
+            data['error']='This feedback has already been replied to.'
         else:
             msg = Message.objects().create(message_type=\
                 FEEDBACK, sender_name=store.get('store_name'),
@@ -369,6 +404,12 @@ def feedback_reply(request, feedback_id):
     # update store session cache
     request.session['store'] = store
     data['feedback'] = feedback
+    
+    # store the updated feedback
+    messages_received_list.pop(i_remove)
+    messages_received_list.insert(i_remove, feedback)
+    request.session['messages_received_list'] =\
+        messages_received_list
     
     return render(request, 'manage/feedback_reply.djhtml', data)
 

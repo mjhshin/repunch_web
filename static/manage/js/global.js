@@ -23,8 +23,11 @@ $(document).ready(function(){
 			dir = 'asc';
 		}
 		
-		el.parent().siblings('.tr').tsort('.'+col,{order:dir});
-		restripe(el.parent().siblings('.tr'));
+		var sibs = el.parent().siblings('.tr');
+		if (sibs.hasOwnProperty("tsort")){
+		    sib.tsort('.'+col,{order:dir});
+		    restripe(sibs);
+	    }
 	});
 	
 	$('div.tab').click(function(){
