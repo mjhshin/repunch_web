@@ -18,14 +18,14 @@ class Patron(ParseObject):
         # string unique in Parse
         self.punch_code = data.get('punch_code')
 
-        
-        self.ReceivedMessages_ = "Feedback"
+        self.ReceivedMessages_ = "MessageStatus"
+        self.SentMessages_ = "Message"
         self.PatronStores_ = "PatronStore"
 
         super(Patron, self).__init__(False, **data)
 
     def get_class(self, className):
-        if className == "Feedback":
+        if className in ("Message", "MessageStatus"):
             return getattr(import_module('parse.apps.messages.models'),
                                 className)
         elif className == "PatronStore":
@@ -52,8 +52,6 @@ class PatronStore(ParseObject):
         self.all_time_punches = data.get('all_time_punches', 0)
         # this is for rewards only! not offers!
         self.pending_reward = data.get("pending_reward", False)
-        # array of object IDs of Message objectIds
-        self.pending_offer_gift = data.get("pending_offer_gift", [])
         
         super(PatronStore, self).__init__(False, **data)
 

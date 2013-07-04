@@ -8,12 +8,15 @@
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
-	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/punch.js" %}"></script>
+	<script src="{% static "manage/js/paginator.js" %}"></script>
 	<script>
-	$(document).ready(function(){
-	    $(".th.not-sortable").unbind("click");
-	});
+    $(document).ready(function(){
+        $(".not-sortable").unbind("click");
+        
+        // activate the paginator!
+        paginator($("#get-page-url").val(), ["pending-redemptions", "history-redemptions"], "pending-redemptions");
+    });
 	</script>
 {% endblock %}
 
@@ -26,7 +29,7 @@
     <input type="hidden" id="redeem-url"
         value="{% url 'workbench_redeem' %}" />
 
-    <div class="section" style="margin-top:0px;">
+    <div class="section" style="margin-top:0px;"> 
 		<h2 style="margin-bottom:10px;">Punch Customers</h2>
         <form action="" method="POST" id="punch-form" >
 	        {% csrf_token %}
@@ -38,18 +41,17 @@
 	    </form> 
     </div>
     
-    <div class="section" style="margin-top:50px;">
+    <div class="section" style="margin-top:50px;"> {# SECTION #}
 		<h2 style="margin-bottom:10px;">Redemptions</h2>
 		<div class="tab-container">
 			<div class="tab active" id="tab-pending-redemptions">Pending {% if redcount > 0 %}({{ redcount }}){% endif %}</div>
 			<div class="tab" id="tab-history-redemptions">History</div>
 		</div>
 	
-	<div id="redemption">
 		<div class="white-box table tab-body active" id="tab-body-pending-redemptions">
 			<div class="table-header">
-				<div class="th sorted desc not-sortable" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th sorted desc" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			<div class="th not-sortable" id="header-redemption_redeem"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
@@ -81,46 +83,54 @@
 			</div>
 			{% endfor %}			
 		</div>
-	</div>
 	
-	<div id="redemption-past">
-		<div class="white-box table tab-body" id="tab-body-history-redemptions">
-			<div class="table-header">
-				<div class="th sorted desc not-sortable" id="header-redemption_time-past">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_customer_name-past">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_title-past">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th not-sortable" id="header-redemption_punches-past">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			<div class="th not-sortable" id="header-redemption_redeem-past"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			
-			</div>
-			
-			{% for redemp in past_redemptions %}
-		    <div id="{{redemp.objectId}}" 
-		        class="tr  {% cycle '' 'odd' %}">
-		        <input type="hidden" value="{{redemp.reward_id}}" />
-				<div class="td redemption_time-past">
-				{% if redemp.updatedAt < today %}
-				{{ redemp.updatedAt|date:"F d" }}
-				{% else %}
-				{{ redemp.updatedAt|date:"h:i a" }}
-				{% endif %}</div>
-				<div class="td redemption_customer_name-past">
-				{{ redemp.customer_name }}</div>
-				<div class="td redemption_title-past">
-				{{ redemp.title }}</div>
-				<div class="td redemption_punches-past">
-				{{ redemp.num_punches }}</div>
-				<div class="td redemption_redeem-past">
-				</div>
-			</div>
-			{% empty %}
-			<div class="tr " id="no-redemptions">
-				<div class="td">No Redemptions</div>
-			</div>
-			{% endfor %}			
-		</div>
-	</div>
+	    <div class="white-box table tab-body" id="tab-body-history-redemptions">
+		    <div class="table-header">
+			    <div class="th sorted desc" id="header-redemption_time-past">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			    <div class="th" id="header-redemption_customer_name-past">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			    <div class="th not-sortable" id="header-redemption_title-past">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			    <div class="th not-sortable" id="header-redemption_punches-past">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+		    <div class="th not-sortable" id="header-redemption_redeem-past"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+		    </div>
+		
+		    {% for redemp in past_redemptions %}
+	        <div id="{{redemp.objectId}}" 
+	            class="tr  {% cycle '' 'odd' %}">
+	            <input type="hidden" value="{{redemp.reward_id}}" />
+			    <div class="td redemption_time-past">
+			    {% if redemp.updatedAt < today %}
+			    {{ redemp.updatedAt|date:"F d" }}
+			    {% else %}
+			    {{ redemp.updatedAt|date:"h:i a" }}
+			    {% endif %}</div>
+			    <div class="td redemption_customer_name-past">
+			    {{ redemp.customer_name }}</div>
+			    <div class="td redemption_title-past">
+			    {{ redemp.title }}</div>
+			    <div class="td redemption_punches-past">
+			    {{ redemp.num_punches }}</div>
+			    <div class="td redemption_redeem-past">
+			    </div>
+		    </div>
+		    {% empty %}
+		    <div class="tr " id="no-redemptions">
+			    <div class="td">No Redemptions</div>
+		    </div>
+		    {% endfor %}			
+	    </div>
 	
-	</div> {# end section class #}
+	    {# PAGINATION #}
+	    <input type="hidden" id="pag-threshold" value="{{ pag_threshold }}" />
+	    <input type="hidden" id="pag-page" value="{{ pag_page }}" />
+	    <input type="hidden" id="pag-page-pending-redemptions-count" />
+	    <input type="hidden" id="pag-page-history-redemptions-count" />
+	    <input type="hidden" id="history-redemptions-count" value="{{ history_redemptions_count }}" />
+	    <input type="hidden" id="pending-redemptions-count" value="{{ pending_redemptions_count }}" />
+	    <input type="hidden" id="get-page-url" value="{% url 'workbench_page' %}" />
+	    <div id="pag-container"> {# let client process this #}
+	    </div>
+	    {# END PAGINATION #}
+	
+	</div> {# END SECTION #}
 	
 {% endblock %}

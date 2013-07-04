@@ -11,6 +11,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
+from repunch.settings import PAGINATION_THRESHOLD
 
 @login_required
 def index(request):
@@ -24,19 +25,28 @@ def index(request):
                     SESSION.get_store_timezone(request.session))
     today = today + relativedelta(days=-1)
     today = today.replace(hour=23, minute=59, second=59) # midnight
-    redemps = SESSION.get_redemptions(request.session)[:20]
-    past_redemps = SESSION.get_redemptions_past(request.session)[:20]
-    data = {"workbench_nav":True,
-        "redemp_pages":ceil(float(len(redemps))/20.0),
-        "past_redemp_pages":ceil(float(len(past_redemps))/20.0),
-        "redemptions":redemps,
-        "settings":SESSION.get_settings(request.session),
-        "past_redemptions":past_redemps,
-        "today":today}
+    
+    data = {"workbench_nav":True, "settings":SESSION.get_settings(request.session), "today":today}
+    
+    redemps = SESSION.get_redemptions(request.session)
+    past_redemps = SESSION.get_redemptions_past(request.session)
+    
+    # initially display the first 20 pending/history chronologically
+    redemps.sort(key=lambda r: r.createdAt, reverse=True)
+    past_redemps.sort(key=lambda r: r.updatedAt, reverse=True)
+    
+    data['redemptions'] = redemps[:PAGINATION_THRESHOLD]
+    data['past_redemptions'] = past_redemps[:PAGINATION_THRESHOLD]
+    
+    data["pag_threshold"] = PAGINATION_THRESHOLD
+    data["pag_page"] = 1
+    data["pending_redemptions_count"] = len(redemps)
+    data["history_redemptions_count"] = len(past_redemps)
+    
     return render(request, 'manage/workbench.djhtml', data)
     
 @login_required
-def get_redemp_page(request):
+def get_page(request):
     """
     Returns a generated html to plug in the tables.
     """

@@ -32,7 +32,7 @@
 	</div>
 	{% endif %}
 	
-	<div class="section">
+	<div class="section"> {# SECTION #}
 		
 		<div class="tab-container">
 			<div class="tab active" id="tab-sent">Sent</div>
@@ -62,17 +62,17 @@
 			
 		</div>
 		
+		{# PAGINATION #}
 		<input type="hidden" id="pag-threshold" value="{{ pag_threshold }}" />
 		<input type="hidden" id="pag-page" value="{{ pag_page }}" />
-		<input type="hidden" id="pag-page-feedback-count" value="{{ pag_page_feedback_count }}" />
-		<input type="hidden" id="pag-page-sent-count" value="{{ pag_page_sent_count }}" />
+		<input type="hidden" id="pag-page-feedback-count" />
+		<input type="hidden" id="pag-page-sent-count" />
 		<input type="hidden" id="sent-count" value="{{ sent_count }}" />
 		<input type="hidden" id="feedback-count" value="{{ feedback_count }}" />
 		<input type="hidden" id="get-page-url" value="{% url 'message_page' %}" />
-		
-		
 		<div id="pag-container"> {# let client process this #}
 		</div>
+		{# END PAGINATION #}
 		
 	</div> {# END SECTION #}
 

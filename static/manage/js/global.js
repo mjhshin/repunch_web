@@ -25,7 +25,7 @@ $(document).ready(function(){
 		
 		var sibs = el.parent().siblings('.tr');
 		if (sibs.hasOwnProperty("tsort")){
-		    sib.tsort('.'+col,{order:dir});
+		    sibs.tsort('.'+col,{order:dir});
 		    restripe(sibs);
 	    }
 	});

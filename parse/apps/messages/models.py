@@ -15,6 +15,7 @@ class Message(ParseObject):
         self.offer_title = data.get("offer_title")
         self.date_offer_expiration = data.get('date_offer_expiration')
         self.message_type = data.get("message_type")
+        # only used by stores
         self.is_read = data.get("is_read", False)
         # store name or patron fullname
         self.sender_name = data.get("sender_name")
@@ -27,13 +28,6 @@ class Message(ParseObject):
         # meta for Reply pointer
         self._reply = "Message"
 
-        # NOT IN SERVER SIDE
-        # reward_title = string
-        # reward_description = string
-        # reward_id = string
-        # reward_punches = interger
-        # ---------------
-
         super(Message, self).__init__(False, **data)
 
     def get_absolute_url(self):
@@ -41,5 +35,23 @@ class Message(ParseObject):
 
     def get_class(self, className):
         """ note that a reply/feedback is also a message """
+        if className == "Message":
+            return Message
+            
+class MessageStatus(ParseObject):
+    """ 
+    This is a simple wrapper around Message. 
+    This is used by patrons since a message they received from a store
+    is shared by other patrons.
+    """
+    def __init__(self, **data):
+        self.is_read = data.get("is_read", False)
+        self.redeem_available = data.get("redeem_available")
+        
+        self.Message  = data.get("Message")
+        
+        super(MessageStatus, self).__init__(False, **data)
+
+    def get_class(self, className):
         if className == "Message":
             return Message

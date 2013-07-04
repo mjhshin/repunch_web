@@ -3,8 +3,6 @@
     constant communication with comet_refresh
 */
 
-
-// TODO finish implementing comet approach
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
@@ -33,50 +31,8 @@ $(document).ready(function(){
                         alert("Customer does not have enough punches!");
                     }
                     row.fadeOut(2000, function(){
-                        if (res.result == 1){
-                            // append to past
-                            var odd = "", 
-                                x=$("#redemption-past div.tab-body div.tr").first();
-                            if (!x.hasClass("odd")){
-                                odd = "odd";
-                            }
-                            var d = new Date();
-                            var hour = d.getHours();
-                            var minute = new String(d.getMinutes());
-                            var ampm;
-                            if (hour > 12){
-                                ampm = "p.m.";
-                            } else {
-                                ampm = "a.m.";
-                            }
-                            if (hour > 12){
-                                hour = hour - 12;
-                            }
-                            hour = new String(hour);
-                            if (hour.length < 2){
-                                hour = "0" + hour;
-                            }
-                            if (minute.length < 2){
-                                minute = "0" + minute;
-                            }
-                            d = hour + ":" + minute + " " + ampm;
-                            var content = "<div class='tr " + odd + "' " + 
-                                "id='"+ rowId + "'>" +
-		                        "<input type='hidden'" + 
-		                        " value='" + rewardId + "'/>" + 
-				                "<div class='td redemption_time-past'>" +
-				                d + "</div>" +
-				                "<div class='td redemption_customer_name-past'>" +
-				                customerName + "</div>" +
-		                        "<div class='td redemption_title-past'>" +
-				                title + "</div>" +
-				                "<div class='td redemption_punches-past'>" +
-				                numPunches + "</div>" +
-				                "<div class='td redemption_redeem-past'>" +
-				                "</div>" +
-		                        "</div>";
-		                    x.before(content);
-                        }
+                        // no longer necessary to append to past redemptions since
+                        // clicking on redeem means that the redemption tab is active...
                         
                         // then remove
                         $(this).remove();
@@ -84,7 +40,7 @@ $(document).ready(function(){
                         // update the counts
                         var rBadge = $("#redemptions-nav a div.nav-item-badge");
                         var diva = $("#redemptions-nav a");
-                        var rcount = new String($("#redemption div.tab-body div.tr").length);
+                        var rcount = new String($("#tab-body-pending-redemptions div.tr").length);
                         if (rcount < 1){
                             // workbench nav badge
                             if (rBadge.length == 1){
@@ -95,7 +51,7 @@ $(document).ready(function(){
                             $("#tab-pending-redemptions").html("Pending");
                             
                             // place the placeholder if now empty
-                            $("#redemption div.tab-body div.table-header").after(
+                            $("#tab-body-pending-redemptions div.table-header").after(
                                 "<div class='tr' id='no-redemptions'>" +
 				                "<div class='td'>No Redemptions</div>" +
 			                    "</div>");
@@ -125,7 +81,7 @@ $(document).ready(function(){
     }
     
     // bind
-    $("#redemption div.tr div.td a").click(function(){
+    $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
         onRedeem($(this).attr("name"));
     });
     
@@ -152,6 +108,8 @@ $(document).ready(function(){
             var feedbackTab = $("#tab-feedback");
             if (feedbackTab.length > 0){
                 feedbackTab.html("Feedback (" + feedback_unread + ")");
+                // update the title
+                document.title = "Repunch | (" + feedback_unread + ") Messages";
             
                 // table content
                 var feedbacks = res.feedbacks;
@@ -249,10 +207,13 @@ $(document).ready(function(){
             
             // Employees page
             var pendingTab = $("#tab-pending");
+            // tab
             if (pendingTab.length > 0){
-                // tab
                 pendingTab.html("Pending (" + 
                             employees_pending + ")");
+                // update the title
+                document.title = "Repunch | (" + employees_pending + ") Employees";
+                
                 // table content
                 var employees = res.employees;
                 for (var i=0; i<employees.length; i++){
@@ -326,14 +287,26 @@ $(document).ready(function(){
         
             // workbench page
             var pendingTab = $("#tab-pending-redemptions");
+            // tab
             if (pendingTab.length >0){
-                // tab
                 pendingTab.html("Pending (" + redemption_count + ")");
+                // update the title
+                document.title = "Repunch | (" + redemption_count + ") Redemptions";
                 
-                // table content
+                // table content TODO
                 var redemptions = res.redemptions;
+                var pagPage = $("#pag-page");
+                var pagThreshold = $("#pag-threshold");
+                var pendingCount = $("#pending-redemptions-count");
+                var pendingPageCount = $("#pag-page-pending-redemptions-count");
+                // only append if we are on the first or last page and if the redemptions tab is the active tab
+                var inLastPage = parseInt(pagPage.val()) == parseInt(redemptionPageCount.val());
+                var inFirstPage = parseInt(pagPage.val()) == 1;
+                var tabPendingActive = $("#tab-pending-redemptions").hasClass("active");
+                var is_desc = $("#header-redemption_time").hasClass("desc");
+                // remember that paginate is called when switching tabs so those rows come from the server!
                 for (var i=0; i<redemptions.length; i++){
-                    var odd = "", x=$("#redemption div.tab-body div.tr").first();
+                    var odd = "", x=$("#tab-body-pending-redemptions div.tr").first();
                     if (!x.hasClass("odd")){
                         odd = "odd";
                     }
@@ -384,7 +357,7 @@ $(document).ready(function(){
             }
             
             // bind
-            $("#redemption div.tr div.td a").click(function(){
+            $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
                 onRedeem($(this).attr("name"));
             });
             
