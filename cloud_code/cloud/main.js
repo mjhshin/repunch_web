@@ -151,7 +151,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	
 	patronStore.set("all_time_punches", 0);
 	patronStore.set("punch_count", 0);
-	patronStore.set("redeem_pending", false);
+	patronStore.set("pending_reward", false);
 	patronStore.set("Store", store);
 	patronStore.set("Patron", patron);
 	
@@ -539,7 +539,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			
 			});
 			
-		} else if(patronStore.get("redeem_pending") == true) {
+		} else if(patronStore.get("pending_reward") == true) {
 			response.success("pending");
 			return;
 		
