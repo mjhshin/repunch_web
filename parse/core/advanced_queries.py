@@ -1,6 +1,15 @@
 """
 Contains somewhat advanced queries not yet supported in ParseObjects.
 
+Example : pointer_query
+To get the Subscription objects that have an active store and whose
+date_last_charged is greater than date_x and whose subscriptionType
+is not free.
+
+The method call is:
+pointer_query("Subscription", {subscriptionType1:1,
+    subscriptionType2:2, date_last_charged__gte:date_x}, 
+
 Example : relational_query
 To get the Punch objects in the relation of a Store object where
 the name of the relation is Punches and the store object's
@@ -58,7 +67,7 @@ def relational_query(src_id, src_class, src_key, dst_class,
                     },
                     "key": src_key
                 }, 
-                # this how queries are done to Pointer types
+                # this is how queries are done to Pointer types
                 dst_class_key:{
                     x:{
                         "where":query(dst_class_key_where,

@@ -83,7 +83,7 @@ def query(constraints, where_only=False):
                     # 2 or more constraint on same attr
                     inner = {}
                     for k, v in constraints.iteritems():
-                        if args[0] != k and\
+                        if "__".join(args) != k and\
                         k.startswith(args[0]) and\
                         k.__contains__("__"):
                             gs = k.split("__")
