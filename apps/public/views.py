@@ -144,8 +144,6 @@ def sign_up2(request):
             subscription.zip = request.POST['zip2']
             subscription.country = request.POST['country2']
             subscription.create()
-            subscription.store_cc(subscription_form.data['cc_number'],
-                            subscription_form.data['cc_cvv'])
 
             # create store
             store.Subscription = subscription.objectId
@@ -158,6 +156,11 @@ def sign_up2(request):
             settings.update()
             account.Store = store.objectId
             account.create()
+            
+            # set the subscription's store (uppdate called in store_cc
+            subscription.Store = store.objectId
+            subscription.store_cc(subscription_form.data['cc_number'],
+                            subscription_form.data['cc_cvv'])
             
             # need to put username and pass in request
             requestDict = request.POST.dict().copy()

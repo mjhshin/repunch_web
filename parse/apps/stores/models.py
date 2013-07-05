@@ -69,7 +69,6 @@ class Store(ParseObject):
 
         self.Punches_ = "Punch"
         self.PatronStores_ = "PatronStore"
-        self.Invoices_ = "Invoice"
         self.Employees_ = "Employee"
         self.FacebookPosts_ = "FacebookPost"
         self.SentMessages_ = "Message"
@@ -137,8 +136,6 @@ class Store(ParseObject):
             return getattr(import_module('parse.apps.patrons.models'), className)
         elif className == "Settings":
             return Settings
-        elif className == "Invoice":
-            return Invoice
         elif className == "Subscription":
             return Subscription
         elif className in ("Punch", "RedeemReward"):
@@ -198,8 +195,19 @@ class Subscription(ParseObject):
         # payer_id for paypal since it is guaranteed to be unique
         self.pp_cc_id = data.get('pp_cc_id')
         self.date_pp_valid = data.get('date_pp_valid')
+        
+        self.Store = data.get("Store")
+        
+        self.Invoices_ = "Invoice"
 
         super(Subscription, self).__init__(False, **data)
+  
+    
+    def get_class(self, className):
+        if className == "Invoice":
+            return Invoice
+        elif className == "Store":
+            return Store
     
     def get_full_address(self):
         """
@@ -261,12 +269,12 @@ class Subscription(ParseObject):
         description: "Recurring monthly subscription "+\
                         from repunch.com." 
                         
-        Returns the Invoice if success. Or not if not.
+        Returns the Invoice if success. Or None if not.
         """
         try:
             res = charge_cc(self, total, description)
         except HTTPError: # wrong credit card info BAD REQUEST (400)
-            return
+            return None
         else:
             invoice = Invoice(
                 state = res['state'],
@@ -281,8 +289,7 @@ class Subscription(ParseObject):
                 except Exception:
                     pass # key error or something
             invoice.create()
-            st = Store.objects().get(Subscription=self.objectId)
-            st.add_relation("Invoices_", [invoice.objectId])
+            self.add_relation("Invoices_", [invoice.objectId])
             return invoice
             
 class Settings(ParseObject):
