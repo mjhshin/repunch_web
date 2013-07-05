@@ -8,7 +8,7 @@ $(document).ready(function(){
     var url = $("#comet_url").val();
     var urlRedeem = $("#redeem-url").val();
     
-    // for the workbench page
+    // for the workbench page TODO fetch items from next page?
     function onRedeem(rowId){
         var row = $("#" + rowId);
         var rewardId = $("#" + rowId + " input[type=hidden]").val();
@@ -123,6 +123,7 @@ $(document).ready(function(){
                 var tabFeedbackActive = $("#tab-feedback").hasClass("active");
                 var is_desc = $("#header-feedback-date").hasClass("desc");
                 // remember that paginate is called when switching tabs so those rows come from the server!
+                // Therefore there is no need to append to a table that is not visible
                 if (tabFeedbackActive && (inLastPage||inFirstPage)) {
                     for (var i=0; i<feedbacks.length; i++){
                         // determine if date is asc or desc
@@ -166,8 +167,11 @@ $(document).ready(function(){
                         }
 	                } // end for loop
 	                
-	                // update the pagination variables (feedbackPageCount is updated in paginate)
-	                feedbackCount.val(feedbacks.length + parseInt(feedbackCount.val()));
+	                 // remove placeholder when no longer empty
+                    if ($("#no-feedback").length > 0) {
+                        $("#no-feedback").remove();
+                    }
+	                
 	                // respect the pagination threshold (trim the last rows that overflow)
 	                var rows = $("#tab-body-feedback div.tr");
 	                var rowCount = rows.length;
@@ -180,18 +184,17 @@ $(document).ready(function(){
 	                    }
 	                }
 	                
+	                // update the pagination variables (feedbackPageCount is updated in paginate)
+	                feedbackCount.val(rowCount);
+	                
 	                // repaginate
                     paginator($("#get-page-url").val(), ["sent", "feedback"], "feedback");                
 	                
 	            } // end if feedback tab is active
 	            
-                // remove placeholder when no longer empty
-                if ($("#no-feedback").length > 0) {
-                    $("#no-feedback").remove();
-                }
-            }
+            } // end if in Message page
             
-        } 
+        } // end hasOwnProperty
         
         if (res.hasOwnProperty('employees')){
             // pending employees nav
@@ -272,7 +275,7 @@ $(document).ready(function(){
             }
         }
         
-        // incoming redemptions TODO asc/desc
+        // incoming redemptions 
         if (res.hasOwnProperty('redemptions')){
             // Workbench nav
             var redemption_count = res.redemption_count;
@@ -285,15 +288,14 @@ $(document).ready(function(){
                     new String(redemption_count) + "</div>");
             }
         
-            // workbench page
-            var pendingTab = $("#tab-pending-redemptions");
             // tab
+            var pendingTab = $("#tab-pending-redemptions");
             if (pendingTab.length >0){
                 pendingTab.html("Pending (" + redemption_count + ")");
                 // update the title
                 document.title = "Repunch | (" + redemption_count + ") Redemptions";
                 
-                // table content TODO
+                // table content # TODO
                 var redemptions = res.redemptions;
                 var pagPage = $("#pag-page");
                 var pagThreshold = $("#pag-threshold");
@@ -305,63 +307,96 @@ $(document).ready(function(){
                 var tabPendingActive = $("#tab-pending-redemptions").hasClass("active");
                 var is_desc = $("#header-redemption_time").hasClass("desc");
                 // remember that paginate is called when switching tabs so those rows come from the server!
-                for (var i=0; i<redemptions.length; i++){
-                    var odd = "", x=$("#tab-body-pending-redemptions div.tr").first();
-                    if (!x.hasClass("odd")){
-                        odd = "odd";
+                // Therefore there is no need to append to a table that is not visible
+                if (tabPendingActive && (inLastPage||inFirstPage)) {
+                    for (var i=0; i<redemptions.length; i++){
+                        var odd = "", row;
+                        if (is_desc){
+                            row = $("#tab-body-pending-redemptions div.tr").first();
+                        } else {
+                            row = $("#tab-body-pending-redemptions div.tr").last();
+                        }
+                        if (!row.hasClass("odd")){
+                            odd = "odd";
+                        }
+                        var d = new Date(redemptions[i].createdAt);
+                        var hour = d.getHours();
+                        var minute = new String(d.getMinutes());
+                        var ampm;
+                        if (hour > 12){
+                            ampm = "p.m.";
+                        } else {
+                            ampm = "a.m.";
+                        }
+                        if (hour > 12){
+                            hour = hour - 12;
+                        }
+                        hour = new String(hour);
+                        if (hour.length < 2){
+                            hour = "0" + hour;
+                        }
+                        if (minute.length < 2){
+                            minute = "0" + minute;
+                        }
+                        d = hour + ":" + minute + " " + ampm;
+                        var rowStr = "<div class='tr " + odd + "' " + 
+                            "id='"+ redemptions[i].objectId+ "'>" +
+		                    "<input type='hidden'" + 
+		                    " value='" + redemptions[i].reward_id + "'/>" + 
+				            "<div class='td redemption_time'>" +
+				            d + "</div>" +
+				            "<div class='td redemption_customer_name'>" +
+				            redemptions[i].customer_name + "</div>" +
+		                    "<div class='td redemption_title'>" +
+				            redemptions[i].title + "</div>" +
+				            "<div class='td redemption_punches'>" +
+				            redemptions[i].num_punches + "</div>" +
+				            "<div class='td redemption_redeem'>" +
+				            "<a name='" + redemptions[i].objectId +
+				                "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
+		                    "</div>";
+		                // prepend if in page 1 and desc
+                        if (is_desc && inFirstPage) {
+                            row.before(rowStr);
+                        // append if in last page and asc
+                        } else if (!is_desc && inLastPage) {
+                            row.after(rowStr);                        
+                        }   
+                    } // end for loop
+                    
+                    // remove placeholder when not empty
+                    if ($("#no-redemptions").length > 0){
+                        $("#no-redemptions").remove();
                     }
-                    var d = new Date(redemptions[i].createdAt);
-                    var hour = d.getHours();
-                    var minute = new String(d.getMinutes());
-                    var ampm;
-                    if (hour > 12){
-                        ampm = "p.m.";
-                    } else {
-                        ampm = "a.m.";
+                    
+                    // respect the pagination threshold (trim the last rows that overflow)
+                    var rows = $("#tab-body-pending-redemptions div.tr");
+                    var rowCount = rows.length;
+                    var overflow = parseInt(pagThreshold.val()) - rowCount;
+                    if (overflow < 0) {
+                        overflow = Math.abs(overflow);
+                        while (overflow > 0){
+                            rows.last().remove();
+                            overflow -= 1;
+                        }
                     }
-                    if (hour > 12){
-                        hour = hour - 12;
-                    }
-                    hour = new String(hour);
-                    if (hour.length < 2){
-                        hour = "0" + hour;
-                    }
-                    if (minute.length < 2){
-                        minute = "0" + minute;
-                    }
-                    d = hour + ":" + minute + " " + ampm;
-                    var content = "<div class='tr " + odd + "' " + 
-                        "id='"+ redemptions[i].objectId+ "'>" +
-		                "<input type='hidden'" + 
-		                " value='" + redemptions[i].reward_id + "'/>" + 
-				        "<div class='td redemption_time'>" +
-				        d + "</div>" +
-				        "<div class='td redemption_customer_name'>" +
-				        redemptions[i].customer_name + "</div>" +
-		                "<div class='td redemption_title'>" +
-				        redemptions[i].title + "</div>" +
-				        "<div class='td redemption_punches'>" +
-				        redemptions[i].num_punches + "</div>" +
-				        "<div class='td redemption_redeem'>" +
-				        "<a name='" + redemptions[i].objectId +
-				            "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
-		                "</div>";
-		            x.before(content);   
-                }
+                    
+                    // update the pagination variables (pendingPageCount is updated in paginate)
+                    pendingCount.val(rowCount);
+                    
+                    // repaginate
+                    paginator($("#get-page-url").val(), ["sent", "feedback"], "feedback");      
+                    
+                } // end if redemption tab is active
                 
-                // remove placeholder when empty
-                if ($("#no-redemptions").length > 0){
-                    $("#no-redemptions").remove();
-                }
-                
-            }
+            } // end if in Workbench page
             
             // bind
             $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
                 onRedeem($(this).attr("name"));
             });
             
-        }
+        } // end hasOwnProperty
                
     } // end mainComet
     
