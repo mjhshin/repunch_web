@@ -7,8 +7,9 @@ date_last_charged is greater than date_x and whose subscriptionType
 is not free.
 
 The method call is:
-pointer_query("Subscription", {subscriptionType1:1,
-    subscriptionType2:2, date_last_charged__gte:date_x}, 
+pointer_query("Subscription", {"subscriptionType1":1,
+    "subscriptionType2":2, "date_last_charged__gte":date_x,
+    'limit':900}, "Store", "Store", {"active":True})
 
 Example : relational_query
 To get the Punch objects in the relation of a Store object where
@@ -20,7 +21,8 @@ pointer to a Patron whose gender is Female.
 The method call is:
 relational_query('4IBEy0cum4', 'Store', 'Punches', 'Punch',
     'Patron', 'Patron', {"gender": "Female"},
-    {'createdAt__lte':end-date, 'createdAt__gte':start-date} )
+    {'createdAt__lte':end-date, 'createdAt__gte':start-date,
+        'limit':900 } )
 
 """
 
@@ -28,6 +30,40 @@ import json
 
 from parse.utils import parse
 from parse.core.formatter import query
+
+def pointer_query(dst_class, dst_class_where, dst_class_key,
+        dst_class_key_class, dst_class_key_where,
+        dst_class_key_where_exclude=False, count=False):
+    if dst_class_key_where_exclude:
+        x = "$notInQuery"
+    else:
+        x = "$inQuery"
+    where = {
+                # this is how queries are done to Pointer types
+                dst_class_key:{
+                    x:{
+                        "where":query(dst_class_key_where,
+                                    where_only=True),
+                        "className": dst_class_key_class,
+                        # inner limit applies!
+                        "limit":900, 
+                    }
+                }      
+            }
+            
+    if dst_class_where:
+        where.update(query(dst_class_where, where_only=True))
+    if count:
+        res = parse("GET", "classes" + "/" + dst_class, query={
+            "where":json.dumps(where), "count":1, "limit":0,
+        })
+        if 'error' not in res:
+            return res['count']
+        return None # shall not be 0
+    
+    return parse("GET", "classes" + "/" + dst_class, query={
+            "where":json.dumps(where), 
+        })
 
 def relational_query(src_id, src_class, src_key, dst_class,
         dst_class_key, dst_class_key_class, dst_class_key_where,

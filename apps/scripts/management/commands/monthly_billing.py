@@ -10,7 +10,9 @@ from parse.apps.stores import MONTHLY
 
 ## first get the number of stores to be billed tonight
 
-# get all of the stores that are active
+# get all of the subscriptions whose stores are active and whose
+# subscriptionType is not free (0>x) and have been last charged
+# 30 days ago.
 # count = relational_query
 
 

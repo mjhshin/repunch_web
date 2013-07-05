@@ -59,7 +59,7 @@ $(document).ready(function(){
 		<h2>Send New Message</h2>
 		    
 		<label>Send to </label>
-        <select id="chosen_filter" name="chosen_filter">
+        <select id="filter" name="filter">
             {% for filter in filters %}
             <option value="{{ filter.0 }}">{{ filter.1 }}</option>
             {% endfor %}

@@ -20,7 +20,12 @@
 	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Message Inbox</a>
 
     <div class="notification success">
-		<div>Sent: {{ message.createdAt }} to X recipients in the group "some group"</div>
+		<div>Sent: {{ message.createdAt }} to 
+		{% for filter in filters %}
+		    {% if filter.0 == message.filter %}
+		        {{ filter.1 }}
+		    {% endif %}
+        {% endfor %}</div>
 	</div>
 	
 	<div class="white-box">

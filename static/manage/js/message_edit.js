@@ -48,7 +48,7 @@ $(document).ready(function(){
     // span is hidden in the beginning
     $( "#min_punches_span *" ).hide();
 	
-	$( "#chosen_filter" ).mouseup(function(){
+	$( "#filter" ).mouseup(function(){
 	    if ($(this).val() == "most_loyal"){
 	        $( "#min_punches_span *" ).fadeIn();
 	    } else {

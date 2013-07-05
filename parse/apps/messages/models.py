@@ -15,6 +15,8 @@ class Message(ParseObject):
         self.offer_title = data.get("offer_title")
         self.date_offer_expiration = data.get('date_offer_expiration')
         self.message_type = data.get("message_type")
+        # can be all, idle, most_loyal
+        self.filter = data.get("filter")
         # only used by stores
         self.is_read = data.get("is_read", False)
         # store name or patron fullname

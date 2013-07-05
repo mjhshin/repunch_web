@@ -186,13 +186,12 @@ def edit(request, message_id):
             message_count += 1
             request.session['message_count'] = message_count
 
-            msg_filter = postDict['chosen_filter']
             params = {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
                 "subject":message.get('subject'),
                 "message_id":message.objectId,
-                "filter":msg_filter,
+                "filter":message.filter,
             }
 
             if msg_filter == "idle":
@@ -276,7 +275,8 @@ def details(request, message_id):
     if not message:
         raise Http404
     return render(request, 'manage/message_details.djhtml', 
-            {'message':message, 'messages_nav': True})
+            {'message':message, 'messages_nav': True,
+                "filters":FILTERS})
 
 
 # FEEDBACK ------------------------------------------
