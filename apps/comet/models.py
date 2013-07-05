@@ -9,6 +9,6 @@ class CometSession(models.Model):
     so we cannot just use the store_id as a unique identifier.
     """
     # this is the request.session._session_key!
-    session_key = models.CharField(max_length=70)
+    session_key = models.CharField(max_length=70, primary_key=True)
     store_id = models.CharField(max_length=20)
     ok = models.BooleanField(default=False)

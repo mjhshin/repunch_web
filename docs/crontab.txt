@@ -1,0 +1,8 @@
+# The following are the cron jobs to be put in the crontab.
+# Must use root user's crontab: sudo crontab -u root -e
+
+### Nightly jobs
+# clean up CometSession table
+python /home/ubuntu/Repunch/repunch_web/manage.py clean_comet_session
+# execute monthly billing routine
+python /home/ubuntu/Repunch/repunch_web/manage.py bill_users_monthly
