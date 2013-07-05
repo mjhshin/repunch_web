@@ -517,6 +517,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	
 	if(isOfferOrGift) {
 		redeemReward.set("num_punches", 0);
+		redeemReward.set("message_status_id", messageStatusId);
 	} else {
 		redeemReward.set("num_punches", numPunches);
 		redeemReward.set("reward_id", rewardId);
@@ -543,7 +544,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			return;
 		
 		} else {
-			patronStore.set("redeem_pending", true);
+			patronStore.set("pending_reward", true);
 			patronStore.save().then(function(patronStore) {
 				console.log("PatronStore save success.");
 				executeRedeemRequest();
@@ -1083,7 +1084,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
-                message_status_id: messageStatus.id,
+                message_id: messageId,
             }, 
 		}); // end Parse.Push
 
