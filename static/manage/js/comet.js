@@ -188,7 +188,8 @@ $(document).ready(function(){
 	                feedbackCount.val(rowCount);
 	                
 	                // repaginate
-                    paginator($("#get-page-url").val(), ["sent", "feedback"], "feedback");                
+                    paginator($("#get-page-url").val(),
+                        ["sent", "feedback"], "feedback");                
 	                
 	            } // end if feedback tab is active
 	            
@@ -385,7 +386,9 @@ $(document).ready(function(){
                     pendingCount.val(rowCount);
                     
                     // repaginate
-                    paginator($("#get-page-url").val(), ["sent", "feedback"], "feedback");      
+                    paginator($("#get-page-url").val(),
+                        ["pending-redemptions", "history-redemptions"],
+                        "pending-redemptions");      
                     
                 } // end if redemption tab is active
                 
