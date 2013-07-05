@@ -1023,13 +1023,15 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
     var filter = request.params.filter; // one means a reply
-    var message, redeem_available, patron_ids = new Array(); // placeholder
+    var message, redeem_available;
+	var messageStatus = new MessageStatus();
+	var patron_ids = new Array(); // placeholder
 
 	androidInstallationQuery.equalTo('deviceType', 'android');
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 
     function addToPatronsInbox(patronStores) {
-        if (patronStores.length == 0 ){
+        if (patronStores.length == 0) {
             // match the installation with the username in the 
             if (filter === "one"){
                 androidInstallationQuery.equalTo("patron_id", patronId);
@@ -1049,7 +1051,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         var pat = pt.get("Patron");
         
         // just in case that there is a null patron
-        if (pat == null){
+        if(pat == null) {
             return addToPatronsInbox(patronStores);
         }
         
@@ -1059,13 +1061,12 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
         // ReceivedMessages is a relation to MessageStatus not Message!
         var rel = pat.relation("ReceivedMessages"); 
-        var messageStatus = new MessageStatus();
         messageStatus.set("Message", message);
         messageStatus.set("is_read", false);
         messageStatus.set("redeem_available", redeem_available);
-        messageStatus.save().then(function(messageStatusResult){
+        messageStatus.save().then(function(messageStatusResult) {
             rel.add(messageStatusResult);
-            pat.save().then(function(){
+            pat.save().then(function() {
                 // chain method call
                 addToPatronsInbox(patronStores);
             });
@@ -1082,7 +1083,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
-                message_id: messageId,
+                message_status_id: messageStatus.id,
             }, 
 		}); // end Parse.Push
 
