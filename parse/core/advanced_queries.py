@@ -64,7 +64,7 @@ def relational_query(src_id, src_class, src_key, dst_class,
                         "where":query(dst_class_key_where,
                                     where_only=True),
                         "className": dst_class_key_class,
-                        # inner limit applies?
+                        # inner limit applies!
                         "limit":900, 
                     }
                 }      

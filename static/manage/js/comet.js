@@ -163,7 +163,7 @@ $(document).ready(function(){
                             row.before(rowStr);
                         // append if in last page and asc
                         } else if (!is_desc && inLastPage) {
-                            row.after(rowStr);                        
+                            row.after(rowStr);                
                         }
 	                } // end for loop
 	                
@@ -185,7 +185,7 @@ $(document).ready(function(){
 	                }
 	                
 	                // update the pagination variables (feedbackPageCount is updated in paginate)
-	                feedbackCount.val(rowCount);
+	                feedbackCount.val(parseInt(feedbackCount.val()) + feedbacks.length);
 	                
 	                // repaginate
                     paginator($("#get-page-url").val(),
@@ -383,7 +383,7 @@ $(document).ready(function(){
                     }
                     
                     // update the pagination variables (pendingPageCount is updated in paginate)
-                    pendingCount.val(rowCount);
+                    pendingCount.val(parseInt(pendingCount.val()) + redemptions.length);
                     
                     // repaginate
                     paginator($("#get-page-url").val(),

@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
 
-{% block title %}({{ epcount }}) Messages{% endblock %}
+{% block title %}{% if epcount > 0 %}({{ epcount }}){% endif %} Messages{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employees.css" %}" />

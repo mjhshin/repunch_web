@@ -870,7 +870,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         console.log("Retrieved store");
         // rewards_old redemption_count
         store = stor;
-        result.rewards = new Array();
         var rewards = store.get("rewards");
         function redemptionCount(reward){
             for (var i=0; i<rewards_old.length; i++){
@@ -884,8 +883,12 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
                 }
             }
         }
-        for (var i=0; i<rewards.length; i++){
-            redemptionCount(rewards[i]);
+        
+        if (rewards.length > 0) {
+            result.rewards = new Array();
+            for (var i=0; i<rewards.length; i++){
+                redemptionCount(rewards[i]);
+            }
         }
         
         // patronStore_count
