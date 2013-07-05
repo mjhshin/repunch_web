@@ -120,9 +120,6 @@ def refresh(request):
         except IOError: # broken pipe or something. 
             # exit silently
             thread.exit()
-            
-    # TODO REMOVE
-    return comet()
     
     # the above is different from SESSION_KEY (which is not unique)
     try: # attempt to get a used CometSession first
