@@ -196,8 +196,12 @@ class Subscription(ParseObject):
         self.pp_cc_id = data.get('pp_cc_id')
         self.date_pp_valid = data.get('date_pp_valid')
         
-        self.Store = data.get("Store")
+        # use to bill monthly! ONLY USE for determining when to charge
+        # monthly bill for premium accounts- not for smartphones or
+        # other services!
+        self.date_last_billed = data.get("date_last_billed")
         
+        self.Store = data.get("Store")
         self.Invoices_ = "Invoice"
 
         super(Subscription, self).__init__(False, **data)

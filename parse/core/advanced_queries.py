@@ -3,12 +3,12 @@ Contains somewhat advanced queries not yet supported in ParseObjects.
 
 Example : pointer_query
 To get the Subscription objects that have an active store and whose
-date_last_charged is greater than date_x and whose subscriptionType
+date_last_billed is greater than date_x and whose subscriptionType
 is not free.
 
 The method call is:
 pointer_query("Subscription", {"subscriptionType1":1,
-    "subscriptionType2":2, "date_last_charged__gte":date_x,
+    "subscriptionType2":2, "date_last_billed__gte":date_x,
     'limit':900}, "Store", "Store", {"active":True})
 
 Example : relational_query
