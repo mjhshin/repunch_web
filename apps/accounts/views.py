@@ -14,6 +14,7 @@ from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings, Store
+from parse.utils import make_aware_to_utc
 
 @csrf_exempt
 def activate(request):
@@ -122,9 +123,11 @@ def update(request):
             subscription.update_locally(request.POST.dict(), False)
             
             try:
+                d = datetime(int(request.POST['date_cc_expiration_year']),
+                        int(request.POST['date_cc_expiration_month']), 1)
                 subscription.set("date_cc_expiration", 
-                    datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1))
+                    make_aware_to_utc(d,
+                        SESSION.get_store_timezone(request.session)) )
                 # only store_cc if it is a digit
                 if str(form.data['cc_number']).isdigit():
                     subscription.store_cc(form.data['cc_number'],
@@ -198,9 +201,11 @@ def upgrade(request):
             subscription.update_locally(request.POST.dict(), False)
             
             try:
+                d = datetime(int(request.POST['date_cc_expiration_year']),
+                        int(request.POST['date_cc_expiration_month']), 1)
                 subscription.set("date_cc_expiration", 
-                    datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1))
+                    make_aware_to_utc(d,
+                        SESSION.get_store_timezone(request.session)) )
                 # only store_cc if it is a digit
                 if str(form.data['cc_number']).isdigit():
                     subscription.store_cc(form.data['cc_number'],

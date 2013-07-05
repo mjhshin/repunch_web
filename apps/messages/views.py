@@ -9,7 +9,7 @@ import urllib
 
 from parse.decorators import session_comet
 from parse import session as SESSION
-from parse.utils import cloud_call
+from parse.utils import cloud_call, make_aware_to_utc
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -138,12 +138,12 @@ def edit(request, message_id):
             postDict = request.POST.dict().copy()
         
         form = MessageForm(postDict) 
-        # check here if limit has been reached
-        start = datetime.now().replace(day=1, hour=0,
-                                    minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
-        message_count = SESSION.get_message_count(request.session, datetime.now())
+        # refresh the message count - make sure we get the one in the cloud
+        del request.session['message_count']
+        message_count = SESSION.get_message_count(request.session,
+            timezone.now())
                                 
         limit_reached = message_count >= sub_type[subType]['max_messages']
         
@@ -156,11 +156,8 @@ def edit(request, message_id):
             # check if attach offer is selected
             if 'attach_offer' in postDict:
                 d = parser.parse(postDict['date_offer_expiration'])
-                # make aware
-                d = timezone.make_aware(d, 
+                d = make_aware_to_utc(d, 
                     SESSION.get_store_timezone(request.session))
-                # then convert to utc format
-                d = timezone.localtime(d, tzutc())
                 message.set('date_offer_expiration', d)
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
@@ -199,7 +196,9 @@ def edit(request, message_id):
             }
 
             if msg_filter == "idle":
-                d = datetime.now() + relativedelta(days=-21)
+                d = make_aware_to_utc(datetime.now() +\
+                    relativedelta(days=-21),
+                    SESSION.get_store_timezone(request.session))
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\

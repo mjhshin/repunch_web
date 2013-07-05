@@ -26,7 +26,8 @@ def index(request):
     today = today + relativedelta(days=-1)
     today = today.replace(hour=23, minute=59, second=59) # midnight
     
-    data = {"workbench_nav":True, "settings":SESSION.get_settings(request.session), "today":today}
+    data = {"workbench_nav":True, "settings":\
+        SESSION.get_settings(request.session), "today":today}
     
     redemps = SESSION.get_redemptions(request.session)
     past_redemps = SESSION.get_redemptions_past(request.session)

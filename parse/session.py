@@ -144,6 +144,7 @@ def get_messages_received_list(session):
         return session['messages_received_list']
         
 def get_message_count(session, time_now):
+    """ time_now must be in utc """ # TODO change
     if 'message_count' not in session:
         now = time_now
         message_count = get_store(session).get(\

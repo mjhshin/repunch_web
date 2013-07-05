@@ -1031,7 +1031,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-            	alert:request.params.store_name + " sent you a message: " + request.params.subject,
+            	alert: storeName + " sent you a message: " + subject,
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
@@ -1065,7 +1065,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             // first get the patron
             patronQuery.get(request.params.patron_id).then(function(patron){
                 patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.include("Patron");
                 patronStoreQuery.first().then(function(pst){
                     var arr = new Array(pst);
                     addToPatronsInbox(arr);
@@ -1073,7 +1072,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             });
         } else {
             patronStoreQuery.select("Patron");
-            patronStoreQuery.include("Patron");
             
             // adding relation to all patron's ReceivedMessages
             patronStoreQuery.find().then(function(patronStores){
@@ -1091,6 +1089,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     storeQuery.get(storeId, {
       success: function(store) {
         patronStoreQuery = store.relation("PatronStores").query();
+        patronStoreQuery.include("Patron");
+        patronStoreQuery.limit(500); // may want to increase to 1000
         // now get the message object
         console.log("RUNNING MESSAGE QUERY");
         messageQuery.get(messageId, {
