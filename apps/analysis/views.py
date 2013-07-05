@@ -44,7 +44,8 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             
         punch_map = {}
         punches = store.get('punches', createdAt__lte=end_aware,
-                    createdAt__gte=start_aware,order='createdAt')
+                    createdAt__gte=start_aware,order='createdAt',
+                    limit=900)
         # have to clear the cache attr
         store.punches = None
         
@@ -79,7 +80,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             
         post_map = {}
         posts = store.get("facebookPosts", createdAt__lte=end,
-                    createdAt__gte=start)
+                    createdAt__gte=start, limit=900)
         store.facebookPosts = None
         #create dictionary for easy search
         if posts:
@@ -147,11 +148,13 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             male_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
                 {"gender": "male"}, {'createdAt__lte':end_aware,
-                    'createdAt__gte':start_aware})['results']
+                    'createdAt__gte':start_aware,
+                    "limit":900})['results']
             female_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
                 {"gender": "female"}, {'createdAt__lte':end_aware,
-                    'createdAt__gte':start_aware})['results']
+                    'createdAt__gte':start_aware,
+                    "limit":900})['results']
             # aggregate the punches
             for p in male_punches:
                 male += p.get('punches')
@@ -187,7 +190,8 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                     {'date_of_birth__lte':end_dob_aware,
                      'date_of_birth__gte':start_dob_aware},
                     {'createdAt__lte':end_aware, 
-                     'createdAt__gte':start_aware})['results']
+                     'createdAt__gte':start_aware,
+                    "limit":900})['results']
                 punch_count = 0
                 if punches: 
                     for punch in punches:

@@ -1,0 +1,24 @@
+{% for redemp in redemptions %}
+<div id="{{redemp.objectId}}" 
+    class="tr  {% cycle '' 'odd' %}">
+    <input type="hidden" value="{{redemp.reward_id}}" />
+	<div class="td redemption_time">
+	{% if redemp.createdAt < today %}
+	{{ redemp.createdAt|date:"F d" }}
+	{% else %}
+	{{ redemp.createdAt|date:"h:i a" }}
+	{% endif %}</div>
+	<div class="td redemption_customer_name">
+	{{ redemp.customer_name }}</div>
+	<div class="td redemption_title">
+	{{ redemp.title }}</div>
+	<div class="td redemption_punches">
+	{{ redemp.num_punches }}</div>
+	<div class="td redemption_redeem">
+	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">redeem</a></div>
+</div>
+{% empty %}
+<div class="tr " id="no-redemptions">
+	<div class="td">No Redemptions</div>
+</div>
+{% endfor %}	

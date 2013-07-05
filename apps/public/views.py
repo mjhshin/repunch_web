@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.core import mail 
 from datetime import datetime
-import json
+import json, pytz
 
 from forms import ContactForm
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
@@ -17,6 +17,7 @@ from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
 from libs.repunch import rputils
 
 from parse.auth import login
+from parse.utils import make_aware_to_utc
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores.models import Store, Subscription,\
@@ -122,12 +123,18 @@ def sign_up2(request):
             request.session['account-tmp']:
             
             postDict = request.POST.dict()
+            
+            store = request.session['store-tmp']
+            settings = request.session['settings-tmp']
+            account = request.session['account-tmp']
 
             # create subscription
             subscription = Subscription(**postDict)
-            subscription.set("date_cc_expiration", 
-                datetime(int(postDict['date_cc_expiration_year']),
-                    int(postDict['date_cc_expiration_month']), 1))
+            tz = pytz.timezone(store.store_timezone)
+            exp = make_aware_to_utc(datetime(\
+                int(postDict['date_cc_expiration_year']),
+                int(postDict['date_cc_expiration_month']), 1), tz)
+            subscription.set("date_cc_expiration", exp)
             subscription.subscriptionType = 0
             # make sure to use the correct POST info
             subscription.first_name = request.POST['first_name2']
@@ -141,10 +148,6 @@ def sign_up2(request):
                             subscription_form.data['cc_cvv'])
 
             # create store
-            store = request.session['store-tmp']
-            settings = request.session['settings-tmp']
-            account = request.session['account-tmp']
-            
             store.Subscription = subscription.objectId
             
             # finally create everything

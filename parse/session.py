@@ -1,5 +1,7 @@
 """
 Use to keep track of all the cache object names in the session.
+
+Note that all get lists return a maximum of 900.
 """
 import pytz
 
@@ -27,7 +29,7 @@ SESSION_CACHE = [
     'messages_sent_list',
     'messages_received_list', # PUSH
     'redemptions', # PUSH
-    'remptions_past', # PUSH
+    'redemptions_past', # PUSH
     
     
     
@@ -45,12 +47,12 @@ def get_store(session):
         
 def get_redemptions(session):
     """ 
-    returns all the unredeemed redemptions.
+    returns all the unredeemed redemptions (limit of 900)
     """
     if "redemptions" not in session:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=False,
-                        order="-createdAt")
+                        order="-createdAt", limit=900)
         if redemptions is None:
             redemptions = []
             
@@ -63,13 +65,13 @@ def get_redemptions(session):
         
 def get_redemptions_past(session):
     """ 
-    returns all the redeemed redemptions.
+    returns all the redeemed redemptions (limit of 900)
     Ordered based on updatedAt attr.
     """
     if "redemptions_past" not in session:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=True,
-                        order="-createdAt")
+                        order="-createdAt", limit=900)
         if redemptions is None:
             redemptions = []
         #else:
@@ -110,7 +112,7 @@ def get_messages_sent_list(session):
         store = get_store(session)
         messages_sent_list = store.get("sentMessages",
                             message_type1=BASIC, message_type2=OFFER,
-                            order="-createdAt")
+                            order="-createdAt", limit=900)
         # make sure that the list is a list and not none
         if messages_sent_list is None:
             messages_sent_list = []
@@ -128,7 +130,7 @@ def get_messages_received_list(session):
         store = get_store(session)
         messages_received_list = store.get(\
                     "receivedMessages", message_type=FEEDBACK,
-                    order="-createdAt")
+                    order="-createdAt", limit=900)
         
         # make sure that the list is a list and not none
         if messages_received_list is None:
@@ -144,6 +146,7 @@ def get_messages_received_list(session):
         return session['messages_received_list']
         
 def get_message_count(session, time_now):
+    """ time_now must be in utc """ # TODO change
     if 'message_count' not in session:
         now = time_now
         message_count = get_store(session).get(\
@@ -163,7 +166,7 @@ def get_employees_pending_list(session):
         store = get_store(session)
         employees_pending_list = get_store(session).get(\
                                 "employees", status=PENDING,
-                                order="-createdAt")
+                                order="-createdAt", limit=900)
                                 
         # make sure that the list is a list and not none
         if employees_pending_list is None:
@@ -184,7 +187,7 @@ def get_employees_approved_list(session):
         store = get_store(session)
         employees_approved_list = store.get(\
                                 "employees", status=APPROVED,
-                                order="-createdAt")     
+                                order="-createdAt", limit=900)     
         
         # make sure that the list is a list and not none
         if employees_approved_list is None:

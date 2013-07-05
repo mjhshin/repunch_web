@@ -17,23 +17,3 @@
 #header-from, .from, #header-feedback-from, .feedback-from {
 	width:160px;
 }
-
-#pag-container {
-    clear:both;
-    position:relative;top:8px;
-    font:0.9em sans-serif;
-    text-align:center;
-}
-
-.pag-unit {
-    display:inline-block;
-    cursor:pointer;
-    background:white; 
-    margin:6px 12px;
-    padding:0px 4px;
-    border:1px solid #cccccc;
-}
-
-.pag-unit.active {
-    background:#fe9900; color:white;
-}

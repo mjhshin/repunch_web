@@ -61,7 +61,7 @@ def refresh(request):
         # rewards redemption_count
         rewards = results.get('rewards')
         mod_rewards = store.get('rewards')
-        if rewards and len(rewards) > 0:
+        if rewards:
             for reward in rewards:
                 for i, mreward in enumerate(mod_rewards):
                     if reward['reward_name']==mreward['reward_name']:
@@ -120,6 +120,9 @@ def refresh(request):
         except IOError: # broken pipe or something. 
             # exit silently
             thread.exit()
+            
+    # TODO REMOVE
+    return comet()
     
     # the above is different from SESSION_KEY (which is not unique)
     try: # attempt to get a used CometSession first

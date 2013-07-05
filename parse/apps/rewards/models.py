@@ -24,7 +24,7 @@ class RedeemReward(ParseObject):
     def __init__(self, **data):
         self.title = data.get("title")
         self.customer_name = data.get("customer_name")
-        self.is_redeemed = data.get("is_redeemed")
+        self.is_redeemed = data.get("is_redeemed", False)
         self.num_punches = data.get("num_punches")
         self.reward_id = data.get("reward_id")
         

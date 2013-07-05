@@ -1,13 +1,19 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load store_tags %}
 
-{% block title %}Messages{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />{% endblock %}
+{% block title %}{% if fcount > 0 %}({{ fcount }}){% endif %} Messages{% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
+{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/messages.js" %}"></script>
+	<script src="{% static "manage/js/paginator.js" %}"></script>
 	<script>
     $(document).ready(function(){
         $(".not-sortable").unbind("click");
+        
+        // activate the paginator!
+        paginator($("#get-page-url").val(), ["sent", "feedback"], "sent");
     });
 	</script>
 {% endblock %}
@@ -28,13 +34,13 @@
 	</div>
 	{% endif %}
 	
-	<div class="section">
+	<div class="section"> {# SECTION #}
 		
 		<div class="tab-container">
 			<div class="tab active" id="tab-sent">Sent</div>
 			{% feedback_unread request.session as fcount %}
 						
-			<div class="tab" id="tab-feedback">Feedback{% if fcount > 0 %} ({{ fcount }}){% endif %}</div>
+			<div class="tab" id="tab-feedback">Feedback {% if fcount > 0 %}({{ fcount }}){% endif %}</div>
 		</div>
 		
 		<div class="white-box table tab-body active" id="tab-body-sent">
@@ -58,15 +64,17 @@
 			
 		</div>
 		
+		{# PAGINATION #}
 		<input type="hidden" id="pag-threshold" value="{{ pag_threshold }}" />
 		<input type="hidden" id="pag-page" value="{{ pag_page }}" />
+		<input type="hidden" id="pag-page-feedback-count" />
+		<input type="hidden" id="pag-page-sent-count" />
 		<input type="hidden" id="sent-count" value="{{ sent_count }}" />
 		<input type="hidden" id="feedback-count" value="{{ feedback_count }}" />
 		<input type="hidden" id="get-page-url" value="{% url 'message_page' %}" />
-		
-		
 		<div id="pag-container"> {# let client process this #}
 		</div>
+		{# END PAGINATION #}
 		
 	</div> {# END SECTION #}
 

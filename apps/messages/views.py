@@ -9,7 +9,7 @@ import urllib
 
 from parse.decorators import session_comet
 from parse import session as SESSION
-from parse.utils import cloud_call
+from parse.utils import cloud_call, make_aware_to_utc
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -33,13 +33,12 @@ def get_page(request):
             template = "manage/message_chunk.djhtml" 
             messages = SESSION.get_messages_sent_list(request.session)
             # sort
+            header_map = {"date":"createdAt"}
             header = request.GET.get("header")
             if header: # header can only be date
-                order = request.GET.get("order")
-                if order == "desc":
-                    messages.sort(key=lambda r: r.createdAt, reverse=True)
-                else:
-                    messages.sort(key=lambda r: r.createdAt)
+                reverse = request.GET.get("order") == "desc"
+                messages.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
             
             # set the chunk
             start = page * PAGINATION_THRESHOLD
@@ -52,24 +51,20 @@ def get_page(request):
             template = "manage/feedback_chunk.djhtml"
             feedbacks = SESSION.get_messages_received_list(request.session)
             # sort
+            header_map = {
+                "feedback-date": "createdAt",
+                "feedback-from": "sender_name", 
+            }
             header = request.GET.get("header")
-            if header == "feedback-date":
-                order = request.GET.get("order")
-                if order == "desc":
-                    feedbacks.sort(key=lambda r: r.createdAt, reverse=True)
-                else:
-                    feedbacks.sort(key=lambda r: r.createdAt)
-            elif header == "feedback-from":
-                order = request.GET.get("order")
-                if order == "desc":
-                    feedbacks.sort(key=lambda r: r.sender_name, reverse=True)
-                else:
-                    feedbacks.sort(key=lambda r: r.sender_name)
+            if header:
+                reverse = request.GET.get("order") == "desc"
+                feedbacks.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
                     
             request.session["messages_received_list"] = feedbacks
             
             # set the chunk
-            start = page * PAGINATION_THRESHOLD
+            start = page * PAGINATION_THRESHOLD 
             end = start + PAGINATION_THRESHOLD
             data = {"feedback":feedbacks[start:end]}
         
@@ -143,12 +138,12 @@ def edit(request, message_id):
             postDict = request.POST.dict().copy()
         
         form = MessageForm(postDict) 
-        # check here if limit has been reached
-        start = datetime.now().replace(day=1, hour=0,
-                                    minute=0, second=0)
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
-        message_count = SESSION.get_message_count(request.session, datetime.now())
+        # refresh the message count - make sure we get the one in the cloud
+        del request.session['message_count']
+        message_count = SESSION.get_message_count(request.session,
+            timezone.now())
                                 
         limit_reached = message_count >= sub_type[subType]['max_messages']
         
@@ -161,11 +156,8 @@ def edit(request, message_id):
             # check if attach offer is selected
             if 'attach_offer' in postDict:
                 d = parser.parse(postDict['date_offer_expiration'])
-                # make aware
-                d = timezone.make_aware(d, 
+                d = make_aware_to_utc(d, 
                     SESSION.get_store_timezone(request.session))
-                # then convert to utc format
-                d = timezone.localtime(d, tzutc())
                 message.set('date_offer_expiration', d)
                 message.set('message_type', OFFER)
                 message.set("offer_redeemed", False)
@@ -204,7 +196,9 @@ def edit(request, message_id):
             }
 
             if msg_filter == "idle":
-                d = datetime.now() + relativedelta(days=-21)
+                d = make_aware_to_utc(datetime.now() +\
+                    relativedelta(days=-21),
+                    SESSION.get_store_timezone(request.session))
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\

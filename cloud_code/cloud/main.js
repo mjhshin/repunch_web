@@ -916,7 +916,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         console.log("Retrieved store");
         // rewards_old redemption_count
         store = stor;
-        result.rewards = new Array();
         var rewards = store.get("rewards");
         function redemptionCount(reward){
             for (var i=0; i<rewards_old.length; i++){
@@ -930,8 +929,12 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
                 }
             }
         }
-        for (var i=0; i<rewards.length; i++){
-            redemptionCount(rewards[i]);
+        
+        if (rewards.length > 0) {
+            result.rewards = new Array();
+            for (var i=0; i<rewards.length; i++){
+                redemptionCount(rewards[i]);
+            }
         }
         
         // patronStore_count
@@ -993,9 +996,11 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
 //  Sends the store's message to a selected group of patrons
 //  in the Store's PatronStore Relation. 
 //  
-//  This adds the message to each Patron's ReceivedMessages.
+//  This adds a MessageStatus, which is a wrapper around Message,
+//  to each Patron's ReceivedMessages.
 //  Replies to feedback does not add the reply itself to the
-//  Patron's ReceivedMessages but rather the original message itself.
+//  Patron's ReceivedMessages but rather the original message itself,
+//  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
 //  This looks at the store's PatronStore relation!!!
 //
@@ -1004,6 +1009,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
    
     var Store = Parse.Object.extend("Store");
     var Message = Parse.Object.extend("Message");
+    var MessageStatus = Parse.Object.extend("MessageStatus");
     var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
@@ -1017,7 +1023,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
     var filter = request.params.filter; // one means a reply
-    var message, patron_ids = new Array(); // placeholder
+    var message, redeem_available, patron_ids = new Array(); // placeholder
 
 	androidInstallationQuery.equalTo('deviceType', 'android');
 	iosInstallationQuery.equalTo('deviceType', 'ios');
@@ -1044,19 +1050,25 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         
         // just in case that there is a null patron
         if (pat == null){
-            addToPatronsInbox(patronStores);
+            return addToPatronsInbox(patronStores);
         }
         
         // keep track of atron ids for the installationQuery
         patron_ids.push(pat.id);
         
         console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
+        // ReceivedMessages is a relation to MessageStatus not Message!
         var rel = pat.relation("ReceivedMessages"); 
-        // message obtained from the beginning (bottom)
-        rel.add(message);
-        pat.save().then(function(){
-            // chain method call
-            addToPatronsInbox(patronStores);
+        var messageStatus = new MessageStatus();
+        messageStatus.set("Message", message);
+        messageStatus.set("is_read", false);
+        messageStatus.set("redeem_available", redeem_available);
+        messageStatus.save().then(function(messageStatusResult){
+            rel.add(messageStatusResult);
+            pat.save().then(function(){
+                // chain method call
+                addToPatronsInbox(patronStores);
+            });
         });
     }
 
@@ -1077,7 +1089,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-            	alert:request.params.store_name + " sent you a message: " + request.params.subject,
+            	alert: storeName + " sent you a message: " + subject,
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
@@ -1111,7 +1123,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             // first get the patron
             patronQuery.get(request.params.patron_id).then(function(patron){
                 patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.include("Patron");
                 patronStoreQuery.first().then(function(pst){
                     var arr = new Array(pst);
                     addToPatronsInbox(arr);
@@ -1119,7 +1130,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             });
         } else {
             patronStoreQuery.select("Patron");
-            patronStoreQuery.include("Patron");
             
             // adding relation to all patron's ReceivedMessages
             patronStoreQuery.find().then(function(patronStores){
@@ -1137,11 +1147,18 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     storeQuery.get(storeId, {
       success: function(store) {
         patronStoreQuery = store.relation("PatronStores").query();
+        patronStoreQuery.include("Patron");
+        patronStoreQuery.limit(500); // may want to increase to 1000
         // now get the message object
         console.log("RUNNING MESSAGE QUERY");
         messageQuery.get(messageId, {
 			success: function(msg) {
             	message = msg;
+            	if (message.get("message_type") == "offer") {
+            	    redeem_available = "yes";
+            	} else { // message is a feedback
+            	    redeem_available = "no";
+            	}
             	continueWithPush();
 			}, error: function(object, error) {
                 console.log(error);

@@ -11,6 +11,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
+from repunch.settings import PAGINATION_THRESHOLD
 
 @login_required
 def index(request):
@@ -24,25 +25,91 @@ def index(request):
                     SESSION.get_store_timezone(request.session))
     today = today + relativedelta(days=-1)
     today = today.replace(hour=23, minute=59, second=59) # midnight
-    redemps = SESSION.get_redemptions(request.session)[:20]
-    past_redemps = SESSION.get_redemptions_past(request.session)[:20]
-    data = {"workbench_nav":True,
-        "redemp_pages":ceil(float(len(redemps))/20.0),
-        "past_redemp_pages":ceil(float(len(past_redemps))/20.0),
-        "redemptions":redemps,
-        "settings":SESSION.get_settings(request.session),
-        "past_redemptions":past_redemps,
-        "today":today}
+    
+    data = {"workbench_nav":True, "settings":\
+        SESSION.get_settings(request.session), "today":today}
+    
+    redemps = SESSION.get_redemptions(request.session)
+    past_redemps = SESSION.get_redemptions_past(request.session)
+    
+    # initially display the first 20 pending/history chronologically
+    redemps.sort(key=lambda r: r.createdAt, reverse=True)
+    past_redemps.sort(key=lambda r: r.updatedAt, reverse=True)
+    
+    data['redemptions'] = redemps[:PAGINATION_THRESHOLD]
+    data['past_redemptions'] = past_redemps[:PAGINATION_THRESHOLD]
+    
+    data["pag_threshold"] = PAGINATION_THRESHOLD
+    data["pag_page"] = 1
+    data["pending_redemptions_count"] = len(redemps)
+    data["history_redemptions_count"] = len(past_redemps)
+    
     return render(request, 'manage/workbench.djhtml', data)
     
 @login_required
-def get_redemp_page(request):
+def get_page(request):
     """
     Returns a generated html to plug in the tables.
     """
-    if request.method == "GET" and request.is_ajax():
-        pass
-    return render(request, 'manage/redemptions.djhtml', data)
+    if request.method == "GET" or request.is_ajax():
+        type = request.GET.get("type")
+        page = int(request.GET.get("page")) - 1
+        if type == "pending-redemptions":
+            template = "manage/redemptions_pending_chunk.djhtml" 
+            pending_redemps = SESSION.get_redemptions(request.session)
+            # sort
+            header_map = {
+                "redemption_time":"createdAt",
+                "redemption_customer_name": "customer_name",
+                "redemption_title": "title",
+                "redemption_punches": "num_punches",
+            }
+            header = request.GET.get("header")
+            if header: # header can only be date
+                reverse = request.GET.get("order") == "desc"
+                pending_redemps.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
+            
+            # set the chunk
+            start = page * PAGINATION_THRESHOLD
+            end = start + PAGINATION_THRESHOLD
+            data = {"redemptions":pending_redemps[start:end]}
+            
+            request.session["redemptions"] = pending_redemps
+            
+        elif type == "history-redemptions":
+            template = "manage/redemptions_history_chunk.djhtml"
+            past_redemps =\
+                SESSION.get_redemptions_past(request.session)
+            # sort
+            header_map = {
+                "redemption_time-past":"createdAt",
+                "redemption_customer_name-past": "customer_name",
+                "redemption_title-past": "title",
+                "redemption_punches-past": "num_punches", 
+            }
+            header = request.GET.get("header")
+            if header:
+                reverse = request.GET.get("order") == "desc"
+                past_redemps.sort(key=lambda r:\
+                    r.__dict__[header_map[header]], reverse=reverse)
+                    
+            request.session["redemptions_past"] = past_redemps
+            # set the chunk
+            start = page * PAGINATION_THRESHOLD 
+            end = start + PAGINATION_THRESHOLD
+            data = {"past_redemptions":past_redemps[start:end]}
+       
+        # don't forget the today for comparison!
+        today = timezone.make_aware(datetime.now(), 
+                    SESSION.get_store_timezone(request.session))
+        today = today + relativedelta(days=-1)
+        today = today.replace(hour=23, minute=59, second=59)
+        
+        data["today"] = today
+        return render(request, template, data)
+        
+    return HttpResponse("Bad request")
     
 @login_required
 def redeem(request):
