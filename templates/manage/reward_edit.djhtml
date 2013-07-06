@@ -4,16 +4,11 @@
 {% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.css" %}" />
-	
-	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/rewards.js" %}"></script>
-	
-	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
 	<script>
     $(document).ready(function(){
         $('#submit-reward-form').click(function(){

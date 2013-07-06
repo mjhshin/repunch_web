@@ -25,6 +25,10 @@
 		<div class="white-box" id="store-details-content">
 	    {% if request.session.has_store_avatar and store|get:'store_avatar' %}
 	        <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px"/>
+	    {% else %}
+	        <a href="{% url 'store_avatar' %}" id="upload-avatar">
+	        <img src="{% static "manage/images/store_avatar_placeholder.png" %}"" alt="" class="avatar-big" width="200px" height="200px"/>
+	        </a>
         {% endif %}
 			<div id="store-details-content-right">
 				<div id="address">

@@ -3,11 +3,9 @@
 
 {% block title %}{% if epcount > 0 %}({{ epcount }}){% endif %} Messages{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employees.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/jquery/jquery-ui-1.10.2.custom.min.js" %}"></script>
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/employees.js" %}"></script>
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>

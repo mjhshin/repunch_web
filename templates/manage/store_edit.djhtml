@@ -5,11 +5,9 @@
 {% block styles %}
 	{{ block.super }}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.css" %}" />
-	<link rel="stylesheet" type="text/css" href="{% static "manage/js/jquery/css/smoothness/jquery-ui-1.10.2.custom.min.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script type="text/javascript" src="{% static 'manage/js/jquery/jquery-ui-1.10.2.custom.min.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
 	<script type="text/javascript">

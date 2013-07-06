@@ -8,7 +8,7 @@ import json, httplib, urllib, tempfile, re
 from PIL import Image
 
 from repunch.settings import PARSE_VERSION,\
-REST_CONNECTION_META,\
+REST_CONNECTION_META, SUPPORTED_IMAGE_FORMATS,\
 PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as dim
 
 BAD_FILE_CHR = re.compile('[\W_]+')
@@ -36,7 +36,6 @@ def parse(method, path, data=None, query=None,
 
     rcm = REST_CONNECTION_META.copy()
     rcm["Content-Type"] = "application/" + cMeta
-    d = None
 
     if method in ("POST", "PUT", "DELETE"):
         if data:
@@ -74,7 +73,7 @@ def parse(method, path, data=None, query=None,
     try:
         result = json.loads(conn.getresponse().read())
     except ValueError as e:
-        if method == "POST" and cMeta == "png" and d:
+        if method == "POST" and cMeta in SUPPORTED_IMAGE_FORMATS:
             conn.close()
         return None
     conn.close()
@@ -130,7 +129,7 @@ def create_png(uploadedFile):
 
 def delete_file(name, fType):
     """ deletes the given file """   
-    parse("DELETE", 'files/' + name, cMeta=fType)
+    return parse("DELETE", 'files/' + name, cMeta=fType)
 
 def cloud_call(func_name, params, timeout=None):
     """ Calls a cloud function with the name func_name and with
