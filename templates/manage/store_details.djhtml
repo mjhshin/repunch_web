@@ -1,8 +1,14 @@
 {% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}{% load parse_tags %}
 
 {% block title %}My Account{% endblock %}
-{% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.css" %}" />{% endblock %}
+{% block styles %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+{% endblock %}
 
+{% block javascript %}
+<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+{% endblock %}
 
 {% block content %}
 {% with store=request.session.store %}

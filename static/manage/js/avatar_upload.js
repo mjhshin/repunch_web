@@ -12,7 +12,6 @@ $(document).ready(function() {
 			modal : true,
 			resizable : true,
 			bgiframe : true,
-			modal : true,
 			cache : false,
 			position : ["center", "center"],
 			overlay : {
@@ -28,9 +27,11 @@ $(document).ready(function() {
 
 function cancelAvatarUpload() {
 	$('#avatar-dialog').dialog('close');
+	$('#avatar-dialog').remove();
 }
 
 function avatarUploadComplete() {
 	$('#avatar-dialog').dialog('close');
+	$('#avatar-dialog').remove();
 	window.location.href = window.location.href;
 }
