@@ -1,0 +1,20 @@
+{% extends "manage/notification.html" %}
+
+{% block title %}
+You have been charged ${{ invoice.total }} for your membership with Repunch.
+{% endblock %}
+
+{% block content %}
+<p style="">
+Hey {{ store.get_owner_fullname }},
+</p>
+<p>
+Here is your receipt for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
+</p>
+
+<p style="">
+<strong>Total (USD):</strong> ${{ invoice.total }}<br/><br/>
+<strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
+</p>
+
+{% endblock %}

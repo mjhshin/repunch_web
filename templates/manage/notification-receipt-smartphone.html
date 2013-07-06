@@ -26,6 +26,7 @@ Here is your receipt for your recent purchase of smartphones.
 <strong>Total (USD):</strong> ${{ invoice.total }}<br/><br/>
 
 {% if invoice.sale_id and for_customer %}
+<strong>Date:</strong> {{ invoice.createdAt }}<br/>
 <strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
 {% endif %}
 </p>

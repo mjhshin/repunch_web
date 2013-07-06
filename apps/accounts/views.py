@@ -15,6 +15,7 @@ from parse import session as SESSION
 from parse.auth.decorators import login_required
 from parse.apps.stores.models import Settings, Store
 from parse.utils import make_aware_to_utc
+from parse.notifications import send_email_receipt_smartphone
 
 @csrf_exempt
 def activate(request):
@@ -136,7 +137,6 @@ def update(request):
                     subscription.update()
                     
             except Exception as e:
-                # DOES NOT GO HERE! store_cc catches the exception!
                 form = SubscriptionForm(subscription.__dict__.copy())
                 form.errors['__all__'] =\
                     form.error_class([e])
@@ -153,7 +153,7 @@ def update(request):
                     "Order placed for " +\
                     str(amount) + " phones", "smartphone")
                 if amount > 0:
-                    send_email_receipt(account, invoice, amount) 
+                    send_email_receipt_smartphone(account, invoice, amount) 
             
             # update the session cache
             request.session['store'] = store
@@ -229,7 +229,7 @@ def upgrade(request):
                     "Order placed for " +\
                     str(amount) + " phones", "smartphone")
                 if amount > 0:
-                    send_email_receipt(account, invoice, amount)
+                    send_email_receipt_smartphone(account, invoice, amount)
                     
             # update the session cache
             request.session['store'] = store

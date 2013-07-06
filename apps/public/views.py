@@ -9,7 +9,8 @@ from forms import ContactForm
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.decorators import session_comet
 from parse.auth.utils import request_password_reset
-from parse.notifications import send_email_signup, send_email_receipt
+from parse.notifications import send_email_signup,\
+send_email_receipt_smartphone
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
@@ -159,8 +160,16 @@ def sign_up2(request):
             
             # set the subscription's store (uppdate called in store_cc
             subscription.Store = store.objectId
-            subscription.store_cc(subscription_form.data['cc_number'],
-                            subscription_form.data['cc_cvv'])
+            try:
+                subscription.store_cc(subscription_form.data['cc_number'],
+                                subscription_form.data['cc_cvv'])
+            except Exception as e:
+                data['store_form'] = StoreSignUpForm(\
+                    request.session['store-tmp'].__dict__.copy())
+                subscription_form.errors['__all__'] =\
+                    subscription_form.error_class([e])
+                data['subscription_form'] = subscription_form
+                return render(request, 'public/signup2.djhtml', data)
             
             # need to put username and pass in request
             requestDict = request.POST.dict().copy()
@@ -178,7 +187,7 @@ def sign_up2(request):
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
                         str(amount) + " phones", "smartphone")
-                    send_email_receipt(account, invoice, amount)
+                    send_email_receipt_smartphone(account, invoice, amount)
             
             # send matt and new user a pretty email.
             send_email_signup(account)

@@ -43,11 +43,16 @@ $(document).ready(function(){
 					</div>
 				</div>
 				
-				{% if store_form.errors or account_form.errors or subscription_form.errors %}
-					<div class="error-box">
-						There was an error processing your information. Please fix the erros below and click "Create Account" again.
-					</div>
+				{% if store_form.errors or subscription_form.errors %}
+				<div class="error-box">
+					There was an error processing your information. Please fix the erros below and click "Create Account" again.
+				</div>
 				{% endif %}
+				{% if subscription_form.non_field_errors %}
+	            <div class="notification">
+		            <div>{{ subscription_form.non_field_errors }}</div>
+	            </div>
+	            {% endif %}
 				
 				{# NEEDED FOR SAME ADDRESS AS BUSINESS #}
 	            <input type="hidden" id="id_street" 

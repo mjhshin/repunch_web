@@ -250,7 +250,7 @@ def graph(request):
     if employees:
         for emp in employees:
             ps =  emp.get('punches', createdAt__gte=start_aware, 
-                createdAt__lte=end_aware, limit=900)
+                createdAt__lte=end_aware)
             if ps:
                 for punch in ps:
                     key = timezone.localtime(punch.createdAt,

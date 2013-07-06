@@ -195,9 +195,7 @@ def edit(request, message_id):
             }
 
             if msg_filter == "idle":
-                d = make_aware_to_utc(datetime.now() +\
-                    relativedelta(days=-21),
-                    SESSION.get_store_timezone(request.session))
+                d = timezone.now() + relativedelta(days=-21)
                 params.update({"idle_date":d.isoformat()})
             elif msg_filter == "most_loyal":
                 params.update({"min_punches":\

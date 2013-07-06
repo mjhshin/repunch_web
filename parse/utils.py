@@ -2,8 +2,8 @@
 Helpers methods for parse.apps to enfore the DRY principle.
 """
 from django.utils import timezone
-from dateutil import parser
 from dateutil.tz import tzutc
+from dateutil import parser
 import json, httplib, urllib, tempfile, re
 from PIL import Image
 
@@ -137,8 +137,8 @@ def cloud_call(func_name, params, timeout=None):
     the parameters params. """
     return parse("POST", "functions/" + func_name,
             params, timeout=timeout)
-
-
+            
+            
 def make_aware_to_utc(dtime, tzone):
     """
     Takes in an unaware datetime object, makes it aware using the 

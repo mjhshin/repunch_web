@@ -3,15 +3,17 @@ Emails notifications
 """
 
 from importlib import import_module
+import pytz
 
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.html import strip_tags
 from django.template import Template, Context
 
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
-ORDER_PLACED_EMAILS
+ORDER_PLACED_EMAILS, TIME_ZONE
 
 def get_notification_ctx():
     """
@@ -40,13 +42,59 @@ def _send_emails(emails, connection=None):
     
     if not connection:
         conn.close()
-
-def send_email_receipt(account, invoice, amount, connection=None):
+        
+def send_email_receipt_monthly(asis, connection=None):
     """
-    Sends the user a pretty receipt.
+    Sends users a receipt and sends admins an email containing a list 
+    of stores that have been charged their monthly bill.
+    
+    asis (account store invoice) is a list in the following format:
+    [
+        (account1, store1, invoice1),
+        (account2, store2, invoice2),
+        ...
+    ]
     """
     with open(FS_SITE_DIR +\
-        "/templates/manage/notification-receipt.html", 'r') as f:
+        "/templates/manage/notification-receipt-monthly.html", 'r') as f:
+        template = Template(f.read())
+    emails = []
+    # for accounts
+    for asi in asis:
+        account = asi[0]
+        store = asi[1]
+        #date_30_ago = 
+        #date_now = 
+        subject = "Repunch Inc. monthly service charge."
+        ctx = get_notification_ctx()
+        ctx.update({
+                'store': store,
+                'invoice': invoice})
+        body = template.render(Context(ctx)).__str__()
+                
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+    # for admins
+    date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+    subject = "Monthly billing results : " + str(date)
+    ctx = get_notification_ctx()
+    ctx.update({'asis': asis, "date":date})
+    body = template.render(Context(ctx)).__str__()
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=ORDER_PLACED_EMAILS)
+    email.attach_alternative(body, 'text/html')
+    emails.append(email)
+    
+    _send_emails(emails, connection)
+
+def send_email_receipt_smartphone(account, invoice, amount, connection=None):
+    """
+    Sends the user and admins pretty receipt.
+    """
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-receipt-smartphone.html", 'r') as f:
         template = Template(f.read())
    
     store = account.get("store")
@@ -83,6 +131,7 @@ def send_email_receipt(account, invoice, amount, connection=None):
     emails.append(email)
     
     _send_emails(emails, connection)
+    
 
 def send_email_signup(account, connection=None):
     """

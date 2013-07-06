@@ -258,7 +258,7 @@ class Subscription(ParseObject):
         try:
             res = store_cc(self, cc_number, cvv2)
         except HTTPError: # wrong credit card info BAD REQUEST (400)
-            return False
+            raise
         else:
             self.pp_cc_id = res['id']
             self.date_pp_valid = parser.parse(res['valid_until'])

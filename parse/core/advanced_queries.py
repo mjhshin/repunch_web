@@ -1,15 +1,15 @@
 """
 Contains somewhat advanced queries not yet supported in ParseObjects.
+Note that all queries here returns a maximum of 900 objects atm.
 
 Example : pointer_query
 To get the Subscription objects that have an active store and whose
-date_last_billed is greater than date_x and whose subscriptionType
+date_last_billed is before date_x and whose subscriptionType
 is not free.
 
 The method call is:
 pointer_query("Subscription", {"subscriptionType1":1,
-    "subscriptionType2":2, "date_last_billed__gte":date_x,
-    'limit':900}, "Store", "Store", {"active":True})
+    "subscriptionType2":2, "date_last_billed__lte":date_x}, "Store", "Store", {"active":True})
 
 Example : relational_query
 To get the Punch objects in the relation of a Store object where
@@ -21,8 +21,7 @@ pointer to a Patron whose gender is Female.
 The method call is:
 relational_query('4IBEy0cum4', 'Store', 'Punches', 'Punch',
     'Patron', 'Patron', {"gender": "Female"},
-    {'createdAt__lte':end-date, 'createdAt__gte':start-date,
-        'limit':900 } )
+    {'createdAt__lte':end-date, 'createdAt__gte':start-date} )
 
 """
 
@@ -60,9 +59,8 @@ def pointer_query(dst_class, dst_class_where, dst_class_key,
         if 'error' not in res:
             return res['count']
         return None # shall not be 0
-    
     return parse("GET", "classes" + "/" + dst_class, query={
-            "where":json.dumps(where), 
+            "where":json.dumps(where), "limit":900, 
         })
 
 def relational_query(src_id, src_class, src_key, dst_class,
@@ -125,7 +123,7 @@ def relational_query(src_id, src_class, src_key, dst_class,
         return None # shall not be 0
     
     return parse("GET", "classes" + "/" + dst_class, query={
-            "where":json.dumps(where), 
+            "where":json.dumps(where), "limit":900, 
         })
 
 
