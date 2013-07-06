@@ -1,0 +1,104 @@
+{% extends "manage/notification.html" %}
+
+{% block title %}
+{% if asiss|length == 0 %}
+No users have been charged their monthly bill today, {{ date|date:"F d, Y" }}.
+{% else %}
+A total of {{ asiss|length }} users have been charged their monthly bill today, {{ date|date:"F d, Y" }}.
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if asiss|length > 0 %}
+
+{# TABLE TOP #}
+<div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
+Keep this for your records.
+</div>
+{# END TABLE TOP #}
+
+{# LIST OF INVOICE #}
+<table cellpadding="0" cellspacing="0" 
+    style="width:100%;background-color:#eee;">
+
+{% for asis in asiss %}
+
+{# ONE INVOICE #}
+<tr>
+    
+    {# DATE BOX #}
+	<td style="width:32px;background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
+		<div style="border:1px solid #555;">
+		    <div style="background-color:#555;text-transform:uppercase;color:#fff;font-weight:bold;text-align:center;font-size:9px;line-height:14px;padding:0 4px;">
+                type</div>
+			<div style="background-color:#fff;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
+                {% for key, val in sub_type.iteritems %}
+                {% if key == asis.3.subscriptionType %}
+                {{ val.name }}
+                {% endif %}
+                {% endfor %}
+            </div>
+		</div>
+    </td>
+    {# END DATE BOX #}
+    
+    {# INNER TABLE #}
+	<td style="vertical-align:top;padding:8px;border-top:1px solid #fff;">
+		<table cellpadding="0" cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="background-color:#eee;vertical-align:top;padding-right:20px;">
+
+                    {# STORE NAME #}
+                    <div style="padding:2px 0 4px 0;font-size:16px;line-height:16px;font-weight:bold;text-decoration:underline;">
+                        {{ asis.1.store_name }} &nbsp;&nbsp;({{asis.1.objectId}})
+					</div>
+                    {# END STORE NAME #}
+
+                    {% if not asis.2 %}
+                    <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
+	                    <strong>Failed to charge.</strong>
+					</div>
+                    {% else %}
+                    {# TOTAL #}
+                    <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
+	                    <strong>Total (USD):</strong> ${{ asis.2.total }}
+					</div>
+                    {# END TOTAL #}
+
+                    {# STATE #}
+                    <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
+	                    <strong>State:</strong> {{ asis.2.state }}
+					</div>
+                    {# END STATE #}
+                    
+                    {# PAYMENT ID #}
+                    <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
+	                    <strong>Payment ID:</strong> {{ asis.2.payment_id }}
+					</div>
+                    {# END PAYMENT ID #}
+
+                    {# SALE ID #}
+					<div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
+	                    <strong>Sale ID:</strong> {{ asis.2.sale_id }}
+					</div>
+                    {# END SALE ID #}
+                    {% endif %}
+                    
+				</td>
+
+            </tr>
+        </table>
+    </td>
+    {# END INNER TABLE #}
+    
+
+</tr>
+{# END ONE INVOICE #}
+
+{% endfor %}
+
+</table><br/>
+{# END LIST OF INVOICE #}
+
+{% endif %}
+{% endblock %}

@@ -9,11 +9,17 @@ You have been charged ${{ invoice.total }} for your membership with Repunch.
 Hey {{ store.get_owner_fullname }},
 </p>
 <p>
-Here is your receipt for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
+We have charged you for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
 </p>
 
 <p style="">
-<strong>Total (USD):</strong> ${{ invoice.total }}<br/><br/>
+<strong>Subscription Type:</strong> 
+{% for key, val in sub_type.iteritems %}
+{% if key == subscription.subscriptionType %}
+{{ val.name }}
+{% endif %}
+{% endfor %}<br/>
+<strong>Total (USD):</strong> ${{ invoice.total }}<br/>
 <strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
 </p>
 

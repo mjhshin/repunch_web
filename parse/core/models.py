@@ -343,11 +343,11 @@ class ParseObject(object):
         """
         res = parse("GET", self.path() + "/" + self.objectId)
         if res and "error" not in res:
-            self.update_locally(res, True)
+            self.update_locally(res, False)
             # fill up the Pointer cache attributes 
-            for key, value in self.__dict__.iteritems():
+            for key, value in self.__dict__.copy().iteritems():
                 if key[0].isupper() and not key.endswith("_"):
-                    self.get(key[0].upper() + key[1:])
+                    self.get(key[0].lower() + key[1:])
             return True
         return False
 

@@ -9,8 +9,12 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.template import Template, Context
+# need to import loader though not used since the loader is not
+# implicitly imported when running as a management command.
+from django.template import Template, Context, loader
 
+from libs.dateutil.relativedelta import relativedelta
+from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE
@@ -43,15 +47,16 @@ def _send_emails(emails, connection=None):
     if not connection:
         conn.close()
         
-def send_email_receipt_monthly(asis, connection=None):
+def send_email_receipt_monthly(asiss, connection=None):
     """
     Sends users a receipt and sends admins an email containing a list 
     of stores that have been charged their monthly bill.
     
-    asis (account store invoice) is a list in the following format:
+    asiss (account store invoice subscription) 
+    is a list in the following format:
     [
-        (account1, store1, invoice1),
-        (account2, store2, invoice2),
+        (account1, store1, invoice1, subscription1),
+        (account2, store2, invoice2, subscription2),
         ...
     ]
     """
@@ -59,17 +64,21 @@ def send_email_receipt_monthly(asis, connection=None):
         "/templates/manage/notification-receipt-monthly.html", 'r') as f:
         template = Template(f.read())
     emails = []
+    date_30_ago = timezone.now() + relativedelta(days=-30)
+    date_now = timezone.now()
     # for accounts
-    for asi in asis:
-        account = asi[0]
-        store = asi[1]
-        #date_30_ago = 
-        #date_now = 
+    for asis in asiss:
+        subscription = asis[3]
+        if not subscription: 
+            continue
+        account = asis[0]
+        store = asis[1]
+        invoice = asis[2]
         subject = "Repunch Inc. monthly service charge."
         ctx = get_notification_ctx()
-        ctx.update({
-                'store': store,
-                'invoice': invoice})
+        ctx.update({'store': store, 'invoice': invoice,
+            "date_30_ago":date_30_ago, "date_now":date_now,
+            "sub_type":sub_type, "subscription":subscription})
         body = template.render(Context(ctx)).__str__()
                 
         email = mail.EmailMultiAlternatives(subject,
@@ -77,10 +86,13 @@ def send_email_receipt_monthly(asis, connection=None):
         email.attach_alternative(body, 'text/html')
         emails.append(email)
     # for admins
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-receipt-monthly-admin.html", 'r') as f:
+        template = Template(f.read())
     date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
-    subject = "Monthly billing results : " + str(date)
+    subject = "Monthly billing results : " + date.strftime("%b %d %Y")
     ctx = get_notification_ctx()
-    ctx.update({'asis': asis, "date":date})
+    ctx.update({'asiss': asiss, "date":date, "sub_type":sub_type})
     body = template.render(Context(ctx)).__str__()
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=ORDER_PLACED_EMAILS)

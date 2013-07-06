@@ -13,6 +13,7 @@ SubscriptionForm3
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
+from parse.apps.stores import SMARTPHONE
 from parse.apps.stores.models import Settings, Store
 from parse.utils import make_aware_to_utc
 from parse.notifications import send_email_receipt_smartphone
@@ -151,7 +152,7 @@ def update(request):
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
-                    str(amount) + " phones", "smartphone")
+                    str(amount) + " phones", SMARTPHONE)
                 if amount > 0:
                     send_email_receipt_smartphone(account, invoice, amount) 
             
@@ -227,7 +228,7 @@ def upgrade(request):
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
-                    str(amount) + " phones", "smartphone")
+                    str(amount) + " phones", SMARTPHONE)
                 if amount > 0:
                     send_email_receipt_smartphone(account, invoice, amount)
                     
