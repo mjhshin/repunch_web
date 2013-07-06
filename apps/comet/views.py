@@ -47,7 +47,6 @@ def refresh(request):
         # make the call
         res = cloud_call("retailer_refresh", {
             "store_id": store.objectId,
-            "rewards": store.get('rewards'),
             "patronStore_count": SESSION.get_patronStore_count(\
                                     request.session),
             "feedback_unread_ids": feedback_unread_ids,
@@ -64,7 +63,7 @@ def refresh(request):
         if rewards:
             for reward in rewards:
                 for i, mreward in enumerate(mod_rewards):
-                    if reward['reward_name']==mreward['reward_name']:
+                    if reward['reward_id']==mreward['reward_id']:
                         mod_rewards[i]['redemption_count'] =\
                             reward['redemption_count']
                         break

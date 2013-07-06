@@ -886,7 +886,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 // 
 //  Input:
 //      store objectId (for comparison with given values)
-//      rewards (array object)
 //      patronStore_count (count)
 //      feedback_unread_ids (String array)
 //      employees_pending_ids (String array)
@@ -904,7 +903,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var Store = Parse.Object.extend("Store");
     
     var store_id = request.params.store_id;
-    var rewards_old = request.params.rewards;
     var patronStore_count = request.params.patronStore_count;
     var feedback_unread_ids = request.params.feedback_unread_ids;
     var employees_pending_ids = request.params.employees_pending_ids;
@@ -913,28 +911,19 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var store, result = new Object();
     
     var storeQuery = new Parse.Query(Store);
-    storeQuery.get(store_id).then(function(stor){
+    storeQuery.get(store_id).then(function(storeResult){
         console.log("Retrieved store");
-        // rewards_old redemption_count
-        store = stor;
+        store = storeResult;
         var rewards = store.get("rewards");
-        function redemptionCount(reward){
-            for (var i=0; i<rewards_old.length; i++){
-                if(rewards_old[i].reward_name == reward.reward_name
-                    && rewards_old[i].redemption_count !=
-                        reward.redemption_count){
-                    result.rewards.push({
-                        "reward_name":reward.reward_name,
-                        "redemption_count":reward.redemption_count});
-                    break;
-                }
-            }
-        }
-        
         if (rewards.length > 0) {
             result.rewards = new Array();
+            // push all rewards even if no change in redemption count 
+            // it is much less costly than having to provide the rewards as a parameter and comparing.
+            // only include the reward_id and redemption_count
             for (var i=0; i<rewards.length; i++){
-                redemptionCount(rewards[i]);
+                result.rewards.push({
+                    "reward_id":rewards[i].reward_id,
+                    "redemption_count":rewards[i].redemption_count});
             }
         }
         
