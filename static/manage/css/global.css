@@ -454,7 +454,7 @@ div#footer{
 #stay-signed-in label{
     position:relative; top:-2px;
     color:gray;
-    font-size:1em;
+    font-size:0.8em;
 	display:inline;
 	font-weight:normal;
 }
@@ -462,6 +462,7 @@ div#footer{
 #forgot-pass-form a {
     color:#0040FF;
     cursor:pointer;
+    font-size:0.9em;
     text-decoration:none;
 }
 
