@@ -296,7 +296,7 @@ $(document).ready(function(){
                 // update the title
                 document.title = "Repunch | (" + redemption_count + ") Redemptions";
                 
-                // table content # TODO
+                // table content 
                 var redemptions = res.redemptions;
                 var pagPage = $("#pag-page");
                 var pagThreshold = $("#pag-threshold");
