@@ -77,7 +77,7 @@ def refresh(request):
             request.session['patronStore_count'] = patronStore_count
         # feedbacks_unread
         feedbacks_unread = results.get('feedbacks_unread')
-        if feedbacks:
+        if feedbacks_unread:
             data['feedbacks_unread'] = []
             for feedback in feedbacks_unread:
                 m = Message(**feedback)

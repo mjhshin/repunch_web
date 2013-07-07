@@ -339,7 +339,14 @@ def feedback_reply(request, feedback_id):
         
     # first fetch the feedback - make sure that we have the updated
     # one - not the one in the cache
-    feedback.fetchAll()
+    if not feedback.fetchAll(): # it has been deleted
+        # remove feedback from the session
+        messages_received_list.pop(i_remove)
+        request.session['messages_received_list'] =\
+            messages_received_list
+        return redirect(reverse('messages_index') +\
+                        "?%s" % urllib.urlencode({'error':\
+                        'Feedback has been deleted elsewhere.'}))
     
     if request.method == 'POST':
         body = request.POST.get('body')
