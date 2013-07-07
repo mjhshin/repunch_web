@@ -29,20 +29,18 @@ def refresh(request):
         # prep the params
         store = SESSION.get_store(request.session)
         redemptions = SESSION.get_redemptions(request.session)
-        redemption_ids = []
-        feedback_unread_ids, employees_pending_ids = [], []
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
-        for fb in messages_received_list:
-            if not fb.get('is_read'):
-                feedback_unread_ids.append(fb.objectId)
         employees_pending_list =\
             SESSION.get_employees_pending_list(request.session)
-        for emp in employees_pending_list:
-            if emp.get('status') == PENDING:
-                employees_pending_ids.append(emp.objectId)
-        for red in redemptions:
-            redemption_ids.append(red.objectId)
+        employees_approved_list =\
+            SESSION.get_employees_approved_list(request.session)
+            
+        redemption_ids = [ red.objectId for red in redemptions]
+        feedback_unread_ids = [ fb.objectId for fb in\
+            messages_received_list if not fb.get('is_read') ]
+        employees_pending_ids = [ emp.objectId for emp in\
+            employees_pending_list ]
                 
         # make the call
         res = cloud_call("retailer_refresh", {
@@ -101,6 +99,29 @@ def refresh(request):
             request.session['employees_pending_list'] =\
                 employees_pending_list
             data['employees_pending_count'] = len(employees_pending_list)
+        # employees_approved
+        employees_approved = results.get("employees_approved")
+        if employees_approved:
+            # check for deleted employees
+            # first build the list of all employees in session
+            session_employees_pending_ids = [emp.objectId for emp in\
+                employees_pending_list]
+            session_employees_approved_ids = [emp.objectId for emp in\
+                employees_approved_list]
+            session_emps = session_employees_pending_ids
+            session_emps.extend(session_employees_approved_ids)
+            
+            """
+            # then build the list of all employees sync'd with Parse
+            parse_employees_pending_ids =\
+                session_employees_pending_ids[:]
+            parse_employees_approved_ids = [emp.objectId for emp in\
+                employees_approved]
+            parse_emps = parse_employees_pending_ids
+            parse_emps.extend(parse_employees_approved_ids)
+            # the diff is the ones deleted
+            """
+            
         # redemptions
         reds, redemps = results.get("redemptions"), []
         if reds:

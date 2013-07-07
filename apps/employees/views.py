@@ -153,6 +153,7 @@ def approve(request, employee_id):
 @login_required
 @session_comet
 def deny(request, employee_id):
+    """ this actually deletes the employee object! """
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
@@ -165,8 +166,8 @@ def deny(request, employee_id):
     if not employee:
         raise Http404
     
-    employee.status = DENIED;
-    employee.update();
+    # delete the employee!
+    employee.delete()
     
     # update session cache for employees_pending_list
     employees_pending_list.pop(i_remove)

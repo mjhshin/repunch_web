@@ -896,6 +896,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      patronStore_count (if changed)
 //      feedbacks_unread (new objects) (if new stuff)
 //      employees_pending (new objects) (if new employees)
+//      employees_approved (for lifetime punches, pending, deleted, and approved checks)
 //      redemptions
 //
 ////////////////////////////////////////////////////
@@ -954,9 +955,20 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         eprq.notContainedIn("objectId", employees_pending_ids);
         return eprq.find();
     }).then(function(pendingEmployees){
-        console.log("Retrieved PendingEmployees");
+        console.log("Retrieved Pending Employees");
         if(pendingEmployees.length > 0){
             result.employees_pending = pendingEmployees;
+        }
+        
+        // employees_approved
+        var earq = store.relation("Employees").query();
+        earq.equalTo("status", "Approved");
+        earq.select("lifetime_punches");
+        return earq.find();
+    }).then(function(approvedEmployees) {
+        console.log("Retrieved Approved Employees");
+        if(approvedEmployees.length > 0){
+            result.employees_approved = approvedEmployees;
         }
         
         // redemptions
@@ -964,7 +976,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
         // rrq.greaterThanOrEqualTo("createdAt", new Date(past_hour));
         rrq.equalTo("is_redeemed", false);
         rrq.descending("createdAt");
-        // rrq.limit(40);
         // TODO remove this
         rrq.notContainedIn("objectId", redemption_ids);
         return rrq.find();
