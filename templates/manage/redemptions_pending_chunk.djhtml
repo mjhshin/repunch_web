@@ -1,3 +1,5 @@
+{% load text_tags %}
+
 {% for redemp in redemptions %}
 <div id="{{redemp.objectId}}" 
     class="tr  {% cycle '' 'odd' %}">
@@ -9,9 +11,9 @@
 	{{ redemp.createdAt|date:"h:i a" }}
 	{% endif %}</div>
 	<div class="td redemption_customer_name">
-	{{ redemp.customer_name }}</div>
+	{{ redemp.customer_name|trim_to_dots:18 }}</div>
 	<div class="td redemption_title">
-	{{ redemp.title }}</div>
+	{{ redemp.title|trim_to_dots:24 }}</div>
 	<div class="td redemption_punches">
 	{{ redemp.num_punches }}</div>
 	<div class="td redemption_redeem">

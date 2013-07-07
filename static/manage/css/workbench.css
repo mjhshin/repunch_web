@@ -4,7 +4,7 @@
 }
 
 #header-redemption_title, .redemption_title{
-    width:160px;
+    width:180px;
 }
 
 #header-redemption_punches, .redemption_punches{
@@ -12,7 +12,7 @@
 }
 
 #header-redemption_customer_name, .redemption_customer_name{
-    width:180px;
+    width:160px;
 }
 
 #header-redemption_redeem, .redemption_redeem{
@@ -24,7 +24,7 @@
 }
 
 #header-redemption_title-past, .redemption_title-past{
-    width:160px;
+    width:180px;
 }
 
 #header-redemption_punches-past, .redemption_punches-past{
@@ -32,7 +32,7 @@
 }
 
 #header-redemption_customer_name-past, .redemption_customer_name-past{
-    width:180px;
+    width:160px;
 }
 
 #header-redemption_redeem-past, .redemption_redeem-past{

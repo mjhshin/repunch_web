@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
+{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}{% load text_tags %}
 
 {% block title %}{% if epcount > 0 %}({{ epcount }}){% endif %} Messages{% endblock %}
 {% block styles %}
@@ -45,8 +45,8 @@
 			</div>
 			{% for employee in employees %}
 			<div class="tr {% cycle 'odd' '' %}">
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td first_name">{{ employee|get:'first_name' }}</div></a>
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td last_name">{{ employee|get:'last_name' }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td first_name">{{ employee|get:'first_name'|trim_to_dots:12 }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td last_name">{{ employee|get:'last_name'|trim_to_dots:14 }}</div></a>
 				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td date_added">{{ employee|get:'createdAt'|date:"m/d/y" }}</div></a>
 				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td punches">{{ employee.lifetime_punches }}</div></a>
 				<div class="td graph"><input type="checkbox" name="employee-graph-cb" value="{{ employee.objectId }}" /></div>
@@ -73,8 +73,8 @@
 			
 			{% for employee in pending %}
 			<div class="tr {% cycle 'odd' '' %}">
-				<div class="td first_name_pending">{{ employee|get:'first_name' }}</div>
-				<div class="td last_name_pending">{{ employee|get:'last_name' }}</div>
+				<div class="td first_name_pending">{{ employee|get:'first_name'|trim_to_dots:12 }}</div>
+				<div class="td last_name_pending">{{ employee|get:'last_name'|trim_to_dots:14 }}</div>
 				<div class="td date_added_pending">{{ employee|get:'createdAt'|date:"m/d/y" }}</div>
 				<div class="td approve">
 					<a href="{% url 'employee_approve' employee.objectId %}" class="employee approve"><img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>

@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}{% load parse_tags %}{% load text_tags %}
 
 {% block title %}Rewards{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/rewards.css" %}" />{% endblock %}
@@ -30,7 +30,7 @@
 				<a href="{% url 'reward_edit' forloop.counter0 %}">
 					<div class="td reward_punches">{{ reward.punches }}</div>
 					<div class="td reward_summary">
-						<span class="reward_title">{{ reward.reward_name }}</span><br />
+						<span class="reward_title">{{ reward.reward_name|trim_to_dots:40 }}</span><br />
 						<span class="reward_description">{{ reward.description }}</span>
 					</div>
 				</a>
