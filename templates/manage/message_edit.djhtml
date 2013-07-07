@@ -76,7 +76,7 @@ $(document).ready(function(){
 		{{ form.subject }}
 		
 		{{ form.body.errors }}
-		<label for="message">Body</label>
+		<label for="body">Body</label>
 		{{ form.body }}
 		
 		<div id="attach-offer-container">

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.core import mail 
+from django.utils import timezone
 from datetime import datetime
 import json, pytz
 
@@ -161,6 +162,9 @@ def sign_up2(request):
             # set the subscription's store (uppdate called in store_cc
             subscription.Store = store.objectId
             try:
+                # use date last billed as a flag for the 30 day 
+                # monthly membership renewal (for message sending)
+                subscription.date_last_billed = timezone.now()
                 subscription.store_cc(subscription_form.data['cc_number'],
                                 subscription_form.data['cc_cvv'])
             except Exception as e:

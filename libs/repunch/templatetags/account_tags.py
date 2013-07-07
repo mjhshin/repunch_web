@@ -47,8 +47,7 @@ def account_message_usage(session, percent_of=None):
     atype = sub_type[SESSION.get_subscription(\
                 session).get('subscriptionType')]
     
-    message_count = SESSION.get_message_count(session,
-                        datetime.now())
+    message_count = SESSION.get_message_count(session)
     
     percent = message_count/atype['max_messages']
     if(percent > 1): #don't go past 1
@@ -65,4 +64,4 @@ def account_user_count(session):
     
 @register.simple_tag
 def account_message_count(session):
-   return SESSION.get_message_count(session, datetime.now())
+   return SESSION.get_message_count(session)

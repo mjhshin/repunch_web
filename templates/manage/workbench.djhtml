@@ -9,12 +9,24 @@
 {% block javascript %}
 	<script src="{% static "manage/js/punch.js" %}"></script>
 	<script src="{% static "manage/js/paginator.js" %}"></script>
+	<script src="{% static "manage/js/redemptions.js" %}"></script>
 	<script>
     $(document).ready(function(){
         $(".not-sortable").unbind("click");
         
+        // specify a callback to bind the fresh html chunk received from the server
+        function rebindRedemptions(){
+            $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
+                onRedeem($(this).attr("name"));
+            });
+        }
+        
+        // initial bind
+        rebindRedemptions();
+        
         // activate the paginator!
-        paginator($("#get-page-url").val(), ["pending-redemptions", "history-redemptions"], "pending-redemptions");
+        paginator($("#get-page-url").val(), ["pending-redemptions", 
+            "history-redemptions"], "pending-redemptions", rebindRedemptions);
     });
 	</script>
 {% endblock %}

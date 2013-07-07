@@ -128,7 +128,7 @@
 		
 		<div class="input-container clearheight">
 			{{ form.store_description.errors }}
-			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">200 character limit</label>
+			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>
 			{{ form.store_description }}
 		</div>
 		

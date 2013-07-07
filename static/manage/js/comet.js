@@ -6,84 +6,8 @@
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
-    var urlRedeem = $("#redeem-url").val();
     
-    // for the workbench page TODO fetch items from next page?
-    function onRedeem(rowId){
-        var row = $("#" + rowId);
-        var rewardId = $("#" + rowId + " input[type=hidden]").val();
-        var customerName = $("#" + rowId + " div:nth-child(3)").text();
-        var title = $("#" + rowId + " div:nth-child(4)").text();
-        var numPunches = $("#" + rowId + " div:nth-child(5)").text();
-        $.ajax({
-            url: urlRedeem,
-            data: {"redeemRewardId":rowId,
-                    "rewardId":rewardId }, 
-            type: "GET",
-            success: function(res){
-                if (res.result == 1 || res.result == 2){
-                    if (res.result == 1){
-                        row.css("background", "#CCFF99");
-                        row.html("Successfully validated redemption.");
-                    } else {
-                        row.css("background", "#ffffcb");
-                        row.html("Customer does not have enough punches!");
-                        alert("Customer does not have enough punches!");
-                    }
-                    row.fadeOut(2000, function(){
-                        // no longer necessary to append to past redemptions since
-                        // clicking on redeem means that the redemption tab is active...
-                        
-                        // then remove
-                        $(this).remove();
-                                                
-                        // update the counts
-                        var rBadge = $("#redemptions-nav a div.nav-item-badge");
-                        var diva = $("#redemptions-nav a");
-                        var rcount = new String($("#tab-body-pending-redemptions div.tr").length);
-                        if (rcount < 1){
-                            // workbench nav badge
-                            if (rBadge.length == 1){
-                                rBadge.fadeOut(2000);
-                            }
-                            
-                            // pending tab
-                            $("#tab-pending-redemptions").html("Pending");
-                            
-                            // place the placeholder if now empty
-                            $("#tab-body-pending-redemptions div.table-header").after(
-                                "<div class='tr' id='no-redemptions'>" +
-				                "<div class='td'>No Redemptions</div>" +
-			                    "</div>");
-                        } else {
-                            // workbench nav badge
-                            if (rBadge.length == 1){
-                                rBadge.text(rcount);
-                            } else {
-                                diva.append("<div class='nav-item-badge'>" +
-                                    rcount + "</div>");
-                            }
-                            
-                            // pending tab
-                            $("#tab-pending-redemptions").html("Pending (" + rcount + ")");
-                            
-                        }
-                        
-                    });
-                } else {
-                    alert("Redemption failed");
-                }
-            },
-            error: function(res){
-                // TODO
-            },
-        });
-    }
-    
-    // bind
-    $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
-        onRedeem($(this).attr("name"));
-    });
+    // need to have included redemptions.js above this script!   
     
     function mainComet(res, status, xhr) {
         // goes here if there are no changes
@@ -303,7 +227,7 @@ $(document).ready(function(){
                 var pendingCount = $("#pending-redemptions-count");
                 var pendingPageCount = $("#pag-page-pending-redemptions-count");
                 // only append if we are on the first or last page and if the redemptions tab is the active tab
-                var inLastPage = parseInt(pagPage.val()) == parseInt(redemptionPageCount.val());
+                var inLastPage = parseInt(pagPage.val()) == parseInt(pendingPageCount.val());
                 var inFirstPage = parseInt(pagPage.val()) == 1;
                 var tabPendingActive = $("#tab-pending-redemptions").hasClass("active");
                 var is_desc = $("#header-redemption_time").hasClass("desc");

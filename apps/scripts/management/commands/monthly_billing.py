@@ -16,35 +16,42 @@ from parse.notifications import send_email_receipt_monthly
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # get all of the subscriptions whose stores are active & whose
-        # subscriptionType is not free (0>x) and have been last billed
-        # 30 days ago.
+        """
+        get all of the subscriptions whose stores are active & who
+        have been last billed 30 days ago.
+        IMPORTANT! This includes accounts of type FREE, which are
+        not charged or included in the email notifications- simply
+        set the date last billed to now.
+        """
         date_30_ago = timezone.now() + relativedelta(days=-30)
         date_now = timezone.now()
         sub_count = pointer_query("Subscription",
-            {"subscriptionType1":1, "subscriptionType2":2,
-                "date_last_billed__lte":date_30_ago},
+            {"date_last_billed__lte":date_30_ago},
                 "Store", "Store", {"active":True}, count=True)
                 
         asiss = []
         if sub_count < 900:
             res = pointer_query("Subscription",
-                {"subscriptionType1":1, "subscriptionType2":2,
-                    "date_last_billed__lte":date_30_ago},
+                {"date_last_billed__lte":date_30_ago},
                     "Store", "Store", {"active":True})['results']
             for each in res:
                 subscription = Subscription(**each)
-                account = Account.objects().get(Store=\
-                            subscription.get("Store"))
-                store = account.get("store")
-                invoice = subscription.charge_cc(\
-                        sub_type[subscription.get(\
-                        "subscriptionType")]["monthly_cost"],
-                        "description", MONTHLY)
-                if invoice:
+                sub_cost = sub_type[subscription.get(\
+                            "subscriptionType")]["monthly_cost"]
+                if sub_cost == 0: # FREE account
                     subscription.date_last_billed = date_now
                     subscription.update()
-                asiss.append((account, store, invoice, subscription))
+                else:
+                    account = Account.objects().get(Store=\
+                                subscription.get("Store"))
+                    store = account.get("store")
+                    invoice = subscription.charge_cc(\
+                            sub_cost, "description", MONTHLY)
+                    if invoice:
+                        subscription.date_last_billed = date_now
+                        subscription.update()
+                    asiss.append((account, store, invoice,
+                        subscription))
         else: 
             pass 
         # if the count is over 900 then retrieve them in chunks TODO

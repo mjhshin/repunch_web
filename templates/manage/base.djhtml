@@ -1,7 +1,14 @@
 {% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}{% load parse_tags %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+{# ASSIGNMENTS UP HERE TO MAKE IT GLOBAL #}
+{% account_alert request.session as alert %}
+{% feedback_unread request.session as fcount %}
+{% employees_pending request.session as epcount %}
+{% redemptions_pending request.session as redcount %}
+
+
+<!DOCTYPE html>
+<html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Repunch | {% block title %}{% endblock %}</title>
@@ -58,7 +65,6 @@
 					<a href="{% url 'store_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
 						<span class="nav-item-title">My Account</span>
-						{% account_alert request.session as alert %}
 						{% if alert %}
 						<div class="nav-item-badge">!</div>
 						{% endif %}
@@ -74,7 +80,6 @@
 					<a href="{% url 'messages_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_messages.png" %}" alt="" />
 						<span class="nav-item-title">Messages</span>
-						{% feedback_unread request.session as fcount %}
 						{% if fcount > 0 %}
 						<div class="nav-item-badge">{{ fcount }}</div>
 						{% endif %}
@@ -90,7 +95,6 @@
 					<a href="{% url 'employees_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_employees.png" %}" alt="" />
 						<span class="nav-item-title">Employees</span>
-						{% employees_pending request.session as epcount %}
 						{% if epcount > 0 %}
 						<div class="nav-item-badge">{{ epcount }}</div>
 						{% endif %}
@@ -107,7 +111,6 @@
 					<a href="{% url 'workbench_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_workbench.png" %}" alt="" />
 						<span class="nav-item-title">Workbench</span>
-						{% redemptions_pending request.session as redcount %}
 						{% if redcount > 0 %}
 						<div class="nav-item-badge">{{ redcount }}</div>
 						{% endif %}

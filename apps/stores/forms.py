@@ -43,13 +43,13 @@ class StoreSignUpForm(forms.Form):
 class StoreForm(forms.Form):
     store_name = forms.CharField(max_length=255)
     street = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=255)
-    state = forms.CharField(max_length=255)
-    zip = forms.CharField(max_length=255)
-    country = forms.CharField(max_length=255)
-    phone_number = forms.CharField(max_length=255)
-    store_description = forms.CharField(max_length=200, 
-                                    widget=forms.Textarea())
+    city = forms.CharField(max_length=75)
+    state = forms.CharField(max_length=50)
+    zip = forms.CharField(max_length=50)
+    country = forms.CharField(max_length=50)
+    phone_number = forms.CharField(max_length=50)
+    store_description = forms.CharField(max_length=500, 
+        widget=forms.Textarea(attrs={"maxlength":500}))
                                     
     def get_full_address(self):
         return self.data['street'] + ", " + self.data['city']  + ", " +\

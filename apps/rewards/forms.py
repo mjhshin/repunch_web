@@ -6,9 +6,10 @@ from libs.repunch import rputils
 from repunch import settings
 
 class RewardForm(forms.Form):
-    reward_name = forms.CharField(max_length=100)
-    description = forms.CharField(widget=forms.Textarea(), 
-                        required=False)
+    reward_name = forms.CharField(max_length=75)
+    description = forms.CharField(max_length=255, 
+        widget=forms.Textarea(\
+        attrs={"maxlength":255}), required=False)
     punches = forms.IntegerField(min_value=1)
         
 class RewardAvatarForm(forms.Form):

@@ -7,7 +7,6 @@ import pytz
 
 from django.utils import timezone
 from libs.dateutil.relativedelta import relativedelta
-from libs.dateutil.extras import start_month, end_month
 
 from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK, BASIC, OFFER
@@ -144,22 +143,6 @@ def get_messages_received_list(session):
         return messages_received_list
     else:
         return session['messages_received_list']
-        
-def get_message_count(session, time_now):
-    """ time_now must be in utc """ # TODO change
-    if 'message_count' not in session:
-        now = time_now
-        message_count = get_store(session).get(\
-            'sentMessages', 
-            createdAt__gte=start_month(now),
-            createdAt__lte=end_month(now),
-            message_type1=BASIC,
-            message_type2=OFFER,
-            count=1, limit=0)
-        session['message_count'] = message_count
-    else:
-        message_count = session['message_count']
-    return message_count
        
 def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:
@@ -218,3 +201,22 @@ def get_settings(session):
         return settings
     else:
         return session['settings']
+        
+def get_message_count(session):
+    """ 
+    Returns the number of messages sent from their last_date_billed
+    to now.
+    """
+    if 'message_count' not in session:
+        date_last_billed =\
+            get_subscription(session).get("date_last_billed")
+        message_count = get_store(session).get(\
+            'sentMessages', 
+            createdAt__gte=date_last_billed,
+            message_type1=BASIC,
+            message_type2=OFFER,
+            count=1, limit=0)
+        session['message_count'] = message_count
+    else:
+        message_count = session['message_count']
+    return message_count

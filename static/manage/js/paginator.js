@@ -2,7 +2,11 @@
     Pagination for django <---> javascript!
 */
 
-function paginator(pagUrl, tabs, activeTab){
+/*
+    getCallback is called after every successful ajax call to the
+    server to fetch the sorted chunk of rows.
+*/
+function paginator(pagUrl, tabs, activeTab, getCallback){
 
     /* pages start from 1 */
     function getPage(pageNum, type, order, header){
@@ -15,6 +19,10 @@ function paginator(pagUrl, tabs, activeTab){
             tableHeader.siblings().remove();
             // now add the result
             tableHeader.after(res);
+            // call the getCallback if provided
+             if (getCallback != null){
+                getCallback();
+            }
         });
         
     }
@@ -106,6 +114,6 @@ function paginator(pagUrl, tabs, activeTab){
                 getPage(1, activeTab, order, el);
             }
         });
-    });
+    })
 
 }
