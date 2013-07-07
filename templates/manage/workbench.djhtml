@@ -15,11 +15,11 @@
         $(".not-sortable").unbind("click");
         
         // specify a callback to bind the fresh html chunk received from the server
-        function rebindRedemptions(){
-            $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
+        var rebindRedemptions = function (){
+            $("#tab-body-pending-redemptions div.tr div.td a").unbind("click", onRedeemclick(function(){
                 onRedeem($(this).attr("name"));
             });
-        }
+        };
         
         // initial bind
         rebindRedemptions();

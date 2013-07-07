@@ -7,6 +7,14 @@ $(document).ready(function(){
 
     var url = $("#comet_url").val();
     
+    String.prototype.trimToDots = function(x){
+        if (this.length > x) {
+            return this.substring(0, x) + "...";
+        } else {
+            return this;
+        }
+    }
+    
     // need to have included redemptions.js above this script!   
     
     function mainComet(res, status, xhr) {
@@ -78,9 +86,9 @@ $(document).ready(function(){
 				            "<div class='td feedback-date'>"+
                             dStr + "</div>" +
 				            "<div class='td feedback-from'>" +
-				            feedbacks[i].sender_name + "</div>" +
+				            feedbacks[i].sender_name.trimToDots(14) + "</div>" +
 				            "<div class='td feedback-subject'>" +
-				            feedbacks[i].subject + "</div>" +
+				            feedbacks[i].subject.trimToDots(26) + "</div>" +
 			                "</a></div>";
 			            // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {
@@ -165,8 +173,8 @@ $(document).ready(function(){
                     $("#tab-body-pending div.table-header").after(
                         "<div class='tr " + odd + " unread'>" +
 				        
-				        "<div class='td first_name_pending'>" + employees[i].first_name + "</div>" +
-				        "<div class='td last_name_pending'>" + employees[i].last_name + "</div>" +
+				        "<div class='td first_name_pending'>" + employees[i].first_name.trimToDots(12) + "</div>" +
+				        "<div class='td last_name_pending'>" + employees[i].last_name.trimToDots(14) + "</div>" +
 				        "<div class='td date_added_pending'>" + dStr + "</div>" +
 				        "<div class='td approve'>" +
 					    "<a href='/manage/employees/" + employees[i].objectId + "/approve' class='employee approve'>" +
@@ -271,9 +279,9 @@ $(document).ready(function(){
 				            "<div class='td redemption_time'>" +
 				            d + "</div>" +
 				            "<div class='td redemption_customer_name'>" +
-				            redemptions[i].customer_name + "</div>" +
+				            redemptions[i].customer_name.trimToDots(18) + "</div>" +
 		                    "<div class='td redemption_title'>" +
-				            redemptions[i].title + "</div>" +
+				            redemptions[i].title.trimToDots(24) + "</div>" +
 				            "<div class='td redemption_punches'>" +
 				            redemptions[i].num_punches + "</div>" +
 				            "<div class='td redemption_redeem'>" +

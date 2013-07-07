@@ -75,11 +75,11 @@ function paginator(pagUrl, tabs, activeTab, getCallback){
     // initial call
     paginate(activeTab);
 
-    // bind the tabs
+    // rebind the tabs
     // $("#tab-sent").click(function(){ paginate("sent"); });
     $.each(tabs, function(index, tab){
         // always goes back to page 1, first header, desc
-        $("#tab-" + tab).click(function(){
+        var onTabClick = function(){
             // set the page
             $("#pag-page").val("1");
             // deactivate all headers
@@ -95,13 +95,15 @@ function paginator(pagUrl, tabs, activeTab, getCallback){
             // repaginate and get the first page
             paginate(tab);
             getPage(1, tab, "desc", firstHeader.attr("id").substring("header-".length));
-        });
+        };
+        $("#tab-" + tab).unbind("click", onTabClick);
+        $("#tab-" + tab).bind("click", onTabClick);
     });
 
-    // bind the headers- select all that are sortable
+    // rebind the headers- select all that are sortable
     $("div.table-header div.th:not(.not-sortable)").each(function(){
         var self = $(this);
-        self.click(function(){
+        var onHeaderClick = function(){
             var el = self.attr("id").substring("header-".length);
             var activeTab = $(".tab.active").attr("id").substring("tab-".length);
             var order;
@@ -113,7 +115,9 @@ function paginator(pagUrl, tabs, activeTab, getCallback){
             } else {
                 getPage(1, activeTab, order, el);
             }
-        });
+        };
+        self.unbind("click",onHeaderClick);
+        self.bind("click", onHeaderClick);
     })
 
 }

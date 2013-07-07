@@ -74,6 +74,5 @@ form#punch-form div.notification div span{
 }
 
 img#punch-loading {
-    display:none;
-    position:absolute; right:-44px; top:-3px;
+    display:none;margin-left:16px; margin-bottom:2px;
 }
