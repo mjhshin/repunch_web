@@ -214,7 +214,7 @@ AUTH_USER_MODEL = 'accounts.Account'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # COMET APPROACH
-if debug:
+if DEBUG:
     COMET_REQUEST_RECEIVE =\
         "http://localhost:8000/manage/comet/receive/"
 else:
