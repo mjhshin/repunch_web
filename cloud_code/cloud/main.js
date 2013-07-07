@@ -894,8 +894,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
-//      feedbacks (new objects) (if new stuff)
-//      employees (new objects) (if new employees)
+//      feedbacks_unread (new objects) (if new stuff)
+//      employees_pending (new objects) (if new employees)
 //      redemptions
 //
 ////////////////////////////////////////////////////
@@ -936,7 +936,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
             result.patronStore_count = newPatronStore_count;
         }
     
-        // feedbacks
+        // feedbacks_unread
         var rmrq = store.relation("ReceivedMessages").query();
         rmrq.equalTo("is_read", false);
         rmrq.equalTo("message_type", "feedback");
@@ -945,10 +945,10 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     }).then(function(newFeedbacks){
         console.log("Retrieved Feedbacks");
         if(newFeedbacks.length > 0){
-            result.feedbacks = newFeedbacks;
+            result.feedbacks_unread = newFeedbacks;
         }
     
-        // employees
+        // employees_pending
         var eprq = store.relation("Employees").query();
         eprq.equalTo("status", "Pending");
         eprq.notContainedIn("objectId", employees_pending_ids);
@@ -956,7 +956,7 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     }).then(function(pendingEmployees){
         console.log("Retrieved PendingEmployees");
         if(pendingEmployees.length > 0){
-            result.employees = pendingEmployees;
+            result.employees_pending = pendingEmployees;
         }
         
         // redemptions

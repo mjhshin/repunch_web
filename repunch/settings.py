@@ -214,6 +214,12 @@ AUTH_USER_MODEL = 'accounts.Account'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # COMET APPROACH
+if debug:
+    COMET_REQUEST_RECEIVE =\
+        "http://localhost:8000/manage/comet/receive/"
+else:
+    COMET_REQUEST_RECEIVE =\
+        'http://www.repunch.com/manage/comet/receive/'
 
 # force responding to requests and getting a new request from the
 # client every 4 minutes at most of inactivity (in seconds)

@@ -75,32 +75,32 @@ def refresh(request):
         if patronStore_count:
             data['patronStore_count'] = patronStore_count
             request.session['patronStore_count'] = patronStore_count
-        # feedbacks
-        feedbacks = results.get('feedbacks')
+        # feedbacks_unread
+        feedbacks_unread = results.get('feedbacks_unread')
         if feedbacks:
-            data['feedbacks'] = []
-            for feedback in feedbacks:
+            data['feedbacks_unread'] = []
+            for feedback in feedbacks_unread:
                 m = Message(**feedback)
                 messages_received_list.insert(0, m)
-                data['feedbacks'].append(m.jsonify())
+                data['feedbacks_unread'].append(m.jsonify())
             request.session['messages_received_list'] =\
                 messages_received_list
             fb_count = 0
             for fb in messages_received_list:
                 if not fb.get("is_read"):
                     fb_count += 1
-            data['feedback_unread'] = fb_count
-        # employees
-        employees = results.get("employees")
-        if employees:
-            data['employees'] = []
-            for emp in employees:
+            data['feedback_unread_count'] = fb_count
+        # employees_pending
+        employees_pending = results.get("employees_pending")
+        if employees_pending:
+            data['employees_pending'] = []
+            for emp in employees_pending:
                 e = Employee(**emp)
                 employees_pending_list.insert(0, e)
-                data['employees'].append(e.jsonify())
+                data['employees_pending'].append(e.jsonify())
             request.session['employees_pending_list'] =\
                 employees_pending_list
-            data['employees_pending'] = len(employees_pending_list)
+            data['employees_pending_count'] = len(employees_pending_list)
         # redemptions
         reds, redemps = results.get("redemptions"), []
         if reds:

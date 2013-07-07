@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import datetime
-import urllib, json
+import urllib, json, requests
 
 from parse.utils import make_aware_to_utc
 from parse.decorators import session_comet
@@ -17,7 +17,7 @@ from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
-
+from repunch.settings import COMET_REQUEST_RECEIVE
 
 @login_required
 @session_comet
@@ -104,6 +104,11 @@ def delete(request, employee_id):
 
     # delete Punches Pointers to this employee?
     employee.delete()
+    
+    # notifiy all other dashboards of this change 
+    store_id = SESSION.get_store(request.session).objectId
+    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
+    # check if success?
 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
@@ -136,7 +141,12 @@ def approve(request, employee_id):
     employees_approved_list.insert(0, employee)
     request.session['employees_approved_list'] =\
         employees_approved_list
-    
+        
+    # notifiy all other dashboards of this change 
+    store_id = SESSION.get_store(request.session).objectId
+    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
+    # check if success?
+        
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
@@ -162,6 +172,11 @@ def deny(request, employee_id):
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
+        
+    # notifiy all other dashboards of this change 
+    store_id = SESSION.get_store(request.session).objectId
+    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
+    # check if success?
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))

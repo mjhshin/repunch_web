@@ -25,26 +25,26 @@ $(document).ready(function(){
             }
         }
         // Messages page
-        if(res.hasOwnProperty("feedbacks")){
-            var feedback_unread = new String(res.feedback_unread);
+        if(res.hasOwnProperty("feedbacks_unread")){
+            var feedback_unread_count = new String(res.feedback_unread_count);
             // Messages nav
             var mBadge = $("#messages-nav a div.nav-item-badge");
             var diva = $("#messages-nav a");
             if (mBadge.length == 1){
-                mBadge.text(feedback_unread);
+                mBadge.text(feedback_unread_count);
             } else {
                 diva.append("<div class='nav-item-badge'>" +
-                    feedback_unread + "</div>");
+                    feedback_unread_count + "</div>");
             }
             // tab
             var feedbackTab = $("#tab-feedback");
             if (feedbackTab.length > 0){
-                feedbackTab.html("Feedback (" + feedback_unread + ")");
+                feedbackTab.html("Feedback (" + feedback_unread_count + ")");
                 // update the title
-                document.title = "Repunch | (" + feedback_unread + ") Messages";
+                document.title = "Repunch | (" + feedback_unread_count + ") Messages";
             
                 // table content
-                var feedbacks = res.feedbacks;
+                var feedbacks_unread = res.feedbacks_unread;
                 var pagPage = $("#pag-page");
                 var pagThreshold = $("#pag-threshold");
                 var feedbackCount = $("#feedback-count");
@@ -57,7 +57,7 @@ $(document).ready(function(){
                 // remember that paginate is called when switching tabs so those rows come from the server!
                 // Therefore there is no need to append to a table that is not visible
                 if (tabFeedbackActive && (inLastPage||inFirstPage)) {
-                    for (var i=0; i<feedbacks.length; i++){
+                    for (var i=0; i<feedbacks_unread.length; i++){
                         // determine if date is asc or desc
                         var odd = "", row;
                         if (is_desc){
@@ -68,7 +68,7 @@ $(document).ready(function(){
                         if (!row.hasClass("odd")){
                                 odd = "odd";
                             }
-                        var d = new Date(feedbacks[i].createdAt);
+                        var d = new Date(feedbacks_unread[i].createdAt);
                         var year = new String(d.getYear());
                         year = year.substring(1, year.length);
                         var month = new String(d.getMonth()+1);
@@ -82,13 +82,13 @@ $(document).ready(function(){
                         var dStr = month + "/" + day + "/" + year;
                         var rowStr = "<div class='tr " + odd + " unread'>" +
 			                "<a href='/manage/messages/feedback/" + 
-			                feedbacks[i].objectId + "'>" +
+			                feedbacks_unread[i].objectId + "'>" +
 				            "<div class='td feedback-date'>"+
                             dStr + "</div>" +
 				            "<div class='td feedback-from'>" +
-				            feedbacks[i].sender_name.trimToDots(14) + "</div>" +
+				            feedbacks_unread[i].sender_name.trimToDots(14) + "</div>" +
 				            "<div class='td feedback-subject'>" +
-				            feedbacks[i].subject.trimToDots(26) + "</div>" +
+				            feedbacks_unread[i].subject.trimToDots(26) + "</div>" +
 			                "</a></div>";
 			            // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {
@@ -117,7 +117,7 @@ $(document).ready(function(){
 	                }
 	                
 	                // update the pagination variables (feedbackPageCount is updated in paginate)
-	                feedbackCount.val(parseInt(feedbackCount.val()) + feedbacks.length);
+	                feedbackCount.val(parseInt(feedbackCount.val()) + feedbacks_unread.length);
 	                
 	                // repaginate
                     paginator($("#get-page-url").val(),
@@ -129,16 +129,16 @@ $(document).ready(function(){
             
         } // end hasOwnProperty
         
-        if (res.hasOwnProperty('employees')){
+        if (res.hasOwnProperty('employees_pending')){
             // pending employees nav
-            var employees_pending = new String(res.employees_pending);
+            var employees_pending_count = new String(res.employees_pending_count);
             var mBadge = $("#employees-nav a div.nav-item-badge");
             var diva = $("#employees-nav a");
             if (mBadge.length == 1){
-                mBadge.text(employees_pending);
+                mBadge.text(employees_pending_count);
             } else {
                 diva.append("<div class='nav-item-badge'>" +
-                    employees_pending + "</div>");
+                    employees_pending_count + "</div>");
             }
             
             // Employees page
@@ -146,19 +146,19 @@ $(document).ready(function(){
             // tab
             if (pendingTab.length > 0){
                 pendingTab.html("Pending (" + 
-                            employees_pending + ")");
+                            employees_pending_count + ")");
                 // update the title
-                document.title = "Repunch | (" + employees_pending + ") Employees";
+                document.title = "Repunch | (" + employees_pending_count + ") Employees";
                 
                 // table content
-                var employees = res.employees;
-                for (var i=0; i<employees.length; i++){
+                var employees_pending = res.employees_pending;
+                for (var i=0; i<employees_pending.length; i++){
                     var odd = "";
                     var first=$("#tab-body-pending div.tr").first();
                     if (!first.hasClass("odd")){
                         odd = "odd";
                     }
-                    var d = new Date(employees[i].createdAt);
+                    var d = new Date(employees_pending[i].createdAt);
                     var year = new String(d.getYear());
                     year = year.substring(1, year.length);
                     var month = new String(d.getMonth()+1);
@@ -173,13 +173,13 @@ $(document).ready(function(){
                     $("#tab-body-pending div.table-header").after(
                         "<div class='tr " + odd + " unread'>" +
 				        
-				        "<div class='td first_name_pending'>" + employees[i].first_name.trimToDots(12) + "</div>" +
-				        "<div class='td last_name_pending'>" + employees[i].last_name.trimToDots(14) + "</div>" +
+				        "<div class='td first_name_pending'>" + employees_pending[i].first_name.trimToDots(12) + "</div>" +
+				        "<div class='td last_name_pending'>" + employees_pending[i].last_name.trimToDots(14) + "</div>" +
 				        "<div class='td date_added_pending'>" + dStr + "</div>" +
 				        "<div class='td approve'>" +
-					    "<a href='/manage/employees/" + employees[i].objectId + "/approve' class='employee approve'>" +
+					    "<a href='/manage/employees/" + employees_pending[i].objectId + "/approve' class='employee approve'>" +
 					        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
-					    "<a href='/manage/employees/" + employees[i].objectId + "/deny' class='employee deny'>" +
+					    "<a href='/manage/employees/" + employees_pending[i].objectId + "/deny' class='employee deny'>" +
 					        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
 				        "</div>" +
 				        "</div>" );
