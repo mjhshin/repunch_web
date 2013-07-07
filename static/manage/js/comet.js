@@ -121,7 +121,7 @@ $(document).ready(function(){
 	                
 	                // repaginate
                     paginator($("#get-page-url").val(),
-                        ["sent", "feedback"], "feedback");                
+                        ["sent", "feedback"], "feedback", rebindRedemptions);                
 	                
 	            } // end if feedback tab is active
 	            
@@ -320,7 +320,7 @@ $(document).ready(function(){
                     // repaginate
                     paginator($("#get-page-url").val(),
                         ["pending-redemptions", "history-redemptions"],
-                        "pending-redemptions");      
+                        "pending-redemptions", rebindRedemptions);      
                     
                 } // end if redemption tab is active
                 

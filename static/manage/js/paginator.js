@@ -25,7 +25,7 @@ function paginator(pagUrl, tabs, activeTab, getCallback){
         var self = $(this);
         self.unbind("click",onHeaderClick);
         self.bind("click", {"self":self, "pagUrl":pagUrl, "getCallback":getCallback}, onHeaderClick);
-    })
+    });
 
 }
 

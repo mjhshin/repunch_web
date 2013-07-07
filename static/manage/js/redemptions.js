@@ -79,3 +79,18 @@ function onRedeem(rowId){
         },
     });
 }
+
+var onRedeemRebind = function (event) {
+    var self = event.data.self;
+    onRedeem(self.attr("name"));
+}
+
+// specify a callback to bind the fresh html chunk received from the server
+var rebindRedemptions = function (){
+    // WARNING! May unbind other functions other than onRedeem
+    $("#tab-body-pending-redemptions div.tr div.td a").each(function(){
+        var self = $(this);
+        self.unbind("click", onRedeemRebind);
+        self.bind("click", {"self":self}, onRedeemRebind); 
+    });
+}

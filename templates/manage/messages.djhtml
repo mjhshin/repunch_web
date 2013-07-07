@@ -60,7 +60,7 @@
 				<div class="th not-sortable" id="header-feedback-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
-			{% include 'manage/feedback_chunk.djhtml' %}
+			{# {% include 'manage/feedback_chunk.djhtml' %} NO NEED TO INCLUDE THIS #}
 			
 		</div>
 		
