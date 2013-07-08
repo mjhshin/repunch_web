@@ -1245,6 +1245,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 Parse.Cloud.define("send_gift", function(request, response) {
 	var storeId = request.params.store_id;
 	var patronId = request.params.patron_id;
+	var patronStoreId = request.params.patron_store_id;
 	var senderName = request.params.sender_name;
 	var subject = request.params.subject;
 	var body = request.params.body;
@@ -1255,6 +1256,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	
 	var Store = Parse.Object.extend("Store");
 	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
 	var Message = Parse.Object.extend("Message");
 	var MessageStatus = Parse.Object.extend("MessageStatus");
 	
@@ -1317,10 +1319,28 @@ Parse.Cloud.define("send_gift", function(request, response) {
 					
 	}).then(function(patronSender) {
 		console.log("Patron (sender) save was successful.");
-		executePush();
+		var patronStoreQuery = new Parse.Query(PatronStore);
+		return patronStoreQuery.get(patronStoreId);
 		
 	}, function(error) {
 		console.log("Patron (sender) save failed.");
+		response.error("error");
+			
+	}).then(function(patronStore) {
+		console.log("PatronStore fetch was successful.");
+		patronStore.increment("punch_count", -1*giftPunches);
+		return patronStore.save();
+		
+	}, function(error) {
+		console.log("PatronStore fetch was failed.");
+		response.error("error");
+			
+	}).then(function(patronStore) {
+		console.log("PatronStore save successful.");
+		executePush();
+		
+	}, function(error) {
+		console.log("PatronStore save failed.");
 		response.error("error");
 			
 	});
@@ -1342,17 +1362,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
                 store_id: storeId,
                 sender: senderName,
                 message_status_id: messageStatus.id
-            }, 
-		}, {
-			success: function() {
-				console.log("Android push success");
-				response.success("success");
-			},
-			error: function(error) {
-				console.log("Android push fail");
-				response.error("error");
-			}
-		}); // end Parse.Push
+            }
+		});
 
         Parse.Push.send({
             where: iosInstallationQuery, 
