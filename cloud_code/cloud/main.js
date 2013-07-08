@@ -965,14 +965,14 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var patronQuery = new Parse.Query(Patron);
     var patronStoreQuery; // retrieved below
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
-    var iosInstallationQuery = new Parse.Query(Parse.Installation)
+    var iosInstallationQuery = new Parse.Query(Parse.Installation);
 	
 	var subject = request.params.subject;
 	var messageId = request.params.message_id;
 	var patronId = request.params.patron_id;
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
-    var filter = request.params.filter; // one means a reply
+    var filter = request.params.filter; 
     var message, redeem_available;
 	var messageStatus = new MessageStatus();
 	var patron_ids = new Array(); // placeholder
