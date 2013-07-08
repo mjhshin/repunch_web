@@ -66,7 +66,7 @@ def refresh(request):
             
         # patronStore_count
         patronStore_count_new = session.get('patronStore_num')
-        if patronStore_count:
+        if patronStore_count_new:
             # TODO patronStore_num > store limit then upgrade account
             # and send email notification make sure to update the
             # subscription in the cache afterwards!
