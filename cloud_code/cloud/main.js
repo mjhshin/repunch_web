@@ -678,9 +678,47 @@ Parse.Cloud.define("request_redeem", function(request, response) {
                     
 });
 
+
 ////////////////////////////////////////////////////
 //
+// Deletes the RedeemReward, sets the patron store's pending_reward to false.
+// If RedeemReward does not have a reward_id, then it is an offer, which if it is
+// the MessageStatus's redeem_available will be set 'no'.
 //
+////////////////////////////////////////////////////
+Parse.Cloud.define("reject_redeem", function(request, response) {
+	var redeemId = request.params.redeem_id;
+	var rewardId = request.params.reward_id;
+	if (rewardId != null) { rewardId = parseInt(rewardId); }
+	
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var RedeemReward = Parse.Object.extend("RedeemReward");
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	var redeemRewardQuery = new Parse.Query(redeemRewardQuery);
+	var redeemReward;
+	
+	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult) {
+	    redeemReward = redeemRewardResult;
+	    return redeemRewardResult.get("PatronStore").fetch();
+	    
+	}, function(error) {
+		console.log("RedeemReward fetch failed.");
+		response.error("DNE"); // rejected/deleted before
+		
+	}).then(function(patronStore) {
+	    patronStore.set("pending_reward", false);
+	    return;
+	    
+	}).then(function() {
+        
+	
+	});
+	
+});
+
+////////////////////////////////////////////////////
+//
+// # TODO check if RedeemReward has already been validated.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("validate_redeem", function(request, response) {
@@ -784,7 +822,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
-			response.error("error");
+			response.error("DNE"); // goes here if it has been deleted
 			
 	});
 	

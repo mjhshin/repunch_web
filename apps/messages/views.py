@@ -193,10 +193,10 @@ def edit(request, message_id):
                 "filter":message.filter,
             }
 
-            if msg_filter == "idle":
+            if message.filter == "idle":
                 d = timezone.now() + relativedelta(days=-21)
                 params.update({"idle_date":d.isoformat()})
-            elif msg_filter == "most_loyal":
+            elif message.filter == "most_loyal":
                 params.update({"min_punches":\
                     postDict['min_punches']})
 
