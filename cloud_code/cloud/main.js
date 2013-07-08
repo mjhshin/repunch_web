@@ -833,6 +833,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	            id: storeId, 
 	            store: store.get("store_name"), 
 	            punches: numPunches,
+	            patron_store_id: patronStore.id,
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }, {
