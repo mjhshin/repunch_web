@@ -486,12 +486,14 @@ Parse.Cloud.define("punch", function(request, response) {
 				return employee;
 				
 		}).then(function(employee) {
-            Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: { 'Content-Type': 'application/json'},
-                body: { employeeLPunches_num: employee.get("lifetime_punches"), }
-            });
+		    if (employee != null) {
+                Parse.Cloud.httpRequest({
+                    method: 'POST',
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: { employeeLPunches_num: employee.get("lifetime_punches"), }
+                });
+            }
             
 		});
 	}

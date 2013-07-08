@@ -1,6 +1,6 @@
 {% load text_tags %}
 
-{% for redemp in redemptions %}
+{% for redemp in pending_redemptions %}
 <div id="{{redemp.objectId}}" 
     class="tr  {% cycle '' 'odd' %}">
     <input type="hidden" value="{{redemp.reward_id}}" />

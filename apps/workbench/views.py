@@ -29,14 +29,14 @@ def index(request):
     data = {"workbench_nav":True, "settings":\
         SESSION.get_settings(request.session), "today":today}
     
-    redemps = SESSION.get_redemptions(request.session)
+    redemps = SESSION.get_redemptions_pending(request.session)
     past_redemps = SESSION.get_redemptions_past(request.session)
     
     # initially display the first 20 pending/history chronologically
     redemps.sort(key=lambda r: r.createdAt, reverse=True)
     past_redemps.sort(key=lambda r: r.updatedAt, reverse=True)
     
-    data['redemptions'] = redemps[:PAGINATION_THRESHOLD]
+    data['pending_redemptions'] = redemps[:PAGINATION_THRESHOLD]
     data['past_redemptions'] = past_redemps[:PAGINATION_THRESHOLD]
     
     data["pag_threshold"] = PAGINATION_THRESHOLD
@@ -56,7 +56,8 @@ def get_page(request):
         page = int(request.GET.get("page")) - 1
         if type == "pending-redemptions":
             template = "manage/redemptions_pending_chunk.djhtml" 
-            pending_redemps = SESSION.get_redemptions(request.session)
+            pending_redemps =\
+                SESSION.get_redemptions_pending(request.session)
             # sort
             header_map = {
                 "redemption_time":"createdAt",
@@ -73,9 +74,9 @@ def get_page(request):
             # set the chunk
             start = page * PAGINATION_THRESHOLD
             end = start + PAGINATION_THRESHOLD
-            data = {"redemptions":pending_redemps[start:end]}
+            data = {"pending_redemptions":pending_redemps[start:end]}
             
-            request.session["redemptions"] = pending_redemps
+            request.session["redemptions_pending"] = pending_redemps
             
         elif type == "history-redemptions":
             template = "manage/redemptions_history_chunk.djhtml"
@@ -125,10 +126,11 @@ def redeem(request):
                 })
                 
         if 'error' not in res:
-            redemptions = SESSION.get_redemptions(request.session)
+            redemptions_pending =\
+                SESSION.get_redemptions_pending(request.session)
             i_remove, result = -1, res.get("result")
-            # remove from redemptions
-            for i, red in enumerate(redemptions):
+            # remove from redemptions_pending
+            for i, red in enumerate(redemptions_pending):
                 if red.objectId == redeemId:
                     i_remove = i 
                     break
@@ -136,14 +138,15 @@ def redeem(request):
                 redemptions_past =\
                     SESSION.get_redemptions_past(request.session)
                 if result and result == "insufficient":
-                    redemptions.pop(i_remove).delete()
+                    redemptions_pending.pop(i_remove).delete()
                 else:
-                    redemption = redemptions.pop(i_remove)
+                    redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True
                     redemptions_past.append(redemption)
                     request.session['redemptions_past'] =\
                         redemptions_past
-                request.session['redemptions'] = redemptions
+                request.session['redemptions_pending'] =\
+                    redemptions_pending
             
             if result and result == "insufficient":
                 return HttpResponse(json.dumps({"result":2}), 

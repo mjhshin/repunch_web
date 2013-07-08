@@ -27,7 +27,7 @@ SESSION_CACHE = [
     'employees_approved_list',
     'messages_sent_list',
     'messages_received_list', # PUSH
-    'redemptions', # PUSH
+    'redemptions_pending', # PUSH
     'redemptions_past', # PUSH
     
     
@@ -44,23 +44,23 @@ def get_store(session):
     else:
         return session['store']
         
-def get_redemptions(session):
+def get_redemptions_pending(session):
     """ 
-    returns all the unredeemed redemptions (limit of 900)
+    returns all the pending redemptions (limit of 900)
     """
-    if "redemptions" not in session:
+    if "redemptions_pending" not in session:
         store = get_store(session)
-        redemptions = store.get('redeemRewards', is_redeemed=False,
-                        order="-createdAt", limit=900)
-        if redemptions is None:
+        redemptions_pending = store.get('redeemRewards',
+                    is_redeemed=False, order="-createdAt", limit=900)
+        if redemptions_pending is None:
             redemptions = []
             
         store.redeemRewards = None
         session['store'] = store
-        session['redemptions'] = redemptions
-        return redemptions
+        session['redemptions_pending'] = redemptions_pending
+        return redemptions_pending
     else:
-        return session['redemptions']
+        return session['redemptions_pending']
         
 def get_redemptions_past(session):
     """ 

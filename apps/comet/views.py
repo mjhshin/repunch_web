@@ -28,21 +28,16 @@ def refresh(request):
         # sleep(COMET_REFRESH_RATE)
         # prep the params
         store = SESSION.get_store(request.session)
-        redemptions = SESSION.get_redemptions(request.session)
+        redemptions_pending =\
+            SESSION.get_redemptions_pending(request.session)
+        redemptions_past =\
+            SESSION.get_redemptions_past(request.session)
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
         employees_pending_list =\
             SESSION.get_employees_pending_list(request.session)
         employees_approved_list =\
             SESSION.get_employees_approved_list(request.session)
-            
-        redemption_ids = [ red.objectId for red in redemptions]
-        feedback_unread_ids = [ fb.objectId for fb in\
-            messages_received_list if not fb.get('is_read') ]
-        employees_pending_ids = [ emp.objectId for emp in\
-            employees_pending_list ]
-        employees_approved_ids = [ emp.objectId for emp in\
-            employees_approved_list ]
             
         # get the session
         session = SessionStore(scomet.session_key)
@@ -121,14 +116,22 @@ def refresh(request):
             
         # redemptions
         reds, redemps = session.get("pendingRedemption"), []
+        redemptions_pending_ids =\
+            [ red.objectId for red in redemptions_pending]
+        redemptions_past_ids =\
+            [ red.objectId for red in redemptions_past]
         if reds:
             for r in reds:
                 rr = RedeemReward(**r)
-                redemptions.insert(0, rr)
-                request.session['redemptions'] = redemptions
-                redemps.append(rr.jsonify())
-            data['redemption_count'] = len(redemptions)
-            data['redemptions'] = redemps
+                if rr.objectId not in redemptions_past_ids or\
+                    rr.objectId not in redemptions_ids:
+                    redemptions_pending.insert(0, rr)
+                    request.session['redemptions_pending'] =\
+                        redemptions_pending
+                    redemps.append(rr.jsonify())
+            data['redemption_pending_count'] =\
+                len(redemptions_pending)
+            data['redemptions_pending'] = redemps
             del session['pendingRedemption']
         
         # make sure to update the session!

@@ -202,34 +202,34 @@ $(document).ready(function(){
                     var reward = $("#rewards div.tab-body div.tr div.td.reward_name").filter(function(){return $(this).text() == res.rewards[i].reward_name;});
                     
                  if (reward.length > 0){
-                  reward.next().text(res.rewards[i].redemption_count);
+                  reward.next().text(res.rewards[i].redemption_pending_count);
                     }
                 }
             }
         }
         
         // incoming redemptions 
-        if (res.hasOwnProperty('redemptions')){
+        if (res.hasOwnProperty('redemptions_pending')){
             // Workbench nav
-            var redemption_count = res.redemption_count;
+            var redemption_pending_count = res.redemption_pending_count;
             var rBadge = $("#redemptions-nav a div.nav-item-badge");
             var diva = $("#redemptions-nav a");
             if (rBadge.length == 1){
-                rBadge.text(new String(redemption_count));
+                rBadge.text(new String(redemption_pending_count));
             } else {
                 diva.append("<div class='nav-item-badge'>" +
-                    new String(redemption_count) + "</div>");
+                    new String(redemption_pending_count) + "</div>");
             }
         
             // tab
             var pendingTab = $("#tab-pending-redemptions");
             if (pendingTab.length >0){
-                pendingTab.html("Pending (" + redemption_count + ")");
+                pendingTab.html("Pending (" + redemption_pending_count + ")");
                 // update the title
-                document.title = "Repunch | (" + redemption_count + ") Redemptions";
+                document.title = "Repunch | (" + redemption_pending_count + ") Redemptions";
                 
                 // table content 
-                var redemptions = res.redemptions;
+                var redemptions_pending = res.redemptions_pending;
                 var pagPage = $("#pag-page");
                 var pagThreshold = $("#pag-threshold");
                 var pendingCount = $("#pending-redemptions-count");
@@ -242,7 +242,7 @@ $(document).ready(function(){
                 // remember that paginate is called when switching tabs so those rows come from the server!
                 // Therefore there is no need to append to a table that is not visible
                 if (tabPendingActive && (inLastPage||inFirstPage)) {
-                    for (var i=0; i<redemptions.length; i++){
+                    for (var i=0; i<redemptions_pending.length; i++){
                         var odd = "", row;
                         if (is_desc){
                             row = $("#tab-body-pending-redemptions div.tr").first();
@@ -252,7 +252,7 @@ $(document).ready(function(){
                         if (!row.hasClass("odd")){
                             odd = "odd";
                         }
-                        var d = new Date(redemptions[i].createdAt);
+                        var d = new Date(redemptions_pending[i].createdAt);
                         var hour = d.getHours();
                         var minute = new String(d.getMinutes());
                         var ampm;
@@ -273,19 +273,19 @@ $(document).ready(function(){
                         }
                         d = hour + ":" + minute + " " + ampm;
                         var rowStr = "<div class='tr " + odd + "' " + 
-                            "id='"+ redemptions[i].objectId+ "'>" +
+                            "id='"+ redemptions_pending[i].objectId+ "'>" +
 		                    "<input type='hidden'" + 
-		                    " value='" + redemptions[i].reward_id + "'/>" + 
+		                    " value='" + redemptions_pending[i].reward_id + "'/>" + 
 				            "<div class='td redemption_time'>" +
 				            d + "</div>" +
 				            "<div class='td redemption_customer_name'>" +
-				            redemptions[i].customer_name.trimToDots(18) + "</div>" +
+				            redemptions_pending[i].customer_name.trimToDots(18) + "</div>" +
 		                    "<div class='td redemption_title'>" +
-				            redemptions[i].title.trimToDots(24) + "</div>" +
+				            redemptions_pending[i].title.trimToDots(24) + "</div>" +
 				            "<div class='td redemption_punches'>" +
-				            redemptions[i].num_punches + "</div>" +
+				            redemptions_pending[i].num_punches + "</div>" +
 				            "<div class='td redemption_redeem'>" +
-				            "<a name='" + redemptions[i].objectId +
+				            "<a name='" + redemptions_pending[i].objectId +
 				                "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
 		                    "</div>";
 		                // prepend if in page 1 and desc
@@ -315,7 +315,7 @@ $(document).ready(function(){
                     }
                     
                     // update the pagination variables (pendingPageCount is updated in paginate)
-                    pendingCount.val(parseInt(pendingCount.val()) + redemptions.length);
+                    pendingCount.val(parseInt(pendingCount.val()) + redemptions_pending.length);
                     
                     // repaginate
                     paginator($("#get-page-url").val(),

@@ -27,7 +27,7 @@ def employees_pending(session):
     
 @register.assignment_tag
 def redemptions_pending(session):
-    return len(SESSION.get_redemptions(session))
+    return len(SESSION.get_redemptions_pending(session))
 
 @register.simple_tag
 def hours(session):
