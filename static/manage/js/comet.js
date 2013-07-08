@@ -121,7 +121,7 @@ $(document).ready(function(){
 	                
 	                // repaginate
                     paginator($("#get-page-url").val(),
-                        ["sent", "feedback"], "feedback", rebindRedemptions);                
+                        ["sent", "feedback"], "feedback");                
 	                
 	            } // end if feedback tab is active
 	            
