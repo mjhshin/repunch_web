@@ -11,7 +11,7 @@ def trim_to_dots(string, x):
     e.g. "hello world|trim_to_dots:5 returns "hello..."
     """
     if string is None:
-        return "  "
+        return "null"
     if len(string) > x:
         return string[:x] + "..."
     else:
