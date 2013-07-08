@@ -53,7 +53,7 @@ def get_redemptions_pending(session):
         redemptions_pending = store.get('redeemRewards',
                     is_redeemed=False, order="-createdAt", limit=900)
         if redemptions_pending is None:
-            redemptions = []
+            redemptions_pending = []
             
         store.redeemRewards = None
         session['store'] = store
