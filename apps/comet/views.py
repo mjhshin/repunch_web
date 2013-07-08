@@ -1,4 +1,5 @@
 from django.contrib.auth import SESSION_KEY
+from django.contrib.sessions.backends.cache import SessionStore
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
@@ -41,6 +42,8 @@ def refresh(request):
             messages_received_list if not fb.get('is_read') ]
         employees_pending_ids = [ emp.objectId for emp in\
             employees_pending_list ]
+        employees_approved_ids = [ emp.objectId for emp in\
+            employees_approved_list ]
                 
         # make the call
         res = cloud_call("retailer_refresh", {
@@ -102,25 +105,18 @@ def refresh(request):
         # employees_approved
         employees_approved = results.get("employees_approved")
         if employees_approved:
-            # check for deleted employees
-            # first build the list of all employees in session
-            session_employees_pending_ids = [emp.objectId for emp in\
-                employees_pending_list]
-            session_employees_approved_ids = [emp.objectId for emp in\
-                employees_approved_list]
-            session_emps = session_employees_pending_ids
-            session_emps.extend(session_employees_approved_ids)
-            
-            """
-            # then build the list of all employees sync'd with Parse
-            parse_employees_pending_ids =\
-                session_employees_pending_ids[:]
-            parse_employees_approved_ids = [emp.objectId for emp in\
-                employees_approved]
-            parse_emps = parse_employees_pending_ids
-            parse_emps.extend(parse_employees_approved_ids)
-            # the diff is the ones deleted
-            """
+            # first check for pending to approved
+            for i, emp in enumerate(employees_pending_list[:]):
+                if emp.objectId in employees_approved:
+                    # transfer from pending to approved list
+                    employees_approved_list.insert(0,
+                        employees_pending_list.pop(i))
+                    if "employees_approved" not in data:
+                        data["employees_approved"] = [emp.objectId]
+                    else:
+                        data["employees_approved"].append(\
+                            emp.objectId)
+                # end for pending to removed
             
         # redemptions
         reds, redemps = results.get("redemptions"), []
@@ -144,9 +140,9 @@ def refresh(request):
     # the above is different from SESSION_KEY (which is not unique)
     try: # attempt to get a used CometSession first
         scomet = CometSession.objects.get(session_key=\
-            request.session._session_key)
-        if scomet.ok:
-            scomet.ok = False
+            request.session.session_key)
+        if scomet.modified:
+            scomet.modified = False
             scomet.save()
             return comet()
         return HttpResponse(json.dumps({"result":0}), 
@@ -154,7 +150,7 @@ def refresh(request):
     except CometSession.DoesNotExist:
         # create it here and call comet
         scomet = CometSession.objects.create(session_key=\
-                request.session._session_key,
+                request.session.session_key,
                 store_id=SESSION.get_store(request.session).objectId)
         return comet()
     else: # should never go here
@@ -165,13 +161,54 @@ def receive(request, store_id):
     """
     Receives a get request from a foreign site and sets all of the 
     CometSessions that have the given store Id.
-    """
-    if request.method == "GET" or request.is_ajax():
-        for scomet in CometSession.objects.filter(store_id=store_id):
-            scomet.ok = True
-            scomet.save()
-        return HttpResponse("success")
+    
+    This adds to the related session's cache:
+    
+        + patronStore_num = request.POST.get("patronStore_num")
+        + employeeLPunches_num =\
+            request.POST.get("employeeLPunches_num")
+        updatedReward = request.POST.get("updatedReward")
+        + newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        pendingEmployee = request.POST.get("pendingEmployee")
+        approvedEmployee = request.POST.get("approvedEmployee")
+        deletedEmployee = request.POST.get("deletedEmployee")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
         
+    """
+    if request.method == "POST" or request.is_ajax():
+        # employeeLPunches_num : updated employee LP count
+        # patronStoreCount : amount of new patrons
+        # reward : updated reward object
+        # message : new message object (from store or patron)
+        # employees : pending/approved/deleted employee object
+        # redemptions : pending/approved/deleted RedeemReward object
+        
+        for scomet in CometSession.objects.filter(store_id=store_id):
+            session = SessionStore(scomet.session_key)
+            for key, value in request.POST.dict().iteritems():
+                if key not in session:
+                    # keys ending with _num is a number
+                    if key.endswith("_num"):
+                        session[key] = value
+                    # everything else is a list
+                    else:
+                        session[key] = [value]
+                else:
+                    # keys ending with _num is a number
+                    if key.endswith("_num"):
+                        session[key] = session[key] + value
+                    # everything else is a list
+                    else:
+                        session[key].append(value)
+                
+            # done additions - set to modified
+            scomet.modified = True
+            scomet.save()
+            
+        return HttpResponse("success")
     return HttpResponse("error")
     
     

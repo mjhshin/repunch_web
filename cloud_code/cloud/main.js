@@ -128,7 +128,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
-//
+// TODO check if store has past the patron limit
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("add_patronstore", function(request, response) {
@@ -205,7 +205,14 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(){
 	    // note that since memcached is used as the cache backend,
 	    // the cache can be shared among all instances
-        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
+        Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+            body: {
+                patronStore_num: 1,
+            }
+        });
+        
 	});
 	
 });
@@ -477,10 +484,17 @@ Parse.Cloud.define("punch", function(request, response) {
 		}).then(function(employee) {
 				console.log("Employee save was successful.");
 				response.success(patron.get("first_name") + " " + patron.get("last_name"));
-		}).then(function(){
-	        // note that since memcached is used as the cache backend,
-	        // the cache can be shared among all instances
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
+				return employee;
+				
+		}).then(function(employee) {
+            Parse.Cloud.httpRequest({
+                method: 'POST',
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+                body: {
+                    employeeLPunches_num: employee.get("lifetime_punches"),
+                }
+            });
+            
 		});
 	}
 
@@ -598,9 +612,14 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			return;
 					
 		}).then(function() {
-	        // note that since memcached is used as the cache backend,
-	        // the cache can be shared among all instances
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
+	        Parse.Cloud.httpRequest({
+                method: 'POST',
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+                body: {
+                    pendingRedemption: redeemReward,
+                }
+            });
+            
 		});
 	}
 	
@@ -743,6 +762,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			Parse.Promise.when(promises).then(function() {
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePushReward();
+			    Parse.Cloud.httpRequest({
+                    method: 'POST',
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+                    body: {
+                        approvedRedemption: redeemReward,
+                    }
+                });
 				
 			}, function(error) {
 			    console.log("PatronStore and RedeemReward save fail (in parallel).");
@@ -754,10 +780,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			console.log("RedeemReward fetch failed.");
 			response.error("error");
 			
-	}).then(function() {
-	    // Since there may be multiple dashboards open and the mobile
-	    // apps may validate redeems, dashboard needs to know about this
-        Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
 	});
 	
 	function executePushReward() {
@@ -888,14 +910,13 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //      store objectId (for comparison with given values)
 //      patronStore_count (count)
 //      feedback_unread_ids (String array)
-//      employees_pending_ids (String array)
 //      redemption_ids (String array)
 //
 //  Output: 
 //      rewards (empty if no redemption_count changed)
 //      patronStore_count (if changed)
 //      feedbacks_unread (new objects) (if new stuff)
-//      employees_pending (new objects) (if new employees)
+//      employees_pending (for deleted employees and new pending)
 //      employees_approved (for lifetime punches, pending, deleted, and approved checks)
 //      redemptions
 //
@@ -906,7 +927,6 @@ Parse.Cloud.define("retailer_refresh", function(request, response) {
     var store_id = request.params.store_id;
     var patronStore_count = request.params.patronStore_count;
     var feedback_unread_ids = request.params.feedback_unread_ids;
-    var employees_pending_ids = request.params.employees_pending_ids;
     var redemption_ids = request.params.redemption_ids;
     // var past_hour = request.params.past_hour;
     var store, result = new Object();
@@ -1042,7 +1062,14 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 androidInstallationQuery.containedIn("patron_id", patron_ids);
 				iosInstallationQuery.containedIn("patron_id", patron_ids);
             }
-            Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
+            Parse.Cloud.httpRequest({
+                method: 'POST',
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+                body: {
+                    newMessage: message,
+                }
+            });
+                
             // all tasks are done. Push now.
             proceedToPush();
             return
@@ -1242,7 +1269,14 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		console.log("Patron save failed.");
 		response.error("error");			
 	}).then(function(){
-	    Parse.Cloud.httpRequest({url: 'http://www.repunch.com/manage/comet/receive/' + storeId});
+	    Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
+            body: {
+                newFeedback: message,
+            }
+        });
+            
 	});
 });
 
