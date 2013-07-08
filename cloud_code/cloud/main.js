@@ -128,8 +128,8 @@ Parse.Cloud.define("register_employee", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
-// TODO check if store has past the patron limit
-//
+// 
+// 
 ////////////////////////////////////////////////////
 Parse.Cloud.define("add_patronstore", function(request, response) {
     var patronId = request.params.patron_id;
@@ -202,14 +202,15 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		console.log("Store save failed.");
 		response.error("error");
 		return;
-	}).then(function(){
-	    // note that since memcached is used as the cache backend,
-	    // the cache can be shared among all instances
+	}).then(function(store){
+	    return store.relation("PatronStores").query().count();
+	    
+    }).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
             method: 'POST',
             url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             body: {
-                patronStore_num: 1,
+                patronStore_num: patronStoreCount,
             }
         });
         
@@ -396,7 +397,6 @@ Parse.Cloud.define("punch", function(request, response) {
 	}
 	
 	function executePush(patronStore) {
-	    // TODO sync ios push reception with android?
 		Parse.Push.send({
 			where: androidInstallationQuery,
 			data: {
@@ -690,7 +690,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var rewardId = request.params.reward_id;
 	if (rewardId != null) { rewardId = parseInt(rewardId); }
 	
-	var numPunches, rewardTitle, store, patron, patronStore, messageStatusId;
+	var numPunches, rewardTitle, store, patron, patronStore,
+	    updatedReward, messageStatusId;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -707,6 +708,10 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		    for (var i=0; i<rewards.length; i++) {
 		        if (rewards[i].reward_id == rewardId) {
 		            rewards[i].redemption_count += 1;
+		            updatedReward = {
+		                redemption_count: rewards[i].redemption_count,
+		                reward_id: rewards[i].reward_id,
+		            };
 		            break;
 		        }
 		    }
@@ -767,6 +772,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
                     url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     body: {
                         approvedRedemption: redeemReward,
+                        updatedReward: updatedReward, 
                     }
                 });
 				

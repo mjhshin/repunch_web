@@ -24,7 +24,7 @@ def refresh(request):
     """
     # in_time = timezone.now()
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
-    def comet():
+    def comet(session_key):
         # sleep(COMET_REFRESH_RATE)
         # prep the params
         store = SESSION.get_store(request.session)
@@ -45,13 +45,12 @@ def refresh(request):
             employees_approved_list ]
             
         # get the session
+        session = SessionStore(scomet.session_key)
         
-        
-        # process results
+        # process the stuff in the session
         data = {}
-        results = res['result']
         # rewards redemption_count
-        rewards = results.get('rewards')
+        rewards = session.get('updatedReward')
         mod_rewards = store.get('rewards')
         if rewards:
             for reward in rewards:
@@ -63,13 +62,20 @@ def refresh(request):
             data['rewards'] = rewards
             store.rewards = mod_rewards
             request.session['store'] = store
+            del session['updatedReward']
+            
         # patronStore_count
-        patronStore_count = results.get('patronStore_count')
+        patronStore_count_new = session.get('patronStore_num')
         if patronStore_count:
-            data['patronStore_count'] = patronStore_count
-            request.session['patronStore_count'] = patronStore_count
+            # TODO patronStore_num > store limit then upgrade account
+            # and send email notification make sure to update the
+            # subscription in the cache afterwards!
+            data['patronStore_count'] = patronStore_count_new
+            request.session['patronStore_count']=patronStore_count_new
+            del session['patronStore_num']
+            
         # feedbacks_unread
-        feedbacks_unread = results.get('feedbacks_unread')
+        feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
             data['feedbacks_unread'] = []
             for feedback in feedbacks_unread:
@@ -83,8 +89,10 @@ def refresh(request):
                 if not fb.get("is_read"):
                     fb_count += 1
             data['feedback_unread_count'] = fb_count
+            del session['newFeedback']
+            
         # employees_pending
-        employees_pending = results.get("employees_pending")
+        employees_pending = session.get("pendingEmployee")
         if employees_pending:
             data['employees_pending'] = []
             for emp in employees_pending:
@@ -94,24 +102,25 @@ def refresh(request):
             request.session['employees_pending_list'] =\
                 employees_pending_list
             data['employees_pending_count'] = len(employees_pending_list)
-        # employees_approved
-        employees_approved = results.get("employees_approved")
-        if employees_approved:
-            # first check for pending to approved
-            for i, emp in enumerate(employees_pending_list[:]):
-                if emp.objectId in employees_approved:
-                    # transfer from pending to approved list
-                    employees_approved_list.insert(0,
-                        employees_pending_list.pop(i))
-                    if "employees_approved" not in data:
-                        data["employees_approved"] = [emp.objectId]
-                    else:
-                        data["employees_approved"].append(\
-                            emp.objectId)
-                # end for pending to removed
+            del session['pendingEmployee']
+            
+        """
+        + patronStore_num = request.POST.get("patronStore_num")
+        + employeeLPunches_num =\
+            request.POST.get("employeeLPunches_num")
+        + updatedReward = request.POST.get("updatedReward")
+        newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        + pendingEmployee = request.POST.get("pendingEmployee")
+        approvedEmployee = request.POST.get("approvedEmployee")
+        deletedEmployee = request.POST.get("deletedEmployee")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
+        """
             
         # redemptions
-        reds, redemps = results.get("redemptions"), []
+        reds, redemps = session.get("pendingRedemption"), []
         if reds:
             for r in reds:
                 rr = RedeemReward(**r)
@@ -120,7 +129,12 @@ def refresh(request):
                 redemps.append(rr.jsonify())
             data['redemption_count'] = len(redemptions)
             data['redemptions'] = redemps
+            del session['pendingRedemption']
         
+        # make sure to update the session!
+        session.save()
+        
+        # respond
         try:
             resp = HttpResponse(json.dumps(data), 
                         content_type="application/json")
@@ -158,7 +172,7 @@ def receive(request, store_id):
         + patronStore_num = request.POST.get("patronStore_num")
         + employeeLPunches_num =\
             request.POST.get("employeeLPunches_num")
-        updatedReward = request.POST.get("updatedReward")
+        + updatedReward = request.POST.get("updatedReward")
         + newMessage = request.POST.get("newMessage")
         + newFeedback = request.POST.get("newFeedback")
         pendingEmployee = request.POST.get("pendingEmployee")
@@ -184,14 +198,14 @@ def receive(request, store_id):
                     # keys ending with _num is a number
                     if key.endswith("_num"):
                         session[key] = value
-                    # everything else is a list
+                    # everything else is a list of dicts
                     else:
                         session[key] = [value]
                 else:
                     # keys ending with _num is a number
                     if key.endswith("_num"):
                         session[key] = session[key] + value
-                    # everything else is a list
+                    # everything else is a list of dicts
                     else:
                         session[key].append(value)
                         
