@@ -155,7 +155,7 @@ def refresh(request):
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except CometSession.DoesNotExist:
-        # create it here and call comet
+        # this should have been created at login!
         scomet = CometSession.objects.create(session_key=\
                 request.session.session_key,
                 store_id=SESSION.get_store(request.session).objectId)

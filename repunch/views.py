@@ -6,6 +6,7 @@ import json, thread
 
 from parse.auth import login
 from apps.accounts.forms import LoginForm
+from apps.comet.models import CometSession
 
 def manage_login(request):
     """
@@ -32,6 +33,16 @@ def manage_login(request):
                     data['code'] = 2
             else:
                 data['code'] = 3
+                # create the session comet here if it does not exist
+                try: # attempt to get a used CometSession first
+                    CometSession.objects.get(session_key=\
+                        request.session.session_key)
+                except CometSession.DoesNotExist:
+                    scomet = CometSession.objects.create(session_key=\
+                            request.session.session_key,
+                            store_id=SESSION.get_store(\
+                            request.session).objectId)
+                            
         else:
             data['code'] =  0        
     else:
