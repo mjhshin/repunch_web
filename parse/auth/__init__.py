@@ -36,7 +36,6 @@ def login(request, requestDict):
                 {"username":requestDict.get('username'),
                  "password":requestDict.get('password')} )
                     
-    # TODO maybe share the session with same user on different browser
     if res and "error" not in res:
         account = Account(**res)
         if account.get("account_type") == "store":

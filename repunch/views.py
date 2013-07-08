@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth import logout
 import json, thread
 
+from parse import session as SESSION
 from parse.auth import login
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSession
