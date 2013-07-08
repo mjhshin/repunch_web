@@ -124,7 +124,7 @@ def refresh(request):
             for r in reds:
                 rr = RedeemReward(**r)
                 if rr.objectId not in redemptions_past_ids or\
-                    rr.objectId not in redemptions_ids:
+                    rr.objectId not in redemptions_pending_ids:
                     redemptions_pending.insert(0, rr)
                     request.session['redemptions_pending'] =\
                         redemptions_pending
