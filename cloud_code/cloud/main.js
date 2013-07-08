@@ -1351,9 +1351,9 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
  
-		androidInstallationQuery.equalTo("patron_id", patronId);
+		androidInstallationQuery.equalTo("patron_id", giftRecepientId);
 		androidInstallationQuery.equalTo("deviceType", "android");
-		iosInstallationQuery.equalTo("patron_id", patronId);
+		iosInstallationQuery.equalTo("patron_id", giftRecepientId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
         
         Parse.Push.send({
@@ -1364,19 +1364,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
                 store_id: storeId,
                 sender: senderName,
                 message_status_id: messageStatus.id
-            }
-		});
-
-        Parse.Push.send({
-            where: iosInstallationQuery, 
-            data: {
-            	alert: storeName + " sent you a message: " + subject,
-                subject: subject,
-                store_name: storeName,
-                message_id: messageId,
-                punch_type: "receive_message"
-            }, 
-		}, {
+			}
+        }, {
 			success: function() {
 				console.log("iOS push success");
 				response.success("success");
