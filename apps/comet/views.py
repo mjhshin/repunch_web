@@ -13,8 +13,7 @@ from apps.comet.models import CometSession
 from parse.apps.messages.models import Message
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
-from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
-RETAILER_REFRESH_TIMEOUT
+from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
    
 @login_required
 def refresh(request):
@@ -44,16 +43,9 @@ def refresh(request):
             employees_pending_list ]
         employees_approved_ids = [ emp.objectId for emp in\
             employees_approved_list ]
-                
-        # make the call
-        res = cloud_call("retailer_refresh", {
-            "store_id": store.objectId,
-            "patronStore_count": SESSION.get_patronStore_count(\
-                                    request.session),
-            "feedback_unread_ids": feedback_unread_ids,
-            "employees_pending_ids": employees_pending_ids,
-            "redemption_ids": redemption_ids,
-        }, timeout=RETAILER_REFRESH_TIMEOUT)
+            
+        # get the session
+        
         
         # process results
         data = {}
@@ -144,7 +136,8 @@ def refresh(request):
         if scomet.modified:
             scomet.modified = False
             scomet.save()
-            return comet()
+            return comet(scomet.session_key)
+            
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except CometSession.DoesNotExist:
@@ -152,9 +145,7 @@ def refresh(request):
         scomet = CometSession.objects.create(session_key=\
                 request.session.session_key,
                 store_id=SESSION.get_store(request.session).objectId)
-        return comet()
-    else: # should never go here
-        return comet()
+        return comet(scomet.session_key)
         
 @csrf_exempt  
 def receive(request, store_id):
@@ -203,7 +194,10 @@ def receive(request, store_id):
                     # everything else is a list
                     else:
                         session[key].append(value)
-                
+                        
+            # need to save session to commit modifications
+            session.save()
+            
             # done additions - set to modified
             scomet.modified = True
             scomet.save()

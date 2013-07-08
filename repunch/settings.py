@@ -226,9 +226,6 @@ else:
 REQUEST_TIMEOUT = 248 # 4 mins
 # check for new activity in Parse every X seconds
 COMET_REFRESH_RATE = 10
-# make sure that the cloud_code for the retailer_refresh does not
-# run for more than this amout of seconds.
-RETAILER_REFRESH_TIMEOUT = 5
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"

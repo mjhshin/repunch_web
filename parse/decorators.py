@@ -1,8 +1,7 @@
 from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
-from repunch.settings import COMET_REFRESH_RATE,\
-RETAILER_REFRESH_TIMEOUT
+from repunch.settings import COMET_REFRESH_RATE
 
 # TODO MAKE USABLE (does nothing at the moment)
 def session_comet(view_func):
@@ -18,8 +17,7 @@ def session_comet(view_func):
     def view(request, *args, **kwargs):
         """
         request.session['comet_dead_time'] =\
-            timezone.now() + relativedelta(\
-             seconds=RETAILER_REFRESH_TIMEOUT+COMET_REFRESH_RATE+2)
+            timezone.now() + relativedelta(COMET_REFRESH_RATE+2)
         # so for 17 seconds, all calls to retailer refresh will 
         # return a server error in the ajax side.
         """
