@@ -1260,6 +1260,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	var Message = Parse.Object.extend("Message");
 	var MessageStatus = Parse.Object.extend("MessageStatus");
 	
+	var patronQuery = new Parse.Query(Patron);
+	
 	var message = new Message();
 	message.set("message_type", "gift");
 	message.set("sender_name", senderName);
@@ -1284,7 +1286,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		response.error("error");
 		
 	}).then(function(messageStatus) {
-		var patronQuery = new Parse.Query(Patron);
+		console.log("MessageStatus save success.");
 		return patronQuery.get(giftRecepientId);
 		
 	}, function(error) {
