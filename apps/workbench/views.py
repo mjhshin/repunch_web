@@ -117,7 +117,10 @@ def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success """
     if request.method == "GET" or request.is_ajax():
         redeemId = request.GET.get('redeemRewardId')
-        rewardId = request.GET.get('rewardId') # as string
+        # may come in as "None" or "null"
+        rewardId = request.GET.get('rewardId') 
+        if rewardId.lower() in ("none", "null"):
+            rewardId = None
         store = SESSION.get_store(request.session)
         res = cloud_call("validate_redeem", {
                 "redeem_id":redeemId,

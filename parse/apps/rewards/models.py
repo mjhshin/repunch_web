@@ -27,6 +27,7 @@ class RedeemReward(ParseObject):
         self.is_redeemed = data.get("is_redeemed", False)
         self.num_punches = data.get("num_punches")
         self.reward_id = data.get("reward_id")
+        self.message_status_id = data.get("message_status_id")
         
         self.PatronStore = data.get('PatronStore')
         

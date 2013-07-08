@@ -688,8 +688,6 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("reject_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
-	var rewardId = request.params.reward_id;
-	if (rewardId != null) { rewardId = parseInt(rewardId); }
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -710,7 +708,10 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	    return;
 	    
 	}).then(function() {
-        
+        var messageStatusId = redeemReward.get("message_status_id");
+	    if (rewardId != null) {
+        } else { // offer/gift
+        }
 	
 	});
 	
