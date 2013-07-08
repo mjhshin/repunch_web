@@ -123,15 +123,19 @@ def refresh(request):
         if reds:
             for r in reds:
                 rr = RedeemReward(**r)
+                # need to check here if the redemption is new because 
+                # the dashboard that validated it will also receive
+                # the validated redemption back.
                 if rr.objectId not in redemptions_past_ids and\
                     rr.objectId not in redemptions_pending_ids:
                     redemptions_pending.insert(0, rr)
                     request.session['redemptions_pending'] =\
                         redemptions_pending
                     redemps.append(rr.jsonify())
-            data['redemption_pending_count'] =\
-                len(redemptions_pending)
-            data['redemptions_pending'] = redemps
+            if len(redemptions_pending) > 0:
+                data['redemption_pending_count'] =\
+                    len(redemptions_pending)
+                data['redemptions_pending'] = redemps
             del session['pendingRedemption']
         
         # make sure to update the session!
