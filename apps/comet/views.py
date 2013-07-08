@@ -26,18 +26,7 @@ def refresh(request):
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
     def comet(session_key):
         # sleep(COMET_REFRESH_RATE)
-        # prep the params
         store = SESSION.get_store(request.session)
-        redemptions_pending =\
-            SESSION.get_redemptions_pending(request.session)
-        redemptions_past =\
-            SESSION.get_redemptions_past(request.session)
-        messages_received_list =\
-            SESSION.get_messages_received_list(request.session)
-        employees_pending_list =\
-            SESSION.get_employees_pending_list(request.session)
-        employees_approved_list =\
-            SESSION.get_employees_approved_list(request.session)
             
         # get the session
         session = SessionStore(scomet.session_key)
@@ -69,12 +58,42 @@ def refresh(request):
             request.session['patronStore_count']=patronStore_count_new
             del session['patronStore_num']
             
+        """
+        + patronStore_num = request.POST.get("patronStore_num")
+        employeeLPunches_num =\
+            request.POST.get("employeeLPunches_num")
+        + updatedReward = request.POST.get("updatedReward")
+        + newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        + pendingEmployee = request.POST.get("pendingEmployee")
+        approvedEmployee = request.POST.get("approvedEmployee")
+        deletedEmployee = request.POST.get("deletedEmployee")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
+        """     
+       
+        # message sent # TODO javascript side?
+        messages_sent = session.get("newMessage")
+        if messages_sent:
+            messages_sent_list =\
+                SESSION.get_messages_sent_list(request.session)
+            messages_sent_ids =\
+                [ msg.id for msg in messages_sent_list ]
+            for message in messages_sent:
+                m = Message(**feedback)
+                if m.objectId not in messages_sent_ids:
+                    messages_sent_list.insert(0, m)
+            request.session['messages_sent_list'] = messages_sent_list
+            
         # feedbacks_unread
-        messages_received_ids =\
-            [ fb.objectId for fb in messages_received_list ]
         feedbacks_unread = session.get('newFeedback')
-        fb_unread = []
         if feedbacks_unread:
+            messages_received_list =\
+                SESSION.get_messages_received_list(request.session)
+            messages_received_ids =\
+                [ fb.objectId for fb in messages_received_list ]
+            fb_unread = []
             for feedback in feedbacks_unread:
                 m = Message(**feedback)
                 if m.objectId not in messages_received_ids:
@@ -95,8 +114,10 @@ def refresh(request):
             
         # employees_pending
         employees_pending = session.get("pendingEmployee")
-        emps_pending = []
         if employees_pending:
+            employees_pending_list =\
+                SESSION.get_employees_pending_list(request.session)
+            emps_pending = []
             for emp in employees_pending:
                 e = Employee(**emp)
                 employees_pending_list.insert(0, e)
@@ -107,28 +128,18 @@ def refresh(request):
             data['employees_pending'] = emps_pending
             del session['pendingEmployee']
             
-        """
-        + patronStore_num = request.POST.get("patronStore_num")
-        + employeeLPunches_num =\
-            request.POST.get("employeeLPunches_num")
-        + updatedReward = request.POST.get("updatedReward")
-        newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
-        + pendingEmployee = request.POST.get("pendingEmployee")
-        approvedEmployee = request.POST.get("approvedEmployee")
-        deletedEmployee = request.POST.get("deletedEmployee")
-        + pendingRedemption = request.POST.get("pendingRedemption")
-        approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
-        """
-            
         # redemptions
-        reds, redemps = session.get("pendingRedemption"), []
-        redemptions_pending_ids =\
-            [ red.objectId for red in redemptions_pending]
-        redemptions_past_ids =\
-            [ red.objectId for red in redemptions_past]
+        reds = session.get("pendingRedemption")
         if reds:
+            redemptions_pending =\
+                SESSION.get_redemptions_pending(request.session)
+            redemptions_past =\
+                SESSION.get_redemptions_past(request.session)
+            redemptions_pending_ids =\
+                [ red.objectId for red in redemptions_pending]
+            redemptions_past_ids =\
+                [ red.objectId for red in redemptions_past]
+            redemps = []
             for r in reds:
                 rr = RedeemReward(**r)
                 # need to check here if the redemption is new because 
@@ -184,16 +195,16 @@ def receive(request, store_id):
     
     This adds to the related session's cache:
     
-        + patronStore_num = request.POST.get("patronStore_num")
-        + employeeLPunches_num =\
+        patronStore_num = request.POST.get("patronStore_num")
+        employeeLPunches_num =\
             request.POST.get("employeeLPunches_num")
-        + updatedReward = request.POST.get("updatedReward")
-        + newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
+        updatedReward = request.POST.get("updatedReward")
+        newMessage = request.POST.get("newMessage")
+        newFeedback = request.POST.get("newFeedback")
         pendingEmployee = request.POST.get("pendingEmployee")
         approvedEmployee = request.POST.get("approvedEmployee")
         deletedEmployee = request.POST.get("deletedEmployee")
-        + pendingRedemption = request.POST.get("pendingRedemption")
+        pendingRedemption = request.POST.get("pendingRedemption")
         approvedRedemption = request.POST.get("approvedRedemption")
         deletedRedemption = request.POST.get("deletedRedemption")
         
