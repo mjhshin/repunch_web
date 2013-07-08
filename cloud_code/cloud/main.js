@@ -789,11 +789,15 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	});
 	
 	function executePushReward() {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("patron_id", patron.id);
+		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+		androidInstallationQuery.equalTo("patron_id", patron.id);
+		iosInstallationQuery.equalTo("patron_id", patron.id);
 		
+		//android push
 		Parse.Push.send({
-	        where: installationQuery,
+	        where: androidInstallationQuery,
 	        data: {
 	            title: rewardTitle,
 	            id: storeId, 
@@ -801,6 +805,35 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	            punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
 				action: "com.repunch.intent.REDEEM_REWARD"
+	        }
+	    }, {
+	        success: function() {
+				console.log("Push success.");
+				if(patron.get("facebook_id") != null) {
+					addFacebookPostToPatron();
+				} else {
+					response.success("success");
+					return;
+				}
+	        },
+	        error: function(error) {
+				console.log("Push failed.");
+	            response.error("error");
+				return;
+	        }
+	    });
+
+		//ios push
+	    Parse.Push.send({
+	        where: iosInstallationQuery,
+	        data: {
+	            title: rewardTitle,
+	            alert: rewardTitle+" was successfully redeemed!",
+	            punch_type: "validate_redeem",
+	            id: storeId, 
+	            store: store.get("store_name"), 
+	            punches: numPunches,
+				total_punches: patronStore.get("punch_count")
 	        }
 	    }, {
 	        success: function() {
