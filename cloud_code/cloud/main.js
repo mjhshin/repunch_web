@@ -1237,6 +1237,145 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	});
 });
 
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("send_gift", function(request, response) {
+	var storeId = request.params.store_id;
+	var patronId = request.params.patron_id;
+	var senderName = request.params.sender_name;
+	var subject = request.params.subject;
+	var body = request.params.body;
+	var giftRecepientId = request.params.recepient_id;
+	var giftTitle = request.params.gift_title;
+	var giftDescription = request.params.gift_description;
+	var giftPunches = request.params.gift_punches;
+	
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var Message = Parse.Object.extend("Message");
+	var MessageStatus = Parse.Object.extend("MessageStatus");
+	
+	var message = new Message();
+	message.set("message_type", "gift");
+	message.set("sender_name", senderName);
+	message.set("store_id", storeId);
+	//message.set("patron_id", patronId);
+	message.set("subject", subject);
+	message.set("body", body);	
+	message.set("gift_title", giftTitle);
+	message.set("gift_description", giftDescription);
+	
+	var messageStatus = new MessageStatus();
+	messageStatus.set("is_read", false);
+	messageStatus.set("redeem_available", "yes");
+	
+	message.save().then(function(message) {
+		console.log("Message save was successful.");
+		messageStatus.set("Message", message);
+		return messageStatus.save();
+		
+	}, function(error) {
+		console.log("Message save failed.");
+		response.error("error");
+		
+	}).then(function(messageStatus) {
+		var patronQuery = new Parse.Query(Patron);
+		return patronQuery.get(giftRecepientId);
+		
+	}, function(error) {
+		console.log("MessageStatus save failed.");
+		response.error("error");
+				
+	}).then(function(patronRecepient) {
+		console.log("Patron (recepient) fetch was successful.");
+		patronRecepient.relation("ReceivedMessages").add(messageStatus);
+		return patronRecepient.save();
+		
+	}, function(error) {
+		console.log("Patron (recepient) fetch was successful.");
+		response.error("error");
+						
+	}).then(function(store) {
+		console.log("Patron (recepient) save was successful.");
+		return patronQuery.get(patronId);
+		
+	}, function(error) {
+		console.log("Store save failed.");
+		response.error("error");
+					
+	}).then(function(patronSender) {
+		console.log("Patron (sender) fetch was successful.");
+		patronSender.relation("SentMessages").add(message);
+		return patronSender.save();	
+		
+	}, function(error) {
+		console.log("Patron (sender) fetch failed.");
+		response.error("error");
+					
+	}).then(function(patronSender) {
+		console.log("Patron (sender) save was successful.");
+		executePush();
+		
+	}, function(error) {
+		console.log("Patron (sender) save failed.");
+		response.error("error");
+			
+	});
+	
+	function executePush() {
+		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+ 
+		androidInstallationQuery.equalTo("patron_id", patronId);
+		androidInstallationQuery.equalTo("deviceType", "android");
+		iosInstallationQuery.equalTo("patron_id", patronId);
+		iosInstallationQuery.equalTo("deviceType", "ios");
+        
+        Parse.Push.send({
+            where: androidInstallationQuery, 
+            data: {
+                action: "com.repunch.intent.GIFT",
+                subject: subject,
+                store_id: storeId,
+                sender: senderName,
+                message_status_id: messageStatus.id
+            }, 
+		}, {
+			success: function() {
+				console.log("Android push success");
+				response.success("success");
+			},
+			error: function(error) {
+				console.log("Android push fail");
+				response.error("error");
+			}
+		}); // end Parse.Push
+
+        Parse.Push.send({
+            where: iosInstallationQuery, 
+            data: {
+            	alert: storeName + " sent you a message: " + subject,
+                subject: subject,
+                store_name: storeName,
+                message_id: messageId,
+                punch_type: "receive_message"
+            }, 
+		}, {
+			success: function() {
+				console.log("iOS push success");
+				response.success("success");
+			},
+			error: function(error) {
+				console.log("iOS push success");
+				response.error("error");
+			}
+		}); // end Parse.Push
+	}
+});
+
 
 
 
