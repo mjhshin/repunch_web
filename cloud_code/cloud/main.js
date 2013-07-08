@@ -195,14 +195,15 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		
 	}).then(function(patron) {
 		console.log("Store save success.");
-		response.success("success");
+		response.success(patronStore);
 		return;
 		
 	}, function(error) {
 		console.log("Store save failed.");
 		response.error("error");
 		return;
-	}).then(function(){
+		
+	}).then(function() {
 	    // note that since memcached is used as the cache backend,
 	    // the cache can be shared among all instances
         Parse.Cloud.httpRequest({
