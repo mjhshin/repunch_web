@@ -491,7 +491,7 @@ Parse.Cloud.define("punch", function(request, response) {
                     method: 'POST',
                     url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
-                    body: { employeeLPunches_num: employee.get("lifetime_punches"), }
+                    body: { updatedEmployeePunch: employee.get("lifetime_punches"), }
                 });
             }
             

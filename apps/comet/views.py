@@ -57,21 +57,6 @@ def refresh(request):
             data['patronStore_count'] = patronStore_count_new
             request.session['patronStore_count']=patronStore_count_new
             del session['patronStore_num']
-            
-        """
-        + patronStore_num = request.POST.get("patronStore_num")
-        employeeLPunches_num =\
-            request.POST.get("employeeLPunches_num")
-        + updatedReward = request.POST.get("updatedReward")
-        + newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
-        + pendingEmployee = request.POST.get("pendingEmployee")
-        approvedEmployee = request.POST.get("approvedEmployee")
-        deletedEmployee = request.POST.get("deletedEmployee")
-        + pendingRedemption = request.POST.get("pendingRedemption")
-        approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
-        """     
        
         # message sent # TODO javascript side?
         messages_sent = session.get("newMessage")
@@ -127,6 +112,23 @@ def refresh(request):
             data['employees_pending_count'] = len(employees_pending_list)
             data['employees_pending'] = emps_pending
             del session['pendingEmployee']
+            
+            
+        """
+        + patronStore_num = request.POST.get("patronStore_num")
+        + updatedReward = request.POST.get("updatedReward")
+        + newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        + pendingEmployee = request.POST.get("pendingEmployee")
+        approvedEmployee = request.POST.get("approvedEmployee")
+        deletedEmployee = request.POST.get("deletedEmployee")
+        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
+        """    
+        
+        # TODO updatedEmployeePunch
             
         # redemptions
         reds = session.get("pendingRedemption")
@@ -196,14 +198,13 @@ def receive(request, store_id):
     This adds to the related session's cache:
     
         patronStore_num = request.POST.get("patronStore_num")
-        employeeLPunches_num =\
-            request.POST.get("employeeLPunches_num")
         updatedReward = request.POST.get("updatedReward")
         newMessage = request.POST.get("newMessage")
         newFeedback = request.POST.get("newFeedback")
         pendingEmployee = request.POST.get("pendingEmployee")
         approvedEmployee = request.POST.get("approvedEmployee")
         deletedEmployee = request.POST.get("deletedEmployee")
+        updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
         pendingRedemption = request.POST.get("pendingRedemption")
         approvedRedemption = request.POST.get("approvedRedemption")
         deletedRedemption = request.POST.get("deletedRedemption")
