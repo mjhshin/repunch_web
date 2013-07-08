@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.core.mail import send_mail
 import json
 
 from parse import session as SESSION
@@ -190,13 +191,14 @@ def receive(request, store_id):
         # message : new message object (from store or patron)
         # employees : pending/approved/deleted employee object
         # redemptions : pending/approved/deleted RedeemReward object
-        
+        send_mail("comet received", str(request.POST.dict()), 
+                to=["vandolf@repunch.com"], fail_silently=True)
         for scomet in CometSession.objects.filter(store_id=store_id):
             session = SessionStore(scomet.session_key)
             for key, value in request.POST.dict().iteritems():
                 if key not in session:
                     # keys ending with _num is a number
-                    if key.endswith("_num"):
+                    if key.endswith("_num") or key.endswith("_count"):
                         session[key] = value
                     # everything else is a list of dicts
                     else:
@@ -204,6 +206,9 @@ def receive(request, store_id):
                 else:
                     # keys ending with _num is a number
                     if key.endswith("_num"):
+                        session[key] = session[key]
+                    # keys ending in _count is a number that is added
+                    elif key.endswith("_count"):
                         session[key] = session[key] + value
                     # everything else is a list of dicts
                     else:
