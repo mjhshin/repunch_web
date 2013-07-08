@@ -70,33 +70,41 @@ def refresh(request):
             del session['patronStore_num']
             
         # feedbacks_unread
+        messages_received_ids =\
+            [ fb.objectId for fb in messages_received_list ]
         feedbacks_unread = session.get('newFeedback')
+        fb_unread = []
         if feedbacks_unread:
-            data['feedbacks_unread'] = []
             for feedback in feedbacks_unread:
                 m = Message(**feedback)
-                messages_received_list.insert(0, m)
-                data['feedbacks_unread'].append(m.jsonify())
+                if m.objectId not in messages_received_ids:
+                    messages_received_list.insert(0, m)
+                    fb_unread.append(m.jsonify())
             request.session['messages_received_list'] =\
                 messages_received_list
-            fb_count = 0
-            for fb in messages_received_list:
-                if not fb.get("is_read"):
-                    fb_count += 1
-            data['feedback_unread_count'] = fb_count
+                
+            if len(fb_unread) > 0:
+                fb_count = 0
+                for fb in messages_received_list:
+                    if not fb.get("is_read"):
+                        fb_count += 1
+                data['feedbacks_unread'] = fb_unread
+                data['feedback_unread_count'] = fb_count
+                
             del session['newFeedback']
             
         # employees_pending
         employees_pending = session.get("pendingEmployee")
+        emps_pending = []
         if employees_pending:
-            data['employees_pending'] = []
             for emp in employees_pending:
                 e = Employee(**emp)
                 employees_pending_list.insert(0, e)
-                data['employees_pending'].append(e.jsonify())
+                emps_pending.append(e.jsonify())
             request.session['employees_pending_list'] =\
                 employees_pending_list
             data['employees_pending_count'] = len(employees_pending_list)
+            data['employees_pending'] = emps_pending
             del session['pendingEmployee']
             
         """
@@ -132,7 +140,7 @@ def refresh(request):
                     request.session['redemptions_pending'] =\
                         redemptions_pending
                     redemps.append(rr.jsonify())
-            if len(redemptions_pending) > 0:
+            if len(redemps) > 0:
                 data['redemption_pending_count'] =\
                     len(redemptions_pending)
                 data['redemptions_pending'] = redemps
