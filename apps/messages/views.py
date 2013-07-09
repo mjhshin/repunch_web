@@ -271,7 +271,9 @@ def details(request, message_id):
         if m.objectId == message_id:
             message = m
     if not message:
-        raise Http404
+        return redirect(reverse('messages_index')+ "?%s" %\
+             urllib.urlencode({'error':\
+                'Message has already been deleted.'}))
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True,
                 "filters":FILTERS})
@@ -296,7 +298,9 @@ def feedback(request, feedback_id):
             break
             
     if not feedback:
-        raise Http404
+        return redirect(reverse('messages_index')+ "?%s" %\
+             urllib.urlencode({'error':\
+                'Feedback has already been deleted.'}))
     
     if not feedback.is_read:
         feedback.is_read = True
@@ -336,7 +340,9 @@ def feedback_reply(request, feedback_id):
             break
             
     if not feedback:
-        raise Http404
+        return redirect(reverse('messages_index')+ "?%s" %\
+             urllib.urlencode({'error':\
+                'Feedback has already been deleted.'}))
         
     # first fetch the feedback - make sure that we have the updated
     # one - not the one in the cache
@@ -426,7 +432,9 @@ def feedback_delete(request, feedback_id):
             break
             
     if not feedback:
-        raise Http404
+        return redirect(reverse('messages_index')+ "?%s" %\
+             urllib.urlencode({'error':\
+                'Feedback has already been deleted.'}))
 
     # delete reply to message first if exist
     if feedback.get('Reply'):
