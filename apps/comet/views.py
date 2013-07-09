@@ -164,7 +164,7 @@ def refresh(request):
         deletedRedemption = request.POST.get("deletedRedemption")
         """ 
             
-        # deleted employees (pending/approved to pop)!
+        # deleted/denied employees (pending/approved to pop)!
         del_emps = session.get("deletedEmployee")
         if del_emps:
             pass

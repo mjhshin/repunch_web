@@ -107,7 +107,8 @@ def delete(request, employee_id):
     deleted_employee = Employee(objectId=employee.objectId)
     payload = {"deletedEmployee":deleted_employee}
     # check for response?
-    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
+    requests.post(COMET_REQUEST_RECEIVE + store_id,
+        data=json.dumps(payload))
     
     # delete Punches Pointers to this employee?
     employee.delete()
@@ -149,7 +150,8 @@ def approve(request, employee_id):
     approved_employee = Employee(objectId=employee.objectId)
     payload = {"approvedEmployee":approved_employee}
     # check for response?
-    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
+    requests.post(COMET_REQUEST_RECEIVE + store_id,
+        data=json.dumps(payload))
         
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
@@ -170,18 +172,21 @@ def deny(request, employee_id):
     if not employee:
         raise Http404
     
-    # delete the employee!
-    employee.delete()
-    
     # update session cache for employees_pending_list
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
         
-    # notifiy all other dashboards of this change 
+    # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
-    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
-    # check if success?
+    deleted_employee = Employee(objectId=employee.objectId)
+    payload = {"deletedEmployee":deleted_employee}
+    # check for response?
+    requests.post(COMET_REQUEST_RECEIVE + store_id,
+        data=json.dumps(payload))
+    
+    # delete the employee!
+    employee.delete()
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))

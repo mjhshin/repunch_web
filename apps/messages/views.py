@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
 from dateutil.tz import tzutc
-import urllib, requests
+import urllib, requests, json
 
 from parse.decorators import session_comet
 from parse import session as SESSION
@@ -450,7 +450,8 @@ def feedback_delete(request, feedback_id):
     deleted_feedback = Message(objectId=feedback.objectId)
     payload = {"deletedFeedback":deleted_feedback}
     # check for response?
-    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
+    requests.post(COMET_REQUEST_RECEIVE + store_id,
+        data=json.dumps(payload))
     
     feedback.delete()
     return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
