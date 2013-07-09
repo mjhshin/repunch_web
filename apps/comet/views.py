@@ -70,6 +70,7 @@ def refresh(request):
                 if m.objectId not in messages_sent_ids:
                     messages_sent_list.insert(0, m)
             request.session['messages_sent_list'] = messages_sent_list
+            del session['newMessage']
             
         # feedbacks_unread
         feedbacks_unread = session.get('newFeedback')
@@ -129,6 +130,8 @@ def refresh(request):
         """    
         
         # TODO updatedEmployeePunch
+        uep = session.get("updatedEmployeePunch")
+        
             
         # redemptions
         reds = session.get("pendingRedemption")

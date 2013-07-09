@@ -20,10 +20,19 @@ from libs.repunch import rputils
 
 from parse.auth import login
 from parse.utils import make_aware_to_utc
+from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores.models import Store, Subscription,\
 Settings
+
+@session_comet
+def terms_mobile(request):
+    return render(request, "public/terms-mobile.djhtml", 
+        get_notification_ctx())
+
+def privacy_mobile(request):
+    pass
 
 @session_comet
 def index(request):
