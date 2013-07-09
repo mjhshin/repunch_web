@@ -1013,12 +1013,10 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0) {
-            // match the installation with the username in the 
             if (filter === "one"){
                 androidInstallationQuery.equalTo("patron_id", patronId);
 				iosInstallationQuery.equalTo("patron_id", patronId);
             } else {
-                console.log(patron_ids);
                 androidInstallationQuery.containedIn("patron_id", patron_ids);
 				iosInstallationQuery.containedIn("patron_id", patron_ids);
             }
@@ -1033,7 +1031,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 
             // all tasks are done. Push now.
             proceedToPush();
-            return
+            return;
         }
         
         var pt = patronStores.pop();

@@ -23,6 +23,13 @@ def refresh(request):
     This is where the comet approach is put into play.
     This handles ajax requests from clients, holding on to the 
     request while checking Parse for new activity.
+    
+    IMPORTANT! The order in which the session cache is checked is very
+    critical. Take for example and employee that registers.
+    Dashboard A receives the pending employee and immediately 
+    approves it. Now Dashboard B will run refresh with the pending
+    employee and the approved employee. We must first add the pending 
+    then check for the approved!
     """
     # in_time = timezone.now()
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
@@ -30,22 +37,27 @@ def refresh(request):
         # sleep(COMET_REFRESH_RATE)
         store = SESSION.get_store(request.session)
         
-        # used by more than 1
+        # used by more than 1 (note that it is ok to retrieve all of 
+        # the lists since they are all pointers - not the actual list!
         employees_pending_list =\
             SESSION.get_employees_pending_list(request.session)
         employees_approved_list =\
             SESSION.employees_approved_list(request.session)
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
-        messages_received_ids =\
-            [ fb.objectId for fb in messages_received_list ]
+        redemptions_pending =\
+            SESSION.get_redemptions_pending(request.session)
+        redemptions_past =\
+            SESSION.get_redemptions_past(request.session)
             
         # get the session
         session = SessionStore(scomet.session_key)
         
         # process the stuff in the session
         data = {}
-        # rewards redemption_count
+        
+        #############################################################
+        # REWARDS redemption_count ##############################
         rewards = session.get('updatedReward')
         mod_rewards = store.get('rewards')
         if rewards:
@@ -60,7 +72,8 @@ def refresh(request):
             request.session['store'] = store
             del session['updatedReward']
             
-        # patronStore_count
+        #############################################################
+        # PATRONSTORE_COUNT ##################################
         patronStore_count_new = session.get('patronStore_num')
         if patronStore_count_new:
             # TODO patronStore_num > store limit then upgrade account
@@ -70,7 +83,7 @@ def refresh(request):
             request.session['patronStore_count']=patronStore_count_new
             del session['patronStore_num']
        
-        # message sent # TODO javascript side?
+        # MESSAGE SENT ##################################
         messages_sent = session.get("newMessage")
         if messages_sent:
             messages_sent_list =\
@@ -84,30 +97,34 @@ def refresh(request):
             request.session['messages_sent_list'] = messages_sent_list
             del session['newMessage']
         
-        # deleted feedback
+        #############################################################
+        # FEEDBACK DELETED ##################################
         feedbacks_deleted = session.get("deletedFeedback")
         if feedbacks_deleted:
+            copy = messages_received_list[:]
             for fb_d in feedbacks_deleted:
                 fb = Message(**fb_d)
-                for i, mro in enumrate(messages_received_list[:]):
+                for i, mro in enumerate(copy):
                     if fb.objectId == mro.objectId:
                         messages_received_list.pop(i)
+                        break
             request.sesion['messages_received_list'] =\
                 messages_received_list
             del session['deletedFeedback']
             
             
-        # feedbacks_unread
+        #############################################################
+        # FEEDBACKS_UNREAD ##################################
         feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
             fb_unread = []
+            messages_received_ids =\
+                [ fb.objectId for fb in messages_received_list ]
             for feedback in feedbacks_unread:
                 m = Message(**feedback)
                 if m.objectId not in messages_received_ids:
                     messages_received_list.insert(0, m)
                     fb_unread.append(m.jsonify())
-            request.session['messages_received_list'] =\
-                messages_received_list
                 
             if len(fb_unread) > 0:
                 fb_count = 0
@@ -117,37 +134,127 @@ def refresh(request):
                 data['feedbacks_unread'] = fb_unread
                 data['feedback_unread_count'] = fb_count
                 
+            request.session['messages_received_list'] =\
+                messages_received_list
             del session['newFeedback']
         
-        # employees_pending
+        #############################################################
+        # EMPLOYEES_PENDING ##################################
+        # must also check if employee is already approved!
         employees_pending = session.get("pendingEmployee")
         if employees_pending:
             emps_pending = []
+            employees_approved_ids =\
+                [ emp.objectId for emp in employees_approved_list ]
+            employees_pending_ids =\
+                [ emp.objectId for emp in employees_pending_list ]
             for emp in employees_pending:
                 e = Employee(**emp)
-                employees_pending_list.insert(0, e)
-                emps_pending.append(e.jsonify())
+                if e.objectId not in employees_pending_ids and\
+                    e.objectId not in employees_approved_ids:
+                    employees_pending_list.insert(0, e)
+                    emps_pending.append(e.jsonify())
+                    
+            if len(emps_pending) > 0:   
+                data['employees_pending_count'] =\
+                    len(employees_pending_list)
+                data['employees_pending'] = emps_pending
+                
             request.session['employees_pending_list'] =\
                 employees_pending_list
-            data['employees_pending_count'] = len(employees_pending_list)
-            data['employees_pending'] = emps_pending
             del session['pendingEmployee']
         
-        # approved employees (pending to approved)
+        #############################################################
+        # EMPLOYEES APPROVED (pending to approved) #################
         appr_emps = session.get("approvedEmployee")
         if appr_emps:
+            copy = employees_pending_list[:]
             for appr_emp in appr_emps:
-                for i, emp_pending in\
-                    enumerate(employees_pending_list[:]):
-                    if appr_emp.objectId == emp_pending.objectId:
+                emp = Employee(**appr_emp)
+                # first check if the employee is in the pending list
+                # if not then check if it is already approved
+                for i, emp_pending in enumerate(copy):
+                    if emp.objectId == emp_pending.objectId:
                         emp = employees_pending_list.pop(i)
                         emp.status = APPROVED
                         employees_approved_list.insert(0, emp)
+                        break
             request.session['employees_pending_list'] =\
                 employees_pending_list
             request.session['employees_approved_list'] =\
                 employees_approved_list
             del session['approvedEmployee']
+            
+        #############################################################
+        # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
+        del_emps = session.get("deletedEmployee")
+        if del_emps:
+            approved_copy = employees_approved_list[:]
+            pending_copy = employees_pending_list[:]
+            for demp in del_emps:
+                emp = Employee(**demp)
+                cont = True
+                # check in approved emps
+                for i, cop in enumerate(approved_copy):
+                    if cop.objectId == emp.objectId:
+                        employees_approved_list.pop(i)
+                        cont = False
+                        break
+                    
+                if not cont:
+                    break
+                    
+                # check in pending emps
+                for i, cop in enumerate(pending_copy):
+                    if cop.objectId == emp.objectId:
+                        employees_pending_list.pop(i)
+                        break
+                        
+            request.session['employees_approved_list'] =\
+                employees_approved_list
+            request.session['employees_pending_list'] =\
+                employees_pending_list
+            del session['deletedEmployee']
+         
+        #############################################################           
+        # EMPLOYEE UPDATED PUNCHES
+        uep = session.get("updatedEmployeePunch")
+        if uep:
+            for updated_emp in uep:
+                u_emp = Employee(**updated_emp)
+                for emp in employees_approved_list:
+                    if u_emp.objectId == emp.objectId:
+                        emp.set("lifetime_punches",
+                            u_emp.lifetime_punches)
+                        break
+            del session['updatedEmployeePunch']
+           
+        #############################################################
+        # REDEMPTIONS PENDING
+        reds = session.get("pendingRedemption")
+        if reds:
+            redemptions_pending_ids =\
+                [ red.objectId for red in redemptions_pending ]
+            redemptions_past_ids =\
+                [ red.objectId for red in redemptions_past ]
+            redemps = []
+            for r in reds:
+                rr = RedeemReward(**r)
+                # need to check here if the redemption is new because 
+                # the dashboard that validated it will also receive
+                # the validated redemption back.
+                if rr.objectId not in redemptions_past_ids and\
+                    rr.objectId not in redemptions_pending_ids:
+                    redemptions_pending.insert(0, rr)
+                    redemps.append(rr.jsonify())
+            if len(redemps) > 0:
+                data['redemption_pending_count'] =\
+                    len(redemptions_pending)
+                data['redemptions_pending'] = redemps
+                
+            request.session['redemptions_pending'] =\
+                redemptions_pending
+            del session['pendingRedemption']
             
         """
         + patronStore_num = request.POST.get("patronStore_num")
@@ -160,63 +267,41 @@ def refresh(request):
         + deletedEmployee = request.POST.get("deletedEmployee")
         + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
         + pendingRedemption = request.POST.get("pendingRedemption")
-        approvedRedemption = request.POST.get("approvedRedemption")
+        + approvedRedemption = request.POST.get("approvedRedemption")
         deletedRedemption = request.POST.get("deletedRedemption")
         """ 
-            
-        # deleted/denied employees (pending/approved to pop)!
-        del_emps = session.get("deletedEmployee")
-        if del_emps:
-            pass
-            # check in approved emps
-            # check in pending emps
-            
-                    
-        # update employee punches
-        uep = session.get("updatedEmployeePunch")
-        if uep:
-            for updated_emp in uep:
-                u_emp = Employee(**updated_emp)
-                for emp in employees_approved_list:
-                    if u_emp.objectId == emp.objectId:
-                        emp.set("lifetime_punches",
-                            u_emp.lifetime_punches)
-            del session['updatedEmployeePunch']
-           
-        # redemptions
-        reds = session.get("pendingRedemption")
-        if reds:
-            redemptions_pending =\
-                SESSION.get_redemptions_pending(request.session)
-            redemptions_past =\
-                SESSION.get_redemptions_past(request.session)
-            redemptions_pending_ids =\
-                [ red.objectId for red in redemptions_pending]
-            redemptions_past_ids =\
-                [ red.objectId for red in redemptions_past]
-            redemps = []
-            for r in reds:
-                rr = RedeemReward(**r)
-                # need to check here if the redemption is new because 
-                # the dashboard that validated it will also receive
-                # the validated redemption back.
-                if rr.objectId not in redemptions_past_ids and\
-                    rr.objectId not in redemptions_pending_ids:
-                    redemptions_pending.insert(0, rr)
-                    request.session['redemptions_pending'] =\
-                        redemptions_pending
-                    redemps.append(rr.jsonify())
-            if len(redemps) > 0:
-                data['redemption_pending_count'] =\
-                    len(redemptions_pending)
-                data['redemptions_pending'] = redemps
-            del session['pendingRedemption']
+        #############################################################
+        # REDEMPTIONS APPROVED (pending to history)
+        appr_redemps = session.get("approvedRedemption") 
+        if appr_redemps:   
+            copy = redemptions_pending[:]
+            redemp_js = []
+            for red in appr_redemps:
+                redemp = RedeemReward(**red)
+                # check if redemp is still in pending
+                for i, redem in enumerate(copy):
+                    if redem.objectId == redemp.objectId:
+                        r = redemptions_pending.pop(i)
+                        r.is_redeemed = True
+                        redemptions_past.insert(0, r)
+                        redemp_js = append(r)
+                        break
+                # if not then check if it is in the history already
+                # the above shouldn't happen!
+            if len(redemp_js) > 0:
+                data['redemptionsApproved'] = redemp_js
+                
+            request.session['redemptions_pending'] =\
+                redemptions_pending
+            request.session['redemptions_past'] =\
+                redemptions_past
+            del session['approvedRedemption']
         
-        # make sure to update the session!
+        
+        #############################################################
+        ######## make sure to update the session!
         session.save()
-        
-        # respond
-        try:
+        try: # respond
             resp = HttpResponse(json.dumps(data), 
                         content_type="application/json")
             return resp
