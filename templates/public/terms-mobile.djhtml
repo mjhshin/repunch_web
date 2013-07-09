@@ -17,17 +17,24 @@
     table#header {
         width:100%;
     }
-    table#header tr td.side {
-        width:49%;padding:0;border-top:1px solid #ea8b13;
+    table#header tr {
+        width:100%;padding:0;border-bottom:1px solid black;
+        background-image: -ms-radial-gradient(center, ellipse farthest-corner, #fea500 0%, #ea8b13 100%);
+        background-image: -moz-radial-gradient(center, ellipse farthest-corner, #fea500 0%, #ea8b13 100%);
+        background-image: -o-radial-gradient(center, ellipse farthest-corner, #fea500 0%, #ea8b13 100%);
+        background-image: -webkit-gradient(radial, center center, 0, center center, 505, color-stop(0, #fea500), color-stop(1, #ea8b13));
+        background-image: -webkit-radial-gradient(center, ellipse farthest-corner, #fffff 0%, #ea8b13 100%);
+        background-image: radial-gradient(ellipse farthest-corner at center, #fea500 0%, #ea8b13 100%);
     }
-    table#header tr td.center {
-        width:189px;padding:0;border-top:1px solid #ea8b13;
+    table#header tr td div#logo {
+        width:380px; height:42px; border-bottom:2px solid black;
+        margin:0 auto;
     }
-    table#header tr td.center a img {
-        background:#ea8b13;
+    table#header tr td div a {
+        text-decoration:none;
     }
-    table#header tr td.side div {
-        height:40px;background:#ea8b13;
+    table#header tr td div a img:first-child {
+        margin-left:14px; margin-top:6px;
     }
     /* FOOTER */
     div#footer {
@@ -77,7 +84,11 @@
         background:#fff;color:#ccc;font-size:18px;
     }
     </style>
-    <script></script>
+    <script>
+    $(document).ready(function() {
+        
+    });
+    </script>
 </head>
 
 <body>
@@ -86,18 +97,16 @@
 <table cellpadding="0" cellspacing="0" id="header" >
 <tr>
 
-    <td class="side" valign="top">
-        <div>&nbsp;</div>
-    </td>
-    <td class="center">
+    <td><div id="logo">
         <a href="http://{{ ABSOLUTE_HOST_ALIAS }}">
         <img src="http://{{ ABSOLUTE_HOST }}{{ ICON_URL }}"
-            width="189px" height="75px" alt="    Repunch Inc."/>
+            alt="    Repunch Inc."/>
         </a>
-    </td>
-    <td class="side" valign="top">
-        <div>&nbsp;</div>
-    </td>
+        <select style="position:relative;left: 80px;top:-8px;padding:6px 2px;">
+            <option selected>Terms of Service</option>
+            <option>Privacy Policy</option>
+        </select>
+    </div></td>
 
 </tr>
 </table>
@@ -142,13 +151,9 @@ We will get in touch with you as soon as we can to help you get started.
         <div>
 
             <p>
-            To manage your dashboard, 
             <a href="http://{{ABSOLUTE_HOST_ALIAS}}{{STORE_INDEX}}">
-            click here</a></p>
-
-            <p><a href="#" 
-            style="color:#ccc;text-decoration:none;cursor:default;">
-            Repunch Inc. is a company that aims to increase customer loyalty towards retailers.</a></p>
+            Click here</a> to manage your dashboard. 
+            </p>
 
             <p>
                 <strong>Visit our official site at&nbsp;&nbsp;

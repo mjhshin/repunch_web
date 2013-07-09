@@ -18,6 +18,7 @@ from parse.apps.stores import format_phone_number
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
 from libs.repunch import rputils
 
+from repunch.settings import STATIC_URL
 from parse.auth import login
 from parse.utils import make_aware_to_utc
 from parse.notifications import get_notification_ctx
@@ -28,8 +29,9 @@ Settings
 
 @session_comet
 def terms_mobile(request):
-    return render(request, "public/terms-mobile.djhtml", 
-        get_notification_ctx())
+    ctx = get_notification_ctx()
+    ctx['ICON_URL']=STATIC_URL+"manage/images/logo_header-mobile.png"
+    return render(request, "public/terms-mobile.djhtml", ctx)
 
 def privacy_mobile(request):
     pass
