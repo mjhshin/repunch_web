@@ -245,7 +245,7 @@ def refresh(request):
                 # the validated redemption back.
                 if rr.objectId not in redemptions_past_ids and\
                     rr.objectId not in redemptions_pending_ids:
-                    redemptions_pending.insert(0, rr.jsonify)
+                    redemptions_pending.insert(0, rr.jsonify())
                     redemps.append(rr.jsonify())
             if len(redemps) > 0:
                 data['redemption_pending_count'] =\
