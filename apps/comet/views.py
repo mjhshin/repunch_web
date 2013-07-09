@@ -42,7 +42,7 @@ def refresh(request):
         employees_pending_list =\
             SESSION.get_employees_pending_list(request.session)
         employees_approved_list =\
-            SESSION.employees_approved_list(request.session)
+            SESSION.get_employees_approved_list(request.session)
         messages_received_list =\
             SESSION.get_messages_received_list(request.session)
         redemptions_pending =\
@@ -98,22 +98,6 @@ def refresh(request):
             del session['newMessage']
         
         #############################################################
-        # FEEDBACK DELETED ##################################
-        feedbacks_deleted = session.get("deletedFeedback")
-        if feedbacks_deleted:
-            copy = messages_received_list[:]
-            for fb_d in feedbacks_deleted:
-                fb = Message(**fb_d)
-                for i, mro in enumerate(copy):
-                    if fb.objectId == mro.objectId:
-                        messages_received_list.pop(i)
-                        break
-            request.sesion['messages_received_list'] =\
-                messages_received_list
-            del session['deletedFeedback']
-            
-            
-        #############################################################
         # FEEDBACKS_UNREAD ##################################
         feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
@@ -137,6 +121,21 @@ def refresh(request):
             request.session['messages_received_list'] =\
                 messages_received_list
             del session['newFeedback']
+
+        #############################################################
+        # FEEDBACK DELETED ##################################
+        feedbacks_deleted = session.get("deletedFeedback")
+        if feedbacks_deleted:
+            copy = messages_received_list[:]
+            for fb_d in feedbacks_deleted:
+                fb = Message(**fb_d)
+                for i, mro in enumerate(copy):
+                    if fb.objectId == mro.objectId:
+                        messages_received_list.pop(i)
+                        break
+            request.session['messages_received_list'] =\
+                messages_received_list
+            del session['deletedFeedback']            
         
         #############################################################
         # EMPLOYEES_PENDING ##################################
