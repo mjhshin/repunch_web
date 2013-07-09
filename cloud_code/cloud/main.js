@@ -487,11 +487,16 @@ Parse.Cloud.define("punch", function(request, response) {
 				
 		}).then(function(employee) {
 		    if (employee != null) {
+		        // only need the objectId and lifetime_punches
+		        var emp = {
+		            objectId: employee.id,
+		            lifetime_punches: employee.get("lifetime_punches")
+		        }
                 Parse.Cloud.httpRequest({
                     method: 'POST',
                     url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
-                    body: { updatedEmployeePunch: employee.get("lifetime_punches"), }
+                    body: { updatedEmployeePunch: emp, }
                 });
             }
             

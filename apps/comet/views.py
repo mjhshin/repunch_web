@@ -113,26 +113,19 @@ def refresh(request):
             data['employees_pending_count'] = len(employees_pending_list)
             data['employees_pending'] = emps_pending
             del session['pendingEmployee']
-            
-            
-        """
-        + patronStore_num = request.POST.get("patronStore_num")
-        + updatedReward = request.POST.get("updatedReward")
-        + newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
-        + pendingEmployee = request.POST.get("pendingEmployee")
-        approvedEmployee = request.POST.get("approvedEmployee")
-        deletedEmployee = request.POST.get("deletedEmployee")
-        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
-        + pendingRedemption = request.POST.get("pendingRedemption")
-        approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
-        """    
         
-        # TODO updatedEmployeePunch
+        # update employee punches
         uep = session.get("updatedEmployeePunch")
-        
-            
+        if uep:
+            employees_approved_ids =\
+                [ emp.objectId for emp in employees_approved_list ] 
+            for updated_emp in uep:
+                for emp in employees_approved_list:
+                    if updated_emp.objectId == emp.objectId:
+                        emp.set("lifetime_punches",
+                            updated_emp.lifetime_punches)
+            del session['updatedEmployeePunch']
+           
         # redemptions
         reds = session.get("pendingRedemption")
         if reds:

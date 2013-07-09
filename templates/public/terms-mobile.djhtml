@@ -32,6 +32,9 @@
     table#header tr td div a {
         text-decoration:none;
     }
+    table#header tr td div select {
+        position:relative;left: 30px;top:-8px;padding:6px 2px;
+    }
     table#header tr td div a img:first-child {
         margin-left:14px; margin-top:12px;
     }
@@ -101,7 +104,7 @@
         <img src="http://{{ ABSOLUTE_HOST }}{{ ICON_URL }}"
             alt="    Repunch Inc."/>
         </a>
-        <select style="position:relative;left: 80px;top:-8px;padding:6px 2px;">
+        <select>
             <option selected>Terms of Service</option>
             <option>Privacy Policy</option>
         </select>
@@ -115,31 +118,12 @@
 <div id="main">
     <div>
 
-{# TITLE #}
-<div id="title">
-{% block title %}
-Thank you for signing up.
-{% endblock %}
-</div>
-<div class="compliment">
-Repunch Inc.
-</div>
-{# END TITLE #}
-
-
 <div id="content">
 {% block content %}
 
-<p>
-Dear {{ store.get_owner_fullname }},
-</p>
 
-<p >
-We will get in touch with you as soon as we can to help you get started. 
-</p>
 
 {% endblock %}
-<div class="compliment">- The Repunch Team</div>
 </div>
 </div>
 </div>
