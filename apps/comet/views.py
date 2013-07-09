@@ -283,7 +283,7 @@ def refresh(request):
                         r = redemptions_pending.pop(i)
                         r.is_redeemed = True
                         redemptions_past.insert(0, r)
-                        redemp_js = append(r)
+                        redemp_js.append(r)
                         break
                 # if not then check if it is in the history already
                 # the above shouldn't happen!
