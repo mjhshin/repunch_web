@@ -33,7 +33,7 @@ def refresh(request):
     """
     # in_time = timezone.now()
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
-    def comet():
+    def comet(session_key):
         # sleep(COMET_REFRESH_RATE)
         store = SESSION.get_store(request.session)
         
@@ -49,13 +49,16 @@ def refresh(request):
             SESSION.get_redemptions_pending(request.session)
         redemptions_past =\
             SESSION.get_redemptions_past(request.session)
+            
+        # get the session
+        session = SessionStore(scomet.session_key)
         
         # process the stuff in the session
         data = {}
         
         #############################################################
         # REWARDS redemption_count ##############################
-        rewards = request.session.get('updatedReward')
+        rewards = session.get('updatedReward')
         mod_rewards = store.get('rewards')
         if rewards:
             for reward in rewards:
@@ -67,21 +70,21 @@ def refresh(request):
             data['rewards'] = rewards
             store.rewards = mod_rewards
             request.session['store'] = store
-            del request.session['updatedReward']
+            session['updatedReward'] = None # del unreliable
             
         #############################################################
         # PATRONSTORE_COUNT ##################################
-        patronStore_count_new = request.session.get('patronStore_num')
+        patronStore_count_new = session.get('patronStore_num')
         if patronStore_count_new:
             # TODO patronStore_num > store limit then upgrade account
             # and send email notification make sure to update the
             # subscription in the cache afterwards!
             data['patronStore_count'] = patronStore_count_new
             request.session['patronStore_count']=patronStore_count_new
-            del request.session['patronStore_num']
+            session['patronStore_num'] = None
        
         # MESSAGE SENT ##################################
-        messages_sent = request.session.get("newMessage")
+        messages_sent = session.get("newMessage")
         if messages_sent:
             messages_sent_list =\
                 SESSION.get_messages_sent_list(request.session)
@@ -92,11 +95,11 @@ def refresh(request):
                 if m.objectId not in messages_sent_ids:
                     messages_sent_list.insert(0, m)
             request.session['messages_sent_list'] = messages_sent_list
-            del request.session['newMessage']
+            session['newMessage'] = None
         
         #############################################################
         # FEEDBACKS_UNREAD ##################################
-        feedbacks_unread = request.session.get('newFeedback')
+        feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
             fb_unread = []
             messages_received_ids =\
@@ -117,11 +120,11 @@ def refresh(request):
                 
             request.session['messages_received_list'] =\
                 messages_received_list
-            del session['newFeedback']
+            session['newFeedback'] = None
 
         #############################################################
         # FEEDBACK DELETED ##################################
-        feedbacks_deleted = request.session.get("deletedFeedback")
+        feedbacks_deleted = session.get("deletedFeedback")
         if feedbacks_deleted:
             copy = messages_received_list[:]
             for fb_d in feedbacks_deleted:
@@ -132,12 +135,12 @@ def refresh(request):
                         break
             request.session['messages_received_list'] =\
                 messages_received_list
-            del request.session['deletedFeedback']     
+            session['deletedFeedback'] = None       
         
         #############################################################
         # EMPLOYEES_PENDING ##################################
         # must also check if employee is already approved!
-        employees_pending = request.session.get("pendingEmployee")
+        employees_pending = session.get("pendingEmployee")
         if employees_pending:
             emps_pending = []
             employees_approved_ids =\
@@ -158,11 +161,11 @@ def refresh(request):
                 
             request.session['employees_pending_list'] =\
                 employees_pending_list
-            del request.session['pendingEmployee']
+            session['pendingEmployee'] = None
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
-        appr_emps = request.session.get("approvedEmployee")
+        appr_emps = session.get("approvedEmployee")
         if appr_emps:
             copy = employees_pending_list[:]
             for appr_emp in appr_emps:
@@ -179,11 +182,11 @@ def refresh(request):
                 employees_pending_list
             request.session['employees_approved_list'] =\
                 employees_approved_list
-            del request.session['approvedEmployee']
+            session['approvedEmployee'] = None
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
-        del_emps = request.session.get("deletedEmployee")
+        del_emps = session.get("deletedEmployee")
         if del_emps:
             approved_copy = employees_approved_list[:]
             pending_copy = employees_pending_list[:]
@@ -210,11 +213,11 @@ def refresh(request):
                 employees_approved_list
             request.session['employees_pending_list'] =\
                 employees_pending_list
-            del request.session['deletedEmployee']
+            session['deletedEmployee'] = None
          
         #############################################################           
         # EMPLOYEE UPDATED PUNCHES
-        uep = request.session.get("updatedEmployeePunch")
+        uep = session.get("updatedEmployeePunch")
         if uep:
             for updated_emp in uep:
                 u_emp = Employee(**updated_emp)
@@ -223,11 +226,11 @@ def refresh(request):
                         emp.set("lifetime_punches",
                             u_emp.lifetime_punches)
                         break
-            del request.session['updatedEmployeePunch']
+            session['updatedEmployeePunch'] = None
            
         #############################################################
         # REDEMPTIONS PENDING
-        reds = request.session.get("pendingRedemption")
+        reds = session.get("pendingRedemption")
         if reds:
             redemptions_pending_ids =\
                 [ red.objectId for red in redemptions_pending ]
@@ -250,7 +253,7 @@ def refresh(request):
                 
             request.session['redemptions_pending'] =\
                 redemptions_pending
-            del request.session['pendingRedemption']
+            session['pendingRedemption'] = None
             
         """
         + patronStore_num = request.POST.get("patronStore_num")
@@ -268,7 +271,7 @@ def refresh(request):
         """ 
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
-        appr_redemps = request.session.get("approvedRedemption") 
+        appr_redemps = session.get("approvedRedemption") 
         if appr_redemps:   
             copy = redemptions_pending[:]
             redemp_js = []
@@ -291,12 +294,13 @@ def refresh(request):
                 redemptions_pending
             request.session['redemptions_past'] =\
                 redemptions_past
-            del request.session['approvedRedemption']
+            session['approvedRedemption'] = None
         
         
         #############################################################
-        # explicitly update the session!
-        request.session.save()
+        ######## make sure to update the session!
+        session.modified = True # make sure this is True explicitly!
+        session.save()
         
         try: # respond
             resp = HttpResponse(json.dumps(data), 
@@ -313,7 +317,7 @@ def refresh(request):
         if scomet.modified:
             scomet.modified = False
             scomet.save()
-            return comet()
+            return comet(scomet.session_key)
             
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
