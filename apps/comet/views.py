@@ -167,9 +167,11 @@ def refresh(request):
         # deleted/denied employees (pending/approved to pop)!
         del_emps = session.get("deletedEmployee")
         if del_emps:
-            pass # TODO
-        
-        
+            pass
+            # check in approved emps
+            # check in pending emps
+            
+                    
         # update employee punches
         uep = session.get("updatedEmployeePunch")
         if uep:
