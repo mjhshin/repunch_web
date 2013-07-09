@@ -93,7 +93,7 @@ def refresh(request):
             for message in messages_sent:
                 m = Message(**feedback)
                 if m.objectId not in messages_sent_ids:
-                    messages_sent_list.insert(0, m)
+                    messages_sent_list.insert(0, m.jsonify())
             request.session['messages_sent_list'] = messages_sent_list
             session['newMessage'] = None
         
@@ -107,7 +107,7 @@ def refresh(request):
             for feedback in feedbacks_unread:
                 m = Message(**feedback)
                 if m.objectId not in messages_received_ids:
-                    messages_received_list.insert(0, m)
+                    messages_received_list.insert(0, m.jsonify())
                     fb_unread.append(m.jsonify())
                 
             if len(fb_unread) > 0:
@@ -151,7 +151,7 @@ def refresh(request):
                 e = Employee(**emp)
                 if e.objectId not in employees_pending_ids and\
                     e.objectId not in employees_approved_ids:
-                    employees_pending_list.insert(0, e)
+                    employees_pending_list.insert(0, e.jsonify())
                     emps_pending.append(e.jsonify())
                     
             if len(emps_pending) > 0:   
@@ -176,7 +176,8 @@ def refresh(request):
                     if emp.objectId == emp_pending.objectId:
                         emp = employees_pending_list.pop(i)
                         emp.status = APPROVED
-                        employees_approved_list.insert(0, emp)
+                        employees_approved_list.insert(0, 
+                            emp.jsonify())
                         break
             request.session['employees_pending_list'] =\
                 employees_pending_list
@@ -244,7 +245,7 @@ def refresh(request):
                 # the validated redemption back.
                 if rr.objectId not in redemptions_past_ids and\
                     rr.objectId not in redemptions_pending_ids:
-                    redemptions_pending.insert(0, rr)
+                    redemptions_pending.insert(0, rr.jsonify)
                     redemps.append(rr.jsonify())
             if len(redemps) > 0:
                 data['redemption_pending_count'] =\
@@ -282,7 +283,7 @@ def refresh(request):
                     if redem.objectId == redemp.objectId:
                         r = redemptions_pending.pop(i)
                         r.is_redeemed = True
-                        redemptions_past.insert(0, r)
+                        redemptions_past.insert(0, r.jsonify())
                         redemp_js.append(r)
                         break
                 # if not then check if it is in the history already
