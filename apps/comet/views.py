@@ -11,8 +11,10 @@ from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from apps.comet.models import CometSession
 from parse.apps.messages.models import Message
+from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
+from parse.apps.employees.models import Employee
 from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
    
 @login_required
@@ -27,6 +29,16 @@ def refresh(request):
     def comet(session_key):
         # sleep(COMET_REFRESH_RATE)
         store = SESSION.get_store(request.session)
+        
+        # used by more than 1
+        employees_pending_list =\
+            SESSION.get_employees_pending_list(request.session)
+        employees_approved_list =\
+            SESSION.employees_approved_list(request.session)
+        messages_received_list =\
+            SESSION.get_messages_received_list(request.session)
+        messages_received_ids =\
+            [ fb.objectId for fb in messages_received_list ]
             
         # get the session
         session = SessionStore(scomet.session_key)
@@ -71,14 +83,23 @@ def refresh(request):
                     messages_sent_list.insert(0, m)
             request.session['messages_sent_list'] = messages_sent_list
             del session['newMessage']
+        
+        # deleted feedback
+        feedbacks_deleted = session.get("deletedFeedback")
+        if feedbacks_deleted:
+            for fb_d in feedbacks_deleted:
+                fb = Message(**fb_d)
+                for i, mro in enumrate(messages_received_list[:]):
+                    if fb.objectId == mro.objectId:
+                        messages_received_list.pop(i)
+            request.sesion['messages_received_list'] =\
+                messages_received_list
+            del session['deletedFeedback']
+            
             
         # feedbacks_unread
         feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
-            messages_received_list =\
-                SESSION.get_messages_received_list(request.session)
-            messages_received_ids =\
-                [ fb.objectId for fb in messages_received_list ]
             fb_unread = []
             for feedback in feedbacks_unread:
                 m = Message(**feedback)
@@ -97,12 +118,10 @@ def refresh(request):
                 data['feedback_unread_count'] = fb_count
                 
             del session['newFeedback']
-            
+        
         # employees_pending
         employees_pending = session.get("pendingEmployee")
         if employees_pending:
-            employees_pending_list =\
-                SESSION.get_employees_pending_list(request.session)
             emps_pending = []
             for emp in employees_pending:
                 e = Employee(**emp)
@@ -114,16 +133,52 @@ def refresh(request):
             data['employees_pending'] = emps_pending
             del session['pendingEmployee']
         
+        # approved employees (pending to approved)
+        appr_emps = session.get("approvedEmployee")
+        if appr_emps:
+            for appr_emp in appr_emps:
+                for i, emp_pending in\
+                    enumerate(employees_pending_list[:]):
+                    if appr_emp.objectId == emp_pending.objectId:
+                        emp = employees_pending_list.pop(i)
+                        emp.status = APPROVED
+                        employees_approved_list.insert(0, emp)
+            request.session['employees_pending_list'] =\
+                employees_pending_list
+            request.session['employees_approved_list'] =\
+                employees_approved_list
+            del session['approvedEmployee']
+            
+        """
+        + patronStore_num = request.POST.get("patronStore_num")
+        + updatedReward = request.POST.get("updatedReward")
+        + newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        + deletedFeedback = request.POST.get("deletedFeedback")
+        + pendingEmployee = request.POST.get("pendingEmployee")
+        + approvedEmployee = request.POST.get("approvedEmployee")
+        + deletedEmployee = request.POST.get("deletedEmployee")
+        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
+        """ 
+            
+        # deleted employees (pending/approved to pop)!
+        del_emps = session.get("deletedEmployee")
+        if del_emps:
+            pass
+        
+        
         # update employee punches
         uep = session.get("updatedEmployeePunch")
         if uep:
-            employees_approved_ids =\
-                [ emp.objectId for emp in employees_approved_list ] 
             for updated_emp in uep:
+                u_emp = Employee(**updated_emp)
                 for emp in employees_approved_list:
-                    if updated_emp.objectId == emp.objectId:
+                    if u_emp.objectId == emp.objectId:
                         emp.set("lifetime_punches",
-                            updated_emp.lifetime_punches)
+                            u_emp.lifetime_punches)
             del session['updatedEmployeePunch']
            
         # redemptions
@@ -197,6 +252,7 @@ def receive(request, store_id):
         updatedReward = request.POST.get("updatedReward")
         newMessage = request.POST.get("newMessage")
         newFeedback = request.POST.get("newFeedback")
+        deletedFeedback = request.POST.get("deletedFeedback")
         pendingEmployee = request.POST.get("pendingEmployee")
         approvedEmployee = request.POST.get("approvedEmployee")
         deletedEmployee = request.POST.get("deletedEmployee")

@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
 from dateutil.tz import tzutc
-import urllib
+import urllib, requests
 
 from parse.decorators import session_comet
 from parse import session as SESSION
@@ -15,7 +15,8 @@ from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
-from repunch.settings import PAGINATION_THRESHOLD
+from repunch.settings import PAGINATION_THRESHOLD,\
+COMET_REQUEST_RECEIVE
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
@@ -443,6 +444,13 @@ def feedback_delete(request, feedback_id):
     messages_received_list.pop(i_remove)
     request.session['messages_received_list'] =\
         messages_received_list
+        
+    # notify other dashboards of this change
+    store_id = SESSION.get_store(request.session).objectId
+    deleted_feedback = Message(objectId=feedback.objectId)
+    payload = {"deletedFeedback":deleted_feedback}
+    # check for response?
+    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
     
     feedback.delete()
     return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))

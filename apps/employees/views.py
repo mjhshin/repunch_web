@@ -102,13 +102,15 @@ def delete(request, employee_id):
     request.session['employees_approved_list'] =\
         employees_approved_list
 
+    # notify other dashboards of this change
+    store_id = SESSION.get_store(request.session).objectId
+    deleted_employee = Employee(objectId=employee.objectId)
+    payload = {"deletedEmployee":deleted_employee}
+    # check for response?
+    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
+    
     # delete Punches Pointers to this employee?
     employee.delete()
-    
-    # notifiy all other dashboards of this change 
-    store_id = SESSION.get_store(request.session).objectId
-    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
-    # check if success?
 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
@@ -142,10 +144,12 @@ def approve(request, employee_id):
     request.session['employees_approved_list'] =\
         employees_approved_list
         
-    # notifiy all other dashboards of this change 
+    # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
-    r = requests.get(COMET_REQUEST_RECEIVE + store_id)
-    # check if success?
+    approved_employee = Employee(objectId=employee.objectId)
+    payload = {"approvedEmployee":approved_employee}
+    # check for response?
+    requests.post(COMET_REQUEST_RECEIVE + store_id, data=payload)
         
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
