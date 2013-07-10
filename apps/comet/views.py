@@ -4,7 +4,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.core.mail import send_mail
 import json
 
 from parse import session as SESSION
@@ -34,7 +33,7 @@ def refresh(request):
     """
     # in_time = timezone.now()
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
-    def comet(session_key):
+    def comet():
         # sleep(COMET_REFRESH_RATE)
         store = SESSION.get_store(request.session)
         
@@ -50,16 +49,16 @@ def refresh(request):
             SESSION.get_redemptions_pending(request.session)
         redemptions_past =\
             SESSION.get_redemptions_past(request.session)
-            
-        # get the session
-        session = SessionStore(session_key)
-        
-        send_mail("SESSION STORE BUG", str(request.session.keys()), 
-                "vandolf@repunch.com", ["vandolf@repunch.com"],
-                fail_silently=True)
         
         # process the stuff in the session
         data = {}
+        
+        # IMPORTANT! The request.session is the same as the 
+        # SessionStore(session_key)! so we must use the 
+        # request.session because it is automatically saved at the end
+        # of each request- thereby overriding/undoing any changes made
+        # to the SessionStore(session_key) key!
+        session = request.session
         
         #############################################################
         # REWARDS redemption_count ##############################
@@ -322,7 +321,7 @@ def refresh(request):
         if scomet.modified:
             scomet.modified = False
             scomet.save()
-            return comet(scomet.session_key)
+            return comet()
             
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
@@ -331,13 +330,15 @@ def refresh(request):
         scomet = CometSession.objects.create(session_key=\
                 request.session.session_key,
                 store_id=SESSION.get_store(request.session).objectId)
-        return comet(scomet.session_key)
+        return comet()
         
 @csrf_exempt  
 def receive(request, store_id):
     """
     Receives a get request from a foreign site and sets all of the 
     CometSessions that have the given store Id.
+    This is called by a currently logged in user as well as by the
+    cloud. Need to differentiate!
     
     This adds to the related session's cache:
     
@@ -365,7 +366,10 @@ def receive(request, store_id):
         
         postDict = json.loads(request.raw_post_data)
         for scomet in CometSession.objects.filter(store_id=store_id):
-            session = SessionStore(scomet.session_key)
+            if request.session.get('SESSION_KEY'):
+                session = request.session
+            else:
+                session = SessionStore(scomet.session_key)
             for key, value in postDict.iteritems():
                 if key not in session or session.get(key) is None:
                     # keys ending with _num is a number
