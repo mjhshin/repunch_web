@@ -778,7 +778,10 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
 			response.error("error");
-			return;
+			
+		} else if(redeemReward.get("is_redeemed") == true) {
+			console.log("RedeemReward has already been validated");
+			response.success("validated");
 			
 		} else if(rewardId == null) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
@@ -797,7 +800,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
 			response.success("insufficient");
-			return;
 			
 		} else{
 			console.log("PatronStore has enough punches.");
