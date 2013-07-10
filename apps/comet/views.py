@@ -135,10 +135,9 @@ def refresh(request):
         # FEEDBACK DELETED ##################################
         feedbacks_deleted = session.get("deletedFeedback")
         if feedbacks_deleted:
-            copy = messages_received_list[:]
             for fb_d in feedbacks_deleted:
                 fb = Message(**fb_d)
-                for i, mro in enumerate(copy):
+                for i, mro in enumerate(messages_received_list):
                     if fb.objectId == mro.objectId:
                         messages_received_list.pop(i)
                         break
@@ -176,12 +175,12 @@ def refresh(request):
         # EMPLOYEES APPROVED (pending to approved) #################
         appr_emps = session.get("approvedEmployee")
         if appr_emps:
-            copy = employees_pending_list[:]
             for appr_emp in appr_emps:
                 emp = Employee(**appr_emp)
                 # first check if the employee is in the pending list
                 # if not then check if it is already approved
-                for i, emp_pending in enumerate(copy):
+                for i, emp_pending in\
+                    enumerate(employees_pending_list):
                     if emp.objectId == emp_pending.objectId:
                         emp = employees_pending_list.pop(i)
                         emp.status = APPROVED
@@ -197,13 +196,11 @@ def refresh(request):
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
         del_emps = session.get("deletedEmployee")
         if del_emps:
-            approved_copy = employees_approved_list[:]
-            pending_copy = employees_pending_list[:]
             for demp in del_emps:
                 emp = Employee(**demp)
                 cont = True
                 # check in approved emps
-                for i, cop in enumerate(approved_copy):
+                for i, cop in enumerate(employees_approved_list):
                     if cop.objectId == emp.objectId:
                         employees_approved_list.pop(i)
                         cont = False
@@ -213,7 +210,7 @@ def refresh(request):
                     break
                     
                 # check in pending emps
-                for i, cop in enumerate(pending_copy):
+                for i, cop in enumerate(employees_pending_list):
                     if cop.objectId == emp.objectId:
                         employees_pending_list.pop(i)
                         break
@@ -282,12 +279,11 @@ def refresh(request):
         # REDEMPTIONS APPROVED (pending to history)
         appr_redemps = session.get("approvedRedemption") 
         if appr_redemps:   
-            copy = redemptions_pending[:]
             redemp_js = []
             for red in appr_redemps:
                 redemp = RedeemReward(**red)
                 # check if redemp is still in pending
-                for i, redem in enumerate(copy):
+                for i, redem in enumerate(redemptions_pending):
                     if redem.objectId == redemp.objectId:
                         r = redemptions_pending.pop(i)
                         r.is_redeemed = True
@@ -392,6 +388,7 @@ def receive(request, store_id):
                         session[key].append(value)
                         
             # need to save session to commit modifications
+            session.modified = True
             session.save()
             
             # done additions - set to modified
