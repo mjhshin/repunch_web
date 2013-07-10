@@ -843,7 +843,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
 
 		androidInstallationQuery.equalTo("patron_id", patron.id);
+		androidInstallationQuery.equalTo("deviceType", "android");
 		iosInstallationQuery.equalTo("patron_id", patron.id);
+		iosInstallationQuery.equalTo("deviceType", "ios");
 
 		//ios push
 	    Parse.Push.send({
@@ -1226,8 +1228,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		
 	}, function(error) {
 		console.log("Patron save failed.");
-		response.error("error");			
-	}).then(function(){
+		response.error("error");
+				
+	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
             url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
@@ -1380,9 +1383,3 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		}); // end Parse.Push
 	}
 });
-
-
-
-
-
-
