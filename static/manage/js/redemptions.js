@@ -12,10 +12,14 @@ function onRedeem(rowId){
                 "rewardId":rewardId }, 
         type: "GET",
         success: function(res){
-            if (res.result == 1 || res.result == 2){
+            if (res.result == 1 || res.result == 2 || res.result == 3){
                 if (res.result == 1){
                     row.css("background", "#CCFF99");
                     row.html("Successfully validated redemption.");
+                } else if (res.result == 3){
+                    row.css("background", "#ffffcb");
+                    row.html("Reward already redeemed.");
+                    alert("Invalid! Reward already redeemed.");
                 } else {
                     row.css("background", "#ffffcb");
                     row.html("Customer does not have enough punches!");

@@ -68,9 +68,22 @@ def refresh(request):
         if rewards:
             for reward in rewards:
                 for i, mreward in enumerate(mod_rewards):
+                    # [{"reward_name":"Free bottle of wine", 
+                    # "description":"Must be under $25 in value",
+                    # "punches":10,"redemption_count":0,reward_id:0},]
                     if reward['reward_id']==mreward['reward_id']:
-                        mod_rewards[i]['redemption_count'] =\
-                            reward['redemption_count']
+                        if reward.has_key("redemption_count"):
+                            mod_rewards[i]['redemption_count'] =\
+                                reward['redemption_count']
+                        if reward.has_key("reward_name"):
+                            mod_rewards[i]['reward_name'] =\
+                                reward['reward_name']
+                        if reward.has_key("punches"):
+                            mod_rewards[i]['punches'] =\
+                                reward['punches']
+                        if reward.has_key("description"):
+                            mod_rewards[i]['description'] =\
+                                reward['description']
                         break
             data['rewards'] = rewards
             store.rewards = mod_rewards
@@ -153,7 +166,8 @@ def refresh(request):
                             messages_received_list.pop(i)
                             messages_received_list.insert(i, m)
                             break
-                        
+            request.session['messages_received_list'] =\
+                messages_received_list
             request.session['messages_sent_list'] = messages_sent_list
             del session['newMessage']
           
@@ -274,20 +288,6 @@ def refresh(request):
                 redemptions_pending
             del session['pendingRedemption']
             
-        """
-        + patronStore_num = request.POST.get("patronStore_num")
-        + updatedReward = request.POST.get("updatedReward")
-        + newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
-        + deletedFeedback = request.POST.get("deletedFeedback")
-        + pendingEmployee = request.POST.get("pendingEmployee")
-        + approvedEmployee = request.POST.get("approvedEmployee")
-        + deletedEmployee = request.POST.get("deletedEmployee")
-        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
-        + pendingRedemption = request.POST.get("pendingRedemption")
-        + approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
-        """ 
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
         appr_redemps = session.get("approvedRedemption") 
@@ -313,6 +313,24 @@ def refresh(request):
             request.session['redemptions_past'] =\
                 redemptions_past
             del session['approvedRedemption']
+            
+        """ TODO
+        updatedStore_one = request.POST.get("updatedStore_one")
+        updatedSubscription_one = request.POST.get("updatedStore_one")
+        updatedSettings_one = request.POST.get("updatedSettings_one")
+        + patronStore_num = request.POST.get("patronStore_num")
+        + updatedReward = request.POST.get("updatedReward")
+        + newMessage = request.POST.get("newMessage")
+        + newFeedback = request.POST.get("newFeedback")
+        + deletedFeedback = request.POST.get("deletedFeedback")
+        + pendingEmployee = request.POST.get("pendingEmployee")
+        + approvedEmployee = request.POST.get("approvedEmployee")
+        + deletedEmployee = request.POST.get("deletedEmployee")
+        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
+        + pendingRedemption = request.POST.get("pendingRedemption")
+        + approvedRedemption = request.POST.get("approvedRedemption")
+        deletedRedemption = request.POST.get("deletedRedemption")
+        """     
         
         # no need to save the session since request.session is auto-
         # matically saved at the end of each request!
@@ -352,7 +370,12 @@ def receive(request, store_id):
     cloud. Need to differentiate!
     
     This adds to the related session's cache:
+        Note: request.POST does not contain the data!
+                Use request.raw_post_data instead!
     
+        updatedStore_one = request.POST.get("updatedStore_one")
+        updatedSubscription_one = request.POST.get("updatedStore_one")
+        updatedSettings_one = request.POST.get("updatedSettings_one")
         patronStore_num = request.POST.get("patronStore_num")
         updatedReward = request.POST.get("updatedReward")
         newMessage = request.POST.get("newMessage")
@@ -386,6 +409,9 @@ def receive(request, store_id):
                     # keys ending with _num is a number
                     if key.endswith("_num") or key.endswith("_count"):
                         session[key] = value
+                    # only 1 dict can exist
+                    elif key.endswith("_one"):
+                        session[key] = value # separated for clarity
                     # everything else is a list of dicts
                     else:
                         session[key] = [value]
@@ -396,6 +422,9 @@ def receive(request, store_id):
                     # keys ending in _count is a number that is added
                     elif key.endswith("_count"):
                         session[key] = session[key] + value
+                    # only 1 dict can exist
+                    elif key.endswith("_one"):
+                        session[key] = value
                     # everything else is a list of dicts
                     else:
                         session[key].append(value)

@@ -114,7 +114,9 @@ def get_page(request):
     
 @login_required
 def redeem(request):
-    """ returns json object. result is 0 if fail, 1 if success """
+    """ returns json object. result is 0 if fail, 1 if success,
+    2 if insufficient, 3 if already validated.
+    """
     if request.method == "GET" or request.is_ajax():
         redeemId = request.GET.get('redeemRewardId')
         # may come in as "None" or "null"
@@ -153,6 +155,9 @@ def redeem(request):
             
             if result and result == "insufficient":
                 return HttpResponse(json.dumps({"result":2}), 
+                            content_type="application/json")
+            elif result and result == "validated":
+                return HttpResponse(json.dumps({"result":3}), 
                             content_type="application/json")
             else:
                 return HttpResponse(json.dumps({"result":1}), 

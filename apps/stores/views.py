@@ -2,10 +2,9 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.request import QueryDict
-from django.http import HttpResponse
 from django.forms.models import inlineformset_factory
 from datetime import datetime
-import json, urllib
+import json, urllib, requests
 
 from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours
@@ -13,6 +12,7 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone
 
+from repunch.settings import COMET_REQUEST_RECEIVE
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
@@ -107,6 +107,11 @@ def edit(request):
             store.update()
             # update the session cache
             request.session['store'] = store
+            
+            # notify other dashboards of this change
+            payload = {"updatedStore_one":store.jsonify()}
+            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                data=json.dumps(payload))
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\

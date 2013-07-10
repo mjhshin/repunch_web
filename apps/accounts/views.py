@@ -4,10 +4,11 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.contrib.auth import SESSION_KEY
 from datetime import datetime
-import json, urllib
+import json, urllib, requests
 
 from apps.accounts.models import AccountActivate
-from repunch.settings import PHONE_COST_UNIT_COST
+from repunch.settings import PHONE_COST_UNIT_COST,\
+COMET_REQUEST_RECEIVE
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
 from parse.decorators import session_comet
@@ -68,6 +69,11 @@ def settings(request):
             store.Settings = settings.objectId
             store.settings = settings
             store.update()
+            
+            # notify other dashboards of this changes
+            payload = {"updatedSettings_one":settings.jsonify()}
+            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                data=json.dumps(payload))
 
             data['success'] = "Settings have been saved."
         else:
@@ -102,6 +108,12 @@ def refresh(request):
             
             # update the session cache
             request.session['settings'] = settings
+            
+            # notify other dashboards of these changes
+            store = SESSION.get_store(request.session)
+            payload = {"updatedSettings_one":settings.jsonify()}
+            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                data=json.dumps(payload))
             
             data['success'] = True
             data['retailer_pin'] = settings.retailer_pin
@@ -159,6 +171,11 @@ def update(request):
             # update the session cache
             request.session['store'] = store
             request.session['subscription'] = subscription
+            
+            # notify other dashboards of these changes
+            payload={"updatedSubscription_one":subscription.jsonify()}
+            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                data=json.dumps(payload))
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -235,6 +252,11 @@ def upgrade(request):
             # update the session cache
             request.session['store'] = store
             request.session['subscription'] = subscription
+            
+            # notify other dashboards of these changes
+            payload={"updatedSubscription_one":subscription.jsonify()}
+            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                data=json.dumps(payload))
             
             # if coming from the message edit limit reached
             if request.session.get('from_limit_reached') and\
