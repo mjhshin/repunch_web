@@ -360,7 +360,7 @@ def refresh(request):
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             for reward in deleted_rewards:
-                if reward['reward_id'] not in rewards_ids:
+                if reward['reward_id'] in rewards_ids:
                     for i, r in enumerate(rewards):
                         if r['reward_id'] == reward['reward_id']:
                             rewards.pop(i)
