@@ -332,6 +332,60 @@ $(document).ready(function(){
             });
             
         } // end hasOwnProperty
+        
+        
+        if (res.hasOwnProperty('redemptions_approved')){
+            // Workbench nav
+            var count, redemps = res.redemptions_approved;
+            var rBadge = $("#redemptions-nav a div.nav-item-badge");
+            if (rBadge.length == 1){
+                count = parseInt(rBadge.text()) - redemps.length;
+                if (count > 0) {
+                    rBadge.text(new String(count));
+                } else {
+                    rBadge.fadeOut(1000, function(){
+                        $(this).remove();
+                    });
+                }
+            }
+        
+            // tab
+            var pendingTab = $("#tab-pending-redemptions");
+            if (pendingTab.length >0){
+                // remove the rows
+                for (var i=0; i< redemps.length; i++){
+                    var row = $("#" + redemps[i].objectId);
+                    row.css("background", "#CCFF99");
+                    row.html("Successfully validated redemption.");
+                    // the last row to go checks if placeholder is necessary
+                    if (i == redemps.length - 1) {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                            // place the placeholder if now empty
+                            $("#tab-body-pending-redemptions div.table-header").after(
+                                "<div class='tr' id='no-redemptions'>" +
+	                            "<div class='td'>No Redemptions</div>" +
+                                "</div>");
+                        });
+                    } else {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                        });
+                    }
+                }
+                
+                // update the title
+                if (count > 0) {
+                    document.title = "Repunch | (" + new String(count) + ") Redemptions";
+                } else {
+                    document.title = "Repunch | Redemptions";
+                }
+                // update the tab
+                $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
+                
+            }
+            
+        } // end hasOwnProperty
                
     } // end mainComet
     

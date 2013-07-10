@@ -297,7 +297,7 @@ def refresh(request):
                 # if not then check if it is in the history already
                 # the above shouldn't happen!
             if len(redemp_js) > 0:
-                data['redemptionsApproved'] = redemp_js
+                data['redemptions_approved'] = redemp_js
                 
             request.session['redemptions_pending'] =\
                 redemptions_pending
