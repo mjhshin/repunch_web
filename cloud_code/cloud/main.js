@@ -195,7 +195,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		
 	}).then(function(patron) {
 		console.log("Store save success.");
-		response.success("success");
+		response.success(patronStore);
 		return;
 		
 	}, function(error) {
