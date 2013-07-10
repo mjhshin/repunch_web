@@ -366,6 +366,7 @@ $(document).ready(function(){
                             if($("#redemptions-nav a div.nav-item-badge").length == 0) {
                                 $("#tab-body-pending-redemptions div.table-header").after(
                                     "<div class='tr' id='no-redemptions'>" +
+                                    "<div class='td'>No Redemptions</div>" +
                                     "</div>");
                             }
                         });
