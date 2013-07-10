@@ -331,8 +331,8 @@ class ParseObject(object):
                     data[key] = val.isoformat()
             # must be strings, numbers (int, long, float),
             # dicts, or lists/tuples!
-            elif type(value) in JSONIFIABLE_TYPES:
-                data[key] = value
+            elif type(val) in JSONIFIABLE_TYPES:
+                data[key] = val
             
         return data
 
