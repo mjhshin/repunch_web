@@ -37,7 +37,6 @@ def refresh(request):
     # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
     def comet():
         # sleep(COMET_REFRESH_RATE)
-        store = SESSION.get_store(request.session)
         
         # used by more than 1 (note that it is ok to retrieve all of 
         # the lists since they are all pointers - not the actual list!
@@ -327,8 +326,8 @@ def refresh(request):
         #############################################################
         # REWARDS UPDATED ##############################
         updated_rewards = session.get('updatedReward')
-        mod_rewards = store.get('rewards')
         if updated_rewards:
+            store = request.session['store']
             for reward in updated_rewards:
                 for i, mreward in enumerate(mod_rewards):
                     # [{"reward_name":"Free bottle of wine", 
@@ -357,7 +356,7 @@ def refresh(request):
         # REWARDS DELETED ##############################
         deleted_rewards = session.get("deletedReward")
         if deleted_rewards:
-            store = request.session
+            store = request.session['store']
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             for reward in deleted_rewards:
