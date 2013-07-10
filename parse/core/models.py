@@ -14,6 +14,8 @@ from parse.core.formatter import query,\
 format_date, format_pointer, format_file, format_geopoint,\
 NOT_WHERE_CONSTRAINTS
 
+JSONIFIABLE_TYPES = (int, float, long, str, list, dict, tuple)
+
 class ParseObjectManager(object):
     """
     Provides extra methods for ParseObjects such as counting.
@@ -318,13 +320,20 @@ class ParseObject(object):
         Returns a json (dict) object representation of this object.
         This is crutial for portability to ajax since datetime
         objects is not JSON serializable.
+        
+        Cache attributes are not returned!
         """
-        data = self.__dict__.copy()
-        for key, val in data.copy().iteritems():
+        data = {}
+        for key, val in self.__dict__.copy().iteritems():
             if key.startswith("date_") or\
                 key in ("createdAt", "updatedAt"):
                 if val is not None:
                     data[key] = val.isoformat()
+            # must be strings, numbers (int, long, float),
+            # dicts, or lists/tuples!
+            elif type(value) in JSONIFIABLE_TYPES:
+                data[key] = value
+            
         return data
 
     def get_class(self, className):
