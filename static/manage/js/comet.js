@@ -358,20 +358,9 @@ $(document).ready(function(){
                     row.css("background", "#CCFF99");
                     row.html("Successfully validated redemption.");
                     // the last row to go checks if placeholder is necessary
-                    if (i == redemps.length - 1) {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                            // place the placeholder if now empty
-                            $("#tab-body-pending-redemptions div.table-header").after(
-                                "<div class='tr' id='no-redemptions'>" +
-	                            "<div class='td'>No Redemptions</div>" +
-                                "</div>");
-                        });
-                    } else {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                        });
-                    }
+                    row.fadeOut(2000, function(){
+                        $(this).remove();
+                    });
                 }
                 
                 // update the title and the tab
@@ -381,7 +370,13 @@ $(document).ready(function(){
                 } else {
                     document.title = "Repunch | Redemptions";
                     $("#tab-pending-redemptions").html("Pending");
-                }
+                
+                    // place the placeholder since now empty
+                    $("#tab-body-pending-redemptions div.table-header").after(
+                        "<div class='tr' id='no-redemptions'>" +
+                        "<div class='td'>No Redemptions</div>" +
+                        "</div>");
+                    }
                 
             }
             
