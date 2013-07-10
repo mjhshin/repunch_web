@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.core.mail import send_mail
 import json
 
 from parse import session as SESSION
@@ -52,6 +53,10 @@ def refresh(request):
             
         # get the session
         session = SessionStore(session_key)
+        
+        send_mail("SESSION STORE BUG", str(request.session.keys()), 
+                "vandolf@repunch.com", ["vandolf@repunch.com"],
+                fail_silently=True)
         
         # process the stuff in the session
         data = {}
