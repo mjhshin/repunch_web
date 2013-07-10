@@ -32,19 +32,20 @@ function onRedeem(rowId){
                     var rBadge = $("#redemptions-nav a div.nav-item-badge");
                     var diva = $("#redemptions-nav a");
                     var rcount = $("#tab-body-pending-redemptions div.tr").length;
+                    
+                    // update the title
+                    if (rcount > 0) {
+                        document.title = "Repunch | (" + new String(rcount) + ") Redemptions";
+                    } else {
+                        document.title = "Repunch | Redemptions";
+                    }
+                    
                     if (rcount < 1){
                         // workbench nav badge
                         if (rBadge.length == 1){
                             rBadge.fadeOut(1000, function(){
                                 $(this).remove();
                             });
-                        }
-                        
-                        // update the title
-                        if (rcount > 0) {
-                            document.title = "Repunch | (" + new String(rcount) + ") Redemptions";
-                        } else {
-                            document.title = "Repunch | Redemptions";
                         }
                         
                         // pending tab

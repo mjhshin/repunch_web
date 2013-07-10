@@ -391,7 +391,8 @@ def receive(request, store_id):
             
             # done additions - set to modified
             scomet.modified = True
-            scomet.save()
+            # may be unnecessary if request is from a know user
+            scomet.save() 
             
         return HttpResponse("success")
     return HttpResponse("error")
