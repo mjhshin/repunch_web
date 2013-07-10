@@ -365,7 +365,9 @@ def feedback_reply(request, feedback_id):
         # double check if feedback already has a reply
         # should not go here unless it is a hacker 
         elif feedback.get('Reply'):
-            data['error']='This feedback has already been replied to.'
+            return redirect(reverse('messages_index')+ "?%s" %\
+                 urllib.urlencode({'error':\
+                    'Feedback has already been replied to.'}))
         else:
             msg = Message.objects().create(message_type=\
                 FEEDBACK, sender_name=store.get('store_name'),

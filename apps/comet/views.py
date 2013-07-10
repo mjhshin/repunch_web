@@ -93,7 +93,7 @@ def refresh(request):
             messages_sent_list =\
                 SESSION.get_messages_sent_list(request.session)
             messages_sent_ids =\
-                [ msg.id for msg in messages_sent_list ]
+                [ msg.objectId for msg in messages_sent_list ]
             for message in messages_sent:
                 m = Message(**feedback)
                 if m.objectId not in messages_sent_ids:
