@@ -10,6 +10,7 @@ from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from apps.comet.models import CometSession
+from parse.apps.stores.models import Store, Subscription, Settings
 from parse.apps.messages import FEEDBACK
 from parse.apps.messages.models import Message
 from parse.apps.employees import APPROVED, DENIED
@@ -60,46 +61,6 @@ def refresh(request):
         # of each request- thereby overriding/undoing any changes made
         # to the SessionStore(session_key) key!
         session = request.session
-        
-        #############################################################
-        # REWARDS redemption_count ##############################
-        rewards = session.get('updatedReward')
-        mod_rewards = store.get('rewards')
-        if rewards:
-            for reward in rewards:
-                for i, mreward in enumerate(mod_rewards):
-                    # [{"reward_name":"Free bottle of wine", 
-                    # "description":"Must be under $25 in value",
-                    # "punches":10,"redemption_count":0,reward_id:0},]
-                    if reward['reward_id']==mreward['reward_id']:
-                        if reward.has_key("redemption_count"):
-                            mod_rewards[i]['redemption_count'] =\
-                                reward['redemption_count']
-                        if reward.has_key("reward_name"):
-                            mod_rewards[i]['reward_name'] =\
-                                reward['reward_name']
-                        if reward.has_key("punches"):
-                            mod_rewards[i]['punches'] =\
-                                reward['punches']
-                        if reward.has_key("description"):
-                            mod_rewards[i]['description'] =\
-                                reward['description']
-                        break
-            data['rewards'] = rewards
-            store.rewards = mod_rewards
-            request.session['store'] = store
-            del session['updatedReward'] 
-            
-        #############################################################
-        # PATRONSTORE_COUNT ##################################
-        patronStore_count_new = session.get('patronStore_num')
-        if patronStore_count_new:
-            # TODO patronStore_num > store limit then upgrade account
-            # and send email notification make sure to update the
-            # subscription in the cache afterwards!
-            data['patronStore_count'] = patronStore_count_new
-            request.session['patronStore_count']=patronStore_count_new
-            del session['patronStore_num']
        
         #############################################################
         # FEEDBACKS_UNREAD ##################################
@@ -314,23 +275,111 @@ def refresh(request):
                 redemptions_past
             del session['approvedRedemption']
             
-        """ TODO
-        updatedStore_one = request.POST.get("updatedStore_one")
-        updatedSubscription_one = request.POST.get("updatedStore_one")
-        updatedSettings_one = request.POST.get("updatedSettings_one")
-        + patronStore_num = request.POST.get("patronStore_num")
-        + updatedReward = request.POST.get("updatedReward")
-        + newMessage = request.POST.get("newMessage")
-        + newFeedback = request.POST.get("newFeedback")
-        + deletedFeedback = request.POST.get("deletedFeedback")
-        + pendingEmployee = request.POST.get("pendingEmployee")
-        + approvedEmployee = request.POST.get("approvedEmployee")
-        + deletedEmployee = request.POST.get("deletedEmployee")
-        + updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
-        + pendingRedemption = request.POST.get("pendingRedemption")
-        + approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
-        """     
+        #############################################################
+        # REDEMPTIONS DELETED ##############################
+        # TODO
+               
+        #############################################################
+        # STORE UPDATED ##############################
+        updatedStore = session.get("updatedStore_one")
+        if updatedStore:
+            request.session['store'] = Store(**updatedStore)
+            del session["updatedStore_one"]
+            
+        #############################################################
+        # SUBSCRIPTION UPDATED ##############################
+        updatedSubscription = session.get("updatedSubscription_one")
+        if updatedSubscription:
+            subscription = Subscription(**updatedSubscription)
+            store = request.session["store"]
+            store.set('subscription', subscription)
+            store.set('Subscription', subscription.objectId)
+            request.session['subscription'] = subscription
+            request.session['store'] = store
+            del session["updatedSubscription_one"]
+            
+        #############################################################
+        # SETTINGS UPDATED ##############################
+        updatedSettings = session.get("updatedSettings_one")
+        if updatedSettings:
+            settings = Settings(**updatedSettings)
+            store = request.session["store"]
+            store.set('settings', settings)
+            store.set("Settings", settings.objectId)
+            request.session['settings'] = settings
+            request.session['store'] = store
+            del session["updatedSettings_one"]
+            
+        #############################################################
+        # REWARDS NEW ##############################
+        new_rewards = session.get("newReward")
+        if new_rewards:
+            store = request.session
+            rewards = store.get("rewards")
+            rewards_ids = [ r['reward_id'] for r in rewards ]
+            for reward in new_rewards:
+                if reward['reward_id'] not in rewards_ids:
+                    rewards.append(reward)
+            store.rewards = rewards
+            request.session['store'] = store
+            del session['newReward']
+        
+        #############################################################
+        # REWARDS UPDATED ##############################
+        updated_rewards = session.get('updatedReward')
+        mod_rewards = store.get('rewards')
+        if updated_rewards:
+            for reward in updated_rewards:
+                for i, mreward in enumerate(mod_rewards):
+                    # [{"reward_name":"Free bottle of wine", 
+                    # "description":"Must be under $25 in value",
+                    # "punches":10,"redemption_count":0,reward_id:0},]
+                    if reward['reward_id']==mreward['reward_id']:
+                        if reward.has_key("redemption_count"):
+                            mod_rewards[i]['redemption_count'] =\
+                                reward['redemption_count']
+                        if reward.has_key("reward_name"):
+                            mod_rewards[i]['reward_name'] =\
+                                reward['reward_name']
+                        if reward.has_key("punches"):
+                            mod_rewards[i]['punches'] =\
+                                reward['punches']
+                        if reward.has_key("description"):
+                            mod_rewards[i]['description'] =\
+                                reward['description']
+                        break
+            data['rewards'] = updated_rewards
+            store.rewards = mod_rewards
+            request.session['store'] = store
+            del session['updatedReward'] 
+            
+        #############################################################
+        # REWARDS DELETED ##############################
+        deleted_rewards = session.get("deletedReward")
+        if deleted_rewards:
+            store = request.session
+            rewards = store.get("rewards")
+            rewards_ids = [ r['reward_id'] for r in rewards ]
+            for reward in deleted_rewards:
+                if reward['reward_id'] not in rewards_ids:
+                    for i, r in enumerate(rewards):
+                        if r['reward_id'] == reward['reward_id']:
+                            rewards.pop(i)
+                            break
+            store.rewards = rewards
+            request.session['store'] = store
+            del session['deletedReward']
+           
+        #############################################################
+        # PATRONSTORE_COUNT ##################################
+        patronStore_count_new = session.get('patronStore_num')
+        if patronStore_count_new:
+            # TODO patronStore_num > store limit then upgrade account
+            # and send email notification make sure to update the
+            # subscription in the cache afterwards!
+            data['patronStore_count'] = patronStore_count_new
+            request.session['patronStore_count']=patronStore_count_new
+            del session['patronStore_num']
         
         # no need to save the session since request.session is auto-
         # matically saved at the end of each request!
@@ -377,6 +426,8 @@ def receive(request, store_id):
         updatedSubscription_one = request.POST.get("updatedStore_one")
         updatedSettings_one = request.POST.get("updatedSettings_one")
         patronStore_num = request.POST.get("patronStore_num")
+        newReward = request.POST.get("newReward")
+        deletedReward = request.POST.get("deletedReward")
         updatedReward = request.POST.get("updatedReward")
         newMessage = request.POST.get("newMessage")
         newFeedback = request.POST.get("newFeedback")
@@ -427,15 +478,17 @@ def receive(request, store_id):
                         session[key] = value
                     # everything else is a list of dicts
                     else:
-                        session[key].append(value)
+                        lst = session[key]
+                        lst.append(value)
+                        session[key] = lst
                         
             # need to save session to commit modifications
-            session.modified = True
-            session.save()
+            if not session.get('SESSION_KEY'):
+                session.modified = True
+                session.save()
             
             # done additions - set to modified
             scomet.modified = True
-            # may be unnecessary if request is from a know user
             scomet.save() 
             
         return HttpResponse("success")

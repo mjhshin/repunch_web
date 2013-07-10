@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-import urllib
+import urllib, requests, json
 
+from repunch.settings import COMET_REQUEST_RECEIVE
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
@@ -105,9 +106,20 @@ def edit(request, reward_index):
             else:
                 msg = 'Reward has been added.'
                 reward['reward_id'] = ids[-1] + 1
+                
+            # notify other dashboards of this change
+            if is_new:
+                payload = {"newReward":reward}
+                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                    data=json.dumps(payload))
+            else:
+                payload = {"updatedReward":reward}
+                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                    data=json.dumps(payload))
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None
+            store.get('rewards')
             
             # update session cache
             request.session['store'] = store
@@ -154,6 +166,11 @@ def delete(request, reward_index):
     store.array_remove('rewards', [reward])
     store.rewards = None
     store.get('rewards')
+    
+    # notify other dashboards of this change
+    payload = {"deletedReward": {"reward_id":reward["reward_id"]} }
+    requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+        data=json.dumps(payload))
     
     # update session cache
     request.session['store'] = store

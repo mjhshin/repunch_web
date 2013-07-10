@@ -459,7 +459,6 @@ def feedback_delete(request, feedback_id):
     store_id = SESSION.get_store(request.session).objectId
     deleted_feedback = Message(objectId=feedback.objectId)
     payload = {"deletedFeedback":deleted_feedback.jsonify()}
-    # check for response?
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
     
