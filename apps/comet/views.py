@@ -300,11 +300,8 @@ def refresh(request):
                 redemptions_past
             del session['approvedRedemption']
         
-        
-        #############################################################
-        ######## make sure to update the session!
-        session.modified = True # make sure this is True explicitly!
-        session.save() # TODO session not getting saved!!!!!!
+        # no need to save the session since request.session is auto-
+        # matically saved at the end of each request!
         
         try: # respond
             resp = HttpResponse(json.dumps(data), 
