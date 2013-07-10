@@ -314,7 +314,7 @@ def refresh(request):
         # REWARDS NEW ##############################
         new_rewards = session.get("newReward")
         if new_rewards:
-            store = request.session
+            store = request.session['store']
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             for reward in new_rewards:
