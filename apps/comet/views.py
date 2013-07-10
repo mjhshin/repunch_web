@@ -89,24 +89,6 @@ def refresh(request):
             del session['patronStore_num']
        
         #############################################################
-        # MESSAGE SENT ##################################
-        # need to check if this new message is a reply to a feedback
-        # or an original message!
-        messages_sent = session.get("newMessage")
-        if messages_sent:
-            messages_sent_list =\
-                SESSION.get_messages_sent_list(request.session)
-            messages_sent_ids =\
-                [ msg.objectId for msg in messages_sent_list ]
-            for message in messages_sent:
-                m = Message(**message)
-                if m.objectId not in messages_sent_ids and\
-                    m.message_type != FEEDBACK:
-                    messages_sent_list.insert(0, m)
-            request.session['messages_sent_list'] = messages_sent_list
-            del session['newMessage']
-        
-        #############################################################
         # FEEDBACKS_UNREAD ##################################
         feedbacks_unread = session.get('newFeedback')
         if feedbacks_unread:
@@ -143,7 +125,38 @@ def refresh(request):
                         break
             request.session['messages_received_list'] =\
                 messages_received_list
-            del session['deletedFeedback']       
+            del session['deletedFeedback']     
+            
+            
+        #############################################################
+        # MESSAGE SENT ##################################
+        # need to check if this new message is an original message 
+        # or a reply to a feedback (the message sent by the patron)!
+        messages_sent = session.get("newMessage")
+        if messages_sent:
+            messages_received_ids =\
+                    [ fb.objectId for fb in messages_received_list ]
+            messages_sent_list =\
+                SESSION.get_messages_sent_list(request.session)
+            messages_sent_ids =\
+                [ msg.objectId for msg in messages_sent_list ]
+            for message in messages_sent:
+                m = Message(**message)
+                if m.objectId not in messages_sent_ids and\
+                    m.message_type != FEEDBACK:
+                    messages_sent_list.insert(0, m)
+                # update an existing feedback
+                if m.objectId in messages_received_ids and\
+                    m.message_type == FEEDBACK:
+                    for i, mrl in enumerate(messages_received_list):
+                        if mrl.objectId == m.objectId:
+                            messages_received_list.pop(i)
+                            messages_received_list.insert(i, m)
+                            break
+                        
+            request.session['messages_sent_list'] = messages_sent_list
+            del session['newMessage']
+          
         
         #############################################################
         # EMPLOYEES_PENDING ##################################
