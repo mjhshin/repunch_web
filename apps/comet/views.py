@@ -10,6 +10,7 @@ from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from apps.comet.models import CometSession
+from parse.apps.messages import FEEDBACK
 from parse.apps.messages.models import Message
 from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
@@ -87,7 +88,10 @@ def refresh(request):
             request.session['patronStore_count']=patronStore_count_new
             del session['patronStore_num']
        
+        #############################################################
         # MESSAGE SENT ##################################
+        # need to check if this new message is a reply to a feedback
+        # or an original message!
         messages_sent = session.get("newMessage")
         if messages_sent:
             messages_sent_list =\
@@ -96,7 +100,8 @@ def refresh(request):
                 [ msg.objectId for msg in messages_sent_list ]
             for message in messages_sent:
                 m = Message(**feedback)
-                if m.objectId not in messages_sent_ids:
+                if m.objectId not in messages_sent_ids and\
+                    m.message_type != FEEDBACK:
                     messages_sent_list.insert(0, m)
             request.session['messages_sent_list'] = messages_sent_list
             del session['newMessage']
