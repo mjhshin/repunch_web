@@ -374,14 +374,14 @@ $(document).ready(function(){
                     }
                 }
                 
-                // update the title
+                // update the title and the tab
                 if (count > 0) {
                     document.title = "Repunch | (" + new String(count) + ") Redemptions";
+                    $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
                 } else {
                     document.title = "Repunch | Redemptions";
+                    $("#tab-pending-redemptions").html("Pending");
                 }
-                // update the tab
-                $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
                 
             }
             
