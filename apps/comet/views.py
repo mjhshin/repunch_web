@@ -99,7 +99,7 @@ def refresh(request):
             messages_sent_ids =\
                 [ msg.objectId for msg in messages_sent_list ]
             for message in messages_sent:
-                m = Message(**feedback)
+                m = Message(**message)
                 if m.objectId not in messages_sent_ids and\
                     m.message_type != FEEDBACK:
                     messages_sent_list.insert(0, m)
