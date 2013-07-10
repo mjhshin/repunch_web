@@ -14,7 +14,8 @@ from parse.core.formatter import query,\
 format_date, format_pointer, format_file, format_geopoint,\
 NOT_WHERE_CONSTRAINTS
 
-JSONIFIABLE_TYPES =(int, float, long, str, unicode, list, dict, tuple)
+JSONIFIABLE_TYPES = (int, bool, float, long, str, unicode, list, 
+                    dict, tuple)
 
 class ParseObjectManager(object):
     """
