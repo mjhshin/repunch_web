@@ -202,7 +202,8 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		console.log("Store save failed.");
 		response.error("error");
 		return;
-	}).then(function(store){
+		
+	}).then(function() {
 	    return store.relation("PatronStores").query().count();
 	    
     }).then(function(patronStoreCount) {
