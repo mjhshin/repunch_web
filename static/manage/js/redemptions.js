@@ -31,7 +31,7 @@ function onRedeem(rowId){
                     // update the counts
                     var rBadge = $("#redemptions-nav a div.nav-item-badge");
                     var diva = $("#redemptions-nav a");
-                    var rcount = new String($("#tab-body-pending-redemptions div.tr").length);
+                    var rcount = $("#tab-body-pending-redemptions div.tr").length;
                     if (rcount < 1){
                         // workbench nav badge
                         if (rBadge.length == 1){
@@ -41,8 +41,8 @@ function onRedeem(rowId){
                         }
                         
                         // update the title
-                        if (parseInt(rcount) > 0) {
-                            document.title = "Repunch | (" + rcount + ") Redemptions";
+                        if (rcount > 0) {
+                            document.title = "Repunch | (" + new String(rcount) + ") Redemptions";
                         } else {
                             document.title = "Repunch | Redemptions";
                         }
@@ -58,14 +58,14 @@ function onRedeem(rowId){
                     } else {
                         // workbench nav badge
                         if (rBadge.length == 1){
-                            rBadge.text(rcount);
+                            rBadge.text(new String(rcount));
                         } else {
                             diva.append("<div class='nav-item-badge'>" +
-                                rcount + "</div>");
+                                new String(rcount) + "</div>");
                         }
                         
                         // pending tab
-                        $("#tab-pending-redemptions").html("Pending (" + rcount + ")");
+                        $("#tab-pending-redemptions").html("Pending (" + new String(rcount) + ")");
                         
                     }
                     
