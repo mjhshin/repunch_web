@@ -750,14 +750,16 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	if (rewardId != null) { rewardId = parseInt(rewardId); }
 	
 	var numPunches, rewardTitle, store, patron, patronStore,
-	    updatedReward, messageStatusId;
+	    updatedReward, messageStatus;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var Store = Parse.Object.extend("Store");
+	var MessageStatus = Parse.Object.extend("MessageStatus");
 	var storeQuery = new Parse.Query(Store);
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	redeemRewardQuery.include(["PatronStore.Patron"]);
+	redeemRewardQuery.include("MessageStatus");
 	
 	storeQuery.get(storeId).then(function(storeResult) {
 	    store = storeResult;
@@ -786,7 +788,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		patronStore = redeemReward.get("PatronStore");
 		numPunches = redeemReward.get("num_punches");
 		rewardTitle = redeemReward.get("title");
-		messageStatusId = redeemReward.get("message_status_id");
+		messageStatus = redeemReward.get("MessageStatus");
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
@@ -799,7 +801,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		} else if(rewardId == null) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
 			patron = patronStore.get("Patron");
-			
+
 			redeemReward.set("is_redeemed", true);
 			redeemReward.save().then(function() {
 			    console.log("RedeemReward save success");
@@ -913,7 +915,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	            title: rewardTitle,
 	            id: storeId, 
 	            store: store.get("store_name"),
-				message_status_id: messageStatusId,
+				message_status_id: messageStatus.id,
 				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
 	        }
 	    }, {
@@ -959,27 +961,19 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		});
 	}
 	
-	function updateMessageStatus(is_accepted) {
-		var MessageStatus = Parse.Object.extend("MessageStatus");
-		var messageStatusQuery = new Parse.Query(MessageStatus);
+	function updateMessageStatus(isAccepted) {
+		if(isAccepted) {
+			messageStatus.set("redeem_available", "no");
+		} else {
+			messageStatus.set("redeem_available", "yes");
+		}
 		
-		messageStatusQuery.get(messageStatusId).then(function(messageStatus) {
-			console.log("MessageStatus query success.");
-			if(is_accepted) {
-				messageStatus.set("redeem_available", "no");
-			} else {
-				messageStatus.set("redeem_available", "yes");
-			}
-			return messageStatus.save();
-		
-		}, function(error) {
-			console.log("MessageStatus query failed.");
-			response.error("error");
-			return;
-			
-		}).then(function(store) {
+		messageStatus.save().then(function(store) {
 			console.log("MessageStatus save success.");
-			executePushOfferGift();
+			
+			if(isAccepted) {
+				executePushOfferGift();
+			}
 					
 		}, function(error) {
 			console.log("MessageStatus save failed.");
