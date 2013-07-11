@@ -3,6 +3,6 @@
 
 ### Nightly jobs
 # clean up CometSession table
-python /home/ubuntu/Repunch/repunch_web/manage.py clean_comet_session
+0 0 * * * python /home/ubuntu/Repunch/repunch_web/manage.py clean_comet_session
 # execute monthly billing routine
-python /home/ubuntu/Repunch/repunch_web/manage.py monthly_billing
+0 0 * * * python /home/ubuntu/Repunch/repunch_web/manage.py monthly_billing

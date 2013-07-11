@@ -244,6 +244,8 @@ $(document).ready(function(){
                 if (tabPendingActive && (inLastPage||inFirstPage)) {
                     for (var i=0; i<redemptions_pending.length; i++){
                         var loadingIconUrl = $("#loading_icon_url").val();
+                        var greenCheckIconUrl = $("#green_check_url").val();
+                        var redXIconUrl = $("#red_x_url").val();
                     
                         var odd = "", row;
                         if (is_desc){
@@ -289,9 +291,9 @@ $(document).ready(function(){
 				            "<div class='td redemption_redeem'>" +
 				            
 	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
-	                            "<img src='" + loadingIconUrl + "' alt='Approve' /></a>" +
+	                            "<img src='" + greenCheckIconUrl + "' alt='Approve' /></a>" +
 	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
-	                            "<img src='" + loadingIconUrl + "' alt='Deny' /></a>" +
+	                            "<img src='" + redXIconUrl + "' alt='Deny' /></a>" +
                             "<img src='" + loadingIconUrl + "' alt='processing' " + 
                                 "class='redemp-loader' width='18' height='18' />" +
 				            

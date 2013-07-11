@@ -1,6 +1,8 @@
 {% load static %}{% load text_tags %}
 
 <input type="hidden" id="loading_icon_url" value="{% static 'manage/images/ajax-loader.gif' %}" />
+<input type="hidden" id="green_check_url" value="{% static 'manage/images/icon_green-check.png' %}" />
+<input type="hidden" id="red_x_url" value="{% static 'manage/images/icon_red-x.png' %}" />
 
 {% for redemp in pending_redemptions %}
 <div id="{{redemp.objectId}}" 
