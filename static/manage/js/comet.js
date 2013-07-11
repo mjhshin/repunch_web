@@ -243,6 +243,8 @@ $(document).ready(function(){
                 // Therefore there is no need to append to a table that is not visible
                 if (tabPendingActive && (inLastPage||inFirstPage)) {
                     for (var i=0; i<redemptions_pending.length; i++){
+                        var loadingIconUrl = $("#loading_icon_url").val();
+                    
                         var odd = "", row;
                         if (is_desc){
                             row = $("#tab-body-pending-redemptions div.tr").first();
@@ -273,7 +275,7 @@ $(document).ready(function(){
                         }
                         d = hour + ":" + minute + " " + ampm;
                         var rowStr = "<div class='tr " + odd + "' " + 
-                            "id='"+ redemptions_pending[i].objectId+ "'>" +
+                            "id='"+ redemptions_pending[i].objectId + "'>" +
 		                    "<input type='hidden'" + 
 		                    " value='" + redemptions_pending[i].reward_id + "'/>" + 
 				            "<div class='td redemption_time'>" +
@@ -285,8 +287,14 @@ $(document).ready(function(){
 				            "<div class='td redemption_punches'>" +
 				            redemptions_pending[i].num_punches + "</div>" +
 				            "<div class='td redemption_redeem'>" +
-				            "<a name='" + redemptions_pending[i].objectId +
-				                "' style='color:blue;cursor:pointer;'>redeem</a></div>" +
+				            
+	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
+	                            "<img src='" + loadingIconUrl + "' alt='Approve' /></a>" +
+	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
+	                            "<img src='" + loadingIconUrl + "' alt='Deny' /></a>" +
+                            "<img src='" + loadingIconUrl + "' alt='processing' " + 
+                                "class='redemp-loader' width='18' height='18' />" +
+				            
 		                    "</div>";
 		                // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {

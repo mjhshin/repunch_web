@@ -1,5 +1,7 @@
 {% load static %}{% load text_tags %}
 
+<input type="hidden" id="loading_icon_url" value="{% static 'manage/images/ajax-loader.gif' %}" />
+
 {% for redemp in pending_redemptions %}
 <div id="{{redemp.objectId}}" 
     class="tr  {% cycle '' 'odd' %}">
