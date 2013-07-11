@@ -4,7 +4,7 @@
 <html lang='en'>
 <head>
     <meta charset='utf-8'>
-    <meta name="viewport" content="width=320">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <style>
     body {
         margin: 0;
@@ -17,7 +17,7 @@
         clear:both;text-align:center;
     }
     div#main div {
-        width:94%;margin:0 auto;min-width:200px;max-width:320px;
+        width:94%;margin:0 auto;min-width:320px;max-width:320px;
         text-align:left; 
     }
     div#main div:first-child {
@@ -38,11 +38,6 @@
         background:#fff;color:#ccc;font-size:18px;
     }
     </style>
-    <script>
-    $(document).ready(function() {
-        
-    });
-    </script>
 </head>
 
 <body>

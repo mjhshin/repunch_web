@@ -395,6 +395,7 @@ $(document).ready(function(){
             var rpin = $("#retailer_pin");
             if (rpin.length > 0){
                 rpin.text(res.retailer_pin);
+                rpin.addClass('refreshed');
             }
         }
                
