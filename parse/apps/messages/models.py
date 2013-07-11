@@ -25,6 +25,10 @@ class Message(ParseObject):
         self.store_id = data.get("store_id")
         # empty if message sent by store NEW
         self.patron_id = data.get('patron_id')
+        
+        # not used by the dashboard
+        self.gift_description = data.get("gift_description")
+        self.gift_title = data.get("gift_title")
     
         self.Reply = data.get("Reply")
         # meta for Reply pointer
