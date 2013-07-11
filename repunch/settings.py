@@ -40,7 +40,8 @@ EMAIL_USE_TLS = True
 if DEBUG:
     ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
 else:
-    ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com']
+    ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com',
+        'mike@repunch.com']
 # for template rendering
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'

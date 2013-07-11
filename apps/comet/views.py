@@ -296,7 +296,7 @@ def refresh(request):
                 
             request.session['redemptions_pending'] =\
                 redemptions_pending
-            del session['approvedRedemption']
+            del session['deletedRedemption']
                
         #############################################################
         # STORE UPDATED ##############################
