@@ -560,6 +560,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 			});
 			
 		} else if(patronStore.get("pending_reward") == true) {
+			console.log("PatronStore already has pending reward");
 			response.success("pending");
 			return;
 		
@@ -816,7 +817,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			Parse.Promise.when(promises).then(function() {
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePushReward();
-			    if(patron.get("facebook_id") != null) {
+			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
 					addFacebookPostToPatron();
 				}
 			    Parse.Cloud.httpRequest({
@@ -1102,7 +1103,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     function continueWithPush() {
         console.log("CONTINUE WITH PUSH");
         // get a subset of patrons
-        if (filter === "all"){
+        if (filter === "all") {
             // nothing
         } else if (filter === "idle") {     
             patronStoreQuery.lessThan("updatedAt", 
@@ -1114,9 +1115,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 
         if (filter === "one"){
             // first get the patron
-            patronQuery.get(request.params.patron_id).then(function(patron){
+            patronQuery.get(request.params.patron_id).then(function(patron) {
                 patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.first().then(function(pst){
+                patronStoreQuery.first().then(function(pst) {
                     var arr = new Array(pst);
                     addToPatronsInbox(arr);
                 });
@@ -1125,7 +1126,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             patronStoreQuery.select("Patron");
             
             // adding relation to all patron's ReceivedMessages
-            patronStoreQuery.find().then(function(patronStores){
+            patronStoreQuery.find().then(function(patronStores) {
                 addToPatronsInbox(patronStores);
             });
         }// end else
