@@ -48,7 +48,7 @@ $(document).ready(function(){
     // span is hidden in the beginning
     $( "#num_patrons_span" ).find("*").hide();
 	
-	$( "#filter" ).mouseup(function(){
+	$( "#filter option" ).mouseup(function(){
 	    if ($(this).val() == "most_loyal"){
             $( "#num_patrons_span" ).find("*").fadeIn();
 	    } else {

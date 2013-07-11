@@ -65,7 +65,7 @@ $(document).ready(function(){
         
         <span id="num_patrons_span" >
         <input type="text" id="num_patrons" name="num_patrons"
-            value={{ mp_slider_value }}
+            value="{{ mp_slider_value }}"
             style="border: 0; color: #f6931f; font-weight: bold; width:40px;" />
         <label id="num_patrons_label">Select the number of most loyal customers you want to send this message to.</label>
         <div id="num_patrons_slider" ></div>
