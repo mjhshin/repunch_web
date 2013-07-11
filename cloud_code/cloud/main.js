@@ -961,7 +961,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			messageStatus.set("redeem_available", "yes");
 		}
 		
-		messageStatus.save().then(function(store) {
+		messageStatus.save().then(function() {
 			console.log("MessageStatus save success.");
 			
 			if(isAccepted) {
