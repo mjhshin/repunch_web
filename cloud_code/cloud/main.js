@@ -336,7 +336,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		var patronStore = new PatronStore();
 		patronStore.set("punch_count", numPunches);
 		patronStore.set("all_time_punches", numPunches);
-		patronStore.set("redeem_pending", false);
+		patronStore.set("pending_reward", false);
 								  
 		patronQuery.first().then(function(patronResult) { //get Patron
 			console.log("Patron fetched");
