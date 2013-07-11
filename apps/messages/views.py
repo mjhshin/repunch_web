@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime
 from dateutil import parser
 from dateutil.tz import tzutc
+from math import ceil
 import urllib, requests, json
 
 from parse.decorators import session_comet
@@ -118,7 +119,7 @@ def edit(request, message_id):
     # make sure cache attr is None for future queries!
     store.patronStores = None
     
-    data['mp_slider_value'] = int(mp*0.50)
+    data['mp_slider_value'] = int(ceil(float(mp)*0.50))
     data['mp_slider_min'] = 1
     data['mp_slider_max'] = mp
     
