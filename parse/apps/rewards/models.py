@@ -27,8 +27,8 @@ class RedeemReward(ParseObject):
         self.is_redeemed = data.get("is_redeemed", False)
         self.num_punches = data.get("num_punches")
         self.reward_id = data.get("reward_id")
-        self.message_status_id = data.get("message_status_id")
         
+        self.MessageStatus = data.get("MessageStatus")
         self.PatronStore = data.get('PatronStore')
         
         super(RedeemReward, self).__init__(False, **data)
@@ -36,6 +36,8 @@ class RedeemReward(ParseObject):
     def get_class(self, className):
         if className == "PatronStore":
             return getattr(import_module('parse.apps.patrons.models'), className)
+        elif className == "MessageStatus":
+            return getattr(import_module('parse.apps.messages.models'), className)
 
 """
 class Reward(ParseObject):
