@@ -1,4 +1,4 @@
-{% load text_tags %}
+{% load static %}{% load text_tags %}
 
 {% for redemp in pending_redemptions %}
 <div id="{{redemp.objectId}}" 
@@ -17,7 +17,10 @@
 	<div class="td redemption_punches">
 	{{ redemp.num_punches }}</div>
 	<div class="td redemption_redeem">
-	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">redeem</a></div>
+	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
+	    <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
+	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
+	    <img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a></div>
 </div>
 {% empty %}
 <div class="tr " id="no-redemptions">

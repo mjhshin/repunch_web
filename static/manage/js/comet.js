@@ -355,8 +355,64 @@ $(document).ready(function(){
                 // remove the rows
                 for (var i=0; i< redemps.length; i++){
                     var row = $("#" + redemps[i].objectId);
-                    row.css("background", "#CCFF99");
-                    row.html("Successfully validated redemption.");
+                    row.css("background", "#FFFFCB");
+                    row.html("Redemption has been validated elsewhere.");
+                    // the last row to go checks if placeholder is necessary
+                    if (i == redemps.length - 1) {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                            
+                            // place the placeholder if now empty
+                            if($("#redemptions-nav a div.nav-item-badge").length == 0) {
+                                $("#tab-body-pending-redemptions div.table-header").after(
+                                    "<div class='tr' id='no-redemptions'>" +
+                                    "<div class='td'>No Redemptions</div>" +
+                                    "</div>");
+                            }
+                        });
+                    } else {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                        });
+                    }
+                }
+                
+                // update the title and the tab
+                if (count > 0) {
+                    document.title = "Repunch | (" + new String(count) + ") Redemptions";
+                    $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
+                } else {
+                    document.title = "Repunch | Redemptions";
+                    $("#tab-pending-redemptions").html("Pending");
+                    }
+                
+            }
+            
+        } // end hasOwnProperty
+        
+        if (res.hasOwnProperty('redemptions_deleted')){
+            // Workbench nav
+            var count, redemps = res.redemptions_deleted;
+            var rBadge = $("#redemptions-nav a div.nav-item-badge");
+            if (rBadge.length == 1){
+                count = parseInt(rBadge.text()) - redemps.length;
+                if (count > 0) {
+                    rBadge.text(new String(count));
+                } else {
+                    rBadge.fadeOut(1000, function(){
+                        $(this).remove();
+                    });
+                }
+            }
+        
+            // tab
+            var pendingTab = $("#tab-pending-redemptions");
+            if (pendingTab.length >0){
+                // remove the rows
+                for (var i=0; i< redemps.length; i++){
+                    var row = $("#" + redemps[i].objectId);
+                    row.css("background", "#FFFFCB");
+                    row.html("Redemption has been deleted elsewhere.");
                     // the last row to go checks if placeholder is necessary
                     if (i == redemps.length - 1) {
                         row.fadeOut(2000, function(){
@@ -397,7 +453,7 @@ $(document).ready(function(){
                 rpin.text(res.retailer_pin);
                 rpin.addClass('refreshed');
             }
-        }
+        } // end hasOwnProperty
                
     } // end mainComet
     

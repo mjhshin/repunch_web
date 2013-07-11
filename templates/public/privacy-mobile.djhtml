@@ -17,11 +17,11 @@
         clear:both;text-align:center;
     }
     div#main div {
-        width:94%;margin:0 auto;min-width:320px;max-width:320px;
+        width:94%;margin:0 auto;
         text-align:left; 
     }
     div#main div:first-child {
-        padding-top:24px;
+        padding-top:6px;
     }
     div#title {
         border-top:5px solid #fff;border-bottom:5px solid #fff;

@@ -17,6 +17,11 @@
 
 #header-redemption_redeem, .redemption_redeem{
     width:80px;
+    margin-top:4px;
+}
+
+.redemption_redeem a:first-child{
+    margin-right:20px; margin-left:14px;
 }
 
 #header-redemption_time-past, .redemption_time-past{

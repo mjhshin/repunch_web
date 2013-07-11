@@ -1,5 +1,5 @@
-// for the workbench page TODO fetch items from next page?
-function onRedeem(rowId){
+
+function onRedeem(rowId, action){
     var urlRedeem = $("#redeem-url").val();
     var row = $("#" + rowId);
     var rewardId = $("#" + rowId + " input[type=hidden]").val();
@@ -9,19 +9,26 @@ function onRedeem(rowId){
     $.ajax({
         url: urlRedeem,
         data: {"redeemRewardId":rowId,
-                "rewardId":rewardId }, 
+                "rewardId":rewardId,
+                "action":action }, 
         type: "GET",
         success: function(res){
-            if (res.result == 1 || res.result == 2 || res.result == 3){
+            if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5){
                 if (res.result == 1){
                     row.css("background", "#CCFF99");
-                    row.html("Successfully validated redemption.");
+                    row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
                 } else if (res.result == 3){
-                    row.css("background", "#ffffcb");
+                    row.css("background", "#FFFFCB");
                     row.html("Reward already redeemed.");
                     alert("Invalid! Reward already redeemed.");
+                } else if (res.result == 4) {
+                    row.css("background", "#CCFF99");
+                    row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
+                } else if (res.result == 5) {
+                    row.css("background", "#FFFFCB");
+                    row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
                 } else {
-                    row.css("background", "#ffffcb");
+                    row.css("background", "#FFFFCB");
                     row.html("Customer does not have enough punches!");
                     alert("Customer does not have enough punches!");
                 }
@@ -87,15 +94,22 @@ function onRedeem(rowId){
 
 var onRedeemRebind = function (event) {
     var self = event.data.self;
-    onRedeem(self.attr("name"));
+    var action = event.data.action;
+    onRedeem(self.attr("name"), action);
 }
 
 // specify a callback to bind the fresh html chunk received from the server
 var rebindRedemptions = function (){
-    // WARNING! May unbind other functions other than onRedeem
-    $("#tab-body-pending-redemptions div.tr div.td a").each(function(){
+    // Redbind approvals
+    $("#tab-body-pending-redemptions div.tr div.td a:nth-child(1)").each(function(){
         var self = $(this);
         self.unbind("click", onRedeemRebind);
-        self.bind("click", {"self":self}, onRedeemRebind); 
+        self.bind("click", {"self":self, "action":"approve"}, onRedeemRebind); 
+    });
+    // Redbind denials
+    $("#tab-body-pending-redemptions div.tr div.td a:nth-child(2)").each(function(){
+        var self = $(this);
+        self.unbind("click", onRedeemRebind);
+        self.bind("click", {"self":self, "action":"deny"}, onRedeemRebind); 
     });
 }

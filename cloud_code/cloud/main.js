@@ -728,7 +728,7 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
-// # TODO check if RedeemReward has already been validated.
+// 
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("validate_redeem", function(request, response) {
@@ -837,7 +837,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
-			response.error("DNE"); // goes here if it has been deleted
+			response.error("deleted"); // goes here if it has been deleted
 			
 	});
 	

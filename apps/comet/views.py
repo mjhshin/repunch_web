@@ -160,6 +160,7 @@ def refresh(request):
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
+        # TODO JAVASCRIPT
         appr_emps = session.get("approvedEmployee")
         if appr_emps:
             for appr_emp in appr_emps:
@@ -181,6 +182,7 @@ def refresh(request):
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
+        # TODO JAVASCRIPT
         del_emps = session.get("deletedEmployee")
         if del_emps:
             for demp in del_emps:
@@ -276,7 +278,25 @@ def refresh(request):
             
         #############################################################
         # REDEMPTIONS DELETED ##############################
-        # TODO
+        # remove from pending (should not be in history!)
+        del_redemps = session.get("deletedRedemption")
+        if del_redemps:
+            redemp_js = []
+            for red in del_redemps:
+                redemp = RedeemReward(**red)
+                # check if redemp is still in pending
+                for i, redem in enumerate(redemptions_pending):
+                    if redem.objectId == redemp.objectId:
+                        redemp_js.append(\
+                            redemptions_pending.pop(i).jsonify())
+                        break
+                
+            if len(redemp_js) > 0:
+                data['redemptions_deleted'] = redemp_js
+                
+            request.session['redemptions_pending'] =\
+                redemptions_pending
+            del session['approvedRedemption']
                
         #############################################################
         # STORE UPDATED ##############################
@@ -329,6 +349,7 @@ def refresh(request):
         updated_rewards = session.get('updatedReward')
         if updated_rewards:
             store = request.session['store']
+            mod_rewards = store.get("rewards")
             for reward in updated_rewards:
                 for i, mreward in enumerate(mod_rewards):
                     # [{"reward_name":"Free bottle of wine", 
