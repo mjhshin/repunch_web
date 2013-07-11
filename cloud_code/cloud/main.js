@@ -536,8 +536,11 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	redeemReward.set("PatronStore", patronStore);	
 	
 	if(isOfferOrGift) {
+		var MessageStatus = Parse.Object.extend("MessageStatus");
+		var messageStatus = new MessageStatus();
+		messageStatus.id = messageStatusId;
 		redeemReward.set("num_punches", 0);
-		redeemReward.set("message_status_id", messageStatusId);
+		redeemReward.set("MessageStatus", messageStatus);
 	} else {
 		redeemReward.set("num_punches", numPunches);
 		redeemReward.set("reward_id", rewardId);
