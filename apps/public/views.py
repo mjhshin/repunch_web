@@ -29,12 +29,13 @@ Settings
 
 @session_comet
 def terms_mobile(request):
-    ctx = get_notification_ctx()
-    ctx['ICON_URL']=STATIC_URL+"manage/images/logo_header-mobile.png"
-    return render(request, "public/terms-mobile.djhtml", ctx)
-
+    return render(request, "public/terms-mobile.djhtml",
+        get_notification_ctx())
+        
+@session_comet
 def privacy_mobile(request):
-    pass
+    return render(request, "public/privacy-mobile.djhtml",
+        get_notification_ctx())
 
 @session_comet
 def index(request):

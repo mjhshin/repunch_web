@@ -307,6 +307,7 @@ def refresh(request):
             store.set("Settings", settings.objectId)
             request.session['settings'] = settings
             request.session['store'] = store
+            data['retailer_pin'] = settings.get("retailer_pin")
             del session["updatedSettings_one"]
             
         #############################################################

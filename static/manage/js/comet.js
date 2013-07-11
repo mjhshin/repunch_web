@@ -389,6 +389,14 @@ $(document).ready(function(){
             }
             
         } // end hasOwnProperty
+        
+        if (res.hasOwnProperty('retailer_pin')){
+            // Settings page
+            var rpin = $("#retailer_pin");
+            if (rpin.length > 0){
+                rpin.text(res.retailer_pin);
+            }
+        }
                
     } // end mainComet
     
@@ -398,6 +406,6 @@ $(document).ready(function(){
             type: "GET",
             success: mainComet,
         });
-    }, 10000);
+    }, 8000);
 
 });
