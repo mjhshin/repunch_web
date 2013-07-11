@@ -46,13 +46,13 @@ $(document).ready(function(){
     */
     
     // span is hidden in the beginning
-    $( "#min_punches_span *" ).hide();
+    $( "#min_punches_span" ).find("*").hide();
 	
 	$( "#filter" ).mouseup(function(){
 	    if ($(this).val() == "most_loyal"){
-	        $( "#min_punches_span *" ).fadeIn();
+            $( "#min_punches_span" ).find("*").fadeIn();
 	    } else {
-	        $( "#min_punches_span *" ).fadeOut();
+            $( "#min_punches_span" ).find("*").fadeOut();
 	    }
 	});
 	

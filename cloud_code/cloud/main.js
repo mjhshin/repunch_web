@@ -1021,7 +1021,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	var storeName = request.params.store_name;
     var filter = request.params.filter; 
     var message, redeem_available;
-	var messageStatus = new MessageStatus();
 	var patron_ids = new Array(); // placeholder
 
 	androidInstallationQuery.equalTo('deviceType', 'android');
@@ -1064,6 +1063,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
         // ReceivedMessages is a relation to MessageStatus not Message!
         var rel = pat.relation("ReceivedMessages"); 
+	    var messageStatus = new MessageStatus();
         messageStatus.set("Message", message);
         messageStatus.set("is_read", false);
         messageStatus.set("redeem_available", redeem_available);
