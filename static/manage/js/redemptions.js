@@ -1,5 +1,12 @@
 
 function onRedeem(rowId, action){
+    // first check if it has been clicked and still in progress
+    var loading = $("#" + rowId + " div.redemption_redeem img.redemp-loader");
+    if (loading.css("display") != "none"){
+        return;
+    }
+    loading.show();
+
     var urlRedeem = $("#redeem-url").val();
     var row = $("#" + rowId);
     var rewardId = $("#" + rowId + " input[type=hidden]").val();
@@ -13,6 +20,9 @@ function onRedeem(rowId, action){
                 "action":action }, 
         type: "GET",
         success: function(res){
+            // now hide the spinner
+            loading.hide();
+            
             if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5){
                 if (res.result == 1){
                     row.css("background", "#CCFF99");

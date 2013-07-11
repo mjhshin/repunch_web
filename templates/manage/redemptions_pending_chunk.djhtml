@@ -17,10 +17,13 @@
 	<div class="td redemption_punches">
 	{{ redemp.num_punches }}</div>
 	<div class="td redemption_redeem">
-	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
-	    <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
-	<a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
-	    <img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a></div>
+	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
+	        <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
+	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
+	        <img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a>
+        <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing"
+            class="redemp-loader" width="18" height="18" />
+    </div>
 </div>
 {% empty %}
 <div class="tr " id="no-redemptions">

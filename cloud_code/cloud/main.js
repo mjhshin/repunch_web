@@ -691,7 +691,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
-// Deletes the RedeemReward, sets the patron store's pending_reward to false.
+// Deletes the RedeemReward, sets the patron store's pending_reward to false IF IT IS NOT an offer!
 // If RedeemReward does not have a reward_id, then it is an offer, which if it is
 // the MessageStatus's redeem_available will be set 'no'.
 //
@@ -702,31 +702,32 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
-	var redeemReward;
+	var redeemReward, messageStatus;
 	
 	redeemRewardQuery.include("MessageStatus");
+	redeemRewardQuery.include("PatronStore");
 	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult) {
 	    redeemReward = redeemRewardResult;
-	    return redeemRewardResult.get("PatronStore").fetch();
-	    
-	}, function(error) {
-		console.log("RedeemReward fetch failed.");
-		response.error("deleted"); // rejected/deleted before
-		
-	}).then(function(patronStore) {
-	    patronStore.set("pending_reward", false);
-	    return patronStore.save();
-	    
-	}).then(function() {
-	    var messageStatus = redeemReward.get("MessageStatus");
+	    messageStatus = redeemReward.get("MessageStatus");
 	    if (messageStatus != null) { // offer/gift
             messageStatus.set("redeem_available", 'no');
             return messageStatus.save();
         }
-	
+        
+	}, function(error) {
+		console.log("RedeemReward fetch failed.");
+		response.error("deleted"); // rejected/deleted before
+		
 	}).then(function() {
-	    // finally delete the redeemReward
+	    if (messageStatus == null) {
+	        var patronStore = redeemReward.get("PatronStore");
+	        patronStore.set("pending_reward", false);
+	        return patronStore.save();
+	    }
+	    
+	}).then(function() {
 	    return redeemReward.destroy();
+	    
 	}).then(function() {
 	    response.success("success");
 	    Parse.Cloud.httpRequest({
@@ -737,6 +738,7 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
                 deletedRedemption: redeemReward,
             }
         });
+        
 	});
 	
 });
