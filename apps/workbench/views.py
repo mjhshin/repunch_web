@@ -117,7 +117,7 @@ def get_page(request):
 def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success,
     2 if insufficient, 3 if already validated, 
-    4 if successfully denied, 5 has been deleted elsewhere.
+    4 if successfully deleted/denied, 5 has been deleted elsewhere.
     """
     if request.method == "GET" or request.is_ajax():
         # approve or deny
@@ -139,7 +139,6 @@ def redeem(request):
                     "redeem_id":redeemId,
                     "store_id":store.get("objectId"),
                     })
-                
         if 'error' not in res:
             redemptions_pending =\
                 SESSION.get_redemptions_pending(request.session)
@@ -175,9 +174,6 @@ def redeem(request):
                 if result and result == "insufficient":
                     return HttpResponse(json.dumps({"result":2}), 
                                 content_type="application/json")
-                elif result and result == "deleted":
-                    return HttpResponse(json.dumps({"result":5}), 
-                                content_type="application/json")
                 elif result and result == "validated":
                     return HttpResponse(json.dumps({"result":3}), 
                                 content_type="application/json")
@@ -190,6 +186,11 @@ def redeem(request):
                     redemptions_pending
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
+                                
+        elif 'error' in res:
+            if res['error'] == "deleted":
+                return HttpResponse(json.dumps({"result":5}), 
+                            content_type="application/json")
                         
     return HttpResponse(json.dumps({"result":0}), 
                     content_type="application/json")

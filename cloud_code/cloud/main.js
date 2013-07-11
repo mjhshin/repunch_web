@@ -695,11 +695,12 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("reject_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
+	var storeId = request.params.store_id;
 	
-	var PatronStore = Parse.Object.extend("PatronStore");
+	var MessageStatus = Parse.Object.extend("MessageStatus");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
-	var patronStoreQuery = new Parse.Query(PatronStore);
 	var redeemRewardQuery = new Parse.Query(redeemRewardQuery);
+	var messageStatusQuery = new Parse.Query(MessageStatus);
 	var redeemReward;
 	
 	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult) {
@@ -708,20 +709,23 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	    
 	}, function(error) {
 		console.log("RedeemReward fetch failed.");
-		response.error("DNE"); // rejected/deleted before
+		response.error("deleted"); // rejected/deleted before
 		
 	}).then(function(patronStore) {
 	    patronStore.set("pending_reward", false);
-	    return;
+	    return patronStore.save();
 	    
 	}).then(function() {
-	    // TODO finish =)
         var messageStatusId = redeemReward.get("message_status_id");
-	    if (rewardId != null) {
+	    if (messageStatusId != null) { // offer/gift
+	        messageStatusQuery.get(messageStatusId).then(function(messageStatus) {
+	            messageStatus.set("redeem_available", 'no');
+	            return messageStatus.save();
+	        }).then(function() {
+	            response.success("success");
+	        });
 	        
-        } else { // offer/gift
-            
-        }
+        } 
 	
 	});
 	
