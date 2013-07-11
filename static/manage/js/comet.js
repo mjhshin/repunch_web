@@ -336,10 +336,8 @@ $(document).ready(function(){
                 
             } // end if in Workbench page
             
-            // bind
-            $("#tab-body-pending-redemptions div.tr div.td a").click(function(){
-                onRedeem($(this).attr("name"));
-            });
+            // Rebind
+            rebindRedemptions();
             
         } // end hasOwnProperty
         
