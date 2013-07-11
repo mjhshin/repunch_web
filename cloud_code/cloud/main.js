@@ -699,7 +699,7 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	
 	var MessageStatus = Parse.Object.extend("MessageStatus");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
-	var redeemRewardQuery = new Parse.Query(redeemRewardQuery);
+	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	var messageStatusQuery = new Parse.Query(MessageStatus);
 	var redeemReward;
 	
