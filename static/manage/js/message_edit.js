@@ -34,25 +34,25 @@ $(document).ready(function(){
 	*  after page loads, the min and max are already provided at
 	*  the time the server renders the page.
 	// init the slider
-	$( "#min_punches_slider" ).slider({
+	$( "#num_patrons_slider" ).slider({
         range: "min",
         value: 37,
         min: 1,
         max: 700,
         slide: function( event, ui ) {
-        $( "#min_punches" ).val( ui.value );
+        $( "#num_patrons" ).val( ui.value );
       }
     });
     */
     
     // span is hidden in the beginning
-    $( "#min_punches_span" ).find("*").hide();
+    $( "#num_patrons_span" ).find("*").hide();
 	
 	$( "#filter" ).mouseup(function(){
 	    if ($(this).val() == "most_loyal"){
-            $( "#min_punches_span" ).find("*").fadeIn();
+            $( "#num_patrons_span" ).find("*").fadeIn();
 	    } else {
-            $( "#min_punches_span" ).find("*").fadeOut();
+            $( "#num_patrons_span" ).find("*").fadeOut();
 	    }
 	});
 	

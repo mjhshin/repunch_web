@@ -11,13 +11,13 @@
 {# INIT THE SLIDER #}
 <script>
 $(document).ready(function(){
-    $( "#min_punches_slider" ).slider({
+    $( "#num_patrons_slider" ).slider({
         range: "max",
         value: {{ mp_slider_value }},
         min: {{ mp_slider_min }},
         max: {{ mp_slider_max }},
         slide: function( event, ui ) {
-        $( "#min_punches" ).val( ui.value );
+        $( "#num_patrons" ).val( ui.value );
       }
     });
 });
@@ -63,12 +63,12 @@ $(document).ready(function(){
             {% endfor %}
         </select>
         
-        <span id="min_punches_span" >
-        <input type="text" id="min_punches" name="min_punches"
+        <span id="num_patrons_span" >
+        <input type="text" id="num_patrons" name="num_patrons"
             value={{ mp_slider_value }}
             style="border: 0; color: #f6931f; font-weight: bold; width:40px;" />
-        <label id="min_punches_label">Select the minimum number punches a "loyal" customer has accumulated in his/her lifetime.</label>
-        <div id="min_punches_slider" ></div>
+        <label id="num_patrons_label">Select the number of most loyal customers you want to send this message to.</label>
+        <div id="num_patrons_slider" ></div>
         </span>
 	
 		{{ form.subject.errors }}

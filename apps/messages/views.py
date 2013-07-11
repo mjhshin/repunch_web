@@ -113,15 +113,14 @@ def edit(request, message_id):
     data = {'messages_nav': True, 'message_id': message_id,
         "filters": FILTERS}
         
-    # for slider most_loyal min_punches
-    mp = store.get("patronStores", limit=1,
-        order="-all_time_punches")[0].get('all_time_punches')
+    # number of patron stores
+    mp = SESSION.get_patronStore_count(request.session)
     # make sure cache attr is None for future queries!
     store.patronStores = None
     
     data['mp_slider_value'] = int(mp*0.50)
-    data['mp_slider_min'] = int(mp*0.20)
-    data['mp_slider_max'] = int(mp*0.80)
+    data['mp_slider_min'] = 1
+    data['mp_slider_max'] = mp
     
     if request.method == 'POST' or (request.method == "GET" and\
         request.GET.get("send_message")):
@@ -198,8 +197,8 @@ def edit(request, message_id):
                 d = timezone.now() + relativedelta(days=-21)
                 params.update({"idle_date":d.isoformat()})
             elif message.filter == "most_loyal":
-                params.update({"min_punches":\
-                    postDict['min_punches']})
+                params.update({"num_patrons":\
+                    postDict['num_patrons']})
 
             # push notification
             cloud_call("retailer_message", params)
@@ -217,7 +216,7 @@ def edit(request, message_id):
         elif limit_reached and subType == 2:
             data['limit_reached'] = limit_reached
             data['maxed_out'] = True
-        elif 'min_punches' in form.errors:
+        elif 'num_patrons' in form.errors:
             data['error'] = "Minimum punches must be a "+\
                                 "whole number."
         else:
