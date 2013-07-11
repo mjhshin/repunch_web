@@ -1320,7 +1320,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		return patronRecepient.save();
 		
 	}, function(error) {
-		console.log("Patron (recepient) fetch was successful.");
+		console.log("Patron (recepient) fetch failed.");
 		response.error("error");
 						
 	}).then(function(store) {
@@ -1328,7 +1328,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		return patronQuery.get(patronId);
 		
 	}, function(error) {
-		console.log("Store save failed.");
+		console.log("Patron (recepient) save failed.");
 		response.error("error");
 					
 	}).then(function(patronSender) {
