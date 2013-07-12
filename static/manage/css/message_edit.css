@@ -28,6 +28,16 @@
 	width: 200px;
 }
 
+/* send to components */ 
+#num_patrons {
+    width:10px;
+}
+
+#num_patrons_label {
+    font-weight:normal;
+    font-size:0.8em;
+}
+
 /* for time picker */
 /* css for timepicker */
 .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }

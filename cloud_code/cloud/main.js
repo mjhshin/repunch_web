@@ -305,6 +305,9 @@ Parse.Cloud.define("punch", function(request, response) {
 	var storeQuery = new Parse.Query(Store);
 	var androidInstallationQuery = new Parse.Query(Parse.Installation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	
+	// below are used so as containers so that they do not have to be passed on to the next promise.
+	var store, patron, postBody = new Object();
    
 	patronQuery.equalTo("punch_code", punchCode);
 	storeQuery.equalTo("objectId", storeId);
@@ -441,7 +444,6 @@ Parse.Cloud.define("punch", function(request, response) {
 		punch.set("punches", numPunches);
 		punch.save().then(function(punch) {
 			console.log("Punch save was successful.");
-			var store = new Store();
 			store = patronStore.get("Store");
 			store.relation("Punches").add(punch);
 			
@@ -482,22 +484,38 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");	
 				
 		}).then(function(employee) {
-				console.log("Employee save was successful.");
+		        if (employee != null) {
+				    console.log("Employee save was successful.");
+				}
 				response.success(patron.get("first_name") + " " + patron.get("last_name"));
 				return employee;
 				
 		}).then(function(employee) {
 		    if (employee != null) {
-		        // only need the objectId and lifetime_punches
-		        var emp = {
+		        postBody.updatedEmployeePunch =  {
 		            objectId: employee.id,
 		            lifetime_punches: employee.get("lifetime_punches")
-		        }
-                Parse.Cloud.httpRequest({
+		        }  
+            }
+            if (isNewPatronStore) {
+                return store.relation("PatronStores").query().count();
+            } else {
+                return -1;
+            }
+		}).then(function(patronStoreCount){
+		    if (isNewPatronStore) {
+		        postBody.patronStore_num = patronStoreCount;
+		    }
+		
+		    // Let the server know if any changes occured
+		    if (postBody.hasOwnProperty("updatedEmployeePunch") || 
+		            postBody.hasOwnProperty("patronStore_num")) {
+		        console.log("Posting to server");
+		        Parse.Cloud.httpRequest({
                     method: 'POST',
                     url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
-                    body: { updatedEmployeePunch: emp, }
+                    body: postBody, 
                 });
             }
             

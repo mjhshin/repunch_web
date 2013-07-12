@@ -490,7 +490,7 @@ def receive(request, store_id):
                 else:
                     # keys ending with _num is a number
                     if key.endswith("_num"):
-                        session[key] = session[key]
+                        session[key] = value
                     # keys ending in _count is a number that is added
                     elif key.endswith("_count"):
                         session[key] = session[key] + value
