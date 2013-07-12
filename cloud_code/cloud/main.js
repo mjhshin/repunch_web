@@ -305,9 +305,6 @@ Parse.Cloud.define("punch", function(request, response) {
 	var storeQuery = new Parse.Query(Store);
 	var androidInstallationQuery = new Parse.Query(Parse.Installation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
-	
-	// below are used so as containers so that they do not have to be passed on to the next promise.
-	var store, patron, postBody = new Object();
    
 	patronQuery.equalTo("punch_code", punchCode);
 	storeQuery.equalTo("objectId", storeId);
@@ -343,7 +340,6 @@ Parse.Cloud.define("punch", function(request, response) {
 								  
 		patronQuery.first().then(function(patronResult) { //get Patron
 			console.log("Patron fetched");
-			patron = patronResult;
 			patronStore.set("Patron", patronResult);
 			return storeQuery.first();
 			
@@ -353,7 +349,6 @@ Parse.Cloud.define("punch", function(request, response) {
 			
 		}).then(function(storeResult) { //get Store
 			console.log("Store query success");
-			store = storeResult;
 			patronStore.set("Store", storeResult);
 			return patronStore.save();
 			
@@ -363,7 +358,8 @@ Parse.Cloud.define("punch", function(request, response) {
 			
 		}).then(function(patronStoreResult){
 			console.log("PatronStore save success");
-		    patronStore = patronStoreResult;
+		    var store = patronStoreResult.get("Store");
+		    var patron = patronStoreResult.get("Patron");
 		    store.relation("PatronStores").add(patronStore);
 			patron.relation("PatronStores").add(patronStore);
 			
@@ -374,7 +370,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			Parse.Promise.when(promises).then(function(){
 			    console.log("Store and Patron save success (in parallel).");
 				executePush(patronStore);
-				saveDataForAnalytics(patronStore, true);
+				saveDataForAnalytics(patronStoreResult, true);
 			
 			}, function(error) {
 			    console.log("Store and Patron save fail (in parallel).");
@@ -388,7 +384,6 @@ Parse.Cloud.define("punch", function(request, response) {
 		console.log("updating existing PatronStore");
 		patronStoreResult.increment("punch_count", numPunches);
 		patronStoreResult.increment("all_time_punches", numPunches);
-		patron = patronStoreResult.get("Patron");
 		patronStoreResult.save().then(function(patronStoreResult) {
 			console.log("PatronStore save was successful.");
 			executePush(patronStoreResult);
@@ -439,12 +434,14 @@ Parse.Cloud.define("punch", function(request, response) {
 	function saveDataForAnalytics(patronStore, isNewPatronStore) {
 		var Punch = Parse.Object.extend("Punch");
 		var punch = new Punch();
+	    var store = patronStore.get("Store");
+	    var patron = patronStore.get("Patron");
+	    var postBody = new Object();
 		
 		punch.set("Patron", patronStore.get("Patron"));
 		punch.set("punches", numPunches);
 		punch.save().then(function(punch) {
 			console.log("Punch save was successful.");
-			store = patronStore.get("Store");
 			store.relation("Punches").add(punch);
 			
 			if(isNewPatronStore) {
@@ -457,9 +454,8 @@ Parse.Cloud.define("punch", function(request, response) {
 				console.log("Store save failed.");
 				response.error("error");
 				
-		}).then(function(store) {
+		}).then(function(storeResult) {
 				console.log("Store save was successful.");
-				
 				if(employeeId != null) {
 					var employeeQuery = new Parse.Query(Employee);
 					return employeeQuery.get(employeeId);
@@ -472,7 +468,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");	
 				
 		}).then(function(employee) {
-				if(employeeId != null) {
+				if(employee != null) {
 					console.log("Employee fetched.");
 					employee.relation("Punches").add(punch);
 					employee.increment("lifetime_punches", numPunches);
@@ -484,32 +480,31 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");	
 				
 		}).then(function(employee) {
+				response.success(patron.get("first_name") + " " + patron.get("last_name"));
+				// below are for server notification
 		        if (employee != null) {
 				    console.log("Employee save was successful.");
+				    postBody.updatedEmployeePunch =  {
+		                objectId: employee.id,
+		                lifetime_punches: employee.get("lifetime_punches")
+		            }  
 				}
-				response.success(patron.get("first_name") + " " + patron.get("last_name"));
-				return employee;
 				
-		}).then(function(employee) {
-		    if (employee != null) {
-		        postBody.updatedEmployeePunch =  {
-		            objectId: employee.id,
-		            lifetime_punches: employee.get("lifetime_punches")
-		        }  
-            }
-            if (isNewPatronStore) {
-                return store.relation("PatronStores").query().count();
-            } else {
-                return -1;
-            }
+				if (isNewPatronStore) {
+		            console.log("Retrieving new PatronStore count");
+                    return store.relation("PatronStores").query().count();
+                } else {
+                    return -1;
+                }
+				
 		}).then(function(patronStoreCount){
 		    if (isNewPatronStore) {
+		        console.log("Retrieved new PatronStore count");
 		        postBody.patronStore_num = patronStoreCount;
 		    }
-		
+		    
 		    // Let the server know if any changes occured
-		    if (postBody.hasOwnProperty("updatedEmployeePunch") || 
-		            postBody.hasOwnProperty("patronStore_num")) {
+		    if (isNewPatronStore || employeeId != null) {
 		        console.log("Posting to server");
 		        Parse.Cloud.httpRequest({
                     method: 'POST',
