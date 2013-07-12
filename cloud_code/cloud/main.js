@@ -480,7 +480,9 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");	
 				
 		}).then(function(employee) {
-				response.success(patron.get("first_name") + " " + patron.get("last_name"));
+		        // IMPORTANT! Once response.success or error is called, the next promise will nto execute!
+				// response.success(patron.get("first_name") + " " + patron.get("last_name"));
+				
 				// below are for server notification
 		        if (employee != null) {
 				    console.log("Employee save was successful.");
@@ -498,6 +500,7 @@ Parse.Cloud.define("punch", function(request, response) {
                 }
 				
 		}).then(function(patronStoreCount){
+		    console.log("Moved on to next promise.");
 		    if (isNewPatronStore) {
 		        console.log("Retrieved new PatronStore count");
 		        postBody.patronStore_num = patronStoreCount;
@@ -514,6 +517,10 @@ Parse.Cloud.define("punch", function(request, response) {
                 });
             }
             
+            response.success(patron.get("first_name") + " " + patron.get("last_name"));
+            
+		}, function(error) {
+		    console.log("There was an error retrieving the patronStore count.");		    
 		});
 	}
 

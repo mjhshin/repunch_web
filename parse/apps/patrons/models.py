@@ -45,13 +45,14 @@ class PunchCode(ParseObject):
 class PatronStore(ParseObject):
     """ New class not in Django """
     def __init__(self, **data):
-        self.Patron = data.get("Patron")
-        self.Store = data.get("Store")
-        self.FacebookPost = data.get("FacebookPost")
         self.punch_count = data.get("punch_count", 0)
         self.all_time_punches = data.get('all_time_punches', 0)
         # this is for rewards only! not offers!
         self.pending_reward = data.get("pending_reward", False)
+        
+        self.Patron = data.get("Patron")
+        self.Store = data.get("Store")
+        self.FacebookPost = data.get("FacebookPost")
         
         super(PatronStore, self).__init__(False, **data)
 
