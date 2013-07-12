@@ -773,9 +773,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	var rewardId = request.params.reward_id;
-	// it is an offer/gift if rewardId is undefined/null or "undefined"/"null"
-	// note the isNaN(null) is false but isNaN("null") is true!
-	var isOfferOrGift = isNaN(String(rewardId));
+	var isOfferOrGift = (rewardId == null);
 	
 	var numPunches, rewardTitle, store, patron, patronStore,
 	    updatedReward, messageStatus;

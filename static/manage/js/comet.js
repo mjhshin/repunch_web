@@ -162,6 +162,43 @@ $(document).ready(function(){
 		        "</div>" );
         }
         
+        function addToEmployeesApproved(employee) {
+            var odd = "";
+            var first=$("#tab-body-approved-employees div.tr").first();
+            if (!first.hasClass("odd")){
+                odd = "odd";
+            }
+            var d = new Date(employee.createdAt);
+            var year = new String(d.getYear());
+            year = year.substring(1, year.length);
+            var month = new String(d.getMonth()+1);
+            if (month.length == 1){
+                month = "0" + month;
+            }
+            var day = new String(d.getDate());
+            if (day.length == 1){
+                day = "0" + day;
+            }
+            var dStr = month + "/" + day + "/" + year;
+            $("#tab-body-approved-employees div.table-header").after(
+                "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
+		        
+		        "<a href='/manage/employees/" + employee.objectId + "/edit'>" + 
+		        "<div class='td first_name_approved'>" + employee.first_name.trimToDots(12) + "</div></a>" +
+		        "<a href='/manage/employees/" + employee.objectId + "/edit'>" + 
+		        "<div class='td last_name_approved'>" + employee.last_name.trimToDots(14) + "</div></a>" +
+		        "<a href='/manage/employees/'" + employee.objectId + "/edit'>" + 
+		        "<div class='td date_added_approved'>" + dStr + "</div></a>" +
+		        "<a href='/manage/employees/'" + employee.objectId + "/edit'>" + 
+		        "<div class='td punches_approved'>" +  new String(employee.lifetime_punches) + "</div></a>" +
+		        
+				"<div class='td graph'><input type='checkbox' name='employee-graph-cb' value='" + employee.objectId + "' /></div>" + 
+				"<div class='td remove'><a href='/manage/employees/" + employee.objectId + "/delete' >" + 
+				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>" +
+		        
+		        "</div>" );
+        }
+        
         if (res.hasOwnProperty('employees_pending')){
             // pending employees nav
             var employees_pending_count = new String(res.employees_pending_count);
@@ -201,12 +238,12 @@ $(document).ready(function(){
             // pending employees nav 
             var employees_pending_count = new String(res.employees_pending_count);
             var mBadge = $("#employees-nav a div.nav-item-badge");
-            var diva = $("#employees-nav a");
             if (mBadge.length == 1) {
                 mBadge.text(employees_pending_count);
             } else {
-                diva.append("<div class='nav-item-badge'>" +
-                    employees_pending_count + "</div>");
+                mBadge.fadeOut(1000, function(){
+                    $(this).remove();
+                });
             }
             
             // Employees page
@@ -226,20 +263,29 @@ $(document).ready(function(){
                         row.fadeOut(2000, function(){
                             $(this).remove();
                             
-                            // place the placeholder if now empty
-                            if($("#employees-nav a div.nav-item-badge").length == 0) {
+                            // place the placeholder if now empty in PENDING
+                            if($("#tab-body-pending-employees div.tr").length == 0) {
                                 $("#tab-body-pending-employees div.table-header").after(
                                     "<div class='tr' id='no-pending-employees'>" +
                                     "<div class='td'>No Pending Employees</div>" +
                                     "</div>");
                             }
+                            
+                            // place the placeholder if now empty in APPROVED
+                            if($("#tab-body-approved-employees div.tr").length == 0) {
+                                $("#tab-body-approved-employees div.table-header").after(
+                                    "<div class='tr' id='no-approved-employees'>" +
+                                    "<div class='td'>No Approved Employees</div>" +
+                                    "</div>");
+                            }
+                            
                         });
                     } else {
                         row.fadeOut(2000, function(){
                             $(this).remove();
                             // Now add to the approved tab
                             if (type == "approved") {
-                                // TODO
+                                addToEmployeesApproved(emps[i]);
                             }
                         });
                     }

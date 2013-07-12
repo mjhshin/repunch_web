@@ -14,6 +14,9 @@
       google.setOnLoadCallback(updateChart);
       
       var _graph_url = '{% url 'employee_graph' %}';
+      $(document).ready(function() {
+        $(".not-sortable").unbind("click");
+      });
     </script>
 
 {% endblock %}
@@ -36,19 +39,19 @@
 		
 		<div class="white-box table tab-body {% if show_pending == False %}active{% endif %}" id="tab-body-approved-employees">
 			<div class="table-header">
-				<div class="th" id="header-first_name">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-last_name">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-date_added">Date Added <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th sorted desc" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-graph">Graph <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-remove">Remove <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-first_name_approved">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-last_name_approved">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th" id="header-date_added_approved">Date Added <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th sorted desc" id="header-punches_approved">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-graph">Graph <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-remove">Remove <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			{% for employee in employees %}
 			<div class="tr {% cycle 'odd' '' %}" id="{{ employee.objectId }}">
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td first_name">{{ employee|get:'first_name'|trim_to_dots:12 }}</div></a>
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td last_name">{{ employee|get:'last_name'|trim_to_dots:14 }}</div></a>
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td date_added">{{ employee|get:'createdAt'|date:"m/d/y" }}</div></a>
-				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td punches">{{ employee.lifetime_punches }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td first_name_approved">{{ employee|get:'first_name'|trim_to_dots:12 }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td last_name_approved">{{ employee|get:'last_name'|trim_to_dots:14 }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td date_added_approved">{{ employee|get:'createdAt'|date:"m/d/y" }}</div></a>
+				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td punches_approved">{{ employee.lifetime_punches }}</div></a>
 				<div class="td graph"><input type="checkbox" name="employee-graph-cb" value="{{ employee.objectId }}" /></div>
 				<div class="td remove"><a href="{% url 'employee_delete' employee.objectId %}"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Remove" /></a></div>
 			</div>
@@ -68,7 +71,7 @@
 				<div class="th" id="header-first_name_pending">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-last_name_pending">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-date_added_pending">Date Added <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-approve">Approve? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-approve">Approve? <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
 			{% for employee in pending %}

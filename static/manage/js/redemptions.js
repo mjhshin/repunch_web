@@ -16,7 +16,7 @@ function onRedeem(rowId, action){
     $.ajax({
         url: urlRedeem,
         data: {"redeemRewardId":rowId,
-                "rewardId":rewardId,
+                "rewardId":rewardId, // "undefined"
                 "action":action }, 
         type: "GET",
         success: function(res){

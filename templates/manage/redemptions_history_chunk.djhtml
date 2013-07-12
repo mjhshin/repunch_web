@@ -1,7 +1,8 @@
 {% load text_tags %}
 
 {% for redemp in past_redemptions %}
-<div class="tr  {% cycle '' 'odd' %}">
+<div id="{{redemp.objectId}}"
+    class="tr  {% cycle '' 'odd' %}">
     <input type="hidden" value="{{redemp.reward_id}}" />
     <div class="td redemption_time-past">
     {% if redemp.updatedAt < today %}

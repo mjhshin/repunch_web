@@ -175,6 +175,7 @@ def refresh(request):
                         emps_approved.append(emp.jsonify())
                         employees_approved_list.insert(0, emp)
                         break
+                        
             if len(emps_pending) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
@@ -188,9 +189,9 @@ def refresh(request):
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
-        # TODO JAVASCRIPT
         del_emps = session.get("deletedEmployee")
         if del_emps:
+            emps_deleted = []
             for demp in del_emps:
                 emp = Employee(**demp)
                 cont = True
@@ -198,6 +199,7 @@ def refresh(request):
                 for i, cop in enumerate(employees_approved_list):
                     if cop.objectId == emp.objectId:
                         employees_approved_list.pop(i)
+                        emps_deleted.append(emp.jsonify())
                         cont = False
                         break
                     
@@ -208,7 +210,13 @@ def refresh(request):
                 for i, cop in enumerate(employees_pending_list):
                     if cop.objectId == emp.objectId:
                         employees_pending_list.pop(i)
+                        emps_deleted.append(emp.jsonify())
                         break
+                        
+            if len(emps_deleted) > 0:   
+                data['employees_pending_count'] =\
+                    len(employees_pending_list)
+                data['employees_deleted'] = emps_deleted
                         
             request.session['employees_approved_list'] =\
                 employees_approved_list

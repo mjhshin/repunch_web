@@ -17,6 +17,9 @@
 
 #header-redemption_redeem, div.redemption_redeem{
     width:80px;
+
+}
+div.redemption_redeem{
     margin-top:4px;
 }
 
@@ -85,4 +88,21 @@ form#punch-form div.notification div span{
 
 img#punch-loading {
     display:none;margin-left:16px; margin-bottom:2px;
+}
+
+/* key map */
+#keymap { 
+	position: relative; 
+	right: -444px;
+	top: -25px; 
+	font-size: 12px; 
+	color: #666; 
+	width: 200px;
+	height: 16px;
+	line-height: 16px;
+	text-align: right;
+}
+#keymap img { 
+	margin: 0px 5px 0px 10px;
+	vertical-align: middle
 }

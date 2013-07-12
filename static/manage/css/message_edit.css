@@ -34,9 +34,9 @@
 }
 
 #num_patrons {
-    border: 0; color: #f6931f; font-weight: bold; 
+    border: 1px solid #cccccc; color: #f6931f; font-weight: bold; 
     text-align:center;
-    width:40px;
+    width:40px; height:20px;
 }
 
 #num_patron_inner {

@@ -123,10 +123,13 @@ def redeem(request):
         # approve or deny
         action = request.GET.get("action")
         redeemId = request.GET.get('redeemRewardId')
-        # may come in as "None" or "null"
+        # may come in as "None" or "null" or "undefined"
         rewardId = request.GET.get('rewardId') 
-        if rewardId.lower() in ("none", "null"):
+        if str(rewardId).isdigit():
+            rewardId = int(rewardId)
+        else:
             rewardId = None
+            
         store = SESSION.get_store(request.session)
         if action == "approve":
             res = cloud_call("validate_redeem", {
@@ -165,6 +168,7 @@ def redeem(request):
                 else:
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True
+                    redemption.updatedAt = timezone.now()
                     redemptions_past.append(redemption)
                     request.session['redemptions_past'] =\
                         redemptions_past
@@ -180,6 +184,7 @@ def redeem(request):
                 else:
                     return HttpResponse(json.dumps({"result":1}), 
                                 content_type="application/json")
+                                
             elif i_remove != -1 and action == "deny":
                 redemptions_pending.pop(i_remove)
                 request.session['redemptions_pending'] =\

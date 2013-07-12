@@ -52,14 +52,23 @@
 			<div class="tab active" id="tab-pending-redemptions">Pending {% if redcount > 0 %}({{ redcount }}){% endif %}</div>
 			<div class="tab" id="tab-history-redemptions">History</div>
 		</div>
+		
 	
 		<div class="white-box table tab-body active" id="tab-body-pending-redemptions">
+		
+		    {% comment %}
+		    <div id="keymap">
+			    <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" />Approve
+			    <img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /> Deny
+		    </div>
+		    {% endcomment %}
+		
 			<div class="table-header">
 				<div class="th sorted desc" id="header-redemption_time">Time <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-redemption_customer_name">Customer name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-redemption_title">Reward name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-redemption_punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-			<div class="th not-sortable" id="header-redemption_redeem"> <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+			<div class="th not-sortable" id="header-redemption_redeem">Approve?<img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			
 			</div>
 			
