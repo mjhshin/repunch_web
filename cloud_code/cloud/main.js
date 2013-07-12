@@ -195,24 +195,24 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		
 	}).then(function(patron) {
 		console.log("Store save success.");
-		response.success(patronStore);
-		return;
+		// calling response.success here will prevent the following promises from executing!
+		// response.success(patronStore);
+	    return store.relation("PatronStores").query().count();
 		
 	}, function(error) {
 		console.log("Store save failed.");
 		response.error("error");
 		return;
 		
-	}).then(function() {
-	    return store.relation("PatronStores").query().count();
-	    
-    }).then(function(patronStoreCount) {
+	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
             method: 'POST',
             url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: { patronStore_num: patronStoreCount, }
         });
+        
+        response.success(patronStore);
         
 	});
 	
@@ -749,7 +749,6 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	    return redeemReward.destroy();
 	    
 	}).then(function() {
-	    response.success("success");
 	    Parse.Cloud.httpRequest({
             method: 'POST',
             url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
@@ -758,6 +757,8 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
                 deletedRedemption: redeemReward,
             }
         });
+        
+	    response.success("success");
         
 	});
 	
@@ -772,7 +773,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	var rewardId = request.params.reward_id;
-	if (rewardId != null) { rewardId = parseInt(rewardId); }
+	// it is an offer/gift if rewardId is undefined/null or "undefined"/"null"
+	// note the isNaN(null) is false but isNaN("null") is true!
+	var isOfferOrGift = isNaN(String(rewardId));
 	
 	var numPunches, rewardTitle, store, patron, patronStore,
 	    updatedReward, messageStatus;
@@ -788,11 +791,12 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	
 	storeQuery.get(storeId).then(function(storeResult) {
 	    store = storeResult;
-	    if (rewardId != null) {
+	    if (!isOfferOrGift) {
+	        var reward_id = parseInt(rewardId);
 	        var rewards = storeResult.get("rewards");
 		    // update the store's rewards redemption_count
 		    for (var i=0; i<rewards.length; i++) {
-		        if (rewards[i].reward_id == rewardId) {
+		        if (rewards[i].reward_id == reward_id) {
 		            rewards[i].redemption_count += 1;
 		            updatedReward = {
 		                redemption_count: rewards[i].redemption_count,
@@ -823,7 +827,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			console.log("RedeemReward has already been validated");
 			response.success("validated");
 			
-		} else if(rewardId == null) {
+		} else if(isOfferOrGift) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
 			patron = patronStore.get("Patron");
 
