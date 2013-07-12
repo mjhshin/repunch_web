@@ -30,11 +30,11 @@
 	<div class="section">
 		
 		<div class="tab-container">
-			<div class="tab  {% if show_pending == False %}active{% endif %}" id="tab-employees">Employees</div>
-			<div class="tab {% if show_pending %}active{% endif %}" id="tab-pending">Pending {% if epcount > 0 %}({{ epcount }}){% endif %}</div>
+			<div class="tab  {% if show_pending == False %}active{% endif %}" id="tab-approved-employees">Employees</div>
+			<div class="tab {% if show_pending %}active{% endif %}" id="tab-pending-employees">Pending {% if epcount > 0 %}({{ epcount }}){% endif %}</div>
 		</div>
 		
-		<div class="white-box table tab-body {% if show_pending == False %}active{% endif %}" id="tab-body-employees">
+		<div class="white-box table tab-body {% if show_pending == False %}active{% endif %}" id="tab-body-approved-employees">
 			<div class="table-header">
 				<div class="th" id="header-first_name">First Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-last_name">Last Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
@@ -44,7 +44,7 @@
 				<div class="th" id="header-remove">Remove <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			{% for employee in employees %}
-			<div class="tr {% cycle 'odd' '' %}">
+			<div class="tr {% cycle 'odd' '' %}" id="{{ employee.objectId }}">
 				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td first_name">{{ employee|get:'first_name'|trim_to_dots:12 }}</div></a>
 				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td last_name">{{ employee|get:'last_name'|trim_to_dots:14 }}</div></a>
 				<a href="{% url 'employee_edit' employee.objectId %}"><div class="td date_added">{{ employee|get:'createdAt'|date:"m/d/y" }}</div></a>
@@ -53,13 +53,13 @@
 				<div class="td remove"><a href="{% url 'employee_delete' employee.objectId %}"><img src="{% static 'manage/images/icon_red-x.png' %}" alt="Remove" /></a></div>
 			</div>
 			{% empty %}
-			<div class="tr odd">
+			<div class="tr odd" id="no-approved-employees">
 				<div class="td">No Employees</div>
 			</div>
 			{% endfor %}
 		</div>
 		
-		<div class="white-box table tab-body {% if show_pending %}active{% endif %}" id="tab-body-pending">
+		<div class="white-box table tab-body {% if show_pending %}active{% endif %}" id="tab-body-pending-employees">
 			<div id="keymap">
 					<img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" />Approve
 					<img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /> Deny
@@ -72,7 +72,7 @@
 			</div>
 			
 			{% for employee in pending %}
-			<div class="tr {% cycle 'odd' '' %}">
+			<div class="tr {% cycle 'odd' '' %}" id="{{ employee.objectId }}">
 				<div class="td first_name_pending">{{ employee|get:'first_name'|trim_to_dots:12 }}</div>
 				<div class="td last_name_pending">{{ employee|get:'last_name'|trim_to_dots:14 }}</div>
 				<div class="td date_added_pending">{{ employee|get:'createdAt'|date:"m/d/y" }}</div>
@@ -82,7 +82,7 @@
 				</div>
 			</div>
 			{% empty %}
-			<div class="tr odd" id="no-pending">
+			<div class="tr odd" id="no-pending-employees">
 				<div class="td" >No Pending Employees</div>
 			</div>
 			{% endfor %}

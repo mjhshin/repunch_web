@@ -160,9 +160,9 @@ def refresh(request):
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
-        # TODO JAVASCRIPT
         appr_emps = session.get("approvedEmployee")
         if appr_emps:
+            emps_approved = []
             for appr_emp in appr_emps:
                 emp = Employee(**appr_emp)
                 # first check if the employee is in the pending list
@@ -172,8 +172,14 @@ def refresh(request):
                     if emp.objectId == emp_pending.objectId:
                         emp = employees_pending_list.pop(i)
                         emp.status = APPROVED
+                        emps_approved.append(emp.jsonify())
                         employees_approved_list.insert(0, emp)
                         break
+            if len(emps_pending) > 0:   
+                data['employees_pending_count'] =\
+                    len(employees_pending_list)
+                data['employees_approved'] = emps_approved
+                
             request.session['employees_pending_list'] =\
                 employees_pending_list
             request.session['employees_approved_list'] =\
@@ -268,6 +274,8 @@ def refresh(request):
                 # if not then check if it is in the history already
                 # the above shouldn't happen!
             if len(redemp_js) > 0:
+                data['redemption_pending_count'] =\
+                    len(redemptions_pending)
                 data['redemptions_approved'] = redemp_js
                 
             request.session['redemptions_pending'] =\
@@ -424,6 +432,7 @@ def refresh(request):
             
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
+                        
     except CometSession.DoesNotExist:
         # this should have been created at login!
         scomet = CometSession.objects.create(session_key=\

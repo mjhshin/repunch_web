@@ -129,6 +129,39 @@ $(document).ready(function(){
             
         } // end hasOwnProperty
         
+        function addToEmployeesPending(employee) {
+            var odd = "";
+            var first=$("#tab-body-pending-employees div.tr").first();
+            if (!first.hasClass("odd")){
+                odd = "odd";
+            }
+            var d = new Date(employee.createdAt);
+            var year = new String(d.getYear());
+            year = year.substring(1, year.length);
+            var month = new String(d.getMonth()+1);
+            if (month.length == 1){
+                month = "0" + month;
+            }
+            var day = new String(d.getDate());
+            if (day.length == 1){
+                day = "0" + day;
+            }
+            var dStr = month + "/" + day + "/" + year;
+            $("#tab-body-pending-employees div.table-header").after(
+                "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
+		        
+		        "<div class='td first_name_pending'>" + employee.first_name.trimToDots(12) + "</div>" +
+		        "<div class='td last_name_pending'>" + employee.last_name.trimToDots(14) + "</div>" +
+		        "<div class='td date_added_pending'>" + dStr + "</div>" +
+		        "<div class='td approve'>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
+			        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/deny' class='employee deny'>" +
+			        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
+		        "</div>" +
+		        "</div>" );
+        }
+        
         if (res.hasOwnProperty('employees_pending')){
             // pending employees nav
             var employees_pending_count = new String(res.employees_pending_count);
@@ -142,7 +175,7 @@ $(document).ready(function(){
             }
             
             // Employees page
-            var pendingTab = $("#tab-pending");
+            var pendingTab = $("#tab-pending-employees");
             // tab
             if (pendingTab.length > 0){
                 pendingTab.html("Pending (" + 
@@ -153,45 +186,84 @@ $(document).ready(function(){
                 // table content
                 var employees_pending = res.employees_pending;
                 for (var i=0; i<employees_pending.length; i++){
-                    var odd = "";
-                    var first=$("#tab-body-pending div.tr").first();
-                    if (!first.hasClass("odd")){
-                        odd = "odd";
-                    }
-                    var d = new Date(employees_pending[i].createdAt);
-                    var year = new String(d.getYear());
-                    year = year.substring(1, year.length);
-                    var month = new String(d.getMonth()+1);
-                    if (month.length == 1){
-                        month = "0" + month;
-                    }
-                    var day = new String(d.getDate());
-                    if (day.length == 1){
-                        day = "0" + day;
-                    }
-                    var dStr = month + "/" + day + "/" + year;
-                    $("#tab-body-pending div.table-header").after(
-                        "<div class='tr " + odd + " unread'>" +
-				        
-				        "<div class='td first_name_pending'>" + employees_pending[i].first_name.trimToDots(12) + "</div>" +
-				        "<div class='td last_name_pending'>" + employees_pending[i].last_name.trimToDots(14) + "</div>" +
-				        "<div class='td date_added_pending'>" + dStr + "</div>" +
-				        "<div class='td approve'>" +
-					    "<a href='/manage/employees/" + employees_pending[i].objectId + "/approve' class='employee approve'>" +
-					        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
-					    "<a href='/manage/employees/" + employees_pending[i].objectId + "/deny' class='employee deny'>" +
-					        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
-				        "</div>" +
-				        "</div>" );
+                    addToEmployeesPending(employees_pending[i]);
 		        }
 		        
                 // remove placeholder when empty
-                if ($("#no-pending").length > 0){
-                    $("#no-pending").remove();
+                if ($("#no-pending-employees").length > 0){
+                    $("#no-pending-employees").remove();
                 }
             }
             
-        }// end employees
+        }// end employees pending
+        
+        function employeesApprovedDeleted(emps, type) {
+            // pending employees nav 
+            var employees_pending_count = new String(res.employees_pending_count);
+            var mBadge = $("#employees-nav a div.nav-item-badge");
+            var diva = $("#employees-nav a");
+            if (mBadge.length == 1) {
+                mBadge.text(employees_pending_count);
+            } else {
+                diva.append("<div class='nav-item-badge'>" +
+                    employees_pending_count + "</div>");
+            }
+            
+            // Employees page
+            var pendingTab = $("#tab-pending-employees");
+            if (pendingTab.length > 0) {
+                // move the rows from pending tab to approved tab
+                for (var i=0; i< emps.length; i++) {
+                    var row = $("#" + emps[i].objectId);
+                    row.css("background", "#FFFFCB");
+                    if (type == "approved") {
+                        row.html("Employee has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                    } else {
+                        row.html("Employee has been <span style='color:red;'>DENIED</span> elsewhere.");
+                    }
+                    // the last row to go checks if placeholder is necessary
+                    if (i == emps.length - 1) {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                            
+                            // place the placeholder if now empty
+                            if($("#employees-nav a div.nav-item-badge").length == 0) {
+                                $("#tab-body-pending-employees div.table-header").after(
+                                    "<div class='tr' id='no-pending-employees'>" +
+                                    "<div class='td'>No Pending Employees</div>" +
+                                    "</div>");
+                            }
+                        });
+                    } else {
+                        row.fadeOut(2000, function(){
+                            $(this).remove();
+                            // Now add to the approved tab
+                            if (type == "approved") {
+                                // TODO
+                            }
+                        });
+                    }
+                }
+                
+                // update the title and the tab
+                if (count > 0) {
+                    document.title = "Repunch | (" + employees_pending_count + ") Employees";
+                    $("#tab-pending-employees").html("Pending (" + employees_pending_count + ")");
+                } else {
+                    document.title = "Repunch | Employees";
+                    $("#tab-pending-employees").html("Pending");
+                }
+                
+            }
+            
+        }
+        
+        if (res.hasOwnProperty('employees_approved')){
+            employeesApprovedDeleted(res.employees_approved, "approved");
+        } 
+        if (res.hasOwnProperty('employees_deleted')){
+            employeesApprovedDeleted(res.employees_deleted, "deleted");
+        } 
         
         // reward redemption count
         if (res.hasOwnProperty('rewards') && res.rewards.length > 0){
@@ -342,14 +414,14 @@ $(document).ready(function(){
         } // end hasOwnProperty
         
         
-        if (res.hasOwnProperty('redemptions_approved')){
+        function redemptionsApprovedDeleted(redemps, type) {
+            
             // Workbench nav
-            var count, redemps = res.redemptions_approved;
+            var redemption_pending_count = res.redemption_pending_count;
             var rBadge = $("#redemptions-nav a div.nav-item-badge");
             if (rBadge.length == 1){
-                count = parseInt(rBadge.text()) - redemps.length;
-                if (count > 0) {
-                    rBadge.text(new String(count));
+                if (redemption_pending_count > 0) {
+                    rBadge.text(new String(redemption_pending_count));
                 } else {
                     rBadge.fadeOut(1000, function(){
                         $(this).remove();
@@ -364,7 +436,11 @@ $(document).ready(function(){
                 for (var i=0; i< redemps.length; i++){
                     var row = $("#" + redemps[i].objectId);
                     row.css("background", "#FFFFCB");
-                    row.html("Redemption has been validated elsewhere.");
+                    if (type == "approved") {
+                        row.html("Redemption has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                    } else {
+                        row.html("Redemption has been <span style='color:red;'>DENIED</span> elsewhere.");
+                    }
                     // the last row to go checks if placeholder is necessary
                     if (i == redemps.length - 1) {
                         row.fadeOut(2000, function(){
@@ -386,73 +462,26 @@ $(document).ready(function(){
                 }
                 
                 // update the title and the tab
-                if (count > 0) {
-                    document.title = "Repunch | (" + new String(count) + ") Redemptions";
-                    $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
+                if (redemption_pending_count > 0) {
+                    document.title = "Repunch | (" + new String(redemption_pending_count) + ") Redemptions";
+                    $("#tab-pending-redemptions").html("Pending (" + new String(redemption_pending_count) + ")");
                 } else {
                     document.title = "Repunch | Redemptions";
                     $("#tab-pending-redemptions").html("Pending");
-                    }
+                }
                 
             }
             
-        } // end hasOwnProperty
+        } 
+        
+        
+        if (res.hasOwnProperty('redemptions_approved')){
+            redemptionsApprovedDeleted(res.redemptions_approved, 'approved');
+        } 
         
         if (res.hasOwnProperty('redemptions_deleted')){
-            // Workbench nav
-            var count, redemps = res.redemptions_deleted;
-            var rBadge = $("#redemptions-nav a div.nav-item-badge");
-            if (rBadge.length == 1){
-                count = parseInt(rBadge.text()) - redemps.length;
-                if (count > 0) {
-                    rBadge.text(new String(count));
-                } else {
-                    rBadge.fadeOut(1000, function(){
-                        $(this).remove();
-                    });
-                }
-            }
-        
-            // tab
-            var pendingTab = $("#tab-pending-redemptions");
-            if (pendingTab.length >0){
-                // remove the rows
-                for (var i=0; i< redemps.length; i++){
-                    var row = $("#" + redemps[i].objectId);
-                    row.css("background", "#FFFFCB");
-                    row.html("Redemption has been deleted elsewhere.");
-                    // the last row to go checks if placeholder is necessary
-                    if (i == redemps.length - 1) {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                            
-                            // place the placeholder if now empty
-                            if($("#redemptions-nav a div.nav-item-badge").length == 0) {
-                                $("#tab-body-pending-redemptions div.table-header").after(
-                                    "<div class='tr' id='no-redemptions'>" +
-                                    "<div class='td'>No Redemptions</div>" +
-                                    "</div>");
-                            }
-                        });
-                    } else {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                        });
-                    }
-                }
-                
-                // update the title and the tab
-                if (count > 0) {
-                    document.title = "Repunch | (" + new String(count) + ") Redemptions";
-                    $("#tab-pending-redemptions").html("Pending (" + new String(count) + ")");
-                } else {
-                    document.title = "Repunch | Redemptions";
-                    $("#tab-pending-redemptions").html("Pending");
-                    }
-                
-            }
-            
-        } // end hasOwnProperty
+            redemptionsApprovedDeleted(res.redemptions_deleted, 'deleted');
+        } 
         
         if (res.hasOwnProperty('retailer_pin')){
             // Settings page
