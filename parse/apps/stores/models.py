@@ -6,7 +6,7 @@ from importlib import import_module
 from dateutil import parser
 import string, random
 
-from parse.utils import parse
+from parse.utils import parse, title
 from parse.apps.accounts import sub_type
 from parse.paypal import store_cc, charge_cc
 from parse.core.models import ParseObject
@@ -76,6 +76,23 @@ class Store(ParseObject):
         self.RedeemRewards_ = "RedeemReward"
         
         super(Store, self).__init__(False, **data)
+     
+    def update(self):
+        """
+        Capitalize certain strings before saving to parse.
+        """
+        self.store_name = title(self.store_name)       
+        self.street = title(self.street)
+        self.city = title(self.city)
+        self.state = self.state.upper()
+        
+        data = self._get_formatted_data()
+        res = parse("PUT", self.path() + "/" + self.objectId, data)
+        if res and "error" not in res:
+            self.update_locally(res, False)
+            return True
+
+        return False
         
     def get_owner_fullname(self):
         return self.first_name.capitalize()+\

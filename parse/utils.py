@@ -147,4 +147,16 @@ def make_aware_to_utc(dtime, tzone):
     dtime = timezone.make_aware(dtime, tzone)
     # then convert to utc format
     return timezone.localtime(dtime, tzutc())
+    
+def title(string):
+    """
+    Like str.title but does not capitalize letter after '
+    """
+    return " ".join([word.capitalize() for word in string.split(" ")])
+    
+    
+
+
+
+
 

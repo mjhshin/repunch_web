@@ -23,8 +23,6 @@ class ParseObjectManager(object):
     This provides functionality similar to Django's Model.objects
     """
 
-    # TODO handles pointer meta?
-
     def __init__(self, cls):
         if cls.__name__ == USER_CLASS:
             self.path = 'classes/' + "_User"
