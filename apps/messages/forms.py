@@ -22,10 +22,13 @@ class MessageForm(forms.Form):
         
     def clean_num_patrons(self):
         try:
-            int(self.cleaned_data['num_patrons'])
+            num = int(self.cleaned_data['num_patrons'])
+            if num < 1:
+                raise forms.ValidationError(\
+                    'Number of customers must at least 1.')
         except ValueError:
-            raise forms.ValidationError('Punches must be"+\
-                                    " a whole number')
+            raise forms.ValidationError('Number of customers must '+\
+                'be a whole number.')
         
     def clean_offer_title(self):
         title = self.cleaned_data['offer_title']

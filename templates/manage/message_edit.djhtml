@@ -73,12 +73,13 @@ $(document).ready(function(){
             value="1"
             {% else %}
             value="{{ mp_slider_value }}"
+            {% endif %} />
+        <div id="num_patron_inner">
+            <label id="num_patrons_label">Select the number of most loyal customers.</label>
+            {% if mp_slider_max > 1 %}
+                <div id="num_patrons_slider" ></div>
             {% endif %}
-            style="border: 0; color: #f6931f; font-weight: bold; width:40px;" />
-        <span id="num_patrons_label">Select the number of most loyal customers.</span>
-        {% if mp_slider_max > 1 %}
-            <div id="num_patrons_slider" ></div>
-        {% endif %}
+        </div>
         </span>
 	
 		{{ form.subject.errors }}

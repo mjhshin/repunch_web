@@ -141,6 +141,7 @@ def edit(request, message_id):
         form = MessageForm(postDict) 
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
+                    
         # refresh the message count - make sure we get the one in the cloud
         del request.session['message_count']
         message_count = SESSION.get_message_count(request.session)
@@ -218,8 +219,8 @@ def edit(request, message_id):
             data['limit_reached'] = limit_reached
             data['maxed_out'] = True
         elif 'num_patrons' in form.errors:
-            data['error'] = "Minimum punches must be a "+\
-                                "whole number."
+            data['error'] = "Number of customers must be a "+\
+                                "whole number and greater than 0."
         else:
             data['error'] = "The form you submitted has errors."
     else:
