@@ -15,7 +15,6 @@ class Employee(ParseObject):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.status = data.get("status", PENDING)
-        self.employee_avatar = data.get("employee_avatar")
         # must be updated everytime a punch event occurs TODO
         self.lifetime_punches = data.get("lifetime_punches", 0)
 
@@ -24,6 +23,10 @@ class Employee(ParseObject):
         self.Store = data.get("Store")
 
         super(Employee, self).__init__(False, **data)
+        
+    def get_fullname(self):
+        return self.first_name.capitalize()+\
+                " " + self.last_name.capitalize()
     
     def get_class(self, className):
         if className == "Store":

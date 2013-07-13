@@ -189,4 +189,23 @@ def send_email_signup(account, connection=None):
     emails.append(email)
     
     _send_emails(emails, connection)
+    
+    
+def send_email_suspicious_activity(store, chunk1, chunk2,\
+        connection=None):
+    """
+    chunk1 and chunk2 are a list of dictionaries - 
+    See the detect_suspicious_activity management command docstring.
+    """
+    pass
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
    

@@ -1,0 +1,106 @@
+{% extends "manage/notification.html" %}
+
+{% block title %}
+Hey {{ store.get_owner_fullname }}, suspicious activity has been detected ({{ today|date:"F d, Y" }}).
+{% endblock %}
+
+{% block content %}
+
+{# CHUNKS #}
+{% for chunk in chunks %}
+
+{# TABLE TOP #}
+<div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
+Consumers that got punched more than 6 times today
+</div>
+{# END TABLE TOP #}
+
+<table cellpadding="0" cellspacing="0" 
+    style="width:100%;background-color:#eee;">
+    
+{% for ch in chunk %}
+
+{# ONE ITEM #}
+<tr>
+
+    {# DATE BOX #}
+	<td style="width:32px;background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
+		<div style="border:1px solid #555;">
+		    <div style="background-color:#555;text-transform:uppercase;color:#fff;font-weight:bold;text-align:center;font-size:9px;line-height:14px;padding:0 4px;">
+                Number</div>
+			<div style="background-color:#fff;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
+                {{ forloop.counter }}
+            </div>
+		</div>
+    </td>
+    {# END DATE BOX #}
+    
+    {# INNER TABLE #}
+	<td style="vertical-align:top;padding:8px;border-top:1px solid #fff;">
+		<table cellpadding="0" cellspacing="0" style="width:100%;">
+			<tr>
+				<td style="background-color:#eee;vertical-align:top;padding-right:20px;">
+
+                    {# PATRON NAME #}
+                    <div style="padding:2px 0 4px 0;font-size:16px;line-height:16px;font-weight:bold;text-decoration:underline;">
+                        <strong>Consumer name:</strong>
+                        {{ ch.patron.get_fullname }}                         
+					</div>
+                    {# END PATRON NAME #}
+                    
+                    {# PATRON EMAIL #}
+                    <div style="padding:2px 0 4px 0;font-size:16px;line-height:16px;font-weight:bold;text-decoration:underline;">
+                        <strong>Consumer email:</strong>
+                        {{ ch.account.email }}                         
+					</div>
+                    {# END PATRON EMAIL #}
+
+                    {# LIST OF PUNCHES #}
+                    <div style="padding:2px 0 4px 0;font-size:16px;line-height:16px;font-weight:bold;text-decoration:underline;">
+                        <strong>{{ ch.punches|length }} separate punches received:</strong>
+                        <button onclick="if(this.innerHTML=='show'){this.innerHTML='hide';this.nextSibling.style.display='block';}else{this.innerHTML='show';this.nextSibling.style.display='none';}">show</button><ol style="display:none;"><ol style="padding:0px;margin:0px;border:1px solid gray;display:none;">
+                        
+                {% for punch in ch.punches %}
+                    <li>
+                        <ul style="padding:0px;margin:0px;border:1px solid gray;">
+                          
+                        <li><strong>Time:</strong>
+                        {{ punch.punch.createdAt|date:"h:i a" }}
+                        </li>
+                        <li><strong>Amount:</strong>
+                        {{ punch.punch.punches }}
+                        </li>
+                        <li><strong>From:</strong>
+                        {% if punch.employee %}
+                        Employee - {{ punch.employee.get_fullname }}
+                        {% else %}
+                        Dashboard
+                        {% endif %}
+                        </li>
+                          
+                        </ul>
+                    </li>
+                {% endfor %}
+                        
+                        </ol>
+                    </div>
+                    {# END LIST OF PUNCHES #}
+                    
+				</td>
+
+            </tr>
+        </table>
+    </td>
+    {# END INNER TABLE #}
+    
+
+</tr>
+{# END ONE ITEM #}
+
+{% endfor %}
+
+</table><br/>
+{% endfor %}
+{# END CHUNKS #}
+
+{% endblock %}
