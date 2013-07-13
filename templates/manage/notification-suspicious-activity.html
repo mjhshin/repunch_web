@@ -1,7 +1,7 @@
 {% extends "manage/notification.html" %}
 
 {% block title %}
-Hey {{ store.get_owner_fullname }}, suspicious activity has been detected ({{ today|date:"F d, Y" }}).
+{{ store.store_name }}, suspicious activity has been detected ({{ today|date:"F d, Y" }}).
 {% endblock %}
 
 {% block content %}
@@ -11,12 +11,14 @@ Hey {{ store.get_owner_fullname }}, suspicious activity has been detected ({{ to
 
 {# TABLE TOP #}
 <div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
-Consumers that got punched more than 6 times today
-</div>
-{# END TABLE TOP #}
-
-<table cellpadding="0" cellspacing="0" 
-    style="width:100%;background-color:#eee;">
+{% if forloop.counter == 1 %}
+There are {{ chunk|length }} consumers that received punches more than 6 times today. 
+{% else %}
+There are {{ chunk|length }} consumers that received punches when the store was closed.
+{% endif %}
+<button style="display:inline-block;" onclick="if(this.innerHTML=='show'){this.innerHTML='hide';this.nextSibling.style.display='block';}else{this.innerHTML='show';this.nextSibling.style.display='none';}">show</button>
+</div>{# END TABLE TOP #}<table cellpadding="0" cellspacing="0" 
+    style="width:100%;background-color:#eee;display:none;">
     
 {% for ch in chunk %}
 
@@ -58,7 +60,7 @@ Consumers that got punched more than 6 times today
                     {# LIST OF PUNCHES #}
                     <div style="padding:2px 0 4px 0;font-size:16px;line-height:16px;font-weight:bold;text-decoration:underline;">
                         <strong>{{ ch.punches|length }} separate punches received:</strong>
-                        <button onclick="if(this.innerHTML=='show'){this.innerHTML='hide';this.nextSibling.style.display='block';}else{this.innerHTML='show';this.nextSibling.style.display='none';}">show</button><ol style="display:none;"><ol style="padding:0px;margin:0px;border:1px solid gray;display:none;">
+                        <button style="display:inline-block;" onclick="if(this.innerHTML=='show'){this.innerHTML='hide';this.nextSibling.style.display='block';}else{this.innerHTML='show';this.nextSibling.style.display='none';}">show</button><ol style="display:none;"><ol style="padding:0px;margin:0px;border:1px solid gray;display:none;">
                         
                 {% for punch in ch.punches %}
                     <li>

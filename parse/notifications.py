@@ -197,7 +197,28 @@ def send_email_suspicious_activity(store, chunk1, chunk2,\
     chunk1 and chunk2 are a list of dictionaries - 
     See the detect_suspicious_activity management command docstring.
     """
-    pass
+    # need to activate the store's timezone for template rendering!
+    timezone.activate(pytz.timezone(store.store_timezone))
+    
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-suspicious-activity.html",
+            'r') as f:
+        template = Template(f.read())
+        
+    subject = "Repunch Inc. Suspicious activity has been detected " +\
+                "for " + store.store_name + "."
+    ctx = get_notification_ctx()
+    ctx.update({'store':store,
+                'chunks':(chunk1, chunk2)})
+    body = template.render(Context(ctx)).__str__()
+    emails = []
+    
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=[account.get('email')])
+    email.attach_alternative(body, 'text/html')
+    emails.append(email)
+    
+    _send_emails(emails, connection)
     
     
     
