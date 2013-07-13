@@ -922,7 +922,8 @@ a.button.orange{
 	-webkit-border-radius:28px;
 }
 
-.member-picture{
+.member-picture, 
+.member-picture img{
 	background:#CCC;
 	width:155px;
 	height:155px;
@@ -932,12 +933,6 @@ a.button.orange{
 	-ms-border-radius:25px;
 	-moz-border-radius:25px;
 	-webkit-border-radius:25px;
-}
-
-.member-picture img{
-    position:relative; top:-12px; left:-12px;
-	width:170px;
-	height:170px;
 }
 
 .member-name{
