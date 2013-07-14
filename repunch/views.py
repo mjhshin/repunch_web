@@ -63,7 +63,7 @@ def manage_logout(request):
 def manage_terms(request):
     return render(request, 'manage/terms.djhtml')
     
-def manage_password_reset(request):
+def manage_parse_frame(request):
     """ Required by Parse to use our urls insstead of theirs """
     return render(request, 'manage/parse-user-management.html')
 
