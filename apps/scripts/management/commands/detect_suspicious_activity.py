@@ -144,7 +144,7 @@ class Command(BaseCommand):
                     start = timezone.localtime(start, tz)
                     end = timezone.localtime(end, tz)
                     for key, val in patron_punch.iteritems():
-                        if val and suspicious: # TODO
+                        if val :#and suspicious: # TODO
                             for punch in val:
                                 suspicious_punch_list.append({
                                     "punch":punch["punch"],
