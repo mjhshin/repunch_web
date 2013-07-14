@@ -24,11 +24,17 @@ urlpatterns = patterns('',
     url(r'^manage/$', views.manage_login, name='manage_login'),
     url(r'^manage/logout$', views.manage_logout, name='manage_logout'),
     
-    url(r'^manage/password-reset$', views.manage_password_reset, 
+    # Parse Stuff
+    url(r'^manage/password-reset$', 
+            views.manage_password_reset, 
             name='manage_password_reset'),
     url(r'^manage/password-reset-complete$', 
             views.manage_password_reset_complete, 
             name='manage_password_reset_complete'),
+    url(r'^manage/parse-frame$', 
+            views.manage_parse_frame, 
+            name='manage_parse_frame'),
+            
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

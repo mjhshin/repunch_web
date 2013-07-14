@@ -9,15 +9,6 @@ from parse.auth import login
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSession
 
-def manage_password_reset(request):
-    """ Displays the password reset template """
-    return render(request, 'manage/choose_password.html')
-    
-
-def manage_password_reset_complete(request):
-    """ Displays the password reset complete template """
-    return render(request, 'manage/password_updated.html')
-
 def manage_login(request):
     """
     Handle s ajax request from login-dialog.
@@ -71,4 +62,17 @@ def manage_logout(request):
 
 def manage_terms(request):
     return render(request, 'manage/terms.djhtml')
+    
+def manage_password_reset(request):
+    """ Required by Parse to use our urls insstead of theirs """
+    return render(request, 'manage/parse-user-management.html')
+
+def manage_password_reset(request):
+    """ Displays the password reset template """
+    return render(request, 'manage/choose_password.html')
+    
+
+def manage_password_reset_complete(request):
+    """ Displays the password reset complete template """
+    return render(request, 'manage/password_updated.html')
 
