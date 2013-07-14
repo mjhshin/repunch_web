@@ -7,7 +7,7 @@
 {% block pageblock %}
 <section id="page-wrapper">
     <div class="page-title-container">
-    <h1 class="page-title">>Frequently Answered Questions</h1>
+    <h1 class="page-title">Frequently Answered Questions</h1>
     </div>
 	<div id="page-content">
 		<div id="faq-content">
