@@ -64,24 +64,25 @@ function updateChart()
 	data.start= start;
 	data.end = end;
 	
-	var jsonData = $.ajax({
-          url: _graph_url,
-          dataType:"json",
-          data: data,
-          async: false
-          }).responseText;
-          
-  
-
-	var options = {
-        	legend: {position: 'bottom', alignment: 'start'},
-        	//chartArea: { left: 0, top: 0},
-        	width: 640,
-        	height: 250,
-        	pointSize: 4
-        };
-      // Instantiate and draw our chart, passing in some options.
-      chart = new google.visualization.LineChart(document.getElementById('employee-chart'));
-      chart.draw(new google.visualization.DataTable(jsonData), options);
+	
+	$.ajax({
+        url: _graph_url,
+        type: "GET",
+        dataType:"json",
+        data: data,
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(jsonData){
+            var options = {
+                	legend: {position: 'bottom', alignment: 'start'},
+                	//chartArea: { left: 0, top: 0},
+                	width: 640,
+                	height: 250,
+                	pointSize: 4
+                };
+              // Instantiate and draw our chart, passing in some options.
+              chart = new google.visualization.LineChart(document.getElementById('employee-chart'));
+              chart.draw(new google.visualization.DataTable(jsonData), options);
+        }
+    });
 
 }

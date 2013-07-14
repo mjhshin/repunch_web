@@ -71,23 +71,28 @@ function punchit(url){
     }
     
     // make the ajax call
-    $.post(url, data, function(res) {
-        // res may be error : {u'code': 141, u'error': u'error'}
-        // alert(res.code + res.error);
-        if (res.hasOwnProperty("error")){
+    $.ajax({
+        url: url,
+        data: data,
+        type: "POST",
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(res) {
+            // res may be error : {u'code': 141, u'error': u'error'}
+            // alert(res.code + res.error);
+            if (res.hasOwnProperty("error")){
+                $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+                "<div><span>Failed to punch customer.<span></div></div>");
+            } else {
+                $("#punch-form").append("<div id='punch-notification' class='notification success hide'>"+
+                    "<div><span>Successfully gave " + pa.val() + " punches to " + res.patron_name + ".<span></div></div>");
+            }
+            finishPunching();
+        },
+        error: function(){ 
             $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Failed to punch customer.<span></div></div>");
-        } else {
-            $("#punch-form").append("<div id='punch-notification' class='notification success hide'>"+
-                "<div><span>Successfully gave " + pa.val() + " punches to " + res.patron_name + ".<span></div></div>");
+                "<div><span>Failed to punch customer.<span></div></div>");
+            finishPunching();
         }
-        finishPunching();
-    }).fail(function(){ 
-        $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Failed to punch customer.<span></div></div>");
-        finishPunching();
     });
-
-    
     
 }

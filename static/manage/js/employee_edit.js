@@ -47,9 +47,16 @@ $(document).ready(function(){
 
 $.fn.loadWith = function(url, data){
     var c=$(this);
-    $.post(url, data, function(response){
-        c.replaceWith(response);
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(response){
+            c.replaceWith(response);
+        }
     });
+        
 };
 
 function loadRow(page)

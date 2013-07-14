@@ -34,15 +34,20 @@ getPage = function (pagUrl, pageNum, type, order, header, getCallback){
     tableHeader = $("#tab-body-" + type + " div.table-header");
     data =  {"type":type, "page":pageNum, "order":order, "header":header,};
     
-    // make the ajax call
-    $.get(pagUrl, data, function(res){
-        // remove the rows of the table first
-        tableHeader.siblings().remove();
-        // now add the result
-        tableHeader.after(res);
-        // call the getCallback if provided
-         if (getCallback != null){
-            getCallback();
+    $.ajax({
+        url: pagUrl,
+        data: data,
+        type: "GET",
+        cache:false, // required to kill internet explorer 304 bug
+        success: function(res){
+            // remove the rows of the table first
+            tableHeader.siblings().remove();
+            // now add the result
+            tableHeader.after(res);
+            // call the getCallback if provided
+             if (getCallback != null){
+                getCallback();
+            }
         }
     });
     

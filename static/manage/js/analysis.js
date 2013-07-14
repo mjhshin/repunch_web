@@ -16,27 +16,32 @@ function updateBreakdownGraph()
 	$('#breakdown-filter').val() + '/' + 
 	$('#breakdown-range').val() + '/';
 	
-	$.get(url, function(jsonData){
-        var options = {
-            	legend: {position: 'bottom', alignment: 'start'},
-            	//chartArea: { left: 0, top: 0},
-            	width: 640,
-            	height: 250,
-            	pointSize: 4
-            };
-            
+	$.ajax({
+        url: url,
+        type: "GET",
+        cache:false, // required to kill internet explorer 304 bug
+        success: function(jsonData){
+            var options = {
+                	legend: {position: 'bottom', alignment: 'start'},
+                	//chartArea: { left: 0, top: 0},
+                	width: 640,
+                	height: 250,
+                	pointSize: 4
+                };
+                
 
-        //jsonData = [
-        //  ['R', 'Male', 'Female', 'Unknown'],
-        //  ['1/1/13 - 1/7/13',  1000, 1170, 660]
-        // ]
-            
-        // Instantiate and draw our chart, passing in some options.
-        breakdownGraph = new google.visualization.ColumnChart(document.getElementById('breakdown-graph'));
-        breakdownGraph.draw(new google.visualization.arrayToDataTable(jsonData), options);
+            //jsonData = [
+            //  ['R', 'Male', 'Female', 'Unknown'],
+            //  ['1/1/13 - 1/7/13',  1000, 1170, 660]
+            // ]
+                
+            // Instantiate and draw our chart, passing in some options.
+            breakdownGraph = new google.visualization.ColumnChart(document.getElementById('breakdown-graph'));
+            breakdownGraph.draw(new google.visualization.arrayToDataTable(jsonData), options);
 
-        $("#breakdown-loading").hide();
-	});
+            $("#breakdown-loading").hide();
+	    },
+    });
 
 }
 
@@ -61,20 +66,25 @@ function updateTrendsGraph()
 	var url = _trends_graph_url + $('#trends-type').val() + '/' + 
 	$.datepicker.formatDate( "yy-mm-dd", start_date) + '/' + 
 	$.datepicker.formatDate( "yy-mm-dd", end_date) + '/';
-		
-	$.get(url, function(jsonData){
-        var options = {
-	        legend: {position: 'bottom', alignment: 'start'},
-	        //chartArea: { left: 0, top: 0},
-	        width: 640,
-	        height: 250,
-	        pointSize: 4
-        };
-        // Instantiate and draw our chart, passing in some options.
-        trendsGraph = new google.visualization.LineChart(document.getElementById('trends-graph'));
-        trendsGraph.draw(new google.visualization.DataTable(jsonData), options);
+	
+	$.ajax({
+        url: url,
+        type: "GET",
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(jsonData){
+            var options = {
+	            legend: {position: 'bottom', alignment: 'start'},
+	            //chartArea: { left: 0, top: 0},
+	            width: 640,
+	            height: 250,
+	            pointSize: 4
+            };
+            // Instantiate and draw our chart, passing in some options.
+            trendsGraph = new google.visualization.LineChart(document.getElementById('trends-graph'));
+            trendsGraph.draw(new google.visualization.DataTable(jsonData), options);
 
-        $("#trends-loading").hide();
-	});
+            $("#trends-loading").hide();
+	    }
+    });
 
 }

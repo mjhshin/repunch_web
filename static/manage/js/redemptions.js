@@ -15,6 +15,7 @@ function onRedeem(rowId, action){
     var numPunches = $("#" + rowId + " div:nth-child(5)").text();
     $.ajax({
         url: urlRedeem,
+        cache: false, // required to kill internet explorer 304 bug
         data: {"redeemRewardId":rowId,
                 "rewardId":rewardId, // "undefined"
                 "action":action }, 
