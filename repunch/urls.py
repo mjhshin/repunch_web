@@ -26,14 +26,17 @@ urlpatterns = patterns('',
     
     # Parse Stuff
     url(r'^manage/password-reset$', 
-            views.manage_password_reset, 
-            name='manage_password_reset'),
+            views.manage_parse_password_reset, 
+            name='manage_parse_password_reset'),
     url(r'^manage/password-reset-complete$', 
-            views.manage_password_reset_complete, 
-            name='manage_password_reset_complete'),
+            views.manage_parse_password_reset_complete, 
+            name='manage_parse_password_reset_complete'),
     url(r'^manage/parse-frame$', 
             views.manage_parse_frame, 
             name='manage_parse_frame'),
+    url(r'^manage/parse-invalid_link$', 
+            views.manage_parse_invalid_link, 
+            name='manage_parse_invalid_link'),
             
 
     # Uncomment the admin/doc line below to enable admin documentation:

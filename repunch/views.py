@@ -63,16 +63,22 @@ def manage_logout(request):
 def manage_terms(request):
     return render(request, 'manage/terms.djhtml')
     
+#### PARSE VIEWS
+
+def manage_parse_invalid_link(request):
+    """ Displays the invalid link template """
+    return render(request, 'manage/parse-invalid-link.html')
+    
 def manage_parse_frame(request):
     """ Required by Parse to use our urls insstead of theirs """
     return render(request, 'manage/parse-user-management.html')
 
-def manage_password_reset(request):
+def manage_parse_password_reset(request):
     """ Displays the password reset template """
-    return render(request, 'manage/choose_password.html')
+    return render(request, 'manage/parse-choose-password.html')
     
 
-def manage_password_reset_complete(request):
+def manage_parse_password_reset_complete(request):
     """ Displays the password reset complete template """
-    return render(request, 'manage/password_updated.html')
+    return render(request, 'manage/parse-password-updated.html')
 
