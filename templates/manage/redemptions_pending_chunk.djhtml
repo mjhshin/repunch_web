@@ -15,9 +15,9 @@
 	{{ redemp.createdAt|date:"h:i a" }}
 	{% endif %}</div>
 	<div class="td redemption_customer_name">
-	{{ redemp.customer_name|trim_to_dots:18 }}</div>
+	{{ redemp.customer_name|trim_to_dots:16 }}</div>
 	<div class="td redemption_title">
-	{{ redemp.title|trim_to_dots:24 }}</div>
+	{{ redemp.title|trim_to_dots:20 }}</div>
 	<div class="td redemption_punches">
 	{{ redemp.num_punches }}</div>
 	<div class="td redemption_redeem">

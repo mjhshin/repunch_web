@@ -88,7 +88,7 @@ $(document).ready(function(){
 				            "<div class='td feedback-from'>" +
 				            feedbacks_unread[i].sender_name.trimToDots(14) + "</div>" +
 				            "<div class='td feedback-subject'>" +
-				            feedbacks_unread[i].subject.trimToDots(26) + "</div>" +
+				            feedbacks_unread[i].subject.trimToDots(24) + "</div>" +
 			                "</a></div>";
 			            // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {
@@ -401,9 +401,9 @@ $(document).ready(function(){
 				            "<div class='td redemption_time'>" +
 				            d + "</div>" +
 				            "<div class='td redemption_customer_name'>" +
-				            redemptions_pending[i].customer_name.trimToDots(18) + "</div>" +
+				            redemptions_pending[i].customer_name.trimToDots(16) + "</div>" +
 		                    "<div class='td redemption_title'>" +
-				            redemptions_pending[i].title.trimToDots(24) + "</div>" +
+				            redemptions_pending[i].title.trimToDots(20) + "</div>" +
 				            "<div class='td redemption_punches'>" +
 				            redemptions_pending[i].num_punches + "</div>" +
 				            "<div class='td redemption_redeem'>" +
