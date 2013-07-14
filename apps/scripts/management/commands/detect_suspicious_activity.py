@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 limit=900):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
-                employee_punches = []
+                total_punches = []
                 # check approved EMPLOYEES
                 employees = store.get("employees", status=APPROVED,
                     limit=900)
@@ -72,9 +72,9 @@ class Command(BaseCommand):
                             createdAt__lte=end, createdAt__gte=start)
                         if not punches:
                             continue
-                        # record the punches for store query
-                        employee_punches.extend(\
-                            [p.objectId for p in punches])
+                        # cache the punches
+                        total_punches.append({"punches":punches,
+                            "employee":employee})
                         # group the punches by patron
                         for punch in punches:
                             if punch.Patron not in patron_punch:
@@ -87,30 +87,35 @@ class Command(BaseCommand):
                                         punch, "employee":employee})
                                 
                 # now check DASHBOARD
+                employee_punches = []
+                for pe in total_punches:
+                    employee_punches.extend([p.objectId for p in\
+                    pe["punches"]])
                 punches = store.get("punches", limit=900,
                     createdAt__lte=end, createdAt__gte=start,
                     objectId__nin=employee_punches)
+                # cache the punches
+                total_punches.append({"punches":punches,
+                            "employee":None})
                 # group the punches by patron
                 for punch in punches:
                     if punch.Patron not in patron_punch:
-                        patron_punch[punch.Patron] = [punch]
+                        patron_punch[punch.Patron] =\
+                            [{"punch":punch, "employee": None}]
                     else:
-                        patron_punch[\
-                            punch.Patron].append(punch)
+                        patron_punch[punch.Patron].append(\
+                            {"punch":punch, "employee":None})
+                # patron_punch now has all of the punches grouped!
+                
                 # check for a group with a list >= 6
                 suspicious_punch_list = []
                 for key, val in patron_punch.iteritems():
                     if val and len(val) >= 6:
                         for punch in val:
-                            if type(punch) is dict:
-                                suspicious_punch_list.append({
-                                    "punch":punch["punch"],
-                                    "employee": punch["employee"]
-                                })
-                            else:
-                                suspicious_punch_list.append({
-                                    "punch":punch,
-                                })
+                            suspicious_punch_list.append({
+                                "punch":punch["punch"],
+                                "employee": punch["employee"]
+                            })
                                 
                         # cache the account and patron
                         if key not in account_patron:
@@ -131,10 +136,38 @@ class Command(BaseCommand):
                         
                         
                 ### CHUNK2 ####################################
-                # TODO
                 chunk2 = []
-                employee_punches = []
-                
+                if store.hours or len(store.hours) > 0:
+                    # check for punches out of hours
+                    suspicious_punch_list = []
+                    tz = pytz.timezone(store.store_timezone)
+                    start = timezone.localtime(start, tz)
+                    end = timezone.localtime(end, tz)
+                    for key, val in patron_punch.iteritems():
+                        if val and suspicious: # TODO
+                            for punch in val:
+                                suspicious_punch_list.append({
+                                    "punch":punch["punch"],
+                                    "employee": punch["employee"]
+                                })
+                                    
+                            # cache the account and patron
+                            if key not in account_patron:
+                                account_patron[key] = {
+                                    "account":\
+                                        Account.objects().get(\
+                                            Patron=key),
+                                    "patron":\
+                                        Patron.objects().get(\
+                                            objectId=key)
+                                }
+                            chunk2.append({
+                                "account":\
+                                   account_patron[key]['account'],
+                                "patron":\
+                                   account_patron[key]['patron'],
+                                "punches": suspicious_punch_list
+                            })
                 
                 if len(chunk1) > 0 or len(chunk2) > 0:
                     send_email_suspicious_activity(\

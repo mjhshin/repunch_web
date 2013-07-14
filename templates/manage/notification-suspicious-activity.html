@@ -1,8 +1,13 @@
 {% extends "manage/notification.html" %}
 
 {% block title %}
-Suspicious activity has been detected.<br/>
+Suspicious activity has been detected.
+{% endblock %}
+
+{% block title_compliment %}
+<div style="border-top:2px solid #fff;border-bottom:6px solid #fff; background:#fff;color:#ccc;font-size:18px;">
 From {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}
+</div>
 {% endblock %}
 
 {% block content %}
@@ -14,9 +19,9 @@ From {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}
 {# TABLE TOP #}
 <div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
 {% if forloop.counter == 1 %}
-There are {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that received punches more than 6 times today. 
+There {% if chunk|length > 1 %}are{% else %}is{% endif %} {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that have been punched more than 6 times today. 
 {% else %}
-There are {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that received punches when the store was closed.
+There {% if chunk|length > 1 %}are{% else %}is{% endif %} {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that have been punched when the store was closed.
 {% endif %}
 </div>
 
@@ -49,8 +54,7 @@ There are {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that 
 
                     {# PATRON INFO #}
                     <div style="padding:0px;">
-                        Consumer Info:
-                        <span style="color:#545454;font-weight:bold;">{{ ch.patron.get_fullname }}</span>,   
+                        <span style="color:#545454;font-weight:bold;">{{ ch.patron.get_fullname }}</span> -   
                         <span style="text-decoration:none;">{{ ch.account.email }}</span>                  
 					</div>
                     {# END PATRON INFO #}
