@@ -423,7 +423,7 @@ def refresh(request):
         
         try: # respond
             resp = HttpResponse(json.dumps(data), 
-                        content_type="application/json", status=200)
+                        content_type="application/json")
             return resp
         except IOError: # broken pipe or something. 
             # exit silently

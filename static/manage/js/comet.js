@@ -544,6 +544,7 @@ $(document).ready(function(){
         $.ajax({
             url: url,
             type: "GET",
+            cache:false, // required to kill internet explorer 304 bug
             success: mainComet,
         });
     }, 8000);
