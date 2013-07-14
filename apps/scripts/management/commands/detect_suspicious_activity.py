@@ -144,15 +144,6 @@ class Command(BaseCommand):
                     tz = pytz.timezone(store.store_timezone)
                     start = timezone.localtime(start, tz)
                     end = timezone.localtime(end, tz)
-                    # get the 2 full days
-                    day1_start =\
-                        start.replace(hour=0, minute=0, second=0)
-                    day1_end =\
-                       start.replace(hour=23, minute=59, second=59)
-                    day2_start =\
-                        end.replace(hour=0, minute=0, second=0)
-                    day2_end =\
-                        end.replace(hour=23, minute=59, second=59)
                     # isoweekday is from 1-7 monday to sunday
                     # convert to 1-7 sunday to saturday
                     day1_weekday = (start.isoweekday()) % 7 + 1
@@ -197,7 +188,9 @@ class Command(BaseCommand):
                             continue
                             
                         suspicious_punch_list = []
-                        for punch in val:
+                        for p in val:
+                            punch = p["punch"]
+                            employee = p["employee"]
                             # suspicious if not in hours1 and 2
                             if not (hours1_start and\
                                 punch.createdAt>hours1_start and\
@@ -205,12 +198,11 @@ class Command(BaseCommand):
                                 not (hours2_start and\
                                 punch.createdAt>hours2_start and\
                                 punch.createdAt<hours2_end):
-                                continue
-                            # not in hours1 or 2 so suspicious!   
-                            suspicious_punch_list.append({
-                                "punch":punch["punch"],
-                                "employee": punch["employee"]
-                            })
+                                # not in hours1 or 2 so suspicious!   
+                                suspicious_punch_list.append({
+                                    "punch":punch,
+                                    "employee": employee
+                                })
                         
                         if len(suspicious_punch_list) == 0:
                             continue
