@@ -41,7 +41,9 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.notifications import send_email_suspicious_activity
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store
+from parse.apps.patrons.models import Patron
 from parse.apps.employees import APPROVED
+from repunch.settings import DEBUG
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -55,65 +57,40 @@ class Command(BaseCommand):
         # if there are less than 900 stores proceed
         if store_count < 900:
             for store in Store.objects().filter(active=True, 
-                limit=900)
+                limit=900):
                 ### CHUNK1 ####################################
-                chunk1, account_patron = {}, {}
+                chunk1, account_patron, patron_punch = [], {}, {}
                 employee_punches = []
                 # check approved EMPLOYEES
                 employees = store.get("employees", status=APPROVED,
                     limit=900)
-                if len(employees) > 0:
+                if employees and len(employees) > 0:
                     # check all the punches of each employee
                     for employee in employees:
                         # get all the punches for today
                         punches = employee.get("punches", limit=900, 
                             createdAt__lte=end, createdAt__gte=start)
                         if not punches:
-                            break
+                            continue
                         # record the punches for store query
                         employee_punches.extend(\
                             [p.objectId for p in punches])
                         # group the punches by patron
-                        patron_punch = {}
                         for punch in punches:
                             if punch.Patron not in patron_punch:
-                                patron_punch[punch.Patron] = [punch]
+                                patron_punch[punch.Patron] =\
+                                    [{"punch":punch, "employee":\
+                                        employee}]
                             else:
                                 patron_punch[\
-                                    punch.Patron].append(punch)
-                        # check for a group with a list >= 6
-                        suspicious_punch_list = []
-                        for key, val in patron_punch.iteritems():
-                            if len(val) >= 6:
-                                for punch in val:
-                                    suspicious_punch_list.append({
-                                        "punch":punch,
-                                        "employee":employee,
-                                    })
-                                # cache the account and patron
-                                if key not in account_patron:
-                                    account_patron[key] = {
-                                        "account":\
-                                        Account.objects().get(\
-                                            Patron=key),
-                                        "patron":\
-                                        suspicious_punch_list[0].get(\
-                                            "patron")
-                                    }
-                                chunk1.update({
-                                    "account":\
-                                       account_patron[key]['account'],
-                                    "patron":\
-                                       account_patron[key]['patron'],
-                                    "punches": suspicious_punch_list
-                                })
+                                    punch.Patron].append({"punch":\
+                                        punch, "employee":employee})
                                 
                 # now check DASHBOARD
                 punches = store.get("punches", limit=900,
                     createdAt__lte=end, createdAt__gte=start,
                     objectId__nin=employee_punches)
                 # group the punches by patron
-                patron_punch = {}
                 for punch in punches:
                     if punch.Patron not in patron_punch:
                         patron_punch[punch.Patron] = [punch]
@@ -123,11 +100,18 @@ class Command(BaseCommand):
                 # check for a group with a list >= 6
                 suspicious_punch_list = []
                 for key, val in patron_punch.iteritems():
-                    if len(val) >= 6:
+                    if val and len(val) >= 6:
                         for punch in val:
-                            suspicious_punch_list.append({
-                                "punch":punch,
-                            })
+                            if type(punch) is dict:
+                                suspicious_punch_list.append({
+                                    "punch":punch["punch"],
+                                    "employee": punch["employee"]
+                                })
+                            else:
+                                suspicious_punch_list.append({
+                                    "punch":punch,
+                                })
+                                
                         # cache the account and patron
                         if key not in account_patron:
                             account_patron[key] = {
@@ -135,10 +119,9 @@ class Command(BaseCommand):
                                 Account.objects().get(\
                                     Patron=key),
                                 "patron":\
-                                suspicious_punch_list[0].get(\
-                                    "patron")
+                                    Patron.objects().get(objectId=key)
                             }
-                        chunk1.update({
+                        chunk1.append({
                             "account":\
                                account_patron[key]['account'],
                             "patron":\
@@ -149,12 +132,14 @@ class Command(BaseCommand):
                         
                 ### CHUNK2 ####################################
                 # TODO
-                chunk2 = {}
+                chunk2 = []
                 employee_punches = []
                 
                 
-                send_email_suspicious_activity(store, chunk1, chunk2,
-                    start, end, conn)
+                if len(chunk1) > 0 or len(chunk2) > 0:
+                    send_email_suspicious_activity(\
+                        Account.objects().get(Store=store.objectId),
+                        store, chunk1, chunk2, start, end, conn)
         
         # else retrieve them in chunks ordered by createdAt TODO
         conn.close()

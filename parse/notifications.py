@@ -191,7 +191,7 @@ def send_email_signup(account, connection=None):
     _send_emails(emails, connection)
     
     
-def send_email_suspicious_activity(store, chunk1, chunk2,\
+def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         start, end, connection=None):
     """
     chunk1 and chunk2 are a list of dictionaries - 
@@ -210,7 +210,7 @@ def send_email_suspicious_activity(store, chunk1, chunk2,\
                 "for " + store.store_name + "."
     ctx = get_notification_ctx()
     ctx.update({'store':store, 'start':start, 'end':end, 
-                'start','chunks':(chunk1, chunk2)})
+                'chunks':(chunk1, chunk2)})
     body = template.render(Context(ctx)).__str__()
     emails = []
     
