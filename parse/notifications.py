@@ -192,10 +192,11 @@ def send_email_signup(account, connection=None):
     
     
 def send_email_suspicious_activity(store, chunk1, chunk2,\
-        connection=None):
+        start, end, connection=None):
     """
     chunk1 and chunk2 are a list of dictionaries - 
     See the detect_suspicious_activity management command docstring.
+    Note that start and end are utc dates.
     """
     # need to activate the store's timezone for template rendering!
     timezone.activate(pytz.timezone(store.store_timezone))
@@ -208,8 +209,8 @@ def send_email_suspicious_activity(store, chunk1, chunk2,\
     subject = "Repunch Inc. Suspicious activity has been detected " +\
                 "for " + store.store_name + "."
     ctx = get_notification_ctx()
-    ctx.update({'store':store,
-                'chunks':(chunk1, chunk2)})
+    ctx.update({'store':store, 'start':start, 'end':end, 
+                'start','chunks':(chunk1, chunk2)})
     body = template.render(Context(ctx)).__str__()
     emails = []
     

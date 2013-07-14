@@ -52,10 +52,8 @@ class Command(BaseCommand):
                         subscription.update()
                     asiss.append((account, store, invoice,
                         subscription))
-        else: 
-            pass 
         # if the count is over 900 then retrieve them in chunks TODO
         # 900 signed up in the same day? unlikely but will handle it.
-            
+        # order by createdAt!
 
         send_email_receipt_monthly(asiss)

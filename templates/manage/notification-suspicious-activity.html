@@ -1,7 +1,7 @@
 {% extends "manage/notification.html" %}
 
 {% block title %}
-{{ store.store_name }}, suspicious activity has been detected ({{ today|date:"F d, Y" }}).
+{{ store.store_name }}, suspicious activity has been detected from {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}.
 {% endblock %}
 
 {% block content %}

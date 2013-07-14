@@ -33,14 +33,131 @@ List of patrons that were punched when the store is closed:
 """
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
+from django.core import mail
+import pytz
 
 from libs.dateutil.relativedelta import relativedelta
 from parse.notifications import send_email_suspicious_activity
+from parse.apps.accounts.models import Account
+from parse.apps.stores.models import Store
+from parse.apps.employees import APPROVED
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        pass
+        # first count the number of active stores
+        store_count = Store.objects().count(active=True)
+        end = timezone.now()
+        start = end + relativedelta(hours=-24)
+        conn = mail.get_connection(fail_silently=(not DEBUG))
+        conn.open()
         
+        # if there are less than 900 stores proceed
+        if store_count < 900:
+            for store in Store.objects().filter(active=True, 
+                limit=900)
+                ### CHUNK1 ####################################
+                chunk1, account_patron = {}, {}
+                employee_punches = []
+                # check approved EMPLOYEES
+                employees = store.get("employees", status=APPROVED,
+                    limit=900)
+                if len(employees) > 0:
+                    # check all the punches of each employee
+                    for employee in employees:
+                        # get all the punches for today
+                        punches = employee.get("punches", limit=900, 
+                            createdAt__lte=end, createdAt__gte=start)
+                        if not punches:
+                            break
+                        # record the punches for store query
+                        employee_punches.extend(\
+                            [p.objectId for p in punches])
+                        # group the punches by patron
+                        patron_punch = {}
+                        for punch in punches:
+                            if punch.Patron not in patron_punch:
+                                patron_punch[punch.Patron] = [punch]
+                            else:
+                                patron_punch[\
+                                    punch.Patron].append(punch)
+                        # check for a group with a list >= 6
+                        suspicious_punch_list = []
+                        for key, val in patron_punch.iteritems():
+                            if len(val) >= 6:
+                                for punch in val:
+                                    suspicious_punch_list.append({
+                                        "punch":punch,
+                                        "employee":employee,
+                                    })
+                                # cache the account and patron
+                                if key not in account_patron:
+                                    account_patron[key] = {
+                                        "account":\
+                                        Account.objects().get(\
+                                            Patron=key),
+                                        "patron":\
+                                        suspicious_punch_list[0].get(\
+                                            "patron")
+                                    }
+                                chunk1.update({
+                                    "account":\
+                                       account_patron[key]['account'],
+                                    "patron":\
+                                       account_patron[key]['patron'],
+                                    "punches": suspicious_punch_list
+                                })
+                                
+                # now check DASHBOARD
+                punches = store.get("punches", limit=900,
+                    createdAt__lte=end, createdAt__gte=start,
+                    objectId__nin=employee_punches)
+                # group the punches by patron
+                patron_punch = {}
+                for punch in punches:
+                    if punch.Patron not in patron_punch:
+                        patron_punch[punch.Patron] = [punch]
+                    else:
+                        patron_punch[\
+                            punch.Patron].append(punch)
+                # check for a group with a list >= 6
+                suspicious_punch_list = []
+                for key, val in patron_punch.iteritems():
+                    if len(val) >= 6:
+                        for punch in val:
+                            suspicious_punch_list.append({
+                                "punch":punch,
+                            })
+                        # cache the account and patron
+                        if key not in account_patron:
+                            account_patron[key] = {
+                                "account":\
+                                Account.objects().get(\
+                                    Patron=key),
+                                "patron":\
+                                suspicious_punch_list[0].get(\
+                                    "patron")
+                            }
+                        chunk1.update({
+                            "account":\
+                               account_patron[key]['account'],
+                            "patron":\
+                               account_patron[key]['patron'],
+                            "punches": suspicious_punch_list
+                        })
+                        
+                        
+                ### CHUNK2 ####################################
+                # TODO
+                chunk2 = {}
+                employee_punches = []
+                
+                
+                send_email_suspicious_activity(store, chunk1, chunk2,
+                    start, end, conn)
+        
+        # else retrieve them in chunks ordered by createdAt TODO
+        conn.close()
         
         
         
