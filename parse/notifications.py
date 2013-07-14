@@ -207,7 +207,7 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         template = Template(f.read())
         
     subject = "Repunch Inc. Suspicious activity has been detected " +\
-                "for " + store.store_name + "."
+                "at " + store.store_name + "."
     ctx = get_notification_ctx()
     ctx.update({'store':store, 'start':start, 'end':end, 
                 'chunks':(chunk1, chunk2)})
