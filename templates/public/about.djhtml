@@ -14,7 +14,9 @@
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <div class="page-title-container">
     <h1 class="page-title">About Us</h1>
+    </div>
 	<div id="page-content">
 		<div id="about-content">
 			<aside class="col1">

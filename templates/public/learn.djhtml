@@ -49,7 +49,9 @@ ul.not-orangy li:before {
 
 {% block pageblock %}
 <section id="page-wrapper">
-	<h1 class="page-title">Learn More for Businesses</h1>	
+    <div class="page-title-container">
+    <h1 class="page-title">Learn More for Businesses</h1>
+    </div>
 	<div id="page-content">
 		<section id="learn-bottom">
 			<nav id="learn-bottom-menu" class="bottom-shadow">

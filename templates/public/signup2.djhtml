@@ -18,7 +18,9 @@ $(document).ready(function(){
 
 {% block pageblock %}
 <section id="page-wrapper">
+    <div class="page-title-container">
     <h1 class="page-title">You are almost there!</h1>
+    </div>
 	<div id="page-content">
 		<div id="signup-content">
 			<aside class="col1">
