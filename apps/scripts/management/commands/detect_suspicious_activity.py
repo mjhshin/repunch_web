@@ -192,47 +192,46 @@ class Command(BaseCommand):
                         hours2_end =\
                             timezone.localtime(hours2_end, tzutc())
                     
-                    if hours1_start or hours2_start:
-                        for key, val in patron_punch.iteritems():
-                            if not val:
-                                continue
-                                
-                            suspicious_punch_list = []
-                            for punch in val:
-                                # not suspicious if in hours1 or 2
-                                if (hours1_start and\
-                                    punch.createdAt>hours1_start and\
-                                    punch.createdAt<hours1_end) or\
-                                    (hours2_start and\
-                                    punch.createdAt>hours2_start and\
-                                    punch.createdAt<hours2_end):
-                                    continue
-                                # not in hours1 or 2 so suspicious!   
-                                suspicious_punch_list.append({
-                                    "punch":punch["punch"],
-                                    "employee": punch["employee"]
-                                })
+                    for key, val in patron_punch.iteritems():
+                        if not val:
+                            continue
                             
-                            if len(suspicious_punch_list) == 0:
+                        suspicious_punch_list = []
+                        for punch in val:
+                            # suspicious if not in hours1 and 2
+                            if not (hours1_start and\
+                                punch.createdAt>hours1_start and\
+                                punch.createdAt<hours1_end) and\
+                                not (hours2_start and\
+                                punch.createdAt>hours2_start and\
+                                punch.createdAt<hours2_end):
                                 continue
-                                
-                            # cache the account and patron
-                            if key not in account_patron:
-                                account_patron[key] = {
-                                    "account":\
-                                        Account.objects().get(\
-                                            Patron=key),
-                                    "patron":\
-                                        Patron.objects().get(\
-                                            objectId=key)
-                                }
-                            chunk2.append({
-                                "account":\
-                                   account_patron[key]['account'],
-                                "patron":\
-                                   account_patron[key]['patron'],
-                                "punches": suspicious_punch_list
+                            # not in hours1 or 2 so suspicious!   
+                            suspicious_punch_list.append({
+                                "punch":punch["punch"],
+                                "employee": punch["employee"]
                             })
+                        
+                        if len(suspicious_punch_list) == 0:
+                            continue
+                            
+                        # cache the account and patron
+                        if key not in account_patron:
+                            account_patron[key] = {
+                                "account":\
+                                    Account.objects().get(\
+                                        Patron=key),
+                                "patron":\
+                                    Patron.objects().get(\
+                                        objectId=key)
+                            }
+                        chunk2.append({
+                            "account":\
+                               account_patron[key]['account'],
+                            "patron":\
+                               account_patron[key]['patron'],
+                            "punches": suspicious_punch_list
+                        })
                 
                 if len(chunk1) > 0 or len(chunk2) > 0:
                     send_email_suspicious_activity(\
