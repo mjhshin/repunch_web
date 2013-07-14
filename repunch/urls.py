@@ -34,7 +34,7 @@ urlpatterns = patterns('',
     url(r'^manage/parse-frame$', 
             views.manage_parse_frame, 
             name='manage_parse_frame'),
-    url(r'^manage/parse-invalid_link$', 
+    url(r'^manage/parse-invalid-link$', 
             views.manage_parse_invalid_link, 
             name='manage_parse_invalid_link'),
             
