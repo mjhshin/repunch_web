@@ -35,6 +35,7 @@ List of patrons that were punched when the store is closed:
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.core import mail
+from dateutil.tz import tzutc
 import pytz
 
 from libs.dateutil.relativedelta import relativedelta
@@ -98,18 +99,19 @@ class Command(BaseCommand):
                 total_punches.append({"punches":punches,
                             "employee":None})
                 # group the punches by patron
-                for punch in punches:
-                    if punch.Patron not in patron_punch:
-                        patron_punch[punch.Patron] =\
-                            [{"punch":punch, "employee": None}]
-                    else:
-                        patron_punch[punch.Patron].append(\
-                            {"punch":punch, "employee":None})
+                if punches:
+                    for punch in punches:
+                        if punch.Patron not in patron_punch:
+                            patron_punch[punch.Patron] =\
+                                [{"punch":punch, "employee": None}]
+                        else:
+                            patron_punch[punch.Patron].append(\
+                                {"punch":punch, "employee":None})
                 # patron_punch now has all of the punches grouped!
                 
                 # check for a group with a list >= 6
-                suspicious_punch_list = []
                 for key, val in patron_punch.iteritems():
+                    suspicious_punch_list = []
                     if val and len(val) >= 6:
                         for punch in val:
                             suspicious_punch_list.append({
@@ -136,21 +138,84 @@ class Command(BaseCommand):
                         
                         
                 ### CHUNK2 ####################################
-                chunk2 = []
-                if store.hours or len(store.hours) > 0:
+                chunk2, hours = [], store.hours
+                if hours or len(hours) > 0:
                     # check for punches out of hours
-                    suspicious_punch_list = []
                     tz = pytz.timezone(store.store_timezone)
                     start = timezone.localtime(start, tz)
                     end = timezone.localtime(end, tz)
-                    for key, val in patron_punch.iteritems():
-                        if val :#and suspicious: # TODO
+                    # get the 2 full days
+                    day1_start =\
+                        start.replace(hour=0, minute=0, second=0)
+                    day1_end =\
+                       start.replace(hour=23, minute=59, second=59)
+                    day2_start =\
+                        end.replace(hour=0, minute=0, second=0)
+                    day2_end =\
+                        end.replace(hour=23, minute=59, second=59)
+                    # isoweekday is from 1-7 monday to sunday
+                    # convert to 1-7 sunday to saturday
+                    day1_weekday = (start.isoweekday()) % 7 + 1
+                    day2_weekday = (end.isoweekday()) % 7 + 1
+                    # get the hours for day1 and day2
+                    def get_hours_range(weekday, d):
+                        for hr in hours:
+                            if hr["day"] == weekday:
+                                hr_start_hour =\
+                                    int(hr["open_time"][:2])
+                                hr_start_minute =\
+                                    int(hr["open_time"][2:])
+                                hr_end_hour =\
+                                    int(hr["close_time"][:2])
+                                hr_end_minute =\
+                                    int(hr["close_time"][2:])
+                                return d.replace(hour=hr_start_hour,
+                                    minute=hr_start_minute),\
+                                    d.replace(hour=hr_end_hour,
+                                    minute=hr_end_minute)
+                        return None, None
+                    
+                    (hours1_start, hours1_end) =\
+                        get_hours_range(day1_weekday, start)
+                    (hours2_start, hours2_end) =\
+                        get_hours_range(day2_weekday, end)
+                        
+                    # now convert to utc since punch times are in utc
+                    if hours1_start:
+                        hours1_start =\
+                            timezone.localtime(hours1_start, tzutc())
+                        hours1_end =\
+                            timezone.localtime(hours1_end, tzutc())
+                    if hours2_start:
+                        hours2_start =\
+                            timezone.localtime(hours2_start, tzutc())
+                        hours2_end =\
+                            timezone.localtime(hours2_end, tzutc())
+                    
+                    if hours1_start or hours2_start:
+                        for key, val in patron_punch.iteritems():
+                            if not val:
+                                continue
+                                
+                            suspicious_punch_list = []
                             for punch in val:
+                                # not suspicious if in hours1 or 2
+                                if (hours1_start and\
+                                    punch.createdAt>hours1_start and\
+                                    punch.createdAt<hours1_end) or\
+                                    (hours2_start and\
+                                    punch.createdAt>hours2_start and\
+                                    punch.createdAt<hours2_end):
+                                    continue
+                                # not in hours1 or 2 so suspicious!   
                                 suspicious_punch_list.append({
                                     "punch":punch["punch"],
                                     "employee": punch["employee"]
                                 })
-                                    
+                            
+                            if len(suspicious_punch_list) == 0:
+                                continue
+                                
                             # cache the account and patron
                             if key not in account_patron:
                                 account_patron[key] = {
