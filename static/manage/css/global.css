@@ -470,6 +470,14 @@ div#footer{
     text-decoration:underline;
 }
 
+#forgot-pass-form-div {
+    margin-top:12px;
+}
+
+#forgot-pass-form-div input[type=submit]:hover {
+    background:#e7e7e7;
+}
+
 #logging-in {
     display:none;
     position:relative;top:20px;left:40px;

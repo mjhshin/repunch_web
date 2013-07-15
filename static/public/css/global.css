@@ -200,6 +200,10 @@ a.button.orange{
     text-decoration:none;
 }
 
+#forgot-pass-form-div {
+    margin-top:6px;
+}
+
 #forgot-pass-form a:hover {
     text-decoration:underline;
 }
