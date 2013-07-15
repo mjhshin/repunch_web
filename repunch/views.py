@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.contrib.auth import logout
@@ -69,15 +70,16 @@ def manage_parse_invalid_link(request):
     """ Displays the invalid link template """
     return render(request, 'manage/parse-invalid-link.html')
     
+@csrf_exempt
 def manage_parse_frame(request):
     """ Required by Parse to use our urls insstead of theirs """
     return render(request, 'manage/parse-user-management.html')
 
+@csrf_exempt
 def manage_parse_password_reset(request):
     """ Displays the password reset template """
     return render(request, 'manage/parse-choose-password.html')
-    
-
+  
 def manage_parse_password_reset_complete(request):
     """ Displays the password reset complete template """
     return render(request, 'manage/parse-password-updated.html')
