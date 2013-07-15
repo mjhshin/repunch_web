@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from time import sleep
-import json
+import json, socket, thread
 
 from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
@@ -420,7 +420,8 @@ def refresh(request):
         try: # respond
             return HttpResponse(json.dumps(data), 
                         content_type="application/json")
-        except IOError: # broken pipe or something. 
+        except (IOError, socket.error) as e: # broken pipe/socket. 
+            print "Request killed"
             thread.exit() # exit silently
             
             
@@ -431,6 +432,7 @@ def refresh(request):
     
     timeout_time = session['comet_time'] +\
         relativedelta(seconds=REQUEST_TIMEOUT)
+    print "Received request."
         
     while timezone.now() < timeout_time: 
         session = SessionStore(request.session.session_key)
@@ -438,7 +440,8 @@ def refresh(request):
             try:
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
-            except IOError: # broken pipe or something. 
+            except (IOError, socket.error) as e: # broken pipe/socket. 
+                print "Request killed"
                 thread.exit() # exit silently
         
         # must update the objects in the object manager!
@@ -452,8 +455,11 @@ def refresh(request):
                 scomet.save()
                 session = SessionStore(request.session.session_key)
                 session['comet_time'] = timezone.now()
+                print "Returning response."
                 return comet(session)
             else: # nothing new, sleep for a bit
+                print str(timezone.now()) + ": sleeping for " +\
+                    str(COMET_REFRESH_RATE) + " seconds."
                 sleep(COMET_REFRESH_RATE)
                             
         except CometSession.DoesNotExist:
@@ -477,7 +483,8 @@ def refresh(request):
         # time is up - return a response result 0 means no change 
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
-    except IOError:
+    except (IOError, socket.error) as e:
+        print "Request killed"
         # timeout time but page that launched this thread is dead
         # roll back the comet_time
         session['comet_time'] = prev_comet_time
