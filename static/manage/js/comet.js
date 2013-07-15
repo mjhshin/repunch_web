@@ -23,7 +23,6 @@ $(document).ready(function(){
         if (res.hasOwnProperty("result")){
             if (res.result == 0){
                 makeRequest();
-                alert("MAKING A NEW REQUEST!");
                 return;
             } else if (res.result == -1) {
                 return;

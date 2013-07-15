@@ -40,15 +40,15 @@ def refresh(request):
         # used by more than 1 (note that it is ok to retrieve all of 
         # the lists since they are all pointers - not the actual list!
         employees_pending_list =\
-            SESSION.get_employees_pending_list(request.session)
+            SESSION.get_employees_pending_list(session)
         employees_approved_list =\
-            SESSION.get_employees_approved_list(request.session)
+            SESSION.get_employees_approved_list(session)
         messages_received_list =\
-            SESSION.get_messages_received_list(request.session)
+            SESSION.get_messages_received_list(session)
         redemptions_pending =\
-            SESSION.get_redemptions_pending(request.session)
+            SESSION.get_redemptions_pending(session)
         redemptions_past =\
-            SESSION.get_redemptions_past(request.session)
+            SESSION.get_redemptions_past(session)
         
         # process the stuff in the session
         data = {}
@@ -74,7 +74,7 @@ def refresh(request):
                 data['feedbacks_unread'] = fb_unread
                 data['feedback_unread_count'] = fb_count
                 
-            request.session['messages_received_list'] =\
+            session['messages_received_list'] =\
                 messages_received_list
             del session['newFeedback']
 
@@ -88,7 +88,7 @@ def refresh(request):
                     if fb.objectId == mro.objectId:
                         messages_received_list.pop(i)
                         break
-            request.session['messages_received_list'] =\
+            session['messages_received_list'] =\
                 messages_received_list
             del session['deletedFeedback']     
             
@@ -102,7 +102,7 @@ def refresh(request):
             messages_received_ids =\
                     [ fb.objectId for fb in messages_received_list ]
             messages_sent_list =\
-                SESSION.get_messages_sent_list(request.session)
+                SESSION.get_messages_sent_list(session)
             messages_sent_ids =\
                 [ msg.objectId for msg in messages_sent_list ]
             for message in messages_sent:
@@ -118,9 +118,9 @@ def refresh(request):
                             messages_received_list.pop(i)
                             messages_received_list.insert(i, m)
                             break
-            request.session['messages_received_list'] =\
+            session['messages_received_list'] =\
                 messages_received_list
-            request.session['messages_sent_list'] = messages_sent_list
+            session['messages_sent_list'] = messages_sent_list
             del session['newMessage']
           
         
@@ -146,7 +146,7 @@ def refresh(request):
                     len(employees_pending_list)
                 data['employees_pending'] = emps_pending
                 
-            request.session['employees_pending_list'] =\
+            session['employees_pending_list'] =\
                 employees_pending_list
             del session['pendingEmployee']
         
@@ -173,9 +173,9 @@ def refresh(request):
                     len(employees_pending_list)
                 data['employees_approved'] = emps_approved
                 
-            request.session['employees_pending_list'] =\
+            session['employees_pending_list'] =\
                 employees_pending_list
-            request.session['employees_approved_list'] =\
+            session['employees_approved_list'] =\
                 employees_approved_list
             del session['approvedEmployee']
             
@@ -210,9 +210,9 @@ def refresh(request):
                     len(employees_pending_list)
                 data['employees_deleted'] = emps_deleted
                         
-            request.session['employees_approved_list'] =\
+            session['employees_approved_list'] =\
                 employees_approved_list
-            request.session['employees_pending_list'] =\
+            session['employees_pending_list'] =\
                 employees_pending_list
             del session['deletedEmployee']
          
@@ -252,7 +252,7 @@ def refresh(request):
                     len(redemptions_pending)
                 data['redemptions_pending'] = redemps
                 
-            request.session['redemptions_pending'] =\
+            session['redemptions_pending'] =\
                 redemptions_pending
             del session['pendingRedemption']
             
@@ -278,9 +278,9 @@ def refresh(request):
                     len(redemptions_pending)
                 data['redemptions_approved'] = redemp_js
                 
-            request.session['redemptions_pending'] =\
+            session['redemptions_pending'] =\
                 redemptions_pending
-            request.session['redemptions_past'] =\
+            session['redemptions_past'] =\
                 redemptions_past
             del session['approvedRedemption']
             
@@ -302,7 +302,7 @@ def refresh(request):
             if len(redemp_js) > 0:
                 data['redemptions_deleted'] = redemp_js
                 
-            request.session['redemptions_pending'] =\
+            session['redemptions_pending'] =\
                 redemptions_pending
             del session['deletedRedemption']
                
@@ -310,7 +310,7 @@ def refresh(request):
         # STORE UPDATED ##############################
         updatedStore = session.get("updatedStore_one")
         if updatedStore:
-            request.session['store'] = Store(**updatedStore)
+            session['store'] = Store(**updatedStore)
             del session["updatedStore_one"]
             
         #############################################################
@@ -318,11 +318,11 @@ def refresh(request):
         updatedSubscription = session.get("updatedSubscription_one")
         if updatedSubscription:
             subscription = Subscription(**updatedSubscription)
-            store = request.session["store"]
+            store = session["store"]
             store.set('subscription', subscription)
             store.set('Subscription', subscription.objectId)
-            request.session['subscription'] = subscription
-            request.session['store'] = store
+            session['subscription'] = subscription
+            session['store'] = store
             del session["updatedSubscription_one"]
             
         #############################################################
@@ -330,11 +330,11 @@ def refresh(request):
         updatedSettings = session.get("updatedSettings_one")
         if updatedSettings:
             settings = Settings(**updatedSettings)
-            store = request.session["store"]
+            store = session["store"]
             store.set('settings', settings)
             store.set("Settings", settings.objectId)
-            request.session['settings'] = settings
-            request.session['store'] = store
+            session['settings'] = settings
+            session['store'] = store
             data['retailer_pin'] = settings.get("retailer_pin")
             del session["updatedSettings_one"]
             
@@ -342,21 +342,21 @@ def refresh(request):
         # REWARDS NEW ##############################
         new_rewards = session.get("newReward")
         if new_rewards:
-            store = request.session['store']
+            store = session['store']
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             for reward in new_rewards:
                 if reward['reward_id'] not in rewards_ids:
                     rewards.append(reward)
             store.rewards = rewards
-            request.session['store'] = store
+            session['store'] = store
             del session['newReward']
         
         #############################################################
         # REWARDS UPDATED ##############################
         updated_rewards = session.get('updatedReward')
         if updated_rewards:
-            store = request.session['store']
+            store = session['store']
             mod_rewards = store.get("rewards")
             for reward in updated_rewards:
                 for i, mreward in enumerate(mod_rewards):
@@ -379,14 +379,14 @@ def refresh(request):
                         break
             data['rewards'] = updated_rewards
             store.rewards = mod_rewards
-            request.session['store'] = store
+            session['store'] = store
             del session['updatedReward'] 
             
         #############################################################
         # REWARDS DELETED ##############################
         deleted_rewards = session.get("deletedReward")
         if deleted_rewards:
-            store = request.session['store']
+            store = session['store']
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             for reward in deleted_rewards:
@@ -396,7 +396,7 @@ def refresh(request):
                             rewards.pop(i)
                             break
             store.rewards = rewards
-            request.session['store'] = store
+            session['store'] = store
             del session['deletedReward']
            
         #############################################################
@@ -407,7 +407,7 @@ def refresh(request):
             # and send email notification make sure to update the
             # subscription in the cache afterwards!
             data['patronStore_count'] = patronStore_count_new
-            request.session['patronStore_count']=patronStore_count_new
+            session['patronStore_count'] = patronStore_count_new
             del session['patronStore_num']
 
         # IMPORTANT! The request.session is the same as the 
@@ -459,11 +459,12 @@ def refresh(request):
                 sleep(COMET_REFRESH_RATE)
                             
         except CometSession.DoesNotExist:
+            session = SessionStore(request.session.session_key)
             # this should have been created at login!
             scomet = CometSession.objects.create(session_key=\
                     request.session.session_key,
                     store_id=SESSION.get_store(\
-                    request.session).objectId)
+                    session).objectId)
             
             session = SessionStore(request.session.session_key)
             session['comet_time'] = timezone.now()
