@@ -32,8 +32,9 @@ SESSION_CACHE = [
     
     
     
-    # time in which all comet processes for the request will die
-    # 'stop_comet_time', unused at the moment
+    # use for comet approach all comet requests will die within
+    # x seconds after this time
+    'comet_time', 
 ]
 
 def get_store(session):

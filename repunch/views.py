@@ -6,10 +6,12 @@ from django.contrib.auth import logout
 import json, thread
 
 from parse import session as SESSION
+from parse.decorators import session_comet
 from parse.auth import login
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSession
 
+@session_comet
 def manage_login(request):
     """
     Handle s ajax request from login-dialog.
@@ -56,11 +58,13 @@ def manage_login(request):
     return HttpResponse(json.dumps(data), 
         content_type="application/json")
 
+@session_comet
 def manage_logout(request):
     # need to clear the session
     request.session.flush()
     return redirect(reverse('public_home'))
 
+@session_comet
 def manage_terms(request):
     return render(request, 'manage/terms.djhtml')
     

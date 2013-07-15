@@ -8,6 +8,7 @@ from math import ceil
 import json, requests
 
 from libs.dateutil.relativedelta import relativedelta
+from parse.decorators import session_comet
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
@@ -15,6 +16,7 @@ from repunch.settings import PAGINATION_THRESHOLD,\
 COMET_REQUEST_RECEIVE
 
 @login_required
+@session_comet
 def index(request):
     """
     Renders the first 20 most recent pending and approved/denied

@@ -3,9 +3,12 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.http import HttpResponse
+from time import sleep
 import json
 
+from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
@@ -33,11 +36,7 @@ def refresh(request):
     employee and the approved employee. We must first add the pending 
     then check for the approved!
     """
-    # in_time = timezone.now()
-    # out_time = in_time + relativedelta(seconds=REQUEST_TIMEOUT)
-    def comet():
-        # sleep(COMET_REFRESH_RATE)
-        
+    def comet(session):
         # used by more than 1 (note that it is ok to retrieve all of 
         # the lists since they are all pointers - not the actual list!
         employees_pending_list =\
@@ -53,13 +52,6 @@ def refresh(request):
         
         # process the stuff in the session
         data = {}
-        
-        # IMPORTANT! The request.session is the same as the 
-        # SessionStore(session_key)! so we must use the 
-        # request.session because it is automatically saved at the end
-        # of each request- thereby overriding/undoing any changes made
-        # to the SessionStore(session_key) key!
-        session = request.session
        
         #############################################################
         # FEEDBACKS_UNREAD ##################################
@@ -417,36 +409,83 @@ def refresh(request):
             data['patronStore_count'] = patronStore_count_new
             request.session['patronStore_count']=patronStore_count_new
             del session['patronStore_num']
-        
-        # no need to save the session since request.session is auto-
-        # matically saved at the end of each request!
+
+        # IMPORTANT! The request.session is the same as the 
+        # SessionStore(session_key)! so we must use the 
+        # request.session because it is automatically saved at the end
+        # of each request- thereby overriding/undoing any changes made
+        # to the SessionStore(session_key) key!
+        request.session.update(session)
         
         try: # respond
-            resp = HttpResponse(json.dumps(data), 
+            return HttpResponse(json.dumps(data), 
                         content_type="application/json")
-            return resp
         except IOError: # broken pipe or something. 
-            # exit silently
-            thread.exit()
-    
-    # the above is different from SESSION_KEY (which is not unique)
-    try: # attempt to get a used CometSession first
-        scomet = CometSession.objects.get(session_key=\
-            request.session.session_key)
-        if scomet.modified:
-            scomet.modified = False
-            scomet.save()
-            return comet()
+            thread.exit() # exit silently
             
+            
+    # all requests that are still running will die here within
+    # COMET_DIE_TIME after the most recent comet_time
+    # make sure to load most up to date session data!
+    session = SessionStore(request.session.session_key)
+    
+    timeout_time = session['comet_time'] + relativedelta(seconds=15)
+        
+    while timezone.now() < timeout_time: 
+        session = SessionStore(request.session.session_key)
+        if timezone.now() < session['comet_die_time']:
+            print "CONNECTION KILLED!"
+            try:
+                return HttpResponse(json.dumps({"result":-1}), 
+                            content_type="application/json")
+            except IOError: # broken pipe or something. 
+                thread.exit() # exit silently
+        
+        # must update the objects in the object manager!
+        CometSession.objects.update()
+        # the above is different from SESSION_KEY (which is not unique)
+        try: # attempt to get a used CometSession first
+            scomet = CometSession.objects.get(session_key=\
+                request.session.session_key)
+            if scomet.modified:
+                scomet.modified = False
+                scomet.save()
+                print "RETURNED A COMET RESPONSE!"
+                session = SessionStore(request.session.session_key)
+                session['comet_time'] = timezone.now()
+                return comet(session)
+            else: # nothing new, sleep for a bit
+                print timezone.now().second
+                sleep(COMET_REFRESH_RATE)
+                            
+        except CometSession.DoesNotExist:
+            # this should have been created at login!
+            scomet = CometSession.objects.create(session_key=\
+                    request.session.session_key,
+                    store_id=SESSION.get_store(\
+                    request.session).objectId)
+            
+            session = SessionStore(request.session.session_key)
+            session['comet_time'] = timezone.now()
+            return comet(session)
+        
+    # the session in request.session will get save!
+    session = SessionStore(request.session.session_key)
+    prev_comet_time = session.get('comet_time')
+    session['comet_time'] = timezone.now()
+    request.session.update(session)
+    try:
+        # time is up - return a response result 0 means no change 
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
-                        
-    except CometSession.DoesNotExist:
-        # this should have been created at login!
-        scomet = CometSession.objects.create(session_key=\
-                request.session.session_key,
-                store_id=SESSION.get_store(request.session).objectId)
-        return comet()
+    except IOError:
+        # timeout time but page that launched this thread is dead
+        # roll back the comet_time
+        session['comet_time'] = prev_comet_time
+        session.save()
+        # just in casse the session is still saved after exiting
+        request.session.update(session)
+        thread.exit() # exit silently
         
 @csrf_exempt  
 def receive(request, store_id):

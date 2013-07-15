@@ -10,7 +10,7 @@ from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
-from libs.repunch.rputils import get_timezone
+from libs.repunch.rputils import get_timezone, get_map_data
 
 from repunch.settings import COMET_REQUEST_RECEIVE
 from parse.apps.patrons.models import Patron
@@ -104,6 +104,15 @@ def edit(request):
                 ind += 1
                 key = "hours-" + str(ind) + "-days"
             store.set("hours", hours)
+            # update the store's coordinates and neighborhood
+            full_address = " ".join(\
+                store.get_full_address().split(", "))
+            map_data = get_map_data(full_address)
+            store.set("coordinates", map_data.get("coordinates"))
+            store.set("neighborhood", 
+                store.get_best_fit_neighborhood(\
+                    map_data.get("neighborhood")))
+                    
             store.update()
             # update the session cache
             request.session['store'] = store

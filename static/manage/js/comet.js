@@ -6,6 +6,7 @@
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
+    var makeRequest; // prototype
     
     String.prototype.trimToDots = function(x){
         if (this.length > x) {
@@ -21,9 +22,14 @@ $(document).ready(function(){
         // goes here if there are no changes
         if (res.hasOwnProperty("result")){
             if (res.result == 0){
+                makeRequest();
+                alert("MAKING A NEW REQUEST!");
+                return;
+            } else if (res.result == -1) {
                 return;
             }
-        }
+        } 
+        
         // Messages page
         if(res.hasOwnProperty("feedbacks_unread")){
             var feedback_unread_count = new String(res.feedback_unread_count);
@@ -537,16 +543,26 @@ $(document).ready(function(){
                 rpin.addClass('refreshed');
             }
         } // end hasOwnProperty
+        
+        // establish another connection
+        makeRequest();
                
     } // end mainComet
     
-    setInterval(function(){
+    makeRequest = function() {
         $.ajax({
             url: url,
             type: "GET",
+            timeout: 300000, // timeout after 5 mins! Server must respond before that!
             cache:false, // required to kill internet explorer 304 bug
             success: mainComet,
         });
-    }, 8000);
+    }
+    
+    // wait 9 seconds before calling initializing the connetion! 
+    // IMPORTANT that this is called after server's COMET_DIE_TIME has passed.
+    setTimeout(function(){
+        makeRequest();
+    }, 9000);
 
 });

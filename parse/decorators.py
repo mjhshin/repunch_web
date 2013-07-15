@@ -1,9 +1,8 @@
 from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
-from repunch.settings import COMET_REFRESH_RATE
+from repunch.settings import COMET_DIE_TIME
 
-# TODO MAKE USABLE (does nothing at the moment)
 def session_comet(view_func):
     """
     Makes sure that there is only 1 manage_refresh thread running
@@ -15,12 +14,13 @@ def session_comet(view_func):
     die. This assumes that the cloud_call 
     """
     def view(request, *args, **kwargs):
-        """
-        request.session['comet_dead_time'] =\
-            timezone.now() + relativedelta(COMET_REFRESH_RATE+2)
-        # so for 17 seconds, all calls to retailer refresh will 
-        # return a server error in the ajax side.
-        """
+        # insert into session the time the page got accessed
+        comet_time = timezone.now()
+        request.session['comet_time'] = comet_time
+        request.session['comet_die_time'] = comet_time +\
+            relativedelta(seconds=COMET_DIE_TIME)
+        # need to save it here so that other looping requests know
+        request.session.save()
         return view_func(request, *args, **kwargs)
 
     return view
