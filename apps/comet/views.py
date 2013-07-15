@@ -429,12 +429,12 @@ def refresh(request):
     # make sure to load most up to date session data!
     session = SessionStore(request.session.session_key)
     
-    timeout_time = session['comet_time'] + relativedelta(seconds=15)
+    timeout_time = session['comet_time'] +\
+        relativedelta(seconds=REQUEST_TIMEOUT)
         
     while timezone.now() < timeout_time: 
         session = SessionStore(request.session.session_key)
         if timezone.now() < session['comet_die_time']:
-            print "CONNECTION KILLED!"
             try:
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
@@ -450,12 +450,10 @@ def refresh(request):
             if scomet.modified:
                 scomet.modified = False
                 scomet.save()
-                print "RETURNED A COMET RESPONSE!"
                 session = SessionStore(request.session.session_key)
                 session['comet_time'] = timezone.now()
                 return comet(session)
             else: # nothing new, sleep for a bit
-                print timezone.now().second
                 sleep(COMET_REFRESH_RATE)
                             
         except CometSession.DoesNotExist:
