@@ -421,7 +421,6 @@ def refresh(request):
             return HttpResponse(json.dumps(data), 
                         content_type="application/json")
         except (IOError, socket.error) as e: # broken pipe/socket. 
-            print "Request killed"
             thread.exit() # exit silently
             
             
@@ -432,7 +431,6 @@ def refresh(request):
     
     timeout_time = session['comet_time'] +\
         relativedelta(seconds=REQUEST_TIMEOUT)
-    print "Received request."
         
     while timezone.now() < timeout_time: 
         session = SessionStore(request.session.session_key)
@@ -441,7 +439,6 @@ def refresh(request):
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
             except (IOError, socket.error) as e: # broken pipe/socket. 
-                print "Request killed"
                 thread.exit() # exit silently
         
         # must update the objects in the object manager!
@@ -455,11 +452,8 @@ def refresh(request):
                 scomet.save()
                 session = SessionStore(request.session.session_key)
                 session['comet_time'] = timezone.now()
-                print "Returning response."
                 return comet(session)
             else: # nothing new, sleep for a bit
-                print str(timezone.now()) + ": sleeping for " +\
-                    str(COMET_REFRESH_RATE) + " seconds."
                 sleep(COMET_REFRESH_RATE)
                             
         except CometSession.DoesNotExist:
@@ -484,7 +478,6 @@ def refresh(request):
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except (IOError, socket.error) as e:
-        print "Request killed"
         # timeout time but page that launched this thread is dead
         # roll back the comet_time
         session['comet_time'] = prev_comet_time

@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.sessions.backends.cache import SessionStore
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -121,7 +122,7 @@ def redeem(request):
     2 if insufficient, 3 if already validated, 
     4 if successfully deleted/denied, 5 has been deleted elsewhere.
     """
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET" or request.is_ajax():        
         # approve or deny
         action = request.GET.get("action")
         redeemId = request.GET.get('redeemRewardId')
@@ -145,8 +146,11 @@ def redeem(request):
                     "store_id":store.get("objectId"),
                     })
         if 'error' not in res:
+            # retrieve latest session since user may click a bunch 
+            # of redemptions consecutively
+            session = SessionStore(request.session.session_key)
             redemptions_pending =\
-                SESSION.get_redemptions_pending(request.session)
+                    SESSION.get_redemptions_pending(session)
             i_remove, result = -1, res.get("result")
             # remove from redemptions_pending
             for i, red in enumerate(redemptions_pending):
@@ -155,12 +159,12 @@ def redeem(request):
                     break
             if i_remove != -1 and action == "approve":
                 redemptions_past =\
-                    SESSION.get_redemptions_past(request.session)
+                    SESSION.get_redemptions_past(session)
                 if result and result == "insufficient":
                     del_red = redemptions_pending.pop(i_remove)
                     # notify other dashboards of this change
                     store_id =\
-                        SESSION.get_store(request.session).objectId
+                        SESSION.get_store(session).objectId
                     payload = {"deletedRedemption":del_red.jsonify()}
                     requests.post(COMET_REQUEST_RECEIVE + store_id,
                         data=json.dumps(payload))
@@ -172,10 +176,12 @@ def redeem(request):
                     redemption.is_redeemed = True
                     redemption.updatedAt = timezone.now()
                     redemptions_past.append(redemption)
-                    request.session['redemptions_past'] =\
+                    session['redemptions_past'] =\
                         redemptions_past
-                request.session['redemptions_pending'] =\
+                session['redemptions_pending'] =\
                     redemptions_pending
+                # request.session will be saved after return
+                request.session.update(session)
                 
                 if result and result == "insufficient":
                     return HttpResponse(json.dumps({"result":2}), 
@@ -189,8 +195,9 @@ def redeem(request):
                                 
             elif i_remove != -1 and action == "deny":
                 redemptions_pending.pop(i_remove)
-                request.session['redemptions_pending'] =\
+                session['redemptions_pending'] =\
                     redemptions_pending
+                request.session.update(session)
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
                                 
