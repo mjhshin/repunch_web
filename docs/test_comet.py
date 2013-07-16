@@ -3,18 +3,22 @@ from parse.apps.stores.models import Store
 from apps.comet.models import CometSession
 import sys
 
-def flag_go(session_key):
+def flag_go(session_key, obj):
     # get the latest redemption
     store = Store.objects().get(objectId="mF3Hox2QkU")
-    newest_redemption = store.get("redeemRewards", limit=1,
-        order="-createdAt")[0]
+    if obj == "pendingRedemption":
+        x = store.get("redeemRewards", limit=1,
+            order="-createdAt")[0]
+    elif obj == "newFeedback":
+        x = store.get("receivedMessages", limit=1,
+            order="-createdAt")[0]
 
     # update the session
     session = SessionStore(session_key)
-    if "pendingRedemption" not in session:
-        session["pendingRedemption"] = [newest_redemption.__dict__]
+    if obj not in session:
+        session[obj] = [x.__dict__]
     else:
-        session["pendingRedemption"].append(newest_redemption.__dict__)
+        session[obj].append(x.__dict__)
         
     session.save()
 

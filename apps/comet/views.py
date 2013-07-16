@@ -429,11 +429,19 @@ def refresh(request):
     # make sure to load most up to date session data!
     session = SessionStore(request.session.session_key)
     
+    # cache was cleared - logged out - exit silently
+    if "comet_time" not in session:
+        thread.exit()
+    
     timeout_time = session['comet_time'] +\
         relativedelta(seconds=REQUEST_TIMEOUT)
         
     while timezone.now() < timeout_time: 
         session = SessionStore(request.session.session_key)
+        
+        if "comet_die_time" not in session:
+            thread.exit()
+        
         if timezone.now() < session['comet_die_time']:
             try:
                 return HttpResponse(json.dumps({"result":-1}), 
@@ -470,7 +478,11 @@ def refresh(request):
         
     # the session in request.session will get save!
     session = SessionStore(request.session.session_key)
-    prev_comet_time = session.get('comet_time')
+    
+    if 'comet_time' not in session:
+        thread.exit()
+    
+    prev_comet_time = session['comet_time']
     session['comet_time'] = timezone.now()
     request.session.update(session)
     try:

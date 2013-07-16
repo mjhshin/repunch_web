@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.contrib.sessions.backends.cache import SessionStore
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from datetime import datetime
@@ -201,12 +202,18 @@ def edit(request, message_id):
             elif message.filter == "most_loyal":
                 params.update({"num_patrons":\
                     postDict['num_patrons']})
+                    
+            # update store session cache
+            request.session['store'] = store
+            # save the session now! cloud_call may take a bit!
+            request.session.save()
 
             # push notification
             cloud_call("retailer_message", params)
             
-            # update store session cache
-            request.session['store'] = store
+            # make sure we have the latest session to save!
+            session = SessionStore(request.session.session_key)
+            request.session.update(session)
 
             return HttpResponseRedirect(message.get_absolute_url())
             
@@ -383,6 +390,9 @@ def feedback_reply(request, feedback_id):
             messages_received_list.insert(i_remove, feedback)
             request.session['messages_received_list'] =\
                 messages_received_list
+                
+            # save the session now! cloud_call may take a bit!
+            request.session.save()
 
             # push notification
             cloud_call("retailer_message", {
@@ -393,6 +403,10 @@ def feedback_reply(request, feedback_id):
                 "filter":'one',
                 "patron_id":feedback.get('patron_id'),
             })
+            
+            # make sure we have the latest session to save!
+            session = SessionStore(request.session.session_key)
+            request.session.update(session)
 
             return redirect(reverse('feedback_details', 
                         args=(feedback.objectId,)) +\

@@ -60,7 +60,7 @@ function validate(which, next) {
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_three.png" %}" alt=""></div>
-						<p class="step-des">You'll be ready roll! Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
+						<p class="step-des">Ready roll!<br/> Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
 					</div>
 				</div>
 				
