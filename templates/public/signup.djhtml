@@ -173,10 +173,10 @@ function validate(which, next) {
 {% block dialogs %}
 <div id="dialog-signup" style="display:none;">
     <img src="{% static 'manage/images/ajax-loader.gif' %}"
-    alt="processing signup form..." id="signing-up"
+    alt="processing signup form..." id="signing-up" 
     style="position:relative;top:7px;margin-right:8px;display:inline-block;"/>
     <div id="dialog-signup-message" 
-        style="display:inline-block;position:relative;top:-2px;">
+        style="display:inline-block;position:relative;top:6px;left:10px;width:220px;">
     Processing your information. Please wait.
     </div>
     <img src="{% static 'public/images/icon_clock-orange.png' %}"

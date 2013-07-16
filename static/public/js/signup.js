@@ -35,7 +35,7 @@ $(document).ready(function(){
     var messageContainer = $("#dialog-signup-message");
     $("#signup-form-submit").click(function(){
         // make sure that this has default message
-        messageContainer.text("Processing your information. Please wait.");
+        messageContainer.html("Processing your information.<br/>Please wait.");
         // update the phone number's value
         $("#id_phone_number").val(new String($("#Ph1").val()) + 
             new String($("#Ph2").val()) + new String($("#Ph3").val()));
@@ -64,7 +64,6 @@ $(document).ready(function(){
         $( "#categories" ).val(cats);
         var data = $("#signup-form").serialize();
         
-        /*
         $.post(url, data, function(res, status, xhr) {
             $("#signing-up").hide();
             respType = xhr.getResponseHeader("content-type");
@@ -101,7 +100,7 @@ $(document).ready(function(){
         }).fail(function(){  // should not go here unless server error
             messageContainer.html("<span>Server Error</span>");
         });
-        */
+        
         return false;
     });
     
