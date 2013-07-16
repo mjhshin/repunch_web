@@ -41,7 +41,6 @@ function avatarCropComplete() {
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
 	        $("#store_avatar").attr("src", result);
-	        $("#logo-header").attr("src", result);
         },
     });
 }
