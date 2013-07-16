@@ -64,6 +64,7 @@ $(document).ready(function(){
         $( "#categories" ).val(cats);
         var data = $("#signup-form").serialize();
         
+        /*
         $.post(url, data, function(res, status, xhr) {
             $("#signing-up").hide();
             respType = xhr.getResponseHeader("content-type");
@@ -100,7 +101,7 @@ $(document).ready(function(){
         }).fail(function(){  // should not go here unless server error
             messageContainer.html("<span>Server Error</span>");
         });
-        
+        */
         return false;
     });
     

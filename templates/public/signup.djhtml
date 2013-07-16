@@ -174,7 +174,7 @@ function validate(which, next) {
 <div id="dialog-signup" style="display:none;">
     <img src="{% static 'manage/images/ajax-loader.gif' %}"
     alt="processing signup form..." id="signing-up"
-    style="position:relative;top:7px;margin-right:8px;"/>
+    style="position:relative;top:7px;margin-right:8px;display:inline-block;"/>
     <div id="dialog-signup-message" 
         style="display:inline-block;position:relative;top:-2px;">
     Processing your information. Please wait.
