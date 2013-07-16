@@ -79,7 +79,8 @@ def parse(method, path, data=None, query=None,
     conn.close()
     return result
 
-def rescale(image_path, img_format, width=dim[0], height=dim[1]):
+def rescale(image_path, img_format, crop_coords=None,
+        width=dim[0], height=dim[1]):
     max_width = width
     max_height = height
     img = Image.open(image_path)
@@ -100,32 +101,39 @@ def rescale(image_path, img_format, width=dim[0], height=dim[1]):
         x_offset = 0
         y_offset = float(src_height - crop_height) / 3
         
-    # we can crop
-    # img = img.crop(x0, y0, x1, y1)
+    # crop if given the coords
+    if crop_coords:
+        x1 = crop_coords["x1"]
+        y1 = crop_coords["y1"]
+        x2 = crop_coords["x2"]
+        y2 = crop_coords["y2"]
+        img = img.crop((x1, y1, x2, y2))
     img = img.resize((int(dst_width), int(dst_height)), Image.ANTIALIAS)
         
     img.save(image_path, img_format)
 
-    
-def create_png(uploadedFile):
+def create_png(file_BytesIO, file_name, coords=None):
     """ 
     creates the given uploadedFile, which is a png image.
     """
-    im = Image.open(uploadedFile.file)
+    im = Image.open(file_BytesIO)
     tmp = tempfile.NamedTemporaryFile()
     # don't auto delete the tmp file on close
     tmp.delete = False
     im.save(tmp, 'png')
-    rescale(tmp.name, 'png')
+    rescale(tmp.name, 'png', coords)
     tmp.close()
     # filenames with spaces and tabs causes broken pipe!
     # also filename must be alpha-numeric! 
     # Otherwise, BadFileName results
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                uploadedFile.name), tmp.name, cMeta='png')
+                file_name), tmp.name, cMeta='png')
+    # cleanup
+    del im
+    file_BytesIO.close()
     # don't forget to delete the file
     tmp.unlink(tmp.name)
-    return res
+    return res 
 
 def delete_file(name, fType):
     """ deletes the given file """   

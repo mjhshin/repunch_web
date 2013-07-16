@@ -31,8 +31,8 @@ function punchit(url){
         cont = false;
     } else if ((new Number(pa.val())>mp)){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>" +
-            "<div><span>Amount of punches must be less than "+
-            new String(mp+1) + ".<span></div></div>");
+            "<div><span><Maximum amount of punches is "+
+            new String(mp) + ".<span></div></div>");
         cont = false;
     } 
     

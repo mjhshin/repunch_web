@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static "manage/css/addons/jquery.Jcrop.min.css" %}" type="text/css" />
+	
+	{% if success %}
+	<script type="text/javascript">
+		window.parent.avatarCropComplete();
+	</script>
+	{% else %}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="{% static "manage/js/jquery/jquery.Jcrop.js" %}"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#crop-btn').click(function(){
+			    if ($("#img-upload-loading").css("display") != "none" || $('#x1').val() == null || $('#x1').val().length < 1){
+			        return false;
+			    }
+			    
+			    $("#img-upload-loading").show();
+				$('#avatar-crop-form').submit();
+			});
+			
+			function changeCoords(c) {
+                $('#x1').val(c.x);
+                $('#y1').val(c.y);
+                $('#x2').val(c.x2);
+                $('#y2').val(c.y2);
+            };
+
+            function clearCoords() {
+                $('#avatar-crop-form input').val('');
+            };
+			
+            $('#jcrop_target').Jcrop({
+	            onChange: changeCoords,
+	            onSelect: changeCoords,
+                onRelease:  clearCoords
+            });
+		});
+	</script>
+	{% endif %}
+	
+
+</head>
+<body style="background-image: none; background-color: white;">
+	<form action="{{ url }}" method="POST" id="avatar-crop-form" >
+	    {% csrf_token %}
+		<div class="input-container" >
+			<img src="{{ img_src }}" id="jcrop_target" alt="store avatar" width="290" height="290" />
+		</div>
+		
+        <input type="hidden" id="x1" name="x1" />
+        <input type="hidden" id="y1" name="y1" />
+        <input type="hidden" id="x2" name="x2" />
+        <input type="hidden" id="y2" name="y2" />
+		
+		<div id="edit-store-options" class="form-options">
+			<a style="cursor: pointer;" class="button blue" id="crop-btn">Crop</a>
+			<a onclick="window.parent.cancelAvatarCrop(); return false;" href="#" class="red">Cancel</a>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            id="img-upload-loading" 
+		            style="display:none;position:relative;top:5px;left:4px;"/>
+		</div>
+	</form>
+</body>
+</html>

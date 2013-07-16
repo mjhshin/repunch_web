@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
+from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
-import json, urllib, requests
+from io import BytesIO
+import json, urllib, urllib2, requests
 
 from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours
@@ -190,16 +192,28 @@ def avatar(request):
     if request.method == 'POST': 
         form = StoreAvatarForm(request.POST, request.FILES)
         if form.is_valid():
+        
             # need to remove old file
             if store.get('store_avatar'):
-                delete_file(store.store_avatar, 'png')
+                delete_file(old_avatar, 'png')
                 
-            res = create_png(request.FILES['store_avatar'])
+            # save the session before a cloud call!
+            request.session.save()
+            
+            res = create_png(request.FILES['store_avatar'].file,
+                request.FILES['store_avatar'].name)
+                
+            # make sure that we have the latest session
+            session = SessionStore(request.session.session_key)
+            store = SESSION.get_store(session)
             if res and 'error' not in res:
                 store.store_avatar = res.get('name')
                 store.store_avatar_url = res.get('url')
                 request.session['has_store_avatar'] = True
             store.update()
+            
+            session["store"] = store
+            request.session.update(session)
             
             data['success'] = True
     else:
@@ -218,6 +232,55 @@ def get_avatar(request):
     if request.method == "GET" or request.is_ajax():
         store = SESSION.get_store(request.session)
         return HttpResponse(store.get("store_avatar_url"))
+        
+
+@login_required
+def crop_avatar(request):
+    """ takes in crop coordinates and creates a new png image """
+    data = {}
+    store = SESSION.get_store(request.session)
+            
+    if request.method == "POST":
+        store = SESSION.get_store(request.session)
+        
+        old_avatar = store.store_avatar
+            
+        crop_coords = {
+            "x1": int(request.POST["x1"]),
+            "y1": int(request.POST["y1"]),
+            "x2": int(request.POST["x2"]),
+            "y2": int(request.POST["y2"]),
+        }
+        
+        # save the session before a cloud call!
+        request.session.save()
+        res = create_png(BytesIO(urllib2.urlopen(\
+            store.store_avatar_url).read()),store.get("store_avatar"),
+            crop_coords)
+        
+        # make sure that we have the latest session
+        session = SessionStore(request.session.session_key)
+        store = SESSION.get_store(session)
+        if res and 'error' not in res:
+            store.store_avatar = res.get('name')
+            store.store_avatar_url = res.get('url')
+        store.update()
+        
+        session["store"] = store
+        request.session.update(session)
+        
+        # need to remove old file
+        delete_file(old_avatar, 'png')
+        
+        # flag the execution of avatarCropComplete js function
+        data['success'] = True
+    
+    # update the session cache
+    request.session['store'] = store
+    
+    data["img_src"] = store.get("store_avatar_url")
+    data['url'] = reverse('store_crop_avatar')
+    return render(request, 'manage/avatar_crop.djhtml', data)
     
     
     

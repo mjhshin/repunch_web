@@ -8,6 +8,7 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^punch$', 'punch', name='store_punch'),
     
     url(r'^get-avatar$', 'get_avatar', name='store_get_avatar'),
+    url(r'^crop-avatar$', 'crop_avatar', name='store_crop_avatar'),
     
 )
 

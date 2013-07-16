@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	$('a#upload-avatar').click(function(e) {
+	$('a#crop-avatar').click(function(e) {
 		e.preventDefault();
 		var $this = $(this);
 		var href = $this.attr('href');
@@ -7,7 +7,7 @@ $(document).ready(function() {
 		var horizontalPadding = 0;
 		var verticalPadding = 0;
 		
-		$('<iframe id="avatar-dialog" class="externalSite" src="' + href + '" frameborder="0" >').dialog({
+		$('<iframe id="avatar-crop-dialog" class="externalSite" src="' + href + '" frameborder="0" >').dialog({
 			autoOpen : true,
 			modal : true,
 			resizable : true,
@@ -18,21 +18,22 @@ $(document).ready(function() {
 				opacity : 1,
 				background : "#000"
 			}, 
-			width: '350px'
-		}).width('325px');
+			height: 390,
+			width: 330,
+		});
 
 		return false;
 	});
 });
 
-function cancelAvatarUpload() {
-	$('#avatar-dialog').dialog('close');
-	$('#avatar-dialog').remove();
+function cancelAvatarCrop() {
+	$('#avatar-crop-dialog').dialog('close');
+	$('#avatar-crop-dialog').remove();
 }
 
-function avatarUploadComplete() {
-	$('#avatar-dialog').dialog('close');
-	$('#avatar-dialog').remove();
+function avatarCropComplete() {
+	$('#avatar-crop-dialog').dialog('close');
+	$('#avatar-crop-dialog').remove();
 	// make an ajax call to retrieve the new store_avatar_url
 	$.ajax({
         url: $("#get_store_avatar_url").val(),
