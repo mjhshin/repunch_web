@@ -9,6 +9,7 @@
 .pag-unit {
     display:inline-block;
     cursor:pointer;
+    color:#666666;
     background:white; 
     margin:6px 12px;
     padding:0px 4px;
