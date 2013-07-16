@@ -367,7 +367,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			promises.push( store.save() );
 			promises.push( patron.save() );
 		
-			Parse.Promise.when(promises).then(function(){
+			Parse.Promise.when(promises).then(function() {
 			    console.log("Store and Patron save success (in parallel).");
 				executePush(patronStore);
 				saveDataForAnalytics(patronStoreResult, true);
@@ -1419,4 +1419,121 @@ Parse.Cloud.define("send_gift", function(request, response) {
 			}
 		}); // end Parse.Push
 	}
+});
+
+
+////////////////////////////////////////////////////
+//  
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("reply_to_gift", function(request, response) {
+	var messageId = request.params.message_id;
+	var patronId = request.params.patron_id;
+	var senderName = request.params.sender_name;
+	var body = request.params.body;
+	
+	var Message = Parse.Object.extend("Message");
+	var MessageStatus = Parse.Object.extend("MessageStatus");
+	
+	var message = new Message();
+	message.set("message_type", "gift");
+	message.set("body", body);
+	message.set("is_read", false);
+	message.set("sender_name", senderName);
+	
+	var messageStatus = new MessageStatus();
+	messageStatus.set("is_read", false);
+	messageStatus.set("redeem_available", "no");
+	
+	var receiverPatronId, subject, storeId;
+	
+	message.save().then(function(message) {
+		console.log("Reply Message save successful.");
+		messageStatus.set("Message", message);
+		
+		var messageQuery = new Parse.Query(Message);
+		return messageQuery.get(messageId);
+		
+	}, function(error) {
+		console.log("Reply Message save failed.");
+		response.error("error");
+			
+	}).then(function(originalMessage) {
+		console.log("Original Message fetch successful.");
+		receiverPatronId = originalMessage.get("patron_id");
+		subject = originalMessage.get("subject");
+		storeId = originalMessage.get("store_id");
+		
+		originalMessage.set("Reply", message);
+		messageStatus.set("Message", originalMessage);
+		
+		var promises[];
+		promises.push( originalMessage.save() );
+		promises.push( messageStatus.save() );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Original Message and MessageStatus save success (in parallel).");
+			var patronQuery = new Parse.Query(Patron);
+			return patronQuery.get(receiverPatronId);
+			
+		}, function(error) {
+		    console.log("Original Message and MessageStatus save fail (in parallel).");
+		    response.error("error");
+        
+		}).then(function(receiverPatron) {
+			console.log("Recepient Patron query successful.");
+			receiverPatron.relation("ReceivedMessages").add(messageStatus);
+			return receiverPatron.save();
+		
+		}, function(error) {
+			console.log("Recepient Patron query failed.");
+			response.error("error");
+			
+		}).then(function() {
+			console.log("Recepient Patron save successful.");
+			executePush();
+		
+		}, function(error) {
+			console.log("Recepient Patron save failed.");
+			response.error("error");
+			
+		});
+		
+	}, function(error) {
+		console.log("Original Message fetch failed.");
+		response.error("error");
+			
+	});
+	
+	function executePush() {
+		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+ 
+		androidInstallationQuery.equalTo("patron_id", receiverPatronId);
+		androidInstallationQuery.equalTo("deviceType", "android");
+		iosInstallationQuery.equalTo("patron_id", receiverPatronId);
+		iosInstallationQuery.equalTo("deviceType", "ios");
+        
+        Parse.Push.send({
+            where: androidInstallationQuery, 
+            data: {
+                action: "com.repunch.intent.MESSAGE",
+                subject: "RE: " + subject,
+                store_id: storeId,
+                sender: senderName,
+                message_status_id: messageStatus.id
+			}
+        }, {
+			success: function() {
+				console.log("android push success");
+				response.success("success");
+			},
+			error: function(error) {
+				console.log("android push success");
+				response.error("error");
+			}
+		}); // end Parse.Push
+	}
+	
 });
