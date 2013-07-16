@@ -1309,7 +1309,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	message.set("message_type", "gift");
 	message.set("sender_name", senderName);
 	message.set("store_id", storeId);
-	//message.set("patron_id", patronId);
+	message.set("patron_id", patronId);
 	message.set("subject", subject);
 	message.set("body", body);	
 	message.set("gift_title", giftTitle);
@@ -1433,6 +1433,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	var senderName = request.params.sender_name;
 	var body = request.params.body;
 	
+	var Patron = Parse.Object.extend("Patron");
 	var Message = Parse.Object.extend("Message");
 	var MessageStatus = Parse.Object.extend("MessageStatus");
 	
@@ -1468,11 +1469,11 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		originalMessage.set("Reply", message);
 		messageStatus.set("Message", originalMessage);
 		
-		var promises[];
+		var promises = [];
 		promises.push( originalMessage.save() );
 		promises.push( messageStatus.save() );
 		
-		Parse.Promise.when(promises).then(function() {
+		Parse.Promise.when(promises).then(function(originalMessage, messageStatus) {
 		    console.log("Original Message and MessageStatus save success (in parallel).");
 			var patronQuery = new Parse.Query(Patron);
 			return patronQuery.get(receiverPatronId);
@@ -1518,7 +1519,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
         Parse.Push.send({
             where: androidInstallationQuery, 
             data: {
-                action: "com.repunch.intent.MESSAGE",
+                action: "com.repunch.intent.GIFT",
                 subject: "RE: " + subject,
                 store_id: storeId,
                 sender: senderName,
