@@ -18,6 +18,9 @@
 
 {% block content %}
 {% with store=request.session.store %}
+
+    {# REQUIRED FOR AVATAR UPLOAD JS #}
+    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
 	
 	<form action="{% url 'store_edit' %}" method="post" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
@@ -29,10 +32,11 @@
 		<div id="photo-edit">
 			<div class="white-box">
 	        {% if request.session.has_store_avatar and store|get:'store_avatar' %}
-	            <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px"/>
+	            <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% else %}
 	            <a href="{% url 'store_avatar' %}" id="upload-avatar">
-	            <img src="{% static "manage/images/store_avatar_placeholder.png" %}"" alt="" class="avatar-big" width="200px" height="200px"/>
+	            <img src="{% static "manage/images/store_avatar_placeholder.png" %}"" alt="" id="store_avatar"
+	                class="avatar-big" width="200px" height="200px"/>
 	            </a>
             {% endif %}
 			</div>

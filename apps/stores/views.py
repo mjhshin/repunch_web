@@ -211,3 +211,19 @@ def avatar(request):
     data['form'] = form
     data['url'] = reverse('store_avatar')
     return render(request, 'manage/avatar_upload.djhtml', data)
+    
+@login_required
+def get_avatar(request):
+    """ returns the store's avatar url """
+    if request.method == "GET" or request.is_ajax():
+        store = SESSION.get_store(request.session)
+        return HttpResponse(store.get("store_avatar_url"))
+    
+    
+    
+    
+    
+    
+    
+        
+

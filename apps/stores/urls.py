@@ -7,5 +7,7 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^hours$', 'hours_preview', name='store_hours'),
     url(r'^punch$', 'punch', name='store_punch'),
     
+    url(r'^get-avatar$', 'get_avatar', name='store_get_avatar'),
+    
 )
 

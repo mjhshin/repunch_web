@@ -33,5 +33,13 @@ function cancelAvatarUpload() {
 function avatarUploadComplete() {
 	$('#avatar-dialog').dialog('close');
 	$('#avatar-dialog').remove();
-	window.location.href = window.location.href;
+	// make an ajax call to retrieve the new store_avatar_url
+	$.ajax({
+        url: $("#get_store_avatar_url").val(),
+        type: "GET",
+        cache:false, // required to kill internet explorer 304 bug
+        success: function(result) {
+	        $("#store_avatar").attr("src", result);
+        },
+    });
 }
