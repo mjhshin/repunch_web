@@ -195,7 +195,7 @@ def avatar(request):
         
             # need to remove old file
             if store.get('store_avatar'):
-                delete_file(old_avatar, 'png')
+                delete_file(store.get("store_avatar"), 'png')
                 
             # save the session before a cloud call!
             request.session.save()
