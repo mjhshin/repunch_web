@@ -78,9 +78,8 @@ $(document).ready(function(){
                 }
                 finish(dim);
             } else if (res.code == 2){
-                messageContainer.html("<span>Your account is not yet active.<br/>" +
-                                " We will get in touch with you soon.</span>");
-                finish(340);
+                messageContainer.html("<span>Your account is not active.</span>");
+                finish(320);
                 loading.hide();
             } else if (res.code == 1){
                 messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");

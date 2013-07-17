@@ -48,6 +48,18 @@ def activate(request):
                     "been used.")                
     
     return HttpResponse("Bad request")
+    
+@login_required
+@session_comet
+def deactivate(request):
+    """
+    This does not delete anything! It merely sets the store's active
+    field to false and logs the user out.
+    """
+    store = request.session['store']
+    store.active = False
+    store.update()
+    return redirect(reverse('manage_logout'))
 
 @login_required
 @session_comet

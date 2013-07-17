@@ -8,6 +8,18 @@
 
 {% block javascript %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+<script>
+$(document).ready(function() {
+    $("#deactivate_account").click(function() {
+        choice = confirm("Are you sure you want to deactivate your account?");
+        if (choice == true) {
+            return true;
+        }
+        
+        return false;
+    });
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -105,7 +117,7 @@
 			<a href="{% url 'account_update' %}" class="button blue">
 				Update Account
 			</a>
-			<a href="#" class="red">Cancel My Account</a>
+			<a href="{% url 'account_deactivate' %}" class="red" id="deactivate_account">Cancel My Account</a>
 		</div>
 	</div>
     {% endwith %}
