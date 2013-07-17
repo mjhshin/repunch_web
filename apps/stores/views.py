@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import Http404
 from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -6,15 +7,16 @@ from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 from io import BytesIO
-import json, urllib, urllib2, requests
+import json, urllib, urllib2, requests, os
 
 from parse.decorators import session_comet
-from apps.stores.models import Store as dStore, Hours as dHours
+from apps.stores.models import Store as dStore, Hours as dHours,\
+StoreAvatarTmp
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
-from repunch.settings import COMET_REQUEST_RECEIVE
+from repunch.settings import COMET_REQUEST_RECEIVE, MEDIA_ROOT
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
@@ -193,9 +195,13 @@ def avatar(request):
         form = StoreAvatarForm(request.POST, request.FILES)
         if form.is_valid():
         
+            # save the file locallly
+            avatar = form.save(request.session.session_key)
+        
+            """
             # need to remove old file
             if store.get('store_avatar'):
-                delete_file(store.get("store_avatar"), 'png')
+               delete_file(store.get("store_avatar"), 'png')
                 
             # save the session before a cloud call!
             request.session.save()
@@ -214,10 +220,33 @@ def avatar(request):
             
             session["store"] = store
             request.session.update(session)
+            """
             
-            data['success'] = True
+            if avatar.width > avatar.height: # height is limiting
+                center_width = avatar.width/2
+                init_y1 = 0
+                init_y2 = avatar.height
+                init_x1 = center_width - avatar.height/2
+                init_x2 = center_width + avatar.height/2
+            else:
+                center_height = avatar.height/2
+                init_x1 = 0
+                init_x2 = avatar.width
+                init_y1 = center_height - avatar.width/2
+                init_y2 = center_height + avatar.width/2
+                
+            data = {
+                'avatar': avatar,
+                'init_x1': init_x1,
+                'init_y1': init_y1,
+                'init_x2': init_x2,
+                'init_y2': init_y2,
+            }
+            
+            return render(request, 'manage/avatar_crop.djhtml', data)
+            
     else:
-        form = StoreAvatarForm();
+        form = StoreAvatarForm()
     
     # update the session cache
     request.session['store'] = store
@@ -237,10 +266,9 @@ def get_avatar(request):
 @login_required
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
-    data = {}
-    store = SESSION.get_store(request.session)
             
     if request.method == "POST":
+        data = {}
         store = SESSION.get_store(request.session)
         
         old_avatar = store.store_avatar
@@ -252,11 +280,16 @@ def crop_avatar(request):
             "y2": int(request.POST["y2"]),
         }
         
+        avatar = StoreAvatarTmp.objects.filter(session_key=\
+            request.session.session_key)
+        if not avatar:
+            raise Http404
+            
+        avatar = avatar[0]
+        
         # save the session before a cloud call!
         request.session.save()
-        res = create_png(BytesIO(urllib2.urlopen(\
-            store.store_avatar_url).read()),store.get("store_avatar"),
-            crop_coords)
+        res = create_png(avatar.avatar.path, crop_coords)
         
         # make sure that we have the latest session
         session = SessionStore(request.session.session_key)
@@ -264,6 +297,10 @@ def crop_avatar(request):
         if res and 'error' not in res:
             store.store_avatar = res.get('name')
             store.store_avatar_url = res.get('url')
+            # delete the model and file since it's useless to keep
+            avatar.avatar.delete()
+            avatar.delete()
+            
         store.update()
         
         session["store"] = store
@@ -275,12 +312,9 @@ def crop_avatar(request):
         # flag the execution of avatarCropComplete js function
         data['success'] = True
     
-    # update the session cache
-    request.session['store'] = store
-    
-    data["img_src"] = store.get("store_avatar_url")
-    data['url'] = reverse('store_crop_avatar')
-    return render(request, 'manage/avatar_crop.djhtml', data)
+        # update the session cache
+        request.session['store'] = store
+        return render(request, 'manage/avatar_crop.djhtml', data)
     
     
     

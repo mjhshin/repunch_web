@@ -19,20 +19,19 @@ function punchit(url){
     // validate inputs
     if (!pc.val().length>0){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Please enter the customer's punch code.<span></div></div>");
+            "<div><span>Please enter the customer's punch code.</span></div></div>");
         cont = false;
     } else if (!pa.val().length>0){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Please enter the amount of punches to give.<span></div></div>");
+            "<div><span>Please enter the amount of punches to give.</span></div></div>");
         cont = false;
     } else if (!(new Number(pa.val())>0)){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Amount of punches must be greater than 0.<span></div></div>");
+            "<div><span>Amount of punches must be greater than 0.</span></div></div>");
         cont = false;
     } else if ((new Number(pa.val())>mp)){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>" +
-            "<div><span><Maximum amount of punches is "+
-            new String(mp) + ".<span></div></div>");
+            "<div><span>Maximum amount of punches is "+ new String(mp) + ".</span></div></div>");
         cont = false;
     } 
     

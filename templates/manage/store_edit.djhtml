@@ -9,7 +9,6 @@
 {% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/avatar_crop.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
 	<script type="text/javascript">
 		var _hours_preview_url = '{% url 'store_hours' %}';
@@ -42,10 +41,6 @@
             {% endif %}
 			</div>
 			<a href="{% url 'store_avatar' %}" id="upload-avatar">Add/Change Photo</a>
-	        {% if request.session.has_store_avatar and store|get:'store_avatar' %}
-	        <br/>
-			<a href="{% url 'store_crop_avatar' %}" id="crop-avatar">Crop Photo</a>
-			{% endif %}
 		</div>
 	
 		

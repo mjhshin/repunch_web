@@ -112,7 +112,7 @@ USE_TZ = True
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 if DEBUG:
-    MEDIA_ROOT = '/media'
+    MEDIA_ROOT = os.getcwd() + '/media'
 else:
     MEDIA_ROOT = FS_SITE_DIR+'/media'
 

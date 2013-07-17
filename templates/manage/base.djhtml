@@ -47,7 +47,7 @@
 					<a href="{% url 'store_index' %}">
 					{% if request.session.has_store_avatar %}
 						{% if request.session.store|get:'store_avatar'  %}
-							<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" />
+							<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
 						{% endif %}
 					{% endif %}
 						<span id="account-name">{{ request.session.account|get:'username' }}</span>

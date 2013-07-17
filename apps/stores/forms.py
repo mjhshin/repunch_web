@@ -1,7 +1,7 @@
 from django import forms
 import os, re, datetime
 
-from models import Store
+from models import Store, StoreAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric
 from repunch import settings
@@ -75,24 +75,28 @@ class StoreForm(forms.Form):
         return data
         
 class StoreAvatarForm(forms.Form):
-    store_avatar = forms.FileField()
-        
-    def save(self, force_insert=False, force_update=False, commit=True):    
-            
-        if self.instance != None:
-            store = Store.objects.filter().get(id=self.instance.id)
-            if store.store_avatar:
-                try:                
-                    store.store_avatar.delete()
-                except Exception:
-                    pass # do nothing, 
-                
-        store = super(StoreAvatarForm, self).save()
-        if store != None:
-            rputils.rescale(os.path.join(settings.MEDIA_ROOT, store.store_avatar.name))
-        
-        return store
+    """
+    Returns the ImageFieldFile associated with the StoreAvatar Model
+    """
     
+    image = forms.ImageField()
+   
+    def save(self, session_key):    
+        # remove previous session image
+        av = StoreAvatarTmp.objects.filter(session_key=session_key)
+        if av:
+            av = av[0]
+            try:
+                av.avatar.delete()
+            except Exception:
+                pass
+            finally:
+                av.avatar = self.cleaned_data['image']
+                av.save()
+        else:
+            av = StoreAvatarTmp.objects.create(session_key=\
+                session_key, avatar=self.cleaned_data['image'])
+        return av.avatar
 
 class SubscriptionForm2(forms.Form):
     """ 

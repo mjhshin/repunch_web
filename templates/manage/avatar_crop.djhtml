@@ -12,6 +12,7 @@
 	</script>
 	{% else %}
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="{% static "manage/js/jquery/jquery.Jcrop.js" %}"></script>
 	
 	<script type="text/javascript">
@@ -39,19 +40,26 @@
             $('#jcrop_target').Jcrop({
 	            onChange: changeCoords,
 	            onSelect: changeCoords,
-                onRelease:  clearCoords
+                onRelease:  clearCoords,
+                aspectRatio: 1, 
+                setSelect: [ {{init_x1}}, {{init_y1}}, {{init_x2}}, {{init_y2}} ],
             });
+            
+            
+            // resize the dialog
+            window.parent.resizeFrame({ "width": {{ avatar.width|add:"34" }},
+                "height": {{ avatar.height|add:"80" }} });           
 		});
 	</script>
 	{% endif %}
 	
 
 </head>
-<body style="background-image: none; background-color: white;">
-	<form action="{{ url }}" method="POST" id="avatar-crop-form" >
+<body style="background-image: none; background-color: transparent;">
+	<form action="{% url 'store_crop_avatar' %}" method="POST" id="avatar-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
-			<img src="{{ img_src }}" id="jcrop_target" alt="store avatar" width="290" height="290" />
+			<img src="{{ avatar.url }}" id="jcrop_target" alt="store avatar" width="{{avatar.width}}" height="{{avatar.height}}" />
 		</div>
 		
         <input type="hidden" id="x1" name="x1" />
@@ -61,7 +69,7 @@
 		
 		<div id="edit-store-options" class="form-options">
 			<a style="cursor: pointer;" class="button blue" id="crop-btn">Crop</a>
-			<a onclick="window.parent.cancelAvatarCrop(); return false;" href="#" class="red">Cancel</a>
+			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
 		            id="img-upload-loading" 
 		            style="display:none;position:relative;top:5px;left:4px;"/>

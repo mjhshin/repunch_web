@@ -1,11 +1,12 @@
+/*
+    Note that avatar_crop should b
+*/
+
 $(document).ready(function() {
 	$('a#upload-avatar').click(function(e) {
 		e.preventDefault();
 		var $this = $(this);
 		var href = $this.attr('href');
-		
-		var horizontalPadding = 0;
-		var verticalPadding = 0;
 		
 		$('<iframe id="avatar-dialog" class="externalSite" src="' + href + '" frameborder="0" >').dialog({
 			autoOpen : true,
@@ -18,19 +19,18 @@ $(document).ready(function() {
 				opacity : 1,
 				background : "#000"
 			}, 
-			width: '350px'
-		}).width('325px');
+		});
 
 		return false;
 	});
 });
 
-function cancelAvatarUpload() {
-	$('#avatar-dialog').dialog('close');
-	$('#avatar-dialog').remove();
+function resizeFrame(settings) {
+    $('#avatar-dialog').dialog(settings);
+    $('#avatar-dialog').css(settings);
 }
 
-function avatarUploadComplete() {
+function avatarCropComplete() {
 	$('#avatar-dialog').dialog('close');
 	$('#avatar-dialog').remove();
 	// make an ajax call to retrieve the new store_avatar_url
@@ -40,6 +40,14 @@ function avatarUploadComplete() {
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
 	        $("#store_avatar").attr("src", result);
+	        $("#avatar-thumbnail").attr("src", result);
         },
     });
+    
 }
+
+function cancelAvatarUpload() {
+	$('#avatar-dialog').dialog('close');
+	$('#avatar-dialog').remove();
+}
+

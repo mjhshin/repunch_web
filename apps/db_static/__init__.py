@@ -3,6 +3,7 @@ from apps.db_static.models import Category
 from django.db import IntegrityError
 from repunch.settings import FS_SITE_DIR
 
+# IMPORTANT! Need to comment this out when executing syncdb for the first time!
 if Category.objects.count() < 1:
     # ec2 machine python does not start at repunch_web
     cats = []

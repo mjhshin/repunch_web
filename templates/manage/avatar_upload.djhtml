@@ -1,21 +1,16 @@
-{% load static %}
+ {% load static %}
 
 <!DOCTYPE html>
 <html>
 <head>
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
 	
-	{% if success %}
-	<script type="text/javascript">
-		window.parent.avatarUploadComplete();
-	</script>
-	{% else %}
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#upload-btn').click(function(){
 				
-				if($('#id_store_avatar').val().length == 0)
+				if($('#id_image').val().length == 0)
 				{
 					alert('Please select an image to upload.');	
 				}
@@ -31,11 +26,9 @@
 			});
 		})
 	</script>
-	{% endif %}
-	
 
 </head>
-<body style="background-image: none; background-color: white;">
+<body style="background-image: none; background-color: transparent;">
 	<form action="{{ url }}" method="post" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}

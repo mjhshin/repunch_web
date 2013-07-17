@@ -4,12 +4,12 @@ Helpers methods for parse.apps to enfore the DRY principle.
 from django.utils import timezone
 from dateutil.tz import tzutc
 from dateutil import parser
-import json, httplib, urllib, tempfile, re
+import json, httplib, urllib, re
 from PIL import Image
 
 from repunch.settings import PARSE_VERSION,\
 REST_CONNECTION_META, SUPPORTED_IMAGE_FORMATS,\
-PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as dim
+PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as PID
 
 BAD_FILE_CHR = re.compile('[\W_]+')
 
@@ -80,14 +80,11 @@ def parse(method, path, data=None, query=None,
     return result
 
 def rescale(image_path, img_format, crop_coords=None,
-        width=dim[0], height=dim[1]):
-    max_width = width
-    max_height = height
+        dst_width=PID[0], dst_height=PID[1]):
     img = Image.open(image_path)
     
     src_width, src_height = img.size
     src_ratio = float(src_width) / float(src_height)
-    dst_width, dst_height = max_width, max_height
     dst_ratio = float(dst_width) / float(dst_height)
     
     if dst_ratio < src_ratio:
@@ -112,27 +109,15 @@ def rescale(image_path, img_format, crop_coords=None,
         
     img.save(image_path, img_format)
 
-def create_png(file_BytesIO, file_name, coords=None):
+def create_png(file_path, coords=None):
     """ 
     creates the given uploadedFile, which is a png image.
     """
-    im = Image.open(file_BytesIO)
-    tmp = tempfile.NamedTemporaryFile()
-    # don't auto delete the tmp file on close
-    tmp.delete = False
-    im.save(tmp, 'png')
-    rescale(tmp.name, 'png', coords)
-    tmp.close()
-    # filenames with spaces and tabs causes broken pipe!
-    # also filename must be alpha-numeric! 
-    # Otherwise, BadFileName results
+    im = Image.open(file_path)
+    im.save(file_path, 'png')
+    rescale(file_path, 'png', coords)
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                file_name), tmp.name, cMeta='png')
-    # cleanup
-    del im
-    file_BytesIO.close()
-    # don't forget to delete the file
-    tmp.unlink(tmp.name)
+                file_path), file_path, cMeta='png')
     return res 
 
 def delete_file(name, fType):
