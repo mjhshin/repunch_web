@@ -271,7 +271,9 @@ def crop_avatar(request):
         data = {}
         store = SESSION.get_store(request.session)
         
-        old_avatar = store.store_avatar
+        old_avatar = None
+        if store.get("store_avatar"):
+            old_avatar = store.store_avatar
             
         crop_coords = {
             "x1": int(request.POST["x1"]),
@@ -300,6 +302,7 @@ def crop_avatar(request):
             # delete the model and file since it's useless to keep
             avatar.avatar.delete()
             avatar.delete()
+            session['has_store_avatar'] = True
             
         store.update()
         
@@ -307,7 +310,8 @@ def crop_avatar(request):
         request.session.update(session)
         
         # need to remove old file
-        delete_file(old_avatar, 'png')
+        if old_avatar:
+            delete_file(old_avatar, 'png')
         
         # flag the execution of avatarCropComplete js function
         data['success'] = True

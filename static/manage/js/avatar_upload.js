@@ -40,7 +40,12 @@ function avatarCropComplete() {
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
 	        $("#store_avatar").attr("src", result);
-	        $("#avatar-thumbnail").attr("src", result);
+	        var thumbnail = $("#avatar-thumbnail");
+	        if (thumbnail.length > 0) {
+	            $("#avatar-thumbnail").attr("src", result);
+	        } else {
+	            $("#avatar-thumbnail-wrapper").prepend("<img src='" + result + "' alt='' class='avatar-small' id='avatar-thumbnail' />");
+	        }
         },
     });
     
