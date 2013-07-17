@@ -1,7 +1,7 @@
 
 <VirtualHost *:80>
-        ServerAdmin ubuntu@ec2-54-224-39-200.compute-1.amazonaws.com
-        ServerName ec2-54-224-39-200.compute-1.amazonaws.com
+        ServerAdmin ubuntu@ec2-23-20-15-30.compute-1.amazonaws.com
+        ServerName ec2-23-20-15-30.compute-1.amazonaws.com
         DocumentRoot /
 
         Alias  /static  /home/ubuntu/Repunch/repunch_web/static/

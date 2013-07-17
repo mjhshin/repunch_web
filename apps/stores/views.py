@@ -68,6 +68,39 @@ def edit(request):
     store = SESSION.get_store(request.session)
     # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
+    
+    def common(form):
+        hours_map = {}
+        # group up the days that aare in the same row
+        if store.get("hours"):
+            for hour in store.get("hours"):
+                key = (hour['close_time'], hour['open_time'])
+                if key in hours_map:
+                    hours_map[key].append(unicode(hour['day']))
+                else:
+                    hours_map[key] = [unicode(hour['day'])]
+                
+        # create the formset
+        HoursFormSet = inlineformset_factory(dStore, dHours,
+                            max_num=7, extra=len(hours_map))
+        formset = HoursFormSet(prefix='hours', instance=dstore_inst)
+        # set forms in formset initial data
+        for i, key in enumerate(hours_map.iterkeys()):
+            d = {'days':hours_map[key],
+                    'open':unicode(key[1][:2] +\
+                            ':' + key[1][2:4] + ':00'),
+                    'close':unicode(key[0][:2] +\
+                            ':' + key[0][2:4] + ':00'),
+                    'list_order':unicode(i+1) }
+            formset[i].initial = d
+                
+        # update the session cache
+        request.session['store'] = store
+           
+        data['form'] = form
+        data['hours_formset'] = formset
+
+        return render(request, 'manage/store_edit.djhtml', data)
             
     if request.method == 'POST': 
         HoursFormSet = inlineformset_factory(dStore, dHours,
@@ -76,18 +109,8 @@ def edit(request):
                                 instance=dstore_inst) 
         form = StoreForm(request.POST)
         if form.is_valid(): 
-            store = Store(**store.__dict__)
-            store.update_locally(request.POST.dict(), False)
-            # set the timezone
-            if store.get('zip'):
-                store.store_timezone =\
-                    get_timezone(store.get('zip')).zone
-                    
-            # format the phone number
-            store.phone_number =\
-                format_phone_number(request.POST['phone_number'])
             # build the list of hours in proper format for saving 
-            # to Parse
+            # to Parse. 
             hours, ind, key = [], 0, "hours-0-days"
             while ind < 7:
                 days = request.POST.getlist(key)
@@ -100,6 +123,11 @@ def edit(request):
                                 "-close"].replace(":", 
                                                 "").zfill(6)[:4]
                     for day in days:
+                        if int(open_time)>=int(close_time):
+                            data["error"] = "Invalid hours. Open "+\
+                                "time must be "+\
+                                "greater than close time."
+                            return common(form)
                         hours.append({
                             "day":int(day), 
                             "open_time":open_time,
@@ -107,7 +135,19 @@ def edit(request):
                         })
                 ind += 1
                 key = "hours-" + str(ind) + "-days"
+            
+            store = Store(**store.__dict__)
+            store.update_locally(request.POST.dict(), False)
             store.set("hours", hours)
+            
+            # set the timezone
+            if store.get('zip'):
+                store.store_timezone =\
+                    get_timezone(store.get('zip')).zone
+                    
+            # format the phone number
+            store.phone_number =\
+                format_phone_number(request.POST['phone_number'])
             # update the store's coordinates and neighborhood
             full_address = " ".join(\
                 store.get_full_address().split(", "))
@@ -137,38 +177,8 @@ def edit(request):
         form.initial['phone_number'] =\
             form.initial['phone_number'].replace("(",
                 "").replace(")","").replace(" ", "").replace("-","")
-        
-    hours_map = {}
-    # group up the days that aare in the same row
-    if store.get("hours"):
-        for hour in store.get("hours"):
-            key = (hour['close_time'], hour['open_time'])
-            if key in hours_map:
-                hours_map[key].append(unicode(hour['day']))
-            else:
-                hours_map[key] = [unicode(hour['day'])]
-            
-    # create the formset
-    HoursFormSet = inlineformset_factory(dStore, dHours,
-                        max_num=7, extra=len(hours_map))
-    formset = HoursFormSet(prefix='hours', instance=dstore_inst)
-    # set forms in formset initial data
-    for i, key in enumerate(hours_map.iterkeys()):
-        d = {'days':hours_map[key],
-                'open':unicode(key[1][:2] +\
-                        ':' + key[1][2:4] + ':00'),
-                'close':unicode(key[0][:2] +\
-                        ':' + key[0][2:4] + ':00'),
-                'list_order':unicode(i+1) }
-        formset[i].initial = d
-            
-    # update the session cache
-    request.session['store'] = store
-       
-    data['form'] = form
-    data['hours_formset'] = formset
-
-    return render(request, 'manage/store_edit.djhtml', data)
+         
+    return common(form)
 
 @login_required
 def hours_preview(request):
