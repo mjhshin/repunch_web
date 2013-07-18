@@ -19,12 +19,13 @@
 	    position:relative; top:4px;
 	}
 	#id_image {
-	    padding-top:7px; color:transparent;
+	    height:100%;
+	    padding-top:2px; padding-bottom:2px; color:transparent;
 	    width:250px;line-height:110%;margin-top:14px;
 	}
 	#img_text {
-	    position:absolute; left:124px;px; top:59px;
-	    font-size: 0.9em; color:#666666;
+	    position:absolute; left:124px;px; top:55px;
+	    font-size: 0.8em; color:#666666;
 	}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
