@@ -8,8 +8,19 @@
 	#avatar-form {
 	    padding-left:15px;
 	}
-	#avatar-form input {
-	    width:250px;padding-top:7px;
+	div.input-container label {
+	    padding:0px; margin-bottom:2px;
+	}
+	ul.errorlist {
+	    padding:0px;margin:0px;line-height:110%;
+	}
+	ul.errorlist li {
+	    padding:0px;margin:0px;line-height:110%;
+	    position:relative; top:4px;
+	}
+	#id_image {
+	    height:100%; padding-left:0px;
+	    width:250px;line-height:110%;margin-top:14px;
 	}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -31,6 +42,10 @@
 					$('#avatar-form').submit();
 				}
 			});
+			
+		    {% if form.errors %}
+		    window.parent.resizeFrame({"height": 180});   
+		    {% endif %}
 		})
 	</script>
 

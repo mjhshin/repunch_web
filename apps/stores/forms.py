@@ -79,7 +79,8 @@ class StoreAvatarForm(forms.Form):
     Returns the ImageFieldFile associated with the StoreAvatar Model
     """
     
-    image = forms.ImageField()
+    image = forms.ImageField(widget=forms.ClearableFileInput(attrs=\
+        {"accept":"image/*"}))
    
     def save(self, session_key):    
         # remove previous session image
