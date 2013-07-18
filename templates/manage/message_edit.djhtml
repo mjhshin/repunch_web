@@ -67,6 +67,16 @@ $(document).ready(function(){
             {% endfor %}
         </select>
         
+        <span id="idle_latency_span">
+            <select name="idle_latency">
+                {# values are in days #}
+                <option value="7" selected>1 week</option>
+                <option value="14">2 weeks</option>
+                <option value="21">3 weeks</option>
+                <option value="28">4 weeks</option>
+            </select>
+        </span>
+        
         <span id="num_patrons_span" >
         <input type="text" id="num_patrons" name="num_patrons"
             {% if mp_slider_max < 2 %}

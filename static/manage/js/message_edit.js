@@ -45,16 +45,23 @@ $(document).ready(function(){
     });
     */
     
-    // span is hidden in the beginning
+    // spans are hidden in the beginning
     $( "#num_patrons_span" ).find("*").hide();
+    $( "#idle_latency_span" ).find("*").hide();
 	
 	$( "#filter" ).change(function(){
-            var option = $("#filter option:selected").val();
+        var option = $("#filter option:selected").val();
 	    if (option == "most_loyal"){
             $( "#num_patrons_span" ).find("*").fadeIn();
 	    } else {
             $( "#num_patrons_span" ).find("*").fadeOut();
 	    }
+	    if (option == "idle") {
+            $( "#idle_latency_span" ).find("*").fadeIn();
+	    } else {
+            $( "#idle_latency_span" ).find("*").fadeOut();
+	    }
+	    
 	});
 	
 });

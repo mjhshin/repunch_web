@@ -197,7 +197,9 @@ def edit(request, message_id):
             }
 
             if message.filter == "idle":
-                d = timezone.now() + relativedelta(days=-21)
+                idle_days = postDict['idle_latency']
+                d = timezone.now() + relativedelta(days=\
+                    -1*int(idle_days))
                 params.update({"idle_date":d.isoformat()})
             elif message.filter == "most_loyal":
                 params.update({"num_patrons":\
