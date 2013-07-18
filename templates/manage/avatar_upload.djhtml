@@ -19,13 +19,8 @@
 	    position:relative; top:4px;
 	}
 	#id_image {
-	    height:100%;
-	    padding-top:2px; padding-bottom:2px; color:transparent;
+	    padding-top:7px; padding-bottom:2px;
 	    width:250px;line-height:110%;margin-top:14px;
-	}
-	#img_text {
-	    position:absolute; left:124px;px; top:55px;
-	    font-size: 0.8em; color:#666666;
 	}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -68,7 +63,6 @@
 	<form action="{{ url }}" method="post" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}
-			<span id="img_text">No file chosen</span>
 		</div>
 		
 		<div id="edit-store-options" class="form-options" style="margin-top:16px;">
