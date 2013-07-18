@@ -20,10 +20,10 @@
 	{{ redemp.title|trim_to_dots:20 }}</div>
 	<div class="td redemption_punches">
 	{{ redemp.num_punches }}</div>
-	<div class="td redemption_redeem">
+	<div class="td redemption_redeem" style="margin-top:4px;">
 	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
 	        <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>
-	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
+	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;margin-left:14px;">
 	        <img src="{% static 'manage/images/icon_red-x.png' %}" alt="Deny" /></a>
         <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing"
             class="redemp-loader" width="18" height="18" />

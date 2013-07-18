@@ -19,13 +19,6 @@
     width:80px;
 
 }
-div.redemption_redeem{
-    margin-top:4px;
-}
-
-div.redemption_redeem a:first-child{
-    margin-right:20px; margin-left:0px;
-}
 
 div.redemption_redeem img.redemp-loader{
     position:relative; left:18px; top:1px;

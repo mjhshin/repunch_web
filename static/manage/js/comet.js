@@ -411,11 +411,11 @@ $(document).ready(function(){
 				            redemptions_pending[i].title.trimToDots(20) + "</div>" +
 				            "<div class='td redemption_punches'>" +
 				            redemptions_pending[i].num_punches + "</div>" +
-				            "<div class='td redemption_redeem'>" +
+				            "<div class='td redemption_redeem' style='margin-top:4px;'>" +
 				            
 	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
 	                            "<img src='" + greenCheckIconUrl + "' alt='Approve' /></a>" +
-	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +
+	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;margin-left:18px;'>" +
 	                            "<img src='" + redXIconUrl + "' alt='Deny' /></a>" +
                             "<img src='" + loadingIconUrl + "' alt='processing' " + 
                                 "class='redemp-loader' width='18' height='18' />" +
