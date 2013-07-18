@@ -213,6 +213,11 @@ class Subscription(ParseObject):
         self.pp_cc_id = data.get('pp_cc_id')
         self.date_pp_valid = data.get('date_pp_valid')
         
+        # used when the user passes the user limit!!
+        # MUST be set back to None if not in use!!!!
+        self.date_passed_user_limit =\
+            data.get("date_passed_user_limit")
+        
         # use to bill monthly! ONLY USE for determining when to charge
         # monthly bill for premium accounts- not for smartphones or
         # other services!

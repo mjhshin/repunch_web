@@ -76,7 +76,9 @@ function validate(which, next) {
 	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
 		        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
 		        <input type="hidden" name="home-url" value="{% url 'public_home' %}" />
-		        <input type="hidden" name="signup2" value="{% url 'public_signup2' %}" />
+		        {# uncomment below when credit card info is brought back on sign up #}
+		        {# also uncomment the parts in signup.js as well #}
+		        {# <input type="hidden" name="signup2" value="{% url 'public_signup2' %}" /> #}
 				
 				    {# currently only supports countries in the US #}
 					<input type="hidden" name="country" id="id_country" value="US" />
@@ -177,10 +179,10 @@ function validate(which, next) {
     style="position:relative;top:7px;margin-right:8px;display:inline-block;"/>
     <div id="dialog-signup-message" 
         style="display:inline-block;position:relative;top:6px;left:10px;width:220px;">
-    Processing your information. Please wait.
+    Processing your information.<br/>Please wait.
     </div>
     <img src="{% static 'public/images/icon_clock-orange.png' %}"
     alt="processing signup form..." id="signing-up-time"
-    style="position:relative;top:-11px;margin-left:70px;display:none;"/>
+    style="position:absolute;top:16px;left:290px;"/>
 </div>
 {% endblock %}

@@ -120,11 +120,132 @@ def password_reset(request):
         request_password_reset(request.POST['forgot-pass-email'])}), 
         content_type="application/json")
         
+@session_comet  
+def sign_up(request):
+    # renders the signup page on GET and returns a json object on POST.
+    data = {'sign_up_nav': True}
+    
+    if request.method == 'POST' or request.is_ajax():
+        # some keys are repeated so must catch this at init
+        store_form = StoreSignUpForm(request.POST)
+        account_form = AccountForm(request.POST)
+        
+        if store_form.is_valid() and account_form.is_valid():
+            postDict = request.POST.dict()
+
+            # create store
+            tz = rputils.get_timezone(request.POST.get("zip"))
+            store = Store(**postDict)
+            store.store_timezone = tz.zone
+            # set defaults for these guys to prevent 
+            # ParseObjects from making parse calls repeatedly
+            store.punches_facebook = 0
+            # format the phone number
+            store.phone_number =\
+                format_phone_number(request.POST['phone_number'])
+            store.set("store_description", "The " + store.store_name)
+            store.set("hours", [])
+            store.set("rewards", [])
+            store.set("categories", [])
+            names = request.POST.get("categories")
+            if names:
+                for name in names.split(",")[:-1]:
+                    alias = Category.objects.filter(name__iexact=\
+                                                    name)
+                    if len(alias) > 0:
+                        alias = alias[0].alias
+                        store.categories.append({
+                            "alias":alias,
+                            "name":name })
+            # coordinates
+            # the call to get map data is actually also in the clean 
+            full_address = " ".join(\
+                store.get_full_address().split(", "))
+            map_data = rputils.get_map_data(full_address)
+            store.set("coordinates", map_data.get("coordinates"))
+            store.set("neighborhood", 
+                store.get_best_fit_neighborhood(\
+                    map_data.get("neighborhood")))
+            
+            # create settings
+            settings = Settings(retailer_pin=\
+                        Settings.generate_id(),
+                        punches_employee=5, Store=store.objectId)
+            store.set('settings', settings)
+
+            # create account
+            account = Account(**postDict)
+            account.account_type = "store"
+            account.set_password(request.POST.get('password'))
+            account.set("store", store)
+
+            # create an empty subscription
+            subscription = Subscription(**postDict)
+            subscription.subscriptionType = 0
+            subscription.date_last_billed = timezone.now()
+            subscription.create()
+
+            # create store
+            store.Subscription = subscription.objectId
+            
+            # finally create everything
+            settings.create()
+            store.Settings = settings.objectId
+            store.create()
+            settings.Store = store.objectId
+            settings.update()
+            account.Store = store.objectId
+            account.create()
+            
+            # update the sub
+            subscription.Store = store.objectId
+            subscription.update()
+            
+            # need to put username and pass in request
+            postDict['username'] = account.username
+            postDict['password'] = account.password
+            
+            ####
+            conn = mail.get_connection(fail_silently=(not DEBUG))
+            
+            # send matt and new user a pretty email.
+            send_email_signup(account)
+            
+            conn.close()
+
+            # auto login
+            user_login = login(request, postDict)
+            if user_login != None:
+                data = {"code":-1}
+                # -1 - invalid request
+                # 0 - invalid form input
+                # 1 - bad login credentials
+                # 2 - subscription is not active
+                # 3 - success (login now)
+                # 4 - go to part 2
+                if type(user_login) is int: # subscription not active
+                    data['code'] = 2
+                else:
+                    # required for datetime awareness!
+                    rputils.set_timezone(request, tz)
+                    data['code'] = 3
+                return HttpResponse(json.dumps(data), 
+                            content_type="application/json")
+           
+    else:
+        store_form = StoreSignUpForm()
+        account_form = AccountForm()
+        
+    data['store_form'] = store_form
+    data['account_form'] = account_form
+    return render(request, 'public/signup.djhtml', data)
+        
+"""
+# DO NOT DELETE THIS! This may be used again when we decide to bring
+back credit card section in the signup process.
 @session_comet
 def sign_up2(request):
-    """
-    Second part of the signup process.
-    """
+    # Second part of the signup process.
     data = {'sign_up_nav': True}
     
     if request.method == 'POST' or request.is_ajax():
@@ -245,9 +366,7 @@ def sign_up2(request):
 
 @session_comet  
 def sign_up(request):
-    """ 
-    renders the signup page on GET and returns a json object on POST.
-    """
+    # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
     
     if request.method == 'POST' or request.is_ajax():
@@ -259,8 +378,7 @@ def sign_up(request):
             postDict = request.POST.dict()
 
             # create store
-            tz = rputils.get_timezone(request.POST.get(\
-                    "store_timezone"))
+            tz = rputils.get_timezone(request.POST.get("zip"))
             store = Store(**postDict)
             store.store_timezone = tz.zone
             # set defaults for these guys to prevent 
@@ -327,4 +445,4 @@ def sign_up(request):
     data['store_form'] = store_form
     data['account_form'] = account_form
     return render(request, 'public/signup.djhtml', data)
-
+"""

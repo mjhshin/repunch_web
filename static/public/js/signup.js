@@ -29,8 +29,8 @@ $(document).ready(function(){
         beforeClose: function(event, ui) { return false; }, 
         title: "Signing up",
         resizable: false,
-        minWidth: 330, minHeight: 100,
-        maxWidth: 330, maxHeight: 100, });
+        minWidth: 330, minHeight: 120,
+        maxWidth: 330, maxHeight: 120, });
 
     var messageContainer = $("#dialog-signup-message");
     $("#signup-form-submit").click(function(){
@@ -49,7 +49,8 @@ $(document).ready(function(){
         var url = $("#signup-form input[name=action]").val();
         var url_redirect = $("#signup-form input[name=redirect-url]").val();
         var url_home = $("#signup-form input[name=home-url]").val();
-        var url_signup2 = $("#signup-form input[name=signup2]").val();
+        // uncomment below when credit card info is brought back on sign up
+        // var url_signup2 = $("#signup-form input[name=signup2]").val();
         
         // need to enable again to serialize
         $("#id_address").attr("disabled", false);
@@ -78,7 +79,7 @@ $(document).ready(function(){
                 if (res.code == 2){
                     // subscription not active. Tell them.
                     $( "#dialog-signup" ).dialog({ 
-                        minHeight: 95, maxHeight: 95,
+                        minHeight: 110, maxHeight: 110,
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
                             window.location.replace(url_home);
@@ -88,7 +89,8 @@ $(document).ready(function(){
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
                 } else if (res.code == 4){
                     // go to part 2
-                    window.location.replace(url_signup2);
+                    // uncomment below when credit card info is brought back on sign up
+                    // window.location.replace(url_signup2);
                 }
                 // active subscription. redirect to dashboard.
                 else if (res.code == 3){
