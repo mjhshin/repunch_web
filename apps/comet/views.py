@@ -455,7 +455,7 @@ def refresh(request):
         try: # attempt to get a used CometSession first
             scomet = CometSession.objects.get(session_key=\
                 request.session.session_key)
-            print str(timezone.now()) + ": Request idling"
+            print str(timezone.now()) + ": Request idling" # TODO REMOVE
             if scomet.modified:
                 scomet.modified = False
                 scomet.save()

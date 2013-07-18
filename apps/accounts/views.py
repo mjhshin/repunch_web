@@ -196,8 +196,9 @@ def update(request):
         form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
-        form.initial['cc_number'] = "*" * 12 +\
-            form.initial.get('cc_number')[-4:]
+        if "cc_number" in form.initial:
+            form.initial['cc_number'] = "*" * 12 +\
+                form.initial.get('cc_number')[-4:]
             
     # update the session cache
     request.session['store'] = store
@@ -285,8 +286,9 @@ def upgrade(request):
         form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
-        form.initial['cc_number'] = "*" * 12 +\
-            form.initial.get('cc_number')[-4:]
+        if "cc_number" in form.initial:
+            form.initial['cc_number'] = "*" * 12 +\
+                form.initial.get('cc_number')[-4:]
             
         from_limit_reached = request.session.get("from_limit_reached")
         if from_limit_reached:
