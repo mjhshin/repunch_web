@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -197,6 +198,7 @@ def hours_preview(request):
     
     
 @login_required
+@csrf_exempt
 def avatar(request):
     data = {}
     store = SESSION.get_store(request.session)
@@ -274,6 +276,7 @@ def get_avatar(request):
         
 
 @login_required
+@csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
             
