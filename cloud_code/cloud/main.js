@@ -1569,11 +1569,11 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 			}
         }, {
 			success: function() {
-				console.log("android push success");
+				console.log("ios push success");
 				response.success("success");
 			},
 			error: function(error) {
-				console.log("android push success");
+				console.log("ios push success");
 				response.error("error");
 			}
 		}); // end Parse.Push
