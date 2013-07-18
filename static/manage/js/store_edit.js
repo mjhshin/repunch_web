@@ -29,13 +29,18 @@ $(document).ready(function(){
 	
 	
 	var form_count = $('#id_hours-TOTAL_FORMS').val();
+	var max_form_count = $("#id_hours-MAX_NUM_FORMS").val();
 	start_count = form_count; //used for sending to server
+	
+	function onAddButton() {
+	    
+	}
 	
 	$('ul.hours-form li.buttons div.add').click(function(event){
 		$this = $(this);
 		
-		// only add up to 7
-		if ($('ul.hours-form').length > 7){
+		// do not allow to add more that the max form count
+		if (form_count >= max_form_count){
 		    return;
 		}
 		
@@ -79,6 +84,8 @@ $(document).ready(function(){
 			}
 			
 			hoursPreview();
+			
+			form_count--;
 		}
 	});
 	
