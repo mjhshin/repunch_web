@@ -196,7 +196,7 @@ def update(request):
         form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
-        if "cc_number" in form.initial:
+        if form.initial.get("cc_number"):
             form.initial['cc_number'] = "*" * 12 +\
                 form.initial.get('cc_number')[-4:]
             
@@ -286,7 +286,7 @@ def upgrade(request):
         form = SubscriptionForm3()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
-        if "cc_number" in form.initial:
+        if form.initial.get("cc_number"):
             form.initial['cc_number'] = "*" * 12 +\
                 form.initial.get('cc_number')[-4:]
             
