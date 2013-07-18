@@ -419,7 +419,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
-				punch_type: "receive_punch"
+				push_type: "receive_punch"
 			}
 		}, {
 			success: function() {
@@ -897,7 +897,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        data: {
 	            title: rewardTitle,
 	            alert: rewardTitle+" was successfully redeemed!",
-	            punch_type: "validate_redeem",
+	            push_type: "validate_redeem",
 	            id: storeId, 
 	            store: store.get("store_name"), 
 	            punches: numPunches,
@@ -1120,7 +1120,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_id: storeId,
                 store_name: storeName,
                 message_id: messageId,
-                punch_type: "receive_message"
+                push_type: "receive_message"
             }, 
 		}, {
 			success: function() {
@@ -1418,6 +1418,27 @@ Parse.Cloud.define("send_gift", function(request, response) {
 				response.error("error");
 			}
 		}); // end Parse.Push
+
+		Parse.Push.send({
+            where: iosInstallationQuery, 
+            data: {
+                alert: "You've received a gift from " + senderName,
+                subject: subject,
+                store_id: storeId,
+                sender: senderName,
+                message_status_id: messageStatus.id,
+                push_type: "receive_gift"
+			}
+        }, {
+			success: function() {
+				console.log("iOS push success");
+				response.success("success");
+			},
+			error: function(error) {
+				console.log("iOS push success");
+				response.error("error");
+			}
+		}); // end Parse.Push
 	}
 });
 
@@ -1535,6 +1556,28 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 				response.error("error");
 			}
 		}); // end Parse.Push
+
+        Parse.Push.send({
+            where: iosInstallationQuery, 
+            data: {
+                alert: "You've received a reply to your gift to " + senderName,
+                subject: "RE: " + subject,
+                store_id: storeId,
+                sender: senderName,
+                message_status_id: messageStatus.id,
+                push_type: "receive_gift_reply"
+			}
+        }, {
+			success: function() {
+				console.log("android push success");
+				response.success("success");
+			},
+			error: function(error) {
+				console.log("android push success");
+				response.error("error");
+			}
+		}); // end Parse.Push
+
 	}
 	
 });
