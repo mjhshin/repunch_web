@@ -43,15 +43,6 @@
 				}
 			});
 			
-			
-			$("#id_image").change(function() {
-			    // comes in as C:\fakepath\image_name.png
-			    var fakePath = $(this).val();
-			    fakePath = fakePath.substring(fakePath.lastIndexOf("\\")+1);
-			    
-			    $("#img_text").text(fakePath);
-		    });
-			
 		    {% if form.errors %}
 		    window.parent.resizeFrame({"height": 180});   
 		    {% endif %}
