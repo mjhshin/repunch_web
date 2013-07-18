@@ -5,7 +5,12 @@
 <head>
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
     <link rel="stylesheet" href="{% static "manage/css/addons/jquery.Jcrop.min.css" %}" type="text/css" />
-	
+	<style>
+	#avatar-crop-form {
+	    padding-left:15px;
+	    padding-top:8px;
+	}
+	</style>
 	{% if success %}
 	<script type="text/javascript">
 		window.parent.avatarCropComplete();
@@ -48,7 +53,7 @@
             
             // resize the dialog
             window.parent.resizeFrame({ "width": {{ avatar.width|add:"34" }},
-                "height": {{ avatar.height|add:"80" }} });           
+                "height": {{ avatar.height|add:"90" }} });           
 		});
 	</script>
 	{% endif %}

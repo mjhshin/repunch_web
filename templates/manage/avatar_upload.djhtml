@@ -4,7 +4,14 @@
 <html>
 <head>
 	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
-	
+	<style>
+	#avatar-form {
+	    padding-left:15px;
+	}
+	#avatar-form input {
+	    width:250px;
+	}
+	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
