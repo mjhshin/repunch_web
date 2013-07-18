@@ -9,7 +9,7 @@
 	    padding-left:15px;
 	}
 	#avatar-form input {
-	    width:250px;
+	    width:250px;padding-top:7px;
 	}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
