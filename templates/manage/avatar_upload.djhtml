@@ -19,8 +19,12 @@
 	    position:relative; top:4px;
 	}
 	#id_image {
-	    height:100%; padding-left:0px;
+	    padding-top:7px; color:transparent;
 	    width:250px;line-height:110%;margin-top:14px;
+	}
+	#img_text {
+	    position:absolute; left:124px;px; top:59px;
+	    font-size: 0.9em; color:#666666;
 	}
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -43,6 +47,15 @@
 				}
 			});
 			
+			
+			$("#id_image").change(function() {
+			    // comes in as C:\fakepath\image_name.png
+			    var fakePath = $(this).val();
+			    fakePath = fakePath.substring(fakePath.lastIndexOf("\\")+1);
+			    
+			    $("#img_text").text(fakePath);
+		    });
+			
 		    {% if form.errors %}
 		    window.parent.resizeFrame({"height": 180});   
 		    {% endif %}
@@ -54,9 +67,10 @@
 	<form action="{{ url }}" method="post" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}
+			<span id="img_text">No file chosen</span>
 		</div>
 		
-		<div id="edit-store-options" class="form-options">
+		<div id="edit-store-options" class="form-options" style="margin-top:16px;">
 			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
 			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
