@@ -124,13 +124,40 @@ def password_reset(request):
 def sign_up(request):
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
+    place_order_checked = False
+    
+    def isdigit(string):
+        # use because "-1".isdigit() is False
+        try:
+            int(string)
+        except:
+            return False
+        else:
+            return True
     
     if request.method == 'POST' or request.is_ajax():
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
+        subscription_form = SubscriptionForm2(request.POST)
         
-        if store_form.is_valid() and account_form.is_valid():
+        all_forms_valid =\
+            store_form.is_valid() and account_form.is_valid()
+        if request.POST.get("place_order"):
+            place_order_checked = True
+            if isdigit(request.POST.get("place_order_amount")):
+                amount = int(request.POST.get("place_order_amount"))
+                if amount > 0:
+                    all_forms_valid = all_forms_valid and\
+                        subscription_form.is_valid()
+                else:
+                    all_forms_valid = False
+                    data["place_order_amount_error"] =\
+                        "Amount must be greater than 0."
+        else:
+            subscription_form = SubscriptionForm2()
+        
+        if all_forms_valid:
             postDict = request.POST.dict()
 
             # create store
@@ -180,10 +207,61 @@ def sign_up(request):
             account.set("store", store)
 
             # create an empty subscription
-            subscription = Subscription(**postDict)
+            if not request.session.get('subscription-tmp'):
+                subscription = Subscription() 
+            else:
+                subscription = request.session.get('subscription-tmp') 
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
-            subscription.create()
+            
+            #### MAIL CONNECTION OPEN
+            conn = mail.get_connection(fail_silently=(not DEBUG))
+            
+            if request.POST.get("place_order"):
+                exp = make_aware_to_utc(datetime(\
+                    int(postDict['date_cc_expiration_year']),
+                    int(postDict['date_cc_expiration_month']), 1), tz)
+                subscription.set("date_cc_expiration", exp)
+                # make sure to use the correct POST info
+                subscription.first_name = request.POST['first_name2']
+                subscription.last_name  = request.POST['last_name2']
+                subscription.city = request.POST['city2']
+                subscription.state = request.POST['state2']
+                subscription.zip = request.POST['zip2']
+                subscription.country = request.POST['country2']
+                amount = int(request.POST.get("place_order_amount"))
+                if not request.session.get('subscription-tmp'):
+                    subscription.create()
+                
+                # set the subscription's store (uppdate called in store_cc
+                subscription.Store = store.objectId
+                try:
+                    subscription.store_cc(subscription_form.data['cc_number'],
+                                    subscription_form.data['cc_cvv'])
+                except Exception as e:
+                    data['store_form'] = StoreSignUpForm(\
+                        request.session['store-tmp'].__dict__.copy())
+                    subscription_form.errors['__all__'] =\
+                        subscription_form.error_class([e])
+                        
+                    # save the created subscription in the session
+                    request.session['subscription-tmp'] = subscription
+                        
+                    data["place_order_checked"] = place_order_checked
+                    data['store_form'] = store_form
+                    data['account_form'] = account_form
+                    data['subscription_form'] = subscription_form
+                    return render(request,'public/signup.djhtml',data)
+                
+                if amount > 0:
+                    invoice = subscription.charge_cc(\
+                        PHONE_COST_UNIT_COST*amount,
+                        "Order placed for " +\
+                        str(amount) + " phones", "smartphone")
+                    send_email_receipt_smartphone(account, invoice, amount)
+            else:
+                if not request.session.get('subscription-tmp'):
+                    subscription.create()
 
             # create store
             store.Subscription = subscription.objectId
@@ -205,12 +283,10 @@ def sign_up(request):
             postDict['username'] = account.username
             postDict['password'] = account.password
             
-            ####
-            conn = mail.get_connection(fail_silently=(not DEBUG))
-            
             # send matt and new user a pretty email.
             send_email_signup(account)
             
+            # MAIL CONNECTION CLOSE
             conn.close()
 
             # auto login
@@ -235,9 +311,12 @@ def sign_up(request):
     else:
         store_form = StoreSignUpForm()
         account_form = AccountForm()
+        subscription_form = SubscriptionForm2()
         
+    data["place_order_checked"] = place_order_checked
     data['store_form'] = store_form
     data['account_form'] = account_form
+    data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)
         
 """
@@ -271,6 +350,9 @@ def sign_up2(request):
                 int(postDict['date_cc_expiration_month']), 1), tz)
             subscription.set("date_cc_expiration", exp)
             subscription.subscriptionType = 0
+            # use date last billed as a flag for the 30 day 
+            # monthly membership renewal (for message sending)
+            subscription.date_last_billed = timezone.now()
             # make sure to use the correct POST info
             subscription.first_name = request.POST['first_name2']
             subscription.last_name  = request.POST['last_name2']
@@ -295,9 +377,6 @@ def sign_up2(request):
             # set the subscription's store (uppdate called in store_cc
             subscription.Store = store.objectId
             try:
-                # use date last billed as a flag for the 30 day 
-                # monthly membership renewal (for message sending)
-                subscription.date_last_billed = timezone.now()
                 subscription.store_cc(subscription_form.data['cc_number'],
                                 subscription_form.data['cc_cvv'])
             except Exception as e:

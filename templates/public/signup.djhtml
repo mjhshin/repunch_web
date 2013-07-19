@@ -20,6 +20,10 @@ $(document).ready(function(){
     $("#Ph1").val(p_num.substring(0,3));
     $("#Ph2").val(p_num.substring(3,6));
     $("#Ph3").val(p_num.substring(6,10));
+    
+    $( ".question_mark" ).tooltip({
+      track: true
+    });
 });
 
 // stolen from http://www.codingforums.com/showthread.php?t=202208
@@ -70,6 +74,12 @@ function validate(which, next) {
 					</div>
 				{% endif %}
 				
+				{% if subscription_form.non_field_errors %}
+	            <div class="notification">
+		            <div>{{ subscription_form.non_field_errors }}</div>
+	            </div>
+	            {% endif %}
+				
 				{# SIGNUP-FORM DIV #}
 				<form id="signup-form">
 				{% csrf_token %}
@@ -112,7 +122,7 @@ function validate(which, next) {
 					
 					<p>Store Data</p>
 					<div id="categories-box" class="ui-widget" >
-                          <label for="categories">Categories (limit of 2)</label>
+                          <label for="categories">Categories <span style="font-size:0.8em;position:relative;top:0px;">(limit of 2)</span></label>
                           <input id="categories" name="categories" />
                     </div>
 					
@@ -135,7 +145,7 @@ function validate(which, next) {
 					<span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
 					    style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
 					    <span style="font-size:22px;position:relative;top:2px;left:2px;margin-right:8px;">)</span>
-                    <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />-
+                    <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />&nbsp;&nbsp;-&nbsp;
                     <input type = "text" id = "Ph3" style="width:70px;" maxlength = "4" onkeyup = "validate(this,3)" />
 					
 					{{ account_form.email.errors }}
@@ -154,6 +164,143 @@ function validate(which, next) {
 					<label for="id_confirm_password">Confirm Password</label>
 					{{ account_form.confirm_password }}					
 					<div class="clear-both"></div>
+					
+					{# NEEDED FOR SAME ADDRESS AS BUSINESS #}
+                    <input type="hidden" id="id_street" 
+                        value="{{ store_form.data.street }}" />
+	                <input type="hidden" id="id_city" 
+	                    value="{{ store_form.data.city }}" />
+	                <input type="hidden" id="id_state" 
+	                    value="{{ store_form.data.state }}" />
+	                <input type="hidden" id="id_zip" 
+	                    value="{{ store_form.data.zip }}" />
+		            
+	            
+				    {# currently only supports countries in the US #}
+					<input type="hidden" name="country" id="id_country" value="US" />
+					
+					<div style="clear: left;"></div>
+					<div class="input-container"
+					        id="place_order_container"
+					        style="margin-bottom: 15px;">
+					    {% if place_order_checked %}
+						<input type="checkbox" name="place_order"
+						        value="yes" id="place_order" checked/>
+				        {% else %}
+						<input type="checkbox" name="place_order"
+						        value="yes" id="place_order" />
+				        {% endif %}
+				        {% if place_order_amount_error %}
+				        <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
+				        {% endif %}
+						<label for="place_order">Order Smartphones
+						    </label>
+					    {% if place_order_checked %}
+						<span id="place_order_span">
+				        {% else %}
+						<span style="display:none;"
+						        id="place_order_span">
+				        {% endif %}
+						        
+						    <label>: amount&nbsp;&nbsp;</label>
+						    <input type="number" min="1"  step="1" 
+						        name="place_order_amount" 
+						        style="width:40px;" value="1" />
+						</span>
+						
+						<img class="question_mark" 
+						    src="{% static 'public/images/question_mark.png' %}" 
+						    style="position:relative;top:4px;left:4px;"
+						    title="You can order smartphones from us. We will charge you $149 for each smartphone.You can order these within the Dashboard at any time." />
+					</div>
+
+                    {# CREDIT CARD SECTION #}
+					{% if place_order_checked %}
+                    <div id="cc_section">
+                    {% else %}
+                    <div id="cc_section" style="display:none;">
+                    {% endif %}
+                    
+					<p>Credit Card Information</p>
+					<div class="floated">
+					{{ subscription_form.first_name2.errors }}
+					<label for="id_first_name2">First Name</label>
+					{{ subscription_form.first_name2 }}
+					</div>
+					
+					<div class="floated">
+					{{ subscription_form.last_name2.errors }}
+					<label for="id_last_name2">Last Name</label>
+					{{ subscription_form.last_name2 }}
+					</div>
+					
+					
+					<div class="clear-both"></div>
+					<div class="input-container" id="card_number_container">
+						{{ subscription_form.cc_number.errors }}
+						<label for="id_card_number" style="clear:left;">Card Number</label>
+						{{ subscription_form.cc_number }}
+						<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
+						<img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
+						<img src="{% static "manage/images/icon_discover.png" %}" alt="Discover" />
+						<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
+					</div>
+					
+					
+					<div class="floated">
+					{{ subscription_form.cc_cvv.errors }}
+					<label for="id_cvc">CVC</label>
+					{{ subscription_form.cc_cvv }}
+					</div>
+				
+					<div class="floated">
+					{{ subscription_form.date_cc_expiration.errors }}
+					<label for="id_expiration_month">Expiration</label>
+					{{ subscription_form.date_cc_expiration }}
+					</div>
+					
+					<div class="clear-both"></div>
+					<p style="display:inline-block">Billing Address</p>
+					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as business address</label>
+					<input type="checkbox" id="same_address" />
+					
+				
+					{{ subscription_form.address.errors }}
+					<label for="id_address">Address</label>
+					{{ subscription_form.address }}
+					
+					
+					<div class="clear-both"></div>
+					<div class="floated">
+						{{ subscription_form.city2.errors }}
+						<label for="id_city2">City</label>
+						{{ subscription_form.city2 }}
+					</div>
+					<div class="floated">					
+						{{ subscription_form.state2.errors }}
+						<label for="id_state2">State</label>
+						{{ subscription_form.state2 }}
+					</div>
+					<div class="floated">
+						{{ subscription_form.zip2.errors }}
+						<label for="id_zip2">Zip</label>
+						{{ subscription_form.zip2 }}
+					</div>
+					<div class="clear-both"></div>
+					
+					<div class="input-container">
+						<label for="id_country2">Country</label>
+						{{ subscription_form.country2 }}
+					</div>
+					
+					</div>
+					{# END CREDIT CARD SECTION #}
+					
+					<div style="clear: left;"></div>
+					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
+						{{ subscription_form.recurring.errors }}
+						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
+					</div>
 					
 					<a class="button orange"
 					    id="signup-form-submit">Create Account</a>

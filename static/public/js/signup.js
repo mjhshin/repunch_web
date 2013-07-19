@@ -85,6 +85,7 @@ $(document).ready(function(){
                             window.location.replace(url_home);
                         } });
                     $("#signing-up-time").show();
+                    messageContainer.css("width", "250px");
                     messageContainer.html("<span style='color:#DF7401;position:relative;top:4px;'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
                 } else if (res.code == 4){

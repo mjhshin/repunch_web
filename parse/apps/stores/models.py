@@ -188,7 +188,7 @@ class Invoice(ParseObject):
                 str(self.payment_id) + "</li>" +\
             "<li><strong>Sale Id:</strong> " + str(self.sale_id) +\
                 "</li>" +\
-            "<li><strong>Total (USD):</strong> " + str(self.total) +\
+            "<li><strong>Total (USD):</strong> $" + str(self.total) +\
                 "</li></ul>"
         
     
