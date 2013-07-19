@@ -5,6 +5,11 @@
 
 {% block styles %}
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
+<style>
+select {
+    margin-top:2px;
+}
+</style>
 {% endblock %}
 
 {% block javascript %}
