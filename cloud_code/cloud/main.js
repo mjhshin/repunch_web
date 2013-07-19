@@ -220,6 +220,69 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
+// 
+// 
+////////////////////////////////////////////////////
+Parse.Cloud.define("delete_patronstore", function(request, response) {
+	var patronStoreId = request.params.patron_store_id;
+    var patronId = request.params.patron_id;
+	var storeId = request.params.store_id;
+	
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	var storeQuery = new Parse.Query(Store);
+	var patronQuery = new Parse.Query(Patron);
+	
+	var patronStore, store, patron;
+	
+	var promises = [];
+	promises.push( patronStoreQuery.get(patronStoreId) );
+	promises.push( storeQuery.get(storeId) );
+	promises.push( patronQuery.get(patronId) );
+	
+	Parse.Promise.when(promises).then(function(patronStoreResult, store, patron) {
+		console.log("PatronStore/Store/Patron fetch success (in parallel).");
+		patronStore = patronStoreResult;
+		
+		store.relation("PatronStores").remove(patronStore);
+		patron.relation("PatronStores").remove(patronStore);
+		
+		var promises2 = [];
+		promises2.push( store.save() );
+		promises2.push( patron.save() );
+		
+		return Parse.Promise.when(promises2);
+
+	}, function(error) {
+		console.log("PatronStore/Store/Patron fetch fail (in parallel).");
+		response.error("error");
+		return;
+		
+	}).then(function() {
+		console.log("Store/Patron save success (in parallel).");
+		return patronStore.destroy();
+
+	}, function(error) {
+		console.log("Store/Patron save fail (in parallel).");
+		response.error("error");
+		return;
+		
+	}).then(function() {
+		console.log("PatronStore delete success.");
+		response.success("success");
+
+	}, function(error) {
+		console.log("PatronStore delete fail.");
+		response.error("error");
+		return;
+	});
+});
+
+////////////////////////////////////////////////////
+//
 //
 //
 ////////////////////////////////////////////////////
@@ -819,7 +882,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		
 		if(patronStore == null) {
 			console.log("PatronStore is null.");
-			response.error("error");
+			response.success("removed");
 			
 		} else if(redeemReward.get("is_redeemed") == true) {
 			console.log("RedeemReward has already been validated");

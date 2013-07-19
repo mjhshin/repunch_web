@@ -32,8 +32,9 @@ $(document).ready(function(){
 	var max_form_count = $("#id_hours-MAX_NUM_FORMS").val();
 	start_count = form_count; //used for sending to server
 	
-	function onAddButton() {
-	    
+	// may initially be 0
+	if (form_count < 1) {
+	    form_count = 1;
 	}
 	
 	$('ul.hours-form li.buttons div.add').click(function(event){
