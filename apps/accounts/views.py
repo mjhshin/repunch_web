@@ -178,7 +178,8 @@ def update(request):
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
                 if amount > 0:
-                    send_email_receipt_smartphone(account, invoice, amount) 
+                    send_email_receipt_smartphone(account, 
+                        subscription, invoice, amount) 
             
             # update the session cache
             request.session['store'] = store
@@ -260,7 +261,8 @@ def upgrade(request):
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
                 if amount > 0:
-                    send_email_receipt_smartphone(account, invoice, amount)
+                    send_email_receipt_smartphone(account, 
+                        subscription, invoice, amount)
                     
             # update the session cache
             request.session['store'] = store

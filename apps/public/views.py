@@ -261,10 +261,10 @@ def sign_up(request):
                 amount = int(request.POST.get("place_order_amount"))
                 if not request.session.get('subscription-tmp-objectId'):
                     subscription.create()
-                    
                 try:
-                    subscription.store_cc(subscription_form.data['cc_number'],
-                                    subscription_form.data['cc_cvv'])
+                    subscription.store_cc(\
+                        subscription_form.data['cc_number'],
+                        subscription_form.data['cc_cvv'])
                 except Exception as e:
                     data['store_form'] = StoreSignUpForm(\
                         request.session['store-tmp'].__dict__.copy())
@@ -292,10 +292,20 @@ def sign_up(request):
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
                         str(amount) + " phones", "smartphone")
-                    send_email_receipt_smartphone(account, invoice, amount)
+                    send_email_receipt_smartphone(account, 
+                        subscription, invoice, amount)
             else:
+                # set the subscription fields back to empty!
+                subscription = Subscription()
+                subscription.Store = store.objectId 
+                subscription.subscriptionType = 0
+                subscription.date_last_billed = timezone.now()
                 if not request.session.get('subscription-tmp-objectId'):
                     subscription.create()
+                else:
+                    subscription.objectId = request.session.get(\
+                        'subscription-tmp-objectId')
+                    subscription.update()
             
             # update the store with a pointer to the subscription
             store.set("Subscription", subscription.objectId)
@@ -425,7 +435,7 @@ def sign_up2(request):
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
                         str(amount) + " phones", "smartphone")
-                    send_email_receipt_smartphone(account, invoice, amount)
+                    send_email_receipt_smartphone(account, subscription, invoice, amount)
             
             # send matt and new user a pretty email.
             send_email_signup(account)

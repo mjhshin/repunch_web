@@ -101,7 +101,8 @@ def send_email_receipt_monthly(asiss, connection=None):
     
     _send_emails(emails, connection)
 
-def send_email_receipt_smartphone(account, invoice, amount, connection=None):
+def send_email_receipt_smartphone(account, subscription, invoice,
+    amount, connection=None):
     """
     Sends the user and admins pretty receipt.
     """
@@ -132,9 +133,11 @@ def send_email_receipt_smartphone(account, invoice, amount, connection=None):
     ctx = get_notification_ctx()
     ctx.update({
             'account': account,
+            'subscription': subscription,
             'store': store,
             'amount': amount,
             'invoice': invoice,
+            'sub_type': sub_type,
             'for_customer': False})
     body = template.render(Context(ctx)).__str__()
     email = mail.EmailMultiAlternatives(subject,

@@ -53,7 +53,11 @@ Here is your receipt for your recent purchase of smartphones.
     {{ store|get:"phone_number" }}
     </li>
     <li><strong>Subscription Type:</strong>
-    {{ sub_type }}
+    {% for key, val in sub_type.iteritems %}
+    {% if key == subscription.subscriptionType %}
+    {{ val.name }}
+    {% endif %}
+    {% endfor %}
     </li>
 </ul>
 <strong>PAYPAL INVOICE</strong>
