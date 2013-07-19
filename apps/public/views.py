@@ -208,7 +208,7 @@ def sign_up(request):
 
             # create an empty subscription
             if not request.session.get('subscription-tmp'):
-                subscription = Subscription() 
+                subscription = Subscription(**postDict) 
             else:
                 subscription = request.session.get('subscription-tmp') 
             subscription.subscriptionType = 0
