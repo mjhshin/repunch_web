@@ -30,9 +30,21 @@ $(document).ready(function() {
 {% with store=request.session.store %}
 	<!-- possibly move to header -->
 	{% account_alert request.session as alert %}
-	{% if alert %}
+	{% if alert > 0 %}
 	<div class="notification">
-		<div>Alert! You are reaching your subscription max.</div>
+	    <div>
+	    {% if alert == 1 and not request.session.subscription.pp_cc_id %}
+	        ALERT! You have passed your maximum number users.
+	        Please update your account info for continued service.
+	    {% else %}
+		    WARNING! Your are reaching your maximum number of users.
+		    {% if request.session.subscription.pp_cc_id %}
+		    Your account will automatically be upgraded once you've passed your limit.
+		    {% else %}
+		    Please update your account info for continued service.
+		    {% endif %}
+	    {% endif %}
+		</div>
 	</div>
 	{% endif %}
 	{% if error or success %}

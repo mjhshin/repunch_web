@@ -402,13 +402,27 @@ def refresh(request):
         #############################################################
         # PATRONSTORE_COUNT ##################################
         patronStore_count_new = session.get('patronStore_num')
+        patronStore_count_new = int(patronStore_count_new)
         if patronStore_count_new:
-            # TODO patronStore_num > store limit then upgrade account
-            # and send email notification make sure to update the
-            # subscription in the cache afterwards!
             data['patronStore_count'] = patronStore_count_new
             session['patronStore_count'] = patronStore_count_new
             del session['patronStore_num']
+            """ Done in an daily cron job!
+            # flag the emailing sequence patronStore_num > store limit
+            sub = session['subscription']
+            # subscriptionType 2 is highest sub, 0 free
+            if sub.get("subscriptionType") != 2 and\
+                not sub.get("date_passed_user_limit"):
+                # now check if we passed the user limit for the sub
+                user_limit =\
+                    sub_type[sub.get("subscriptionType")]['max_users']
+                if patronStore_count_new > user_limit:
+                    sub.set("date_passed_user_limit",
+                        timezone.now())
+                    sub.update()
+                    
+            session['subscription'] = sub
+            """
 
         # IMPORTANT! The request.session is the same as the 
         # SessionStore(session_key)! so we must use the 

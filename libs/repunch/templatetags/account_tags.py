@@ -37,11 +37,15 @@ def account_alert(session):
     num_patrons = SESSION.get_patronStore_count(session)
         
     # may cause division by 0!!!
-    percent = num_patrons / atype['max_users']
+    percent = float(num_patrons) / float(atype['max_users'])
     
     #if they are at 80 percent of their users, alert
-    return (percent >= .8)
-
+    if percent >= .8:
+        return 1
+    elif percent >= 1.0:
+        return 2
+    return 0
+        
 @register.simple_tag
 def account_message_usage(session, percent_of=None):
     atype = sub_type[SESSION.get_subscription(\

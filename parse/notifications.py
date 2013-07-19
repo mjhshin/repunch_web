@@ -225,6 +225,38 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
     _send_emails(emails, connection)
     
     
+def send_email_passed_user_limit(account, store, package,
+        connection=None):
+    """
+    Used by management command passed_user_limit.
+    """
+    # need to activate the store's timezone for template rendering!
+    timezone.activate(pytz.timezone(store.store_timezone))
+    
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-passed-user-limit.html",
+            'r') as f:
+        template = Template(f.read())
+        
+    subject = "Repunch Inc. Alert. Your store, " +\
+        store.get("store_name") + " has passed the user limit."
+    ctx = get_notification_ctx()
+    ctx.update({'store':store, 'package':start})
+    body = template.render(Context(ctx)).__str__()
+    emails = []
+    
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=[account.get('email')])
+    email.attach_alternative(body, 'text/html')
+    emails.append(email)
+    
+    _send_emails(emails, connection)
+    
+   
+   
+   
+   
+   
     
     
     

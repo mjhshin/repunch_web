@@ -65,7 +65,7 @@
 					<a href="{% url 'store_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
 						<span class="nav-item-title">My Account</span>
-						{% if alert %}
+						{% if alert != 0 %}
 						<div class="nav-item-badge">!</div>
 						{% endif %}
 					</a>
