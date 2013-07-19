@@ -207,24 +207,43 @@ def sign_up(request):
             account.set("store", store)
 
             # create an empty subscription
-            if not request.session.get('subscription-tmp'):
-                subscription = Subscription(**postDict) 
-            else:
-                subscription = request.session.get('subscription-tmp') 
+            subscription = Subscription(**postDict) 
+            if request.session.get('subscription-tmp-objectId'):
+                subscription.objectId =\
+                    request.session.get('subscription-tmp-objectId')
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
             
             #### MAIL CONNECTION OPEN
             conn = mail.get_connection(fail_silently=(not DEBUG))
             
-            # finally create everything
-            settings.create()
+            # create/update settings
+            if request.session.get("settings-tmp-objectId"):
+                settings.objectId =\
+                    request.session.get("settings-tmp-objectId")
+                settings.update()
+            else:
+                settings.create()
+                
+            # create/update store
             store.Settings = settings.objectId
-            store.create()
+            if request.session.get("store-tmp-objectId"):
+                store.objectId =\
+                    request.session.get("store-tmp-objectId")
+                store.update()
+            else:
+                store.create()
             settings.Store = store.objectId
             settings.update()
+            
+            # create/update account
             account.Store = store.objectId
-            account.create()
+            if request.session.get("account-tmp-objectId"):
+                account.objectId =\
+                    request.session.get("account-tmp-objectId")
+                account.update()
+            else:
+                account.create()
             
             subscription.Store = store.objectId
             if request.POST.get("place_order"):
@@ -240,7 +259,7 @@ def sign_up(request):
                 subscription.zip = request.POST['zip2']
                 subscription.country = request.POST['country2']
                 amount = int(request.POST.get("place_order_amount"))
-                if not request.session.get('subscription-tmp'):
+                if not request.session.get('subscription-tmp-objectId'):
                     subscription.create()
                     
                 try:
@@ -252,8 +271,15 @@ def sign_up(request):
                     subscription_form.errors['__all__'] =\
                         subscription_form.error_class([e])
                         
-                    # save the created subscription in the session
-                    request.session['subscription-tmp'] = subscription
+                    # save the objectIds in the session
+                    request.session['subscription-tmp-objectId'] =\
+                        subscription.objectId
+                    request.session['account-tmp-objectId'] =\
+                        account.objectId
+                    request.session['store-tmp-objectId'] =\
+                        store.objectId
+                    request.session['settings-tmp-objectId'] =\
+                        settings.objectId
                         
                     data["place_order_checked"] = place_order_checked
                     data['store_form'] = store_form
@@ -268,7 +294,7 @@ def sign_up(request):
                         str(amount) + " phones", "smartphone")
                     send_email_receipt_smartphone(account, invoice, amount)
             else:
-                if not request.session.get('subscription-tmp'):
+                if not request.session.get('subscription-tmp-objectId'):
                     subscription.create()
             
             # update the store with a pointer to the subscription
