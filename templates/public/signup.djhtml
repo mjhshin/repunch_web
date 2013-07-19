@@ -168,18 +168,7 @@ function validate(which, next) {
 					{{ account_form.confirm_password.errors }}
 					<label for="id_confirm_password">Confirm Password</label>
 					{{ account_form.confirm_password }}					
-					<div class="clear-both"></div>
-					
-					{# NEEDED FOR SAME ADDRESS AS BUSINESS #}
-                    <input type="hidden" id="id_street" 
-                        value="{{ store_form.data.street }}" />
-	                <input type="hidden" id="id_city" 
-	                    value="{{ store_form.data.city }}" />
-	                <input type="hidden" id="id_state" 
-	                    value="{{ store_form.data.state }}" />
-	                <input type="hidden" id="id_zip" 
-	                    value="{{ store_form.data.zip }}" />
-		            
+					<div class="clear-both"></div>		            
 	            
 				    {# currently only supports countries in the US #}
 					<input type="hidden" name="country" id="id_country" value="US" />

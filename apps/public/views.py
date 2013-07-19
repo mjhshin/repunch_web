@@ -217,6 +217,16 @@ def sign_up(request):
             #### MAIL CONNECTION OPEN
             conn = mail.get_connection(fail_silently=(not DEBUG))
             
+            # finally create everything
+            settings.create()
+            store.Settings = settings.objectId
+            store.create()
+            settings.Store = store.objectId
+            settings.update()
+            account.Store = store.objectId
+            account.create()
+            
+            subscription.Store = store.objectId
             if request.POST.get("place_order"):
                 exp = make_aware_to_utc(datetime(\
                     int(postDict['date_cc_expiration_year']),
@@ -232,9 +242,7 @@ def sign_up(request):
                 amount = int(request.POST.get("place_order_amount"))
                 if not request.session.get('subscription-tmp'):
                     subscription.create()
-                
-                # set the subscription's store (uppdate called in store_cc
-                subscription.Store = store.objectId
+                    
                 try:
                     subscription.store_cc(subscription_form.data['cc_number'],
                                     subscription_form.data['cc_cvv'])
@@ -262,22 +270,10 @@ def sign_up(request):
             else:
                 if not request.session.get('subscription-tmp'):
                     subscription.create()
-
-            # create store
-            store.Subscription = subscription.objectId
             
-            # finally create everything
-            settings.create()
-            store.Settings = settings.objectId
-            store.create()
-            settings.Store = store.objectId
-            settings.update()
-            account.Store = store.objectId
-            account.create()
-            
-            # update the sub
-            subscription.Store = store.objectId
-            subscription.update()
+            # update the store with a pointer to the subscription
+            store.set("Subscription", subscription.objectId)
+            store.update()
             
             # need to put username and pass in request
             postDict['username'] = account.username
