@@ -20,7 +20,8 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.notifications import send_email_passed_user_limit
 from parse.apps.accounts import sub_type
 from parse.apps.accounts.models import Account
-from repunch.settings import COMET_REQUEST_RECEIVE
+from repunch.settings import COMET_REQUEST_RECEIVE,\
+USER_LIMIT_PASSED_DISABLE_DAYS
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -45,7 +46,7 @@ class Command(BaseCommand):
         #### SUB_TYPE 0
         ## 1st day
         for sub in Subscription.objects().filter(\
-            subscriptionType=0, limit=900, 
+            subscriptionType=0, limit=900, include="Store", 
             date_passed_user_limit__lte=day1_end,
             date_passed_user_limit__gte=day1_start):
             # with pp_cc_id
@@ -54,14 +55,34 @@ class Command(BaseCommand):
                 sub.date_passed_user_limit = None
                 sub.update()
                 # notify the dashboards of these changes
-                payload={"updatedSubscription_one":\
-                    subscription.jsonify()}
+                payload={"updatedSubscription_one": sub.jsonify()}
                 requests.post(COMET_REQUEST_RECEIVE + sub.Store,
                     data=json.dumps(payload))
+                package = {
+                    "status": "upgraded",
+                    "sub_type": sub_type[0]["name"],
+                    "new_sub_type": sub_type[1]["name"],
+                    "new_sub_type_cost": sub_type[1]["monthly_cost"],
+                    "new_max_patronStore_count":\
+                        sub_type[1]["max_users"], 
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                }
                 send_email_passed_user_limit(Account.objects().get(\
-                    Store=sub.Store), sub.get("store"), 
+                    Store=sub.Store), sub.store, package, conn)
             # no pp_cc_id
             else:
+                package = {
+                    "sub_type": sub_type[0]["name"],
+                    "max_patronStore_count": sub_type[0]["max_users"],
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                    "disable_date": sub.date_passed_user_limit + 
+                        relativedelta(days=\
+                            USER_LIMIT_PASSED_DISABLE_DAYS),
+                }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
         
         ## 4th day
         ## 8th day
@@ -72,9 +93,43 @@ class Command(BaseCommand):
         
         #### SUB_TYPE 1
         ## 1st day
-        # with pp_cc_id
-        
-        # no pp_cc_id
+        for sub in Subscription.objects().filter(\
+            subscriptionType=1, limit=900, include="Store", 
+            date_passed_user_limit__lte=day1_end,
+            date_passed_user_limit__gte=day1_start):
+            # with pp_cc_id
+            if sub.pp_cc_id:
+                sub.subscriptionType = 2
+                sub.date_passed_user_limit = None
+                sub.update()
+                # notify the dashboards of these changes
+                payload={"updatedSubscription_one": sub.jsonify()}
+                requests.post(COMET_REQUEST_RECEIVE + sub.Store,
+                    data=json.dumps(payload))
+                package = {
+                    "status": "upgraded",
+                    "sub_type": sub_type[1]["name"],
+                    "new_sub_type": sub_type[2]["name"],
+                    "new_sub_type_cost": sub_type[2]["monthly_cost"],
+                    "new_max_patronStore_count": "UNLIMITED",
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
+            # no pp_cc_id
+            else:
+                package = {
+                    "sub_type": sub_type[1]["name"],
+                    "max_patronStore_count": sub_type[1]["max_users"],
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                    "disable_date": sub.date_passed_user_limit + 
+                        relativedelta(days=\
+                            USER_LIMIT_PASSED_DISABLE_DAYS),
+                }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
         
         
         ## 4th day

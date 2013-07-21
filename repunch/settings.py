@@ -207,9 +207,12 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
+# order placed on smartphones
 PHONE_COST_UNIT_COST = 149
+# paginator
 PAGINATION_THRESHOLD = 20
-AUTH_USER_MODEL = 'accounts.Account'
+# days given before account is disabled when passed user limit
+USER_LIMIT_PASSED_DISABLE_DAYS = 14
 
 # SESSION POLICIES
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
