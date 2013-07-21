@@ -215,7 +215,8 @@ def punches(request, employee_id):
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
      
-    ps = employee.get('punches', order=order_by)
+    # TODO limit of 200 applies
+    ps = employee.get('punches', order=order_by, limit=200)
     if not ps:
         ps = []
     paginator = Paginator(ps, 12)

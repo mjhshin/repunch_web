@@ -9,7 +9,7 @@ Your store, {{ store.store_name }}, has passed the user limit of your current su
 Hey {{ store.get_owner_fullname }},
 </p>
 
-{% if package.upgraded %}
+{% if package.status == 'upgraded' %}
 
 <p>
 We have upgraded your account from {{ package.sub_type }} to {{ package.new_sub_type }}.
@@ -20,6 +20,13 @@ We have upgraded your account from {{ package.sub_type }} to {{ package.new_sub_
 <strong>New maximum number of users:</strong> {{ package.max_patronStore_count }}<br/>
 <strong>Subscription type:</strong> {{ package.sub_type }}<br/>
 <strong>Monthly cost:</strong> {{ package.sub_type_cost }}
+</p>
+
+{% elif package.status == 'disabled' %}
+
+<p>
+Your account has been disabled.<br/>
+Please contact us at <a href="mailto:{{EMAIL_HOST_USER}}" style="color:#ccc;">{{EMAIL_HOST_USER}}</a> to enable your account.
 </p>
 
 {% else %}

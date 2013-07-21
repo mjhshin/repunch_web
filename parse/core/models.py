@@ -293,9 +293,18 @@ class ParseObject(object):
                 (key not in self.__dict__ and not create):
                 continue
 
-            # Pointers attrs- store only the objectId
+            # Pointers attrs- store the objectId and create cache
+            # attr if whole data is included
             if key[0].isupper() and type(value) is dict:
                 setattr(self, key, value.get('objectId'))
+                if not str(value.get("__type")) == "Pointer":
+                    # if pointer meta exist then use it
+                    if "_" + key.lower() in self.__dict__:
+                        className = self.__dict__["_" + attr.lower()]
+                    else:
+                        className = key
+                    setattr(self, key[0].lower() + key[1:], 
+                        self.get_class(className)(**value))
             # image file type
             elif key.endswith("_avatar") and type(value) is dict: 
                 setattr(self, key, value.get('name'))

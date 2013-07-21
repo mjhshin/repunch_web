@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}
+{% load static %}{% load account_tags %}
 
 {% block title %}Account Upgrade{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/upgradeaccount.css" %}" />{% endblock %}
@@ -37,6 +37,9 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block content %}
+
+	{% account_alert request.session as alert %}
+	
 	{% if error or success %}
 	<div class="notification {% if success %}success{% endif %} hide">
 		<div>{{ error }}{{ success }}</div>
@@ -50,6 +53,10 @@ $(document).ready(function(){
 	{% if from_limit_reached %}
     <div class="notification">
 		<div>Your message will be sent after you succesfully upgrade your account.</div>
+	</div>
+	{% elif alert == 2 %}
+    <div class="notification">
+		<div>You have passed your user limit. Your account will be upgrade once you update your account with valid credit card info.</div>
 	</div>
 	{% endif %}
 	

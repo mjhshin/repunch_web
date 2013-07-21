@@ -33,9 +33,14 @@ $(document).ready(function() {
 	{% if alert > 0 %}
 	<div class="notification">
 	    <div>
-	    {% if alert == 1 and not request.session.subscription.pp_cc_id %}
+	    {% if alert == 2  %}
 	        ALERT! You have passed your maximum number users.
+	        {% if request.session.subscription.pp_cc_id %}
+	        Your account will be upgraded later today.
+	        {% else %}
 	        Please update your account info for continued service.
+	        {% endif %}
+	        
 	    {% else %}
 		    WARNING! Your are reaching your maximum number of users.
 		    {% if request.session.subscription.pp_cc_id %}
