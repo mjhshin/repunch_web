@@ -44,7 +44,8 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             
         punch_map = {}
         punches = store.get('punches', createdAt__lte=end_aware,
-                    createdAt__gte=start_aware,order='createdAt')
+                    createdAt__gte=start_aware,order='createdAt',
+                    limit=900)
         # have to clear the cache attr
         store.punches = None
         
@@ -79,7 +80,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
             
         post_map = {}
         posts = store.get("facebookPosts", createdAt__lte=end,
-                    createdAt__gte=start)
+                    createdAt__gte=start, limit=900)
         store.facebookPosts = None
         #create dictionary for easy search
         if posts:

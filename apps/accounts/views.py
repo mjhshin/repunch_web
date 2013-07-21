@@ -180,6 +180,8 @@ def update(request):
                 if amount > 0:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount) 
+                        
+            # TODO upgrade account if date_passed_user_limit is on
             
             # update the session cache
             request.session['store'] = store

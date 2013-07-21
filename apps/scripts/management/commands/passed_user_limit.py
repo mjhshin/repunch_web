@@ -22,6 +22,7 @@ from parse.apps.accounts import sub_type
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        # TODO there is a limit of 900 on queries
         conn = mail.get_connection(fail_silently=(not DEBUG))
         conn.open()
         now = timezone.now()
@@ -38,18 +39,39 @@ class Command(BaseCommand):
         day14_end = now + relativedelta(days=-14)
         day14_start = day14_end + relativedelta(hours=-24)
         
-        ## SUB_TYPE 0
-        # 1st day
-        # 4th day
-        # 8th day
-        # 14th day
+        #### SUB_TYPE 0
+        ## 1st day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=0, limit=900, 
+            date_passed_user_limit__lte=day1_end,
+            date_passed_user_limit__gte=day1_start):
+            # with pp_cc_id
+            
+            # no pp_cc_id
+        
+        ## 4th day
+        ## 8th day
         
         
-        ## SUB_TYPE 1
-        # 1st day
-        # 4th day
-        # 8th day
-        # 14th day
+        ## 14th day
+        
+        
+        
+        
+        #### SUB_TYPE 1
+        ## 1st day
+        # with pp_cc_id
+        
+        # no pp_cc_id
+        
+        
+        ## 4th day
+        
+        
+        ## 8th day
+        
+        
+        ## 14th day
         
         
         
