@@ -10,5 +10,12 @@ class CometSession(models.Model):
     """
     # this is the request.session.session_key!
     session_key = models.CharField(max_length=70, primary_key=True)
+    # hours:minutes:seconds e.g. 08:07:21
+    timestamp = models.CharField(max_length=8)
+    
     store_id = models.CharField(max_length=20)
     modified = models.BooleanField(default=False)
+    
+    
+    class Meta:
+        unique_together = (("session_key", "timestamp"),)

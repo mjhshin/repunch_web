@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from time import sleep
+from dateutil import parser
 import json, socket, thread
 
 from libs.dateutil.relativedelta import relativedelta
@@ -76,7 +77,7 @@ def refresh(request):
                 
             session['messages_received_list'] =\
                 messages_received_list
-            del session['newFeedback']
+            session['newFeedback'] = None
 
         #############################################################
         # FEEDBACK DELETED ##################################
@@ -90,7 +91,7 @@ def refresh(request):
                         break
             session['messages_received_list'] =\
                 messages_received_list
-            del session['deletedFeedback']     
+            session['deletedFeedback'] = None
             
             
         #############################################################
@@ -121,7 +122,7 @@ def refresh(request):
             session['messages_received_list'] =\
                 messages_received_list
             session['messages_sent_list'] = messages_sent_list
-            del session['newMessage']
+            session['newMessage'] = None
           
         
         #############################################################
@@ -148,7 +149,7 @@ def refresh(request):
                 
             session['employees_pending_list'] =\
                 employees_pending_list
-            del session['pendingEmployee']
+            session['pendingEmployee'] = None
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
@@ -177,7 +178,7 @@ def refresh(request):
                 employees_pending_list
             session['employees_approved_list'] =\
                 employees_approved_list
-            del session['approvedEmployee']
+            session['approvedEmployee'] = None
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
@@ -214,7 +215,7 @@ def refresh(request):
                 employees_approved_list
             session['employees_pending_list'] =\
                 employees_pending_list
-            del session['deletedEmployee']
+            session['deletedEmployee'] = None
          
         #############################################################           
         # EMPLOYEE UPDATED PUNCHES
@@ -227,7 +228,7 @@ def refresh(request):
                         emp.set("lifetime_punches",
                             u_emp.lifetime_punches)
                         break
-            del session['updatedEmployeePunch']
+            session['updatedEmployeePunch'] = None
            
         #############################################################
         # REDEMPTIONS PENDING
@@ -254,7 +255,7 @@ def refresh(request):
                 
             session['redemptions_pending'] =\
                 redemptions_pending
-            del session['pendingRedemption']
+            session['pendingRedemption'] = None
             
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
@@ -282,7 +283,7 @@ def refresh(request):
                 redemptions_pending
             session['redemptions_past'] =\
                 redemptions_past
-            del session['approvedRedemption']
+            session['approvedRedemption'] = None
             
         #############################################################
         # REDEMPTIONS DELETED ##############################
@@ -304,14 +305,14 @@ def refresh(request):
                 
             session['redemptions_pending'] =\
                 redemptions_pending
-            del session['deletedRedemption']
+            session['deletedRedemption'] = None
                
         #############################################################
         # STORE UPDATED ##############################
         updatedStore = session.get("updatedStore_one")
         if updatedStore:
             session['store'] = Store(**updatedStore)
-            del session["updatedStore_one"]
+            session["updatedStore_one"] = None
             
         #############################################################
         # SUBSCRIPTION UPDATED ##############################
@@ -323,7 +324,7 @@ def refresh(request):
             store.set('Subscription', subscription.objectId)
             session['subscription'] = subscription
             session['store'] = store
-            del session["updatedSubscription_one"]
+            session["updatedSubscription_one"] = None
             
         #############################################################
         # SETTINGS UPDATED ##############################
@@ -336,7 +337,7 @@ def refresh(request):
             session['settings'] = settings
             session['store'] = store
             data['retailer_pin'] = settings.get("retailer_pin")
-            del session["updatedSettings_one"]
+            session["updatedSettings_one"] = None
             
         #############################################################
         # REWARDS NEW ##############################
@@ -350,7 +351,7 @@ def refresh(request):
                     rewards.append(reward)
             store.rewards = rewards
             session['store'] = store
-            del session['newReward']
+            session['newReward'] = None
         
         #############################################################
         # REWARDS UPDATED ##############################
@@ -380,7 +381,7 @@ def refresh(request):
             data['rewards'] = updated_rewards
             store.rewards = mod_rewards
             session['store'] = store
-            del session['updatedReward'] 
+            session['updatedReward'] = None
             
         #############################################################
         # REWARDS DELETED ##############################
@@ -397,7 +398,7 @@ def refresh(request):
                             break
             store.rewards = rewards
             session['store'] = store
-            del session['deletedReward']
+            session['deletedReward'] = None
            
         #############################################################
         # PATRONSTORE_COUNT ##################################
@@ -406,7 +407,7 @@ def refresh(request):
             patronStore_count_new = int(patronStore_count_new)
             data['patronStore_count'] = patronStore_count_new
             session['patronStore_count'] = patronStore_count_new
-            del session['patronStore_num']
+            session['patronStore_num'] = None
             """ Done in an daily cron job!
             # flag the emailing sequence patronStore_num > store limit
             sub = session['subscription']
@@ -429,7 +430,8 @@ def refresh(request):
         # request.session because it is automatically saved at the end
         # of each request- thereby overriding/undoing any changes made
         # to the SessionStore(session_key) key!
-        request.session.update(session)
+        request.session.update(\
+            SessionStore(request.session.session_key))
         
         try: # respond
             return HttpResponse(json.dumps(data), 
@@ -437,81 +439,83 @@ def refresh(request):
         except (IOError, socket.error) as e: # broken pipe/socket. 
             thread.exit() # exit silently
             
-            
-    # all requests that are still running will die here within
-    # COMET_DIE_TIME after the most recent comet_time
-    # make sure to load most up to date session data!
-    session = SessionStore(request.session.session_key)
+    # get the timestamp
+    t = parser.parse(request.GET["timestamp"])
+    timestamp = str(t.hour).zfill(2) + ":" +\
+        str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
+        
+    # register the comet session
+    CometSession.objects.update()
+    CometSession.objects.create(session_key=\
+        request.session.session_key, timestamp=timestamp,
+        store_id=request.session['store'].objectId)
     
-    # cache was cleared - logged out - exit silently
-    if "comet_time" not in session:
-        thread.exit()
+    # cache the current session at this state
+    session_copy = request.session.copy()
+    comet_time = session_copy['comet_time']
+    timeout_time = comet_time + relativedelta(seconds=REQUEST_TIMEOUT)
     
-    timeout_time = session['comet_time'] +\
-        relativedelta(seconds=REQUEST_TIMEOUT)
-        
-    while timezone.now() < timeout_time: 
-        session = SessionStore(request.session.session_key)
-        
-        if "comet_die_time" not in session:
-            thread.exit()
-        
-        if timezone.now() < session['comet_die_time']:
+    # keep going until its time to return a response forcibly
+    while timezone.now() < timeout_time:  
+        # need to update he objects manager to get the latest objects
+        CometSession.objects.update() 
+        try:     
+            scomet = CometSession.objects.get(session_key=\
+                request.session.session_key,timestamp=timestamp):
+        except CometSession.DoesNotExist:
+            # cometsession was deleted - time to go
             try:
+                # make sure that the latest session is saved!
+                request.session.update(\
+                    SessionStore(request.session.session_key))
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
-            except (IOError, socket.error) as e: # broken pipe/socket. 
-                thread.exit() # exit silently
-        
-        # must update the objects in the object manager!
-        CometSession.objects.update()
-        # the above is different from SESSION_KEY (which is not unique)
-        try: # attempt to get a used CometSession first
-            scomet = CometSession.objects.get(session_key=\
-                request.session.session_key)
-            print str(timezone.now()) + ": Request idling" # TODO REMOVE
-            if scomet.modified:
-                scomet.modified = False
-                scomet.save()
-                session = SessionStore(request.session.session_key)
-                session['comet_time'] = timezone.now()
-                return comet(session)
-            else: # nothing new, sleep for a bit
-                sleep(COMET_REFRESH_RATE)
-                            
-        except CometSession.DoesNotExist:
-            session = SessionStore(request.session.session_key)
-            # this should have been created at login!
-            scomet = CometSession.objects.create(session_key=\
-                    request.session.session_key,
-                    store_id=SESSION.get_store(\
-                    session).objectId)
-            
-            session = SessionStore(request.session.session_key)
-            session['comet_time'] = timezone.now()
+            except (IOError, socket.error) as e: 
+                thread.exit() 
+                
+        if scomet.modified:
+            # delete the registered comet session object
+            CometSession.objects.update()
+            try:
+                scomet = CometSession.objects.get(session_key=\
+                    request.session.session_key, timestamp=timestamp)
+                scomet.delete()
+            except CometSession.DoesNotExist:
+                pass # do nothing
             return comet(session)
-        
-    # the session in request.session will get save!
+        else: # nothing new, sleep for a bit
+            sleep(COMET_REFRESH_RATE)
+            
+    # TIME IS UP - return a response result 0 means no change 
+            
+    # make sure that request.session is the most up to date
     session = SessionStore(request.session.session_key)
-    
-    if 'comet_time' not in session:
-        thread.exit()
-    
-    prev_comet_time = session['comet_time']
-    session['comet_time'] = timezone.now()
     request.session.update(session)
+    
     try:
-        # time is up - return a response result 0 means no change 
         return HttpResponse(json.dumps({"result":0}), 
                         content_type="application/json")
     except (IOError, socket.error) as e:
-        # timeout time but page that launched this thread is dead
-        # roll back the comet_time
-        session['comet_time'] = prev_comet_time
-        session.save()
-        # just in casse the session is still saved after exiting
-        request.session.update(session)
         thread.exit() # exit silently
+        
+@login_required
+def terminate(request):
+    """
+    Flags the looping thread in refresh view to exit.
+    This simply deletes the CometSession bound to this instance.
+    """
+    if request.method == "GET" or request.is_ajax():
+        t = parser.parse(request.GET["timestamp"])
+        timestamp = str(t.hour).zfill(2) + ":" +\
+            str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
+        try:
+            scomet = CometSession.objects.get(session_key=\
+                request.session.session_key, timestamp=timestamp)
+            scomet.delete()
+        except CometSession.DoesNotExist:
+            pass # do nothing
+        
+        return HttpResponse("ok")
         
 @csrf_exempt  
 def receive(request, store_id):
@@ -545,18 +549,27 @@ def receive(request, store_id):
         approvedRedemption = request.POST.get("approvedRedemption")
         deletedRedemption = request.POST.get("deletedRedemption")
         
+    Note that since each CometSession is no longer unique to 1 session
+    we need to keep track of the session_keys that have already been 
+    processed to avoid duplication.     
+        
     """
     if request.method == "POST" or request.is_ajax():
-        # employeeLPunches_num : updated employee LP count
-        # patronStoreCount : amount of new patrons
-        # reward : updated reward object
-        # message : new message object (from store or patron)
-        # employees : pending/approved/deleted employee object
-        # redemptions : pending/approved/deleted RedeemReward object
-        
         postDict = json.loads(request.raw_post_data)
+        skip = []
         for scomet in CometSession.objects.filter(store_id=store_id):
+            # flag all threads with this session_key that new stuff
+            scomet.modified = True
+            scomet.save() 
+            
+            # do not process the same session again
+            if session.scomet.session_key in skip:
+                continue
+            skip.append(scomet.session_key)
+            
+            # get the latest session associated with this object
             session = SessionStore(scomet.session_key)
+            # TODO FIX THIS UP
             for key, value in postDict.iteritems():
                 if key not in session or session.get(key) is None:
                     # keys ending with _num is a number
@@ -587,10 +600,6 @@ def receive(request, store_id):
             # need to save session to commit modifications
             session.modified = True
             session.save()
-            
-            # done additions - set to modified
-            scomet.modified = True
-            scomet.save() 
             
         return HttpResponse("success")
     return HttpResponse("error")

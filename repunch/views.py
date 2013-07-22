@@ -37,15 +37,6 @@ def manage_login(request):
                     data['code'] = 2
             else:
                 data['code'] = 3
-                # create the session comet here if it does not exist
-                try: # attempt to get a used CometSession first
-                    CometSession.objects.get(session_key=\
-                        request.session.session_key)
-                except CometSession.DoesNotExist:
-                    scomet = CometSession.objects.create(session_key=\
-                            request.session.session_key,
-                            store_id=SESSION.get_store(\
-                            request.session).objectId)
                             
         else:
             data['code'] =  0        
@@ -62,11 +53,11 @@ def manage_login(request):
 def manage_logout(request):
     # need to clear the session
     request.session.flush()
-    # also delete the cometsession associated with the request
+    # also delete ALL the cometsessions associated with the request
     cs = CometSession.objects.filter(session_key=\
         request.session.session_key)
-    if len(cs) > 0:
-        cs[0].delete()
+    for c in cs:
+        c.delete()
     return redirect(reverse('public_home'))
 
 @session_comet

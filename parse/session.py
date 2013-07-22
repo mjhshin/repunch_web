@@ -30,11 +30,7 @@ SESSION_CACHE = [
     'redemptions_pending', # PUSH
     'redemptions_past', # PUSH
     
-    
-    
-    # use for comet approach all comet requests will die within
-    # x seconds after this time
-    'comet_time', 
+    'comet_time', # used by the comet mechanism
 ]
 
 def get_store(session):

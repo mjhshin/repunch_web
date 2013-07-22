@@ -6,6 +6,7 @@
 $(document).ready(function(){
 
     var url = $("#comet_url").val();
+    var url_terminate = $("#comet_url_terminate").val();
     var makeRequest; // prototype
     
     String.prototype.trimToDots = function(x){
@@ -548,20 +549,35 @@ $(document).ready(function(){
                
     } // end mainComet
     
+    // used serverside as a unique identifier with the session_key
+    var timestamp;
+    
     makeRequest = function() {
+        timestamp = new Date();
         $.ajax({
             url: url,
             type: "GET",
-            timeout: 300000, // timeout after 5 mins! Server must respond before that!
+            data: {"timestamp": timestamp},
+            timeout: 50000, // timeout after 50 seconds! Server must respond before that!
             cache:false, // required to kill internet explorer 304 bug
             success: mainComet,
         });
     }
     
-    // wait 9 seconds before calling initializing the connetion! 
+    // Immediately make a connection
     // IMPORTANT that this is called after server's COMET_DIE_TIME has passed.
-    setTimeout(function(){
-        makeRequest();
-    }, 9000);
+    makeRequest();
+    
+    $(window).bind("beforeunload", function() {
+        // TODO make a get request to the server flagging to terminate
+        // the looping thread associated with this connection 
+        $.ajax({
+            url: url_terminate,
+            type: "GET",
+            async: false,
+            data: {"timestamp": timestamp},
+            cache:false, // required to kill internet explorer 304 bug
+        });
+    });
 
 });

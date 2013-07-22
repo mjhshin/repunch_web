@@ -226,14 +226,11 @@ else:
         'http://www.repunch.com/manage/comet/receive/'
 
 # force responding to requests and getting a new request from the
-# client every 4 minutes at most of inactivity (in seconds)
+# client every 40 seconds at most of inactivity (in seconds)
 # client timeout is 5 mins just in case.
-REQUEST_TIMEOUT = 248 # 4 mins
+REQUEST_TIMEOUT = 40 # in seconds
 # check for new stuff in the cache every 5 seconds
 COMET_REFRESH_RATE = 5
-# number of seconds after a request in which all comet request will 
-# return result (as json object) of -1
-COMET_DIE_TIME = COMET_REFRESH_RATE + 2
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"
