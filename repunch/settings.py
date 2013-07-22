@@ -30,6 +30,9 @@ DATABASES = {
     }
 }
 
+# this 1 is for django
+AUTH_USER_MODEL = 'accounts.Account'
+
 # configuration for SMTP
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

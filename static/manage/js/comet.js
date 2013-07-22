@@ -323,10 +323,10 @@ $(document).ready(function(){
             // analysis page
             if (reSection.length > 0){
                 for (var i=0; i<res.rewards.length; i++){
-                    var reward = $("#rewards div.tab-body div.tr div.td.reward_name").filter(function(){return $(this).text() == res.rewards[i].reward_name;});
+                    var reward = $("#rewards div.tab-body div.tr#" +  rewards[i].reward_id + " div.td.reward_redemptions");
                     
                  if (reward.length > 0){
-                  reward.next().text(res.rewards[i].redemption_pending_count);
+                        reward.text(res.rewards[i].redemption_count);
                     }
                 }
             }

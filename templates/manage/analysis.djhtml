@@ -90,7 +90,7 @@
 				<div class="th" id="header-reward_redemptions">Redemptions <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			{% for reward in rewards %}
-		    <div class="tr  {% cycle '' 'odd' %}">
+		    <div class="tr  {% cycle '' 'odd' %}" id="{{ reward.reward_id }}">
 				<div class="td reward_name">{{ reward.reward_name|trim_to_dots:40 }}</div>
 				<div class="td reward_redemptions">{{ reward.redemption_count }}</div>
 			</div>
