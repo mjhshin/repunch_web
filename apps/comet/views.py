@@ -408,22 +408,6 @@ def refresh(request):
             data['patronStore_count'] = patronStore_count_new
             session['patronStore_count'] = patronStore_count_new
             session['patronStore_num'] = None
-            """ Done in an daily cron job!
-            # flag the emailing sequence patronStore_num > store limit
-            sub = session['subscription']
-            # subscriptionType 2 is highest sub, 0 free
-            if sub.get("subscriptionType") != 2 and\
-                not sub.get("date_passed_user_limit"):
-                # now check if we passed the user limit for the sub
-                user_limit =\
-                    sub_type[sub.get("subscriptionType")]['max_users']
-                if patronStore_count_new > user_limit:
-                    sub.set("date_passed_user_limit",
-                        timezone.now())
-                    sub.update()
-                    
-            session['subscription'] = sub
-            """
 
         # IMPORTANT! The request.session is the same as the 
         # SessionStore(session_key)! so we must use the 
@@ -554,6 +538,297 @@ def receive(request, store_id):
     processed to avoid duplication.     
         
     """
+    def processPostDict(session, postDict):
+        #############################################################
+        # FEEDBACKS_UNREAD ##################################
+        newFeedback = postDict.get('newFeedback')
+        if newFeedback:
+            messages_received_ids =\
+                [ fb.objectId for fb in messages_received_list ]
+            m = Message(**newFeedback)
+            if m.objectId not in messages_received_ids:
+                messages_received_list.insert(0, m)
+                
+            session['messages_received_list'] =\
+                messages_received_list
+            session['newFeedback'] = None
+
+        #############################################################
+        # FEEDBACK DELETED ##################################
+        deletedFeedback = session.get("deletedFeedback")
+        if deletedFeedback:
+            fb = Message(**deletedFeedback)
+            for i, mro in enumerate(messages_received_list):
+                if fb.objectId == mro.objectId:
+                    messages_received_list.pop(i)
+                    break
+            session['messages_received_list'] =\
+                messages_received_list
+            session['deletedFeedback'] = None
+            
+            
+        #############################################################
+        # MESSAGE SENT ##################################
+        # need to check if this new message is an original message 
+        # or a reply to a feedback (the message sent by the patron)!
+        newMessage = session.get("newMessage")
+        if newMessage:
+            messages_received_ids =\
+                    [ fb.objectId for fb in messages_received_list ]
+            messages_sent_list =\
+                SESSION.get_messages_sent_list(session)
+            messages_sent_ids =\
+                [ msg.objectId for msg in messages_sent_list ]
+            m = Message(**newMessage)
+            if m.objectId not in messages_sent_ids and\
+                m.message_type != FEEDBACK:
+                messages_sent_list.insert(0, m)
+            # update an existing feedback
+            if m.objectId in messages_received_ids and\
+                m.message_type == FEEDBACK:
+                for i, mrl in enumerate(messages_received_list):
+                    if mrl.objectId == m.objectId:
+                        messages_received_list.pop(i)
+                        messages_received_list.insert(i, m)
+                        break
+            session['messages_received_list'] =\
+                messages_received_list
+            session['messages_sent_list'] = messages_sent_list
+            session['newMessage'] = None
+          
+        
+        #############################################################
+        # EMPLOYEES_PENDING ##################################
+        # must also check if employee is already approved!
+        pendingEmployee = session.get("pendingEmployee")
+        if pendingEmployee:
+            employees_approved_ids =\
+                [ emp.objectId for emp in employees_approved_list ]
+            employees_pending_ids =\
+                [ emp.objectId for emp in employees_pending_list ]
+            e = Employee(**pendingEmployee)
+            if e.objectId not in employees_pending_ids and\
+                e.objectId not in employees_approved_ids:
+                employees_pending_list.insert(0, e)
+                
+            session['employees_pending_list'] =\
+                employees_pending_list
+            session['pendingEmployee'] = None
+        
+        #############################################################
+        # EMPLOYEES APPROVED (pending to approved) #################
+        approvedEmployee = session.get("approvedEmployee")
+        if approvedEmployee:
+            emp = Employee(**approvedEmployee)
+            # first check if the employee is in the pending list
+            # if not then check if it is already approved
+            for i, emp_pending in\
+                enumerate(employees_pending_list):
+                if emp.objectId == emp_pending.objectId:
+                    emp = employees_pending_list.pop(i)
+                    emp.status = APPROVED
+                    employees_approved_list.insert(0, emp)
+                    break
+                
+            session['employees_pending_list'] =\
+                employees_pending_list
+            session['employees_approved_list'] =\
+                employees_approved_list
+            session['approvedEmployee'] = None
+            
+        #############################################################
+        # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
+        deletedEmployee = session.get("deletedEmployee")
+        if deletedEmployee:
+            emp = Employee(**deletedEmployee)
+            # check in approved emps
+            for i, cop in enumerate(employees_approved_list):
+                if cop.objectId == emp.objectId:
+                    employees_approved_list.pop(i)
+                    break
+                
+            # check in pending emps
+            for i, cop in enumerate(employees_pending_list):
+                if cop.objectId == emp.objectId:
+                    employees_pending_list.pop(i)
+                    break
+                        
+            session['employees_approved_list'] =\
+                employees_approved_list
+            session['employees_pending_list'] =\
+                employees_pending_list
+            session['deletedEmployee'] = None
+         
+        #############################################################           
+        # EMPLOYEE UPDATED PUNCHES
+        updatedEmployeePunch = session.get("updatedEmployeePunch")
+        if updatedEmployeePunch:
+            u_emp = Employee(**updatedEmployeePunch)
+            for emp in employees_approved_list:
+                if u_emp.objectId == emp.objectId:
+                    emp.set("lifetime_punches",
+                        u_emp.lifetime_punches)
+                    break
+            session['updatedEmployeePunch'] = None
+           
+        #############################################################
+        # REDEMPTIONS PENDING
+        rependingRedemptionds = session.get("pendingRedemption")
+        if pendingRedemption:
+            redemptions_pending_ids =\
+                [ red.objectId for red in redemptions_pending ]
+            redemptions_past_ids =\
+                [ red.objectId for red in redemptions_past ]
+            rr = RedeemReward(**pendingRedemption)
+            # need to check here if the redemption is new because 
+            # the dashboard that validated it will also receive
+            # the validated redemption back.
+            if rr.objectId not in redemptions_past_ids and\
+                rr.objectId not in redemptions_pending_ids:
+                redemptions_pending.insert(0, rr)
+                
+            session['redemptions_pending'] =\
+                redemptions_pending
+            session['pendingRedemption'] = None
+            
+        #############################################################
+        # REDEMPTIONS APPROVED (pending to history)
+        approvedRedemption = session.get("approvedRedemption") 
+        if approvedRedemption:  
+            redemp = RedeemReward(**approvedRedemption)
+            # check if redemp is still in pending
+            for i, redem in enumerate(redemptions_pending):
+                if redem.objectId == redemp.objectId:
+                    r = redemptions_pending.pop(i)
+                    r.is_redeemed = True
+                    redemptions_past.insert(0, r)
+                    break
+            # if not then check if it is in the history already
+            # the above shouldn't happen!
+                
+            session['redemptions_pending'] =\
+                redemptions_pending
+            session['redemptions_past'] =\
+                redemptions_past
+            session['approvedRedemption'] = None
+            
+        #############################################################
+        # REDEMPTIONS DELETED ##############################
+        # remove from pending (should not be in history!)
+        deletedRedemption = session.get("deletedRedemption")
+        if deletedRedemption:
+            redemp = RedeemReward(**deletedRedemption)
+            # check if redemp is still in pending
+            for i, redem in enumerate(redemptions_pending):
+                if redem.objectId == redemp.objectId:
+                    redemptions_pending.pop(i)
+                    break
+                
+            session['redemptions_pending'] =\
+                redemptions_pending
+            session['deletedRedemption'] = None
+               
+        #############################################################
+        # STORE UPDATED ##############################
+        updatedStore_one = session.get("updatedStore_one")
+        if updatedStore_one:
+            session['store'] = Store(**updatedStore_one)
+            session["updatedStore_one"] = None
+            
+        #############################################################
+        # SUBSCRIPTION UPDATED ##############################
+        updatedSubscription_one=session.get("updatedSubscription_one")
+        if updatedSubscription_one:
+            subscription = Subscription(**updatedSubscription_one)
+            store = session["store"]
+            store.set('subscription', subscription)
+            store.set('Subscription', subscription.objectId)
+            session['subscription'] = subscription
+            session['store'] = store
+            session["updatedSubscription_one"] = None
+            
+        #############################################################
+        # SETTINGS UPDATED ##############################
+        updatedSettings_one = session.get("updatedSettings_one")
+        if updatedSettings_one:
+            settings = Settings(**updatedSettings_one)
+            store = session["store"]
+            store.set('settings', settings)
+            store.set("Settings", settings.objectId)
+            session['settings'] = settings
+            session['store'] = store
+            data['retailer_pin'] = settings.get("retailer_pin")
+            session["updatedSettings_one"] = None
+            
+        #############################################################
+        # REWARDS NEW ##############################
+        newReward = session.get("newReward")
+        if newReward:
+            store = session['store']
+            rewards = store.get("rewards")
+            rewards_ids = [ r['reward_id'] for r in rewards ]
+            if newReward['reward_id'] not in rewards_ids:
+                rewards.append(reward)
+            store.rewards = rewards
+            session['store'] = store
+            session['newReward'] = None
+        
+        #############################################################
+        # REWARDS UPDATED ##############################
+        updatedReward = session.get('updatedReward')
+        if updatedReward:
+            store = session['store']
+            mod_rewards = store.get("rewards")
+            for i, mreward in enumerate(mod_rewards):
+                # [{"reward_name":"Free bottle of wine", 
+                # "description":"Must be under $25 in value",
+                # "punches":10,"redemption_count":0,reward_id:0},]
+                if updatedReward['reward_id']==mreward['reward_id']:
+                    if updatedReward.has_key("redemption_count"):
+                        mod_rewards[i]['redemption_count'] =\
+                            updatedReward['redemption_count']
+                    if updatedReward.has_key("reward_name"):
+                        mod_rewards[i]['reward_name'] =\
+                            updatedReward['reward_name']
+                    if updatedReward.has_key("punches"):
+                        mod_rewards[i]['punches'] =\
+                            updatedReward['punches']
+                    if updatedReward.has_key("description"):
+                        mod_rewards[i]['description'] =\
+                            updatedReward['description']
+                    break
+                        
+            store.rewards = mod_rewards
+            session['store'] = store
+            session['updatedReward'] = None
+            
+        #############################################################
+        # REWARDS DELETED ##############################
+        deletedReward = session.get("deletedReward")
+        if deletedReward:
+            store = session['store']
+            rewards = store.get("rewards")
+            rewards_ids = [ r['reward_id'] for r in rewards ]
+            if deletedReward['reward_id'] in rewards_ids:
+                for i, r in enumerate(rewards):
+                    if r['reward_id'] == deletedReward['reward_id']:
+                        rewards.pop(i)
+                        break
+            store.rewards = rewards
+            session['store'] = store
+            session['deletedReward'] = None
+           
+        #############################################################
+        # PATRONSTORE_COUNT ##################################
+        patronStore_num = session.get('patronStore_num')
+        if patronStore_num:
+            patronStore_num = int(patronStore_num)
+            data['patronStore_count'] = patronStore_num
+            session['patronStore_count'] = patronStore_num
+            session['patronStore_num'] = None
+    
+    
+    # ENTRY POINT
     if request.method == "POST" or request.is_ajax():
         postDict = json.loads(request.raw_post_data)
         skip = []
@@ -569,33 +844,7 @@ def receive(request, store_id):
             
             # get the latest session associated with this object
             session = SessionStore(scomet.session_key)
-            # TODO FIX THIS UP
-            for key, value in postDict.iteritems():
-                if key not in session or session.get(key) is None:
-                    # keys ending with _num is a number
-                    if key.endswith("_num") or key.endswith("_count"):
-                        session[key] = value
-                    # only 1 dict can exist
-                    elif key.endswith("_one"):
-                        session[key] = value # separated for clarity
-                    # everything else is a list of dicts
-                    else:
-                        session[key] = [value]
-                else:
-                    # keys ending with _num is a number
-                    if key.endswith("_num"):
-                        session[key] = value
-                    # keys ending in _count is a number that is added
-                    elif key.endswith("_count"):
-                        session[key] = session[key] + value
-                    # only 1 dict can exist
-                    elif key.endswith("_one"):
-                        session[key] = value
-                    # everything else is a list of dicts
-                    else:
-                        lst = session[key]
-                        lst.append(value)
-                        session[key] = lst
+            processPostDict(session, postDict)
                         
             # need to save session to commit modifications
             session.modified = True
