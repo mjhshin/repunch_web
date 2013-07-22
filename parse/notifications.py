@@ -253,6 +253,31 @@ def send_email_passed_user_limit(account, store, package,
     _send_emails(emails, connection)
     
    
+def send_email_account_upgrade(account, store, package,
+        connection=None):
+    """
+    User for notifying users that their account has been upgraded.
+    """
+    # need to activate the store's timezone for template rendering!
+    timezone.activate(pytz.timezone(store.store_timezone))
+    
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-account-upgraded.html",
+            'r') as f:
+        template = Template(f.read())
+        
+    subject = "Repunch Inc. Your account has been upgraded."
+    ctx = get_notification_ctx()
+    ctx.update({'store':store, 'package':package})
+    body = template.render(Context(ctx)).__str__()
+    emails = []
+    
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=[account.get('email')])
+    email.attach_alternative(body, 'text/html')
+    emails.append(email)
+    
+    _send_emails(emails, connection)
    
    
    

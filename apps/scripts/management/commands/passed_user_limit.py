@@ -9,6 +9,9 @@ notification.
 
 Email send flow: now, 4 days, 8 days, 12 days
 Account disabled: 14th day from now
+
+NOTE that this does not detect date_passed_user_limit!
+It must be set somewhere else (comet view)
 """
 
 from django.utils import timezone

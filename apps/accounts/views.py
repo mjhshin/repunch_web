@@ -14,10 +14,12 @@ SubscriptionForm3
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
+from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import SMARTPHONE
-from parse.apps.stores.models import Settings, Store
+from parse.apps.stores.models import Settings, Store, Subscription
 from parse.utils import make_aware_to_utc
-from parse.notifications import send_email_receipt_smartphone
+from parse.notifications import send_email_receipt_smartphone,\
+send_email_account_upgrade
 
 @csrf_exempt
 def activate(request):
@@ -145,6 +147,22 @@ def update(request):
         form = SubscriptionForm3(request.POST)
         form.subscription = subscription # to validate cc_number
         if form.is_valid():       
+            # upgrade account if date_passed_user_limit is on
+            # should fetch the most up-to-date subscription first
+            subscription = Subscription.objects().get(objectId=\
+                subscription.objectId)
+            upgraded = False
+            if subscription.date_passed_user_limit:
+                level = subscription.get("subscriptionType")
+                if level == 0:
+                    subscription.set("subscriptionType", 1)
+                    subscription.date_passed_user_limit = None
+                    upgraded = True
+                elif level == 1:
+                    subscription.date_passed_user_limit = None
+                    subscription.set("subscriptionType", 2) 
+                    upgraded = True
+                
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
@@ -181,7 +199,22 @@ def update(request):
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount) 
                         
-            # TODO upgrade account if date_passed_user_limit is on
+            if upgraded:  
+                max_users = sub_type[\
+                        subscription.subscriptionType]["max_users"]
+                if max_users == UNLIMITED:
+                    max_users = "Unlimited"
+                package = {
+                    "sub_type": sub_type[\
+                        subscription.subscriptionType-1]["name"],
+                    "new_sub_type": sub_type[\
+                        subscription.subscriptionType]["name"],
+                    "new_sub_type_cost": sub_type[\
+                        subscription.subscriptionType]["monthly_cost"],
+                    "new_max_patronStore_count": max_users, 
+                }
+                send_email_account_upgrade(request.session['account'],
+                    store, package)
             
             # update the session cache
             request.session['store'] = store
@@ -224,12 +257,19 @@ def upgrade(request):
         form = SubscriptionForm3(request.POST)
         form.subscription = subscription # to validate cc_number
         if form.is_valid(): 
-            # consult accounts.__init__
+            # should fetch the most up-to-date subscription first
+            subscription = Subscription.objects().get(objectId=\
+                subscription.objectId)
+            upgraded = False
             level = subscription.get("subscriptionType")
             if level == 0:
                 subscription.set("subscriptionType", 1)
+                subscription.date_passed_user_limit = None
+                upgraded = True
             elif level == 1:
-                subscription.set("subscriptionType", 2)        
+                subscription.set("subscriptionType", 2)  
+                subscription.date_passed_user_limit = None
+                upgraded = True 
 
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
@@ -265,6 +305,23 @@ def upgrade(request):
                 if amount > 0:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount)
+                        
+            if upgraded:  
+                max_users = sub_type[\
+                        subscription.subscriptionType]["max_users"]
+                if max_users == UNLIMITED:
+                    max_users = "Unlimited"
+                package = {
+                    "sub_type": sub_type[\
+                        subscription.subscriptionType-1]["name"],
+                    "new_sub_type": sub_type[\
+                        subscription.subscriptionType]["name"],
+                    "new_sub_type_cost": sub_type[\
+                        subscription.subscriptionType]["monthly_cost"],
+                    "new_max_patronStore_count": max_users, 
+                }
+                send_email_account_upgrade(request.session['account'],
+                    store, package)
                     
             # update the session cache
             request.session['store'] = store
