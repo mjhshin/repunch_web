@@ -85,9 +85,45 @@ class Command(BaseCommand):
                     Store=sub.Store), sub.store, package, conn)
         
         ## 4th day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=0, limit=900, include="Store", 
+            date_passed_user_limit__lte=day4_end,
+            date_passed_user_limit__gte=day4_start):
+            package = {
+                "sub_type": sub_type[0]["name"],
+                "max_patronStore_count": sub_type[0]["max_users"],
+                "patronStore_count": sub.store.get(\
+                    "patronStores", limit=0, count=1),
+                "disable_date": sub.date_passed_user_limit + 
+                    relativedelta(days=\
+                        USER_LIMIT_PASSED_DISABLE_DAYS),
+            }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         ## 8th day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=0, limit=900, include="Store", 
+            date_passed_user_limit__lte=day8_end,
+            date_passed_user_limit__gte=day8_start):
+            package = {
+                "sub_type": sub_type[0]["name"],
+                "max_patronStore_count": sub_type[0]["max_users"],
+                "patronStore_count": sub.store.get(\
+                    "patronStores", limit=0, count=1),
+                "disable_date": sub.date_passed_user_limit + 
+                    relativedelta(days=\
+                        USER_LIMIT_PASSED_DISABLE_DAYS),
+            }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         ## 14th day
-        
+        for sub in Subscription.objects().filter(\
+            subscriptionType=0, limit=900, include="Store", 
+            date_passed_user_limit__lte=day14_end,
+            date_passed_user_limit__gte=day14_start):
+            package = { "status": "disabled" }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         
         
         
@@ -131,10 +167,46 @@ class Command(BaseCommand):
                 send_email_passed_user_limit(Account.objects().get(\
                     Store=sub.Store), sub.store, package, conn)
         
-        
         ## 4th day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=1, limit=900, include="Store", 
+            date_passed_user_limit__lte=day4_end,
+            date_passed_user_limit__gte=day4_start):
+            package = {
+                "sub_type": sub_type[1]["name"],
+                "max_patronStore_count": sub_type[1]["max_users"],
+                "patronStore_count": sub.store.get(\
+                    "patronStores", limit=0, count=1),
+                "disable_date": sub.date_passed_user_limit + 
+                    relativedelta(days=\
+                        USER_LIMIT_PASSED_DISABLE_DAYS),
+            }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         ## 8th day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=1, limit=900, include="Store", 
+            date_passed_user_limit__lte=day8_end,
+            date_passed_user_limit__gte=day8_start):
+            package = {
+                "sub_type": sub_type[1]["name"],
+                "max_patronStore_count": sub_type[1]["max_users"],
+                "patronStore_count": sub.store.get(\
+                    "patronStores", limit=0, count=1),
+                "disable_date": sub.date_passed_user_limit + 
+                    relativedelta(days=\
+                        USER_LIMIT_PASSED_DISABLE_DAYS),
+            }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         ## 14th day
+        for sub in Subscription.objects().filter(\
+            subscriptionType=1, limit=900, include="Store", 
+            date_passed_user_limit__lte=day14_end,
+            date_passed_user_limit__gte=day14_start):
+            package = { "status": "disabled" }
+            send_email_passed_user_limit(Account.objects().get(\
+                Store=sub.Store), sub.store, package, conn)
         
         
         
