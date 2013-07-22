@@ -22,8 +22,9 @@ def flag_go(session_key, obj):
         
     session.save()
 
-    # the GO code!
+    # the GO code(s)!
     CometSession.objects.update()
-    comet_session = CometSession.objects.get(session_key=session_key)
-    comet_session.modified = True
-    comet_session.save()
+    comet_sessions = CometSession.objects.filter(session_key=session_key)
+    for comet_session in comet_sessions:
+        comet_session.modified = True
+        comet_session.save()

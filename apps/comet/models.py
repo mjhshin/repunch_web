@@ -9,7 +9,7 @@ class CometSession(models.Model):
     so we cannot just use the store_id as a unique identifier.
     """
     # this is the request.session.session_key!
-    session_key = models.CharField(max_length=70, primary_key=True)
+    session_key = models.CharField(max_length=70)
     # hours:minutes:seconds e.g. 08:07:21
     timestamp = models.CharField(max_length=8)
     

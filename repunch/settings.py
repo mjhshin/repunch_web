@@ -231,7 +231,7 @@ else:
 # force responding to requests and getting a new request from the
 # client every 40 seconds at most of inactivity (in seconds)
 # client timeout is 5 mins just in case.
-REQUEST_TIMEOUT = 40 # in seconds
+REQUEST_TIMEOUT = 20 # in seconds # TODO change to a bigger number
 # check for new stuff in the cache every 5 seconds
 COMET_REFRESH_RATE = 5
 

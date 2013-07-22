@@ -29,8 +29,6 @@ SESSION_CACHE = [
     'messages_received_list', # PUSH
     'redemptions_pending', # PUSH
     'redemptions_past', # PUSH
-    
-    'comet_time', # used by the comet mechanism
 ]
 
 def get_store(session):

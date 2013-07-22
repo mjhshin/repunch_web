@@ -11,7 +11,6 @@ def session_comet(view_func):
     die. This assumes that the cloud_call 
     """
     def view(request, *args, **kwargs):
-        request.session['comet_time'] = timezone.now()
         return view_func(request, *args, **kwargs)
 
     return view

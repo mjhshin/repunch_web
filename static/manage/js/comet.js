@@ -552,6 +552,18 @@ $(document).ready(function(){
     // used serverside as a unique identifier with the session_key
     var timestamp;
     
+    var terminateFunc = function() {
+        // make a get request to the server flagging to terminate
+        // the looping thread associated with this connection 
+        $.ajax({
+            url: url_terminate,
+            type: "GET",
+            async: false,
+            data: {"timestamp": timestamp},
+            cache:false, // required to kill internet explorer 304 bug
+        });
+    };
+    
     makeRequest = function() {
         timestamp = new Date();
         $.ajax({
@@ -562,22 +574,15 @@ $(document).ready(function(){
             cache:false, // required to kill internet explorer 304 bug
             success: mainComet,
         });
-    }
+        
+        $(window).unbind("beforeunload", terminateFunc);
+        $(window).bind("beforeunload", terminateFunc);
+    };
+    
     
     // Immediately make a connection
     // IMPORTANT that this is called after server's COMET_DIE_TIME has passed.
     makeRequest();
     
-    $(window).bind("beforeunload", function() {
-        // TODO make a get request to the server flagging to terminate
-        // the looping thread associated with this connection 
-        $.ajax({
-            url: url_terminate,
-            type: "GET",
-            async: false,
-            data: {"timestamp": timestamp},
-            cache:false, // required to kill internet explorer 304 bug
-        });
-    });
 
 });

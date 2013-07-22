@@ -194,17 +194,17 @@ def refresh(request):
                 
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
-        reds_approved_copy = [ r.objectId for r in\
-            redemptions_approved_copy ]
-        reds_approved = [ r.objectId for r in redemptions_approved ]
+        reds_past_copy = [ r.objectId for r in\
+            redemptions_past_copy ]
+        reds_past = [ r.objectId for r in redemptions_past ]
         
         appr_redemps =\
-            tuple(set(reds_approved) - set(reds_approved_copy))
+            tuple(set(reds_past) - set(reds_past_copy))
             
         if appr_redemps:   
             redemp_js = []
             for red_id in appr_redemps:
-                for redemp in redemptions_approved:
+                for redemp in redemptions_past:
                     if redemp.objectId == red_id:
                         redemp_js.append(redemp.jsonify())
                         break
@@ -217,9 +217,9 @@ def refresh(request):
         #############################################################
         # REDEMPTIONS DELETED ##############################
         # remove from pending (should not be in history!)
-        reds_copy = reds_approved_copy[:]
+        reds_copy = reds_past_copy[:]
         reds_copy.extend(reds_pending_copy)
-        reds = reds_approved[:]
+        reds = reds_past[:]
         reds.extend(reds_pending)
         
         # reds_copy has the same or more items that reds
@@ -228,10 +228,10 @@ def refresh(request):
         if del_redemps:
             redemp_js = []
             for red_id in del_redemps:
-                if red_id in reds_approved_copy:
-                    reds_list = reds_approved_list_copy
+                if red_id in reds_past_copy:
+                    reds_list = redemptions_past_copy
                 else:
-                    reds_list = reds_pending_list_copy
+                    reds_list = redemptions_past
                     
                 for redemp in reds_list:
                     if redemp.objectId == red_id:
@@ -261,7 +261,7 @@ def refresh(request):
         rewards = { reward['reward_id']:reward for reward in rewards }
         updated_rewards = []
         
-        for reward_id, rew_copy in rewards_copy:
+        for reward_id, rew_copy in rewards_copy.iteritems():
             rew = rewards[reward_id]
             if rew_copy['redemption_count']!=rew['redemption_count']:
                 # only the redemtpion_count and reward_id are used
@@ -308,8 +308,7 @@ def refresh(request):
     
     # cache the current session at this state
     session_copy = dict(request.session)
-    comet_time = session_copy['comet_time']
-    timeout_time = comet_time + relativedelta(seconds=REQUEST_TIMEOUT)
+    timeout_time = timezone.now() + relativedelta(seconds=REQUEST_TIMEOUT)
     
     # keep going until its time to return a response forcibly
     while timezone.now() < timeout_time:  
@@ -338,8 +337,11 @@ def refresh(request):
                 scomet.delete()
             except CometSession.DoesNotExist:
                 pass # do nothing
+            print "Returning comet!"
             return comet(session_copy)
         else: # nothing new, sleep for a bit
+            print str(timezone.now()) + scomet.timestamp
+            print request.session.session_key
             sleep(COMET_REFRESH_RATE)
             
     # TIME IS UP - return a response result 0 means no change 
@@ -347,6 +349,14 @@ def refresh(request):
     # make sure that request.session is the most up to date
     session = SessionStore(request.session.session_key)
     request.session.update(session)
+    
+    # attempt to delete registered comet session if not yet deleted
+    try:
+        scomet = CometSession.objects.get(session_key=\
+            request.session.session_key, timestamp=timestamp)
+        scomet.delete()
+    except CometSession.DoesNotExist:
+        pass # do nothing
     
     try:
         return HttpResponse(json.dumps({"result":0}), 
