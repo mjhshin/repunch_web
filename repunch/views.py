@@ -62,6 +62,11 @@ def manage_login(request):
 def manage_logout(request):
     # need to clear the session
     request.session.flush()
+    # also delete the cometsession associated with the request
+    cs = CometSession.objects.filter(session_key=\
+        request.session.session_key)
+    if len(cs) > 0:
+        cs[0].delete()
     return redirect(reverse('public_home'))
 
 @session_comet

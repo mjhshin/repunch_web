@@ -402,8 +402,8 @@ def refresh(request):
         #############################################################
         # PATRONSTORE_COUNT ##################################
         patronStore_count_new = session.get('patronStore_num')
-        patronStore_count_new = int(patronStore_count_new)
         if patronStore_count_new:
+            patronStore_count_new = int(patronStore_count_new)
             data['patronStore_count'] = patronStore_count_new
             session['patronStore_count'] = patronStore_count_new
             del session['patronStore_num']
@@ -521,6 +521,8 @@ def receive(request, store_id):
     This is called by a currently logged in user as well as by the
     cloud. Need to differentiate!
     
+    IMPORTANT! This should only be called by an anonymous session!
+    
     This adds to the related session's cache:
         Note: request.POST does not contain the data!
                 Use request.raw_post_data instead!
@@ -554,10 +556,7 @@ def receive(request, store_id):
         
         postDict = json.loads(request.raw_post_data)
         for scomet in CometSession.objects.filter(store_id=store_id):
-            if request.session.get('SESSION_KEY'):
-                session = request.session
-            else:
-                session = SessionStore(scomet.session_key)
+            session = SessionStore(scomet.session_key)
             for key, value in postDict.iteritems():
                 if key not in session or session.get(key) is None:
                     # keys ending with _num is a number
@@ -586,9 +585,8 @@ def receive(request, store_id):
                         session[key] = lst
                         
             # need to save session to commit modifications
-            if not session.get('SESSION_KEY'):
-                session.modified = True
-                session.save()
+            session.modified = True
+            session.save()
             
             # done additions - set to modified
             scomet.modified = True
