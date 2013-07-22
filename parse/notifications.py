@@ -241,7 +241,7 @@ def send_email_passed_user_limit(account, store, package,
     subject = "Repunch Inc. Alert. Your store, " +\
         store.get("store_name") + " has passed the user limit."
     ctx = get_notification_ctx()
-    ctx.update({'store':store, 'package':start})
+    ctx.update({'store':store, 'package':package})
     body = template.render(Context(ctx)).__str__()
     emails = []
     

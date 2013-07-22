@@ -20,8 +20,9 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.notifications import send_email_passed_user_limit
 from parse.apps.accounts import sub_type
 from parse.apps.accounts.models import Account
+from parse.apps.stores.models import Subscription
 from repunch.settings import COMET_REQUEST_RECEIVE,\
-USER_LIMIT_PASSED_DISABLE_DAYS
+USER_LIMIT_PASSED_DISABLE_DAYS, DEBUG
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -50,7 +51,7 @@ class Command(BaseCommand):
             date_passed_user_limit__lte=day1_end,
             date_passed_user_limit__gte=day1_start):
             # with pp_cc_id
-            if sub.pp_cc_id:
+            if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
                 sub.subscriptionType = 1
                 sub.date_passed_user_limit = None
                 sub.update()
@@ -134,7 +135,7 @@ class Command(BaseCommand):
             date_passed_user_limit__lte=day1_end,
             date_passed_user_limit__gte=day1_start):
             # with pp_cc_id
-            if sub.pp_cc_id:
+            if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
                 sub.subscriptionType = 2
                 sub.date_passed_user_limit = None
                 sub.update()
