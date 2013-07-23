@@ -7,6 +7,9 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# For running selenium tests
+TEST_REMOTE_SERVER = True
+
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
 else:
