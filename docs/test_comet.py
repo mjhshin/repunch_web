@@ -13,6 +13,9 @@ def flag_go(obj):
     elif obj == "newFeedback":
         x = store.get("receivedMessages", limit=1,
             order="-createdAt")[0]
+    elif obj == "newMessage":
+        x = store.get("sentMessages", limit=1,
+            order="-createdAt")[0]
 
     # make the post request
     payload = {obj:x.jsonify()}

@@ -322,6 +322,12 @@ def crop_avatar(request):
         session["store"] = store
         request.session.update(session)
         
+        # notify other dashboards of this change
+        payload = {"updatedStoreAvatarName_str":store.store_avatar,
+            "updatedStoreAvatarUrl_str":store.store_avatar_url, }
+        requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+            data=json.dumps(payload))
+        
         # need to remove old file
         if old_avatar:
             delete_file(old_avatar, 'png')

@@ -17,7 +17,7 @@ from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
-from repunch.settings import PAGINATION_THRESHOLD,\
+from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_REQUEST_RECEIVE
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
@@ -213,6 +213,11 @@ def edit(request, message_id):
             # push notification
             cloud_call("retailer_message", params)
             
+            if DEBUG:
+                payload = {"newMessage":message.jsonify()}
+                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                    data=json.dumps(payload))
+            
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
             request.session.update(session)
@@ -405,6 +410,11 @@ def feedback_reply(request, feedback_id):
                 "filter":'one',
                 "patron_id":feedback.get('patron_id'),
             })
+            
+            if DEBUG:
+                payload = {"newMessage":feedback.jsonify()}
+                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
+                    data=json.dumps(payload))
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)

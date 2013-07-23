@@ -444,6 +444,8 @@ def receive(request, store_id):
         pendingRedemption = request.POST.get("pendingRedemption")
         approvedRedemption = request.POST.get("approvedRedemption")
         deletedRedemption = request.POST.get("deletedRedemption")
+        updatedStoreAvatarName_str
+        updatedStoreAvatarUrl_str
         
     Note that since each CometSession is no longer unique to 1 session
     we need to keep track of the session_keys that have already been 
@@ -649,6 +651,16 @@ def receive(request, store_id):
         updatedStore_one = postDict.get("updatedStore_one")
         if updatedStore_one:
             session['store'] = Store(**updatedStore_one)
+            
+        updatedStoreAvatarName_str =\
+            postDict.get("updatedStoreAvatarName_str")
+        if updatedStoreAvatarName_str:
+            store = session['store']
+            updatedStoreAvatarUrl_str =\
+                postDict.get("updatedStoreAvatarUrl_str")
+            if updatedStoreAvatarUrl_str:
+                store.store_avatar_url = updatedStoreAvatarUrl_str
+            store.store_avatar = updatedStoreAvatarName_str            
             
         #############################################################
         # SUBSCRIPTION UPDATED ##############################
