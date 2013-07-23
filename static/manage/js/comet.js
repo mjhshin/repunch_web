@@ -551,6 +551,7 @@ $(document).ready(function(){
     
     // used serverside as a unique identifier with the session_key
     var timestamp;
+    var uid;
     
     var terminateFunc = function() {
         // make a get request to the server flagging to terminate
@@ -559,18 +560,21 @@ $(document).ready(function(){
             url: url_terminate,
             type: "GET",
             async: false,
-            data: {"timestamp": timestamp},
+            data: {"timestamp": timestamp, "uid": uid, },
             cache:false, // required to kill internet explorer 304 bug
         });
     };
     
     makeRequest = function() {
         timestamp = new Date();
+        // get a number from 0 to 998 as a unique id just incase they 
+        // have 2 tabs refreshing at the same time
+        uid = String(Math.floor(Math.random()*999));
         $.ajax({
             url: url,
             type: "GET",
-            data: {"timestamp": timestamp},
-            timeout: 50000, // timeout after 50 seconds! Server must respond before that!
+            data: {"timestamp": timestamp, "uid": uid, },
+            timeout: 300000, // timeout after 5 minutes! Server must respond before that!
             cache:false, // required to kill internet explorer 304 bug
             success: mainComet,
         });

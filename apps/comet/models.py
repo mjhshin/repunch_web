@@ -12,10 +12,12 @@ class CometSession(models.Model):
     session_key = models.CharField(max_length=70)
     # hours:minutes:seconds e.g. 08:07:21
     timestamp = models.CharField(max_length=8)
+    # number from 0 to 998
+    uid = models.CharField(max_length=3)
     
     store_id = models.CharField(max_length=20)
     modified = models.BooleanField(default=False)
     
     
     class Meta:
-        unique_together = (("session_key", "timestamp"),)
+        unique_together = (("session_key", "timestamp", "uid"),)

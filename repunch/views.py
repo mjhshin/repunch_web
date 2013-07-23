@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.contrib.sessions.backends.cache import SessionStore
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -51,13 +52,14 @@ def manage_login(request):
 
 @session_comet
 def manage_logout(request):
-    # need to clear the session
-    request.session.flush()
+    # need to do this before flushing the session because the session
+    # key will change after the flush!
     # also delete ALL the cometsessions associated with the request
     cs = CometSession.objects.filter(session_key=\
         request.session.session_key)
     for c in cs:
         c.delete()
+    request.session.flush()
     return redirect(reverse('public_home'))
 
 @session_comet

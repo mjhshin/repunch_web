@@ -224,20 +224,20 @@ def refresh(request):
         
         # reds_copy has the same or more items that reds
         del_redemps = tuple(set(reds_copy) - set(reds))
-        
+        print "Deleted redemptions"
         if del_redemps:
             redemp_js = []
             for red_id in del_redemps:
+                reds_list = []
                 if red_id in reds_past_copy:
                     reds_list = redemptions_past_copy
-                else:
-                    reds_list = redemptions_past
+                elif red_id in reds_pending_copy:
+                    reds_list = redemptions_pending_copy
                     
                 for redemp in reds_list:
                     if redemp.objectId == red_id:
                         redemp_js.append(redemp.jsonify())
-                        break
-                                    
+                        break               
             if len(redemp_js) > 0:
                 data['redemption_pending_count'] =\
                     len(redemptions_pending)
@@ -286,8 +286,12 @@ def refresh(request):
         # request.session because it is automatically saved at the end
         # of each request- thereby overriding/undoing any changes made
         # to the SessionStore(session_key) key!
-        request.session.update(\
-            SessionStore(request.session.session_key))
+        # need to check if we are still logged in
+        session = SessionStore(request.session.session_key)
+        if 'account' in session and SESSION_KEY in session:
+            request.session.update(session)
+        else:
+            request.session.flush()
         
         try: # respond
             return HttpResponse(json.dumps(data), 
@@ -295,15 +299,16 @@ def refresh(request):
         except (IOError, socket.error) as e: # broken pipe/socket. 
             thread.exit() # exit silently
             
-    # get the timestamp
+    # get the timestamp and uid
     t = parser.parse(request.GET["timestamp"])
     timestamp = str(t.hour).zfill(2) + ":" +\
         str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
+    uid = request.GET['uid']
         
     # register the comet session
     CometSession.objects.update()
     CometSession.objects.create(session_key=\
-        request.session.session_key, timestamp=timestamp,
+        request.session.session_key, timestamp=timestamp, uid=uid, 
         store_id=request.session['store'].objectId)
     
     # cache the current session at this state
@@ -316,13 +321,18 @@ def refresh(request):
         CometSession.objects.update() 
         try:     
             scomet = CometSession.objects.get(session_key=\
-                request.session.session_key,timestamp=timestamp)
+                request.session.session_key,
+                timestamp=timestamp, uid=uid)
         except CometSession.DoesNotExist:
             # cometsession was deleted - time to go
             try:
                 # make sure that the latest session is saved!
-                request.session.update(\
-                    SessionStore(request.session.session_key))
+                # need to check if we are still logged in
+                session = SessionStore(request.session.session_key)
+                if 'account' in session and SESSION_KEY in session:
+                    request.session.update(session)
+                else:
+                    request.session.flush()
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
             except (IOError, socket.error) as e: 
@@ -333,27 +343,45 @@ def refresh(request):
             CometSession.objects.update()
             try:
                 scomet = CometSession.objects.get(session_key=\
-                    request.session.session_key, timestamp=timestamp)
+                    request.session.session_key,
+                    timestamp=timestamp, uid=uid)
                 scomet.delete()
             except CometSession.DoesNotExist:
                 pass # do nothing
             print "Returning comet!"
             return comet(session_copy)
         else: # nothing new, sleep for a bit
-            print str(timezone.now()) + scomet.timestamp
-            print request.session.session_key
             sleep(COMET_REFRESH_RATE)
             
+            
     # TIME IS UP - return a response result 0 means no change 
+    # try 1 last time
+    if scomet.modified:
+        # delete the registered comet session object
+        CometSession.objects.update()
+        try:
+            scomet = CometSession.objects.get(session_key=\
+                request.session.session_key,
+                timestamp=timestamp, uid=uid)
+            scomet.delete()
+        except CometSession.DoesNotExist:
+            pass # do nothing
+        print "returning comet!"
+        return comet(session_copy)
             
     # make sure that request.session is the most up to date
     session = SessionStore(request.session.session_key)
-    request.session.update(session)
+    # need to check if we are still logged in
+    if 'account' in session and SESSION_KEY in session:
+        request.session.update(session)
+    else:
+        request.session.flush()
     
     # attempt to delete registered comet session if not yet deleted
     try:
         scomet = CometSession.objects.get(session_key=\
-            request.session.session_key, timestamp=timestamp)
+            request.session.session_key,
+            timestamp=timestamp, uid=uid)
         scomet.delete()
     except CometSession.DoesNotExist:
         pass # do nothing
@@ -374,9 +402,11 @@ def terminate(request):
         t = parser.parse(request.GET["timestamp"])
         timestamp = str(t.hour).zfill(2) + ":" +\
             str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
+        uid = request.GET['uid']
         try:
             scomet = CometSession.objects.get(session_key=\
-                request.session.session_key, timestamp=timestamp)
+                request.session.session_key,
+                timestamp=timestamp, uid=uid)
             scomet.delete()
         except CometSession.DoesNotExist:
             pass # do nothing
@@ -395,7 +425,7 @@ def receive(request, store_id):
     
     This adds to the related session's cache:
         Note: request.POST does not contain the data!
-                Use request.raw_post_data instead!
+                Use request.body instead!
     
         updatedStore_one = request.POST.get("updatedStore_one")
         updatedSubscription_one = request.POST.get("updatedStore_one")
@@ -444,11 +474,10 @@ def receive(request, store_id):
                 
             session['messages_received_list'] =\
                 messages_received_list
-            session['newFeedback'] = None
 
         #############################################################
         # FEEDBACK DELETED ##################################
-        deletedFeedback = session.get("deletedFeedback")
+        deletedFeedback = postDict.get("deletedFeedback")
         if deletedFeedback:
             fb = Message(**deletedFeedback)
             for i, mro in enumerate(messages_received_list):
@@ -457,14 +486,13 @@ def receive(request, store_id):
                     break
             session['messages_received_list'] =\
                 messages_received_list
-            session['deletedFeedback'] = None
             
             
         #############################################################
         # MESSAGE SENT ##################################
         # need to check if this new message is an original message 
         # or a reply to a feedback (the message sent by the patron)!
-        newMessage = session.get("newMessage")
+        newMessage = postDict.get("newMessage")
         if newMessage:
             messages_received_ids =\
                     [ fb.objectId for fb in messages_received_list ]
@@ -487,13 +515,12 @@ def receive(request, store_id):
             session['messages_received_list'] =\
                 messages_received_list
             session['messages_sent_list'] = messages_sent_list
-            session['newMessage'] = None
           
         
         #############################################################
         # EMPLOYEES_PENDING ##################################
         # must also check if employee is already approved!
-        pendingEmployee = session.get("pendingEmployee")
+        pendingEmployee = postDict.get("pendingEmployee")
         if pendingEmployee:
             employees_approved_ids =\
                 [ emp.objectId for emp in employees_approved_list ]
@@ -506,11 +533,10 @@ def receive(request, store_id):
                 
             session['employees_pending_list'] =\
                 employees_pending_list
-            session['pendingEmployee'] = None
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
-        approvedEmployee = session.get("approvedEmployee")
+        approvedEmployee = postDict.get("approvedEmployee")
         if approvedEmployee:
             emp = Employee(**approvedEmployee)
             # first check if the employee is in the pending list
@@ -527,11 +553,10 @@ def receive(request, store_id):
                 employees_pending_list
             session['employees_approved_list'] =\
                 employees_approved_list
-            session['approvedEmployee'] = None
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
-        deletedEmployee = session.get("deletedEmployee")
+        deletedEmployee = postDict.get("deletedEmployee")
         if deletedEmployee:
             emp = Employee(**deletedEmployee)
             # check in approved emps
@@ -550,11 +575,10 @@ def receive(request, store_id):
                 employees_approved_list
             session['employees_pending_list'] =\
                 employees_pending_list
-            session['deletedEmployee'] = None
          
         #############################################################           
         # EMPLOYEE UPDATED PUNCHES
-        updatedEmployeePunch = session.get("updatedEmployeePunch")
+        updatedEmployeePunch = postDict.get("updatedEmployeePunch")
         if updatedEmployeePunch:
             u_emp = Employee(**updatedEmployeePunch)
             for emp in employees_approved_list:
@@ -562,12 +586,14 @@ def receive(request, store_id):
                     emp.set("lifetime_punches",
                         u_emp.lifetime_punches)
                     break
-            session['updatedEmployeePunch'] = None
+            session['employees_approved_list'] =\
+                employees_approved_list
            
         #############################################################
         # REDEMPTIONS PENDING
-        rependingRedemptionds = session.get("pendingRedemption")
+        pendingRedemption = postDict.get("pendingRedemption")
         if pendingRedemption:
+            print "New Pending Redemption"
             redemptions_pending_ids =\
                 [ red.objectId for red in redemptions_pending ]
             redemptions_past_ids =\
@@ -582,11 +608,10 @@ def receive(request, store_id):
                 
             session['redemptions_pending'] =\
                 redemptions_pending
-            session['pendingRedemption'] = None
             
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
-        approvedRedemption = session.get("approvedRedemption") 
+        approvedRedemption = postDict.get("approvedRedemption") 
         if approvedRedemption:  
             redemp = RedeemReward(**approvedRedemption)
             # check if redemp is still in pending
@@ -603,12 +628,11 @@ def receive(request, store_id):
                 redemptions_pending
             session['redemptions_past'] =\
                 redemptions_past
-            session['approvedRedemption'] = None
             
         #############################################################
         # REDEMPTIONS DELETED ##############################
         # remove from pending (should not be in history!)
-        deletedRedemption = session.get("deletedRedemption")
+        deletedRedemption = postDict.get("deletedRedemption")
         if deletedRedemption:
             redemp = RedeemReward(**deletedRedemption)
             # check if redemp is still in pending
@@ -619,18 +643,17 @@ def receive(request, store_id):
                 
             session['redemptions_pending'] =\
                 redemptions_pending
-            session['deletedRedemption'] = None
                
         #############################################################
         # STORE UPDATED ##############################
-        updatedStore_one = session.get("updatedStore_one")
+        updatedStore_one = postDict.get("updatedStore_one")
         if updatedStore_one:
             session['store'] = Store(**updatedStore_one)
-            session["updatedStore_one"] = None
             
         #############################################################
         # SUBSCRIPTION UPDATED ##############################
-        updatedSubscription_one=session.get("updatedSubscription_one")
+        updatedSubscription_one =\
+            postDict.get("updatedSubscription_one")
         if updatedSubscription_one:
             subscription = Subscription(**updatedSubscription_one)
             store = session["store"]
@@ -638,11 +661,10 @@ def receive(request, store_id):
             store.set('Subscription', subscription.objectId)
             session['subscription'] = subscription
             session['store'] = store
-            session["updatedSubscription_one"] = None
             
         #############################################################
         # SETTINGS UPDATED ##############################
-        updatedSettings_one = session.get("updatedSettings_one")
+        updatedSettings_one = postDict.get("updatedSettings_one")
         if updatedSettings_one:
             settings = Settings(**updatedSettings_one)
             store = session["store"]
@@ -650,11 +672,10 @@ def receive(request, store_id):
             store.set("Settings", settings.objectId)
             session['settings'] = settings
             session['store'] = store
-            session["updatedSettings_one"] = None
             
         #############################################################
         # REWARDS NEW ##############################
-        newReward = session.get("newReward")
+        newReward = postDict.get("newReward")
         if newReward:
             store = session['store']
             rewards = store.get("rewards")
@@ -663,11 +684,10 @@ def receive(request, store_id):
                 rewards.append(reward)
             store.rewards = rewards
             session['store'] = store
-            session['newReward'] = None
         
         #############################################################
         # REWARDS UPDATED ##############################
-        updatedReward = session.get('updatedReward')
+        updatedReward = postDict.get('updatedReward')
         if updatedReward:
             store = session['store']
             mod_rewards = store.get("rewards")
@@ -692,11 +712,10 @@ def receive(request, store_id):
                         
             store.rewards = mod_rewards
             session['store'] = store
-            session['updatedReward'] = None
             
         #############################################################
         # REWARDS DELETED ##############################
-        deletedReward = session.get("deletedReward")
+        deletedReward = postDict.get("deletedReward")
         if deletedReward:
             store = session['store']
             rewards = store.get("rewards")
@@ -708,20 +727,18 @@ def receive(request, store_id):
                         break
             store.rewards = rewards
             session['store'] = store
-            session['deletedReward'] = None
            
         #############################################################
         # PATRONSTORE_COUNT ##################################
-        patronStore_num = session.get('patronStore_num')
+        patronStore_num = postDict.get('patronStore_num')
         if patronStore_num:
             patronStore_num = int(patronStore_num)
             session['patronStore_count'] = patronStore_num
-            session['patronStore_num'] = None
     
     
     # ENTRY POINT
     if request.method == "POST" or request.is_ajax():
-        postDict = json.loads(request.raw_post_data)
+        postDict = json.loads(request.body)
         skip = []
         for scomet in CometSession.objects.filter(store_id=store_id):
             # flag all threads with this session_key that new stuff
@@ -729,12 +746,16 @@ def receive(request, store_id):
             scomet.save() 
             
             # do not process the same session again
-            if session.scomet.session_key in skip:
+            if scomet.session_key in skip:
                 continue
             skip.append(scomet.session_key)
             
             # get the latest session associated with this object
             session = SessionStore(scomet.session_key)
+            # do not go if the session has already been logged out
+            if 'account' not in session or\
+                SESSION_KEY not in session:
+                continue
             processPostDict(session, postDict)
                         
             # need to save session to commit modifications

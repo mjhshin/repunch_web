@@ -13,7 +13,7 @@ from parse.decorators import session_comet
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
-from repunch.settings import PAGINATION_THRESHOLD,\
+from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_REQUEST_RECEIVE
 
 @login_required
@@ -178,6 +178,14 @@ def redeem(request):
                     redemptions_past.append(redemption)
                     session['redemptions_past'] =\
                         redemptions_past
+                    if DEBUG:
+                        store_id =\
+                            SESSION.get_store(session).objectId
+                        payload = {"approvedRedemption":\
+                            redemption.jsonify()}
+                        requests.post(COMET_REQUEST_RECEIVE+store_id,
+                            data=json.dumps(payload))
+                        
                 session['redemptions_pending'] =\
                     redemptions_pending
                 # request.session will be saved after return
@@ -194,9 +202,16 @@ def redeem(request):
                                 content_type="application/json")
                                 
             elif i_remove != -1 and action == "deny":
-                redemptions_pending.pop(i_remove)
+                del_red = redemptions_pending.pop(i_remove)
                 session['redemptions_pending'] =\
                     redemptions_pending
+                if DEBUG:
+                    store_id =\
+                        SESSION.get_store(session).objectId
+                    payload = {"deletedRedemption":del_red.jsonify()}
+                    requests.post(COMET_REQUEST_RECEIVE + store_id,
+                        data=json.dumps(payload))
+                        
                 request.session.update(session)
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
