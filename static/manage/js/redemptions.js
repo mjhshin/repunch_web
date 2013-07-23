@@ -37,7 +37,8 @@ function onRedeem(rowId, action){
                     row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
                 } else if (res.result == 5) {
                     row.css("background", "#FFFFCB");
-                    row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
+                    // row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
+                    row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
                 } else {
                     row.css("background", "#FFFFCB");
                     row.html("Customer does not have enough punches!");

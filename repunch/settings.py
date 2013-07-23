@@ -265,6 +265,7 @@ INSTALLED_APPS = (
     'apps.comet',
     'apps.scripts',
     'libs.repunch',
+    'selenium_tests', 
     
 
     'django_extensions',

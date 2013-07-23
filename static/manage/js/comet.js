@@ -258,12 +258,16 @@ $(document).ready(function(){
                 // move the rows from pending tab to approved tab
                 for (var i=0; i< emps.length; i++) {
                     var row = $("#" + emps[i].objectId);
-                    row.css("background", "#FFFFCB");
+                    // row.css("background", "#FFFFCB");
+                    row.css("background", "#CCFF99");
                     if (type == "approved") {
-                        row.html("Employee has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                        // row.html("Employee has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                        row.html("Successfully <span style='color:blue;'>APPROVED</span> employee.");
                     } else {
-                        row.html("Employee has been <span style='color:red;'>DENIED</span> elsewhere.");
+                        // row.html("Employee has been <span style='color:red;'>DENIED</span> elsewhere.");
+                        row.html("Successfully <span style='color:red;'>DENIED</span> employee.");
                     }
+                    
                     // the last row to go checks if placeholder is necessary
                     if (i == emps.length - 1) {
                         row.fadeOut(2000, function(){
@@ -487,11 +491,14 @@ $(document).ready(function(){
                 // remove the rows
                 for (var i=0; i< redemps.length; i++){
                     var row = $("#" + redemps[i].objectId);
-                    row.css("background", "#FFFFCB");
+                    // row.css("background", "#FFFFCB");
+                    row.css("background", "#CCFF99");
                     if (type == "approved") {
-                        row.html("Redemption has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                        // row.html("Redemption has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                        row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
                     } else {
-                        row.html("Redemption has been <span style='color:red;'>DENIED</span> elsewhere.");
+                        // row.html("Redemption has been <span style='color:red;'>DENIED</span> elsewhere.");
+                        row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
                     }
                     // the last row to go checks if placeholder is necessary
                     if (i == redemps.length - 1) {
