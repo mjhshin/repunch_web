@@ -27,7 +27,7 @@
 		
 		{% for reward in rewards %}
 		    <div class="tr reward {% cycle '' 'odd' %}" id="{{ reward.reward_id }}">
-				<a href="{% url 'reward_edit' forloop.counter0 %}">
+				<a href="{% url 'reward_edit' reward.reward_id %}">
 					<div class="td reward_punches">{{ reward.punches }}</div>
 					<div class="td reward_summary">
 						<span class="reward_title">{{ reward.reward_name|trim_to_dots:40 }}</span><br />

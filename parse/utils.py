@@ -116,8 +116,9 @@ def create_png(file_path, coords=None):
     im = Image.open(file_path)
     im.save(file_path, 'png')
     rescale(file_path, 'png', coords)
+    file_name = file_path.split("/")[-1]
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                file_path), file_path, cMeta='png')
+                file_name), file_path, cMeta='png')
     return res 
 
 def delete_file(name, fType):
