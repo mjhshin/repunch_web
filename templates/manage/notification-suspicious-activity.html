@@ -19,9 +19,17 @@ From {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}
 {# TABLE TOP #}
 <div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
 {% if forloop.counter == 1 %}
-There {% if chunk|length > 1 %}are{% else %}is{% endif %} {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that have been punched more than 6 times today. 
+    {% if chunk|length > 1 %}
+    There are {{ chunk|length }} consumers that have been punched more than 6 times today. 
+    {% else %}
+    There is {{ chunk|length }} consumer that has been punched more than 6 times today. 
+    {% endif %}
 {% else %}
-There {% if chunk|length > 1 %}are{% else %}is{% endif %} {{ chunk|length }} consumer{% if chunk|length > 1 %}s{% endif %} that have been punched when the store was closed.
+    {% if chunk|length > 1 %}
+    There are {{ chunk|length }} consumers that have been punched when the store was closed.
+    {% else %}
+    There is {{ chunk|length }} consumer that has been punched when the store was closed.
+    {% endif %}
 {% endif %}
 </div>
 
