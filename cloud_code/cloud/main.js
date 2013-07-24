@@ -123,6 +123,108 @@ Parse.Cloud.define("register_patron", function(request, response) {
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_employee", function(request, response) {
+	var retailerPin = request.params.retailer_pin;
+    var username = request.params.username;
+	var password = request.params.password;
+	var firstName = request.params.first_name;
+	var lastName = request.params.last_name;
+	var email = request.params.email;
+	
+	var Employee = Parse.Object.extend("Employee");
+	var Store = Parse.Object.extend("Store");
+	var Settings = Parse.Object.extend("Settings");
+	
+	var store, employee, user;
+	
+	var settingsQuery = new Parse.Query(Settings);
+	settingsQuery.include("Store");
+	settingsQuery.equalTo("retailer_pin", retailerPin);
+	
+	settingsQuery.first().then(function(settings) {
+		if(settings == null) {
+			console.log("Settings fetch success, PIN invalid.");
+			response.success("invalid_pin");
+			
+		} else {
+			console.log("Settings fetch success, PIN valid.");
+			executeSignUp();
+		}		
+			
+	}, function(error) {
+		console.log("Settings fetch failed.");
+		response.error("error");
+		
+	});
+	
+	function executeSignUp() {
+		store = settings.get("Store");
+		
+		employee = new Employee();
+		employee.set("first_name", true);
+		employee.set("last_name", username);
+		employee.set("lifetime_punches", 0);
+		employee.set("status", "pending");
+		employee.set("Store", store);
+		
+		employee.save().then(function(employee) {
+			console.log("Employee save success.");
+
+			user = new Parse.User();
+			user.set("username", username);
+			user.set("password", password);
+			user.set("email", email);
+			user.set("Employee", employee);
+			
+			return user.save();
+			
+		}, function(error) {
+			console.log("Employee save failed.");
+			response.error("error");
+			return;
+				
+		}).then(function(user) {
+			console.log("User save success.");
+			store.relation("Employees").add(employee);
+			return store.save();
+			
+		}, function(error) {
+			console.log("User save failed.");
+			console.log("User save failed.");
+		
+			if(error.code == Parse.Error.EMAIL_TAKEN) {
+				console.log("User save failed - email already taken.");
+				response.error(error.message);
+				deleteEmployee();
+			
+			} else if(error.code == Parse.Error.USERNAME_TAKEN)) {
+				console.log("User save failed - username already taken.");
+				response.error(error.message);
+				deleteEmployee();
+				
+			} else {
+				response.error("error");
+			}
+			
+		}).then(function(store) {
+			console.log("Store save success.");
+			response.success("success");
+			//TODO: notify store of new employee registration
+			
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+				
+		})
+	}
+	
+	function deleteEmployee() {
+		employee.destroy().then(function() {
+			console.log("Employee delete success.");
+			
+		}, function(error) {
+			console.log("Employee delete fail.");
+		});
+	}
     
 });
 
@@ -382,7 +484,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				   
 	patronStoreQuery.first({
 		success: function(patronStoreResult) {
-			if(patronStoreResult == null) {//customer's first punch at this store, need new PatronStore.
+			if(patronStoreResult == null) { //customer's first punch at this store, need new PatronStore.
 				addPatronStore();				
 			} else {
 				updatePatronStore(patronStoreResult);
