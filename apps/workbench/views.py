@@ -16,9 +16,6 @@ from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_REQUEST_RECEIVE
 
-from django.core.mail import send_mail
-from repunch.settings import ORDER_PLACED_EMAILS
-
 @login_required
 @session_comet
 def index(request):
@@ -148,6 +145,7 @@ def redeem(request):
                     "redeem_id":redeemId,
                     "store_id":store.get("objectId"),
                     })
+            
         if 'error' not in res:
             # retrieve latest session since user may click a bunch 
             # of redemptions consecutively
@@ -160,14 +158,16 @@ def redeem(request):
                 if red.objectId == redeemId:
                     i_remove = i 
                     break
-            full_message = "i_remove is " + str(i_remove)
-            send_mail("Redeem failed why?", full_message, 
-                "vandolf@repunch.com", ["vandolf@repunch.com"],
-                fail_silently=True)
-            if i_remove != -1 and action == "approve":
+           
+            # IMPORTANT! Since comet receive  immediately commits
+            # changes to a session, i_remove will probably be -1
+            
+           
+            if action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
-                if result and result == "insufficient":
+                if result and result == "insufficient" and\
+                    i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
                     # notify other dashboards of this change
                     store_id =\
@@ -178,7 +178,7 @@ def redeem(request):
                         
                     # now delete the redemption
                     del_red.delete()
-                else:
+                elif i_remove != -1:
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True
                     redemption.updatedAt = timezone.now()
@@ -192,11 +192,13 @@ def redeem(request):
                             redemption.jsonify()}
                         requests.post(COMET_REQUEST_RECEIVE+store_id,
                             data=json.dumps(payload))
-                        
-                session['redemptions_pending'] =\
-                    redemptions_pending
-                # request.session will be saved after return
-                request.session.update(session)
+                      
+                # session changed only if i_remove was not 1
+                if i_remove != -1: 
+                    session['redemptions_pending'] =\
+                        redemptions_pending
+                    # request.session will be saved after return
+                    request.session.update(session)
                 
                 if result and result == "insufficient":
                     return HttpResponse(json.dumps({"result":2}), 
@@ -208,18 +210,21 @@ def redeem(request):
                     return HttpResponse(json.dumps({"result":1}), 
                                 content_type="application/json")
                                 
-            elif i_remove != -1 and action == "deny":
-                del_red = redemptions_pending.pop(i_remove)
-                session['redemptions_pending'] =\
-                    redemptions_pending
-                if DEBUG:
-                    store_id =\
-                        SESSION.get_store(session).objectId
-                    payload = {"deletedRedemption":del_red.jsonify()}
-                    requests.post(COMET_REQUEST_RECEIVE + store_id,
-                        data=json.dumps(payload))
+            elif action == "deny":
+                if i_remove != -1:
+                    del_red = redemptions_pending.pop(i_remove)
+                    session['redemptions_pending'] =\
+                        redemptions_pending
+                    request.session.update(session)
+                    
+                    if DEBUG:
+                        store_id =\
+                            SESSION.get_store(session).objectId
+                        payload = {"deletedRedemption":\
+                            del_red.jsonify()}
+                        requests.post(COMET_REQUEST_RECEIVE+store_id,
+                            data=json.dumps(payload))
                         
-                request.session.update(session)
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
                                 
