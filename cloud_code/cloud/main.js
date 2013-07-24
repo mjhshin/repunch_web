@@ -196,9 +196,9 @@ Parse.Cloud.define("register_employee", function(request, response) {
 				response.error(error.message);
 				deleteEmployee();
 			
-			} else if(error.code == Parse.Error.USERNAME_TAKEN)) {
-				console.log("User save failed - username already taken.");
-				response.error(error.message);
+			} else if(error.code == Parse.Error.USERNAME_TAKEN) {
+			    console.log("User save failed - username already taken.");
+			    response.error(error.message);
 				deleteEmployee();
 				
 			} else {
