@@ -21,8 +21,7 @@ class PublicPagesTestCase(get_test_case_class()):
         pages.
         """
         ### HOME
-        # ACTION!
-        self.open(reverse("public_home"))
+        self.open(reverse("public_home")) # ACTION!
         sleep(1)
         
         ### LEARN
@@ -36,8 +35,7 @@ class PublicPagesTestCase(get_test_case_class()):
             "#tabSocial",
             "#tabPlans-pricing", 
         )
-        # ACTION!
-        # self.action_chain(1, selectors) 
+        # self.action_chain(1, selectors) # ACTION!
         
         ### FAQ
         selectors = [
@@ -49,8 +47,7 @@ class PublicPagesTestCase(get_test_case_class()):
         for i in range(1, 15):
             selectors.append("//div[@id='faq-content']/aside/"+\
                 "div[" + str(i) + "]/div[@class='accordionButton']")
-        # ACTION!
-        # self.action_chain(1, selectors, type="xpath")
+        # self.action_chain(1, selectors, type="xpath") # ACTION!
         
         ### ABOUT
         # ACTION!
@@ -65,11 +62,6 @@ class PublicPagesTestCase(get_test_case_class()):
         # ACTION!
         # self.action_chain(1, selectors, action="move", type="xpath")
         
-        # go back to home page via header logo
-        # ACTION!
-        self.find("//div[@id='header-content']/a[1]",
-            type="xpath").click()
-        
         ### FOOTER elements
         selectors = []
         for i in range(1, 5): # TOS, PP, Contact, Jobs
@@ -78,23 +70,18 @@ class PublicPagesTestCase(get_test_case_class()):
         # facebook and twitter
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-        # ACTION!
-        self.action_chain(1, selectors, type="xpath")
+        self.action_chain(2, selectors, type="xpath") # ACTION!
         
         # close all windows
         sleep(2)
-        # ACTION!
-        self.driver.close()
-        sleep(1)
-        
         # open the home page again
-        # ACTION!
-        self.open(reverse("public_home"))
-        sleep(1)
+        self.new_driver() # ACTION!
+        self.open(reverse("public_home")) # ACTION!
         
-        
-        # TODO SIGNUP
-        
+        # SIGNUP
+        sleep(2)
+        self.find("//aside[@id='home-col-left']/a[1]",
+            type="xpath").click() # ACTION!
         
         
         

@@ -21,6 +21,14 @@ class LocalTestCase(LiveServerTestCase):
     def tearDownClass(cls):
         super(LocalTestCase, cls).tearDownClass()
         cls.driver.quit()
+        
+    def new_driver(self):
+        """
+        quits the current driver and instantiates a new one
+        """
+        self.driver.quit()
+        sleep(2)
+        self.driver = webdriver.Firefox()
     
     def open(self, url):
         self.driver.get("%s%s" % (self.live_server_url, url))
@@ -67,6 +75,14 @@ class RemoteTestCase(TestCase):
     def tearDownClass(cls):
         super(RemoteTestCase, cls).tearDownClass()
         cls.driver.quit()
+        
+    def new_driver(self):
+        """
+        quits the current driver and instantiates a new one
+        """
+        self.driver.quit()
+        sleep(2)
+        self.driver = webdriver.Firefox()
     
     def open(self, url):
         self.driver.get("%s%s" % (RemoteTestCase.SERVER_URL, url)) 
