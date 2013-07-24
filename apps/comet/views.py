@@ -224,7 +224,6 @@ def refresh(request):
         
         # reds_copy has the same or more items that reds
         del_redemps = tuple(set(reds_copy) - set(reds))
-        print "Deleted redemptions"
         if del_redemps:
             redemp_js = []
             for red_id in del_redemps:
@@ -348,7 +347,6 @@ def refresh(request):
                 scomet.delete()
             except CometSession.DoesNotExist:
                 pass # do nothing
-            print "Returning comet!"
             return comet(session_copy)
         else: # nothing new, sleep for a bit
             sleep(COMET_REFRESH_RATE)
@@ -366,7 +364,6 @@ def refresh(request):
             scomet.delete()
         except CometSession.DoesNotExist:
             pass # do nothing
-        print "returning comet!"
         return comet(session_copy)
             
     # make sure that request.session is the most up to date
@@ -595,7 +592,6 @@ def receive(request, store_id):
         # REDEMPTIONS PENDING
         pendingRedemption = postDict.get("pendingRedemption")
         if pendingRedemption:
-            print "New Pending Redemption"
             redemptions_pending_ids =\
                 [ red.objectId for red in redemptions_pending ]
             redemptions_past_ids =\

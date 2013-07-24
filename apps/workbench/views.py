@@ -16,6 +16,9 @@ from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_REQUEST_RECEIVE
 
+from django.core.mail import send_mail
+from repunch.settings import ORDER_PLACED_EMAILS
+
 @login_required
 @session_comet
 def index(request):
@@ -157,6 +160,10 @@ def redeem(request):
                 if red.objectId == redeemId:
                     i_remove = i 
                     break
+            full_message = "i_remove is " + str(i_remove)
+            send_mail("Redeem failed why?", full_message, 
+                "vandolf@repunch.com", ["vandolf@repunch.com"],
+                fail_silently=True)
             if i_remove != -1 and action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
