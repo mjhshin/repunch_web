@@ -128,8 +128,8 @@
 				</div>				
 			</aside>
 			<aside class="col2">
-				<h3>Don't see your question</h3>
-				<p id="question-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia  Curae; Suspendisse potenti.</p>
+				<h3>Don't see your question?</h3>
+				<p id="question-description">Ask us.</p>
 				<form id="make-question-form" method="post" action="{% url 'public_contact' %}">{% csrf_token %}
 					{{ form.full_name.errors }}
 			        <label for="id_full_name">Name</label>
