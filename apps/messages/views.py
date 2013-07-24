@@ -22,7 +22,6 @@ COMET_REQUEST_RECEIVE
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
-
 @login_required
 def get_page(request):
     """
@@ -358,17 +357,6 @@ def feedback_reply(request, feedback_id):
         return redirect(reverse('messages_index')+ "?%s" %\
              urllib.urlencode({'error':\
                 'Feedback has already been deleted.'}))
-        
-    # first fetch the feedback - make sure that we have the updated
-    # one - not the one in the cache
-    if not feedback.fetchAll(): # it has been deleted
-        # remove feedback from the session
-        messages_received_list.pop(i_remove)
-        request.session['messages_received_list'] =\
-            messages_received_list
-        return redirect(reverse('messages_index') +\
-                        "?%s" % urllib.urlencode({'error':\
-                        'Feedback has been deleted elsewhere.'}))
     
     if request.method == 'POST':
         body = request.POST.get('body')
@@ -450,6 +438,7 @@ def feedback_reply(request, feedback_id):
 @login_required
 @session_comet  
 def feedback_delete(request, feedback_id):
+    store = SESSION.get_store(request.session)
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
         request.session)
@@ -464,11 +453,9 @@ def feedback_delete(request, feedback_id):
         return redirect(reverse('messages_index')+ "?%s" %\
              urllib.urlencode({'error':\
                 'Feedback has already been deleted.'}))
-
-    # delete reply to message first if exist
-    if feedback.get('Reply'):
-        feedback_reply = feedback.get('reply')
-        feedback_reply.delete()
+                
+    # DO NOT DELETE ANYTHING! Just remove from the store's relation
+    store.remove_relation("ReceivedMessages", [feedback.objectId])
     
     # update messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
@@ -483,13 +470,14 @@ def feedback_delete(request, feedback_id):
         messages_received_list
         
     # notify other dashboards of this change
-    store_id = SESSION.get_store(request.session).objectId
+    store_id = store.objectId
     deleted_feedback = Message(objectId=feedback.objectId)
     payload = {"deletedFeedback":deleted_feedback.jsonify()}
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
-    
-    feedback.delete()
+        
+    # no need to save the store since we just removed from relation
+        
     return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
 
 @login_required

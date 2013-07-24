@@ -532,13 +532,10 @@ class ParseObject(object):
             self.update_locally(res, False)
             return True
         return False 
-
-    def add_relation(self, relAttrName, objectIds):
-        """ Adds the list of objectIds to the given relation. 
-        relAttrName is a str, which is the name of the Relation attr.
-
-        Adds the relations to Parse and empty  the cache. 
-        Returns True if successful.
+        
+    def _relation_op(self, op, relAttrName, objectIds):
+        """
+        Helper function for add and remove relations.
         """
         if relAttrName not in self.__dict__:
             return False
@@ -552,7 +549,7 @@ class ParseObject(object):
                            "objectId": oid } )
         res = parse("PUT", self.path() + "/" + self.objectId, {
                     relAttrName[:-1]: {
-                        "__op": "AddRelation",
+                        "__op": op,
                         "objects": objs, 
                     }
                  } )
@@ -562,6 +559,26 @@ class ParseObject(object):
             return True
         else:
             return False
+
+    def add_relation(self, relAttrName, objectIds):
+        """ Adds the list of objectIds to the given relation. 
+        relAttrName is a str, which is the name of the Relation attr.
+
+        Adds the relations to Parse and empty  the cache. 
+        Returns True if successful.
+        """
+        return self._relation_op("AddRelation",relAttrName,objectIds)
+
+    def remove_relation(self, relAttrName, objectIds):
+        """ Adds the list of objectIds to the given relation. 
+        relAttrName is a str, which is the name of the Relation attr.
+
+        Adds the relations to Parse and empty  the cache. 
+        Returns True if successful.
+        """
+        return self._relation_op("RemoveRelation",
+            relAttrName,objectIds)
+        
 
     def update(self):
         """ Save changes to this object to the Parse DB.
