@@ -21,6 +21,7 @@ class PublicPagesTestCase(get_test_case_class()):
         pages.
         """
         ### HOME
+        # ACTION!
         self.open(reverse("public_home"))
         sleep(1)
         
@@ -35,7 +36,8 @@ class PublicPagesTestCase(get_test_case_class()):
             "#tabSocial",
             "#tabPlans-pricing", 
         )
-        self.action_chain(1, selectors)
+        # ACTION!
+        # self.action_chain(1, selectors) 
         
         ### FAQ
         selectors = [
@@ -47,18 +49,55 @@ class PublicPagesTestCase(get_test_case_class()):
         for i in range(1, 15):
             selectors.append("//div[@id='faq-content']/aside/"+\
                 "div[" + str(i) + "]/div[@class='accordionButton']")
-        self.action_chain(1, selectors, type="xpath")
+        # ACTION!
+        # self.action_chain(1, selectors, type="xpath")
         
         ### ABOUT
-        self.find("//nav[@id='header-menu']/a[@href='" +\
-                reverse("public_about") + "']", type="xpath").click()
+        # ACTION!
+        # self.find("//nav[@id='header-menu']/a[@href='" +\
+        #        reverse("public_about") + "']", type="xpath").click()
         selectors = [] 
         # about member photos
         for i in range(1, 7):
             selectors.append("//div[@id='the-team']/" +\
                 "div[@class='the-team-member tooltip'][" +\
                 str(i) + "]")
-        self.action_chain(1, selectors, action="move", type="xpath")
+        # ACTION!
+        # self.action_chain(1, selectors, action="move", type="xpath")
+        
+        # go back to home page via header logo
+        # ACTION!
+        self.find("//div[@id='header-content']/a[1]",
+            type="xpath").click()
+        
+        ### FOOTER elements
+        selectors = []
+        for i in range(1, 5): # TOS, PP, Contact, Jobs
+            selectors.append("//ul[@id='footer-menu']/li[" +\
+                str(i) + "]/a[1]")
+        # facebook and twitter
+        selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
+        selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
+        # ACTION!
+        self.action_chain(1, selectors, type="xpath")
+        
+        # close all windows
+        sleep(2)
+        # ACTION!
+        self.driver.close()
+        sleep(1)
+        
+        # open the home page again
+        # ACTION!
+        self.open(reverse("public_home"))
+        sleep(1)
+        
+        
+        # TODO SIGNUP
+        
+        
+        
+        
         
         # END
         sleep(5)

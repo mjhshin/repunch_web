@@ -1,3 +1,3 @@
-PENDING = "Pending"
-APPROVED = "Approved"
-DENIED = "Denied" 
+PENDING = "pending"
+APPROVED = "approved"
+DENIED = "denied" 

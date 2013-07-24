@@ -10,7 +10,7 @@ class Employee(models.Model):
 	last_name = models.CharField(max_length=255)
 	email = models.CharField(max_length=255)
 	date_added = models.DateField(auto_now_add=True)
-	status = models.IntegerField(choices=((0,'Pending'),(1,'Approved'),(2,'Denied')),default=0)
+	status = models.IntegerField(choices=((0,'pending'),(1,'approved'),(2,'denied')),default=0)
 	employee_avatar = models.ImageField(max_length=255,upload_to='images/avatars/employees',blank=True)
 	
 	def delete(self):
