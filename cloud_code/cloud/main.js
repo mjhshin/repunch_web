@@ -207,8 +207,13 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 		}).then(function(store) {
 			console.log("Store save success.");
-			response.success("success");
-			//TODO: notify store of new employee registration
+			// notify store of new employee registration
+			Parse.Cloud.httpRequest({
+                method: 'POST',
+                url: 'http://www.repunch.com/manage/comet/receive/' + store.id,
+                headers: { 'Content-Type': 'application/json'},
+                body: { pendingEmployee: employee, }
+            });
 			
 		}, function(error) {
 			console.log("Store save failed.");
