@@ -7,6 +7,9 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+# Used in notification templates
+MAIN_TRANSPORT_PROTOCOL = "https"
+
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
 else:

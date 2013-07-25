@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link href="{% static "manage/css/global.css" %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.css' %}" rel="stylesheet" />
 	<style>
 	#avatar-form {
 	    padding-left:15px;
@@ -23,7 +23,7 @@
 	    width:250px;line-height:110%;margin-top:14px;
 	}
 	</style>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}""></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#upload-btn').click(function(){
