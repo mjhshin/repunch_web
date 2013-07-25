@@ -7,8 +7,11 @@ Replace this with more appropriate tests for your application.
 
 from django.core.urlresolvers import reverse
 from selenium_tests import get_test_case_class
+from selenium.webdriver.common.keys import Keys
 
 from time import sleep
+
+from parse.notifications import send_email_selenium_test_results
 
 class PublicPagesTestCase(get_test_case_class()):
     """
@@ -70,21 +73,51 @@ class PublicPagesTestCase(get_test_case_class()):
         # facebook and twitter
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-        self.action_chain(2, selectors, type="xpath") # ACTION!
+        # self.action_chain(2, selectors, type="xpath") # ACTION!
         
         # close all windows
         sleep(2)
         # open the home page again
-        self.new_driver() # ACTION!
-        self.open(reverse("public_home")) # ACTION!
+        # self.new_driver() # ACTION!
+        # self.open(reverse("public_home")) # ACTION!
         
         # SIGNUP
         sleep(2)
         self.find("//aside[@id='home-col-left']/a[1]",
             type="xpath").click() # ACTION!
         
+        # form data
+        selectors = (
+            ("#id_store_name", "test business"),
+            ("#id_street", "1370 virginia ave 4d"),
+            ("#id_city", "bronx"),
+            ("#id_state", "ny"),
+            ("#id_zip", "10462"),
+            ("#categories", "baker"),
+            ("", Keys.ARROW_DOWN),
+            ("", Keys.RETURN),
+            ("#categories", "fitn"),
+            ("", Keys.ARROW_DOWN),
+            ("", Keys.RETURN),
+            ("#id_first_name", "Testee"),
+            ("#id_last_name", "Bestee"),
+            ("#Ph1", "777"),
+            ("#Ph2", "777"),
+            ("#Ph3", "7777"),
+            ("#id_email", "test@iusluixylusr.com"),
+            ("#id_username", "iusluixylusr"),
+            ("#id_password", "iusluixylusr"),
+            ("#id_confirm_password", "iusluixylusr"),
+        )
+        self.action_chain(1, selectors, action="send_keys") # ACTION!
+        # ToS and submit
+        selectors = (
+            "#id_recurring",
+            # "#signup-form-submit",
+        )
+        self.action_chain(2, selectors) # ACTION!
         
-        
+        # retrieve the st
         
         # END
         sleep(5)

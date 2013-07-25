@@ -17,7 +17,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
-ORDER_PLACED_EMAILS, TIME_ZONE
+ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS
 
 def get_notification_ctx():
     """
@@ -49,7 +49,8 @@ def _send_emails(emails, connection=None):
         
 def send_email_receipt_monthly(asiss, connection=None):
     """
-    Sends users a receipt and sends admins an email containing a list 
+    Sends users a receipt and sends ORDER_PLACED_EMAILS
+    an email containing a list 
     of stores that have been charged their monthly bill.
     
     asiss (account store invoice subscription) 
@@ -85,7 +86,7 @@ def send_email_receipt_monthly(asiss, connection=None):
                     strip_tags(body), to=[account.get('email')])
         email.attach_alternative(body, 'text/html')
         emails.append(email)
-    # for admins
+    # for ORDER_PLACED_EMAILS
     with open(FS_SITE_DIR +\
         "/templates/manage/notification-receipt-monthly-admin.html", 'r') as f:
         template = Template(f.read())
@@ -104,7 +105,7 @@ def send_email_receipt_monthly(asiss, connection=None):
 def send_email_receipt_smartphone(account, subscription, invoice,
     amount, connection=None):
     """
-    Sends the user and admins pretty receipt.
+    Sends the user and ORDER_PLACED_EMAILS pretty receipt.
     """
     with open(FS_SITE_DIR +\
         "/templates/manage/notification-receipt-smartphone.html", 'r') as f:
@@ -127,7 +128,7 @@ def send_email_receipt_smartphone(account, subscription, invoice,
     email.attach_alternative(body, 'text/html')
     emails.append(email)
     
-    # for admins
+    # for ORDER_PLACED_EMAILS
     subject = "Smartphone(s) purchased by " +\
          store.get_owner_fullname() + "."
     ctx = get_notification_ctx()
@@ -150,7 +151,8 @@ def send_email_receipt_smartphone(account, subscription, invoice,
 
 def send_email_signup(account, connection=None):
     """
-    Sends a welcome notification to the account and admins.
+    Sends a welcome notification to the account and 
+    ORDER_PLACED_EMAILS.
     """
     # for new account
     with open(FS_SITE_DIR +\
@@ -169,14 +171,14 @@ def send_email_signup(account, connection=None):
     email.attach_alternative(body, 'text/html')
     emails.append(email)
     
-    # for admins
+    # for ORDER_PLACED_EMAILS
     with open(FS_SITE_DIR +\
         "/templates/manage/notification-newuser.html", 'r') as f:
         template = Template(f.read())
     
     subject = "New business: "+account.get("store").get("store_name")
     AccountActivate = getattr(import_module('apps.accounts.models'),
-                                "AccountActivate")
+                                "AccountActsend_email_selenium_test_resultsivate")
     ctx = get_notification_ctx()
     ctx.update({
         'account': account,
@@ -215,14 +217,12 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
     ctx.update({'store':store, 'start':start, 'end':end, 
                 'chunks':(chunk1, chunk2)})
     body = template.render(Context(ctx)).__str__()
-    emails = []
     
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=[account.get('email')])
     email.attach_alternative(body, 'text/html')
-    emails.append(email)
     
-    _send_emails(emails, connection)
+    _send_emails([email], connection)
     
     
 def send_email_passed_user_limit(account, store, package,
@@ -243,14 +243,12 @@ def send_email_passed_user_limit(account, store, package,
     ctx = get_notification_ctx()
     ctx.update({'store':store, 'package':package})
     body = template.render(Context(ctx)).__str__()
-    emails = []
     
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=[account.get('email')])
     email.attach_alternative(body, 'text/html')
-    emails.append(email)
     
-    _send_emails(emails, connection)
+    _send_emails([email], connection)
     
    
 def send_email_account_upgrade(account, store, package,
@@ -270,17 +268,34 @@ def send_email_account_upgrade(account, store, package,
     ctx = get_notification_ctx()
     ctx.update({'store':store, 'package':package})
     body = template.render(Context(ctx)).__str__()
-    emails = []
     
     email = mail.EmailMultiAlternatives(subject,
                 strip_tags(body), to=[account.get('email')])
     email.attach_alternative(body, 'text/html')
-    emails.append(email)
     
-    _send_emails(emails, connection)
+    _send_emails([email], connection)
    
-   
-   
+
+def send_email_selenium_test_results(package, connection=None):
+    """
+    Used by selenium tests to send the results of the test to ADMINS
+    """
+    with open(FS_SITE_DIR +\
+        "/templates/manage/notification-selenium-tests-results.html",
+            'r') as f:
+        template = Template(f.read())
+        
+    date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+    subject = "Repunch Inc. Selenium test results."
+    ctx = get_notification_ctx()
+    ctx.update({'date':date, 'package':package})
+    body = template.render(Context(ctx)).__str__()
+    
+    email = mail.EmailMultiAlternatives(subject,
+                strip_tags(body), to=ADMINS[0][1])
+    email.attach_alternative(body, 'text/html')
+    
+    _send_emails([email], connection)
    
     
     

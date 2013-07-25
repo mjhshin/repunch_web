@@ -48,6 +48,9 @@ class LocalTestCase(LiveServerTestCase):
         Performs the action on each of the elements found by the
         given selectors located by the given method with the given 
         wait_time in between each action.
+        
+        Note that if action is send_keys, selectors must be a list 
+        of tuples that contain a selector and a string.
         """
         for selector in selectors:
             sleep(wait_time)
@@ -56,6 +59,12 @@ class LocalTestCase(LiveServerTestCase):
             elif action == "move":
                 ActionChains(self.driver).move_to_element(\
                     self.find(selector, type)).perform()
+            elif action == "send_keys":
+                if len(selector[0]) == 0:
+                    ActionChains(self.driver).send_keys(\
+                        selector[1]).perform()
+                else:
+                    self.find(selector[0],type).send_keys(selector[1])
     
         
 class RemoteTestCase(TestCase):
@@ -102,6 +111,11 @@ class RemoteTestCase(TestCase):
         Performs the action on each of the elements found by the
         given selectors located by the given method with the given 
         wait_time in between each action.
+        
+        Note that if action is send_keys, selectors must be a list 
+        of tuples that contain a selector and a string. If a selector
+        is not provided then an ActionChains will be performed at
+        the current element.
         """
         for selector in selectors:
             sleep(wait_time)
@@ -110,6 +124,12 @@ class RemoteTestCase(TestCase):
             elif action == "move":
                 ActionChains(self.driver).move_to_element(\
                     self.find(selector, type)).perform()
+            elif action == "send_keys":
+                if len(selector[0]) == 0:
+                    ActionChains(self.driver).send_keys(\
+                        selector[1]).perform()
+                else:
+                    self.find(selector[0],type).send_keys(selector[1])
 
 def get_test_case_class():
     """
