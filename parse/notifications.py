@@ -298,7 +298,7 @@ def send_email_selenium_test_results(tests, connection=None):
     body = template.render(Context(ctx)).__str__()
     
     email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=ADMINS[0][1])
+                strip_tags(body), to=(ADMINS[0][1], ))
     email.attach_alternative(body, 'text/html')
     
     _send_emails([email], connection)

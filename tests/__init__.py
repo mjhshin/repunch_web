@@ -4,14 +4,16 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 
-from repunch.settings import TEST_REMOTE_SERVER
 from parse.notifications import send_email_selenium_test_results
 
 class SeleniumTest(object):
     """
     Wrapper around selenium - makes life easier.
     """
-    def __init__(self, base_url):
+    
+    SERVER_URL = "http://www.repunch.com"
+    
+    def __init__(self):
         """
         Prepare the driver and results container.
         
@@ -22,7 +24,6 @@ class SeleniumTest(object):
         """
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
-        self.base_url = base_url
         self.results = []
         
     def tear_down(self):
@@ -33,7 +34,7 @@ class SeleniumTest(object):
         send_email_selenium_test_results(self.results)
         
     def open(self, url):
-        self.driver.get("%s%s" % (self.base_url, url))
+        self.driver.get("%s%s" % (SERVER_URL, url))
     
     def new_driver(self):
         """
@@ -77,45 +78,3 @@ class SeleniumTest(object):
                         selector[1]).perform()
                 else:
                     self.find(selector[0],type).send_keys(selector[1])
-
-class LocalTestCase(LiveServerTestCase):
-    """
-    Base class for testing locally.
-    """
-    
-    @classmethod
-    def setUpClass(cls):
-        cls.t = SeleniumTest(cls.live_server_url)        
-        super(LocalTestCase, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.t.tear_down()
-        super(LocalTestCase, cls).tearDownClass()
-        
-class RemoteTestCase(TestCase):
-    """
-    Base class for testing the remote site.
-    """
-    
-    SERVER_URL = "http://www.repunch.com"
-    
-    @classmethod
-    def setUpClass(cls):
-        cls.t = SeleniumTest(RemoteTestCase.SERVER_URL)        
-        super(RemoteTestCase, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.t.tear_down()
-        super(RemoteTestCase, cls).tearDownClass()
-
-def get_test_case_class():
-    """
-    Returns the LocalTestCase if TEST_REMOTE_SERVER is False.
-    RemoteTestCase otherwise.
-    """
-    if TEST_REMOTE_SERVER:
-        return RemoteTestCase
-    else:
-        return LocalTestCase
