@@ -5,23 +5,36 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 
 from repunch.settings import TEST_REMOTE_SERVER
+from parse.notifications import send_email_selenium_test_results
 
-class LocalTestCase(LiveServerTestCase):
+class SeleniumTest(object):
     """
-    Base class for testing locally.
+    Wrapper around selenium - makes life easier.
     """
-    
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Firefox()
-        cls.driver.implicitly_wait(10)
-        super(LocalTestCase, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(LocalTestCase, cls).tearDownClass()
-        cls.driver.quit()
+    def __init__(self, base_url):
+        """
+        Prepare the driver and results container.
         
+        results format:
+        [ {'section_name": section1,
+                'parts': [ {'success':True, 'test_name':test1}, ... ],
+            ... ]
+        """
+        self.driver = webdriver.Firefox()
+        self.driver.implicitly_wait(10)
+        self.base_url = base_url
+        self.results = []
+        
+    def tear_down(self):
+        """
+        Quit the driver and sent the results of the test.
+        """
+        self.driver.quit()
+        send_email_selenium_test_results(self.results)
+        
+    def open(self, url):
+        self.driver.get("%s%s" % (self.base_url, url))
+    
     def new_driver(self):
         """
         quits the current driver and instantiates a new one
@@ -29,72 +42,6 @@ class LocalTestCase(LiveServerTestCase):
         self.driver.quit()
         sleep(2)
         self.driver = webdriver.Firefox()
-    
-    def open(self, url):
-        self.driver.get("%s%s" % (self.live_server_url, url))
-        
-    def find(self, selector, type="css"):
-        """
-        Shortcut for find_element_by_css_selector or xpath, etc
-        """     
-        if type == "css":
-            return self.driver.find_element_by_css_selector(selector)
-        elif type == "xpath":
-            return self.driver.find_element_by_xpath(selector)
-            
-    def action_chain(self, wait_time, selectors, action="click",
-            type="css"):
-        """
-        Performs the action on each of the elements found by the
-        given selectors located by the given method with the given 
-        wait_time in between each action.
-        
-        Note that if action is send_keys, selectors must be a list 
-        of tuples that contain a selector and a string.
-        """
-        for selector in selectors:
-            sleep(wait_time)
-            if action == "click":
-                self.find(selector, type).click()
-            elif action == "move":
-                ActionChains(self.driver).move_to_element(\
-                    self.find(selector, type)).perform()
-            elif action == "send_keys":
-                if len(selector[0]) == 0:
-                    ActionChains(self.driver).send_keys(\
-                        selector[1]).perform()
-                else:
-                    self.find(selector[0],type).send_keys(selector[1])
-    
-        
-class RemoteTestCase(TestCase):
-    """
-    Base class for testing the remote site.
-    """
-    
-    SERVER_URL = "http://www.repunch.com"
-    
-    @classmethod
-    def setUpClass(cls):
-        cls.driver = webdriver.Firefox()
-        cls.driver.implicitly_wait(10)
-        super(RemoteTestCase, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(RemoteTestCase, cls).tearDownClass()
-        cls.driver.quit()
-        
-    def new_driver(self):
-        """
-        quits the current driver and instantiates a new one
-        """
-        self.driver.quit()
-        sleep(2)
-        self.driver = webdriver.Firefox()
-    
-    def open(self, url):
-        self.driver.get("%s%s" % (RemoteTestCase.SERVER_URL, url)) 
         
     def find(self, selector, type="css"):
         """
@@ -130,6 +77,38 @@ class RemoteTestCase(TestCase):
                         selector[1]).perform()
                 else:
                     self.find(selector[0],type).send_keys(selector[1])
+
+class LocalTestCase(LiveServerTestCase):
+    """
+    Base class for testing locally.
+    """
+    
+    @classmethod
+    def setUpClass(cls):
+        cls.t = SeleniumTest(cls.live_server_url)        
+        super(LocalTestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.t.tear_down()
+        super(LocalTestCase, cls).tearDownClass()
+        
+class RemoteTestCase(TestCase):
+    """
+    Base class for testing the remote site.
+    """
+    
+    SERVER_URL = "http://www.repunch.com"
+    
+    @classmethod
+    def setUpClass(cls):
+        cls.t = SeleniumTest(RemoteTestCase.SERVER_URL)        
+        super(RemoteTestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.t.tear_down()
+        super(RemoteTestCase, cls).tearDownClass()
 
 def get_test_case_class():
     """

@@ -11,8 +11,6 @@ from selenium.webdriver.common.keys import Keys
 
 from time import sleep
 
-from parse.notifications import send_email_selenium_test_results
-
 class PublicPagesTestCase(get_test_case_class()):
     """
     Test that all public pages are accessible.
@@ -24,7 +22,7 @@ class PublicPagesTestCase(get_test_case_class()):
         pages.
         """
         ### HOME
-        self.open(reverse("public_home")) # ACTION!
+        self.t.open(reverse("public_home")) # ACTION!
         sleep(1)
         
         ### LEARN
@@ -38,7 +36,7 @@ class PublicPagesTestCase(get_test_case_class()):
             "#tabSocial",
             "#tabPlans-pricing", 
         )
-        # self.action_chain(1, selectors) # ACTION!
+        # self.t.action_chain(1, selectors) # ACTION!
         
         ### FAQ
         selectors = [
@@ -50,11 +48,11 @@ class PublicPagesTestCase(get_test_case_class()):
         for i in range(1, 15):
             selectors.append("//div[@id='faq-content']/aside/"+\
                 "div[" + str(i) + "]/div[@class='accordionButton']")
-        # self.action_chain(1, selectors, type="xpath") # ACTION!
+        # self.t.action_chain(1, selectors, type="xpath") # ACTION!
         
         ### ABOUT
         # ACTION!
-        # self.find("//nav[@id='header-menu']/a[@href='" +\
+        # self.t.find("//nav[@id='header-menu']/a[@href='" +\
         #        reverse("public_about") + "']", type="xpath").click()
         selectors = [] 
         # about member photos
@@ -63,7 +61,7 @@ class PublicPagesTestCase(get_test_case_class()):
                 "div[@class='the-team-member tooltip'][" +\
                 str(i) + "]")
         # ACTION!
-        # self.action_chain(1, selectors, action="move", type="xpath")
+        # self.t.action_chain(1, selectors, action="move", type="xpath")
         
         ### FOOTER elements
         selectors = []
@@ -73,17 +71,17 @@ class PublicPagesTestCase(get_test_case_class()):
         # facebook and twitter
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-        # self.action_chain(2, selectors, type="xpath") # ACTION!
+        # self.t.action_chain(2, selectors, type="xpath") # ACTION!
         
         # close all windows
         sleep(2)
         # open the home page again
-        # self.new_driver() # ACTION!
-        # self.open(reverse("public_home")) # ACTION!
+        # self.t.new_driver() # ACTION!
+        # self.t.open(reverse("public_home")) # ACTION!
         
         # SIGNUP
         sleep(2)
-        self.find("//aside[@id='home-col-left']/a[1]",
+        self.t.find("//aside[@id='home-col-left']/a[1]",
             type="xpath").click() # ACTION!
         
         # form data
@@ -109,13 +107,13 @@ class PublicPagesTestCase(get_test_case_class()):
             ("#id_password", "iusluixylusr"),
             ("#id_confirm_password", "iusluixylusr"),
         )
-        self.action_chain(1, selectors, action="send_keys") # ACTION!
+        self.t.action_chain(1, selectors, action="send_keys") # ACTION!
         # ToS and submit
         selectors = (
             "#id_recurring",
             # "#signup-form-submit",
         )
-        self.action_chain(2, selectors) # ACTION!
+        self.t.action_chain(2, selectors) # ACTION!
         
         # retrieve the st
         

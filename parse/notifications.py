@@ -278,7 +278,13 @@ def send_email_account_upgrade(account, store, package,
 
 def send_email_selenium_test_results(tests, connection=None):
     """
-    Used by selenium tests to send the results of the test to ADMINS
+    Used by selenium tests to send the results of the test to ADMINS.
+    tests has the following format:
+        tests = [
+            {'section_name": section1,
+                'parts': [ {'success':True, 'test_name':test1}, ... ],
+            ...
+        ]
     """
     with open(FS_SITE_DIR +\
         "/templates/manage/notification-selenium-test-results.html",
