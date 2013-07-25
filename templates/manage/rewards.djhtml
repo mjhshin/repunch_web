@@ -30,7 +30,7 @@
 				<a href="{% url 'reward_edit' reward.reward_id %}">
 					<div class="td reward_punches">{{ reward.punches }}</div>
 					<div class="td reward_summary">
-						<span class="reward_title">{{ reward.reward_name|trim_to_dots:40 }}</span><br />
+						<span class="reward_title">{{ reward.reward_name|trim_to_dots:34 }}</span><br />
 						<span class="reward_description">{{ reward.description }}</span>
 					</div>
 				</a>

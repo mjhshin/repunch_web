@@ -92,9 +92,9 @@ $(document).ready(function(){
 				            "<div class='td feedback-date'>"+
                             dStr + "</div>" +
 				            "<div class='td feedback-from'>" +
-				            feedbacks_unread[i].sender_name.trimToDots(14) + "</div>" +
+				            feedbacks_unread[i].sender_name.trimToDots(18) + "</div>" +
 				            "<div class='td feedback-subject'>" +
-				            feedbacks_unread[i].subject.trimToDots(24) + "</div>" +
+				            feedbacks_unread[i].subject.trimToDots(34) + "</div>" +
 			                "</a></div>";
 			            // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {
@@ -157,7 +157,7 @@ $(document).ready(function(){
                 "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
 		        
 		        "<div class='td first_name_pending'>" + employee.first_name.trimToDots(12) + "</div>" +
-		        "<div class='td last_name_pending'>" + employee.last_name.trimToDots(14) + "</div>" +
+		        "<div class='td last_name_pending'>" + employee.last_name.trimToDots(12) + "</div>" +
 		        "<div class='td date_added_pending'>" + dStr + "</div>" +
 		        "<div class='td approve'>" +
 			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
@@ -192,7 +192,7 @@ $(document).ready(function(){
 		        "<a href='/manage/employees/" + employee.objectId + "/edit'>" + 
 		        "<div class='td first_name_approved'>" + employee.first_name.trimToDots(12) + "</div></a>" +
 		        "<a href='/manage/employees/" + employee.objectId + "/edit'>" + 
-		        "<div class='td last_name_approved'>" + employee.last_name.trimToDots(14) + "</div></a>" +
+		        "<div class='td last_name_approved'>" + employee.last_name.trimToDots(12) + "</div></a>" +
 		        "<a href='/manage/employees/'" + employee.objectId + "/edit'>" + 
 		        "<div class='td date_added_approved'>" + dStr + "</div></a>" +
 		        "<a href='/manage/employees/'" + employee.objectId + "/edit'>" + 
@@ -411,9 +411,9 @@ $(document).ready(function(){
 				            "<div class='td redemption_time'>" +
 				            d + "</div>" +
 				            "<div class='td redemption_customer_name'>" +
-				            redemptions_pending[i].customer_name.trimToDots(16) + "</div>" +
+				            redemptions_pending[i].customer_name.trimToDots(18) + "</div>" +
 		                    "<div class='td redemption_title'>" +
-				            redemptions_pending[i].title.trimToDots(20) + "</div>" +
+				            redemptions_pending[i].title.trimToDots(18) + "</div>" +
 				            "<div class='td redemption_punches'>" +
 				            redemptions_pending[i].num_punches + "</div>" +
 				            "<div class='td redemption_redeem' style='margin-top:4px;'>" +
