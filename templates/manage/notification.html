@@ -5,7 +5,7 @@ CSS style declarations in the head of an HTML document (using style tags) are ig
 
 ...The most reliable way to include CSS in an HTML email is to use inline styles. They aren't pretty, but few email clients ignore them.
 
-http://www.htmlgoodies.com/beyond/css/article.php/3679231/How-to-Create-Great-HTML-Emails-with-CSS.htm
+{{ MAIN_TRANSPORT_PROTOCOL }}://www.htmlgoodies.com/beyond/css/article.php/3679231/How-to-Create-Great-HTML-Emails-with-CSS.htm
 -----------------------------------------------
 {% endcomment %}
 {% load static %}
@@ -40,8 +40,8 @@ No theft intended.
         <div style="height:40px;background:#ea8b13;">&nbsp;</div>
     </td>
     <td style="width:189px;padding:0;border-top:1px solid #ea8b13;">
-        <a href="http://{{ ABSOLUTE_HOST_ALIAS }}">
-        <img src="http://{{ ABSOLUTE_HOST }}{{ ICON_URL }}"
+        <a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST_ALIAS }}">
+        <img src="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{ ICON_URL }}"
             width="189px" height="75px" alt="    Repunch Inc."
             style="background:#ea8b13;"/>
         </a>
@@ -108,7 +108,7 @@ We will get in touch with you as soon as we can to help you get started.
 
             <p style="margin: 0 0 .25em;color:#cccccc;">
             To manage your dashboard, 
-               <a href="http://{{ABSOLUTE_HOST_ALIAS}}{{STORE_INDEX}}"
+               <a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ABSOLUTE_HOST_ALIAS}}{{STORE_INDEX}}"
                   style="color:#cccccc;">click here</a></p>
 
             <p style="margin: 0 0 .25em;color:#cccccc;"><a href="#" 
@@ -118,7 +118,7 @@ We will get in touch with you as soon as we can to help you get started.
             <p style="margin: 0 0 .25em;color:#cccccc;">
                 <strong>Visit our official site at&nbsp;&nbsp;
                 </strong>
-                <a href="http://{{ ABSOLUTE_HOST_ALIAS }}"
+                <a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST_ALIAS }}"
                     style="color:#cccccc;">
                 Repunch.com</a>
             </p>

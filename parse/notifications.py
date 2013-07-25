@@ -17,7 +17,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
-ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS
+ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
 def get_notification_ctx():
     """
@@ -29,6 +29,7 @@ def get_notification_ctx():
         'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
         'STORE_INDEX':reverse('store_index'),
         'EMAIL_HOST_USER': EMAIL_HOST_USER,
+        'MAIN_TRANSPORT_PROTOCOL': MAIN_TRANSPORT_PROTOCOL,
     }
 
 def _send_emails(emails, connection=None):

@@ -29,7 +29,7 @@ A new business has signed up!
 </ul>
 
 <form method="POST" 
-    action="http://{{ ABSOLUTE_HOST }}{% url 'account_activate' %}">
+    action="{{ {{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{% url 'account_activate' %}">
 	<input type="hidden" name="store_id" 
 		value="{{ activate.store_id }}" />
 	<input type="hidden" name="act_id" 
