@@ -21,8 +21,28 @@ class PublicPagesTestCase(get_test_case_class()):
         Loads the home page and clicks around to access all public
         pages.
         """
+        
+        """
+        [ {'section_name": section1,
+              'parts': [ {'test_name':test1, 'success':True}, ... ]}
+            ... ]
+        """
+        parts = [
+            {'test_name': "Home page functional"},
+            {'test_name': "Learn page functional"},
+            {'test_name': "FAQ page functional"},
+            {'test_name': "About page functional"},
+            {'test_name': "Footer elements functional"},
+            {'test_name': "Sign Up page functional"},
+        ]
+        section = {
+            "section_name": "Are all public pages functional?",
+            "parts": parts,
+        }
+        
         ### HOME
         self.t.open(reverse("public_home")) # ACTION!
+        parts[0]['success'] = True
         sleep(1)
         
         ### LEARN
@@ -37,6 +57,7 @@ class PublicPagesTestCase(get_test_case_class()):
             "#tabPlans-pricing", 
         )
         # self.t.action_chain(1, selectors) # ACTION!
+        parts[1]['success'] = True
         
         ### FAQ
         selectors = [
@@ -49,6 +70,7 @@ class PublicPagesTestCase(get_test_case_class()):
             selectors.append("//div[@id='faq-content']/aside/"+\
                 "div[" + str(i) + "]/div[@class='accordionButton']")
         # self.t.action_chain(1, selectors, type="xpath") # ACTION!
+        parts[2]['success'] = True
         
         ### ABOUT
         # ACTION!
@@ -62,6 +84,7 @@ class PublicPagesTestCase(get_test_case_class()):
                 str(i) + "]")
         # ACTION!
         # self.t.action_chain(1, selectors, action="move", type="xpath")
+        parts[3]['success'] = True
         
         ### FOOTER elements
         selectors = []
@@ -72,6 +95,7 @@ class PublicPagesTestCase(get_test_case_class()):
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
         # self.t.action_chain(2, selectors, type="xpath") # ACTION!
+        parts[4]['success'] = True
         
         # close all windows
         sleep(2)
@@ -115,9 +139,13 @@ class PublicPagesTestCase(get_test_case_class()):
         )
         self.t.action_chain(2, selectors) # ACTION!
         
-        # retrieve the st
+        # TODO interact with the pop up dialog
+        # TODO delete the created Parse objects
+        
+        parts[5]['success'] = True
         
         # END
+        self.t.results.append(section)
         sleep(5)
         
         
