@@ -207,7 +207,8 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 		}).then(function(store) {
 			console.log("Store save success.");
-			// notify store of new employee registration
+			response.success("success");
+			
 			Parse.Cloud.httpRequest({
                 method: 'POST',
                 url: 'http://www.repunch.com/manage/comet/receive/' + store.id,
