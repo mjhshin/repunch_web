@@ -276,19 +276,19 @@ def send_email_account_upgrade(account, store, package,
     _send_emails([email], connection)
    
 
-def send_email_selenium_test_results(package, connection=None):
+def send_email_selenium_test_results(tests, connection=None):
     """
     Used by selenium tests to send the results of the test to ADMINS
     """
     with open(FS_SITE_DIR +\
-        "/templates/manage/notification-selenium-tests-results.html",
+        "/templates/manage/notification-selenium-test-results.html",
             'r') as f:
         template = Template(f.read())
         
     date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
     subject = "Repunch Inc. Selenium test results."
     ctx = get_notification_ctx()
-    ctx.update({'date':date, 'package':package})
+    ctx.update({'date':date, 'tests':tests})
     body = template.render(Context(ctx)).__str__()
     
     email = mail.EmailMultiAlternatives(subject,
