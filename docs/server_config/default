@@ -1,5 +1,3 @@
-# Note that this is the configuration for http based connections
-
 <VirtualHost *:80>
         ServerAdmin ubuntu@ec2-23-20-15-30.compute-1.amazonaws.com
         ServerName ec2-23-20-15-30.compute-1.amazonaws.com
