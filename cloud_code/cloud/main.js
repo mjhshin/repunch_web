@@ -134,7 +134,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	var Store = Parse.Object.extend("Store");
 	var Settings = Parse.Object.extend("Settings");
 	
-	var store, employee, user;
+	var store, employee, user, settings;
 	
 	var settingsQuery = new Parse.Query(Settings);
 	settingsQuery.include("Store");
