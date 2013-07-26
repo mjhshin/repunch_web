@@ -407,6 +407,10 @@ def terminate(request):
             scomet.delete()
         except CometSession.DoesNotExist:
             pass # do nothing
+            
+        # make sure that the latest session data is saved!
+        request.session.update(SessionStore(\
+            request.session.session_key))
         
         return HttpResponse("ok")
         
