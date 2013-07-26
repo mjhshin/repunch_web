@@ -17,7 +17,8 @@ from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
-from repunch.settings import COMET_REQUEST_RECEIVE
+from repunch.settings import COMET_REQUEST_RECEIVE,\
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
 @session_comet
@@ -105,7 +106,10 @@ def delete(request, employee_id):
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
     deleted_employee = Employee(objectId=employee.objectId)
-    payload = {"deletedEmployee":deleted_employee.jsonify()}
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "deletedEmployee":deleted_employee.jsonify()
+    }
     # check for response?
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
@@ -148,7 +152,10 @@ def approve(request, employee_id):
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
     approved_employee = Employee(objectId=employee.objectId)
-    payload = {"approvedEmployee":approved_employee.jsonify()}
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "approvedEmployee":approved_employee.jsonify()
+    }
     # check for response?
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
@@ -180,7 +187,10 @@ def deny(request, employee_id):
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
     deleted_employee = Employee(objectId=employee.objectId)
-    payload = {"deletedEmployee":deleted_employee.jsonify()}
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "deletedEmployee":deleted_employee.jsonify()
+    }
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
     

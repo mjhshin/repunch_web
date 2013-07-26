@@ -238,6 +238,10 @@ else:
     COMET_REQUEST_RECEIVE = MAIN_TRANSPORT_PROTOCOL +\
         '://www.repunch.com/manage/comet/receive/'
 
+# Key used to verify the validity of post request to comet receive
+COMET_RECEIVE_KEY_NAME = "cometrkey"
+COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
+
 # force responding to requests and getting a new request from the
 # client every 4 minutes
 # client timeout is 5 mins just in case.

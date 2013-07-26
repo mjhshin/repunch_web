@@ -25,7 +25,8 @@ from parse.apps.accounts import sub_type
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Subscription
 from repunch.settings import COMET_REQUEST_RECEIVE,\
-USER_LIMIT_PASSED_DISABLE_DAYS, DEBUG
+USER_LIMIT_PASSED_DISABLE_DAYS, DEBUG, COMET_RECEIVE_KEY_NAME,\
+COMET_RECEIVE_KEY
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -59,7 +60,10 @@ class Command(BaseCommand):
                 sub.date_passed_user_limit = None
                 sub.update()
                 # notify the dashboards of these changes
-                payload={"updatedSubscription_one": sub.jsonify()}
+                payload={
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedSubscription_one": sub.jsonify()
+                }
                 requests.post(COMET_REQUEST_RECEIVE + sub.Store,
                     data=json.dumps(payload))
                 package = {
@@ -143,7 +147,10 @@ class Command(BaseCommand):
                 sub.date_passed_user_limit = None
                 sub.update()
                 # notify the dashboards of these changes
-                payload={"updatedSubscription_one": sub.jsonify()}
+                payload={
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedSubscription_one": sub.jsonify()
+                }
                 requests.post(COMET_REQUEST_RECEIVE + sub.Store,
                     data=json.dumps(payload))
                 package = {

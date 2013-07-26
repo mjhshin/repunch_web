@@ -3,7 +3,8 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 import urllib, requests, json
 
-from repunch.settings import COMET_REQUEST_RECEIVE
+from repunch.settings import COMET_REQUEST_RECEIVE,\
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.auth.decorators import login_required
@@ -106,11 +107,17 @@ def edit(request, reward_id):
                 
             # notify other dashboards of this change
             if is_new:
-                payload = {"newReward":reward}
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "newReward":reward
+                }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                     data=json.dumps(payload))
             else:
-                payload = {"updatedReward":reward}
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedReward":reward
+                }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                     data=json.dumps(payload))
             
@@ -168,7 +175,10 @@ def delete(request, reward_id):
     store.get('rewards')
     
     # notify other dashboards of this change
-    payload = {"deletedReward": {"reward_id":reward["reward_id"]} }
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "deletedReward": {"reward_id":reward["reward_id"]}
+    }
     requests.post(COMET_REQUEST_RECEIVE + store.objectId,
         data=json.dumps(payload))
     

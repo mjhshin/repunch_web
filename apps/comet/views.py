@@ -21,7 +21,8 @@ from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
 from parse.apps.employees.models import Employee
-from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE
+from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
    
 @login_required
 def refresh(request):
@@ -751,6 +752,11 @@ def receive(request, store_id):
     # ENTRY POINT
     if request.method == "POST" or request.is_ajax():
         postDict = json.loads(request.body)
+        
+        # check if key is present and valid
+        if postDict.get(COMET_RECEIVE_KEY_NAME) != COMET_RECEIVE_KEY:
+            return HttpResponse("error")
+        
         skip = []
         for scomet in CometSession.objects.filter(store_id=store_id):
             # flag all threads with this session_key that new stuff
@@ -775,6 +781,7 @@ def receive(request, store_id):
             session.save()
             
         return HttpResponse("success")
+        
     return HttpResponse("error")
     
     

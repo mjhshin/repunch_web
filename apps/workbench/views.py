@@ -14,7 +14,7 @@ from parse.utils import cloud_call
 from parse.auth.decorators import login_required
 from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
-COMET_REQUEST_RECEIVE
+COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
 @session_comet
@@ -197,7 +197,10 @@ def redeem(request):
                     # notify other dashboards of this change
                     store_id =\
                         SESSION.get_store(session).objectId
-                    payload = {"deletedRedemption":del_red.jsonify()}
+                    payload = {
+                        COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
+                        "deletedRedemption":del_red.jsonify()
+                    }
                     requests.post(COMET_REQUEST_RECEIVE + store_id,
                         data=json.dumps(payload))
                         
@@ -213,8 +216,10 @@ def redeem(request):
                     if DEBUG:
                         store_id =\
                             SESSION.get_store(session).objectId
-                        payload = {"approvedRedemption":\
-                            redemption.jsonify()}
+                        payload = {
+                            COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
+                            "approvedRedemption":redemption.jsonify()
+                        }
                         requests.post(COMET_REQUEST_RECEIVE+store_id,
                             data=json.dumps(payload))
                       
@@ -245,8 +250,10 @@ def redeem(request):
                     if DEBUG:
                         store_id =\
                             SESSION.get_store(session).objectId
-                        payload = {"deletedRedemption":\
-                            del_red.jsonify()}
+                        payload = {
+                            COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY,
+                            "deletedRedemption":del_red.jsonify()
+                        }
                         requests.post(COMET_REQUEST_RECEIVE+store_id,
                             data=json.dumps(payload))
                         

@@ -8,7 +8,7 @@ import json, urllib, requests
 
 from apps.accounts.models import AccountActivate
 from repunch.settings import PHONE_COST_UNIT_COST,\
-COMET_REQUEST_RECEIVE
+COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
 from parse.decorators import session_comet
@@ -85,7 +85,10 @@ def settings(request):
             store.update()
             
             # notify other dashboards of this changes
-            payload = {"updatedSettings_one":settings.jsonify()}
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSettings_one":settings.jsonify()
+            }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                 data=json.dumps(payload))
 
@@ -125,7 +128,10 @@ def refresh(request):
             
             # notify other dashboards of these changes
             store = SESSION.get_store(request.session)
-            payload = {"updatedSettings_one":settings.jsonify()}
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSettings_one":settings.jsonify()
+            }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                 data=json.dumps(payload))
             
@@ -221,7 +227,10 @@ def update(request):
             request.session['subscription'] = subscription
             
             # notify other dashboards of these changes
-            payload={"updatedSubscription_one":subscription.jsonify()}
+            payload={
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSubscription_one":subscription.jsonify()
+            }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                 data=json.dumps(payload))
             
@@ -328,7 +337,10 @@ def upgrade(request):
             request.session['subscription'] = subscription
             
             # notify other dashboards of these changes
-            payload={"updatedSubscription_one":subscription.jsonify()}
+            payload={
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSubscription_one":subscription.jsonify()
+            }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                 data=json.dumps(payload))
             

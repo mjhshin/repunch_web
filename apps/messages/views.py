@@ -18,7 +18,7 @@ from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
-COMET_REQUEST_RECEIVE
+COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
@@ -213,7 +213,10 @@ def edit(request, message_id):
             cloud_call("retailer_message", params)
             
             if DEBUG:
-                payload = {"newMessage":message.jsonify()}
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "newMessage":message.jsonify()
+                }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                     data=json.dumps(payload))
             
@@ -400,7 +403,10 @@ def feedback_reply(request, feedback_id):
             })
             
             if DEBUG:
-                payload = {"newMessage":feedback.jsonify()}
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "newMessage":feedback.jsonify()
+                }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                     data=json.dumps(payload))
             
@@ -472,7 +478,10 @@ def feedback_delete(request, feedback_id):
     # notify other dashboards of this change
     store_id = store.objectId
     deleted_feedback = Message(objectId=feedback.objectId)
-    payload = {"deletedFeedback":deleted_feedback.jsonify()}
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "deletedFeedback":deleted_feedback.jsonify(),
+    }
     requests.post(COMET_REQUEST_RECEIVE + store_id,
         data=json.dumps(payload))
         

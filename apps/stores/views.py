@@ -17,7 +17,8 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
-from repunch.settings import COMET_REQUEST_RECEIVE, MEDIA_ROOT
+from repunch.settings import COMET_REQUEST_RECEIVE, MEDIA_ROOT,\
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.utils import delete_file, create_png, cloud_call
@@ -138,7 +139,10 @@ def edit(request):
             request.session['store'] = store
             
             # notify other dashboards of this change
-            payload = {"updatedStore_one":store.jsonify()}
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedStore_one":store.jsonify()
+            }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
                 data=json.dumps(payload))
             
@@ -298,8 +302,11 @@ def crop_avatar(request):
         request.session.update(session)
         
         # notify other dashboards of this change
-        payload = {"updatedStoreAvatarName_str":store.store_avatar,
-            "updatedStoreAvatarUrl_str":store.store_avatar_url, }
+        payload = {
+            COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            "updatedStoreAvatarName_str":store.store_avatar,
+            "updatedStoreAvatarUrl_str":store.store_avatar_url, 
+        }
         requests.post(COMET_REQUEST_RECEIVE + store.objectId,
             data=json.dumps(payload))
         
