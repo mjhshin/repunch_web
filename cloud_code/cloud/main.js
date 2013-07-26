@@ -161,8 +161,8 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		store = settings.get("Store");
 		
 		employee = new Employee();
-		employee.set("first_name", true);
-		employee.set("last_name", username);
+		employee.set("first_name", firstName);
+		employee.set("last_name", lastName);
 		employee.set("lifetime_punches", 0);
 		employee.set("status", "pending");
 		employee.set("Store", store);
@@ -190,7 +190,6 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			return store.save();
 			
 		}, function(error) {
-			console.log("User save failed.");
 			console.log("User save failed.");
 		
 			if(error.code == Parse.Error.USERNAME_TAKEN) {
