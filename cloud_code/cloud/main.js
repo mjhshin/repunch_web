@@ -936,6 +936,12 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
             headers: { 'Content-Type': 'application/json'},
             body: {
                 deletedRedemption: redeemReward,
+            },
+            success: function(httpResponse) {
+                console.error('SUCCESS:'  + httpResponse.text);
+            },
+            error: function(httpResponse) {
+                console.error('FAILED:'  + httpResponse.text);
             }
         });
         
