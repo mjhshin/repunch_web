@@ -140,13 +140,14 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	settingsQuery.include("Store");
 	settingsQuery.equalTo("retailer_pin", retailerPin);
 	
-	settingsQuery.first().then(function(settings) {
-		if(settings == null) {
+	settingsQuery.first().then(function(settingsResult) {
+		if(settingsResult == null) {
 			console.log("Settings fetch success, PIN invalid.");
 			response.success("invalid_pin");
 			
 		} else {
 			console.log("Settings fetch success, PIN valid.");
+			settings = settingsResult;
 			executeSignUp();
 		}		
 			
