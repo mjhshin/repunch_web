@@ -14,9 +14,13 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
 else:
     FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
-    MAIN_TRANSPORT_PROTOCOL = "https"
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    MAIN_TRANSPORT_PROTOCOL = "http"
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    # TODO UNCOMMENT BELOW
+    # MAIN_TRANSPORT_PROTOCOL = "https"
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
 
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),

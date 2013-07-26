@@ -221,7 +221,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 			Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + store.id,
+                url: 'http://www.repunch.com/manage/comet/receive/' + store.id,
                 headers: { 'Content-Type': 'application/json'},
                 body: { pendingEmployee: employee, }
             });
@@ -325,7 +325,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: { patronStore_num: patronStoreCount, }
         });
@@ -692,7 +692,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		        console.log("Posting to server");
 		        Parse.Cloud.httpRequest({
                     method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
                     body: postBody, 
                 });
@@ -825,7 +825,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 		}).then(function() {
 	        Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                 headers: { 'Content-Type': 'application/json'},
                 body: { pendingRedemption: redeemReward, }
             });
@@ -932,7 +932,7 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: {
                 deletedRedemption: redeemReward,
@@ -1043,7 +1043,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 				}
 			    Parse.Cloud.httpRequest({
                     method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
                     body: {
                         approvedRedemption: redeemReward,
@@ -1240,7 +1240,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             }
             Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                 headers: { 'Content-Type': 'application/json'},
                 body: {
                     newMessage: message,
@@ -1451,7 +1451,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: {
                 newFeedback: message,
