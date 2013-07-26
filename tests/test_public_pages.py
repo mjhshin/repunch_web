@@ -87,35 +87,9 @@ def test_public_pages():
     # END TEST
     sleep(2)
     test.results.append(section)
-    # test.new_driver() # ACTION!
-    
-    ###### SIGNUP ####################################
-    parts = [
-        {'test_name': "Sign up page navigable"},
-        {'test_name': "Form submission"},
-        {'test_name': "User object created"},
-        {'test_name': "Store object created"},
-        {'test_name': "Subscription object created"},
-        {'test_name': "Settings object created"},
-    ]
-    section = {
-        "section_name": "Sign up working properly?",
-        "parts": parts,
-    }
-    
-    test.open(reverse("public_signup")) # ACTION!
-    parts[0]['success'] = True
-    sleep(1)
-    
-    
-    
-    # END TEST
-    sleep(2)
-    test.results.append(section)
-    
     
     # END OF ALL TESTS
-    test.tear_down()
+    return test.tear_down()
     
     
         

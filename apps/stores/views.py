@@ -26,31 +26,6 @@ from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required
 
 @login_required
-def punch(request):
-    if request.method == "POST" or request.is_ajax():
-        nump = int(request.POST['num_punches'])
-        settings = SESSION.get_settings(request.session)
-        if nump > settings.get("punches_employee"):
-            return HttpResponse(json.dumps({u'code': 141,
-                u'error': u'error'}), content_type="application/json")
-    
-        store = SESSION.get_store(request.session)
-        data = {
-            "store_id":store.objectId,
-            "store_name":str(store.get('store_name')),
-            "punch_code":str(request.POST['punch_code']),
-            "num_punches":nump,
-        }
-        res = cloud_call("punch", data)
-        if 'error' not in res:
-            res['patron_name'] = res['result']
-            return HttpResponse(json.dumps(res), 
-                    content_type="application/json")
-
-    return HttpResponse(json.dumps({u'code': 141,
-            u'error': u'error'}), content_type="application/json")
-
-@login_required
 @session_comet
 def index(request):
     data = {'account_nav': True}

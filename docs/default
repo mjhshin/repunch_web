@@ -1,16 +1,17 @@
+# Note that this is the configuration for http based connections
 
 <VirtualHost *:80>
         ServerAdmin ubuntu@ec2-23-20-15-30.compute-1.amazonaws.com
         ServerName ec2-23-20-15-30.compute-1.amazonaws.com
-        DocumentRoot /
+        DocumentRoot /home/ubuntu/Repunch/repunch_web/
 
-        Alias  /static  /home/ubuntu/Repunch/repunch_web/static/
+        Alias  /static/  /home/ubuntu/Repunch/repunch_web/static/
         <Directory /home/ubuntu/Repunch/repunch_web/static>
                 Order deny,allow
                 Allow from all
         </Directory>
 
-        Alias  /media /home/ubuntu/Repunch/repunch_web/media/
+        Alias  /media/ /home/ubuntu/Repunch/repunch_web/media/
         <Directory /home/ubuntu/Repunch/repunch_web/media>
                 Order deny,allow
                 Allow from all
@@ -27,3 +28,4 @@
         LogLevel warn
         CustomLog /var/log/apache2/access.log combined
 </VirtualHost>
+
