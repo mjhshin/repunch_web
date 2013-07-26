@@ -932,20 +932,14 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.facebook.com', 
+            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: {
                 deletedRedemption: redeemReward,
             },
-            success: function(httpResponse) {
-                console.error('SUCCESS:'  + httpResponse.text);
-	            response.success("post success");
-            },
-            error: function(httpResponse) {
-                console.error('Request failed with response code ' + httpResponse.status);
-	            response.error("post error");
-            }
         });
+        
+        response.success("success");
         
 	});
 	
