@@ -228,8 +228,8 @@ if DEBUG:
     COMET_REQUEST_RECEIVE =\
         "http://localhost:8000/manage/comet/receive/"
 else:
-    COMET_REQUEST_RECEIVE = MAIN_TRANSPORT_PROTOCOL +\
-        '://www.repunch.com/manage/comet/receive/'
+    COMET_REQUEST_RECEIVE =\ # MAIN_TRANSPORT_PROTOCOL +\
+        'http://www.repunch.com/manage/comet/receive/'
 
 # force responding to requests and getting a new request from the
 # client every 4 minutes
