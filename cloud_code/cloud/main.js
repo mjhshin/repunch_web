@@ -186,8 +186,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 				
 		}).then(function(user) {
 			console.log("User save success.");
-			store.relation("Employees").add(employee);
-			return store.save();
+			addEmployeeToStore();		
 			
 		}, function(error) {
 			console.log("User save failed.");
@@ -210,7 +209,13 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 			deleteEmployee();
 			
-		}).then(function(store) {
+		});
+	}
+	
+	function addEmployeeToStore() {
+		store.relation("Employees").add(employee);
+		
+		store.save().then(function(store) {
 			console.log("Store save success.");
 			response.success("success");
 			
@@ -225,7 +230,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("Store save failed.");
 			response.error("error");
 				
-		})
+		});
 	}
 	
 	function deleteEmployee() {
