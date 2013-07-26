@@ -170,6 +170,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("Employee save success.");
 
 			user = new Parse.User();
+			user.set("account_type", "employee");
 			user.set("username", username);
 			user.set("password", password);
 			user.set("email", email);
@@ -191,19 +192,23 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("User save failed.");
 			console.log("User save failed.");
 		
-			if(error.code == Parse.Error.EMAIL_TAKEN) {
-				console.log("User save failed - email already taken.");
-				response.error(error.message);
-				deleteEmployee();
+			if(error.code == Parse.Error.USERNAME_TAKEN) {
+				console.log("User save failed - username already taken.");
+				response.error(error);				
 			
-			} else if(error.code == Parse.Error.USERNAME_TAKEN) {
-			    console.log("User save failed - username already taken.");
-			    response.error(error.message);
-				deleteEmployee();
+			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
+			    console.log("User save failed - email already taken.");
+			    response.error(error);
+				
+			} else if(error.code == Parse.Error.EMAIL_ADDRESS_INVALID) {
+			    console.log("User save failed - email is invalid.");
+			    response.error(error);
 				
 			} else {
 				response.error("error");
 			}
+			
+			deleteEmployee();
 			
 		}).then(function(store) {
 			console.log("Store save success.");
