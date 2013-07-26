@@ -1,0 +1,6 @@
+# Replaces default when we want to redirect all http requests to https
+<VirtualHost *:80>
+        RewriteEngine on
+        ReWriteCond %{SERVER_PORT} !^443$
+        RewriteRule ^/(.*) https://%{HTTP_HOST}/$1 [NC,R,L]
+</VirtualHost>
