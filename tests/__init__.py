@@ -4,8 +4,6 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 
-from parse.notifications import send_email_selenium_test_results
-
 class SeleniumTest(object):
     """
     Wrapper around selenium - makes life easier.
@@ -28,13 +26,13 @@ class SeleniumTest(object):
         
     def tear_down(self):
         """
-        Quit the driver and sent the results of the test.
+        Quit the driver and return the results of the test.
         """
         self.driver.quit()
-        send_email_selenium_test_results(self.results)
+        return self.results
         
     def open(self, url):
-        self.driver.get("%s%s" % (SERVER_URL, url))
+        self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))
     
     def new_driver(self):
         """
