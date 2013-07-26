@@ -939,13 +939,12 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
             },
             success: function(httpResponse) {
                 console.error('SUCCESS:'  + httpResponse.text);
+	            response.success("success");
             },
             error: function(httpResponse) {
                 console.error('FAILED:'  + httpResponse.text);
             }
         });
-        
-	    response.success("success");
         
 	});
 	
