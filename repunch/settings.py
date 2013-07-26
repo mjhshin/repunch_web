@@ -7,13 +7,16 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-# Used in notification templates
-MAIN_TRANSPORT_PROTOCOL = "https"
-
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
+    MAIN_TRANSPORT_PROTOCOL = "http"
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 else:
     FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
+    MAIN_TRANSPORT_PROTOCOL = "https"
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),
