@@ -59,7 +59,7 @@ ul.not-orangy li:before {
 				<a href="#" id="tabMessages"><img src="{% static "public/images/icon_mail-gray.png" %}" alt=""> Messages</a>
 				<a href="#" id="tabFeedback"><img src="{% static "public/images/icon_chat-bubble-gray.png" %}" alt=""> Feedback</a>
 				<a href="#" id="tabAnalytics"><img src="{% static "public/images/icon_graph-gray.png" %}" alt=""> Analytics</a>
-				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt=""> Social Marketing</a>
+				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt=""> Social</a>
 				<a href="#" id="tabPlans-pricing"><img src="{% static "public/images/icon_tag-gray.png" %}" alt=""> Let's Get Going</a>
 			</nav>
 			<div id="learn-bottom-tabs-contents">

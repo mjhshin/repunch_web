@@ -23,7 +23,7 @@
 	    width:250px;line-height:110%;margin-top:14px;
 	}
 	</style>
-	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}""></script>
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#upload-btn').click(function(){

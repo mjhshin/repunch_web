@@ -12,13 +12,14 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/global.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
 	
 	{% block styles %}{% endblock %}
 		
 	
-	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}""></script>
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script src="{% static 'manage/js/global.js' %}"></script>
     {# AUTO COMPLETE Categories #}

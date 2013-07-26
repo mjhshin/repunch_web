@@ -22,7 +22,7 @@
 	
 	{% block styles %}{% endblock %}
 	
-	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}""></script>
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script src="{% static 'manage/js/global.js' %}"></script>
 	{% block javascript %}{% endblock %}

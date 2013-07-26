@@ -7,7 +7,7 @@
 	<!-- include page specific css -->
 	<link href="{% static 'manage/css/global.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/login.css' %}" rel="stylesheet" />   
-	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}""></script>
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
     <script src="{% static 'public/js/dialog-login.js' %}" type="text/javascript"></script>
 	
