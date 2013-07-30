@@ -12,7 +12,6 @@ class CometSession(models.Model):
     # number from 0 to 998
     uid = models.CharField(max_length=3)
     
-    store_id = models.CharField(max_length=20)
     modified = models.BooleanField(default=False)
     
     
@@ -31,5 +30,6 @@ class CometSessionIndex(models.Model):
     with otherwise it will get deleted after a certain time.
     """
     session_key = models.CharField(primary_key=True, max_length=70)
+    store_id = models.CharField(max_length=20)
     last_updated = models.DateTimeField()
     

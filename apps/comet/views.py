@@ -314,14 +314,15 @@ def pull(request):
     except CometSessionIndex.DoesNotExist:
         # should never go here but just in case.
         CometSessionIndex.objects.create(session_key=\
-            request.session.session_key, last_updated=timezone.now())
+            request.session.session_key, 
+            store_id = SESSION.get_store(request.session).objectId,
+            last_updated=timezone.now())
         
         
-    # register the comet session
+    # register the CometSession
     CometSession.objects.update()
     CometSession.objects.create(session_key=\
-        request.session.session_key, timestamp=timestamp, uid=uid, 
-        store_id=request.session['store'].objectId)
+        request.session.session_key, timestamp=timestamp, uid=uid)
     
     # cache the current session at this state
     session_copy = dict(request.session)
@@ -771,10 +772,6 @@ def receive(request, store_id):
             
         for scomet in CometSessionIndex.objects.filter(\
             store_id=store_id):
-            # flag all threads with this session_key that new stuff
-            scomet.modified = True
-            scomet.save() 
-            
             # get the latest session associated with this object
             session = SessionStore(scomet.session_key)
             # do not go if the session has already been logged out
@@ -782,6 +779,13 @@ def receive(request, store_id):
                 SESSION_KEY not in session:
                 continue
             processPostDict(session, postDict)
+            
+            # flag all threads with this session_key that new stuff
+            CometSession.objects.update()
+            for comet in CometSession.objects.filter(session_key=\
+                scomet.session_key):
+                comet.modified = True
+                comet.save()
                         
             # need to save session to commit modifications
             session.modified = True
