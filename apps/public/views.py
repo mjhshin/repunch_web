@@ -195,9 +195,7 @@ def sign_up(request):
                     map_data.get("neighborhood")))
             
             # create settings
-            settings = Settings(retailer_pin=\
-                        Settings.generate_id(),
-                        punches_employee=5, Store=store.objectId)
+            settings = Settings(Store=store.objectId)
             store.set('settings', settings)
 
             # create account
@@ -523,9 +521,7 @@ def sign_up(request):
                     map_data.get("neighborhood")))
             
             # create settings
-            settings = Settings(retailer_pin=\
-                        Settings.generate_id(),
-                        punches_employee=5, Store=store.objectId)
+            settings = Settings(Store=store.objectId)
             store.set('settings', settings)
 
             # create account
