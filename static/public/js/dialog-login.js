@@ -92,7 +92,7 @@ $(document).ready(function(){
                 loading.hide();
             }
         }).fail(function(){  // should not go here unless server error
-            messageContainer.html("<span name='incorrect'>Server Error</span>");
+            messageContainer.html("<span name='incorrect'>Error. Please try again.</span>");
             finish(320);
             loading.hide();
         });

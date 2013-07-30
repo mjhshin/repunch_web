@@ -462,10 +462,10 @@ $(document).ready(function(){
                     
                 } // end if redemption tab is active
                 
+                // Rebind
+                rebindRedemptions();
+                
             } // end if in Workbench page
-            
-            // Rebind
-            rebindRedemptions();
             
         } // end hasOwnProperty
         
