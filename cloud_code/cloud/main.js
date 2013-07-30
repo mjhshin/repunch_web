@@ -599,10 +599,13 @@ Parse.Cloud.define("punch", function(request, response) {
 				response.error("error");
 			}
 		});
+		
+		var punchString = numPunches > 0 ? "punches" : "punch";
+		
 		Parse.Push.send({
 			where: iosInstallationQuery,
 			data: {
-				alert: storeName + " has punched you. BAM.",
+				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
