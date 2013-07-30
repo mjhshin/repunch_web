@@ -247,7 +247,7 @@ COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
 # client timeout is 5 mins just in case.
 REQUEST_TIMEOUT = 240 # in seconds 
 # check for new stuff in the cache every 4 seconds
-COMET_REFRESH_RATE = 4
+COMET_PULL_RATE = 4
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"

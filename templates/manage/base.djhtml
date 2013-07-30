@@ -34,7 +34,7 @@
 
 
 {# NEEDED FOR comet.js #}
-<input id="comet_url" type="hidden" value="{% url 'comet_refresh' %}" />
+<input id="comet_url" type="hidden" value="{% url 'comet_pull' %}" />
 <input id="comet_url_terminate" type="hidden" value="{% url 'comet_terminate' %}" />
 
 	<div id="site-frame">

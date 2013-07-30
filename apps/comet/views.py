@@ -21,11 +21,11 @@ from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
 from parse.apps.employees.models import Employee
-from repunch.settings import REQUEST_TIMEOUT, COMET_REFRESH_RATE,\
+from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
    
 @login_required
-def refresh(request):
+def pull(request):
     """
     This is where the comet approach is put into play.
     This handles ajax requests from clients, holding on to the 
@@ -34,7 +34,7 @@ def refresh(request):
     IMPORTANT! The order in which the session cache is checked is very
     critical. Take for example and employee that registers.
     Dashboard A receives the pending employee and immediately 
-    approves it. Now Dashboard B will run refresh with the pending
+    approves it. Now Dashboard B will run pull with the pending
     employee and the approved employee. We must first add the pending 
     then check for the approved!
     """
@@ -309,7 +309,8 @@ def refresh(request):
     CometSession.objects.update()
     CometSession.objects.create(session_key=\
         request.session.session_key, timestamp=timestamp, uid=uid, 
-        store_id=request.session['store'].objectId)
+        datetime=timezone.now(), store_id=\
+            request.session['store'].objectId)
     
     # cache the current session at this state
     session_copy = dict(request.session)
@@ -350,7 +351,7 @@ def refresh(request):
                 pass # do nothing
             return comet(session_copy)
         else: # nothing new, sleep for a bit
-            sleep(COMET_REFRESH_RATE)
+            sleep(COMET_PULL_RATE)
             
             
     # TIME IS UP - return a response result 0 means no change 
@@ -393,7 +394,7 @@ def refresh(request):
 @login_required
 def terminate(request):
     """
-    Flags the looping thread in refresh view to exit.
+    Flags the looping thread in the pull view to exit.
     This simply deletes the CometSession bound to this instance.
     """
     if request.method == "GET" or request.is_ajax():

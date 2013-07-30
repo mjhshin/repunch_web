@@ -1,6 +1,6 @@
 /*
     Comet approach.
-    constant communication with comet_refresh
+    constant communication with comet_pull
 */
 
 $(document).ready(function(){
@@ -576,7 +576,7 @@ $(document).ready(function(){
     makeRequest = function() {
         timestamp = (new Date()).toISOString();
         // get a number from 0 to 998 as a unique id just incase they 
-        // have 2 tabs refreshing at the same time
+        // have 2 tabs pulling at the same time
         uid = String(Math.floor(Math.random()*999));
         $.ajax({
             url: url,
