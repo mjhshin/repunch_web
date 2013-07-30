@@ -1309,7 +1309,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-            	alert: storeName + " sent you a message: " + subject,
+            	alert: storeName + " sent you a message",
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
