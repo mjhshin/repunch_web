@@ -43,7 +43,7 @@ def manage_login(request):
                 # user may try to login on another tab when already in
                 try:
                     CometSessionIndex.objects.create(session_key=\
-                        request.session.session_key, datetime=\
+                        request.session.session_key, last_updated=\
                             timezone.now())
                 except IntegrityError:
                     pass

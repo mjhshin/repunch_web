@@ -13,7 +13,7 @@ from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
 from parse.utils import cloud_call
 from parse.auth.decorators import login_required
-from apps.comet.models import CometSession
+from apps.comet.models import CometSession, CometSessionIndex
 from parse.apps.stores.models import Store, Subscription, Settings
 from parse.apps.messages import FEEDBACK
 from parse.apps.messages.models import Message
@@ -305,8 +305,17 @@ def pull(request):
         str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
     uid = request.GET['uid']
     
-    # TODO do not delete the cometsession if it is the last object
-    # with the unique session_key 
+    # update the last_updated field of the CometSessionIndex
+    try:
+        csi = CometSessionIndex.objects.get(session_key=\
+            request.session.session_key)
+        csi.last_updated = timezone.now()
+        csi.save()
+    except CometSessionIndex.DoesNotExist:
+        # should never go here but just in case.
+        CometSessionIndex.objects.create(session_key=\
+            request.session.session_key, last_updated=timezone.now())
+        
         
     # register the comet session
     CometSession.objects.update()
