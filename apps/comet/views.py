@@ -315,7 +315,7 @@ def pull(request):
         # should never go here but just in case.
         CometSessionIndex.objects.create(session_key=\
             request.session.session_key, 
-            store_id = SESSION.get_store(request.session).objectId,
+            store_id=SESSION.get_store(request.session).objectId,
             last_updated=timezone.now())
         
         

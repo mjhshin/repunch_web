@@ -25,15 +25,6 @@ def create():
     with open("1000_stores.txt", "a") as fd:
         for i in range(1, 1001):
             name = "store" + str(i)
-            # first create the account
-            account = Account.objects().create(username=name, 
-                password=name, email=name+"@"+name+".com", 
-                account_type="store")
-            
-            # account object already exists
-            if not account:
-                continue
-                
             # create the Settings
             settings = Settings.objects().create()
             
@@ -78,9 +69,12 @@ def create():
                     map_data.get("neighborhood")))
             store.update()
             
+            # create the account
+            Account.objects().create(username=name, 
+                password=name, email=name+"@"+name+".com", 
+                account_type="store", Store=store.objectId)
+            
             # update the pointers
-            account.Store = store.objectId
-            account.update()
             settings.Store = store.objectId
             settings.update()
             subscription.Store = store.objectId
@@ -90,7 +84,7 @@ def create():
             fd.write(account.objectId+","+store.objectId+","+\
                 settings.objectId+","+subscription.objectId+"|")
            
-            print "created store " + store.objectId
+            print "created store #" + str(i) + " " + store.objectId
 
 def delete():
     """ 
