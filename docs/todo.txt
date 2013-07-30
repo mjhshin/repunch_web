@@ -1,5 +1,0 @@
-
-1. Fix bug where closing the tab or clicking stay signed in and closing the window
-    will not update the session cache.
-    - problem is that terminate view is called when window is closed, thereby
-        deleting the cometsession associated with the session! FIX THIS!
