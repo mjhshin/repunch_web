@@ -600,7 +600,7 @@ Parse.Cloud.define("punch", function(request, response) {
 			}
 		});
 		
-		var punchString = numPunches > 0 ? "punches" : "punch";
+		var punchString = (numPunches == 1) ? "punch" : "punches";
 		
 		Parse.Push.send({
 			where: iosInstallationQuery,
