@@ -70,7 +70,7 @@ def create():
             store.update()
             
             # create the account
-            Account.objects().create(username=name, 
+            account = Account.objects().create(username=name, 
                 password=name, email=name+"@"+name+".com", 
                 account_type="store", Store=store.objectId)
             
