@@ -324,13 +324,14 @@ $(document).ready(function(){
         // reward redemption count
         if (res.hasOwnProperty('rewards') && res.rewards.length > 0){
             var reSection = $("#rewards");
+            var rewards = res.rewards;
             // analysis page
             if (reSection.length > 0){
-                for (var i=0; i<res.rewards.length; i++){
+                for (var i=0; i<rewards.length; i++){
                     var reward = $("#rewards div.tab-body div.tr#" +  rewards[i].reward_id + " div.td.reward_redemptions");
                     
                  if (reward.length > 0){
-                        reward.text(res.rewards[i].redemption_count);
+                        reward.text(rewards[i].redemption_count);
                     }
                 }
             }
