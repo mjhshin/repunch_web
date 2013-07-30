@@ -1035,7 +1035,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			console.log("PatronStore has insufficient punches.");
 			response.success("insufficient");
 			
-		} else{
+		} else {
 			console.log("PatronStore has enough punches.");
 			patron = patronStore.get("Patron");
 			patronStore.increment("punch_count", -1*numPunches);
@@ -1083,9 +1083,20 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		androidInstallationQuery.equalTo("deviceType", "android");
 		iosInstallationQuery.equalTo("patron_id", patron.id);
 		iosInstallationQuery.equalTo("deviceType", "ios");
-
-		//ios push
-	    Parse.Push.send({
+		
+		var promises = [];
+		promises.push( Parse.Push.send({
+	        where: androidInstallationQuery,
+	        data: {
+	            title: rewardTitle,
+	            id: storeId, 
+	            store: store.get("store_name"), 
+	            punches: numPunches,
+				total_punches: patronStore.get("punch_count"),
+				action: "com.repunch.intent.REDEEM_REWARD"
+	        }
+	    }) );
+		promises.push( Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
 	            title: rewardTitle,
@@ -1097,31 +1108,17 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	            patron_store_id: patronStore.id,
 				total_punches: patronStore.get("punch_count")
 	        }
-	    });
-	    
-	    //android push
-		Parse.Push.send({
-	        where: androidInstallationQuery,
-	        data: {
-	            title: rewardTitle,
-	            id: storeId, 
-	            store: store.get("store_name"), 
-	            punches: numPunches,
-				total_punches: patronStore.get("punch_count"),
-				action: "com.repunch.intent.REDEEM_REWARD"
-	        }
-	    }, {
-	        success: function() {
-				console.log("Push success.");
-				response.success("success");
-				return;
-	        },
-	        error: function(error) {
-				console.log("Push failed.");
-	            response.error("error");
-				return;
-	        }
-	    });
+	    }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	    
 	}
 	
@@ -1295,7 +1292,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // call when all tasks are done
     function proceedToPush(){
         console.log("PROCEED TO PUSH");
-        Parse.Push.send({
+		var promises = [];
+		promises.push( Parse.Push.send({
             where: androidInstallationQuery, 
             data: {
                 action: "com.repunch.intent.MESSAGE",
@@ -1303,10 +1301,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_id: storeId,
                 store_name: storeName,
                 message_id: messageId,
-            }, 
-		}); // end Parse.Push
-
-        Parse.Push.send({
+            }
+		}) );
+		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
             	alert: storeName + " sent you a message: " + subject,
@@ -1315,15 +1312,18 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_name: storeName,
                 message_id: messageId,
                 push_type: "receive_message"
-            }, 
-		}, {
-			success: function() {
-				response.success("success");
-			},
-			error: function(error) {
-				response.error("error");
-			}
-		}); // end Parse.Push
+            }
+		}) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	}// end proceedToPush
    
     function continueWithPush() {
@@ -1593,8 +1593,9 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		androidInstallationQuery.equalTo("deviceType", "android");
 		iosInstallationQuery.equalTo("patron_id", giftRecepientId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
-        
-        Parse.Push.send({
+		
+		var promises = [];
+		promises.push( Parse.Push.send({
             where: androidInstallationQuery, 
             data: {
                 action: "com.repunch.intent.GIFT",
@@ -1603,18 +1604,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
                 sender: senderName,
                 message_status_id: messageStatus.id
 			}
-        }, {
-			success: function() {
-				console.log("iOS push success");
-				response.success("success");
-			},
-			error: function(error) {
-				console.log("iOS push success");
-				response.error("error");
-			}
-		}); // end Parse.Push
-
-		Parse.Push.send({
+        }) );
+		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
                 alert: "You've received a gift from " + senderName,
@@ -1624,16 +1615,17 @@ Parse.Cloud.define("send_gift", function(request, response) {
                 message_status_id: messageStatus.id,
                 push_type: "receive_gift"
 			}
-        }, {
-			success: function() {
-				console.log("iOS push success");
-				response.success("success");
-			},
-			error: function(error) {
-				console.log("iOS push success");
-				response.error("error");
-			}
-		}); // end Parse.Push
+        }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	}
 });
 
@@ -1731,8 +1723,9 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		androidInstallationQuery.equalTo("deviceType", "android");
 		iosInstallationQuery.equalTo("patron_id", receiverPatronId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
-        
-        Parse.Push.send({
+		
+		var promises = [];
+		promises.push( Parse.Push.send({
             where: androidInstallationQuery, 
             data: {
                 action: "com.repunch.intent.GIFT",
@@ -1741,18 +1734,8 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
                 sender: senderName,
                 message_status_id: messageStatus.id
 			}
-        }, {
-			success: function() {
-				console.log("android push success");
-				response.success("success");
-			},
-			error: function(error) {
-				console.log("android push success");
-				response.error("error");
-			}
-		}); // end Parse.Push
-
-        Parse.Push.send({
+        }) );
+		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
                 alert: "You've received a reply to your gift to " + senderName,
@@ -1762,17 +1745,17 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
                 message_status_id: messageStatus.id,
                 push_type: "receive_gift_reply"
 			}
-        }, {
-			success: function() {
-				console.log("ios push success");
-				response.success("success");
-			},
-			error: function(error) {
-				console.log("ios push success");
-				response.error("error");
-			}
-		}); // end Parse.Push
-
+        }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	}
 	
 });
