@@ -3,15 +3,19 @@ As the filename states. This script will create 1000 valid
 Accounts (Users), Stores, Settings, and Subscriptions.
 """
 
+from libs.repunch import rputils
+
+from parse.utils import parse
 from parse.apps.accounts.models import Account
-from parse.apps.stores.models import Settings, Subscription
+from parse.apps.stores.models import Settings, Subscription, Store
 
 def _gen_phone_number(i):
     """
     Returns a phone number generated from i with the format:
         (xxx) xxx-xxxx
     """
-    return "(" + str(i%1000) + ") " + str(i%1000) + "-" + str(i%10000)
+    return "(" + str(i%1000).zfill(3) + ") " +\
+        str(i%1000).zfill(3) + "-" + str(i%10000).zfill(4)
 
 def create():
     """
@@ -35,11 +39,12 @@ def create():
             
             # create the Subscription
             subscription = Subscription.objects().create(first_name=\
-                name, last_name=name, zip=10100+i)
+                name, last_name=name, zip=str(10100+i))
                 
             # create the store
-            store = Store.objects().get(active=True, store_name=name,
-                street=name+" street",zip=10100+i, first_name=name, 
+            store = Store.objects().create(\
+                active=True, store_name=name, street=name+" street",
+                zip=str(10100+i), first_name=name, 
                 last_name=name, phone_number=_gen_phone_number(i), 
                 store_description=name, store_avatar="df9fbd9f-"+\
                     "8dfc-44d3-838b-6a5f2aebab33-showcasepic1png",
@@ -66,7 +71,7 @@ def create():
                 Subscription=subscription.objectId,
                 Settings=settings.objectId)
             store.store_timezone = rputils.get_timezone(10100+i).zone
-            map_data = rputils.get_map_data()
+            map_data = rputils.get_map_data(str(10100+i))
             store.set("coordinates", map_data.get("coordinates"))
             store.set("neighborhood", 
                 store.get_best_fit_neighborhood(\
@@ -84,6 +89,8 @@ def create():
             # record the objectIds
             fd.write(account.objectId+","+store.objectId+","+\
                 settings.objectId+","+subscription.objectId+"|")
+           
+            print "created store " + store.objectId
 
 def delete():
     """ 
@@ -95,6 +102,7 @@ def delete():
         
     for data in record.split("|"):
         data = data.split(",")
+        print "deleting store " + data[1]
         parse("DELETE", "classes/_User/" + data[0])
         parse("DELETE", "classes/Store/" + data[1])
         parse("DELETE", "classes/Settings/" + data[2])

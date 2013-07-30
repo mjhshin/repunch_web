@@ -84,7 +84,8 @@ class Store(ParseObject):
         self.store_name = title(self.store_name)       
         self.street = title(self.street)
         self.city = title(self.city)
-        self.state = self.state.upper()
+        if self.state:
+            self.state = self.state.upper()
         
         data = self._get_formatted_data()
         res = parse("PUT", self.path() + "/" + self.objectId, data)
@@ -102,8 +103,18 @@ class Store(ParseObject):
         """
         Returns street, city, state, zip, country
         """
-        return self.street + ", " + self.city  + ", " +\
-            self.state + ", " + self.zip  + ", " + self.country
+        full_address = ''
+        if self.street:
+            full_address += self.street + ", "
+        if self.city:
+            full_address += self.city + ", "
+        if self.state:
+            full_address += self.state + ", "
+        if self.zip:
+            full_address += self.zip + ", "
+        if self.country:
+            full_address += self.country
+        return full_address
             
     def get_best_fit_neighborhood(self, exact_neighborhood):
         """

@@ -146,6 +146,8 @@ def title(string):
     """
     Like str.title but does not capitalize letter after '
     """
+    if not string:
+        return ''
     return " ".join([word.capitalize() for word in string.split(" ")])
     
     

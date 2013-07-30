@@ -106,7 +106,7 @@ def get_map_data(address):
 def get_timezone(zip_code):
     # first need to get the lat, lng
     conn = httplib.HTTPConnection("maps.googleapis.com")
-    conn.request("GET", "/maps/api/geocode/json?address=%s&sensor=false" % zip_code)
+    conn.request("GET", "/maps/api/geocode/json?address=%s&sensor=false" % str(zip_code))
     
     resp = conn.getresponse()
     if resp.status == 200:
