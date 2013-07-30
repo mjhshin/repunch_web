@@ -32,6 +32,10 @@ def login(request, requestDict):
     credentials (wrong pass or account_type) 
     and 1 if subscription is not active.
     """
+    # first check if the request is already logged in 
+    if request.session.get('account'):
+        return request.session.get('account')
+    
     res = parse("GET", "login", query=\
                 {"username":requestDict.get('username'),
                  "password":requestDict.get('password')} )

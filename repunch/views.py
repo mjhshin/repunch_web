@@ -1,8 +1,10 @@
 from django.shortcuts import redirect, render
+from django.db import IntegrityError
 from django.contrib.sessions.backends.cache import SessionStore
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.utils import timezone
 from django.contrib.auth import logout
 import json, thread
 
@@ -10,7 +12,7 @@ from parse import session as SESSION
 from parse.decorators import session_comet
 from parse.auth import login
 from apps.accounts.forms import LoginForm
-from apps.comet.models import CometSession
+from apps.comet.models import CometSession, CometSessionIndex
 
 @session_comet
 def manage_login(request):
@@ -38,6 +40,13 @@ def manage_login(request):
                     data['code'] = 2
             else:
                 data['code'] = 3
+                # user may try to login on another tab when already in
+                try:
+                    CometSessionIndex.objects.create(session_key=\
+                        request.session.session_key, datetime=\
+                            timezone.now())
+                except IntegrityError:
+                    pass
                             
         else:
             data['code'] =  0        
@@ -54,6 +63,15 @@ def manage_login(request):
 def manage_logout(request):
     # need to do this before flushing the session because the session
     # key will change after the flush!
+    
+    # first delete the CometSessionIndex
+    try:
+        csi = CometSessionIndex.objects.get(session_key=\
+            request.session.session_key)
+        csi.delete()
+    except CometSessionIndex.DoesNotExist:
+        pass
+    
     # also delete ALL the cometsessions associated with the request
     cs = CometSession.objects.filter(session_key=\
         request.session.session_key)
