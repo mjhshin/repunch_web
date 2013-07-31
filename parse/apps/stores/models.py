@@ -8,7 +8,7 @@ import string, random
 
 from parse.utils import parse, title
 from parse.apps.accounts import sub_type
-from parse.paypal import store_cc, charge_cc
+from libs.paypal import store_cc, charge_cc
 from parse.core.models import ParseObject
 from repunch.settings import TIME_ZONE
 from libs.repunch import rputils
