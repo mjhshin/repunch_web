@@ -1,5 +1,9 @@
 """
-Selenium test for public pages
+Selenium test for public pages.
+
+I know that this is not how tests are done in Django. 
+The justification for this is that we are not using Django Models but
+Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
@@ -28,7 +32,7 @@ def test_public_pages():
     }
     
     ### HOME
-    # test.open(reverse("public_home")) # ACTION!
+    test.open(reverse("public_home")) # ACTION!
     parts[0]['success'] = True
     sleep(1)
     
@@ -43,8 +47,12 @@ def test_public_pages():
         "#tabSocial",
         "#tabPlans-pricing", 
     )
-    # test.action_chain(1, selectors) # ACTION!
-    parts[1]['success'] = True
+    try:
+        test.action_chain(1, selectors) # ACTION!
+    except Exception:
+        pass # don't really need to set success to False
+    else:
+        parts[1]['success'] = True
     
     ### FAQ
     selectors = [
@@ -56,13 +64,17 @@ def test_public_pages():
     for i in range(1, 15):
         selectors.append("//div[@id='faq-content']/aside/"+\
             "div[" + str(i) + "]/div[@class='accordionButton']")
-    # test.action_chain(1, selectors, type="xpath") # ACTION!
-    parts[2]['success'] = True
+    try:
+        test.action_chain(1, selectors, type="xpath") # ACTION!
+    except Exception:
+        pass
+    else:
+        parts[2]['success'] = True
     
     ### ABOUT
     # ACTION!
-    # test.find("//nav[@id='header-menu']/a[@href='" +\
-    #        reverse("public_about") + "']", type="xpath").click()
+    test.find("//nav[@id='header-menu']/a[@href='" +\
+           reverse("public_about") + "']", type="xpath").click()
     selectors = [] 
     # about member photos
     for i in range(1, 7):
@@ -70,8 +82,12 @@ def test_public_pages():
             "div[@class='the-team-member tooltip'][" +\
             str(i) + "]")
     # ACTION!
-    # test.action_chain(1, selectors, action="move", type="xpath")
-    parts[3]['success'] = True
+    try:
+        test.action_chain(1, selectors, action="move", type="xpath")
+    except Exception:
+        pass
+    else:
+        parts[3]['success'] = True
     
     ### FOOTER elements
     selectors = []
@@ -81,8 +97,12 @@ def test_public_pages():
     # facebook and twitter
     selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
     selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-    # test.action_chain(2, selectors, type="xpath") # ACTION!
-    parts[4]['success'] = True
+    try:
+        test.action_chain(2, selectors, type="xpath") # ACTION!
+    except Exception:
+        pass
+    else:
+        parts[4]['success'] = True
     
     # END TEST
     sleep(2)

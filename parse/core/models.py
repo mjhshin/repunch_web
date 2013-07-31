@@ -383,7 +383,8 @@ class ParseObject(object):
         return False
 
     def get(self, attr, **constraints):
-        """ returns attr if it is not None, otherwise fetches the 
+        """ 
+        returns attr if it is not None, otherwise fetches the 
         attr from the Parse DB and returns that. 
 
         If the attr is a #2, then it is treated
@@ -407,7 +408,7 @@ class ParseObject(object):
                 'count' in constraints):
                 return self.__dict__.get(attr)
                 
-        # Pointer cache
+        # Pointer cache this only supports include!
         if attr[0].islower() and\
             self.__dict__.get(attr[0].upper() + attr[1:]):
             # if pointer meta exist then use it
@@ -415,9 +416,12 @@ class ParseObject(object):
                 className = self.__dict__["_" + attr.lower()]
             else:
                 className = attr[0].upper() + attr[1:]
+            q = {}
+            if "include" in constraints:
+                q["include"] = constraints['include']
             res = parse("GET", "classes/" + className +\
                     "/" + self.__dict__.get(attr[0].upper() +\
-                    attr[1:]))
+                    attr[1:]), query=q)
 
             if res and "error" not in res:
                 c = self.get_class(className)
