@@ -114,7 +114,7 @@ def update():
         store = Store.objects().get(objectId=data[1])
         store.set("city", "City " + str(i)) 
         store.set("country", "US") 
-        store.set("state", "NY" + str(i)) 
+        store.set("state", "NY") 
         if store.update():
             print "updated store #" + str(i)
     

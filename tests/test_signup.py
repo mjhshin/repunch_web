@@ -104,37 +104,6 @@ def test_signup():
         settings = store.get("settings")
         parts[6]['success'] = settings is not None
     
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
     # END OF ALL TESTS - cleanup
     user.delete()
     store.delete()
