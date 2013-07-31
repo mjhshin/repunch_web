@@ -11,14 +11,11 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from libs.imap import Mail
-from repunch.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from tests import SeleniumTest
-
-SENT_MAILBOX = "[Gmail]/Sent Mail"
 
 def test_public_pages():
     test = SeleniumTest()
-    mail = Mail(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+    mail = Mail()
     
     parts = [
         {'test_name': "Home page navigable"},
@@ -127,7 +124,8 @@ def test_public_pages():
     else:
         parts[5]['success'] = True
     sleep(3) # wait for the email to register in gmail
-    mail.select_mailbox(SENT_MAILBOX)
+    mail.select_sent_mailbox()
+    # TODO FINISH
     
     
     ##########  Contact Us email form working
