@@ -179,7 +179,7 @@ def send_email_signup(account, connection=None):
     
     subject = "New business: "+account.get("store").get("store_name")
     AccountActivate = getattr(import_module('apps.accounts.models'),
-                                "AccountActsend_email_selenium_test_resultsivate")
+                                "AccountActivate")
     ctx = get_notification_ctx()
     ctx.update({
         'account': account,
