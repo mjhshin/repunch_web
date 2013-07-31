@@ -27,10 +27,11 @@ class StoreSignUpForm(forms.Form):
         full_address = " ".join(\
             self.get_full_address().split(", "))
         map_data = rputils.get_map_data(full_address)
+        # WARNING! get_map_data is unreliable due to google api 
+        # query limit!!!!
         if not map_data.get('coordinates'):
             raise forms.ValidationError("Enter a valid adress, city, "+\
                     "state, and/or zip.")
-            
         return data
     
     def clean_phone_number(self):
@@ -57,6 +58,8 @@ class StoreForm(forms.Form):
             self.data['country']
                                     
     def clean_street(self):
+        # WARNING! get_map_data is unreliable due to google api 
+        # query limit!!!!
         data = self.cleaned_data['street']
         full_address = " ".join(\
             self.get_full_address().split(", "))
@@ -64,7 +67,6 @@ class StoreForm(forms.Form):
         if not map_data.get('coordinates'):
             raise forms.ValidationError("Enter a valid adress, city, "+\
                     "state, and/or zip.")
-            
         return data
                                     
     def clean_phone_number(self):

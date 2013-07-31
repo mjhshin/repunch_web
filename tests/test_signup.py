@@ -24,6 +24,7 @@ def test_signup():
     parts = [
         {'test_name': "Sign up page navigable"},
         {'test_name': "Form submission okay"},
+        {'test_name': "Popup dialog functional"},
         {'test_name': "User object created"},
         {'test_name': "Store object created"},
         {'test_name': "Subscription object created"},
@@ -75,22 +76,33 @@ def test_signup():
         pass
     else:
         parts[1]['success'] = True
+        sleep(1) 
+        
+    ##########  Popup dialog functional
+    max_wait_time, time_waited = 10, 0
+    # the orange clock that pops up after signing up.
+    time_img =\
+        driver.find_element_by_id("signing-up-time")
+    while not time_img.is_displayed():
         sleep(1)
+        time_waited += 1
+    if time_waited < 10:
+        parts[2]['success'] = True
 
     ##########  User object created
     user = Account.objects().get(username=TEST_USER['username'],
         include="Store.Subscription,Store.Settings")
-    parts[2]['success'] = user is not None
+    parts[3]['success'] = user is not None
     ##########  Store object created
     if user is not None:
         store = user.get("store")
-        parts[3]['success'] = store is not None
+        parts[4]['success'] = store is not None
         ##########  Subscription object created
         subscription = store.get("subscription")
-        parts[4]['success'] = subscription is not None
+        parts[5]['success'] = subscription is not None
         ##########  Settings object created
         settings = store.get("settings")
-        parts[5]['success'] = settings is not None
+        parts[6]['success'] = settings is not None
     
     
         

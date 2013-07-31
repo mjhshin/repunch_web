@@ -60,7 +60,7 @@ if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
     ABSOLUTE_HOST_ALIAS = ABSOLUTE_HOST
 else:
-    ABSOLUTE_HOST = 'ec2-23-20-15-30.compute-1.amazonaws.com'
+    ABSOLUTE_HOST = 'repunch.com'
     ABSOLUTE_HOST_ALIAS = "repunch.com"
 
 # PARSE 

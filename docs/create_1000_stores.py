@@ -94,13 +94,30 @@ def delete():
     with open("1000_stores.txt", "r") as fd:
         record = fd.read()
         
-    for data in record.split("|"):
+    for i, data in enumerate(record.split("|")):
+        print "deleting store #" + str(i)
         data = data.split(",")
-        print "deleting store " + data[1]
         parse("DELETE", "classes/_User/" + data[0])
         parse("DELETE", "classes/Store/" + data[1])
         parse("DELETE", "classes/Settings/" + data[2])
         parse("DELETE", "classes/Subscription/" + data[3])
+        
+def update():
+    """
+    Updates the city, country, and state of created stores.
+    """
+    with open("1000_stores.txt", "r") as fd:
+        record = fd.read()
+        
+    for i, data in enumerate(record.split("|")):
+        data = data.split(",")
+        store = Store.objects().get(objectId=data[1])
+        store.set("city", "City " + str(i)) 
+        store.set("country", "US") 
+        store.set("state", "NY" + str(i)) 
+        if store.update():
+            print "updated store #" + str(i)
+    
         
 if __name__ == "__main__":
     create()
