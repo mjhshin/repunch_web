@@ -1103,7 +1103,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        where: iosInstallationQuery,
 	        data: {
 	            title: rewardTitle,
-	            alert: rewardTitle+" was successfully redeemed!",
+	            alert: "Successfully redeemed '" + rewardTitle + "'",
 	            push_type: "validate_redeem",
 	            id: storeId, 
 	            store: store.get("store_name"), 
@@ -1293,7 +1293,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     }
 
     // call when all tasks are done
-    function proceedToPush(){
+    function proceedToPush() {
         console.log("PROCEED TO PUSH");
 		var promises = [];
 		promises.push( Parse.Push.send({
