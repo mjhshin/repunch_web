@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 
+from libs.dateutil.relativedelta import relativedelta
 from models import Message
 
 
@@ -51,7 +52,14 @@ class MessageForm(forms.Form):
                 # make sure the expiration is in the future
                 now = timezone.now()
                 if now >= exp:
-                    raise forms.ValidationError('Please enter an expiration date that is later than today.')
+                    raise forms.ValidationError('Please enter an'+\
+                        ' expiration date that is later than today.')
+                # max is 1 year
+                year_later = now + relativedelta(years=1)
+                if exp >= year_later:
+                    raise forms.ValidationError('Please enter an'+\
+                        ' expiration date that is less than a year.')
+                    
         else:
             exp = None
                 

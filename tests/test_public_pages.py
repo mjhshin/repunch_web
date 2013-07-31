@@ -10,33 +10,38 @@ from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
+from libs.imap import Mail
+from repunch.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from tests import SeleniumTest
 
+SENT_MAILBOX = "[Gmail]/Sent Mail"
+
 def test_public_pages():
-    """        
-    # TODO FAQ Form
-    # TODO Contact Us Form
-    """
     test = SeleniumTest()
+    mail = Mail(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
     
     parts = [
         {'test_name': "Home page navigable"},
-        {'test_name': "Learn page functional"},
-        {'test_name': "FAQ page functional"},
-        {'test_name': "About page functional"},
-        {'test_name': "Footer elements functional"},
+        {'test_name': "Learn page navigable"},
+        {'test_name': "FAQ page navigable"},
+        {'test_name': "About page navigable"},
+        {'test_name': "Footer elements navigable"},
+        {'test_name': "FAQ email form working"},
+        {'test_name': "FAQ email sent"},
+        {'test_name': "Contact Us email form working"},
+        {'test_name': "Contact Us email sent"},
     ]
     section = {
         "section_name": "Are all public pages functional?",
         "parts": parts,
     }
     
-    ### HOME
+    ##########  Home page navigable
     test.open(reverse("public_home")) # ACTION!
     parts[0]['success'] = True
     sleep(1)
     
-    ### LEARN
+    ##########  Learn page navigable
     selectors = (
         # learn page link
         "#header-menu a[href='" + reverse("public_learn") + "']",
@@ -54,7 +59,7 @@ def test_public_pages():
     else:
         parts[1]['success'] = True
     
-    ### FAQ
+    ##########  FAQ page navigable
     selectors = [
         # faq page
         "//nav[@id='header-menu']/a[@href='" +\
@@ -71,7 +76,7 @@ def test_public_pages():
     else:
         parts[2]['success'] = True
     
-    ### ABOUT
+    ##########  About page navigable
     # ACTION!
     test.find("//nav[@id='header-menu']/a[@href='" +\
            reverse("public_about") + "']", type="xpath").click()
@@ -89,7 +94,7 @@ def test_public_pages():
     else:
         parts[3]['success'] = True
     
-    ### FOOTER elements
+    ##########  Footer elements navigable
     selectors = []
     for i in range(1, 5): # TOS, PP, Contact, Jobs
         selectors.append("//ul[@id='footer-menu']/li[" +\
@@ -103,6 +108,30 @@ def test_public_pages():
         pass
     else:
         parts[4]['success'] = True
+        
+    test.new_driver()
+        
+    ##########  FAQ email form working
+    test.open(reverse("public_faq")) # ACTION!
+    selectors = (
+        ("#id_full_name", "Test User"),
+        ("#id_email", "test@test.com"),
+        ("#id_message", "This is a test. Ignore this.")
+    )
+    try:
+        test.action_chain(1, selectors, action="send_keys") # ACTION!
+        test.find("//form[@id='make-question-form']/a", 
+            type="xpath").click()
+    except Exception:
+        pass
+    else:
+        parts[5]['success'] = True
+    sleep(3) # wait for the email to register in gmail
+    mail.select_mailbox(SENT_MAILBOX)
+    
+    
+    ##########  Contact Us email form working
+    test.open(reverse("public_contact")) # ACTION!
     
     # END TEST
     sleep(2)

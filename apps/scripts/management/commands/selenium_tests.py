@@ -14,10 +14,10 @@ class Command(BaseCommand):
         results = []
         
         # PUBLIC PAGES
-        # results.extend(test_public_pages())
+        results.extend(test_public_pages())
         # SIGNUP
         # results.extend(test_signup())
         # LOGIN
-        results.extend(test_login())
+        # results.extend(test_login())
         
         send_email_selenium_test_results(results)
