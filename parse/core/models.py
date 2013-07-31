@@ -497,6 +497,8 @@ class ParseObject(object):
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
+                # TODO what if Pointer/Relation attr was set to None?
+                # getting them will return a dict!
                 setattr(self, attr, res.get('results')[0].get(attr) )
 
         return self.__dict__.get(attr)

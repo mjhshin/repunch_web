@@ -68,7 +68,7 @@ def test_signup():
         # ToS and submit
         selectors = (
             "#id_recurring",
-            # "#signup-form-submit",
+            "#signup-form-submit",
         )
         test.action_chain(2, selectors) # ACTION!
     except Exception:
@@ -78,15 +78,21 @@ def test_signup():
         sleep(1)
 
     ##########  User object created
-    user = Account.objects().get(username=TEST_USER['username'])
+    user = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription,Store.Settings")
     parts[2]['success'] = user is not None
     ##########  Store object created
-    store = user.get("store")
-    parts[3]['success'] = store is not None
-    ##########  Subscription object created
-    subscription = store.get("subscription")
-        
-        
+    if user is not None:
+        store = user.get("store")
+        parts[3]['success'] = store is not None
+        ##########  Subscription object created
+        subscription = store.get("subscription")
+        parts[4]['success'] = subscription is not None
+        ##########  Settings object created
+        settings = store.get("settings")
+        parts[5]['success'] = settings is not None
+    
+    
         
         
         
@@ -117,5 +123,9 @@ def test_signup():
         
         
     
-    # END OF ALL TESTS
+    # END OF ALL TESTS - cleanup
+    user.delete()
+    store.delete()
+    subscription.delete()
+    settings.delete()
     return test.tear_down()
