@@ -48,7 +48,7 @@ class Mail(object):
         in ascending order.
         """
         ids = self.conn.search(None, '(SUBJECT "'+\
-            subject + '")')[1]
+            subject + '")')[1][0]
         if ids:
             ids = [int(i) for i in ids.split(" ")]
             ids.sort()
