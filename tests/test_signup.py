@@ -7,12 +7,15 @@ Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
+from libs.imap import Mail
+from libs.dateutil.relativedelta import relativedelta
 from tests import SeleniumTest
 from parse.apps.accounts.models import Account
-# from parse.apps.stores.models import Store
+from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX
 
 TEST_USER = {
     "username": "iusluixylusr",
@@ -20,6 +23,7 @@ TEST_USER = {
 }
 
 def test_signup():
+    # TODO test place order!
     test = SeleniumTest()
     parts = [
         {'test_name': "Sign up page navigable"},
@@ -29,6 +33,7 @@ def test_signup():
         {'test_name': "Store object created"},
         {'test_name': "Subscription object created"},
         {'test_name': "Settings object created"},
+        {'test_name': "Email about new user sent"},
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -72,8 +77,8 @@ def test_signup():
             "#signup-form-submit",
         )
         test.action_chain(2, selectors) # ACTION!
-    except Exception:
-        pass
+    except Exception as e:
+        print e
     else:
         parts[1]['success'] = True
         sleep(1) 
@@ -81,13 +86,16 @@ def test_signup():
     ##########  Popup dialog functional
     max_wait_time, time_waited = 10, 0
     # the orange clock that pops up after signing up.
-    time_img =\
-        driver.find_element_by_id("signing-up-time")
-    while not time_img.is_displayed():
-        sleep(1)
-        time_waited += 1
-    if time_waited < 10:
-        parts[2]['success'] = True
+    try:
+        time_img =\
+            test.driver.find_element_by_id("signing-up-time")
+        while not time_img.is_displayed():
+            sleep(1)
+            time_waited += 1
+        if time_waited < 10:
+            parts[2]['success'] = True
+    except Exception as e:
+        print e
 
     ##########  User object created
     user = Account.objects().get(username=TEST_USER['username'],
@@ -103,10 +111,30 @@ def test_signup():
         ##########  Settings object created
         settings = store.get("settings")
         parts[6]['success'] = settings is not None
+        
+    
+        ##########  Email about new user sent
+        sleep(5) # wait for the email to register in gmail
+        mail = Mail()
+        mail.select_sent_mailbox()
+        mail_ids=mail.search_by_subject(EMAIL_SIGNUP_SUBJECT_PREFIX +\
+            store.store_name)
+        if len(mail_ids) > 0:
+            sent = mail.fetch_date(str(mail_ids[-1]))
+            now = timezone.now()
+            lb = now + relativedelta(seconds=-10)
+            # make sure that this is the email that was just sent
+            if now.year == sent.year and now.month == sent.month and\
+                now.day == sent.day and now.hour == sent.hour and\
+                (sent.minute == now.minute or\
+                    sent.minute == lb.minute):
+                parts[7]['success'] = True
+    
+        mail.logout()
+        user.delete()
+        store.delete()
+        subscription.delete()
+        settings.delete()
     
     # END OF ALL TESTS - cleanup
-    user.delete()
-    store.delete()
-    subscription.delete()
-    settings.delete()
     return test.tear_down()

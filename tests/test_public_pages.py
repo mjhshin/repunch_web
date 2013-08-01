@@ -19,7 +19,6 @@ from apps.public.forms import SUBJECT_PREFIX
 
 def test_public_pages():
     test = SeleniumTest()
-    mail = Mail()
     
     parts = [
         {'test_name': "Home page navigable"},
@@ -54,10 +53,9 @@ def test_public_pages():
         "#tabPlans-pricing", 
     )
     try:
-        # test.action_chain(1, selectors) # ACTION!
-        pass
-    except Exception:
-        pass # don't really need to set success to False
+        test.action_chain(1, selectors) # ACTION!
+    except Exception as e:
+        print e # don't really need to set success to False
     else:
         parts[1]['success'] = True
     
@@ -72,17 +70,16 @@ def test_public_pages():
         selectors.append("//div[@id='faq-content']/aside/"+\
             "div[" + str(i) + "]/div[@class='accordionButton']")
     try:
-        # test.action_chain(1, selectors, type="xpath") # ACTION!
-        pass
-    except Exception:
-        pass
+        test.action_chain(1, selectors, type="xpath") # ACTION!
+    except Exception as e:
+        print e
     else:
         parts[2]['success'] = True
     
     ##########  About page navigable
     # ACTION!
-    #test.find("//nav[@id='header-menu']/a[@href='" +\
-    #       reverse("public_about") + "']", type="xpath").click()
+    test.find("//nav[@id='header-menu']/a[@href='" +\
+           reverse("public_about") + "']", type="xpath").click()
     selectors = [] 
     # about member photos
     for i in range(1, 7):
@@ -91,10 +88,9 @@ def test_public_pages():
             str(i) + "]")
     # ACTION!
     try:
-        # test.action_chain(1, selectors, action="move", type="xpath")
-        pass
-    except Exception:
-        pass
+        test.action_chain(1, selectors, action="move", type="xpath")
+    except Exception as e:
+        print e
     else:
         parts[3]['success'] = True
     
@@ -107,15 +103,14 @@ def test_public_pages():
     selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
     selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
     try:
-        # test.action_chain(2, selectors, type="xpath") # ACTION!
-        pass
-    except Exception:
-        pass
+        test.action_chain(3, selectors, type="xpath") # ACTION!
+    except Exception as e:
+        print e
     else:
         parts[4]['success'] = True
         
     test.new_driver()
-        
+    
     ##########  FAQ email form working
     test.open(reverse("public_faq")) # ACTION!
     selectors = (
@@ -127,13 +122,14 @@ def test_public_pages():
         test.action_chain(1, selectors, action="send_keys") # ACTION!
         test.find("//form[@id='make-question-form']/a", 
             type="xpath").click()
-    except Exception:
-        pass
+    except Exception as e:
+        print e
     else:
         if test.is_current_url(reverse("public_thank_you")):
             parts[5]['success'] = True
             
     sleep(5) # wait for the email to register in gmail
+    mail = Mail()
     mail.select_sent_mailbox()
     mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User X")
     if len(mail_ids) > 0:
@@ -157,8 +153,8 @@ def test_public_pages():
         test.action_chain(1, selectors, action="send_keys") # ACTION!
         test.find("//form[@id='contact-form']/a", 
             type="xpath").click()
-    except Exception:
-        pass
+    except Exception as e:
+        print e
     else:
         if test.is_current_url(reverse("public_thank_you")):
             parts[7]['success'] = True
@@ -175,14 +171,14 @@ def test_public_pages():
             now.day == sent.day and now.hour == sent.hour and\
             (sent.minute == now.minute or sent.minute == lb.minute):
             parts[8]['success'] = True
-    
+            
+    mail.logout()
     
     # END TEST
     sleep(2)
     test.results.append(section)
     
     # END OF ALL TESTS
-    mail.logout()
     return test.tear_down()
     
     

@@ -1,4 +1,3 @@
-from django.test import LiveServerTestCase, TestCase
 from time import sleep
 
 from selenium import webdriver

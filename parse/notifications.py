@@ -19,6 +19,8 @@ from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
+EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
+
 def get_notification_ctx():
     """
     Cannot declare as a constant. The reverse method crashes the app.
@@ -177,7 +179,8 @@ def send_email_signup(account, connection=None):
         "/templates/manage/notification-newuser.html", 'r') as f:
         template = Template(f.read())
     
-    subject = "New business: "+account.get("store").get("store_name")
+    subject = EMAIL_SIGNUP_SUBJECT_PREFIX +\
+        account.get("store").get("store_name")
     AccountActivate = getattr(import_module('apps.accounts.models'),
                                 "AccountActivate")
     ctx = get_notification_ctx()
