@@ -132,8 +132,6 @@ def test_public_pages():
     mail.select_sent_mailbox()
     mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User")
     if len(mail_ids) > 0:
-        mail_ids = [int(i) for i in mail_ids]
-        mail_ids.sort()
         sent = mail.fetch_date(str(mail_ids[-1]))
         now = timezone.now()
         lb = now + relativedelta(seconds=-10)
@@ -143,7 +141,6 @@ def test_public_pages():
             (sent.minute == now.minute or sent.minute == lb.minute):
             parts[6]['success'] = True
             
-    
     ##########  Contact Us email form working
     test.open(reverse("public_contact")) # ACTION!
     

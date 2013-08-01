@@ -55,7 +55,7 @@ class MessageForm(forms.Form):
                     raise forms.ValidationError('Please enter an'+\
                         ' expiration date that is later than today.')
                 # max is 1 year
-                year_later = now + relativedelta(years=1)
+                year_later = now + relativedelta(days=365)
                 if exp >= year_later:
                     raise forms.ValidationError('Please enter an'+\
                         ' expiration date that is less than a year.')

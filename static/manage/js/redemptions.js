@@ -24,7 +24,7 @@ function onRedeem(rowId, action){
             // now hide the spinner
             loading.hide();
             
-            if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5){
+            if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5 || res.result == 6){
                 if (res.result == 1){
                     row.css("background", "#CCFF99");
                     row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
@@ -39,6 +39,10 @@ function onRedeem(rowId, action){
                     row.css("background", "#FFFFCB");
                     // row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
                     row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
+                } else if (res.result == 6) {
+                    row.css("background", "#FFFFCB");
+                    row.html("Patron no longer exist.");
+                    alert("Invalid! Patron no longer exist.");
                 } else {
                     row.css("background", "#FFFFCB");
                     row.html("Customer does not have enough punches!");

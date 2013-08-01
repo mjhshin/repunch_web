@@ -935,8 +935,10 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	}).then(function() {
 	    if (messageStatus == null) {
 	        var patronStore = redeemReward.get("PatronStore");
-	        patronStore.set("pending_reward", false);
-	        return patronStore.save();
+	        if (patronStore != null){
+	            patronStore.set("pending_reward", false);
+	            return patronStore.save();
+	        }
 	    }
 	    
 	}).then(function() {

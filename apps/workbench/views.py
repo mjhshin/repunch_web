@@ -145,7 +145,8 @@ def punch(request):
 def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success,
     2 if insufficient, 3 if already validated, 
-    4 if successfully deleted/denied, 5 has been deleted elsewhere.
+    4 if successfully deleted/denied, 5 has been deleted elsewhere,
+    6 PatronStore has been removed.
     """
     if request.method == "GET" or request.is_ajax():        
         # approve or deny
@@ -171,6 +172,7 @@ def redeem(request):
                     "store_id":store.get("objectId"),
                     })
             
+        # success result removed means patronstore is null!
         if 'error' not in res:
             # retrieve latest session since user may click a bunch 
             # of redemptions consecutively
@@ -191,8 +193,8 @@ def redeem(request):
             if action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
-                if result and result == "insufficient" and\
-                    i_remove != -1:
+                if result and result in\
+                    ("insufficient", "removed") and i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
                     # notify other dashboards of this change
                     store_id =\
@@ -203,7 +205,6 @@ def redeem(request):
                     }
                     requests.post(COMET_REQUEST_RECEIVE + store_id,
                         data=json.dumps(payload))
-                        
                     # now delete the redemption
                     del_red.delete()
                 elif i_remove != -1:
@@ -235,6 +236,9 @@ def redeem(request):
                                 content_type="application/json")
                 elif result and result == "validated":
                     return HttpResponse(json.dumps({"result":3}), 
+                                content_type="application/json")
+                elif result and result == "removed":
+                    return HttpResponse(json.dumps({"result":6}), 
                                 content_type="application/json")
                 else:
                     return HttpResponse(json.dumps({"result":1}), 

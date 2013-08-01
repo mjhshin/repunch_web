@@ -44,10 +44,15 @@ class Mail(object):
         """ 
         Matches the subject with a subject of one of the mails
         in the currently selected mailbox if it exists. 
-        Returns the list of ids of all matching emails.
+        Returns the list of ids of all matching emails as strings
+        in ascending order.
         """
-        return self.conn.search(None, '(SUBJECT "'+\
+        ids = self.conn.search(None, '(SUBJECT "'+\
             subject + '")')[1]
+        if ids:
+            ids = [int(i) for i in ids.split(" ")]
+            ids.sort()
+        return ids
         
     def fetch_date(self, ids):
         """ Fetches the date of the email with the given id """

@@ -707,7 +707,7 @@ def receive(request, store_id):
             rewards = store.get("rewards")
             rewards_ids = [ r['reward_id'] for r in rewards ]
             if newReward['reward_id'] not in rewards_ids:
-                rewards.append(reward)
+                rewards.append(newReward)
             store.rewards = rewards
             session['store'] = store
         
