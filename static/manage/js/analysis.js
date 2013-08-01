@@ -32,6 +32,7 @@ function updateBreakdownGraph()
                     },
                 	tooltip: {
                 	    showColorCode: true,
+                	    isHtml: true,
                 	},
                 };
                 
@@ -92,6 +93,10 @@ function updateTrendsGraph()
                     duration: 1000,
                     easing: 'out'
                 },
+            	tooltip: {
+            	    showColorCode: true,
+            	    isHtml: true,
+            	},
             };
             // Instantiate and draw our chart, passing in some options.
             if (trendsGraph == null) {
