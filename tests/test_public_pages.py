@@ -7,11 +7,14 @@ Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from libs.imap import Mail
 from tests import SeleniumTest
+
+from apps.public.forms import SUBJECT_PREFIX
 
 def test_public_pages():
     test = SeleniumTest()
@@ -122,11 +125,24 @@ def test_public_pages():
     except Exception:
         pass
     else:
-        parts[5]['success'] = True
-    sleep(3) # wait for the email to register in gmail
+        if test.is_current_url(reverse("public_thank_you")):
+            parts[5]['success'] = True
+            
+    sleep(5) # wait for the email to register in gmail
     mail.select_sent_mailbox()
-    # TODO FINISH
-    
+    mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User")
+    if len(mail_ids) > 0:
+        mail_ids = [int(i) for i in mail_ids]
+        mail_ids.sort()
+        sent = mail.fetch_date(str(mail_ids[-1]))
+        now = timezone.now()
+        lb = now + relativedelta(seconds=-10)
+        # make sure that this is the correct email that was just sent
+        if now.year == sent.year and now.month == sent.month and\
+            now.day == sent.day and now.hour == sent.hour and\
+            (sent.minute == now.minute or sent.minute == lb.minute):
+            parts[6]['success'] = True
+            
     
     ##########  Contact Us email form working
     test.open(reverse("public_contact")) # ACTION!
@@ -136,6 +152,7 @@ def test_public_pages():
     test.results.append(section)
     
     # END OF ALL TESTS
+    mail.logout()
     return test.tear_down()
     
     

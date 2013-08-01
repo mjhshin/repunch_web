@@ -34,6 +34,11 @@ class SeleniumTest(object):
         
     def open(self, url):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))
+   
+    def is_current_url(self, url):
+        """
+        returns True if the current url is equal to url """
+        return self.driver.current_url == SERVER_URL + url
     
     def new_driver(self):
         """

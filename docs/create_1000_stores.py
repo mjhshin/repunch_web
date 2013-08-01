@@ -112,11 +112,11 @@ def update():
     for i, data in enumerate(record.split("|")):
         data = data.split(",")
         store = Store.objects().get(objectId=data[1])
-        store.set("city", "City " + str(i)) 
+        store.set("city", "City " + str(i+1)) 
         store.set("country", "US") 
         store.set("state", "NY") 
         if store.update():
-            print "updated store #" + str(i)
+            print "updated store #" + str(i+1)
     
         
 if __name__ == "__main__":

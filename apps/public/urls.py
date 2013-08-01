@@ -13,7 +13,7 @@ urlpatterns = patterns('apps.public.views',
     url(r'^privacy/$', 'privacy', name='public_privacy'),
     url(r'^privacy-mobile/$', 'privacy_mobile', name='public_privacy_mobile'),
     url(r'^contact/$', 'contact', name='public_contact'),
-    url(r'^contact/thank_you/$', 'thank_you', name='public_thank_you'),
+    url(r'^contact/thank-you/$', 'thank_you', name='public_thank_you'),
     url(r'^jobs/$', 'jobs', name='public_jobs'),
     url(r'^categories/$', 'categories', name='public_categories'),
     

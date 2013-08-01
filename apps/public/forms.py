@@ -1,8 +1,10 @@
 from django import forms
 from django.core.mail import send_mail
 
-from repunch.settings import ORDER_PLACED_EMAILS
+from repunch.settings import ORDER_PLACED_EMAILS, DEBUG
 
+SUBJECT_PREFIX = "Contact Form - "
+    
 class ContactForm(forms.Form):
     full_name = forms.CharField(max_length=100,required=True)
     email = forms.EmailField(required=True)
@@ -16,6 +18,6 @@ class ContactForm(forms.Form):
                 self.cleaned_data['email'], 
                 self.cleaned_data['message'])
 
-        send_mail("Contact Form", full_message, 
-                self.cleaned_data['email'], ORDER_PLACED_EMAILS,
-                fail_silently=True)
+        send_mail(SUBJECT_PREFIX + self.cleaned_data['full_name'], 
+                full_message, self.cleaned_data['email'], 
+                ORDER_PLACED_EMAILS, fail_silently=not DEBUG)
