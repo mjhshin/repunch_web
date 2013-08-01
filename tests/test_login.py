@@ -86,7 +86,6 @@ def test_login_dialog():
     ##########  Closing the window logs out the user if 
     ##########  the stay signed in option was not activated.
     test.new_driver()    
-    test.open(reverse("public_home")) # ACTION!
     parts[3]["success"] =\
         test.is_current_url(reverse("public_home"))
     
@@ -103,7 +102,7 @@ def test_login_dialog():
         test.action_chain(1, selectors, "send_keys") # ACTION!
         sleep(7)
         test.new_driver()
-        test.open(reverse("public_home")) # ACTION!
+        test.driver.refresh()
         parts[4]["success"] =\
             test.is_current_url(reverse("store_index"))
     except Exception as e:

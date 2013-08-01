@@ -26,7 +26,13 @@ function updateBreakdownGraph()
                 	//chartArea: { left: 0, top: 0},
                 	width: 640,
                 	height: 250,
-                	pointSize: 4
+                	animation:{
+                        duration: 1000,
+                        easing: 'out'
+                    },
+                	tooltip: {
+                	    showColorCode: true,
+                	},
                 };
                 
 
@@ -36,8 +42,12 @@ function updateBreakdownGraph()
             // ]
                 
             // Instantiate and draw our chart, passing in some options.
-            breakdownGraph = new google.visualization.ColumnChart(document.getElementById('breakdown-graph'));
-            breakdownGraph.draw(new google.visualization.arrayToDataTable(jsonData), options);
+            if (breakdownGraph == null) {
+                breakdownGraph = new google.visualization.ColumnChart(document.getElementById('breakdown-graph'));
+            }
+            
+            var dataTable = new google.visualization.arrayToDataTable(jsonData);
+            breakdownGraph.draw(dataTable, options);
 
             $("#breakdown-loading").hide();
 	    },
@@ -77,10 +87,16 @@ function updateTrendsGraph()
 	            //chartArea: { left: 0, top: 0},
 	            width: 640,
 	            height: 250,
-	            pointSize: 4
+	            pointSize: 4,
+            	animation:{
+                    duration: 1000,
+                    easing: 'out'
+                },
             };
             // Instantiate and draw our chart, passing in some options.
-            trendsGraph = new google.visualization.LineChart(document.getElementById('trends-graph'));
+            if (trendsGraph == null) {
+                trendsGraph = new google.visualization.LineChart(document.getElementById('trends-graph'));
+            }
             trendsGraph.draw(new google.visualization.DataTable(jsonData), options);
 
             $("#trends-loading").hide();

@@ -31,7 +31,7 @@ class SeleniumTest(object):
         self.driver.quit()
         return self.results
         
-    def open(self, url):
+    def open(self, url="/"):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))
    
     def is_current_url(self, url):
@@ -39,13 +39,26 @@ class SeleniumTest(object):
         returns True if the current url is equal to url """
         return self.driver.current_url == SeleniumTest.SERVER_URL+url
     
-    def new_driver(self):
+    def new_driver(self, save_session_cookie=True):
         """
-        quits the current driver and instantiates a new one
+        Quits the current driver and instantiates a new one.
+        
+        If save_session_cookie is True saves the current cookies and 
+        loads it back after getting back to the SERVER_URL page 
+        (which is necessary in order to use add_cookie).
         """
+        if save_session_cookie:
+            cookie = None
+            for c in self.get_cookies():
+                if c['name'] == 'sessionid':
+                    cookie = c
         self.driver.quit()
         sleep(2)
         self.driver = webdriver.Firefox()
+        self.open()
+        sleep(1)
+        if save_session_cookie:
+            self.driver.add_cookie(cookie)
         
     def find(self, selector, type="css"):
         """
