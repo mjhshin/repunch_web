@@ -28,10 +28,10 @@ def test_login_dialog():
         {'test_name': "Login dialog showing up"},
         {'test_name': "Wrong login credentials show error"},
         {'test_name': "Successful login redirects to dashboard"},
-        {'test_name': "Closing the window logs out the user if "+\
-            "the stay signed in option was not activated"},
-        {'test_name': "Closing the window does not log out the "+\
-            " user if the stay signed in option was activated"},
+        {'test_name': "Not having the stay signed in option "+\
+            "sets the sessionid's cookie expiry to None"},
+        {'test_name': "Having the stay signed in option "+\
+            "sets the sessionid's cookie expiry to a number"},
         {'test_name': "Logout works"},
         {'test_name': "Forgot password form functional"},
     ]
@@ -84,29 +84,26 @@ def test_login_dialog():
     except Exception as e:
         print e
     
-    ##########  Closing the window logs out the user if 
-    ##########  the stay signed in option was not activated.
-    test.new_driver()    
-    parts[3]["success"] =\
-        test.is_current_url(reverse("public_home"))
+    ##########  Not having the stay signed in option
+    ##########  sets the sessionid's cookie expiry to None
+    parts[3]["success"] = test.driver.get_cookie(\
+        "sessionid")['expiry'] == None
     
-    ##########  Closing the window does not log out the
-    ##########  user if the stay signed in was activated.
+    ##########  Having the stay signed in option
+    ##########  sets the sessionid's cookie expiry to a number
     selectors = (
         ("#id_username", TEST_USER['username']),
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     try:
+        test.new_driver(save_session_cookie=False)
         test.find("#header-signin-btn").click() # ACTION!
         test.find("#stay_in").click() # ACTION!
         test.action_chain(1, selectors, "send_keys") # ACTION!
         sleep(7)
-        test.new_driver()
-        test.driver.refresh()
-        sleep(2)
-        parts[4]["success"] =\
-            test.is_current_url(reverse("store_index"))
+        parts[4]["success"] = test.driver.get_cookie(\
+            "sessionid")['expiry'] != None
     except Exception as e:
         print e
     
@@ -124,16 +121,16 @@ def test_login_dialog():
         test.find("#header-signin-btn").click() # ACTION!
         test.find("//form[@id='forgot-pass-form']/a",
             type="xpath").click() # ACTION!
-        sleep(1)
+        sleep(3)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@name='forgot-pass-email']", type="xpath").send_keys(\
                 TEST_USER['email'])
+        sleep(1)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
         sleep(3)
-        part[6]['success'] = str(test.find(\
-            "#forgot-pass-message").text) ==\
-            "Password Reset form sent."
+        parts[6]['success'] = str(test.find(\
+            "#forgot-pass-form").text) == "Password Reset form sent."
     except Exception as e:
         print e
     

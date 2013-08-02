@@ -48,10 +48,7 @@ class SeleniumTest(object):
         (which is necessary in order to use add_cookie).
         """
         if save_session_cookie:
-            cookie = None
-            for c in self.driver.get_cookies():
-                if c['name'] == 'sessionid':
-                    cookie = c
+            cookie = self.driver.get_cookie("sessionid")
         self.driver.quit()
         sleep(2)
         self.driver = webdriver.Firefox()
