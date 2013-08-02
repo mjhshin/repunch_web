@@ -49,7 +49,7 @@ class SeleniumTest(object):
         """
         if save_session_cookie:
             cookie = None
-            for c in self.get_cookies():
+            for c in self.driver.get_cookies():
                 if c['name'] == 'sessionid':
                     cookie = c
         self.driver.quit()

@@ -77,10 +77,20 @@ function updateChart()
                 	//chartArea: { left: 0, top: 0},
                 	width: 640,
                 	height: 250,
-                	pointSize: 4
+                	pointSize: 4,
+                	animation:{
+                        duration: 1000,
+                        easing: 'out'
+                    },
+                	tooltip: {
+                	    showColorCode: true,
+                	    isHtml: true,
+                	},
                 };
               // Instantiate and draw our chart, passing in some options.
-              chart = new google.visualization.LineChart(document.getElementById('employee-chart'));
+              if (chart == null) {
+                chart = new google.visualization.LineChart(document.getElementById('employee-chart'));
+              }
               chart.draw(new google.visualization.DataTable(jsonData), options);
         }
     });
