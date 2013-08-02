@@ -124,7 +124,7 @@ def test_login_dialog():
         sleep(1)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
-        sleep(3)
+        sleep(5)
         parts[6]['success'] = str(test.find(\
             "#forgot-pass-form").text) == "Password Reset form sent."
     except Exception as e:
@@ -235,7 +235,7 @@ def test_login_page():
         sleep(1)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
-        sleep(3)
+        sleep(5)
         parts[5]['success'] = str(test.find(\
             "#forgot-pass-form").text) == "Password Reset form sent."
     except Exception as e:
