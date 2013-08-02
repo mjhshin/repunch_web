@@ -47,6 +47,8 @@ class Store(ParseObject):
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
         self.neighborhood = data.get('neighborhood')
         self.cross_streets = data.get('cross_streets')
+        # GeoPoint [latitude, longtitude]
+        self.coordinates = data.get('coordinates')
         
         self.punches_facebook = data.get("punches_facebook")  
 
@@ -61,9 +63,6 @@ class Store(ParseObject):
         # {"alias":"coffee","name":"Coffee & Tea"}]
         self.categories = data.get('categories')
 
-        # GeoPoint [latitude, longtitude]
-        self.coordinates = data.get('coordinates')
-   
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
 
