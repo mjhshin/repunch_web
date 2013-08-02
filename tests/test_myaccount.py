@@ -12,14 +12,20 @@ from parse.apps.accounts.models import Account
 TEST_USER = {
     "username": "clothing",
     "password": "123456",
+    "email": "clothing@vandolf.com",
+}
+
+TEST_USER_INFO = {
+    "email": "militia@vandolf.com",
 }
     
     
-# set the store information 
-store = Account.objects().get(username=TEST_USER['username'],
-    include="Store").store
+# set the store information
+account =  Account.objects().get(username=TEST_USER['username'],
+    include="Store")
+store = account.store
     
-DEFAULT_STORE_INFO = {
+STORE_INFO = {
     "store_name": "Vandolf's Women's Clothing Corp",
     "street": "1370 Virginia Ave 4d",
     "city": "Bronx",
@@ -39,7 +45,7 @@ DEFAULT_STORE_INFO = {
     "coordinates": [40.83673, -73.862669],
 }
 
-store.update_locally(DEFAULT_STORE_INFO, False)
+store.update_locally(STORE_INFO, False)
 store.update()
 
 TEST_STORE_INFO = {
@@ -162,6 +168,10 @@ def test_edit_store_details():
     ph1.send_keys(TEST_STORE_INFO['Ph1'])
     ph2.send_keys(TEST_STORE_INFO['Ph2'])
     ph3.send_keys(TEST_STORE_INFO['Ph3'])
+    # email
+    email = test.find("#id_email")
+    email.clear()
+    email.send_keys(TEST_USER_INFO['email'])
     # store_description
     store_description = test.find("#id_store_description")
     store_description.clear()
@@ -173,7 +183,11 @@ def test_edit_store_details():
     
     address = str(test.find("#address p").text).split("\n")
     street = address[0]
-    phone_number = adress[2]
+    l2 = address[1].split(", ")
+    city = l2[0]
+    state, zip = l2[1].split(" ")
+    phone_number = address[2]
+    email = address[3]
 
     ##########  Changes to store name are visible 
     parts[2]['success'] = str(test.find("#address span").text) ==\
@@ -193,25 +207,43 @@ def test_edit_store_details():
         TEST_STORE_INFO['street']
             
     ##########  Changes to city are visible
-    parts[6]['success'] = 
+    parts[6]['success'] = city == TEST_STORE_INFO['city']
     
-    ##########  Changes to city are saved to Parse TODO
+    ##########  Changes to city are saved to Parse
+    store.city = None
+    parts[7]['success'] = store.get("city") == TEST_STORE_INFO['city']
     
-    ##########  Changes to state are visible TODO
+    ##########  Changes to state are visible
+    parts[8]['success'] = state == TEST_STORE_INFO['state']
     
-    ##########  Changes to state are saved to Parse TODO
+    ##########  Changes to state are saved to Parse
+    store.state = None
+    parts[9]['success'] = store.get("state") ==\
+        TEST_STORE_INFO['state']
     
-    ##########  Changes to zip are visible TODO
+    ##########  Changes to zip are visible
+    parts[10]['success'] = zip == TEST_STORE_INFO['zip']
     
-    ##########  Changes to zip are saved to Parse TODO
+    ##########  Changes to zip are saved to Parse
+    store.zip = None
+    parts[11]['success'] = store.get("zip") == TEST_STORE_INFO['zip']
     
-    ##########  Changes to phone number are visible TODO
+    ##########  Changes to phone number are visible
+    parts[12]['success'] = phone_number ==\
+        TEST_STORE_INFO['phone_number']
     
-    ##########  Changes to phone number are saved to Parse TODO
+    ##########  Changes to phone number are saved to Parse
+    store.phone_number = None
+    parts[13]['success'] = store.get("phone_number") ==\
+        TEST_STORE_INFO['phone_number']
     
-    ##########  Changes to email are visible TODO
+    ##########  Changes to email are visible
+    parts[14]['success'] = email == TEST_STORE_INFO['email']
     
-    ##########  Changes to email are saved to Parse TODO
+    ##########  Changes to email are saved to Parse
+    account.email = None
+    parts[15]['success'] = account.get("email") ==\
+        TEST_USER_INFO['email']
     
     ##########  Changes to hours are visible TODO
     

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import SESSION_KEY
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sessions.backends.cache import SessionStore
@@ -86,7 +87,7 @@ def edit(request):
                             max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
-        form = StoreForm(request.POST)
+        form = StoreForm(request.POST['email'], request.POST)
         if form.is_valid(): 
             # build the list of hours in proper format for saving 
             # to Parse. 
@@ -140,7 +141,7 @@ def edit(request):
             
             # update the account
             account.email = request.POST['email']
-            account.update()
+            account.update(request.session[SESSION_KEY])
             
             # update the session cache
             request.session['account'] = account
@@ -159,7 +160,7 @@ def edit(request):
                             'Store details has been updated.'}))
                 
     else:
-        form = StoreForm()
+        form = StoreForm(None)
         form.initial = store.__dict__.copy()
         # the email is in the account
         form.initial['email'] = account.email

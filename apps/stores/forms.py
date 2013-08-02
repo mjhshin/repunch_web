@@ -53,6 +53,10 @@ class StoreForm(forms.Form):
     email = forms.EmailField()
     store_description = forms.CharField(max_length=500, 
         widget=forms.Textarea(attrs={"maxlength":500}))
+        
+    def __init__(self, email, *args, **kwargs):
+        super(StoreForm, self).__init__(*args, **kwargs)
+        self.email = email
                                     
     def get_full_address(self):
         return self.data['street'] + ", " + self.data['city']  + ", " +\
@@ -63,7 +67,10 @@ class StoreForm(forms.Form):
         """ emails are unique """
         e = self.cleaned_data.get('email')
         if e and Account.objects().get(email=e):
-            raise forms.ValidationError("Email is already being used")
+            # only raise if email is not its own!
+            if self.email != e:
+                raise forms.ValidationError("Email is already " +\
+                    "being used")
         return e
                                     
     def clean_street(self):

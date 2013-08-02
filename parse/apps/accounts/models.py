@@ -6,7 +6,7 @@ from importlib import import_module
 
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.apps.accounts import sub_type, FREE
-from parse.utils import EXTRA
+from parse.utils import EXTRA, parse
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 

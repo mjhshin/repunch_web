@@ -54,7 +54,7 @@ class SeleniumTest(object):
         self.driver = webdriver.Firefox()
         self.open()
         sleep(1)
-        if save_session_cookie:
+        if save_session_cookie and cookie:
             self.driver.add_cookie(cookie)
         
     def find(self, selector, type="css"):

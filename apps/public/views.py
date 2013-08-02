@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from django.contrib.auth import SESSION_KEY 
 from django.http import HttpResponse
 from django.core import mail 
 from django.utils import timezone
@@ -21,7 +20,7 @@ from libs.repunch import rputils
 
 from repunch.settings import STATIC_URL
 from parse.auth import login
-from parse.utils import make_aware_to_utc
+from parse.utils import make_aware_to_utc, parse
 from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED
@@ -142,8 +141,13 @@ def sign_up(request):
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
         
-        all_forms_valid =\
-            store_form.is_valid() and account_form.is_valid()
+        all_forms_valid = store_form.is_valid() 
+        # we will not check if the account form is valid if 
+        # the tmp object is in the session since it will return false
+        # if the user does not change the username and email
+        if not request.session.get("account-tmp-objectId"):
+            all_forms_valid = all_forms_valid and\
+                account_form.is_valid()
         if request.POST.get("place_order"):
             place_order_checked = True
             if isdigit(request.POST.get("place_order_amount")):
@@ -240,7 +244,15 @@ def sign_up(request):
             if request.session.get("account-tmp-objectId"):
                 account.objectId =\
                     request.session.get("account-tmp-objectId")
-                account.update(request.session[SESSION_KEY])
+                # need to get session token before we can update
+                # this is guaranteed to update the User class since
+                # the user may have changed the email or username
+                # to one that already exists TODO?
+                res = parse("GET", "login", query=\
+                            {"username":requestDict.get('username'),
+                             "password":requestDict.get('password')} )
+                if res.get('sessionToken'):
+                    account.update(res.get('sessionToken'))
             else:
                 account.create()
             
