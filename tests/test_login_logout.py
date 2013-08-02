@@ -1,9 +1,5 @@
 """
 Selenium test for login and logout.
-
-I know that this is not how tests are done in Django. 
-The justification for this is that we are not using Django Models but
-Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
