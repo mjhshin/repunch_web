@@ -57,19 +57,7 @@ def edit(request, employee_id):
             
     if not employee or not acc:
         raise Http404
-    
-    """
-    if request.method == 'POST': 
-        # shouldn't go here, shin scrapped editing employee info
-        form = EmployeeForm(request.POST)
-        if form.is_valid(): 
-            employee.update_locally(request.POST.dict(), False)
-            employee.update()
-            acc.set('email', request.POST['email'])
-            acc.update()
-            data['success'] = "Employee has been updated."
-    else:
-    """
+        
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):

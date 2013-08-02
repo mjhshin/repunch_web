@@ -42,6 +42,7 @@ def index(request):
 @session_comet
 def edit(request):
     data = {'account_nav': True}
+    account = request.session['account']
     store = SESSION.get_store(request.session)
     # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
@@ -72,6 +73,7 @@ def edit(request):
             formset[i].initial = d
                 
         # update the session cache
+        request.session['account'] = account
         request.session['store'] = store
            
         data['form'] = form
@@ -135,7 +137,13 @@ def edit(request):
                     map_data.get("neighborhood")))
                     
             store.update()
+            
+            # update the account
+            account.email = request.POST['email']
+            account.update()
+            
             # update the session cache
+            request.session['account'] = account
             request.session['store'] = store
             
             # notify other dashboards of this change
@@ -153,6 +161,8 @@ def edit(request):
     else:
         form = StoreForm()
         form.initial = store.__dict__.copy()
+        # the email is in the account
+        form.initial['email'] = account.email
         # make sure that the phone number is unformatted
         form.initial['phone_number'] =\
             form.initial['phone_number'].replace("(",

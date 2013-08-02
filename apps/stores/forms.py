@@ -5,6 +5,7 @@ from models import Store, StoreAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric
 from repunch import settings
+from parse.apps.accounts.models import Account
 
 class StoreSignUpForm(forms.Form):
     store_name = forms.CharField(max_length=255)
@@ -49,6 +50,7 @@ class StoreForm(forms.Form):
     zip = forms.CharField(max_length=50)
     country = forms.CharField(max_length=50)
     phone_number = forms.CharField(max_length=50)
+    email = forms.EmailField()
     store_description = forms.CharField(max_length=500, 
         widget=forms.Textarea(attrs={"maxlength":500}))
                                     
@@ -56,6 +58,13 @@ class StoreForm(forms.Form):
         return self.data['street'] + ", " + self.data['city']  + ", " +\
             self.data['state'] + ", " + self.data['zip']  + ", " +\
             self.data['country']
+            
+    def clean_email(self):
+        """ emails are unique """
+        e = self.cleaned_data.get('email')
+        if e and Account.objects().get(email=e):
+            raise forms.ValidationError("Email is already being used")
+        return e
                                     
     def clean_street(self):
         # WARNING! get_map_data is unreliable due to google api 

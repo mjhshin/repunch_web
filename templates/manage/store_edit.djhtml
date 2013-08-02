@@ -131,6 +131,12 @@
 		</div>
 		
 		<div class="input-container clearheight">
+			{{ form.email.errors }}
+			<label for="id_email" id="label_email">Email</label>
+			{{ form.email }}
+		</div>
+		
+		<div class="input-container clearheight">
 			{{ form.store_description.errors }}
 			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>
 			{{ form.store_description }}

@@ -15,8 +15,10 @@ BAD_FILE_CHR = re.compile('[\W_]+')
 
 import traceback
 
+EXTRA = {"cMeta": "json"}
+
 def parse(method, path, data=None, query=None,
-            cMeta='json', timeout=None):
+        timeout=None, extra=EXTRA):
     """
     sends a request to parse using specified method, url, data,
     and optionally a query.
@@ -33,24 +35,24 @@ def parse(method, path, data=None, query=None,
     else:
         conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
+    
+    cMeta = extra['cMeta']
 
     rcm = REST_CONNECTION_META.copy()
     rcm["Content-Type"] = "application/" + cMeta
 
     if method in ("POST", "PUT", "DELETE"):
-        if data:
-            # create a new Parse object
+        if data: # POST & PUT
             if cMeta == 'json':
+                # need to add the parse session token for _User class!
+                if method == "PUT" and path.__contains__("_User"):
+                    rcm["X-Parse-Session-Token"] =\
+                        extra['sessionToken']
                 conn.request(method, '/' + PARSE_VERSION + '/' +\
                         path, json.dumps(data), rcm)
             elif cMeta == 'png':
-                # if method == "DELETE":
-                # delete should have no data
-                # create a file
                 conn.request(method, '/' + PARSE_VERSION +\
                         '/' + path, open(data, 'r'), rcm)
-                # data.close() don't close the file yet!
-                # transaction may not be done, wait for response!
         else:
             if method == "DELETE":
                 rcm.pop("X-Parse-REST-API-Key")
@@ -118,12 +120,12 @@ def create_png(file_path, coords=None):
     rescale(file_path, 'png', coords)
     file_name = file_path.split("/")[-1]
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                file_name), file_path, cMeta='png')
+                file_name), file_path, extra={"cMeta":'png'})
     return res 
 
 def delete_file(name, fType):
     """ deletes the given file """   
-    return parse("DELETE", 'files/' + name, cMeta=fType)
+    return parse("DELETE", 'files/' + name, extra={"cMeta":fType})
 
 def cloud_call(func_name, params, timeout=None):
     """ Calls a cloud function with the name func_name and with

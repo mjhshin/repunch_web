@@ -55,6 +55,7 @@ TEST_STORE_INFO = {
             {"close_time":"1930","day":4,"open_time":"1000"},
             {"close_time":"1930","day":5,"open_time":"1000"},
             {"close_time":"1930","day":6,"open_time":"1000"},],
+    "Ph1": '111', "Ph2": '111', "Ph3": '1111',
 }
 
 def test_edit_store_details():
@@ -74,6 +75,8 @@ def test_edit_store_details():
         {'test_name': "Changes to zip are saved to Parse"},
         {'test_name': "Changes to phone number are visible"},
         {'test_name': "Changes to phone number are saved to Parse"},
+        {'test_name': "Changes to email are visible"},
+        {'test_name': "Changes to email are saved to Parse"},
         {'test_name': "Changes to hours are visible"},
         {'test_name': "Changes to hours are saved to Parse"},
         {'test_name': "Entering invalid address shows error"},
@@ -83,7 +86,6 @@ def test_edit_store_details():
         {'test_name': "Changing the zip changes the store_timezone"},
         {'test_name': "Changing the zip changes the neighborhood"},
         {'test_name': "Changing the zip changes the coordinates"},
-        {'test_name': "Changes are relected in store details page"},
         {'test_name': "Cancel button redirects user back to store " +\
             "details page and no changes are saved to Parse"},
         {'test_name': "Clicking Add/Change Photo brings up the " +\
@@ -117,30 +119,81 @@ def test_edit_store_details():
     test.action_chain(1, selectors, "send_keys") # ACTION!
     sleep(7)
     
+    def click_store_edit():
+        test.find("//div[@id='store-details']/a[@href='" +\
+            reverse("store_edit") + "']", type="xpath").click() 
+    
     ##########  Edit page reachable
     try:
-        test.find("//div[@id='store-details']/a[@href='" +\
-            reverse("store_edit") + "']", type="xpath").click() # ACTION!
+        click_store_edit() # ACTION!
         sleep(3)
-        parts[1]['success']=test.is_curren_url(reverse("store_edit"))
+        parts[1]['success']=test.is_current_url(reverse("store_edit"))
     except Exception as e:
         print e
         
-    ##########  Changes to store name are visible TODO
-    
-    ##########  Changes to store name are saved to Parse TODO
+    ### make all the changes
+    # store_name
     store_name = test.find("#id_store_name")
     store_name.clear()
     store_name.send_keys(TEST_STORE_INFO['store_name'])
+    # street
+    street = test.find("#id_street")
+    street.clear()
+    street.send_keys(TEST_STORE_INFO['street'])
+    # city
+    city = test.find("#id_city")
+    city.clear()
+    city.send_keys(TEST_STORE_INFO['city'])
+    # state
+    state = test.find("#id_state")
+    state.clear()
+    state.send_keys(TEST_STORE_INFO['state'])
+    # zip
+    zip = test.find("#id_zip")
+    zip.clear()
+    zip.send_keys(TEST_STORE_INFO['zip'])
+    # phone_number
+    ph1 = test.find("#Ph1")
+    ph2 = test.find("#Ph2")
+    ph3 = test.find("#Ph3")
+    ph1.clear()
+    ph2.clear()
+    ph3.clear()
+    ph1.send_keys(TEST_STORE_INFO['Ph1'])
+    ph2.send_keys(TEST_STORE_INFO['Ph2'])
+    ph3.send_keys(TEST_STORE_INFO['Ph3'])
+    # store_description
+    store_description = test.find("#id_store_description")
+    store_description.clear()
+    store_description.send_keys(TEST_STORE_INFO['store_description'])
+    
+    # save!
     test.find("#save-button").click()
-    sleep(3)
+    sleep(6)
     
+    address = str(test.find("#address p").text).split("\n")
+    street = address[0]
+    phone_number = adress[2]
+
+    ##########  Changes to store name are visible 
+    parts[2]['success'] = str(test.find("#address span").text) ==\
+        TEST_STORE_INFO['store_name']
     
-    ##########  Changes to street are visible TODO
+    ##########  Changes to store name are saved to Parse 
+    store.store_name = None
+    parts[3]['success'] = store.get("store_name") ==\
+        TEST_STORE_INFO['store_name']
+        
+    ##########  Changes to street are visible
+    parts[4]['success'] = street == TEST_STORE_INFO['street']
     
-    ##########  Changes to street are saved to Parse TODO
-    
-    ##########  Changes to city are visible TODO
+    ##########  Changes to street are saved to Parse
+    store.street = None
+    parts[5]['success'] = store.get("street") ==\
+        TEST_STORE_INFO['street']
+            
+    ##########  Changes to city are visible
+    parts[6]['success'] = 
     
     ##########  Changes to city are saved to Parse TODO
     
@@ -155,6 +208,10 @@ def test_edit_store_details():
     ##########  Changes to phone number are visible TODO
     
     ##########  Changes to phone number are saved to Parse TODO
+    
+    ##########  Changes to email are visible TODO
+    
+    ##########  Changes to email are saved to Parse TODO
     
     ##########  Changes to hours are visible TODO
     
@@ -173,8 +230,6 @@ def test_edit_store_details():
     ##########  Changing the zip changes the neighborhood TODO
     
     ##########  Changing the zip changes the coordinates TODO
-    
-    ##########  Changes are reflected in store details page TODO
     
     ##########  Cancel button redirects user back to store TODO
     ##########  details page and no changes are saved to Parse

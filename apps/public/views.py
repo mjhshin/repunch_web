@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.contrib.auth import SESSION_KEY 
 from django.http import HttpResponse
 from django.core import mail 
 from django.utils import timezone
@@ -239,7 +240,7 @@ def sign_up(request):
             if request.session.get("account-tmp-objectId"):
                 account.objectId =\
                     request.session.get("account-tmp-objectId")
-                account.update()
+                account.update(request.session[SESSION_KEY])
             else:
                 account.create()
             
