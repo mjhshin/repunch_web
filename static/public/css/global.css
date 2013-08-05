@@ -220,7 +220,23 @@ a.button.orange{
 #forgot-pass-form {
     margin-top:16px;
 }
-	
+
+
+/*** terms styles ***/
+/*******************/
+#agreement li span {
+    text-decoration: underline;
+    font-weight:bold;
+    margin: 10px;
+}
+#agreement li ol {
+    margin:20px 0px;
+}
+#agreement li ol li {
+    margin-bottom:10px;
+}
+
+
 /*** page styles ***/
 /*******************/
 .page-title{

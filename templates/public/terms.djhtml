@@ -20,158 +20,97 @@
 		<div id="about-content">
 			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
 			
-<h3>Terms of Use</h3><p>
-These Terms of Use (the “Agreement”) is a legal agreement between You (an entity or person) and Repunch, Inc., a Delaware corporation (“Repunch”, “Us”, “We”), that governs your limited, non-exclusive, terminable right to use of the Repunch application and related services on your mobile device (the “Services”).  This Agreement includes the <a href="{% url 'public_privacy' %}">Privacy Policy</a>. 
-<br/>
-By proceeding to registering your account and downloading the application for the Service, or otherwise using the Service, You agree to be bound by the terms of this Agreement. If you do not agree to these terms, you cannot not register your account or download the application or use any of our services. You acknowledge that you have read this agreement, understand it, and agree to be bound by its terms and conditions.
-<br />
-We may amend this Agreement from time-to-time. All amended terms automatically take effect on the sooner of the day you use the Service or 10 you are initially provided notice of such changes. Your use of the Service following the effective date of any modifications to this Agreement will constitute your acceptance of the Agreement, as modified. You agree that such notice of modifications is adequate notice.
-<br />
-The Services are not targeted towards, nor intended for use by, anyone under the age of 13. If you are between the ages of 13 and 18, you may only use Services under the supervision of a parent or legal guardian who agrees to be bound by these Terms of Use.
-</p>
-<br />
-<h3>The Repunch Services</h3><p>
-The Services are a vehicle for businesses to reward customers for patronizing them. We have entered into agreements with certain business who have agreed with us to provide you with loyalty or similar rewards or “punches” that can be redeemed according to terms and conditions in place with the applicable participating business, which terms and conditions govern the earning and rewards and redemption of rewards or “punches” at that business.  Because we are merely connecting you and participating businesses, we have no responsibility or liability to you for any aspects of any relationship you engage in with a participating business, including the earning, redemption and expiration of rewards.  You are responsible for understanding the terms and conditions imposed by a participating business.
-<br />
-You cannot consider the fact that a business uses our Service as any endorsement by us of that business.  We express no opinions as to any participating businesses and you engage in a relationship with them at your own risk. 
-<br />
-Not all businesses have subscribed to the Service and you should check with a business prior to patronizing them if you would like to know if they have subscribed to the Service.  A list of businesses that participate in the Service can be found at in the application for the Service that you downloaded to your mobile device.
-<br />
-To enroll in the Service and begin accumulating rewards at participating businesses, you must download and install the Repunch mobile app to your Android™ or iPhone® device and then follow the prompts to create an account.
-If you discontinue the Service at any time, either by cancelling your account or uninstalling the Repunch mobile app, you may lose any rewards or punches you have accumulated and may lose other information and data generated in connection with your prior use of the Service.
-</p>
-	
-<br />
-<h3>Limited Right to Use Services</h3><p>
-We grant you a limited, revocable, non-exclusive, non-transferable right to use and access the Services for your own individual non-commercial use subject to the other terms of this Agreement. You agree not to resell the Services or any aspect of the Services. You may not modify, reverse engineer, decompile or disassemble any mobile app for using the Services and you may not copy, adapt, alter, modify, translate, or create derivative works of such a mobile app.
-<br />
-You may not use the Services for illegal purposes or for the transmission of material that is unlawful, harassing, libelous, invasive of another’s privacy, abusive, threatening, obscene or that infringes the rights or intellectual property of others. You may not permit other individuals to use the Services, including but not limited to shared use via a network connection, except under the terms of this Agreement. You may not rent, lease, loan, sublicense, distribute, or otherwise transfer rights to the Services. You may not circumvent or disable any technological features or measures in the Services for protection of intellectual property rights. You may not use the Services in an attempt to, or in conjunction with, any device, program, or service designed to circumvent technological measures employed to control access to, or the rights in, a content file or other work protected by the copyright laws of any jurisdiction. Any such forbidden use shall immediately terminate your right to use the Services. 
-<br />
-You agree not to access, copy, or otherwise use Services unless such use is authorized by this Agreement or otherwise authorized in writing. You agree that any information you provide to, or enter in order to use, the Services will complete and accurate. You will not use the Services is any illegal, abusive, interfering or otherwise unacceptable or inappropriate manner, including:
-
-<ul>
-<li>to violate any law, regulation or other published policy;</li>
-<li>to violate or infringe on intellectual property, privacy, or rights of another;</li>
-<li>to violate any agreement, rules or policies that govern the use of your mobile device;</li>
-<li>to transmit any content that is illegal, abusive, harassing, racist, hateful, or in our sole discretion objectionable;</li>
-<li>to transmit sexually explicit, pornographic, obscene, or other content which in our sole discretion we find objectionable;</li>
-<li>to sell, trade, resell or otherwise exploit for any unauthorized commercial purpose or transfer any account;</li>
-<li>to stalk, harass, or harm another individual;</li>
-<li>to impersonate another, misrepresent or falsely identify yourself;</li>
-<li>to violate any applicable third party policies or requirements that Repunch has communicated to you, or;</li>
-<li>to engage in fraudulent activity with respect to third parties or otherwise;</li>
-<li>engaging in spamming or other unsolicited advertising, marketing or other activities.</li>
-</ul>
-</p>
-<br />
-<h3>No Charge</h3><p>
-Repunch does not currently charge you to use Services.
-</p>
-<br />
-<h3>Proprietary Rights</h3><p>
-All right, title and interest in the Service and any content contained herein is the exclusive property of Repunch, except as otherwise stated. Unless otherwise specified, this Service is for your personal and limited commercial use only and you may print, copy and download any information or portion of the Services for your personal use only. If you copy or download any information or software from this Site, you agree that you will not remove or obscure any copyright or other notices or legends contained in any such information. 
-<br />
-You may not modify, copy, distribute, transmit, display, perform, reproduce, publish, license, frame, create derivative works from, transfer, or otherwise use in any other way for commercial or public purposes, in whole or in part, any information, software, products or services obtained from the Service, except for the purposes expressly provided herein, without Repunch’s prior written approval. 
-<br />
-All trademarks, trade names, service marks and logos are proprietary to Repunch. Your use of any marks on the Services in any manner other than as authorized in these Terms and Conditions, or as authorized in writing by Repunch, is strictly prohibited. 
-</p>
-<br />
-<h3>Content License</h3><p>
-You grant Repunch a non-exclusive, worldwide, perpetual, irrevocable, royalty-free, sublicensable (through multiple tiers) right to exercise any and all rights that you have as the copyright owner in any content or feedback that you provided to us. 
-</p>
-<br />
-<h3>Disclaimer</h3><p>
-The materials on Services are provided “as is”. Repunch makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights. Further, Repunch does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of the materials on the Services or otherwise relating to such materials or on any sites or content linked to the Services. 
-<br />
-Since the Services ARE dependent on the IP networks, the availability of an adequate power supply, and correct equipment configuration, we do not guarantee that any portion of the ServiceS will be continuous or error-free. You also acknowledge and understand that we cannot guarantee that communications are completely secure. 
-</p>
-<br />
-<h3>Limitations</h3><p>
-In no event shall Repunch or its suppliers be liable for any consequential, indirect, special, punitive or similar damages, including loss of data or profit, or business interruption, arising out of the use of, or inability to use, the Service, even if Repunch or a Repunch authorized representative has been notified orally or in writing of the possibility of such damage. IN NO EVENT WILL THE COLLECTIVE LIABILITY OF REPUNCH OR ITS OFFICERS, DIRECTORS, EMPLOYEES, AFFILIATES, AGENTS, LICENSORS, REPRESENTATIVES, ATTORNEYS, AND BUSINESS PARTNERS TO ANY PARTY, REGARDLESS OF THE TYPE OF ACTION WHETHER IN CONTRACT, TORT, OR OTHERWISE, EXCEED $100. 
-Any cause of action you may have with respect to your use of the Services and service provided by the Services must be commenced within one (1) year after the claim or cause of action arises. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.
-</p>
-<br />
-<h3>Revisions</h3><p>
-The materials appearing on Services may include technical, typographical, or photographic errors. Repunch does not warrant that any of the materials on or provide through its Services, including through participating businesses, are accurate, complete, or current. Repunch may make changes to the materials contained on its Services at any time without notice. Repunch however, makes no commitment of any kind to update the materials. 
-</p>
-	
-<br />
-<h3>Assumption of Risk</h3><p>
-You use the Services solely at your own risk and subject to all applicable local, state, national, and international laws and regulations.  In addition, Repunch is not responsible for the security of any information transmitted via the Internet, the accuracy of the information contained on the Site, or for the consequences of any reliance on such information. Repunch shall have no liability for interruptions or omissions in Internet, network or hosting services. You assume the sole and complete risk of using the Site. 
-<br/>
-Any material downloaded or otherwise obtained through the use of the Services is done at your own discretion and risk. You will be solely responsible for any damage to your computer system or loss of data that results from the download of any such material. 
+<h3>VENDOR AGREEMENT</h3><p>
+This Vendor Agreement is effective as of the date upon which your Repunch account is
+activated (hereinafter, the “Effective Date”) and is by and between Repunch, Inc., a
+Delaware corporation with offices located at 155 Water St, Brooklyn, NY 11201 
+(“Repunch”), and you (the “Vendor”).
 </p>
 
-<br />
-<h3>Your Responsibility to Protect Data and Password</h3><p>
-It is your responsibility to protect your personal data and maintain the confidentiality of your user information and password. You are also responsible for immediately notifying Repunch of any unauthorized use of your account, or breach of your account information or password. Repunch will not be liable for any loss that You may incur as a result of someone else using Your username or password, either with or without Your knowledge. To the extent allowable by law, you shall be liable for any expenses, including usage charges and fines, fees, civil judgments, and reasonable attorney’s fees for your failure to safeguard user and password information and/or promptly notify Repunch about unauthorized use of your account or breach of your account information or password. 
+<p><strong>WHEREAS,</strong> Repunch develops and administers an application for mobile
+devices and related platforms (the “Repunch Application”), whereby end-users of the
+Repunch Application (“End-Users”) can be rewarded by a participating vendor with certain
+benefits when that end-user makes qualified transactions with that vendor; and
 </p>
 
-<br />
-<h3>Links</h3><p>
-The Service may include links to certain website, materials, or content developed by third parties. Repunch has not reviewed all of the sites linked to its Internet Services and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Repunch of the Site. Use of any such linked website is at your own risk. Repunch reserves the right in its sole and absolute discretion to discontinue links to any other sites at any time and for any reason. 
+<p><strong>WHEREAS,</strong> the Vendor desires to participate in the Repunch
+Application by offering its goods and/or services (collectively, the “Vendor Products”)
+for sale through reward vouchers issued by the Vendor to the End-Users (“Punches”) on
+the terms and conditions set forth herein.
 </p>
 
-<br />
-<h3>Enforcing Security</h3><p>
-Actual or attempted unauthorized use of any of the Services may result in criminal and/or civil prosecution. For your protection, we reserve the right to view, monitor, and record activity on the Services without notice or further permission from you, to the fullest extent permitted by applicable law. This right extends to our review of message content and details pertaining to claimed violations of our Spam Policy. Any information obtained by monitoring, reviewing, or recording is subject to review by law enforcement organizations in connection with the investigation or prosecution of possible criminal activity on any of the Site. 
-</p>
-	
-<br />
-<h3>Compliance with Laws</h3><p>
-You will use the Service in full compliance with all applicable laws and regulations with regard to your use of this Services.
-</p>
-		
-<br />
-<h3>Indemnity</h3><p>
-You will indemnify and hold Repunch, its affiliates, officers, directors, employees, agents, legal representatives, licensors, subsidiaries, joint ventures and suppliers, harmless from any claim or demand, including reasonable attorneys’ fees, made by any third party due to or arising out of your breach of this Agreement, your violation of any law, or the rights of a third party. 
-</p>
-		
-<br />
-<h3>Termination</h3><p>
-Repunch may terminate your right to use the Service with or without cause at any time. You may also terminate this Agreement by simply discontinuing use of the Service. 	
-</p>		
-		
-<br />
-<h3>Governing Law</h3><p>
-ANY CLAIM RELATING TO THE SERVICES SHALL BE GOVERNED BY THE LAWS OF THE STATE OF NEW YORK WITHOUT REGARD TO ITS CONFLICT OF LAW PROVISIONS. SOLE AND EXCLUSIVE JURISDICTION FOR ANY ACTION OR PROCEEDING ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL BE IN AN APPROPRIATE STATE OR FEDERAL COURT LOCATED IN THE COUNTY OF MONROE COUNTY AND THE PARTIES UNCONDITIONALLY WAIVE THEIR RESPECTIVE RIGHTS TO A JURY TRIAL. IF FOR ANY REASON A COURT OF COMPETENT JURISDICTION FINDS ANY PROVISION OF THIS AGREEMENT, OR A PORTION THEREOF, TO BE UNENFORCEABLE, THAT PROVISION SHALL BE ENFORCED TO THE MAXIMUM EXTENT PERMISSIBLE SO AS TO AFFECT THE INTENT OF THIS AGREEMENT, AND THE REMAINDER OF THIS AGREEMENT SHALL CONTINUE IN FULL FORCE AND EFFECT. A PRINTED VERSION OF THIS AGREEMENT SHALL BE ADMISSIBLE IN JUDICIAL OR ADMINISTRATIVE PROCEEDINGS. 
-</p>
-		
-<br />
-<h3>Waiver of Jury Trial</h3><p>
-EACH OF THE PARTIES WAIVES ITS RIGHTS TO A TRIAL BY JURY OF ALL CLAIMS OR CAUSES OF ACTION (INCLUDING COUNTERCLAIMS) RELATED TO OR ARISING OUT OF THIS AGREEMENT BROUGHT BY EITHER PARTY AGAINST THE OTHER. THIS WAIVER WILL APPLY TO ANY SUBSEQUENT AMENDMENTS OF OR MODIFICATIONS TO THIS AGREEMENT. 
+<p><strong>WHEREAS,</strong> in consideration of the obligations set forth in this
+Agreement and for other good and valuable consideration, the receipt of sufficiency of
+which is hereby acknowledged, Repunch and the Vendor agree as follows.
 </p>
 
-<br />
-<h3>No Class Actions</h3><p>
-All claims between the parties related to this Agreement will be litigated individually and you will not consolidate or seek class treatment for any claim with respect to the Services. 
-<br/>
-YOU HEREBY ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS. 
-</p>
-
-<br />
-<h3>Waiver of Compliance of this Agreement</h3><p>
-Even if we do not require strict compliance with the Agreement in each instance, you will be obligated to comply with the Agreement. Our failure to enforce, at any time, any of the provisions, conditions or requirements of the Agreement, or the failure to require, at any time, performance by you of any of the provisions of the Agreement, will in no way waive your obligation to comply with any of the provisions of the Agreement or our ability to enforce each and every such provision as written. 
-<br/>
-Any and all waivers by Repunch of any provision, condition or requirement of the Agreement will only be effective against Repunch if it is in writing and signed by an authorized officer of Repunch, and any such written waiver will not constitute a waiver of any future obligation to comply with such provision, condition or requirement. 
-</p>
-
-<br />
-<h3>Assignment and Delegation</h3><p>
-You may not assign or delegate any rights or obligations under the Agreement. Any purported assignment and delegation shall be ineffective. We may freely assign or delegate all rights and obligations under the Agreement, fully or partially without notice to you. We may also substitute, by way of unilateral novation, effective upon notice to you, Repunch for any third party that assumes our rights and obligations under this Agreement.
-</p>
-
-<br />
-<h3>No Injunctive Relief</h3><p>
-In no event shall you seek or be entitled to rescission, injunctive or other equitable relief, or to enjoin or restrain the operation of the Service, exploitation of any advertising or other materials issued in connection therewith, or exploitation of the Service or any content or other material used or displayed through the Service. 
-</p>
-
-<br />
-<h3>Contacting Users</h3><p>
-By using Services, you agree that we may contact you via voice call, text message or other electronic medium. In the event that any information you have provided to changes, including but not limited to, your phone number, e-mail or address, you agree to promptly update your information.
-</p>
+{# START OL #}
+<ol id="agreement">
 
 
+{# START PARTICIPATION #}
+<li><span>Participation.</span>
+<ol type="a">
+<li><strong>Punches.</strong>&nbsp;
+The Vendor agrees to participate in Repunch Application by offering the
+Vendor Products for sale through Punches.  During the Term (as defined in Section 
+4 below), Repunch may create, market, and promote the Repunch Application in 
+accordance with this Agreement. The Vendor acknowledges and agrees that Repunch 
+may terminate the publication or promotion of the Repunch Application at any time, 
+at its sole discretion, and without advance notice to the Vendor.  The Vendor agrees 
+that Punches shall be honored and redeemable by End-Users for the Vendor Products 
+according their terms and in compliance with all applicable laws, rules and
+regulations. The Vendor shall act as the seller of the Vendor Products and as the
+issuer of the Punches, and Repunch only provides the Repunch Application to facilitate
+transactions between the Vendor and the End-Users.
+</li>
+
+<li><strong>Vendor Responsible for Customer Service for the Vendor Products.</strong>
+The Vendor agrees that once a Punch is delivered to any End-User who qualifies to
+receive the Punch for discount or prepaid purchase of the Vendor Products, the Vendor
+shall be solely responsible for all customer service in connection with the Punch and
+the Vendor Products relating thereto.
+</li>
+
+<li><strong>Non-Disparagement; Cooperation.</strong>
+The Vendor shall not: (i) engage in any deceptive, misleading or unethical practices
+or activities which could bring Repunch, the Repunch Application or any End-User into
+disrepute; or (ii) make representations, warranties or statements about the
+specifications, features or capabilities of the Repunch Application or Punches that
+are inconsistent with this Agreement. The Vendor shall cooperate with Repunch using
+its commercially reasonable efforts to facilitate the promotion of Punches.
+</li>
+
+</ol>
+</li>
+{# END PARTICIPATION #}
+
+{# START PROMOTION AND DELIVERY #}
+<li><span>Promotion and Delivery.</span>
+
+</li>
+{# END PROMOTION AND DELIVERY #}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</ol>
+{# END OL #}
 				
 		    </div>
 		</div>
