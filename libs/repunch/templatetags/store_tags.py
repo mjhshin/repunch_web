@@ -44,11 +44,20 @@ def hours(session):
                 hours_map[key].append(hour['day'])
             else:
                 hours_map[key] = [hour['day']]
-        for i, key in enumerate(hours_map.iterkeys()):
-            hours.append(Hours(days=\
-                    [str(d) for d in hours_map[key]],
-                    open=datetime.datetime.strptime(key[1], "%H%M"),
-                    close=datetime.datetime.strptime(key[0], "%H%M"),
+        hrsmap_vk, days_list = {}, []
+        for k, v in hours_map.iteritems():
+            v.sort()
+            v_tup = tuple(v)
+            hrsmap_vk[v_tup] = k
+            days_list.append(v_tup)
+        # now sort the days list by first element
+        days_list.sort(key=lambda k: k[0])
+        for i, days in enumerate(days_list):
+            hours.append(Hours(days=[str(d) for d in days],
+                    open=datetime.datetime.strptime(\
+                         hrsmap_vk[days][1], "%H%M"),
+                    close=datetime.datetime.strptime(\
+                        hrsmap_vk[days][0], "%H%M"),
                     list_order=i+1))
                     
     # update the session cache

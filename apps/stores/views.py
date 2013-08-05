@@ -55,21 +55,30 @@ def edit(request):
             for hour in store.get("hours"):
                 key = (hour['close_time'], hour['open_time'])
                 if key in hours_map:
-                    hours_map[key].append(unicode(hour['day']))
+                    hours_map[key].append(hour['day'])
                 else:
-                    hours_map[key] = [unicode(hour['day'])]
+                    hours_map[key] = [hour['day']]
                 
         # create the formset
         HoursFormSet = inlineformset_factory(dStore, dHours,
                             max_num=7, extra=len(hours_map))
         formset = HoursFormSet(prefix='hours', instance=dstore_inst)
+        hrsmap_vk, days_list = {}, []
+        for k, v in hours_map.iteritems():
+            v.sort()
+            v_tup = tuple(v)
+            hrsmap_vk[v_tup] = k
+            days_list.append(v_tup)
+        # now sort the days list by first element
+        days_list.sort(key=lambda k: k[0])
+        
         # set forms in formset initial data
-        for i, key in enumerate(hours_map.iterkeys()):
-            d = {'days':hours_map[key],
-                    'open':unicode(key[1][:2] +\
-                            ':' + key[1][2:4] + ':00'),
-                    'close':unicode(key[0][:2] +\
-                            ':' + key[0][2:4] + ':00'),
+        for i, days in enumerate(days_list):
+            d = {'days':[unicode(d) for d in days],
+                    'open':unicode(hrsmap_vk[days][1][:2] +\
+                            ':' + hrsmap_vk[days][1][2:4] + ':00'),
+                    'close':unicode( hrsmap_vk[days][0][:2] +\
+                            ':' +  hrsmap_vk[days][0][2:4] + ':00'),
                     'list_order':unicode(i+1) }
             formset[i].initial = d
                 
@@ -115,6 +124,8 @@ def edit(request):
                         })
                 ind += 1
                 key = "hours-" + str(ind) + "-days"
+            # sort the list
+            hours.sort(key=lambda k: k['day'])
             
             store = Store(**store.__dict__)
             store.update_locally(request.POST.dict(), False)
