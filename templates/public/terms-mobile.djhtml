@@ -50,11 +50,11 @@
 {% block content %}
 <h2>Terms of Use</h2>
 <p>
-These Terms of Use (the “Agreement”) is a legal agreement between You (an entity
-or person) and Repunch, Inc., a Delaware corporation (“Repunch”, “Us”, “We”), that 
+These Terms of Use (the "Agreement") is a legal agreement between You (an entity
+or person) and Repunch, Inc., a Delaware corporation ("Repunch", "Us", "We"), that 
 governs your limited, non-exclusive, terminable right to use of the Repunch
-application and related services on your mobile device (the “Services”).
-This Agreement includes the Privacy Policy found at {# TODO [add URL] #}.  
+application and related services on your mobile device (the "Services").
+This Agreement includes the <a href="{% url 'public_privacy_mobile' %}">Privacy Policy</a>.  
 By proceeding to registering your account and downloading the application for the
 Service, or otherwise using the Service, You agree to be bound by the terms of this
 Agreement. IF YOU DO NOT AGREE TO THESE TERMS, YOU MUST NOT REGISTERING YOUR ACCOUNT
@@ -82,9 +82,9 @@ supervision of a parent or legal guardian who agrees to be bound by these Terms 
 <p>
 The Services are a vehicle for businesses to reward customers for patronizing them. We
 have entered into agreements with certain business who have agreed with us to provide
-you with loyalty or similar rewards or “punches” that can be redeemed according to 
+you with loyalty or similar rewards or "punches" that can be redeemed according to 
 terms and conditions in place with the applicable participating business, which terms
-and conditions govern the earning and rewards and redemption of rewards or “punches”
+and conditions govern the earning and rewards and redemption of rewards or "punches"
 at that business.  Because we are merely connecting you and participating businesses,
 we have no responsibility or liability to you for any aspects of any relationship you
 engage in with a participating business, including the earning, redemption and
@@ -130,7 +130,7 @@ create derivative works of such a mobile app.
 
 <p>
 You may not use the Services for illegal purposes or for the transmission of material 
-that is unlawful, harassing, libelous, invasive of another’s privacy, abusive,
+that is unlawful, harassing, libelous, invasive of another's privacy, abusive,
 threatening, obscene or that infringes the rights or intellectual property of others.
 You may not permit other individuals to use the Services, including but not limited to
 shared use via a network connection, except under the terms of this Agreement. You may
@@ -195,7 +195,7 @@ You may not modify, copy, distribute, transmit, display, perform, reproduce, pub
 license, frame, create derivative works from, transfer, or otherwise use in any other 
 way for commercial or public purposes, in whole or in part, any information, software, 
 products or services obtained from the Service, except for the purposes expressly 
-provided herein, without Repunch’s prior written approval.
+provided herein, without Repunch's prior written approval.
 </p>
 
 <p>
@@ -213,7 +213,7 @@ have as the copyright owner in any content or feedback that you provided to us.
 
 <h3>Disclaimer</h3>
 <p>
-The materials on Services are provided “as is”. Repunch makes no warranties, expressed 
+The materials on Services are provided "as is". Repunch makes no warranties, expressed 
 or implied, and hereby disclaims and negates all other warranties, including without 
 limitation, implied warranties or conditions of merchantability, fitness for a
 particular purpose, or non-infringement of intellectual property or other violation of
@@ -289,7 +289,7 @@ your account information or password. Repunch will not be liable for any loss th
 may incur as a result of someone else using Your username or password, either with or
 without Your knowledge. To the extent allowable by law, you shall be liable for any
 expenses, including usage charges and fines, fees, civil judgments, and reasonable
-attorney’s fees for your failure to safeguard user and password information and/or
+attorney's fees for your failure to safeguard user and password information and/or
 promptly notify Repunch about unauthorized use of your account or breach of your
 account information or password.
 </p>
@@ -327,7 +327,7 @@ with regard to your use of this Services.
 <p>
 You will indemnify and hold Repunch, its affiliates, officers, directors, employees, 
 agents, legal representatives, licensors, subsidiaries, joint ventures and suppliers, 
-harmless from any claim or demand, including reasonable attorneys’ fees, made by any 
+harmless from any claim or demand, including reasonable attorneys' fees, made by any 
 third party due to or arising out of your breach of this Agreement, your violation of
 any law, or the rights of a third party.
 </p>
