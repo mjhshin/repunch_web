@@ -224,15 +224,15 @@ a.button.orange{
 
 /*** terms styles ***/
 /*******************/
-#agreement li span {
+.policy li span {
     text-decoration: underline;
     font-weight:bold;
-    margin: 10px;
+    margin-right: 12px;
 }
-#agreement li ol {
+.policy li ol {
     margin:20px 0px;
 }
-#agreement li ol li {
+.policy li ol li {
     margin-bottom:10px;
 }
 

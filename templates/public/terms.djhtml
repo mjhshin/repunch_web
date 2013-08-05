@@ -16,26 +16,26 @@
     <div class="page-title-container">
     <h1 class="page-title">Terms &amp; Conditions</h1>
     </div>
-	<div id="page-content" style="height:5550px;">
+	<div id="page-content" style="height:6250px;">
 		<div id="about-content">
 			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
 			
 <h3>VENDOR AGREEMENT</h3><p>
 This Vendor Agreement is effective as of the date upon which your Repunch account is
-activated (hereinafter, the “Effective Date”) and is by and between Repunch, Inc., a
+activated (hereinafter, the "Effective Date") and is by and between Repunch, Inc., a
 Delaware corporation with offices located at 155 Water St, Brooklyn, NY 11201 
-(“Repunch”), and you (the “Vendor”).
+("Repunch"), and you (the "Vendor").
 </p>
 
 <p><strong>WHEREAS,</strong> Repunch develops and administers an application for mobile
-devices and related platforms (the “Repunch Application”), whereby end-users of the
-Repunch Application (“End-Users”) can be rewarded by a participating vendor with certain
+devices and related platforms (the "Repunch Application"), whereby end-users of the
+Repunch Application ("End-Users") can be rewarded by a participating vendor with certain
 benefits when that end-user makes qualified transactions with that vendor; and
 </p>
 
 <p><strong>WHEREAS,</strong> the Vendor desires to participate in the Repunch
-Application by offering its goods and/or services (collectively, the “Vendor Products”)
-for sale through reward vouchers issued by the Vendor to the End-Users (“Punches”) on
+Application by offering its goods and/or services (collectively, the "Vendor Products")
+for sale through reward vouchers issued by the Vendor to the End-Users ("Punches") on
 the terms and conditions set forth herein.
 </p>
 
@@ -45,7 +45,7 @@ which is hereby acknowledged, Repunch and the Vendor agree as follows.
 </p>
 
 {# START OL #}
-<ol id="agreement">
+<ol class="policy">
 
 
 {# START PARTICIPATION #}
@@ -85,25 +85,444 @@ its commercially reasonable efforts to facilitate the promotion of Punches.
 </li>
 {# END PARTICIPATION #}
 
+
 {# START PROMOTION AND DELIVERY #}
 <li><span>Promotion and Delivery.</span>
-
+The Vendor agrees that the Repunch Application may be promoted and delivered to 
+End-Users by Repunch through different media, including without limitation electronic
+media, at Repunch's sole option. Repunch may include references to the Vendor as a
+participating vendor in marketing the Repunch Application through different
+promotional media, including without limitation web site(s) or broadcast media. 
+The Vendor acknowledges that not every such promotional communication will be provided to the Vendor.
 </li>
 {# END PROMOTION AND DELIVERY #}
+<br />
 
 
+{# START APPLICATION CREATIVES #}
+<li><span>Application Creatives; License for Vendor Content.</span>
+<ol type="a">
+<li><strong>Application Creatives.</strong>
+All promotional or marketing communications and materials
+used by Repunch in connection with Repunch Application are "Application Creatives." 
+The Vendor is responsible for supplying to Repunch any artworks, text, trademarks, 
+images, photographs, marketing materials and the names and/or logos to be included 
+in marketing communications or to be used in developing the Application Creatives 
+that are reasonably requested by Repunch (collectively, "Vendor Content"). Repunch 
+may use Vendor Content to prepare Application Creatives in its sole discretion. 
+Application Creatives will be provided to the Vendor for prior approval, which shall not  be unreasonably withheld, conditioned, or delayed, and any Application 
+Creative not objected to within seventy two (72) hours after it is provided to the
+Vendor for approval shall be deemed approved. Once an Application Creative has 
+been approved, Repunch is deemed to have approval to use and promote other 
+Application Creatives that are substantially similar to the approved 
+Application Creative. Repunch retains full editorial control over the content of 
+any information or material to be included with respect to the approved Application
+Creatives.
+</li>
+
+<li><strong>License for Vendor Content.</strong>
+The Vendor hereby grants Repunch a non-exclusive,
+worldwide license throughout the Term (as defined in Section 4 below) to reproduce, 
+use, display, perform, distribute, transmit, publish, and create Application Creatives 
+or marketing materials using the Vendor Content provided to Repunch for the purpose 
+of publishing, selling, developing, distributing, and otherwise promoting the Repunch 
+Application. The Vendor acknowledges that this grant of license shall extend to 
+Repunch's distribution partners who publish and promote the Repunch Application to 
+potential End-Users.  The Vendor represents, warrants, and covenants to Repunch that: 
+(i) it has all right, title, and interest to the Vendor Content provided to Repunch and (ii) the Vendor Content provided to Repunch does not infringe, and during the 
+Term of this Agreement shall not infringe, upon the rights (including all 
+intellectual property rights) of any third party.
+</li>
+
+</ol>
+</li>
+{# END APPLICATION CREATIVES #}
 
 
+{# START TERM #}
+<li><span>Term.</span>
+The term of this Agreement shall commence on the Effective Date and continue until
+this  Agreement is terminated by either party in accordance with this Section 4 
+(the "Term"). Repunch may terminate this Agreement at any time and without notice for
+due cause, including, without limitation, if the Vendor breaches this Agreement or
+becomes insolvent, bankrupt (whether voluntary or involuntary), has a receiver
+appointed, liquidates or dissolves. The Vendor may terminate this Agreement at any
+time by cancelling its Repunch account. The Vendor agrees that Repunch may continue 
+to use printed Vendor Content for up to a ninety (90) day period after termination 
+or expiration hereof without the Vendor's consent.
+</li>
+{# END TERM #}
+<br />
 
 
+{# START ADDITIONAL REPRESENTATIONS #}
+<li><span>Additional Representations, Warranties, and Covenants.</span>
+In addition to any other representations, warranties, and covenants set forth in 
+the Agreement, the parties represent, warrant, and covenant for the Term as follows:
+<ol type="a">
+<li><strong>Compliance with Laws.</strong>
+The Vendor represents and warrants that it complies, and
+covenants that for the Term of this Agreement it shall comply, with all laws, rules, 
+and regulations applicable to its performance under this Agreement, including without 
+limitation all consumer privacy and advertising laws.
+</li>
+
+<li><strong>Cooperation.</strong>
+The Vendor covenants to use all its commercially reasonable efforts to
+cooperate with Repunch to secure any required or appropriate consents or approvals, 
+and shall use all its commercially reasonable efforts to cooperate with Repunch (and 
+shall not unreasonably withhold) to approve creative briefs, concepts, proofs, 
+and other operationally required process steps in a commercially timely and prompt
+manner to meet its deadlines. The Vendor covenants to it execute such further
+documents, and perform such further acts as may be reasonably necessary or appropriate
+for Repunch to perform and fulfill its obligations set forth in this Agreement.
+</li>
+
+<li><strong>Power, Authority, and Non-Contravention.</strong>
+Each party represents, warrants, and covenants that: (i) it is in good standing in 
+its jurisdiction of organization or incorporation; (ii) it has full power and
+authority to enter into this Agreement and to undertake its obligations contained
+herein; (iii) this Agreement has been duly authorized, executed and delivered by, 
+and constitutes the valid and binding obligation of  such party, enforceable in
+accordance with its terms; and (iv) the Agreement does not breach any other material
+agreement by which it is bound.
+</li>
+
+<li><strong>Performance by Vendor.</strong>
+The Vendor represents, warrants, and covenants that: (i) it will provide the Vendor
+Products in a safe, professional, and reputable manner; (ii) it is registered for
+sales and use tax purposes in all states in which the Vendor Products will be
+provided; (iii) it has all valid federal, state, and local licenses and or permits 
+required to conduct its business and perform this Agreement, (iv) it will comply with 
+applicable federal and state laws related to redemption of the Punches, including
+those related to deceptive trade practices, unclaimed property liability associated
+with Punches that have not been redeemed, alcohol related service and discounting, 
+and expiration of gift cards;  (v) the terms and conditions of each Punch, 
+including any discounts or goods and services offered thereunder, comply with all, 
+and do not and will not violate any, local, state or federal law, rule, or regulation,
+including but not limited to  any law and/or regulation governing the use, sale, 
+and/or distribution of alcohol and any laws governing vouchers, gift cards, coupons,
+and/or gift certificates; and (vi) the Punches and any advertising or promotion of the
+Vendor Products relating thereto will not constitute false, deceptive or unfair
+advertising or disparagement under any applicable law, rule, or
+</li>
+
+</ol>
+</li>
+{# END ADDITIONAL REPRESENTATIONS #}
 
 
+{# START DISCLAIMER #}
+<li><span>Disclaimer of Certain Warranties.</span>
+EXCEPT AS EXPRESSLY SET FORTH IN THIS
+AGREEMENT, REPUNCH MAKES NO REPRESENTATIONS OR WARRANTIES, 
+EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED 
+WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR 
+NON-INFRINGEMENT. REPUNCH DOES NOT WARRANT OR GUARANTEE THAT
+THE SERVICES OFFERED ON OR THROUGH THE REPUNCH APPLICATION SHALL
+BE UNINTERRUPTED OR ERROR-FREE, OR THAT ANY ERRORS IN THE REPUNCH
+APPLICATION WILL BE CORRECTED, OR THAT THE REPUNCH APPLICATION 
+WILL RESULT IN ANY REVENUE OR PROFIT FOR THE VENDOR.
+</li>
+{# END DISCLAIMER #}
+<br />
 
 
+{# START FEES AND TAXES #}
+<li><span>Fees and Taxes.</span>
+<ol type="a">
+<li><strong>Fees.</strong>
+In consideration for the services of marketing, promoting, and selling the Repunch
+Application to End-Users, (i) a non-refundable Repunch account fee determined in 
+accordance with the fee schedule attached hereto as Exhibit A, which may be changed 
+at any time by Repunch in its sole discretion upon notice to the Vendor, will be 
+automatically billed on an advance basis every thirty (30) days to the credit card
+provided by the Vendor when activating its Repunch account and (ii) Repunch will be
+entitled to retain all payments it receives from End-Users and the Vendor hereby
+disclaims any rights to, or interest in, such payments.
+</li>
+
+<li><strong>Taxes.</strong>
+The Vendor is solely responsible for collecting and remitting any value added,
+use or sales taxes owed to, federal, state, or local taxing authorities in connection
+with Vendor Products and the Punches. The Vendor has the sole responsible to determine
+which, if any, taxes apply to the payments the Vendor receives  in connection with the 
+Vendor Products and the Punches, and it is the Vendor's responsibility to collect,
+report and remit the correct tax to the appropriate tax authority.  
+Repunch is not responsible for determining whether taxes apply to the Vendor's
+transactions with End-Users, or for collecting, reporting or remitting any taxes
+arising from any transaction with or by the Vendor.  
+The Vendor acknowledges that it shall make all filings with the Internal 
+Revenue Service with respect to all purchases using Punches.  Further, notwithstanding 
+anything to the contrary in this agreement, if required by applicable law, the Vendor 
+covenants that at all times through the Term it shall be registered for sales and 
+use tax collection purposes, and shall further be responsible for paying any and all
+sales, use taxes or any other taxes related to the Vendor Products.
+</li>
+
+</ol>
+</li>
+{# END FEES AND TAXES #}
 
 
+{# START INTELLECTUAL PROPERTY #}
+<li><span>Intellectual Property.</span>
+Except as expressly stated in this Agreement, neither party grants the other party any
+right or license to any of its patents, business method patents, trade secrets,
+copyrights, mask work rights, moral rights, trade names, trademarks, rights in 
+trade dress, technical know-how, software, specifications, processes, designs, trade
+secrets and all other intellectual property rights and proprietary rights
+(collectively, "Intellectual Property"). Neither party shall misappropriate,
+decompile, or reverse engineer the Intellectual Property of the other party, except 
+as expressly provided by this Agreement. Specifically and without limitation of the
+foregoing, the Vendor acknowledges and agrees that the Repunch Application, including
+any related technical know-how, specifications, designs, processes, supplier
+information, software, service platforms, technology, financial information, 
+vendor relationships, strategic plans, sales and marketing plans, inventions,
+techniques, text, graphics, designs, photographs, data and support and training
+materials related to Repunch's service platforms, software and/or services, is the
+Intellectual Property of Repunch. The Vendor understands and agrees that Repunch
+grants the Vendor a limited license to Repunch's Intellectual Property solely for the
+Vendor's issuance of Punches and for no other purpose whatsoever.
+</li>
+{# END INTELLECTUAL PROPERTY #}
+<br />
 
 
+{# START INDEMNIFICATION #}
+<li><span>Indemnification; Limitation of Liability.</span>
+<ol type="a">
+<li><strong>Indemnity.</strong>
+The Vendor agrees to indemnify, defend and hold harmless Repunch, including its
+affiliates, shareholders, directors, officers and employees, and the End-Users
+(collectively, the "Indemnified Parties") from any damages, claims, costs 
+liabilities, and expenses, including attorneys' fees and other legal costs, in
+connection with any claims or actions arising in any way out of (i) any Punch; 
+(ii) any breach or alleged breach of any of the Vendor's representations, warranties,
+covenants, duties or obligations set forth in this Agreement; (iii) any violation of
+any applicable law, rule, or regulation by the Vendor in the performance of this
+Agreement or affecting the performance of this Agreement; (iv) any use of the Vendor
+Content or any Intellectual Property supplied by the Vendor to Repunch in accordance
+with this Agreement; (v) any Vendor Product and the fulfillment thereof; (vi) the
+gross negligence or intentional misconduct of the Vendor or any affiliate,
+shareholder, director, officer or employee of the Vendor; and (vii) any unauthorized
+use of the Repunch Application by the Vendor or any affiliate, shareholder, 
+director, officer or employee of the Vendor.
+</li>
+
+<li><strong>Process for Indemnification.</strong>
+Repunch shall notify the Vendor promptly in writing of
+any claim for indemnification hereunder, and provide, at the Vendor's expense (to the 
+extent of Repunch's out-of-pocket expenses only), all reasonably necessary assistance, 
+information and authority to allow the Vendor to control the defense and settlement of 
+such claim, provided that the failure of Repunch to promptly inform the Vendor of any 
+claim shall not excuse the Vendor of its obligations under this Section 9 except to
+the extent such failure materially prejudices the Vendor. Notwithstanding the
+foregoing, the Vendor shall not enter into any settlement of the defense of such
+action, other than with respect to the payment of monies, without Repunch's prior
+written consent, which consent shall not be unreasonably withheld or delayed. Repunch
+may participate at its expense in the defense and/or settlement of any such action
+with counsel of its choosing and at its sole expense.
+</li>
+
+<li><strong>Limitation of Liability.</strong>
+IN NO EVENT WILL EITHER PARTY BE LIABLE
+FOR  SPECIAL, INDIRECT, INCIDENTAL, EXEMPLARY, PUNITIVE OR 
+CONSEQUENTIAL DAMAGES ARISING OUT OF THIS AGREEMENT EVEN 
+IF THE APPLICABLE PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF 
+SUCH DAMAGES (PROVIDED THAT THIRD PARTY DAMAGES ACTUALLY 
+AWARDED AGAINST A PARTY IN CONNECTION WITH A CLAIM FOR 
+WHICH THE OTHER PARTY IS OBLIGATED TO PROVIDE INDEMNIFICATION 
+HEREUNDER SHALL NOT BE DEEMED "SPECIAL, INDIRECT, INCIDENTAL, 
+EXEMPLARY, PUNITIVE OR  CONSEQUENTIAL DAMAGES").   THE 
+AGGREGATE LIABILITY OF REPUNCH FOR ALL CLAIMS ARISING OUT OF 
+THIS AGREEMENT SHALL NOT EXCEED THE SUM OF THE FEES PAYABLE TO 
+REPUNCH UNDER THIS AGREEMENT IN THE TWELVE (12) MONTH PERIOD 
+PRIOR TO THE ACCRUAL OF THE CLAIM.
+</li>
+
+</ol>
+</li>
+{# END INDEMNIFICATION #}
+
+
+{# START CONFIDENTIALITY #}
+<li><span>Confidentiality.</span>
+<ol type="a">
+<li><strong>No Conflict.</strong>
+If the parties enter into a separate non-disclosure or confidentiality
+agreement, the obligations of this Section 10 shall be construed as in addition to 
+and not conflicting with any such obligations.
+</li>
+
+<li><strong>Definition of Confidential Information.</strong>
+For purposes of this Agreement, Repunch's "Confidential Information" shall mean 
+(i) information that would be reasonably understood by the Vendor to constitute
+commercially sensitive and proprietary information, whether or not such information
+constitutes Intellectual Property, including information that has been accumulated or
+developed by the owner thereof; (ii) any other information disclosed in a tangible or
+written form that Repunch designates or otherwise marks in writing as "confidential,"
+"restricted," "proprietary" or with a similar designation; (iii) in the case of any
+other information that is provided orally or in another non-tangible form, information
+that Repunch designates as confidential in a writing to the Vendor; (iv) all
+information concerning the End-Users (including, without limitation, the names and
+account numbers of the End-Users); (iv) the terms of this Agreement; and (v) until
+publicly promoted by Repunch, any information concerning the Repunch Application.
+The Vendor agrees that the breach or threatened breach of this Section 10 will cause
+Repunch irreparable harm for which damages cannot easily be determined, and 
+thereby expressly consents to permit Repunch to obtain any and all injunctive relief
+and/or specific performance, in addition to all other rights it has at law or equity.
+</li>
+
+<li><strong>Nondisclosure and Limitations of Use.</strong>
+The Vendor agrees that, except as is set forth in this Agreement, all Confidential
+Information communicated to it by any means and in any form by or on behalf of Repunch
+shall be and is received in strict confidence and that no Confidential Information
+shall be disclosed or used by the Vendor, its agents, employees or contractors without
+prior written consent of the Repunch, except as may be necessary to perform its
+obligations under this Agreement. The Vendor shall only disclose the Confidential
+Information to its employees, agents, subcontractors and vendors who have a need to
+know such information in performance of the obligations under this Agreement and who
+have been advised of the obligation to preserve such information's confidentiality.
+All Confidential Information shall be used only for the purposes set forth in this
+Agreement. The Vendor shall be responsible to Repunch for any breach by any such
+employee, agent, subcontractor or vendor of any such confidentiality obligations. 
+Upon expiration or termination of this Agreement for any reason, the Vendor shall
+return promptly to Repunch all Confidential Information in its possession and certify
+in writing its compliance with this provision.
+</li>
+
+<li><strong>Exclusions.</strong>
+Notwithstanding the foregoing, this Section 10 will not apply to any
+information that the Vendor can demonstrate with competent evidence: (i) was in the 
+public domain prior Repunch's disclosure to the Vendor; (ii) was in the lawful
+possession of the Vendor prior to Repunch's disclosure to the Vendor; (iii) was
+received from a third party who had a lawful right to disclose such information prior
+to Repunch's disclosure to the Vendor; (iv) was independently developed by the Vendor
+prior to Repunch's disclosure to the Vendor; or (v) is published or otherwise becomes
+part of the public domain through no fault of Vendor after Repunch's disclosure to the
+Vendor.
+</li>
+
+<li><strong>No Implied Rights; No Warranty.</strong>
+Nothing contained in this Agreement shall be construed as obligating Repunch to
+disclose any particular Confidential Information to the Vendor, or as granting to or
+conferring to the Vendor, expressly or impliedly, any rights in or license to the
+Confidential Information, except as expressly provided herein. Repunch makes no
+warranty to the accuracy or completeness of any Confidential Information.
+</li>
+
+</ol>
+</li>
+{# END CONFIDENTIALITY #}
+
+
+{# START MISCELLANEOUS #} 
+<li><span>Miscellaneous.</span>
+<ol type="a">
+<li><strong>Entire Agreement.</strong>
+This Agreement is the entire agreement of the parties hereto with
+respect to the subject matter hereof, and supersedes any and all prior agreements or 
+understandings, whether written or oral. This Agreement shall not be modified except by
+a written agreement dated subsequent hereto signed on behalf of each party by their
+duly authorized representatives. 
+</li>
+
+<li><strong>Headings; Waiver. </strong>
+The section headings set forth herein are for convenience only and do not constitute a
+substantive part of this Agreement. This Agreement cannot be amended or waived except
+by an agreement in writing signed by authorized representatives of both parties hereto
+and specifically referring to this Agreement.  Any waiver of any provision of this
+Agreement and any consent to any departure from the terms of any provision of this
+Agreement is to be effective only in the specific instance and for the specific
+purpose for which given. The failure of either party hereto to object to or to take
+affirmative action with respect to any conduct of the other party which is in
+violation of the terms hereof shall not be construed as a waiver thereof, nor of any
+subsequent breach or wrongful conduct. The rights and remedies set forth herein are
+intended to be cumulative, and the exercise of any right or remedy by either party
+hereto shall not preclude or waive its exercise of any other rights or remedies
+hereunder or pursuant to law or equity.
+</li>
+
+<li><strong>Governing Law.</strong>
+ANY CLAIM RELATING TO THIS AGREEMENT SHALL BE GOVERNED BY THE LAWS OF THE STATE OF 
+NEW YORK WITHOUT REGARD TO ITS CONFLICT OF LAW PROVISIONS. SOLE AND EXCLUSIVE
+JURISDICTION FOR ANY ACTION OR PROCEEDING ARISING OUT OF OR RELATED TO THIS AGREEMENT
+SHALL BE IN AN APPROPRIATE STATE OR FEDERAL COURT LOCATED IN THE COUNTY OF MONROE IN
+THE STATE OF NEW YORK AND THE PARTIES UNCONDITIONALLY WAIVE THEIR RESPECTIVE RIGHTS TO
+A JURY TRIAL. A PRINTED VERSION OF THIS AGREEMENT SHALL BE ADMISSIBLE IN JUDICIAL OR
+ADMINISTRATIVE PROCEEDINGS.  THE PREVAILING PARTY IN ANY DISPUTE SHALL BE ENTITLED TO
+REASONABLE ATTORNEYS' FEES AND COSTS.
+</li>
+
+<li><strong>Waiver of Jury Trial.</strong>
+EACH OF THE PARTIES HERETO UNCONDITIONALLY WAIVES ITS RIGHTS TO A TRIAL BY JURY OF ALL
+CLAIMS OR CAUSES OF ACTION (INCLUDING COUNTERCLAIMS) RELATED TO OR ARISING OUT OF THIS
+AGREEMENT BROUGHT BY EITHER PARTY AGAINST THE OTHER. THIS WAIVER WILL ALSO APPLY TO
+ANY SUBSEQUENT AMENDMENTS OF OR MODIFICATIONS TO THIS AGREEMENT.
+</li>
+
+<li><strong>No Class Actions.</strong>
+All claims between the parties hereto related to this Agreement will be litigated
+individually and the Vendor will not consolidate or seek class treatment for any claim
+with respect to this Agreement.
+</li>
+
+<li><strong>Counterparts.</strong>
+This Agreement may be executed in one or more counterparts, which may be exchanged by
+facsimile or other electronic means, each of which shall be deemed an original and
+which together shall constitute one and the same agreement.
+</li>
+
+<li><strong>Force Majeure.</strong>
+Except for the payment of outstanding balances when due, neither party hereto shall be
+liable for delays or interruptions due to causes beyond its reasonable control,
+including, but not limited to, acts of God, fire, strikes, disasters, acts of
+terrorism, computer failure, changes in laws or regulations, judicial orders or acts
+of third parties; provided, however, that the non-performing party shall use
+commercially reasonable efforts to mitigate any such delays or interruptions.  In the
+event that any event described in this Section 11(h) affecting either party continues
+for a period of more than ninety (90) days, the unaffected party may terminate this
+Agreement upon written notice to the affected party.
+</li>
+
+<li><strong>Independent Contractors.</strong>
+The relationship of the parties hereto is that of independent contractors.  Nothing in
+this Agreement or otherwise shall be construed to constitute either party as the agent
+or employee of the other, nor shall this Agreement be construed to designate either of
+the parties or their respective employees or representatives as the employees, agents,
+joint venturers, or partners of the other(s).  Neither party shall have the power or
+authority to bind the other party in any transaction with a third party.
+</li>
+
+<li><strong>Severability.</strong>
+If any provision of this Agreement is deemed to be invalid or unenforceable by any
+court of competent jurisdiction, then the balance of this Agreement shall remain
+enforceable, and such invalid or unenforceable provision shall be enforced by such
+court to the maximum possible extent, unless the ineffectiveness of such provision
+would result in such a material change as to cause completion of the transactions
+contemplated hereby to be unreasonable.  
+</li>
+
+<li><strong>Assignment</strong>
+This Agreement and the rights hereunder may not be assigned by either party without
+the prior written consent of the other party, except that Repunch's rights and
+obligations arising hereunder will be automatically assigned to and assumed by any
+successor entity into which Repunch may be merged or by which its business may be
+acquired, without requiring the Vendor's consent. This Agreement and all of the terms
+and provisions hereof will be binding upon, and will inure to the benefit of, the
+parties hereto, and their respective successors and approved assigns.
+</li>
+
+<li><strong>Survival.</strong>
+Sections 4, 6, 7, 8, 9, 10, and 11 shall survive expiration or termination of this
+Agreement, and any provisions necessary to give such provisions full effect shall
+survive for such purpose. 
+</li>
+
+</ol>
+</li>
+{# END MISCELLANEOUS #} 
 
 
 
