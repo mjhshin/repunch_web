@@ -228,6 +228,8 @@ authorities, including local data protection authorities, to resolve any complai
 regarding the transfer of personal data that cannot be resolved between you and us.
 </p>
 
+<br/>
+<br/>
 
 {% endblock %}
 </div>

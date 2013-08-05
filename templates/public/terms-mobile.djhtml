@@ -421,13 +421,9 @@ or other electronic medium. In the event that any information you have provided 
 changes, including but not limited to, your phone number, e-mail or address, you agree
 to promptly update your information.
 </p>
+
 <br/>
 <br/>
-<br/>
-
-
-
-
 
 {% endblock %}
 </div>
