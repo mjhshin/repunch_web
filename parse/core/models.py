@@ -484,14 +484,18 @@ class ParseObject(object):
                 setattr(self, attr.replace("_url",""), 
                     res['results'][0].get(\
                     attr.replace("_url", "")).get('name'))
-                    
         # attr is a geopoint
         elif attr == "coordinates" and attr in self.__dict__:
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
-                setattr(self, attr, 
-                    [value.get('latitude'),value.get('longitude')] )
+                coordinates = res['results'][0].get("coordinates")
+                latitude = coordinates.get("latitude")
+                longitude = coordinates.get("longitude")
+                if coordinates and latitude and longitude:
+                    setattr(self, attr, [latitude, longitude])
+                else:
+                    setattr(self, attr, None)
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,

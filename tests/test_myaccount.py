@@ -5,6 +5,7 @@ Selenium tests for dashboard 'My Account' tab.
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
 from time import sleep
+import math
 
 from tests import SeleniumTest
 from parse.apps.accounts.models import Account
@@ -33,9 +34,9 @@ STORE_INFO = {
     "zip": "10462",
     "phone_number": "(777) 777-7777",
     "store_description": "Beautiful clothing for women!",
+    "hours": [],
     "store_timezone": "America/New_York",
     "neighborhood": "Parkchester",
-    "hours": [],
     "coordinates": [40.83673, -73.862669],
 }
 
@@ -56,6 +57,9 @@ TEST_STORE_INFO = {
             {"close_time":"0400","day":5,"open_time":"0330"},
             {"close_time":"0500","day":6,"open_time":"0430"},],
     "Ph1": '111', "Ph2": '111', "Ph3": '1111',
+    "store_timezone": "America/Los_Angeles",
+    "neighborhood": "Lower Nob Hill",
+    "coordinates": [37.788366, -122.4161347],
 }
 
 def test_edit_store_details():
@@ -79,14 +83,17 @@ def test_edit_store_details():
         {'test_name': "Changes to email are saved to Parse"},
         {'test_name': "Changes to hours are visible"},
         {'test_name': "Changes to hours are saved to Parse"},
-        {'test_name': "Entering invalid address shows error"},
-        {'test_name': "Entering invalid hours shows error"},
-        {'test_name': "Entering invalid phone number shows error"},
-        {'test_name': "Having no hours is allowed"},
-        {'test_name': "There can be no more than 7 hours rows"},
         {'test_name': "Changing the zip changes the store_timezone"},
         {'test_name': "Changing the zip changes the neighborhood"},
         {'test_name': "Changing the zip changes the coordinates"},
+        {'test_name': "Entering invalid address shows error"},
+        {'test_name': "Entering invalid hours with same open time" +\
+            " as close time shows error"},
+        {'test_name': "Entering invalid hours with later open time" +\
+            " than close time shows error"},
+        {'test_name': "Entering invalid phone number shows error"},
+        {'test_name': "Having no hours is allowed"},
+        {'test_name': "There can be no more than 7 hours rows"},
         {'test_name': "Cancel button redirects user back to store " +\
             "details page and no changes are saved to Parse"},
         {'test_name': "Clicking Add/Change Photo brings up the " +\
@@ -98,6 +105,7 @@ def test_edit_store_details():
         {'test_name': "New store avatar is saved to Parse"},
         {'test_name': "The store avatar thumbnail and image in " +\
             "store details/edit match the one saved in Parse."},
+        {'test_name': "Old store avatar is deleted from Parse files"},
     ]
     section = {
         "section_name": "Edit store details working properly?",
@@ -274,7 +282,7 @@ def test_edit_store_details():
         TEST_USER_INFO['email']
     
     ##########  Changes to hours are visible
-    hours = test.find("#hours").text.split("\n")
+    hours = test.find("#hours").text.split("\n")[1:]
     equal = True
     for hour in hours:
         success = False
@@ -288,25 +296,80 @@ def test_edit_store_details():
     parts[16]['success'] = equal
     
     ##########  Changes to hours are saved to Parse
-    store.hours = None
-    parts[17]['success'] = store.get("hours") ==\
-        TEST_STORE_INFO['hours']
+    store.hours, equal = None, True
+    hours = store.get("hours")
+    for hour in hours:
+        success = False
+        for hour_prev in TEST_STORE_INFO['hours']:
+            if hour == hour_prev:
+                success = True
+                break
+        if not success:
+            equal = False
+            break
+    parts[17]['success'] = equal
     
-    ##########  Entering invalid address shows error TODO
+    ##########  Changing the zip changes the store_timezone
+    store.store_timezone = None
+    parts[18]['success'] = store.get("store_timezone") ==\
+        TEST_STORE_INFO['store_timezone']
     
-    ##########  Entering invalid hours shows error TODO
+    ##########  Changing the zip changes the neighborhood 
+    store.neighborhood = None
+    parts[19]['success'] = store.get("neighborhood") ==\
+        TEST_STORE_INFO['neighborhood']
+    
+    ##########  Changing the zip changes the coordinates 
+    store.coordinates = None
+    parts[20]['success'] =\
+        int(math.floor(store.get("coordinates")[0])) ==\
+        int(math.floor(TEST_STORE_INFO['coordinates'][0])) and\
+        int(math.floor(store.get("coordinates")[1])) ==\
+        int(math.floor(TEST_STORE_INFO['coordinates'][1]))
+    
+    ##########  Entering invalid address shows error
+    click_store_edit()
+    sleep(3)
+    # street
+    street = test.find("#id_street")
+    street.clear()
+    street.send_keys("988 dsgsd s")
+    # city
+    city = test.find("#id_city")
+    city.clear()
+    city.send_keys("mandarin")
+    # state
+    state = test.find("#id_state")
+    state.clear()
+    state.send_keys("klk")
+    # zip
+    zip = test.find("#id_zip")
+    zip.clear()
+    zip.send_keys("941091")
+    # save!
+    test.find("#save-button").click()
+    sleep(3)
+    parts[21]['success'] = str(test.find(".errorlist").text) ==\
+        "Enter a valid adress, city, state, and/or zip."
+        
+    test.find("//div[@id='edit-store-options']/a[2]",
+        type="xpath").click()
+    sleep(2)
+    
+    ##########  Entering invalid hours with same open time TODO
+    ##########  as close time shows error
+    click_store_edit()
+    sleep(3)
+    
+    ##########  Entering invalid hours with later open time TODO
+    ##########  than close time shows error
+    
     
     ##########  Entering invalid phone number shows error TODO
     
     ##########  Having no hours is allowed TODO
     
     ##########  There can be no more than 7 hours rows TODO
-    
-    ##########  Changing the zip changes the store_timezone TODO
-    
-    ##########  Changing the zip changes the neighborhood TODO
-    
-    ##########  Changing the zip changes the coordinates TODO
     
     ##########  Cancel button redirects user back to store TODO
     ##########  details page and no changes are saved to Parse
