@@ -34,8 +34,11 @@ def test_signup():
         {'test_name': "Subscription object created"},
         {'test_name': "Settings object created"},
         {'test_name': "Email about new user sent"},
-        # TODO  fields required
+        {'test_name': "Required fields are required!"},
         # TODO wrong address
+        # TODO username must not contain whitespace
+        # TODO password must not contain whitespace
+        # TODO password must be at least 6 characters
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -139,6 +142,9 @@ def test_signup():
         store.delete()
         subscription.delete()
         settings.delete()
+        
+    ##########  Required fields are required!
+    
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()

@@ -31,7 +31,7 @@ def test_public_pages():
         {'test_name': "FAQ email form all fields required"},
         {'test_name': "Contact Us email form working"},
         {'test_name': "Contact Us email sent"},
-        # TODO fields required
+        {'test_name': "Contact Us email form all fields required"},
     ]
     section = {
         "section_name": "Are all public pages functional?",
@@ -164,10 +164,11 @@ def test_public_pages():
             type="xpath").click()
     except Exception as e:
         print e
-        parts[5]['test_message'] = str(e)
+        parts[7]['test_message'] = str(e)
     else:
-        if test.is_current_url(reverse("public_thank_you")):
-            parts[5]['success'] = True
+        parts[7]['success'] = len(test.find(".errorlist",
+            multiple=True)) == 3
+    sleep(1)
             
     ##########  Contact Us email form working
     test.open(reverse("public_contact")) # ACTION!
@@ -201,12 +202,27 @@ def test_public_pages():
             (sent.minute == now.minute or sent.minute == lb.minute):
             parts[9]['success'] = True
             
-    
-    
+    ##########  Contact Us email form all fields required
+    test.open(reverse("public_contact")) # ACTION!
+    selectors = (
+        ("#id_full_name", "   "),
+        ("#id_email", "   "),
+        ("#id_message", "   ")
+    )
+    try:
+        test.action_chain(1, selectors, action="send_keys") # ACTION!
+        test.find("//form[@id='contact-form']/a", 
+            type="xpath").click()
+    except Exception as e:
+        print e
+        parts[10]['test_message'] = str(e)
+    else:
+        parts[10]['success'] =  len(test.find(".errorlist",
+            multiple=True)) == 3
+    sleep(2)
     
     # END TEST
     mail.logout()
-    sleep(2)
     test.results.append(section)
     
     # END OF ALL TESTS
