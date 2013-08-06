@@ -47,11 +47,11 @@ def test_signup():
         {'test_name': "Password is required"},
         {'test_name': "Password confirmation is required"},
         {'test_name': "ToS check is required"},
-        # TODO wrong address
-        # TODO username must not contain whitespace
-        # TODO password must not contain whitespace
-        # TODO password must be at least 6 characters
-        # password and corfirmation must be the same
+        {'test_name': "Invalid address is detected (no coordinates)"},
+        {'test_name': "username must not contain whitespace"},
+        {'test_name': "password must not contain whitespace"},
+        {'test_name': "password must be at least 6 characters"},
+        {'test_name': "password and corfirmation must be the same"},
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -111,8 +111,7 @@ def test_signup():
         while not time_img.is_displayed():
             sleep(1)
             time_waited += 1
-        if time_waited < 10:
-            parts[2]['success'] = True
+        parts[2]['success'] = time_waited < 10
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
@@ -156,7 +155,7 @@ def test_signup():
         subscription.delete()
         settings.delete()
         
-    #  Required fields are required!
+    ## Required fields are required!
     test.open(reverse("public_signup")) # ACTION!
     sleep(1)
     selectors = (
@@ -238,6 +237,81 @@ def test_signup():
     parts[20]['success'] =\
         str(test.find("#recurring_e ul li").text) ==\
             "You must accept the Terms & Conditions to continue."
+            
+    ##########  Invalid address is detected (no coordinates)
+    # street
+    street = test.find("#id_street")
+    street.clear()
+    street.send_keys("988 dsgsd s")
+    # city
+    city = test.find("#id_city")
+    city.clear()
+    city.send_keys("mandarin")
+    # state
+    state = test.find("#id_state")
+    state.clear()
+    state.send_keys("klk")
+    # zip
+    zip = test.find("#id_zip")
+    zip.clear()
+    zip.send_keys("941091")
+    # submit
+    test.find("#signup-form-submit").click() # ACTION!
+    sleep(2)
+    parts[21]['success'] = str(test.find("#street_e ul li").text) ==\
+        "Enter a valid adress, city, state, and/or zip."
+   
+    ## no whitespace
+    # username
+    pass1 = test.find("#id_username")
+    pass1.clear()
+    pass1.send_keys("van d olf")
+    # password
+    pass2 = test.find("#id_password")
+    pass2.clear()
+    pass2.send_keys("123 567")
+    # submit
+    test.find("#signup-form-submit").click() # ACTION!
+    sleep(2)
+    ##########  username must not contain whitespace
+    parts[22]['success'] =str(test.find("#username_e ul li").text) ==\
+        "Must contain only alpha-numeric characters without spaces."
+    ##########  password must not contain whitespace
+    parts[23]['success'] =str(test.find("#password_e ul li").text) ==\
+        "Must contain only alpha-numeric characters without spaces."
+    
+    ##########  password must be at least 6 characters
+    # pass1
+    pass1 = test.find("#id_password")
+    pass1.clear()
+    pass1.send_keys("12345")
+    # pass2
+    pass2 = test.find("#id_confirm_password")
+    pass2.clear()
+    pass2.send_keys("12345")
+    # submit
+    test.find("#signup-form-submit").click() # ACTION!
+    sleep(2)
+    parts[24]['success'] =\
+        str(test.find("#password_e ul li").text)== "Ensure this " +\
+        "value has at least 6 characters (it has 5)." and\
+        str(test.find("#password2_e ul li").text)== "Ensure this " +\
+        "value has at least 6 characters (it has 5)."
+ 
+    ##########  password and corfirmation must be the same
+    # pass1
+    pass1 = test.find("#id_password")
+    pass1.clear()
+    pass1.send_keys("1234567")
+    # pass2
+    pass2 = test.find("#id_confirm_password")
+    pass2.clear()
+    pass2.send_keys("1234467")
+    # submit
+    test.find("#signup-form-submit").click() # ACTION!
+    sleep(2)
+    parts[25]['success'] =str(test.find("#password_e ul li").text) ==\
+        "Passwords don't match"
     
     
     # END OF ALL TESTS - cleanup
