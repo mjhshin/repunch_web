@@ -17,7 +17,8 @@ class SeleniumTest(object):
         
         results format:
         [ {'section_name": section1,
-              'parts': [ {'test_name':test1, 'success':True}, ... ]}
+              'parts': [ {'test_name':test1, 'success':True,
+                            'test_message':'...'}, ... ]}
             ... ]
         """
         self.driver = webdriver.Firefox()

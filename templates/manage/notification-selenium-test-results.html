@@ -58,6 +58,14 @@ Selenium test results.
                         {{ part.test_name }}     
 					</div>
                     {# END TEST NAME #}
+                    
+                    {# TEST MESSAGE #}
+                    {% if part.test_message %}
+                    <div style="padding:6px;">
+                        {{ part.test_message }}     
+					</div>
+					{% endif %}
+                    {# END TEST MESSAGE #}
 
 				</td>
 

@@ -28,8 +28,10 @@ def test_public_pages():
         {'test_name': "Footer elements navigable"},
         {'test_name': "FAQ email form working"},
         {'test_name': "FAQ email sent"},
+        # TODO fields required
         {'test_name': "Contact Us email form working"},
         {'test_name': "Contact Us email sent"},
+        # TODO fields required
     ]
     section = {
         "section_name": "Are all public pages functional?",
@@ -55,7 +57,8 @@ def test_public_pages():
     try:
         test.action_chain(1, selectors) # ACTION!
     except Exception as e:
-        print e # don't really need to set success to False
+        print e 
+        parts[1]['test_message'] = str(e)
     else:
         parts[1]['success'] = True
     
@@ -73,6 +76,7 @@ def test_public_pages():
         test.action_chain(1, selectors, type="xpath") # ACTION!
     except Exception as e:
         print e
+        parts[2]['test_message'] = str(e)
     else:
         parts[2]['success'] = True
     
@@ -91,6 +95,7 @@ def test_public_pages():
         test.action_chain(1, selectors, action="move", type="xpath")
     except Exception as e:
         print e
+        parts[3]['test_message'] = str(e)
     else:
         parts[3]['success'] = True
     
@@ -106,6 +111,7 @@ def test_public_pages():
         test.action_chain(3, selectors, type="xpath") # ACTION!
     except Exception as e:
         print e
+        parts[4]['test_message'] = str(e)
     else:
         parts[4]['success'] = True
         
@@ -124,6 +130,7 @@ def test_public_pages():
             type="xpath").click()
     except Exception as e:
         print e
+        parts[5]['test_message'] = str(e)
     else:
         if test.is_current_url(reverse("public_thank_you")):
             parts[5]['success'] = True
@@ -155,6 +162,7 @@ def test_public_pages():
             type="xpath").click()
     except Exception as e:
         print e
+        parts[7]['test_message'] = str(e)
     else:
         if test.is_current_url(reverse("public_thank_you")):
             parts[7]['success'] = True

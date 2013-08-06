@@ -46,6 +46,7 @@ def test_login_dialog():
             parts[0]["success"] = True
     except Exception as e:
         print e
+        parts[0]['test_message'] = str(e)
     
     ##########  Wrong login credentials show error
     selectors = (
@@ -61,6 +62,7 @@ def test_login_dialog():
                 "The username or password you entered is incorrect."
     except Exception as e:
         print e
+        parts[1]['test_message'] = str(e)
         
     # clear the input fields
     test.find("#id_username").clear()
@@ -79,6 +81,7 @@ def test_login_dialog():
             test.is_current_url(reverse("store_index"))
     except Exception as e:
         print e
+        parts[2]['test_message'] = str(e)
     
     ##########  Not having the stay signed in option
     ##########  sets the sessionid's cookie expiry to None
@@ -102,6 +105,7 @@ def test_login_dialog():
             "sessionid")['expiry'] != None
     except Exception as e:
         print e
+        parts[4]['test_message'] = str(e)
     
     ##########  Logout works
     try:
@@ -111,6 +115,7 @@ def test_login_dialog():
             test.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
+        parts[5]['test_message'] = str(e)
     
     ##########  Forgot password form functional
     try:
@@ -129,6 +134,7 @@ def test_login_dialog():
             "#forgot-pass-form").text) == "Password Reset form sent."
     except Exception as e:
         print e
+        parts[6]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
@@ -170,6 +176,7 @@ def test_login_page():
                 "The username or password you entered is incorrect."
     except Exception as e:
         print e
+        parts[0]['test_message'] = str(e)
         
     # clear the input fields
     test.find("#id_username").clear()
@@ -188,6 +195,7 @@ def test_login_page():
             test.is_current_url(reverse("store_index"))
     except Exception as e:
         print e
+        parts[1]['test_message'] = str(e)
     
     ##########  Not having the stay signed in option
     ##########  sets the sessionid's cookie expiry to None
@@ -212,6 +220,7 @@ def test_login_page():
             "sessionid")['expiry'] != None
     except Exception as e:
         print e
+        parts[3]['test_message'] = str(e)
     
     ##########  Logout works
     try:
@@ -221,6 +230,7 @@ def test_login_page():
             test.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
+        parts[4]['test_message'] = str(e)
     
     ##########  Forgot password form functional
     try:
@@ -240,6 +250,7 @@ def test_login_page():
             "#forgot-pass-form").text) == "Password Reset form sent."
     except Exception as e:
         print e
+        parts[5]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()

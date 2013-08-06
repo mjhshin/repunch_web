@@ -34,6 +34,8 @@ def test_signup():
         {'test_name': "Subscription object created"},
         {'test_name': "Settings object created"},
         {'test_name': "Email about new user sent"},
+        # TODO  fields required
+        # TODO wrong address
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -79,6 +81,7 @@ def test_signup():
         test.action_chain(2, selectors) # ACTION!
     except Exception as e:
         print e
+        parts[1]['test_message'] = str(e)
     else:
         parts[1]['success'] = True
         sleep(1) 
@@ -96,6 +99,7 @@ def test_signup():
             parts[2]['success'] = True
     except Exception as e:
         print e
+        parts[2]['test_message'] = str(e)
 
     ##########  User object created
     user = Account.objects().get(username=TEST_USER['username'],

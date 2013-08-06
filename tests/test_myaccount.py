@@ -91,9 +91,9 @@ def test_edit_store_details():
             " as close time shows error"},
         {'test_name': "Entering invalid hours with later open time" +\
             " than close time shows error"},
-        {'test_name': "Entering invalid phone number shows error"},
         {'test_name': "Having no hours is allowed"},
         {'test_name': "There can be no more than 7 hours rows"},
+        # TODO fields required
         {'test_name': "Cancel button redirects user back to store " +\
             "details page and no changes are saved to Parse"},
         {'test_name': "Clicking Add/Change Photo brings up the " +\
@@ -356,20 +356,48 @@ def test_edit_store_details():
         type="xpath").click()
     sleep(2)
     
-    ##########  Entering invalid hours with same open time TODO
+    ##########  Entering invalid hours with same open time
     ##########  as close time shows error
-    click_store_edit()
-    sleep(3)
+    try:
+        test.find("//select[@id='id_hours-0-open']"+\
+            "/option[@value='6:30:00']", type="xpath").click()
+        sleep(1)
+        test.find("//select[@id='id_hours-0-close']"+\
+            "/option[@value='6:30:00']", type="xpath").click()
+        # save!
+        test.find("#save-button").click()
+        sleep(3)
+        parts[22]['success'] = str(test.find(\
+            ".notification div").text) == "Invalid hours. Open " +\
+                "time must be greater than close time."
+    except Exception as e:
+        print e
+        parts[22]['test_message'] = str(e)
     
-    ##########  Entering invalid hours with later open time TODO
+    
+    ##########  Entering invalid hours with later open time
     ##########  than close time shows error
-    
-    
-    ##########  Entering invalid phone number shows error TODO
+    try:
+        test.find("//select[@id='id_hours-0-open']"+\
+            "/option[@value='6:30:00']", type="xpath").click()
+        sleep(1)
+        test.find("//select[@id='id_hours-0-close']"+\
+            "/option[@value='5:30:00']", type="xpath").click()
+        # save!
+        test.find("#save-button").click()
+        sleep(3)
+        parts[23]['success'] = str(test.find(\
+            ".notification div").text) == "Invalid hours. Open " +\
+                "time must be greater than close time."
+    except Exception as e:
+        print e
+        parts[23]['test_message'] = str(e)
     
     ##########  Having no hours is allowed TODO
     
     ##########  There can be no more than 7 hours rows TODO
+    
+    # TODO fields required
     
     ##########  Cancel button redirects user back to store TODO
     ##########  details page and no changes are saved to Parse

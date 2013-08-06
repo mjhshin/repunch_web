@@ -286,7 +286,8 @@ def send_email_selenium_test_results(tests, connection=None):
     tests has the following format:
         tests = [
             {'section_name": section1,
-                'parts': [ {'success':True, 'test_name':test1}, ... ],
+                'parts': [ {'success':True, 'test_name':test1,
+                            'test_message':'...'}, ... ],
             ...
         ]
     """
