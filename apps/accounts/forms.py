@@ -4,20 +4,20 @@ from django.utils import timezone
 import datetime, re, pytz
 
 from libs.repunch import rpforms, rpccutils, rputils
-from libs.repunch.validators import required
+from libs.repunch.validators import required, no_outer_space
 
 from parse.apps.accounts.models import Account
 
 class AccountForm(forms.Form):   
     username = forms.CharField(min_length=3, max_length=30,
                 widget=forms.TextInput(attrs={'pattern':".{3,30}"}),
-                validators=[required])
+                validators=[required, no_outer_space])
     password = forms.CharField(min_length=6,
             widget=forms.PasswordInput(attrs={'pattern':".{6,}"}),
-            validators=[required])
+            validators=[required, no_outer_space])
     confirm_password = forms.CharField(min_length=6,
             widget=forms.PasswordInput(),
-            validators=[required])
+            validators=[required, no_outer_space])
     email = forms.EmailField()
 
     def clean_password(self):
@@ -44,7 +44,7 @@ class AccountForm(forms.Form):
         return u
             
 class LoginForm(forms.Form):
-    username = forms.CharField(validators=[required])
+    username = forms.CharField(validators=[required, no_outer_space])
     password = forms.CharField(widget=forms.PasswordInput(),
-        validators=[required])
+        validators=[required, no_outer_space])
 

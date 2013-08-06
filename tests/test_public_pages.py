@@ -154,9 +154,9 @@ def test_public_pages():
     test.open(reverse("public_faq"))
     sleep(1)
     selectors = (
-        ("#id_full_name", " "),
-        ("#id_email", " "),
-        ("#id_message", " ")
+        ("#id_full_name", "  "),
+        ("#id_email", "  "),
+        ("#id_message", "  ")
     )
     try:
         test.action_chain(1, selectors, action="send_keys") # ACTION!

@@ -3,7 +3,8 @@ import os, re, datetime
 
 from models import Store, StoreAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
-from libs.repunch.validators import alphanumeric, required
+from libs.repunch.validators import alphanumeric, numeric, required,\
+no_outer_space
 from repunch import settings
 from parse.apps.accounts.models import Account
 
@@ -17,12 +18,12 @@ class StoreSignUpForm(forms.Form):
     state = forms.CharField(max_length=255,
         validators=[required])
     zip = forms.CharField(max_length=255,
-        validators=[required])
+        validators=[required, no_outer_space, numeric])
     country = forms.CharField(max_length=255,
         validators=[required])
-    first_name = forms.CharField(max_length=100,
+    first_name = forms.CharField(max_length=50,
         validators=[required])
-    last_name = forms.CharField(max_length=100,
+    last_name = forms.CharField(max_length=50,
         validators=[required])
     phone_number = forms.CharField()
     
@@ -60,7 +61,7 @@ class StoreForm(forms.Form):
     state = forms.CharField(max_length=50,
         validators=[required])
     zip = forms.CharField(max_length=50,
-        validators=[required])
+        validators=[required, no_outer_space, numeric])
     country = forms.CharField(max_length=50,
         validators=[required])
     phone_number = forms.CharField(max_length=50)
@@ -149,7 +150,7 @@ class SubscriptionForm2(forms.Form):
     state2 = forms.CharField(max_length=255,
                     validators=[alphanumeric, required])
     zip2 = forms.CharField(max_length=255,
-                    validators=[alphanumeric, required])
+                    validators=[no_outer_space, numeric, required])
     country2 = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
                                     
@@ -205,9 +206,9 @@ class SubscriptionForm2(forms.Form):
         return data
         
 class SubscriptionForm(forms.Form):
-    first_name = forms.CharField(max_length=100,
+    first_name = forms.CharField(max_length=50,
                     validators=[alphanumeric, required])
-    last_name = forms.CharField(max_length=100,
+    last_name = forms.CharField(max_length=50,
                     validators=[alphanumeric, required])
     cc_number = forms.CharField(max_length=255)
     date_cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
@@ -218,7 +219,7 @@ class SubscriptionForm(forms.Form):
     state = forms.CharField(max_length=255,
                     validators=[alphanumeric, required])
     zip = forms.CharField(max_length=255,
-                    validators=[alphanumeric, required])
+                    validators=[no_outer_space, numeric, required])
     country = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
 
