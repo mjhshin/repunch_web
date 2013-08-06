@@ -4,7 +4,7 @@ import os, re, datetime
 from models import Store, StoreAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric, numeric, required,\
-no_outer_space
+alphanumeric_no_space
 from repunch import settings
 from parse.apps.accounts.models import Account
 
@@ -18,7 +18,7 @@ class StoreSignUpForm(forms.Form):
     state = forms.CharField(max_length=255,
         validators=[required])
     zip = forms.CharField(max_length=255,
-        validators=[required, no_outer_space, numeric])
+        validators=[required, numeric])
     country = forms.CharField(max_length=255,
         validators=[required])
     first_name = forms.CharField(max_length=50,
@@ -26,6 +26,15 @@ class StoreSignUpForm(forms.Form):
     last_name = forms.CharField(max_length=50,
         validators=[required])
     phone_number = forms.CharField()
+    
+    recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
+    
+    def clean_recurring(self):
+        data = self.cleaned_data['recurring']
+        if not data:
+            raise forms.ValidationError("You must accept the Terms"+\
+                                    " & Conditions to continue.")
+        return data
     
     def get_full_address(self):
         return self.data['street'] + ", " + self.data['city']  + ", " +\
@@ -61,7 +70,7 @@ class StoreForm(forms.Form):
     state = forms.CharField(max_length=50,
         validators=[required])
     zip = forms.CharField(max_length=50,
-        validators=[required, no_outer_space, numeric])
+        validators=[required, numeric])
     country = forms.CharField(max_length=50,
         validators=[required])
     phone_number = forms.CharField(max_length=50)
@@ -135,8 +144,10 @@ class StoreAvatarForm(forms.Form):
 
 class SubscriptionForm2(forms.Form):
     """ 
-    2s are appended at each attr name because of name confllicts at
-    signup with StoreSignUpForm. """
+    2s are appended at each attr name because of name conflicts at
+    signup with StoreSignUpForm. 
+    THIS DOES NOT HAVE THE RECURRING CHECKBOX INPUT!!
+    """
     first_name2 = forms.CharField(max_length=100,
                     validators=[alphanumeric, required])
     last_name2 = forms.CharField(max_length=100,
@@ -150,12 +161,11 @@ class SubscriptionForm2(forms.Form):
     state2 = forms.CharField(max_length=255,
                     validators=[alphanumeric, required])
     zip2 = forms.CharField(max_length=255,
-                    validators=[no_outer_space, numeric, required])
+        validators=[numeric, required])
     country2 = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
                                     
     cc_cvv = forms.CharField()
-    recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
     
     def clean(self, *args, **kwargs):
         super(SubscriptionForm2, self).clean()
@@ -174,13 +184,6 @@ class SubscriptionForm2(forms.Form):
             #                            " card!")
         
         return cleaned_data
-    
-    def clean_recurring(self):
-        data = self.cleaned_data['recurring']
-        if not data:
-            raise forms.ValidationError("You must accept the Terms"+\
-                                    " & Conditions to continue.")
-        return data
     
     def clean_date_cc_expiration(self):
         data = self.cleaned_data['date_cc_expiration']
@@ -219,7 +222,7 @@ class SubscriptionForm(forms.Form):
     state = forms.CharField(max_length=255,
                     validators=[alphanumeric, required])
     zip = forms.CharField(max_length=255,
-                    validators=[no_outer_space, numeric, required])
+                    validators=[numeric, required])
     country = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
 

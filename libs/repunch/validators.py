@@ -1,13 +1,16 @@
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 
-alphanumeric = RegexValidator(r"[\w ]+", "Must contain only alpha-"+\
-                    "numeric characters and spaces.")
+alphanumeric = RegexValidator(regex=r"^[a-zA-Z0-9_ ]+$", 
+    message="Must contain only alpha-numeric characters and spaces.",
+    code="not_alphanumeric")
                     
-numeric = RegexValidator(r"[0-9]+", "Must contain only numbers.")
+numeric = RegexValidator(regex=r"^[0-9]+$", 
+    message="Must contain only numbers.", code="non_numeric")
                     
-no_outer_space = RegexValidator(r"[\w]+", 
-    "Must contain only alpha-numeric characters without spaces.")
+alphanumeric_no_space = RegexValidator(regex=r"^[a-zA-Z0-9_]+$", 
+    message="Must contain only alpha-numeric characters " +\
+        "without spaces.", code="not_alphanumeric_no_space")
                     
 def required(value):
     """

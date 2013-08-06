@@ -292,8 +292,8 @@ function validate(which, next) {
 					
 					<div style="clear: left;"></div>
 					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
-						{{ subscription_form.recurring.errors }}
-						{{ subscription_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
+						{{ store_form.recurring.errors }}
+						{{ store_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					
 					<a class="button orange"

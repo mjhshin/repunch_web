@@ -144,7 +144,32 @@ def test_signup():
         settings.delete()
         
     ##########  Required fields are required!
-    
+    selectors = (
+        ("#id_store_name", "    "),
+        ("#id_street", "   "),
+        ("#id_city", "   "),
+        ("#id_state", "   "),
+        ("#id_zip", "   "),
+        ("#id_first_name", "   "),
+        ("#id_last_name", " "),
+        ("#Ph1", "   "),
+        ("#Ph2", "   "),
+        ("#Ph3", "    "),
+        ("#id_email", "   "),
+        ("#id_username", "   "),
+        ("#id_password", "         "),
+        ("#id_confirm_password", "         "),
+    )
+    try:
+        test.action_chain(1, selectors, action="send_keys") # ACTION!
+        # submit
+        test.find("#signup-form-submit").click() # ACTION!
+    except Exception as e:
+        print e
+        parts[8]['test_message'] = str(e)
+    else:
+        parts[8]['success'] = True
+        sleep(1) 
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
