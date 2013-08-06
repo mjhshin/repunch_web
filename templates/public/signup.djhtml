@@ -75,7 +75,7 @@ function validate(which, next) {
 				
 				{% if store_form.errors or account_form.errors or subscription_form.errors %}
 					<div class="error-box">
-						There was an error processing your information. Please fix the erros below and click "Create Account" again.
+						There was an error processing your information. Please fix the errors below and click "Create Account" again.
 					</div>
 				{% endif %}
 				
@@ -99,27 +99,27 @@ function validate(which, next) {
 					<input type="hidden" name="country" id="id_country" value="US" />
 
 				    <p>Store Information</p>
-				    {{ store_form.store_name.errors }}
+				    <div id="store_name_e">{{ store_form.store_name.errors }}</div>
 				    <label for="id_store_name">Business Name</label>
 				    {{ store_form.store_name }}
 					
-					{{ store_form.street.errors }}
+					<div id="street_e">{{ store_form.street.errors }}</div>
 					<label for="id_street">Business Address</label>
 					{{ store_form.street }}
 					
 					<div class="clear-both"></div>
 					<div class="floated">
-						{{ store_form.city.errors }}
+						<div id="city_e">{{ store_form.city.errors }}</div>
 						<label for="id_city">City</label>
 						{{ store_form.city }}
 					</div>
 					<div class="floated">
-						{{ store_form.state.errors }}
+						<div id="state_e">{{ store_form.state.errors }}</div>
 						<label for="state">State</label>
 						{{ store_form.state }}
 					</div>
 					<div class="floated">
-						{{ store_form.zip.errors }}
+						<div id="zip_e">{{ store_form.zip.errors }}</div>
 						<label for="zip">Zip</label>
 						{{ store_form.zip }}
 					</div>
@@ -131,20 +131,20 @@ function validate(which, next) {
                           <input id="categories" name="categories" />
                     </div>
 					
-					<p>Account Information</p>
+					<p id="account_info">Account Information</p>
 					<div class="floated">
-						{{ store_form.first_name.errors }}
+						<div id="first_name_e">{{ store_form.first_name.errors }}</div>
 						<label for="id_first_name">Your First Name</label>
 						{{ store_form.first_name }}
 					</div>
 					<div class="floated">
-						{{ store_form.last_name.errors }}
+						<div id="last_name_e">{{ store_form.last_name.errors }}</div>
 						<label for="id_last_name">Your Last Name</label>
 						{{ store_form.last_name }}
 					</div>
 					
 					<div class="clear-both"></div>
-					{{ store_form.phone_number.errors }}
+					<div id="phone_number_e">{{ store_form.phone_number.errors }}</div>
 					<label for="id_phone_number">Your Phone Number</label>
 					<input id="id_phone_number" name="phone_number" type="hidden" />
 					<span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
@@ -153,19 +153,19 @@ function validate(which, next) {
                     <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />&nbsp;&nbsp;-&nbsp;
                     <input type = "text" id = "Ph3" style="width:70px;" maxlength = "4" onkeyup = "validate(this,3)" />
 					
-					{{ account_form.email.errors }}
+					<div id="email_e">{{ account_form.email.errors }}</div>
 					<label for="id_email">Your Email Address</label>
 					{{ account_form.email }}
 					
-					{{ account_form.username.errors }}
+					<div id="username_e">{{ account_form.username.errors }}</div>
 					<label for="id_username">Your User Name</label>
 					{{ account_form.username }}
 					
-					{{ account_form.password.errors }}
+					<div id="password_e">{{ account_form.password.errors }}</div>
 					<label for="id_password">Create Password</label>
 					{{ account_form.password }}
 					
-					{{ account_form.confirm_password.errors }}
+					<div id="password2_e">{{ account_form.confirm_password.errors }}</div>
 					<label for="id_confirm_password">Confirm Password</label>
 					{{ account_form.confirm_password }}					
 					<div class="clear-both"></div>		            
@@ -215,15 +215,15 @@ function validate(which, next) {
                     <div id="cc_section" style="display:none;">
                     {% endif %}
                     
-					<p>Credit Card Information</p>
+					<p id="cc_info">Credit Card Information</p>
 					<div class="floated">
-					{{ subscription_form.first_name2.errors }}
+					<div id="first_name2_e">{{ subscription_form.first_name2.errors }}</div>
 					<label for="id_first_name2">First Name</label>
 					{{ subscription_form.first_name2 }}
 					</div>
 					
 					<div class="floated">
-					{{ subscription_form.last_name2.errors }}
+					<div id="last_name2_e">{{ subscription_form.last_name2.errors }}</div>
 					<label for="id_last_name2">Last Name</label>
 					{{ subscription_form.last_name2 }}
 					</div>
@@ -231,7 +231,7 @@ function validate(which, next) {
 					
 					<div class="clear-both"></div>
 					<div class="input-container" id="card_number_container">
-						{{ subscription_form.cc_number.errors }}
+						<div id="cc_number_e">{{ subscription_form.cc_number.errors }}</div>
 						<label for="id_card_number" style="clear:left;">Card Number</label>
 						{{ subscription_form.cc_number }}
 						<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
@@ -242,41 +242,41 @@ function validate(which, next) {
 					
 					
 					<div class="floated">
-					{{ subscription_form.cc_cvv.errors }}
+					<div id="cc_cvv_e">{{ subscription_form.cc_cvv.errors }}</div>
 					<label for="id_cvc">CVC</label>
 					{{ subscription_form.cc_cvv }}
 					</div>
 				
 					<div class="floated">
-					{{ subscription_form.date_cc_expiration.errors }}
+					<div id="date_cc_expiration_e">{{ subscription_form.date_cc_expiration.errors }}</div>
 					<label for="id_expiration_month">Expiration</label>
 					{{ subscription_form.date_cc_expiration }}
 					</div>
 					
 					<div class="clear-both"></div>
-					<p style="display:inline-block">Billing Address</p>
+					<p style="display:inline-block" id="billing_address">Billing Address</p>
 					<label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as business address</label>
 					<input type="checkbox" id="same_address" />
 					
 				
-					{{ subscription_form.address.errors }}
+					<div id="address_e">{{ subscription_form.address.errors }}</div>
 					<label for="id_address">Address</label>
 					{{ subscription_form.address }}
 					
 					
 					<div class="clear-both"></div>
 					<div class="floated">
-						{{ subscription_form.city2.errors }}
+						<div id="city2_e">{{ subscription_form.city2.errors }}</div>
 						<label for="id_city2">City</label>
 						{{ subscription_form.city2 }}
 					</div>
 					<div class="floated">					
-						{{ subscription_form.state2.errors }}
+						<div id="state2_e">{{ subscription_form.state2.errors }}</div>
 						<label for="id_state2">State</label>
 						{{ subscription_form.state2 }}
 					</div>
 					<div class="floated">
-						{{ subscription_form.zip2.errors }}
+						<div id="zip2_e">{{ subscription_form.zip2.errors }}</div>
 						<label for="id_zip2">Zip</label>
 						{{ subscription_form.zip2 }}
 					</div>
@@ -292,7 +292,7 @@ function validate(which, next) {
 					
 					<div style="clear: left;"></div>
 					<div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
-						{{ store_form.recurring.errors }}
+						<div id="recurring_e">{{ store_form.recurring.errors }}</div>
 						{{ store_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					

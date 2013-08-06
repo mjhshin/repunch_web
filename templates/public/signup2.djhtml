@@ -47,7 +47,7 @@ $(document).ready(function(){
 				
 				{% if store_form.errors or subscription_form.errors %}
 				<div class="error-box">
-					There was an error processing your information. Please fix the erros below and click "Create Account" again.
+					There was an error processing your information. Please fix the errors below and click "Create Account" again.
 				</div>
 				{% endif %}
 				{% if subscription_form.non_field_errors %}

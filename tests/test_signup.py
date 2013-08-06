@@ -34,11 +34,23 @@ def test_signup():
         {'test_name': "Subscription object created"},
         {'test_name': "Settings object created"},
         {'test_name': "Email about new user sent"},
-        {'test_name': "Required fields are required!"},
+        {'test_name': "Store name is required"},
+        {'test_name': "Street is required"},
+        {'test_name': "City is required"},
+        {'test_name': "State is required"},
+        {'test_name': "Zip is required"},
+        {'test_name': "First name is required"},
+        {'test_name': "Last name is required"},
+        {'test_name': "Phone number is required"},
+        {'test_name': "Email is required"},
+        {'test_name': "Username is required"},
+        {'test_name': "Password is required"},
+        {'test_name': "ToS check is required"},
         # TODO wrong address
         # TODO username must not contain whitespace
         # TODO password must not contain whitespace
         # TODO password must be at least 6 characters
+        # password and corfirmation must be the same
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -143,7 +155,9 @@ def test_signup():
         subscription.delete()
         settings.delete()
         
-    ##########  Required fields are required!
+    #  Required fields are required!
+    test.open(reverse("public_signup")) # ACTION!
+    sleep(1)
     selectors = (
         ("#id_store_name", "    "),
         ("#id_street", "   "),
@@ -160,16 +174,72 @@ def test_signup():
         ("#id_password", "         "),
         ("#id_confirm_password", "         "),
     )
-    try:
-        test.action_chain(1, selectors, action="send_keys") # ACTION!
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
-    except Exception as e:
-        print e
-        parts[8]['test_message'] = str(e)
-    else:
-        parts[8]['success'] = True
-        sleep(1) 
+    test.action_chain(0, selectors, action="send_keys") # ACTION!
+    # submit
+    test.find("#signup-form-submit").click() # ACTION!
+    sleep(3)
+    
+    ##########  Store name is required
+    parts[8]['success'] =\
+        str(test.find("//p[@id='store_info']/ul[1]/li", 
+            type="xpath").text) == "This field is required."
+    ##########  Street is required
+    parts[9]['success'] =\
+        str(test.find("//p[@id='store_info']/ul[2]/li", 
+            type="xpath").text) == "This field is required."
+    ##########  City is required
+    parts[10]['success'] =\
+        str(test.find("//p[@id='store_info']/" +\
+            "div[@class='floated'][1]/ul/li", 
+            type="xpath").text) == "This field is required."
+    ##########  State is required 
+    parts[11]['success'] =\
+        str(test.find("//p[@id='store_info']/" +\
+            "div[@class='floated'][2]/ul/li", 
+            type="xpath").text) == "This field is required."
+    ##########  Zip is required 
+    parts[12]['success'] =\
+        str(test.find("//p[@id='store_info']/" +\
+            "div[@class='floated'][3]/ul/li", 
+            type="xpath").text) == "This field is required."
+    ##########  First name is required 
+    parts[13]['success'] =\
+        str(test.find("//p[@id='account_info']/" +\
+            "div[@class='floated'][1]/ul/li", 
+            type="xpath").text) == "This field is required."
+    ##########  Last name is required 
+    parts[14]['success'] =\
+        str(test.find("//p[@id='account_info']/" +\
+            "div[@class='floated'][2]/ul/li", 
+            type="xpath").text) == "This field is required."
+    ##########  Phone number is required 
+    parts[15]['success'] =\
+        str(test.find("//p[@id='account_info']/ul[1]/li", 
+            type="xpath").text) == "Enter a valid phone number."
+    ##########  Email is required 
+    parts[16]['success'] =\
+        str(test.find("//p[@id='account_info']/ul[2]/li", 
+            type="xpath").text) == "This field is required."
+    ##########  Username is required
+    parts[17]['success'] =\
+        str(test.find("//p[@id='account_info']/ul[3]/li[1]", 
+            type="xpath").text) == "This field is required." and\
+        str(test.find("//p[@id='account_info']/ul[3]/li[2]", 
+            type="xpath").text) == "Must contain only alpha-numeric" +\
+            " characters without spaces."
+    ##########  Password is required 
+    parts[18]['success'] =\
+        str(test.find("//p[@id='account_info']/ul[4]/li[1]", 
+            type="xpath").text) == "This field is required." and\
+        str(test.find("//p[@id='account_info']/ul[4]/li[2]", 
+            type="xpath").text) == "Must contain only alpha-numeric" +\
+            " characters without spaces."
+    ##########  ToS is required 
+    parts[19]['success'] =\
+        str(test.find("//div[@id='recurring_charge_container']/ul/li", 
+            type="xpath").text) == "You must accept the Terms" +\
+                " & Conditions to continue."
+    
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
