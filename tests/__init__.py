@@ -58,14 +58,20 @@ class SeleniumTest(object):
         if save_session_cookie and cookie:
             self.driver.add_cookie(cookie)
         
-    def find(self, selector, type="css"):
+    def find(self, selector, type="css", multiple=False):
         """
-        Shortcut for find_element_by_css_selector or xpath, etc
+        Shortcut for find_element_by_css_selector(s) or xpath, etc
         """     
         if type == "css":
-            return self.driver.find_element_by_css_selector(selector)
+            if multiple:
+                return self.driver.find_elements_by_css_selector(selector)
+            else:
+                return self.driver.find_element_by_css_selector(selector)
         elif type == "xpath":
-            return self.driver.find_element_by_xpath(selector)
+            if multiple:
+                return self.driver.find_elements_by_xpath(selector)
+            else:
+                return self.driver.find_element_by_xpath(selector)
             
     def action_chain(self, wait_time, selectors, action="click",
             type="css"):
@@ -80,7 +86,8 @@ class SeleniumTest(object):
         the current element.
         """
         for selector in selectors:
-            sleep(wait_time)
+            if wait_time > 0:
+                sleep(wait_time)
             if action == "click":
                 self.find(selector, type).click()
             elif action == "move":

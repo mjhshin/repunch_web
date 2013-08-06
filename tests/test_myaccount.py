@@ -328,37 +328,43 @@ def test_edit_store_details():
         int(math.floor(TEST_STORE_INFO['coordinates'][1]))
     
     ##########  Entering invalid address shows error
-    click_store_edit()
-    sleep(3)
-    # street
-    street = test.find("#id_street")
-    street.clear()
-    street.send_keys("988 dsgsd s")
-    # city
-    city = test.find("#id_city")
-    city.clear()
-    city.send_keys("mandarin")
-    # state
-    state = test.find("#id_state")
-    state.clear()
-    state.send_keys("klk")
-    # zip
-    zip = test.find("#id_zip")
-    zip.clear()
-    zip.send_keys("941091")
-    # save!
-    test.find("#save-button").click()
-    sleep(3)
-    parts[21]['success'] = str(test.find(".errorlist").text) ==\
-        "Enter a valid adress, city, state, and/or zip."
-        
-    test.find("//div[@id='edit-store-options']/a[2]",
-        type="xpath").click()
-    sleep(2)
+    try:
+        click_store_edit()
+        sleep(3)
+        # street
+        street = test.find("#id_street")
+        street.clear()
+        street.send_keys("988 dsgsd s")
+        # city
+        city = test.find("#id_city")
+        city.clear()
+        city.send_keys("mandarin")
+        # state
+        state = test.find("#id_state")
+        state.clear()
+        state.send_keys("klk")
+        # zip
+        zip = test.find("#id_zip")
+        zip.clear()
+        zip.send_keys("941091")
+        # save!
+        test.find("#save-button").click()
+        sleep(3)
+        parts[21]['success'] = str(test.find(".errorlist").text) ==\
+            "Enter a valid adress, city, state, and/or zip."
+            
+        test.find("//div[@id='edit-store-options']/a[2]",
+            type="xpath").click()
+        sleep(2)
+    except Exception as e:
+        print e
+        parts[21]['test_message'] = str(e)
     
     ##########  Entering invalid hours with same open time
     ##########  as close time shows error
     try:
+        click_store_edit()
+        sleep(3)
         test.find("//select[@id='id_hours-0-open']"+\
             "/option[@value='6:30:00']", type="xpath").click()
         sleep(1)
@@ -393,9 +399,40 @@ def test_edit_store_details():
         print e
         parts[23]['test_message'] = str(e)
     
-    ##########  Having no hours is allowed TODO
+    ##########  Having no hours is allowed
+    try:
+        for i in range(1, 4):
+            test.find("#hours-%s-remove" % (str(i),)).click()
+            sleep(1)
+            test.driver.switch_to_alert().accept()
+        # cannot remove the first row so just deactivate the day
+        test.find("//ul[@id='hours-0-row']/" +\
+            "li[@class='days']/div[2]", type="xpath").click()
+        # save!
+        test.find("#save-button").click()
+        sleep(6)
+        store.hours = None
+        parts[24]['success'] =\
+            test.is_current_url(reverse("store_index")) and\
+            test.find("#hours").text.split("\n")[1] ==\
+            'Closed Sunday - Saturday' and\
+            len(store.get("hours")) == 0
+    except Exception as e:
+        print e
+        parts[24]['test_message'] = str(e)
     
-    ##########  There can be no more than 7 hours rows TODO
+    ##########  There can be no more than 7 hours rows 
+    try:
+        click_store_edit()
+        sleep(3)
+        test.action_chain(1, ["#hours-0-add" for i in range(9)])
+        # 8 because of the hidden clone row
+        parts[25]['test_message'] =\
+            len(test.find(".days", multiple=True)) == 8
+    except Exception as e:
+        print e
+        parts[25]['test_message'] = str(e)
+    
     
     # TODO fields required
     
