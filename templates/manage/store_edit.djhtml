@@ -48,37 +48,37 @@
 		<br><br><br>
 		{{ form.non_field_errors }}
 		<div class="input-container">
-			{{ form.store_name.errors }}
-			<label for="store_name">Store Name</label>
+			<div id="store_name_e">{{ form.store_name.errors }}</div>
+			<label for="id_store_name">Store Name</label>
 			{{ form.store_name }}
 		</div>
 		
 		<div class="input-container street-container">
-			{{ form.street.errors }}
-			<label for="street">Street</label>
+			<div id="street_e">{{ form.street.errors }}</div>
+			<label for="id_street">Street</label>
 			{{ form.street }}
 		</div>
 		
 		<div class="input-container clearheight">
-			{{ form.city.errors }}
-			<label for="city">City</label>
+			<div id="city_e">{{ form.city.errors }}</div>
+			<label for="id_city">City</label>
 			{{ form.city }}
 		</div>
 		
 		<div class="input-container">
-			{{ form.state.errors }}
-			<label for="state">State</label>
+			<div id="state_e">{{ form.state.errors }}</div>
+			<label for="id_state">State</label>
 			{{ form.state }}
 		</div>
 		
 		<div class="input-container">
-			{{ form.zip.errors }}
-			<label for="zip">Zip</label>
+			<div id="zip_e">{{ form.zip.errors }}</div>
+			<label for="id_zip">Zip</label>
 			{{ form.zip }}
 		</div>
 		
 		<div class="input-container">
-			{{ form.country.errors }}
+			<div id="country_e">{{ form.country.errors }}</div>
 			<label for="country">Country</label>
 			<select name="country" id="country">
 				<option value="US">United States of America</option>
@@ -86,8 +86,8 @@
 		</div>
 		
 		<div class="input-container clearheight">
-			{{ form.phone_number.errors }}
-			<label for="phone_number">Phone Number</label>
+			<div id="phone_number_e">{{ form.phone_number.errors }}</div>
+			<label for="id_phone_number">Phone Number</label>
 			<input id="id_phone_number" name="phone_number" type="hidden" />
 			<span style="font-size:1.1em;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
 					    style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
@@ -131,14 +131,14 @@
 		</div>
 		
 		<div class="input-container clearheight">
-			{{ form.email.errors }}
+			<div id="email_e">{{ form.email.errors }}</div>
 			<label for="id_email" id="label_email">Email</label>
 			{{ form.email }}
 		</div>
 		
 		<div class="input-container clearheight">
-			{{ form.store_description.errors }}
-			<label for="store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>
+			<div id="store_description_e">{{ form.store_description.errors }}</div>
+			<label for="id_store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>
 			{{ form.store_description }}
 		</div>
 		

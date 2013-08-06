@@ -6,7 +6,7 @@ alphanumeric = RegexValidator(regex=r"^[a-zA-Z0-9_ ]+$",
     code="not_alphanumeric")
                     
 numeric = RegexValidator(regex=r"^[0-9]+$", 
-    message="Must contain only numbers.", code="non_numeric")
+    message="Must contain numbers only.", code="non_numeric")
                     
 alphanumeric_no_space = RegexValidator(regex=r"^[a-zA-Z0-9_]+$", 
     message="Must contain only alpha-numeric characters " +\

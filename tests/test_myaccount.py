@@ -93,7 +93,14 @@ def test_edit_store_details():
             " than close time shows error"},
         {'test_name': "Having no hours is allowed"},
         {'test_name': "There can be no more than 7 hours rows"},
-        # TODO fields required
+        {'test_name': "Store name is required"},
+        {'test_name': "Street is required"},
+        {'test_name': "City is required"},
+        {'test_name': "State is required"},
+        {'test_name': "Zip is required"},
+        {'test_name': "Phone number is required"},
+        {'test_name': "Email is required"},
+        {'test_name': "Description is required"},
         {'test_name': "Cancel button redirects user back to store " +\
             "details page and no changes are saved to Parse"},
         {'test_name': "Clicking Add/Change Photo brings up the " +\
@@ -425,6 +432,7 @@ def test_edit_store_details():
         click_store_edit()
         sleep(3)
         test.action_chain(1, ["#hours-0-add" for i in range(10)])
+        sleep(1)
         # 8 because of the hidden clone row
         parts[25]['success'] =\
             len(test.find(".days", multiple=True)) == 8
@@ -432,11 +440,47 @@ def test_edit_store_details():
         print e
         parts[25]['test_message'] = str(e)
     
+    ## fields required
+    selectors = [
+        "#id_store_name", "#id_street", "#id_city",
+        "#id_state", "#id_zip",
+        "#Ph1", "#Ph2", "#Ph3",
+        "#id_email", "#id_store_description",
+    ]
+    test.action_chain(0, selectors, action="clear") # ACTION!
+    selectors2 = []
+    for selector in selectors:
+        selectors2.append(( selector, "   " ))
+    test.action_chain(0, selectors2, action="send_keys") # ACTION!
+    # submit
+    test.find("#save-button").click() # ACTION!
+    sleep(3)
     
-    # TODO fields required
+    ##########  Store name is required 
+    ##########  Street is required 
+    ##########  City is required 
+    ##########  State is required 
+    ##########  Zip is required 
+    ##########  Phone number is required 
+    ##########  Email is required 
+    ##########  Description is required 
+    e_list = ["store_name", "street", "city", "state", "zip",
+                "phone_number", "email", "store_description"]
+    for i in range(26, 34):
+        selector = "#%s_e ul li" % (e_list.pop(0),)
+        parts[i]['success'] = str(test.find(selector).text) ==\
+            "This field is required."
     
-    ##########  Cancel button redirects user back to store TODO
-    ##########  details page and no changes are saved to Parse
+    ##########  Cancel button redirects user back to store index
+    try:
+        test.find("//div[@id='edit-store-options']/a[2]",
+            type="xpath").click()
+        sleep(2)
+        parts[34]['success'] =\
+            test.is_current_url(reverse('store_index'))
+    except Exception as e:
+        print e
+        parts[34]['message'] = str(e)
     
     ##########  Clicking Add/Change Photo brings up the TODO
     ##########  image upload dialog

@@ -99,3 +99,8 @@ class SeleniumTest(object):
                         selector[1]).perform()
                 else:
                     self.find(selector[0],type).send_keys(selector[1])
+            elif action == "clear":
+                self.find(selector, type).clear()
+                    
+                    
+                    

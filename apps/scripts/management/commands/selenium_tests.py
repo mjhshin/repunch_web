@@ -19,14 +19,14 @@ class Command(BaseCommand):
         # PUBLIC PAGES
         # results.extend(test_public_pages())
         # SIGNUP
-        results.extend(test_signup())
+        # results.extend(test_signup())
         # LOGIN (dialog)
-        #results.extend(test_login_dialog())
+        # results.extend(test_login_dialog())
         # LOGIN (dedicated page)
-        #results.extend(test_login_page())
+        # results.extend(test_login_page())
         
         ####### DASHBOARD
         # MY ACCOUNT
-        # results.extend(test_edit_store_details())
+        results.extend(test_edit_store_details())
         
         send_email_selenium_test_results(results)
