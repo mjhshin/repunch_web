@@ -72,6 +72,11 @@ class SeleniumTest(object):
                 return self.driver.find_elements_by_xpath(selector)
             else:
                 return self.driver.find_element_by_xpath(selector)
+        elif type == "tag_name":
+            if multiple:
+                return self.driver.find_elements_by_tag_name(selector)
+            else:
+                return self.driver.find_element_by_tag_name(selector)
             
     def action_chain(self, wait_time, selectors, action="click",
             type="css"):

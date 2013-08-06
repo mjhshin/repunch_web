@@ -485,6 +485,7 @@ def test_edit_store_details():
     ##########  Clicking Add/Change Photo brings up the TODO
     ##########  image upload dialog
     
+    
     ##########  Clicking cancel on upload removes the dialog TODO
     
     ##########  Uploading images works TODO

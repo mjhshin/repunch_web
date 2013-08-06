@@ -8,7 +8,7 @@ $(document).ready(function() {
 		var $this = $(this);
 		var href = $this.attr('href');
 		
-		$('<iframe id="avatar-dialog" class="externalSite" src="' + href + '" frameborder="0" style="padding:0px;padding:0px;">').dialog({
+		$('<iframe name="avatar-dialog" id="avatar-dialog" class="externalSite" src="' + href + '" frameborder="0" style="padding:0px;padding:0px;">').dialog({
 			autoOpen : true,
 			modal : true,
 			resizable : true,
