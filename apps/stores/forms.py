@@ -3,19 +3,27 @@ import os, re, datetime
 
 from models import Store, StoreAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
-from libs.repunch.validators import alphanumeric
+from libs.repunch.validators import alphanumeric, required
 from repunch import settings
 from parse.apps.accounts.models import Account
 
 class StoreSignUpForm(forms.Form):
-    store_name = forms.CharField(max_length=255)
-    street = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=255)
-    state = forms.CharField(max_length=255)
-    zip = forms.CharField(max_length=255)
-    country = forms.CharField(max_length=255)
-    first_name = forms.CharField(max_length=100)
-    last_name = forms.CharField(max_length=100)
+    store_name = forms.CharField(max_length=255,
+        validators=[required])
+    street = forms.CharField(max_length=255,
+        validators=[required])
+    city = forms.CharField(max_length=255,
+        validators=[required])
+    state = forms.CharField(max_length=255,
+        validators=[required])
+    zip = forms.CharField(max_length=255,
+        validators=[required])
+    country = forms.CharField(max_length=255,
+        validators=[required])
+    first_name = forms.CharField(max_length=100,
+        validators=[required])
+    last_name = forms.CharField(max_length=100,
+        validators=[required])
     phone_number = forms.CharField()
     
     def get_full_address(self):
@@ -43,16 +51,23 @@ class StoreSignUpForm(forms.Form):
         return data
 
 class StoreForm(forms.Form):
-    store_name = forms.CharField(max_length=255)
-    street = forms.CharField(max_length=255)
-    city = forms.CharField(max_length=75)
-    state = forms.CharField(max_length=50)
-    zip = forms.CharField(max_length=50)
-    country = forms.CharField(max_length=50)
+    store_name = forms.CharField(max_length=255,
+        validators=[required])
+    street = forms.CharField(max_length=255,
+        validators=[required])
+    city = forms.CharField(max_length=75,
+        validators=[required])
+    state = forms.CharField(max_length=50,
+        validators=[required])
+    zip = forms.CharField(max_length=50,
+        validators=[required])
+    country = forms.CharField(max_length=50,
+        validators=[required])
     phone_number = forms.CharField(max_length=50)
     email = forms.EmailField()
     store_description = forms.CharField(max_length=500, 
-        widget=forms.Textarea(attrs={"maxlength":500}))
+        widget=forms.Textarea(attrs={"maxlength":500}),
+        validators=[required])
         
     def __init__(self, email, *args, **kwargs):
         super(StoreForm, self).__init__(*args, **kwargs)
@@ -122,19 +137,19 @@ class SubscriptionForm2(forms.Form):
     2s are appended at each attr name because of name confllicts at
     signup with StoreSignUpForm. """
     first_name2 = forms.CharField(max_length=100,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     last_name2 = forms.CharField(max_length=100,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     cc_number = forms.CharField(max_length=255)
     date_cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
     address = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     city2 = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     state2 = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     zip2 = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     country2 = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
                                     
@@ -191,19 +206,19 @@ class SubscriptionForm2(forms.Form):
         
 class SubscriptionForm(forms.Form):
     first_name = forms.CharField(max_length=100,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     last_name = forms.CharField(max_length=100,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     cc_number = forms.CharField(max_length=255)
     date_cc_expiration = forms.DateField(widget=rpforms.MonthYearWidget())
     address = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     city = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     state = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     zip = forms.CharField(max_length=255,
-                    validators=[alphanumeric])
+                    validators=[alphanumeric, required])
     country = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
 

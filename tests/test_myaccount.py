@@ -413,8 +413,7 @@ def test_edit_store_details():
         sleep(6)
         store.hours = None
         parts[24]['success'] =\
-            test.is_current_url(reverse("store_index")) and\
-            test.find("#hours").text.split("\n")[1] ==\
+            str(test.find("#hours").text.split("\n")[1]) ==\
             'Closed Sunday - Saturday' and\
             len(store.get("hours")) == 0
     except Exception as e:
@@ -425,9 +424,9 @@ def test_edit_store_details():
     try:
         click_store_edit()
         sleep(3)
-        test.action_chain(1, ["#hours-0-add" for i in range(9)])
+        test.action_chain(1, ["#hours-0-add" for i in range(10)])
         # 8 because of the hidden clone row
-        parts[25]['test_message'] =\
+        parts[25]['success'] =\
             len(test.find(".days", multiple=True)) == 8
     except Exception as e:
         print e

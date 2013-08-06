@@ -4,10 +4,15 @@ from libs.repunch import rputils
 from repunch import settings
 import os
 
+from libs.repunch.validators import required
+
 class EmployeeForm(forms.Form):
-    first_name = forms.CharField(max_length=255)
-    last_name = forms.CharField(max_length=255)
-    email = forms.CharField(max_length=255)
+    first_name = forms.CharField(max_length=255, 
+        validators=[required])
+    last_name = forms.CharField(max_length=255,
+        validators=[required])
+    email = forms.CharField(max_length=255,
+        validators=[required])
         
 class EmployeeAvatarForm(forms.Form):
     employee_avatar = forms.FileField()

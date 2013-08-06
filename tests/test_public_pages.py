@@ -28,7 +28,7 @@ def test_public_pages():
         {'test_name': "Footer elements navigable"},
         {'test_name': "FAQ email form working"},
         {'test_name': "FAQ email sent"},
-        # TODO fields required
+        {'test_name': "FAQ email form all fields required"},
         {'test_name': "Contact Us email form working"},
         {'test_name': "Contact Us email sent"},
         # TODO fields required
@@ -134,7 +134,8 @@ def test_public_pages():
     else:
         if test.is_current_url(reverse("public_thank_you")):
             parts[5]['success'] = True
-            
+        
+    ##########  FAQ email sent
     sleep(5) # wait for the email to register in gmail
     mail = Mail()
     mail.select_sent_mailbox()
@@ -149,6 +150,25 @@ def test_public_pages():
             (sent.minute == now.minute or sent.minute == lb.minute):
             parts[6]['success'] = True
             
+    ##########  FAQ email form all fields required
+    test.open(reverse("public_faq"))
+    sleep(1)
+    selectors = (
+        ("#id_full_name", " "),
+        ("#id_email", " "),
+        ("#id_message", " ")
+    )
+    try:
+        test.action_chain(1, selectors, action="send_keys") # ACTION!
+        test.find("//form[@id='make-question-form']/a", 
+            type="xpath").click()
+    except Exception as e:
+        print e
+        parts[5]['test_message'] = str(e)
+    else:
+        if test.is_current_url(reverse("public_thank_you")):
+            parts[5]['success'] = True
+            
     ##########  Contact Us email form working
     test.open(reverse("public_contact")) # ACTION!
     selectors = (
@@ -162,11 +182,12 @@ def test_public_pages():
             type="xpath").click()
     except Exception as e:
         print e
-        parts[7]['test_message'] = str(e)
+        parts[8]['test_message'] = str(e)
     else:
         if test.is_current_url(reverse("public_thank_you")):
-            parts[7]['success'] = True
-            
+            parts[8]['success'] = True
+         
+    ##########  Contact Us email sent
     sleep(5) # wait for the email to register in gmail
     mail.select_sent_mailbox()
     mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User Y")
@@ -178,11 +199,13 @@ def test_public_pages():
         if now.year == sent.year and now.month == sent.month and\
             now.day == sent.day and now.hour == sent.hour and\
             (sent.minute == now.minute or sent.minute == lb.minute):
-            parts[8]['success'] = True
+            parts[9]['success'] = True
             
-    mail.logout()
+    
+    
     
     # END TEST
+    mail.logout()
     sleep(2)
     test.results.append(section)
     

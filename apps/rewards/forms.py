@@ -4,9 +4,11 @@ import os
 
 from libs.repunch import rputils
 from repunch import settings
+from libs.repunch.validators import required
 
 class RewardForm(forms.Form):
-    reward_name = forms.CharField(max_length=75)
+    reward_name = forms.CharField(max_length=75,
+        validators=[required])
     description = forms.CharField(max_length=255, 
         widget=forms.Textarea(\
         attrs={"maxlength":255}), required=False)

@@ -3,11 +3,12 @@ from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
 from models import Message
+from libs.repunch.validators import required
 
 
 class MessageForm(forms.Form):
-    subject = forms.CharField(max_length=50)
-    body = forms.CharField(max_length=750, 
+    subject = forms.CharField(max_length=50, validators=[required])
+    body = forms.CharField(max_length=750, validators=[required],
         widget=forms.Textarea(attrs={"cols":40, "rows":10, "maxlength":750}))
 
     attach_offer = forms.BooleanField(required=False)
@@ -32,7 +33,7 @@ class MessageForm(forms.Form):
                 'be a whole number.')
         
     def clean_offer_title(self):
-        title = self.cleaned_data['offer_title']
+        title = self.cleaned_data.get('offer_title', '').strip()
         
         if self.cleaned_data['attach_offer']:
             if title == None or len(title) == 0:
