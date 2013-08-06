@@ -19,7 +19,7 @@ from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX
 
 TEST_USER = {
     "username": "iusluixylusr",
-    "email": "admin@repunch.com",
+    "email": "iusluixylusr@vandolf.com",
 }
 
 def test_signup():
@@ -45,6 +45,7 @@ def test_signup():
         {'test_name': "Email is required"},
         {'test_name': "Username is required"},
         {'test_name': "Password is required"},
+        {'test_name': "Password confirmation is required"},
         {'test_name': "ToS check is required"},
         # TODO wrong address
         # TODO username must not contain whitespace
@@ -181,64 +182,62 @@ def test_signup():
     
     ##########  Store name is required
     parts[8]['success'] =\
-        str(test.find("//p[@id='store_info']/ul[1]/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#store_name_e ul li").text) ==\
+            "This field is required."
     ##########  Street is required
     parts[9]['success'] =\
-        str(test.find("//p[@id='store_info']/ul[2]/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#street_e ul li").text) ==\
+            "This field is required."
     ##########  City is required
     parts[10]['success'] =\
-        str(test.find("//p[@id='store_info']/" +\
-            "div[@class='floated'][1]/ul/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#city_e ul li").text) ==\
+            "This field is required."
     ##########  State is required 
     parts[11]['success'] =\
-        str(test.find("//p[@id='store_info']/" +\
-            "div[@class='floated'][2]/ul/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#state_e ul li").text) ==\
+            "This field is required."
     ##########  Zip is required 
     parts[12]['success'] =\
-        str(test.find("//p[@id='store_info']/" +\
-            "div[@class='floated'][3]/ul/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#zip_e ul li").text) ==\
+            "This field is required."
     ##########  First name is required 
     parts[13]['success'] =\
-        str(test.find("//p[@id='account_info']/" +\
-            "div[@class='floated'][1]/ul/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#first_name_e ul li").text) ==\
+            "This field is required."
     ##########  Last name is required 
     parts[14]['success'] =\
-        str(test.find("//p[@id='account_info']/" +\
-            "div[@class='floated'][2]/ul/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#last_name_e ul li").text) ==\
+            "This field is required."
     ##########  Phone number is required 
     parts[15]['success'] =\
-        str(test.find("//p[@id='account_info']/ul[1]/li", 
-            type="xpath").text) == "Enter a valid phone number."
+        str(test.find("#phone_number_e ul li").text) ==\
+            "This field is required."
     ##########  Email is required 
     parts[16]['success'] =\
-        str(test.find("//p[@id='account_info']/ul[2]/li", 
-            type="xpath").text) == "This field is required."
+        str(test.find("#email_e ul li").text) ==\
+            "This field is required."
     ##########  Username is required
+    e1, e2 = test.find("#username_e ul li", multiple=True)
     parts[17]['success'] =\
-        str(test.find("//p[@id='account_info']/ul[3]/li[1]", 
-            type="xpath").text) == "This field is required." and\
-        str(test.find("//p[@id='account_info']/ul[3]/li[2]", 
-            type="xpath").text) == "Must contain only alpha-numeric" +\
+        str(e1.text) == "This field is required." and\
+        str(e2.text) == "Must contain only alpha-numeric" +\
             " characters without spaces."
     ##########  Password is required 
+    e1, e2 = test.find("#password_e ul li", multiple=True)
     parts[18]['success'] =\
-        str(test.find("//p[@id='account_info']/ul[4]/li[1]", 
-            type="xpath").text) == "This field is required." and\
-        str(test.find("//p[@id='account_info']/ul[4]/li[2]", 
-            type="xpath").text) == "Must contain only alpha-numeric" +\
+        str(e1.text) == "This field is required." and\
+        str(e2.text) == "Must contain only alpha-numeric" +\
+            " characters without spaces."
+    ##########  Password confirmation is required
+    e1, e2 = test.find("#password2_e ul li", multiple=True)
+    parts[19]['success'] =\
+        str(e1.text) == "This field is required." and\
+        str(e2.text) == "Must contain only alpha-numeric" +\
             " characters without spaces."
     ##########  ToS is required 
-    parts[19]['success'] =\
-        str(test.find("//div[@id='recurring_charge_container']/ul/li", 
-            type="xpath").text) == "You must accept the Terms" +\
-                " & Conditions to continue."
+    parts[20]['success'] =\
+        str(test.find("#recurring_e ul li").text) ==\
+            "You must accept the Terms & Conditions to continue."
     
     
     # END OF ALL TESTS - cleanup

@@ -147,8 +147,7 @@ function validate(which, next) {
 					<div id="phone_number_e">{{ store_form.phone_number.errors }}</div>
 					<label for="id_phone_number">Your Phone Number</label>
 					<input id="id_phone_number" name="phone_number" type="hidden" />
-					<span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
-					    style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
+					<span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
 					    <span style="font-size:22px;position:relative;top:2px;left:2px;margin-right:8px;">)</span>
                     <input type = "text" id = "Ph2" style="width:50px;" maxlength = "3" onkeyup = "validate(this,3)" />&nbsp;&nbsp;-&nbsp;
                     <input type = "text" id = "Ph3" style="width:70px;" maxlength = "4" onkeyup = "validate(this,3)" />
