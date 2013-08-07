@@ -19,6 +19,8 @@ TEST_USER = {
 TEST_USER_INFO = {
     "email": "militia@vandolf.com",
 }
+
+IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
     
     
 # set the store information
@@ -482,13 +484,44 @@ def test_edit_store_details():
         print e
         parts[34]['message'] = str(e)
     
-    ##########  Clicking Add/Change Photo brings up the TODO
-    ##########  image upload dialog
+    ##########  Clicking Add/Change Photo brings up the
+    ##########  image upload dialog/frame
+    try:
+        click_store_edit()
+        sleep(3)
+        test.find("#upload-avatar").click()
+        # switch to frame!
+        test.driver.switch_to_frame(\
+            test.find("iframe", type='tag_name'))
+        
+        parts[35]['success'] =\
+            test.find("#edit-avatar-options").is_displayed()
+    except Exception as e:
+        print e
+        parts[35]['message'] = str(e)
     
+    ##########  Clicking cancel on upload removes the dialog /frame
+    try:
+        test.find("//div[@id='edit-avatar-options']/a[2]",
+            type="xpath").click()
+        parts[36]['success'] =\
+            test.find("#edit-store-options") is not None
+    except Exception as e:
+        print e
+        parts[36]['message'] = str(e)
     
-    ##########  Clicking cancel on upload removes the dialog TODO
-    
-    ##########  Uploading images works TODO
+    ##########  Uploading images works
+    try:
+        test.find("#upload-avatar").click()
+        # switch to frame!
+        test.driver.switch_to_frame(\
+            test.find("iframe", type='tag_name'))
+        test.find("#id_image").send_keys(IMAGE_UPLOAD)
+        test.find("//div[@id='edit-avatar-options']/a[1]",
+            type="xpath").click()
+    except Exception as e:
+        print e
+        parts[37]['message'] = str(e)
     
     ##########  Clicking cancel on crop removes the dialog TODO
     

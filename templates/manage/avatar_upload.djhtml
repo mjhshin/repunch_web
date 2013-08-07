@@ -56,7 +56,7 @@
 			{{ form }}
 		</div>
 		
-		<div id="edit-store-options" class="form-options" style="margin-top:16px;">
+		<div id="edit-avatar-options" class="form-options" style="margin-top:16px;">
 			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
 			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 

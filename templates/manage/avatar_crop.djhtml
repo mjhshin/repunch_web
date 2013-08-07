@@ -73,7 +73,7 @@
         <input type="hidden" id="x2" name="x2" />
         <input type="hidden" id="y2" name="y2" />
 		
-		<div id="edit-store-options" class="form-options">
+		<div id="edit-avatar-options" class="form-options">
 			<a style="cursor: pointer;" class="button blue" id="crop-btn">Crop</a>
 			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
