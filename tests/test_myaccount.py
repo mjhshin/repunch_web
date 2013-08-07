@@ -372,7 +372,7 @@ def test_edit_store_details():
         parts[21]['test_message'] = str(e)
     
     ##########  Entering invalid hours with same open time
-    ##########  as close time shows error
+    ########    as close time shows error
     try:
         click_store_edit()
         sleep(3)
@@ -393,7 +393,7 @@ def test_edit_store_details():
     
     
     ##########  Entering invalid hours with later open time
-    ##########  than close time shows error
+    ########    than close time shows error
     try:
         test.find("//select[@id='id_hours-0-open']"+\
             "/option[@value='6:30:00']", type="xpath").click()
@@ -487,7 +487,7 @@ def test_edit_store_details():
         parts[34]['message'] = str(e)
     
     ##########  Clicking Add/Change Photo brings up the
-    ##########  image upload dialog/frame
+    ########    image upload dialog/frame
     try:
         click_store_edit()
         sleep(3)
@@ -594,9 +594,43 @@ def test_edit_store_details():
     
     
 def test_edit_account():
+    # TODO test place_order
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Update account page reachable"},
+        {'test_name': "Changes to first name are visible"},
+        {'test_name': "Changes to first name are saved to parse"},
+        {'test_name': "Changes to last name are visible"},
+        {'test_name': "Changes to last name are saved to parse"},
+        {'test_name': "Changes to card number are visible"},
+        {'test_name': "Changes to card number are saved to parse"},
+        {'test_name': "A paypal credit card id is generated & saved"},
+        {'test_name': "Changes to cc expiration are visible"},
+        {'test_name': "Changes to cc expiration are saved to parse"},
+        {'test_name': "Changes to street are visible"},
+        {'test_name': "Changes to street are saved to parse"},
+        {'test_name': "Changes to city are visible"},
+        {'test_name': "Changes to city are saved to parse"},
+        {'test_name': "Changes to state are visible"},
+        {'test_name': "Changes to state are saved to parse"},
+        {'test_name': "Changes to zip are visible"},
+        {'test_name': "Changes to zip are saved to parse"},
+        {'test_name': "First name is required"},
+        {'test_name': "Last name is required"},
+        {'test_name': "Card number is required"},
+        {'test_name': "Security code (cvc) is required"},
+        {'test_name': "Street is required"},
+        {'test_name': "City is required"},
+        {'test_name': "State is required"},
+        {'test_name': "Zip is required"},
+        {'test_name': "ToS checked is required"},
+        {'test_name': "Invalid credit card number shows error"},
+        {'test_name': "Past expiration date is invalid"},
+        {'test_name': "Only the last 4 digits of the card number" +\
+            " is shown"},
+        {'test_name': "Not changing the card number does not " +\
+            "generate new paypal credit card id"},
     ]
     section = {
         "section_name": "Edit store details working properly?",
@@ -620,6 +654,40 @@ def test_edit_account():
     sleep(7)  
     
     
+    ##########  User needs to be logged in to access page TODO
+    ##########  Update account page reachable TODO
+    ##########  Changes to first name are visible TODO
+    ##########  Changes to first name are saved to parse TODO
+    ##########  Changes to last name are visible TODO
+    ##########  Changes to last name are saved to parse TODO
+    ##########  Changes to card number are visible TODO
+    ##########  Changes to card number are saved to parse TODO
+    ##########  A paypal credit card id is generated & saved TODO
+    ##########  Changes to cc expiration are visible TODO
+    ##########  Changes to cc expiration are saved to parse TODO
+    ##########  Changes to street are visible TODO
+    ##########  Changes to street are saved to parse TODO
+    ##########  Changes to city are visible TODO
+    ##########  Changes to city are saved to parse TODO
+    ##########  Changes to state are visible TODO
+    ##########  Changes to state are saved to parse TODO
+    ##########  Changes to zip are visible TODO
+    ##########  Changes to zip are saved to parse TODO
+    ##########  First name is required TODO
+    ##########  Last name is required TODO
+    ##########  Card number is required TODO
+    ##########  Security code (cvc) is required TODO
+    ##########  Street is required TODO
+    ##########  City is required TODO
+    ##########  State is required TODO
+    ##########  Zip is required TODO
+    ##########  ToS checked is required TODO
+    ##########  Invalid credit card number shows error TODO
+    ##########  Past expiration date is invalid TODO
+    ##########  Only the last 4 digits of the card number is shown TODO
+    ##########  Not changing the card number does not TODO
+    ######      generate new paypal credit card id
+        
     
     
     
@@ -637,6 +705,8 @@ def test_edit_account():
     
     
     
+    # END OF ALL TESTS - cleanup
+    return test.tear_down()
     
     
     
