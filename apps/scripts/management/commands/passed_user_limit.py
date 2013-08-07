@@ -65,7 +65,7 @@ class Command(BaseCommand):
                     "updatedSubscription_one": sub.jsonify()
                 }
                 requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
                 package = {
                     "status": "upgraded",
                     "sub_type": sub_type[0]["name"],
@@ -152,7 +152,7 @@ class Command(BaseCommand):
                     "updatedSubscription_one": sub.jsonify()
                 }
                 requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
                 package = {
                     "status": "upgraded",
                     "sub_type": sub_type[1]["name"],

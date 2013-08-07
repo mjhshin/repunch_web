@@ -100,7 +100,7 @@ def delete(request, employee_id):
     }
     # check for response?
     requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload))
+        data=json.dumps(payload), verify=False)
     
     # delete Punches Pointers to this employee?
     employee.delete()
@@ -146,7 +146,7 @@ def approve(request, employee_id):
     }
     # check for response?
     requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload))
+        data=json.dumps(payload), verify=False)
         
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
@@ -180,7 +180,7 @@ def deny(request, employee_id):
         "deletedEmployee":deleted_employee.jsonify()
     }
     requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload))
+        data=json.dumps(payload), verify=False)
     
     # delete the employee!
     employee.delete()

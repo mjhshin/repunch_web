@@ -90,7 +90,7 @@ def settings(request):
                 "updatedSettings_one":settings.jsonify()
             }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload))
+                data=json.dumps(payload), verify=False)
 
             data['success'] = "Settings have been saved."
         else:
@@ -133,7 +133,7 @@ def refresh(request):
                 "updatedSettings_one":settings.jsonify()
             }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload))
+                data=json.dumps(payload), verify=False)
             
             data['success'] = True
             data['retailer_pin'] = settings.retailer_pin
@@ -232,7 +232,7 @@ def update(request):
                 "updatedSubscription_one":subscription.jsonify()
             }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload))
+                data=json.dumps(payload), verify=False)
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -342,7 +342,7 @@ def upgrade(request):
                 "updatedSubscription_one":subscription.jsonify()
             }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload))
+                data=json.dumps(payload), verify=False)
             
             # if coming from the message edit limit reached
             if request.session.get('from_limit_reached') and\

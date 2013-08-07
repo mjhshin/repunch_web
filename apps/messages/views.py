@@ -218,7 +218,7 @@ def edit(request, message_id):
                     "newMessage":message.jsonify()
                 }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -408,7 +408,7 @@ def feedback_reply(request, feedback_id):
                     "newMessage":feedback.jsonify()
                 }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -483,7 +483,7 @@ def feedback_delete(request, feedback_id):
         "deletedFeedback":deleted_feedback.jsonify(),
     }
     requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload))
+        data=json.dumps(payload), verify=False)
         
     # no need to save the store since we just removed from relation
         

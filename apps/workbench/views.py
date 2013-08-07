@@ -204,7 +204,7 @@ def redeem(request):
                         "deletedRedemption":del_red.jsonify()
                     }
                     requests.post(COMET_REQUEST_RECEIVE + store_id,
-                        data=json.dumps(payload))
+                        data=json.dumps(payload), verify=False)
                     # now delete the redemption
                     del_red.delete()
                 elif i_remove != -1:
@@ -222,7 +222,7 @@ def redeem(request):
                             "approvedRedemption":redemption.jsonify()
                         }
                         requests.post(COMET_REQUEST_RECEIVE+store_id,
-                            data=json.dumps(payload))
+                            data=json.dumps(payload), verify=False)
                       
                 # session changed only if i_remove was not 1
                 if i_remove != -1: 
@@ -259,7 +259,7 @@ def redeem(request):
                             "deletedRedemption":del_red.jsonify()
                         }
                         requests.post(COMET_REQUEST_RECEIVE+store_id,
-                            data=json.dumps(payload))
+                            data=json.dumps(payload), verify=False)
                         
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")

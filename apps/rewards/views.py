@@ -112,14 +112,14 @@ def edit(request, reward_id):
                     "newReward":reward
                 }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
             else:
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "updatedReward":reward
                 }
                 requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload))
+                    data=json.dumps(payload), verify=False)
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None
@@ -180,7 +180,7 @@ def delete(request, reward_id):
         "deletedReward": {"reward_id":reward["reward_id"]}
     }
     requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-        data=json.dumps(payload))
+        data=json.dumps(payload), verify=False)
     
     # update session cache
     request.session['store'] = store

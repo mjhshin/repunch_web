@@ -164,7 +164,7 @@ def edit(request):
                 "updatedStore_one":store.jsonify()
             }
             requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload))
+                data=json.dumps(payload), verify=False)
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -330,7 +330,7 @@ def crop_avatar(request):
             "updatedStoreAvatarUrl_str":store.store_avatar_url, 
         }
         requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-            data=json.dumps(payload))
+            data=json.dumps(payload), verify=False)
         
         # need to remove old file
         if old_avatar:
