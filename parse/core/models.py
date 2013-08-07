@@ -471,7 +471,8 @@ class ParseObject(object):
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
                 setattr(self, attr, 
-                    parser.parse(res.get('results')[0].get(attr)) )
+                    parser.parse(res.get('results')[0].get(\
+                        attr).get("iso")))
         # File types avatar
         elif attr.endswith("_avatar_url") and\
             attr.replace("_url", "") in self.__dict__:

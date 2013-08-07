@@ -2,8 +2,11 @@
 Selenium tests for dashboard 'My Account' tab.
 """
 
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
+from dateutil.tz import tzutc
+from datetime import datetime
 from time import sleep
 import math, requests
 
@@ -25,8 +28,9 @@ IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
     
 # set the store information
 account =  Account.objects().get(username=TEST_USER['username'],
-    include="Store")
+    include="Store.Subscription")
 store = account.store
+subscription = store.subscription
 
 STORE_INFO = {
     "store_name": "Vandolf's Women's Clothing Corp",
@@ -62,6 +66,34 @@ TEST_STORE_INFO = {
     "store_timezone": "America/Los_Angeles",
     "neighborhood": "Lower Nob Hill",
     "coordinates": [37.788366, -122.4161347],
+}
+
+SUBSCRIPTION_INFO = {
+    "first_name": "Vandolf",
+    "last_name": "Estrellado",
+    "cc_number": None,
+    "date_cc_expiration": None,
+    "address": "1370 Virginia Ave 4d",
+    "city": "Bronx",
+    "state": "NY",
+    "zip": "10462",
+    "pp_cc_id": None,
+    "date_pp_valid": None, 
+}
+
+subscription.update_locally(SUBSCRIPTION_INFO, False)
+subscription.update()
+
+TEST_SUBSCRIPTION_INFO = {
+    "first_name": "Gundam",
+    "last_name": "Wing",
+    "cc_number": "4158740018304009",
+    "date_cc_expiration": timezone.make_aware(\
+        datetime(year=2015, month=12, day=1), tzutc()),
+    "address": "123 Bleeker Street",
+    "city": "Brooklyn",
+    "state": "NY",
+    "zip": "11571",
 }
 
 def test_edit_store_details():
@@ -452,10 +484,9 @@ def test_edit_store_details():
         "#id_email", "#id_store_description",
     ]
     test.action_chain(0, selectors, action="clear") # ACTION!
-    selectors2 = []
-    for selector in selectors:
-        selectors2.append(( selector, "   " ))
-    test.action_chain(0, selectors2, action="send_keys") # ACTION!
+    for i in range(len(selectors)):
+        selectors[i] = (selectors[i], "   ")
+    test.action_chain(0, selectors, action="send_keys") # ACTION!
     # submit
     test.find("#save-button").click() # ACTION!
     sleep(3)
@@ -608,8 +639,8 @@ def test_edit_account():
         {'test_name': "A paypal credit card id is generated & saved"},
         {'test_name': "Changes to cc expiration are visible"},
         {'test_name': "Changes to cc expiration are saved to parse"},
-        {'test_name': "Changes to street are visible"},
-        {'test_name': "Changes to street are saved to parse"},
+        {'test_name': "Changes to address are visible"},
+        {'test_name': "Changes to address are saved to parse"},
         {'test_name': "Changes to city are visible"},
         {'test_name': "Changes to city are saved to parse"},
         {'test_name': "Changes to state are visible"},
@@ -620,7 +651,7 @@ def test_edit_account():
         {'test_name': "Last name is required"},
         {'test_name': "Card number is required"},
         {'test_name': "Security code (cvc) is required"},
-        {'test_name': "Street is required"},
+        {'test_name': "Address is required"},
         {'test_name': "City is required"},
         {'test_name': "State is required"},
         {'test_name': "Zip is required"},
@@ -631,6 +662,7 @@ def test_edit_account():
             " is shown"},
         {'test_name': "Not changing the card number does not " +\
             "generate new paypal credit card id"},
+        # TODO cancel my account
     ]
     section = {
         "section_name": "Edit store details working properly?",
@@ -652,32 +684,139 @@ def test_edit_account():
     )
     test.action_chain(1, selectors, "send_keys") # ACTION!
     sleep(7)  
+   
+    ##########  Update account page reachable
+    try:
+        test.find("//div[@id='account-options']/a[1]",
+            type="xpath").click()
+        sleep(3)
+        parts[1]['success'] =\
+            test.is_current_url(reverse("account_update"))
+    except Exception as e:
+        print e
+        parts[1]['message'] = str(e)
     
+    ## Make changes
+    # first clear all inputs
+    for el in test.find("input[type='text']", multiple=True):
+        el.clear()
     
-    ##########  User needs to be logged in to access page TODO
-    ##########  Update account page reachable TODO
-    ##########  Changes to first name are visible TODO
-    ##########  Changes to first name are saved to parse TODO
-    ##########  Changes to last name are visible TODO
-    ##########  Changes to last name are saved to parse TODO
-    ##########  Changes to card number are visible TODO
-    ##########  Changes to card number are saved to parse TODO
-    ##########  A paypal credit card id is generated & saved TODO
-    ##########  Changes to cc expiration are visible TODO
-    ##########  Changes to cc expiration are saved to parse TODO
-    ##########  Changes to street are visible TODO
-    ##########  Changes to street are saved to parse TODO
-    ##########  Changes to city are visible TODO
-    ##########  Changes to city are saved to parse TODO
-    ##########  Changes to state are visible TODO
-    ##########  Changes to state are saved to parse TODO
-    ##########  Changes to zip are visible TODO
-    ##########  Changes to zip are saved to parse TODO
+    selectors = (
+        ("#id_first_name", TEST_SUBSCRIPTION_INFO['first_name']), 
+        ("#id_last_name", TEST_SUBSCRIPTION_INFO['last_name']), 
+        ("#id_cc_number", TEST_SUBSCRIPTION_INFO['cc_number']),
+        ("#id_cc_cvv", "905"), 
+        ("#id_address", TEST_SUBSCRIPTION_INFO['address']), 
+        ("#id_city", TEST_SUBSCRIPTION_INFO['city']), 
+        ("#id_state", TEST_SUBSCRIPTION_INFO['state']), 
+        ("#id_zip", TEST_SUBSCRIPTION_INFO['zip']),
+    )
+    test.action_chain(0, selectors, action="send_keys")
+    
+    month_el =\
+        test.find("//select[@id='id_date_cc_expiration_month']/" +\
+            "option[%s]" % (str(TEST_SUBSCRIPTION_INFO[\
+                'date_cc_expiration'].month)), type="xpath")
+    year_el =\
+        test.find("//select[@id='id_date_cc_expiration_year']/" +\
+            "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
+                'date_cc_expiration'].year)), type="xpath")
+    month, year = month_el.text, year_el.text
+    month_el.click()
+    year_el.click()
+    
+    test.find("#id_recurring").click()
+    test.find("#upgrade-form-submit").click()
+    sleep(5)
+    
+    # back to update account page
+    test.find("//div[@id='account-options']/a[1]",
+        type="xpath").click()
+    sleep(3)
+    
+    ##########  Changes to first name are visible
+    parts[2]['success'] = test.find("#id_first_name").text ==\
+        TEST_SUBSCRIPTION_INFO['first_name']
+    ##########  Changes to first name are saved to parse
+    subscription.first_name = None
+    parts[3]['success'] = subscription.get("first_name") ==\
+        TEST_SUBSCRIPTION_INFO['first_name']
+    ##########  Changes to last name are visible
+    parts[5]['success'] = test.find("#id_last_name").text ==\
+        TEST_SUBSCRIPTION_INFO['last_name']
+    ##########  Changes to last name are saved to parse
+    subscription.last_name = None
+    parts[6]['success'] = subscription.get("last_name") ==\
+        TEST_SUBSCRIPTION_INFO['last_name']
+    ##########  Changes to card number are visible
+    parts[7]['success'] = test.find("#id_cc_number").text ==\
+        TEST_SUBSCRIPTION_INFO['cc_number']
+    ##########  Changes to card number are saved to parse
+    subscription.cc_number = None
+    parts[8]['success'] = subscription.get("cc_number") ==\
+        TEST_SUBSCRIPTION_INFO['cc_number']
+    ##########  A paypal credit card id is generated & saved
+    # CARD-97223025G70599255KHHCCVQ
+    subscription.pp_cc_id = None
+    parts[9]['success'] = subscription.get("pp_cc_id").__contains__(\
+        "CARD") and len(subscription.get("pp_cc_id")) == 29
+    ##########  Changes to cc expiration are visible 
+    parts[10]['success'] = month == test.get_selected("//select" +\
+        "[@id='id_date_cc_expiration_month']/option",
+        type="xpath").text and year == test.get_selected(\
+        "//select[@id='id_date_cc_expiration_year']/option",
+        type="xpath").text
+    ##########  Changes to cc expiration are saved to parse
+    subscription.date_cc_expiration = None
+    exp = subscription.get("date_cc_expiration")
+    parts[11]['success'] = exp.month == TEST_SUBSCRIPTION_INFO[\
+        'date_cc_expiration'].month and exp.year ==\
+        TEST_SUBSCRIPTION_INFO['date_cc_expiration'].year
+    ##########  Changes to address are visible
+    parts[12]['success'] = test.find("#id_address").text ==\
+        TEST_SUBSCRIPTION_INFO['address']
+    ##########  Changes to address are saved to parse 
+    subscription.address = None
+    parts[13]['success'] = subscription.get("address") ==\
+        TEST_SUBSCRIPTION_INFO['address']
+    ##########  Changes to city are visible
+    parts[14]['success'] = test.find("#id_city").text ==\
+        TEST_SUBSCRIPTION_INFO['city']
+    ##########  Changes to city are saved to parse 
+    subscription.city = None
+    parts[15]['success'] = subscription.get("city") ==\
+        TEST_SUBSCRIPTION_INFO['city']
+    ##########  Changes to state are visible
+    parts[16]['success'] = test.find("#id_state").text ==\
+        TEST_SUBSCRIPTION_INFO['state']
+    ##########  Changes to state are saved to parse 
+    subscription.state = None
+    parts[17]['success'] = subscription.get("state") ==\
+        TEST_SUBSCRIPTION_INFO['state']
+    ##########  Changes to zip are visible
+    parts[12]['success'] = test.find("#id_zip").text ==\
+        TEST_SUBSCRIPTION_INFO['zip']
+    ##########  Changes to zip are saved to parse 
+    subscription.zip = None
+    parts[13]['success'] = subscription.get("zip") ==\
+        TEST_SUBSCRIPTION_INFO['zip']
+    
+    ## Make changes
+    selectors = [
+        "#id_first_name", "#id_last_name", 
+        "#id_cc_number", "#id_cc_cvv",  
+        "#id_address", "#id_city", "#id_state", "#id_zip",
+    ]
+    test.action_chain(0, selectors, action="clear")
+    for i in range(len(selectors)):
+        selectors[i] = (selectors[i], "    ")
+    test.action_chain(0, selectors, action="send_keys")
+    
     ##########  First name is required TODO
     ##########  Last name is required TODO
     ##########  Card number is required TODO
     ##########  Security code (cvc) is required TODO
-    ##########  Street is required TODO
+    ##########  Address is required TODO
     ##########  City is required TODO
     ##########  State is required TODO
     ##########  Zip is required TODO
