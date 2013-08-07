@@ -2,6 +2,7 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoAlertPresentException
 
 class SeleniumTest(object):
     """
@@ -57,6 +58,20 @@ class SeleniumTest(object):
         sleep(1)
         if save_session_cookie and cookie:
             self.driver.add_cookie(cookie)
+            
+    def switch_to_alert(self):
+        """
+        Returns the active alert if one is present. Otherwise None.
+        """
+        alert = self.driver.switch_to_alert()
+        try:
+            # switch_to_alert is actually lazy - it returns a
+            # web element even if an alert is not present
+            alert.text # this will check if the alert actually exist
+        except NoAlertPresentException:
+            return None
+        else:
+            return alert
         
     def find(self, selector, type="css", multiple=False):
         """

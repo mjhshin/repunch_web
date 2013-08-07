@@ -5,7 +5,7 @@ Selenium tests for dashboard 'My Account' tab.
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
 from time import sleep
-import math
+import math, requests
 
 from tests import SeleniumTest
 from parse.apps.accounts.models import Account
@@ -27,7 +27,7 @@ IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
 account =  Account.objects().get(username=TEST_USER['username'],
     include="Store")
 store = account.store
-    
+
 STORE_INFO = {
     "store_name": "Vandolf's Women's Clothing Corp",
     "street": "1370 Virginia Ave 4d",
@@ -108,13 +108,15 @@ def test_edit_store_details():
         {'test_name': "Clicking Add/Change Photo brings up the " +\
             "image upload dialog"},
         {'test_name': "Clicking cancel on upload removes the dialog"},
+        {'test_name': "Clicking upload when no file is " +\
+            "selected shows alert"},
         {'test_name': "Uploading images works"},
         {'test_name': "Clicking cancel on crop removes the dialog"},
         {'test_name': "Cropping images works"},
         {'test_name': "New store avatar is saved to Parse"},
+        {'test_name': "Old store avatar is deleted from Parse files"},
         {'test_name': "The store avatar thumbnail and image in " +\
             "store details/edit match the one saved in Parse."},
-        {'test_name': "Old store avatar is deleted from Parse files"},
     ]
     section = {
         "section_name": "Edit store details working properly?",
@@ -490,6 +492,7 @@ def test_edit_store_details():
         click_store_edit()
         sleep(3)
         test.find("#upload-avatar").click()
+        sleep(1)
         # switch to frame!
         test.driver.switch_to_frame(\
             test.find("iframe", type='tag_name'))
@@ -504,35 +507,136 @@ def test_edit_store_details():
     try:
         test.find("//div[@id='edit-avatar-options']/a[2]",
             type="xpath").click()
+        sleep(1)
         parts[36]['success'] =\
             test.find("#edit-store-options") is not None
     except Exception as e:
         print e
         parts[36]['message'] = str(e)
-    
-    ##########  Uploading images works
+        
+    ##########  Clicking upload when no file is selected shows alert
     try:
         test.find("#upload-avatar").click()
+        sleep(1)
         # switch to frame!
         test.driver.switch_to_frame(\
             test.find("iframe", type='tag_name'))
-        test.find("#id_image").send_keys(IMAGE_UPLOAD)
-        test.find("//div[@id='edit-avatar-options']/a[1]",
-            type="xpath").click()
+        test.find("#upload-btn").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        parts[37]['success'] = str(alert.text) ==\
+            "Please select an image to upload."
+        alert.accept()
     except Exception as e:
         print e
         parts[37]['message'] = str(e)
     
-    ##########  Clicking cancel on crop removes the dialog TODO
+    ##########  Uploading images works
+    try:
+        test.find("#id_image").send_keys(IMAGE_UPLOAD)
+        test.find("#upload-btn").click()
+        sleep(3)
+        parts[38]['success'] = test.find("#crop-btn").is_displayed()
+    except Exception as e:
+        print e
+        parts[38]['message'] = str(e)
     
-    ##########  Cropping images works TODO
+    ##########  Clicking cancel on crop removes the dialog
+    try:
+        test.find("//div[@id='edit-avatar-options']/a[2]",
+            type="xpath").click()
+        sleep(1)
+        parts[39]['success'] =\
+            test.find("#edit-store-options") is not None
+    except Exception as e:
+        print e
+        parts[39]['message'] = str(e)
+        
+    ##########  Cropping images works
+    try:
+        test.find("#upload-avatar").click()
+        sleep(1)
+        # switch to frame!
+        test.driver.switch_to_frame(\
+            test.find("iframe", type='tag_name'))
+        test.find("#id_image").send_keys(IMAGE_UPLOAD)
+        test.find("#upload-btn").click()
+        sleep(3)
+        test.find("#crop-btn").click()
+        parts[40]['success'] = True
+    except Exception as e:
+        print e
+        parts[40]['message'] = str(e)
     
-    ##########  New store avatar is saved to Parse TODO
+    sleep(5)
+    old_avatar_url = store.store_avatar_url
+    store.store_avatar = None
+    store.store_avatar_url = None
+    new_avatar_url = store.get("store_avatar_url")
     
-    ##########  The store avatar thumbnail and image in TODO
+    ##########  New store avatar is saved to Parse
+    parts[41]['success'] = old_avatar_url != new_avatar_url
+    
+    ##########  Old store avatar is deleted from Parse files
+    resp = requests.get(old_avatar_url)
+    parts[42]['success'] = not resp.ok and resp.status_code == 403
+    
+    ##########  The store avatar thumbnail and image in
     ##########  store details/edit match the one saved in Parse
-    
+    parts[43]['success'] = new_avatar_url ==\
+        test.find("#store_avatar").get_attribute("src") and\
+        new_avatar_url ==\
+        test.find("#avatar-thumbnail").get_attribute("src")
     
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
+    
+    
+def test_edit_account():
+    test = SeleniumTest()
+    parts = [
+        {'test_name': "User needs to be logged in to access page"},
+    ]
+    section = {
+        "section_name": "Edit store details working properly?",
+        "parts": parts,
+    }
+    test.results.append(section)
+    
+    ##########  User needs to be logged in to access page
+    test.open(reverse("store_index")) # ACTION!
+    sleep(1)
+    parts[0]['success'] = test.is_current_url(reverse(\
+        'manage_login') + "?next=/manage/store/")
+        
+    # login
+    selectors = (
+        ("#id_username", TEST_USER['username']),
+        ("#id_password", TEST_USER['password']),
+        ("", Keys.RETURN)
+    )
+    test.action_chain(1, selectors, "send_keys") # ACTION!
+    sleep(7)  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
