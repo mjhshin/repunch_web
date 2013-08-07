@@ -310,6 +310,11 @@ class ParseObject(object):
                 setattr(self, key, value.get('name'))
                 setattr(self, key + "_url", value.get('url').replace(\
                     "http:", "https:")) # TODO confirm safety
+            elif key.endswith("_avatar_url") and\
+                type(value) is not dict and value:
+                setattr(self, key, value.replace(\
+                    "http:", "https:")) # TODO confirm safety
+                
             # make sure dates are datetime objects
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
