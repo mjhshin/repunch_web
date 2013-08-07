@@ -19,7 +19,7 @@ from apps.comet.models import CometSession, CometSessionIndex
 LAST_UPDATED_THRESHOLD = 24 # in hours
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):\
+    def handle(self, *args, **options):
         now = timezone.now()
         timedout_time = now + relativedelta(hours=\
             -1*LAST_UPDATED_THRESHOLD)
