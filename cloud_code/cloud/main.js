@@ -221,7 +221,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 			Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + store.id,
+                url: 'http://www.repunch.com/manage/comet/receive/' + store.id,
                 headers: { 'Content-Type': 'application/json'},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
@@ -328,7 +328,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: { 
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
@@ -702,7 +702,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		        postBody.cometrkey = "f2cwxn35cxyoq8723c78wnvy";
 		        Parse.Cloud.httpRequest({
                     method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
                     body: postBody, 
                 });
@@ -835,12 +835,12 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 		}).then(function() {
 	        Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                 headers: { 'Content-Type': 'application/json'},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     pendingRedemption: redeemReward, 
-                }
+                },
             });
             
 		});
@@ -947,7 +947,7 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
@@ -1059,7 +1059,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 				}
 			    Parse.Cloud.httpRequest({
                     method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                    url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                     headers: { 'Content-Type': 'application/json'},
                     body: {
                         "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
@@ -1254,7 +1254,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             }
             Parse.Cloud.httpRequest({
                 method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
                 headers: { 'Content-Type': 'application/json'},
                 body: {
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
@@ -1469,7 +1469,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            url: 'http://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 

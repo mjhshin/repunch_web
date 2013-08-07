@@ -308,7 +308,8 @@ class ParseObject(object):
             # image file type
             elif key.endswith("_avatar") and type(value) is dict: 
                 setattr(self, key, value.get('name'))
-                setattr(self, key + "_url", value.get('url'))
+                setattr(self, key + "_url", value.get('url').replace(\
+                    "http:", "https:")) # TODO confirm safety
             # make sure dates are datetime objects
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
@@ -481,7 +482,8 @@ class ParseObject(object):
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
                 setattr(self, attr, res['results'][0].get(\
-                    attr.replace("_url", "")).get('url'))
+                    attr.replace("_url", "")).get('url').replace(\
+                    "http:", "https:")) # TODO confirm safety
                 setattr(self, attr.replace("_url",""), 
                     res['results'][0].get(\
                     attr.replace("_url", "")).get('name'))
