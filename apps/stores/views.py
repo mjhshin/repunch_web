@@ -312,7 +312,8 @@ def crop_avatar(request):
         store = SESSION.get_store(session)
         if res and 'error' not in res:
             store.store_avatar = res.get('name')
-            store.store_avatar_url = res.get('url')
+            store.store_avatar_url =\
+                res.get('url').replace("http:", "https:")
             # delete the model and file since it's useless to keep
             avatar.avatar.delete()
             avatar.delete()
