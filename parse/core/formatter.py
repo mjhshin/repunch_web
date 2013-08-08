@@ -7,8 +7,9 @@ from dateutil import parser
 
 from repunch.settings import USER_CLASS
 
+# should be renamed to QUERY_OPTIONS
 NOT_WHERE_CONSTRAINTS = [
-    "include", "count", "limit", "order"
+    "include", "count", "limit", "order", "keys", "skip",
 ]
 
 WHERE_OPTIONS = [

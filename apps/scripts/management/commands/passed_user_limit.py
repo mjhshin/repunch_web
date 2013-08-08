@@ -30,7 +30,6 @@ COMET_RECEIVE_KEY
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # TODO there is a limit of 900 on queries
         
         conn = mail.get_connection(fail_silently=(not DEBUG))
         conn.open()
@@ -48,38 +47,76 @@ class Command(BaseCommand):
         day14_end = now + relativedelta(days=-14)
         day14_start = day14_end + relativedelta(hours=-24)
         
+        # get 500 subscriptions at a time
+        LIMIT = 500
+        
         #### SUB_TYPE 0
         ## 1st day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=0, limit=900, include="Store", 
-            date_passed_user_limit__lte=day1_end,
-            date_passed_user_limit__gte=day1_start):
-            # with pp_cc_id
-            if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
-                sub.subscriptionType = 1
-                sub.date_passed_user_limit = None
-                sub.update()
-                # notify the dashboards of these changes
-                payload={
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "updatedSubscription_one": sub.jsonify()
-                }
-                requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                    data=json.dumps(payload), verify=False)
-                package = {
-                    "status": "upgraded",
-                    "sub_type": sub_type[0]["name"],
-                    "new_sub_type": sub_type[1]["name"],
-                    "new_sub_type_cost": sub_type[1]["monthly_cost"],
-                    "new_max_patronStore_count":\
-                        sub_type[1]["max_users"], 
-                    "patronStore_count": sub.store.get(\
-                        "patronStores", limit=0, count=1),
-                }
-                send_email_passed_user_limit(Account.objects().get(\
-                    Store=sub.Store), sub.store, package, conn)
-            # no pp_cc_id
-            else:
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=0, date_passed_user_limit__lte=day1_end,
+            date_passed_user_limit__gte=day1_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=0, include="Store", 
+                date_passed_user_limit__lte=day1_end,
+                date_passed_user_limit__gte=day1_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                # with pp_cc_id
+                if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
+                    sub.subscriptionType = 1
+                    sub.date_passed_user_limit = None
+                    sub.update()
+                    # notify the dashboards of these changes
+                    payload={
+                        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                        "updatedSubscription_one": sub.jsonify()
+                    }
+                    if not DEBUG:
+                        requests.post(COMET_REQUEST_RECEIVE + sub.Store,
+                            data=json.dumps(payload), verify=False)
+                    package = {
+                        "status": "upgraded",
+                        "sub_type": sub_type[0]["name"],
+                        "new_sub_type": sub_type[1]["name"],
+                        "new_sub_type_cost": sub_type[1]["monthly_cost"],
+                        "new_max_patronStore_count":\
+                            sub_type[1]["max_users"], 
+                        "patronStore_count": sub.store.get(\
+                            "patronStores", limit=0, count=1),
+                    }
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+                # no pp_cc_id
+                else:
+                    package = {
+                        "sub_type": sub_type[0]["name"],
+                        "max_patronStore_count": sub_type[0]["max_users"],
+                        "patronStore_count": sub.store.get(\
+                            "patronStores", limit=0, count=1),
+                        "disable_date": sub.date_passed_user_limit + 
+                            relativedelta(days=\
+                                USER_LIMIT_PASSED_DISABLE_DAYS),
+                    }
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+      
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT   
+            
+        
+        ## 4th day
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=0, date_passed_user_limit__lte=day4_end,
+            date_passed_user_limit__gte=day4_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=0, include="Store", 
+                date_passed_user_limit__lte=day4_end,
+                date_passed_user_limit__gte=day4_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
                 package = {
                     "sub_type": sub_type[0]["name"],
                     "max_patronStore_count": sub_type[0]["max_users"],
@@ -91,81 +128,125 @@ class Command(BaseCommand):
                 }
                 send_email_passed_user_limit(Account.objects().get(\
                     Store=sub.Store), sub.store, package, conn)
-        
-        ## 4th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=0, limit=900, include="Store", 
-            date_passed_user_limit__lte=day4_end,
-            date_passed_user_limit__gte=day4_start):
-            package = {
-                "sub_type": sub_type[0]["name"],
-                "max_patronStore_count": sub_type[0]["max_users"],
-                "patronStore_count": sub.store.get(\
-                    "patronStores", limit=0, count=1),
-                "disable_date": sub.date_passed_user_limit + 
-                    relativedelta(days=\
-                        USER_LIMIT_PASSED_DISABLE_DAYS),
-            }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+                    
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT   
+            
+                    
         ## 8th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=0, limit=900, include="Store", 
-            date_passed_user_limit__lte=day8_end,
-            date_passed_user_limit__gte=day8_start):
-            package = {
-                "sub_type": sub_type[0]["name"],
-                "max_patronStore_count": sub_type[0]["max_users"],
-                "patronStore_count": sub.store.get(\
-                    "patronStores", limit=0, count=1),
-                "disable_date": sub.date_passed_user_limit + 
-                    relativedelta(days=\
-                        USER_LIMIT_PASSED_DISABLE_DAYS),
-            }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=0, date_passed_user_limit__lte=day8_end,
+            date_passed_user_limit__gte=day8_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=0, include="Store", 
+                date_passed_user_limit__lte=day8_end,
+                date_passed_user_limit__gte=day8_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                package = {
+                    "sub_type": sub_type[0]["name"],
+                    "max_patronStore_count": sub_type[0]["max_users"],
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                    "disable_date": sub.date_passed_user_limit + 
+                        relativedelta(days=\
+                            USER_LIMIT_PASSED_DISABLE_DAYS),
+                }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
+                    
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT  
+            
+                
         ## 14th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=0, limit=900, include="Store", 
-            date_passed_user_limit__lte=day14_end,
-            date_passed_user_limit__gte=day14_start):
-            package = { "status": "disabled" }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=0, date_passed_user_limit__lte=day14_end,
+            date_passed_user_limit__gte=day14_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=0, include="Store", 
+                date_passed_user_limit__lte=day14_end,
+                date_passed_user_limit__gte=day14_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                package = { "status": "disabled" }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
         
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT  
         
         
         #### SUB_TYPE 1
         ## 1st day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=1, limit=900, include="Store", 
-            date_passed_user_limit__lte=day1_end,
-            date_passed_user_limit__gte=day1_start):
-            # with pp_cc_id
-            if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
-                sub.subscriptionType = 2
-                sub.date_passed_user_limit = None
-                sub.update()
-                # notify the dashboards of these changes
-                payload={
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "updatedSubscription_one": sub.jsonify()
-                }
-                requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                    data=json.dumps(payload), verify=False)
-                package = {
-                    "status": "upgraded",
-                    "sub_type": sub_type[1]["name"],
-                    "new_sub_type": sub_type[2]["name"],
-                    "new_sub_type_cost": sub_type[2]["monthly_cost"],
-                    "new_max_patronStore_count": "UNLIMITED",
-                    "patronStore_count": sub.store.get(\
-                        "patronStores", limit=0, count=1),
-                }
-                send_email_passed_user_limit(Account.objects().get(\
-                    Store=sub.Store), sub.store, package, conn)
-            # no pp_cc_id
-            else:
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=1, date_passed_user_limit__lte=day1_end,
+            date_passed_user_limit__gte=day1_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=1, include="Store", 
+                date_passed_user_limit__lte=day1_end,
+                date_passed_user_limit__gte=day1_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                # with pp_cc_id
+                if sub.pp_cc_id and len(sub.pp_cc_id) > 0:
+                    sub.subscriptionType = 2
+                    sub.date_passed_user_limit = None
+                    sub.update()
+                    # notify the dashboards of these changes
+                    payload={
+                        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                        "updatedSubscription_one": sub.jsonify()
+                    }
+                    if not DEBUG:
+                        requests.post(COMET_REQUEST_RECEIVE + sub.Store,
+                            data=json.dumps(payload), verify=False)
+                    package = {
+                        "status": "upgraded",
+                        "sub_type": sub_type[1]["name"],
+                        "new_sub_type": sub_type[2]["name"],
+                        "new_sub_type_cost": sub_type[2]["monthly_cost"],
+                        "new_max_patronStore_count": "UNLIMITED",
+                        "patronStore_count": sub.store.get(\
+                            "patronStores", limit=0, count=1),
+                    }
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+                # no pp_cc_id
+                else:
+                    package = {
+                        "sub_type": sub_type[1]["name"],
+                        "max_patronStore_count": sub_type[1]["max_users"],
+                        "patronStore_count": sub.store.get(\
+                            "patronStores", limit=0, count=1),
+                        "disable_date": sub.date_passed_user_limit + 
+                            relativedelta(days=\
+                                USER_LIMIT_PASSED_DISABLE_DAYS),
+                    }
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+                        
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT  
+        
+        ## 4th day
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=1, date_passed_user_limit__lte=day4_end,
+            date_passed_user_limit__gte=day4_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=1, include="Store", 
+                date_passed_user_limit__lte=day4_end,
+                date_passed_user_limit__gte=day4_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
                 package = {
                     "sub_type": sub_type[1]["name"],
                     "max_patronStore_count": sub_type[1]["max_users"],
@@ -177,47 +258,57 @@ class Command(BaseCommand):
                 }
                 send_email_passed_user_limit(Account.objects().get(\
                     Store=sub.Store), sub.store, package, conn)
-        
-        ## 4th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=1, limit=900, include="Store", 
-            date_passed_user_limit__lte=day4_end,
-            date_passed_user_limit__gte=day4_start):
-            package = {
-                "sub_type": sub_type[1]["name"],
-                "max_patronStore_count": sub_type[1]["max_users"],
-                "patronStore_count": sub.store.get(\
-                    "patronStores", limit=0, count=1),
-                "disable_date": sub.date_passed_user_limit + 
-                    relativedelta(days=\
-                        USER_LIMIT_PASSED_DISABLE_DAYS),
-            }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+                    
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT  
+            
+            
         ## 8th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=1, limit=900, include="Store", 
-            date_passed_user_limit__lte=day8_end,
-            date_passed_user_limit__gte=day8_start):
-            package = {
-                "sub_type": sub_type[1]["name"],
-                "max_patronStore_count": sub_type[1]["max_users"],
-                "patronStore_count": sub.store.get(\
-                    "patronStores", limit=0, count=1),
-                "disable_date": sub.date_passed_user_limit + 
-                    relativedelta(days=\
-                        USER_LIMIT_PASSED_DISABLE_DAYS),
-            }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=1, date_passed_user_limit__lte=day8_end,
+            date_passed_user_limit__gte=day8_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=1, include="Store", 
+                date_passed_user_limit__lte=day8_end,
+                date_passed_user_limit__gte=day8_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                package = {
+                    "sub_type": sub_type[1]["name"],
+                    "max_patronStore_count": sub_type[1]["max_users"],
+                    "patronStore_count": sub.store.get(\
+                        "patronStores", limit=0, count=1),
+                    "disable_date": sub.date_passed_user_limit + 
+                        relativedelta(days=\
+                            USER_LIMIT_PASSED_DISABLE_DAYS),
+                }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
+             
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT         
+             
         ## 14th day
-        for sub in Subscription.objects().filter(\
-            subscriptionType=1, limit=900, include="Store", 
-            date_passed_user_limit__lte=day14_end,
-            date_passed_user_limit__gte=day14_start):
-            package = { "status": "disabled" }
-            send_email_passed_user_limit(Account.objects().get(\
-                Store=sub.Store), sub.store, package, conn)
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            subscriptionType=1, date_passed_user_limit__lte=day14_end,
+            date_passed_user_limit__gte=day14_start)
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=1, include="Store", 
+                date_passed_user_limit__lte=day14_end,
+                date_passed_user_limit__gte=day14_start,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                package = { "status": "disabled" }
+                send_email_passed_user_limit(Account.objects().get(\
+                    Store=sub.Store), sub.store, package, conn)
+                
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT       
         
         
         

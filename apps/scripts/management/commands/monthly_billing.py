@@ -30,11 +30,13 @@ class Command(BaseCommand):
                 "Store", "Store", {"active":True}, count=True)
                 
         asiss = []
-        if sub_count < 900:
-            res = pointer_query("Subscription",
-                {"date_last_billed__lte":date_30_ago},
-                    "Store", "Store", {"active":True})['results']
-            for each in res:
+        # get 500 subscriptions at a time
+        LIMIT, skip = 500, 0
+        while sub_count > 0:
+            for each in pointer_query("Subscription",
+                {"date_last_billed__lte":date_30_ago}, "Store",
+                    "Store", {"active":True}, limit=LIMIT,
+                    skip=skip, order="createdAt")['results']:
                 subscription = Subscription(**each)
                 sub_cost = sub_type[subscription.get(\
                             "subscriptionType")]["monthly_cost"]
@@ -52,8 +54,13 @@ class Command(BaseCommand):
                         subscription.update()
                     asiss.append((account, store, invoice,
                         subscription))
-        # if the count is over 900 then retrieve them in chunks TODO
-        # 900 signed up in the same day? unlikely but will handle it.
-        # order by createdAt!
-
+                
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT
+            
+        # everything is done - send the emails
         send_email_receipt_monthly(asiss)
+        
+        
+        

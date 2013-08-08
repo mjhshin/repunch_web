@@ -55,10 +55,11 @@ class Command(BaseCommand):
         conn = mail.get_connection(fail_silently=(not DEBUG))
         conn.open()
         
-        # if there are less than 900 stores proceed
-        if store_count < 900:
+        # get 500 stores at a time
+        LIMIT, skip = 500, 0
+        while store_count > 0:
             for store in Store.objects().filter(active=True, 
-                limit=900):
+                limit=LIMIT, skip=skip, order="createdAt"):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
                 total_punches = []
@@ -225,12 +226,53 @@ class Command(BaseCommand):
                             "punches": suspicious_punch_list
                         })
                 
+                # store has no hours - all punches are suspicious!
+                else:        
+                    for key, val in patron_punch.iteritems():
+                        if not val:
+                            continue
+                            
+                        suspicious_punch_list = []
+                        for p in val:
+                            punch = p["punch"]
+                            employee = p["employee"]   
+                            suspicious_punch_list.append({
+                                "punch":punch,
+                                "employee": employee
+                            })
+                        
+                        if len(suspicious_punch_list) == 0:
+                            continue
+                            
+                        # cache the account and patron
+                        if key not in account_patron:
+                            account_patron[key] = {
+                                "account":\
+                                    Account.objects().get(\
+                                        Patron=key),
+                                "patron":\
+                                    Patron.objects().get(\
+                                        objectId=key)
+                            }
+                        chunk2.append({
+                            "account":\
+                               account_patron[key]['account'],
+                            "patron":\
+                               account_patron[key]['patron'],
+                            "punches": suspicious_punch_list
+                        })
+                
+                # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
                     send_email_suspicious_activity(\
                         Account.objects().get(Store=store.objectId),
                         store, chunk1, chunk2, start, end, conn)
+                        
+            # end of while loop
+            store_count -= LIMIT
+            skip += LIMIT
         
-        # else retrieve them in chunks ordered by createdAt TODO
+        # everything is done. close the connection
         conn.close()
         
         
