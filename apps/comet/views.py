@@ -254,8 +254,10 @@ def pull(request):
         updated_rewards = []
         
         for reward_id, rew_copy in rewards_copy.iteritems():
-            rew = rewards[reward_id]
-            if rew_copy['redemption_count']!=rew['redemption_count']:
+            # Note that some rewards may have been deleted!
+            rew = rewards.get(reward_id)
+            if rew and rew_copy['redemption_count'] !=\
+                rew['redemption_count']:
                 # only the redemtpion_count and reward_id are used
                 # in the client side
                 updated_rewards.append({
