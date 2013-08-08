@@ -123,8 +123,8 @@ def punch(request):
         nump = int(request.POST['num_punches'])
         settings = SESSION.get_settings(request.session)
         if nump > settings.get("punches_employee"):
-            return HttpResponse(json.dumps({u'code': 141,
-                u'error': u'error'}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': 'over',
+                'limit': nump}), content_type="application/json")
     
         store = SESSION.get_store(request.session)
         data = {
@@ -139,8 +139,8 @@ def punch(request):
             return HttpResponse(json.dumps(res), 
                     content_type="application/json")
 
-    return HttpResponse(json.dumps({u'code': 141,
-            u'error': u'error'}), content_type="application/json")
+    return HttpResponse(json.dumps({'error': 'error'}),
+        content_type="application/json")
     
 @login_required
 def redeem(request):

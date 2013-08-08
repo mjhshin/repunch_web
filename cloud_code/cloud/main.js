@@ -1203,15 +1203,18 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	}
 	
 	function postToServer(redeemReward){
+	    var postBody = {
+            "cometrkey": "f2cwxn35cxyoq8723c78wnvy",
+	        approvedRedemption: redeemReward,
+	    }
+	    if(updatedReward != null) {
+	        postBody.updatedReward = updatedReward;
+	    }
 	    Parse.Cloud.httpRequest({
             method: 'POST',
             url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
             headers: { 'Content-Type': 'application/json'},
-            body: {
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                approvedRedemption: redeemReward,
-                updatedReward: updatedReward, 
-            }
+            body: postBody
         });
 	}
 	

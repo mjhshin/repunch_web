@@ -79,8 +79,13 @@ function punchit(url){
             // res may be error : {u'code': 141, u'error': u'error'}
             // alert(res.code + res.error);
             if (res.hasOwnProperty("error")){
-                $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-                "<div><span>Failed to punch customer.<span></div></div>");
+                if (res.error == "over") {
+                    $("#punch-form").append("<div id='punch-notification' class='notification hide'>" +
+                        "<div><span>Maximum amount of punches is "+ new String(res.limit) + ".</span></div></div>");
+                } else {
+                    $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+                    "<div><span>Failed to punch customer.<span></div></div>");
+                }
             } else {
                 $("#punch-form").append("<div id='punch-notification' class='notification success hide'>"+
                     "<div><span>Successfully gave " + pa.val() + " punches to " + res.patron_name + ".<span></div></div>");
