@@ -309,11 +309,11 @@ class ParseObject(object):
             elif key.endswith("_avatar") and type(value) is dict: 
                 setattr(self, key, value.get('name'))
                 setattr(self, key + "_url", value.get('url').replace(\
-                    "http:", "https:")) # TODO confirm safety
+                    "http:/", "https://s3.amazonaws.com")) 
             elif key.endswith("_avatar_url") and\
                 type(value) is not dict and value:
                 setattr(self, key, value.replace(\
-                    "http:", "https:")) # TODO confirm safety
+                    "http:/", "https://s3.amazonaws.com")) 
                 
             # make sure dates are datetime objects
             elif key.startswith("date_") and type(value) is dict:
@@ -488,7 +488,7 @@ class ParseObject(object):
             if 'results' in res and res['results']:
                 setattr(self, attr, res['results'][0].get(\
                     attr.replace("_url", "")).get('url').replace(\
-                    "http:", "https:")) # TODO confirm safety
+                    "http:/", "https://s3.amazonaws.com")) 
                 setattr(self, attr.replace("_url",""), 
                     res['results'][0].get(\
                     attr.replace("_url", "")).get('name'))
