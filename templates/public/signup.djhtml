@@ -295,8 +295,16 @@ function validate(which, next) {
 						{{ store_form.recurring }}&nbsp;<label for="id_recurring">I have read and accept the <a href="{% url 'public_terms' %}" target="_blank">Terms &amp; Conditions</a></label>
 					</div>
 					
-					<a class="button orange"
+					<a style="float:left;margin-top:10px;margin-right:4px;" class="button orange"
 					    id="signup-form-submit">Create Account</a>
+
+<table style="float:left;margin-top:4px;" width="135" border="0" cellpadding="2" cellspacing="0" title="Click to Verify - This site chose Symantec SSL for secure e-commerce and confidential communications.">
+<tr>
+<td width="135" align="center" valign="top"><script type="text/javascript" src="https://seal.verisign.com/getseal?host_name=www.repunch.com&amp;size=XS&amp;use_flash=NO&amp;use_transparent=NO&amp;lang=en"></script><br />
+<a href="http://www.symantec.com/ssl-certificates" target="_blank"  style="color:#000000; text-decoration:none; font:bold 7px verdana,sans-serif; letter-spacing:.5px; text-align:center; margin:0px; padding:0px;">ABOUT SSL CERTIFICATES</a></td>
+</tr>
+</table>
+
 		            <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
 	                    id="processing-form" 
 	                    style="display:none;position:relative;top:14px;left:6px;"/>
