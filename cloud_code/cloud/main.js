@@ -1037,7 +1037,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			redeemReward.save().then(function() {
 			    console.log("RedeemReward save success");
 				updateMessageStatus(true); //boolean argument since we probably will add ability to reject redeem in future
-				
+				postToServer(redeemReward);
 			}, function(error) {
 			    console.log("RedeemReward save fail");
 			    response.error("error");
@@ -1064,17 +1064,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
 					addFacebookPostToPatron();
 				}
-			    Parse.Cloud.httpRequest({
-                    method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: {
-                        "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                        approvedRedemption: redeemReward,
-                        updatedReward: updatedReward, 
-                    }
-                });
-				
+				postToServer(redeemReward);
 			}, function(error) {
 			    console.log("PatronStore and RedeemReward save fail (in parallel).");
 			    response.error("error");
@@ -1211,6 +1201,20 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			
 		});
 	}
+	
+	function postToServer(redeemReward){
+	    Parse.Cloud.httpRequest({
+            method: 'POST',
+            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+            headers: { 'Content-Type': 'application/json'},
+            body: {
+                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                approvedRedemption: redeemReward,
+                updatedReward: updatedReward, 
+            }
+        });
+	}
+	
 });
  
 ////////////////////////////////////////////////////
