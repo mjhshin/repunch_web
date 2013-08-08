@@ -4,7 +4,7 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
 import os
 
 # SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 if DEBUG:
