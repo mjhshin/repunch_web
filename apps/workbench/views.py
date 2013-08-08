@@ -204,7 +204,7 @@ def redeem(request):
                         COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
                         "deletedRedemption":del_red.jsonify()
                     }
-                    comet_receive(store_id, json.dumps(payload))
+                    comet_receive(store_id, payload)
                     # now delete the redemption
                     del_red.delete()
                 elif i_remove != -1:
@@ -224,7 +224,7 @@ def redeem(request):
                             COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
                             "approvedRedemption":redemption.jsonify()
                         }
-                        comet_receive(store_id, json.dumps(payload))
+                        comet_receive(store_id, payload)
                    
                       
                 # session changed only if i_remove was not 1
@@ -261,7 +261,7 @@ def redeem(request):
                             COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY,
                             "deletedRedemption":del_red.jsonify()
                         }
-                        comet_receive(store_id, json.dumps(payload))
+                        comet_receive(store_id, payload)
                         
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")

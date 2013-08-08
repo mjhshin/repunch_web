@@ -90,7 +90,7 @@ def settings(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSettings_one":settings.jsonify()
             }
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
 
             data['success'] = "Settings have been saved."
         else:
@@ -132,7 +132,7 @@ def refresh(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSettings_one":settings.jsonify()
             }
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
             
             data['success'] = True
             data['retailer_pin'] = settings.retailer_pin
@@ -230,7 +230,7 @@ def update(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSubscription_one":subscription.jsonify()
             }
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -339,7 +339,7 @@ def upgrade(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSubscription_one":subscription.jsonify()
             }
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
             
             # if coming from the message edit limit reached
             if request.session.get('from_limit_reached') and\

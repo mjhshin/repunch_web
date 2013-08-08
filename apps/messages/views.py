@@ -218,7 +218,7 @@ def edit(request, message_id):
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newMessage":message.jsonify()
                 }
-                comet_receive(store.objectId, json.dumps(payload))
+                comet_receive(store.objectId, payload)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -407,7 +407,7 @@ def feedback_reply(request, feedback_id):
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newMessage":feedback.jsonify()
                 }
-                comet_receive(store.objectId, json.dumps(payload))
+                comet_receive(store.objectId, payload)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -481,7 +481,7 @@ def feedback_delete(request, feedback_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedFeedback":deleted_feedback.jsonify(),
     }
-    comet_receive(store.objectId, json.dumps(payload))
+    comet_receive(store.objectId, payload)
         
     # no need to save the store since we just removed from relation
         

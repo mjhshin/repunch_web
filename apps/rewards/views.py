@@ -117,7 +117,7 @@ def edit(request, reward_id):
                     "updatedReward":reward
                 }
                 
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None
@@ -177,7 +177,7 @@ def delete(request, reward_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedReward": {"reward_id":reward["reward_id"]}
     }
-    comet_receive(store.objectId, json.dumps(payload))
+    comet_receive(store.objectId, payload)
     
     # update session cache
     request.session['store'] = store

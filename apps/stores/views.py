@@ -164,7 +164,7 @@ def edit(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore_one":store.jsonify()
             }
-            comet_receive(store.objectId, json.dumps(payload))
+            comet_receive(store.objectId, payload)
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -306,7 +306,7 @@ def crop_avatar(request):
             "updatedStoreAvatarName_str":store.store_avatar,
             "updatedStoreAvatarUrl_str":store.store_avatar_url, 
         }
-        comet_receive(store.objectId, json.dumps(payload))
+        comet_receive(store.objectId, payload)
         
         # need to remove old file
         if old_avatar:

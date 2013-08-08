@@ -98,7 +98,7 @@ def delete(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedEmployee":deleted_employee.jsonify()
     }
-    comet_receive(store_id, json.dumps(payload))
+    comet_receive(store_id, payload)
     
     # delete Punches Pointers to this employee?
     employee.delete()
@@ -142,7 +142,7 @@ def approve(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "approvedEmployee":approved_employee.jsonify()
     }
-    comet_receive(store_id, json.dumps(payload))
+    comet_receive(store_id, payload)
         
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
@@ -175,7 +175,7 @@ def deny(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedEmployee":deleted_employee.jsonify()
     }
-    comet_receive(store_id, json.dumps(payload))
+    comet_receive(store_id, payload)
     
     # delete the employee!
     employee.delete()
