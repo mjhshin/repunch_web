@@ -43,6 +43,7 @@ def comet_receive(store_id, postDict):
         deletedRedemption = request.POST.get("deletedRedemption")
         updatedStoreAvatarName_str
         updatedStoreAvatarUrl_str
+        updatedPunchesFacebook_int
         
     Note that since each CometSession is no longer unique to 1 session
     we need to keep track of the session_keys that have already been 
@@ -257,7 +258,17 @@ def comet_receive(store_id, postDict):
                 postDict.get("updatedStoreAvatarUrl_str")
             if updatedStoreAvatarUrl_str:
                 store.store_avatar_url = updatedStoreAvatarUrl_str
-            store.store_avatar = updatedStoreAvatarName_str            
+            store.store_avatar = updatedStoreAvatarName_str  
+            session['store'] = store      
+           
+        # this is in the settings tab in the dashboard but the field
+        # is in the Store class
+        updatedPunchesFacebook_int =\
+            postDict.get("updatedPunchesFacebook_int")
+        if updatedPunchesFacebook_int:
+            store = session['store']
+            store.punches_facebook = int(updatedPunchesFacebook_int)
+            session['store'] = store
             
         #############################################################
         # SUBSCRIPTION UPDATED ##############################

@@ -88,7 +88,9 @@ def settings(request):
             # notify other dashboards of this changes
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings_one":settings.jsonify()
+                "updatedSettings_one":settings.jsonify(),
+                "updatedPunchesFacebook_int":\
+                    store.punches_facebook,
             }
             comet_receive(store.objectId, payload)
 
