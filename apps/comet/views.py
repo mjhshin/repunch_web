@@ -24,9 +24,6 @@ from parse.apps.employees.models import Employee
 from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
-
-from django.core.mail import send_mail
-   
 @login_required
 def pull(request):
     """
@@ -470,14 +467,8 @@ def receive(request, store_id):
     processed to avoid duplication.     
         
     """
-    
-
-    send_mail("comet received.", "comet received",
-        "support@repunch.com", ["vandolf@repunch.com"],
-        fail_silently=True)
             
-            
-    def processPostDict(session, postDict):
+    def processCometReceivedDict(session, postDict):
         employees_pending_list =\
             SESSION.get_employees_pending_list(session)
         employees_approved_list =\
@@ -788,7 +779,7 @@ def receive(request, store_id):
             if session.get('account') is None or\
                 SESSION_KEY not in session:
                 continue
-            processPostDict(session, postDict)
+            processCometReceivedDict(session, postDict)
             
             # flag all threads with this session_key that new stuff
             CometSession.objects.update()
