@@ -5,7 +5,7 @@ Accounts (Users), Stores, Settings, and Subscriptions.
 
 from libs.repunch import rputils
 
-from parse.utils import parse
+from parse.utils import parse, create_png
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Settings, Subscription, Store
 
@@ -115,9 +115,25 @@ def update():
         store.set("city", "City " + str(i+1)) 
         store.set("country", "US") 
         store.set("state", "NY") 
+        full_address = " ".join(\
+            store.get_full_address().split(", "))
+        map_data = rputils.get_map_data(store.zip)
+        store.set("coordinates", map_data.get("coordinates"))
+        store.set("neighborhood", store.get_best_fit_neighborhood(\
+            map_data.get("neighborhood")))
+            
+        # create a png for each 1
+        res =\
+            create_png("/home/vestrel00/Pictures/wallpapers/test.png")
+        if res and 'error' not in res:
+            store.store_avatar = res.get('name')
+        else:
+            print "Error in creating png for store: " + store.objectId
+            
         if store.update():
-            print "updated store #" + str(i+1)
-    
+            print "Updated store #" + str(i+1)
+        else:
+            print "Error updating store: " + store.objectId
         
 if __name__ == "__main__":
     create()

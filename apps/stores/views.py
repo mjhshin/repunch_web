@@ -9,7 +9,7 @@ from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 from io import BytesIO
-import json, urllib, urllib2, requests, os
+import json, urllib, urllib2, os
 
 from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours,\
@@ -18,10 +18,11 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
-from repunch.settings import COMET_REQUEST_RECEIVE, MEDIA_ROOT,\
+from repunch.settings import MEDIA_ROOT,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
+from parse.comet import comet_receive
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
@@ -163,8 +164,7 @@ def edit(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore_one":store.jsonify()
             }
-            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload), verify=False)
+            comet_receive(store.objectId, json.dumps(payload))
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -210,30 +210,6 @@ def avatar(request):
         
             # save the file locallly
             avatar = form.save(request.session.session_key)
-        
-            """
-            # need to remove old file
-            if store.get('store_avatar'):
-               delete_file(store.get("store_avatar"), 'png')
-                
-            # save the session before a cloud call!
-            request.session.save()
-            
-            res = create_png(request.FILES['store_avatar'].file,
-                request.FILES['store_avatar'].name)
-                
-            # make sure that we have the latest session
-            session = SessionStore(request.session.session_key)
-            store = SESSION.get_store(session)
-            if res and 'error' not in res:
-                store.store_avatar = res.get('name')
-                store.store_avatar_url = res.get('url')
-                request.session['has_store_avatar'] = True
-            store.update()
-            
-            session["store"] = store
-            request.session.update(session)
-            """
             
             if avatar.width > avatar.height: # height is limiting
                 center_width = avatar.width/2
@@ -330,8 +306,7 @@ def crop_avatar(request):
             "updatedStoreAvatarName_str":store.store_avatar,
             "updatedStoreAvatarUrl_str":store.store_avatar_url, 
         }
-        requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-            data=json.dumps(payload), verify=False)
+        comet_receive(store.objectId, json.dumps(payload))
         
         # need to remove old file
         if old_avatar:

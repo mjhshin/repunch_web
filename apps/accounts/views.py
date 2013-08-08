@@ -4,15 +4,16 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
 from django.contrib.auth import SESSION_KEY
 from datetime import datetime
-import json, urllib, requests
+import json, urllib
 
 from apps.accounts.models import AccountActivate
 from repunch.settings import PHONE_COST_UNIT_COST,\
-COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
 from parse.decorators import session_comet
 from parse import session as SESSION
+from parse.comet import comet_receive
 from parse.auth.decorators import login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import SMARTPHONE
@@ -89,8 +90,7 @@ def settings(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSettings_one":settings.jsonify()
             }
-            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload), verify=False)
+            comet_receive(store.objectId, json.dumps(payload))
 
             data['success'] = "Settings have been saved."
         else:
@@ -132,8 +132,7 @@ def refresh(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSettings_one":settings.jsonify()
             }
-            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload), verify=False)
+            comet_receive(store.objectId, json.dumps(payload))
             
             data['success'] = True
             data['retailer_pin'] = settings.retailer_pin
@@ -231,8 +230,7 @@ def update(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSubscription_one":subscription.jsonify()
             }
-            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload), verify=False)
+            comet_receive(store.objectId, json.dumps(payload))
             
             return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
@@ -341,8 +339,7 @@ def upgrade(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedSubscription_one":subscription.jsonify()
             }
-            requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                data=json.dumps(payload), verify=False)
+            comet_receive(store.objectId, json.dumps(payload))
             
             # if coming from the message edit limit reached
             if request.session.get('from_limit_reached') and\

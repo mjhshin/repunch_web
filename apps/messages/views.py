@@ -7,9 +7,10 @@ from datetime import datetime
 from dateutil import parser
 from dateutil.tz import tzutc
 from math import ceil
-import urllib, requests, json
+import urllib, json
 
 from parse.decorators import session_comet
+from parse.comet import comet_receive
 from parse import session as SESSION
 from parse.utils import cloud_call, make_aware_to_utc
 from parse.auth.decorators import login_required
@@ -18,7 +19,7 @@ from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
-COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
@@ -217,8 +218,7 @@ def edit(request, message_id):
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newMessage":message.jsonify()
                 }
-                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload), verify=False)
+                comet_receive(store.objectId, json.dumps(payload))
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -407,8 +407,7 @@ def feedback_reply(request, feedback_id):
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newMessage":feedback.jsonify()
                 }
-                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload), verify=False)
+                comet_receive(store.objectId, json.dumps(payload))
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -482,8 +481,7 @@ def feedback_delete(request, feedback_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedFeedback":deleted_feedback.jsonify(),
     }
-    requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload), verify=False)
+    comet_receive(store.objectId, json.dumps(payload))
         
     # no need to save the store since we just removed from relation
         
@@ -491,28 +489,5 @@ def feedback_delete(request, feedback_id):
 
 @login_required
 def delete(request, message_id):
-    # entire thing is commented out just in case they try to trigger
-    # this via the url manually
-    """ this should not be used as messages, once sent, 
-    cannot be deleted. """
-    """
-    store = request.session['account'].store
-    
-    message = store.get("sentMessages", objectId=message_id)[0]
-    if not message:
-        raise Http404
-
-    # delete reply to message first if exist
-    # there shouldn't be any from messages sent by store
-    # except if it is a reply to a feedback but just to be safe
-    if message.get('Reply'):
-        msg_reply = message.get('reply')
-        msg_reply.delete()
-    
-    message.delete()
-    return redirect(reverse('messages_index')+\
-            "?%s" % urllib.urlencode({'success':\
-            'Message has been deleted.'}))
-    """
-    return HttpResponse("sorry, this operation is not supported")
+    return HttpResponse("error")
 

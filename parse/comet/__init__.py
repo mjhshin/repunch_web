@@ -21,6 +21,8 @@ def comet_receive(store_id, postDict):
     Returns True if the injection to the session and SessionComet
     is successful.
     
+    Note that postDict must be contain values that are jsonified!
+    
     This adds to the related session's cache:
         updatedStore_one = request.POST.get("updatedStore_one")
         updatedSubscription_one = request.POST.get("updatedStore_one")

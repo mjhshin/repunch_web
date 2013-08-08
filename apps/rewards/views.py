@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-import urllib, requests, json
+import urllib, json
 
-from repunch.settings import COMET_REQUEST_RECEIVE,\
-COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.decorators import session_comet
 from parse import session as SESSION
+from parse.comet import comet_receive
 from parse.auth.decorators import login_required
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
@@ -111,15 +111,13 @@ def edit(request, reward_id):
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newReward":reward
                 }
-                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload), verify=False)
             else:
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "updatedReward":reward
                 }
-                requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-                    data=json.dumps(payload), verify=False)
+                
+            comet_receive(store.objectId, json.dumps(payload))
             
             store.array_add_unique('rewards', [reward])
             store.rewards = None
@@ -179,8 +177,7 @@ def delete(request, reward_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedReward": {"reward_id":reward["reward_id"]}
     }
-    requests.post(COMET_REQUEST_RECEIVE + store.objectId,
-        data=json.dumps(payload), verify=False)
+    comet_receive(store.objectId, json.dumps(payload))
     
     # update session cache
     request.session['store'] = store

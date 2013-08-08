@@ -5,20 +5,20 @@ from django.http import Http404, HttpResponse
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import datetime
-import urllib, json, requests
+import urllib, json
 
 from parse.utils import make_aware_to_utc
 from parse.decorators import session_comet
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
+from parse.comet import comet_receive
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
-from repunch.settings import COMET_REQUEST_RECEIVE,\
-COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
 @session_comet
@@ -98,9 +98,7 @@ def delete(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedEmployee":deleted_employee.jsonify()
     }
-    # check for response?
-    requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload), verify=False)
+    comet_receive(store_id, json.dumps(payload))
     
     # delete Punches Pointers to this employee?
     employee.delete()
@@ -144,9 +142,7 @@ def approve(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "approvedEmployee":approved_employee.jsonify()
     }
-    # check for response?
-    requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload), verify=False)
+    comet_receive(store_id, json.dumps(payload))
         
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
@@ -179,8 +175,7 @@ def deny(request, employee_id):
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
         "deletedEmployee":deleted_employee.jsonify()
     }
-    requests.post(COMET_REQUEST_RECEIVE + store_id,
-        data=json.dumps(payload), verify=False)
+    comet_receive(store_id, json.dumps(payload))
     
     # delete the employee!
     employee.delete()
@@ -213,7 +208,7 @@ def punches(request, employee_id):
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
      
-    # TODO limit of 200 applies
+    # TODO limit of 200 applies - remove paginator!
     ps = employee.get('punches', order=order_by, limit=200)
     if not ps:
         ps = []

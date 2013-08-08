@@ -6,15 +6,16 @@ from django.utils import timezone
 from datetime import datetime
 from dateutil.tz import tzutc
 from math import ceil
-import json, requests
+import json
 
 from libs.dateutil.relativedelta import relativedelta
 from parse.decorators import session_comet
 from parse.utils import cloud_call
+from parse.comet import comet_receive
 from parse.auth.decorators import login_required
 from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
-COMET_REQUEST_RECEIVE, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
 @session_comet
@@ -203,8 +204,7 @@ def redeem(request):
                         COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
                         "deletedRedemption":del_red.jsonify()
                     }
-                    requests.post(COMET_REQUEST_RECEIVE + store_id,
-                        data=json.dumps(payload), verify=False)
+                    comet_receive(store_id, json.dumps(payload))
                     # now delete the redemption
                     del_red.delete()
                 elif i_remove != -1:
@@ -214,15 +214,18 @@ def redeem(request):
                     redemptions_past.append(redemption)
                     session['redemptions_past'] =\
                         redemptions_past
+                    
                     if DEBUG:
+                        # necessary when testing notifications server
+                        # to server when in debug mode since i_remove 
                         store_id =\
                             SESSION.get_store(session).objectId
                         payload = {
                             COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
                             "approvedRedemption":redemption.jsonify()
                         }
-                        requests.post(COMET_REQUEST_RECEIVE+store_id,
-                            data=json.dumps(payload), verify=False)
+                        comet_receive(store_id, json.dumps(payload))
+                   
                       
                 # session changed only if i_remove was not 1
                 if i_remove != -1: 
@@ -258,8 +261,7 @@ def redeem(request):
                             COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY,
                             "deletedRedemption":del_red.jsonify()
                         }
-                        requests.post(COMET_REQUEST_RECEIVE+store_id,
-                            data=json.dumps(payload), verify=False)
+                        comet_receive(store_id, json.dumps(payload))
                         
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
