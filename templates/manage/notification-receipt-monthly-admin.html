@@ -63,30 +63,30 @@ Keep this for your records.
                     <div style="padding:8px;background:#fdfdd7;">
                     {% if not asis.2 %}
                     <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
-	                    <strong>Failed to charge.</strong>
+	                    <span style="color:#545454;font-weight:bold;">Failed to charge.</span>
 					</div>
                     {% else %}
                     {# TOTAL #}
                     <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
-	                    <strong>Total (USD):</strong> ${{ asis.2.total }}
+	                    <span style="color:#545454;font-weight:bold;">Total (USD):</span> ${{ asis.2.total }}
 					</div>
                     {# END TOTAL #}
 
                     {# STATE #}
                     <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
-	                    <strong>State:</strong> {{ asis.2.state }}
+	                    <span style="color:#545454;font-weight:bold;">State:</span> {{ asis.2.state }}
 					</div>
                     {# END STATE #}
                     
                     {# PAYMENT ID #}
                     <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
-	                    <strong>Payment ID:</strong> {{ asis.2.payment_id }}
+	                    <span style="color:#545454;font-weight:bold;">Payment ID:</span> {{ asis.2.payment_id }}
 					</div>
                     {# END PAYMENT ID #}
 
                     {# SALE ID #}
 					<div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
-	                    <strong>Sale ID:</strong> {{ asis.2.sale_id }}
+	                    <span style="color:#545454;font-weight:bold;">Sale ID:</span> {{ asis.2.sale_id }}
 					</div>
                     {# END SALE ID #}
                     {% endif %}

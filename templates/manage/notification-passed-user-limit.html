@@ -16,10 +16,10 @@ We have upgraded your account from {{ package.sub_type }} to {{ package.new_sub_
 </p>
 
 <p>
-<strong>Current Number of users:</strong> {{ package.patronStore_count }}<br/>
-<strong>New maximum number of users:</strong> {{ package.new_max_patronStore_count }}<br/>
-<strong>New Subscription type:</strong> {{ package.new_sub_type }}<br/>
-<strong>New Monthly cost (USD):</strong> ${{ package.new_sub_type_cost }}
+<span style="color:#545454;font-weight:bold;">Current Number of users:</span> {{ package.patronStore_count }}<br/>
+<span style="color:#545454;font-weight:bold;">New maximum number of users:</span> {{ package.new_max_patronStore_count }}<br/>
+<span style="color:#545454;font-weight:bold;">New Subscription type:</span> {{ package.new_sub_type }}<br/>
+<span style="color:#545454;font-weight:bold;">New Monthly cost (USD):</span> ${{ package.new_sub_type_cost }}
 </p>
 
 {% elif package.status == 'disabled' %}
@@ -40,9 +40,9 @@ updating your account.
 </p>
 
 <p>
-<strong>Current Number of users:</strong> {{ package.patronStore_count }}<br/>
-<strong>Maximum number of users:</strong> {{ package.max_patronStore_count }}<br/>
-<strong>Subscription type:</strong> {{ package.sub_type }}
+<span style="color:#545454;font-weight:bold;">Current Number of users:</span> {{ package.patronStore_count }}<br/>
+<span style="color:#545454;font-weight:bold;">Maximum number of users:</span> {{ package.max_patronStore_count }}<br/>
+<span style="color:#545454;font-weight:bold;">Subscription type:</span> {{ package.sub_type }}
 </p>
 {% endif %}
 

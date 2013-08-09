@@ -13,14 +13,14 @@ We have charged you for your membership from {{ date_30_ago|date:"F d, Y" }} to 
 </p>
 
 <p style="">
-<strong>Subscription Type:</strong> 
+<span style="color:#545454;font-weight:bold;">Subscription Type:</span> 
 {% for key, val in sub_type.iteritems %}
 {% if key == subscription.subscriptionType %}
 {{ val.name }}
 {% endif %}
 {% endfor %}<br/>
-<strong>Total (USD):</strong> ${{ invoice.total }}<br/>
-<strong>Transaction ID:</strong> {{ invoice.sale_id }}<br/>
+<span style="color:#545454;font-weight:bold;">Total (USD):</span> ${{ invoice.total }}<br/>
+<span style="color:#545454;font-weight:bold;">Transaction ID:</span> {{ invoice.sale_id }}<br/>
 </p>
 
 {% endblock %}

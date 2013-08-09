@@ -189,16 +189,17 @@ class Invoice(ParseObject):
         """
         Returns this invoice object as an html ul.
         """
+        span = '<span style="color:#545454;font-weight:bold;">'
         return "<ul>" +\
-            "<li><strong>Invoice Type:</strong> " + str(self.type) +\
+            "<li>"+span+"Invoice Type:</span> " + str(self.type) +\
                 "</li>" +\
-            "<li><strong>State:</strong> " + str(self.state) +\
+            "<li>"+span+"State:</span> " + str(self.state) +\
                 "</li>" +\
-            "<li><strong>Payment Id:</strong> " +\
+            "<li>"+span+"Payment Id:</span> " +\
                 str(self.payment_id) + "</li>" +\
-            "<li><strong>Sale Id:</strong> " + str(self.sale_id) +\
+            "<li>"+span+"Sale Id:</span> " + str(self.sale_id) +\
                 "</li>" +\
-            "<li><strong>Total (USD):</strong> $" + str(self.total) +\
+            "<li>"+span+"Total (USD):</span> $" + str(self.total) +\
                 "</li></ul>"
         
     
