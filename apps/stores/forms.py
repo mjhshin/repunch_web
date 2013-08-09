@@ -178,7 +178,7 @@ class SubscriptionForm2(forms.Form):
     country2 = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
                                     
-    cc_cvv = forms.CharField()
+    cc_cvv = forms.CharField(validators=[required, numeric])
     
     def clean(self, *args, **kwargs):
         super(SubscriptionForm2, self).clean()
@@ -235,11 +235,11 @@ class SubscriptionForm(forms.Form):
     state = forms.CharField(max_length=255,
                     validators=[alphanumeric, required])
     zip = forms.CharField(max_length=255,
-                    validators=[numeric, required])
+                    validators=[required, numeric])
     country = forms.ChoiceField(choices=[('US', 
                                     'United States of America')])
 
-    cc_cvv = forms.CharField()
+    cc_cvv = forms.CharField(validators=[required, numeric])
     recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
     
     def clean(self, *args, **kwargs):

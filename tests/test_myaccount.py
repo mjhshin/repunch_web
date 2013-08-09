@@ -515,7 +515,7 @@ def test_edit_store_details():
             test.is_current_url(reverse('store_index'))
     except Exception as e:
         print e
-        parts[34]['message'] = str(e)
+        parts[34]['test_message'] = str(e)
     
     ##########  Clicking Add/Change Photo brings up the
     ########    image upload dialog/frame
@@ -532,7 +532,7 @@ def test_edit_store_details():
             test.find("#edit-avatar-options").is_displayed()
     except Exception as e:
         print e
-        parts[35]['message'] = str(e)
+        parts[35]['test_message'] = str(e)
     
     ##########  Clicking cancel on upload removes the dialog /frame
     try:
@@ -543,7 +543,7 @@ def test_edit_store_details():
             test.find("#edit-store-options") is not None
     except Exception as e:
         print e
-        parts[36]['message'] = str(e)
+        parts[36]['test_message'] = str(e)
         
     ##########  Clicking upload when no file is selected shows alert
     try:
@@ -560,7 +560,7 @@ def test_edit_store_details():
         alert.accept()
     except Exception as e:
         print e
-        parts[37]['message'] = str(e)
+        parts[37]['test_message'] = str(e)
     
     ##########  Uploading images works
     try:
@@ -570,7 +570,7 @@ def test_edit_store_details():
         parts[38]['success'] = test.find("#crop-btn").is_displayed()
     except Exception as e:
         print e
-        parts[38]['message'] = str(e)
+        parts[38]['test_message'] = str(e)
     
     ##########  Clicking cancel on crop removes the dialog
     try:
@@ -581,7 +581,7 @@ def test_edit_store_details():
             test.find("#edit-store-options") is not None
     except Exception as e:
         print e
-        parts[39]['message'] = str(e)
+        parts[39]['test_message'] = str(e)
         
     ##########  Cropping images works
     try:
@@ -597,7 +597,7 @@ def test_edit_store_details():
         parts[40]['success'] = True
     except Exception as e:
         print e
-        parts[40]['message'] = str(e)
+        parts[40]['test_message'] = str(e)
     
     sleep(5)
     old_avatar_url = store.store_avatar_url
@@ -694,7 +694,7 @@ def test_edit_account():
             test.is_current_url(reverse("account_update"))
     except Exception as e:
         print e
-        parts[1]['message'] = str(e)
+        parts[1]['test_message'] = str(e)
     
     ## Make changes
     # first clear all inputs
@@ -820,36 +820,48 @@ def test_edit_account():
         selectors[i] = (selectors[i], "    ")
     test.action_chain(0, selectors, action="send_keys")
     
-    ##########  First name is required
+    test.find("#upgrade-form-submit").click()
+    sleep(3)
     
-    ##########  Last name is required TODO
-    ##########  Card number is required TODO
-    ##########  Security code (cvc) is required TODO
-    ##########  Address is required TODO
-    ##########  City is required TODO
-    ##########  State is required TODO
-    ##########  Zip is required TODO
-    ##########  ToS checked is required TODO
+    ##########  First name is required
+    ##########  Last name is required
+    ##########  Card number is required
+    ##########  Security code (cvc) is required 
+    ##########  Address is required 
+    ##########  City is required 
+    ##########  State is required 
+    ##########  Zip is required 
+    ##########  ToS checked is required 
+    def field_is_required(part, selector,
+        message="This field is required."):
+        try:
+            parts[part]['success'] = test.find(selector).text==message
+        except Exception as e:
+            print e
+            parts[part]['test_message'] = str(e)
+    
+    selectors = (
+        (19, "#first_name_ic ul.errorlist li"),
+        (20, "#last_name_ic ul.errorlist li"),
+        (21, "#card_number_container ul.errorlist li",
+            "Enter a valid credit card number."),
+        (22, "#cc_cvv_ic ul.errorlist li"),
+        (23, "#address_ic ul.errorlist li"),
+        (24, "#city_ic ul.errorlist li"),
+        (25, "#state_ic ul.errorlist li"),
+        (26, "#zip_ic ul.errorlist li"),
+        (27, "#recurring_charge_container ul.errorlist li",
+            "You must accept the Terms & Conditions to continue."),
+    )
+    
+    for selector in selectors:
+        field_is_required(*selector)
+    
     ##########  Invalid credit card number shows error TODO
     ##########  Past expiration date is invalid TODO
     ##########  Only the last 4 digits of the card number is shown TODO
     ##########  Not changing the card number does not TODO
     ######      generate new paypal credit card id
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     

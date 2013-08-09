@@ -70,13 +70,13 @@ $(document).ready(function(){
 			Credit Card Information
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="first_name_ic">
 			{{ form.first_name.errors }}
 			<label for="first_name">First Name</label>
 			{{ form.first_name }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="last_name_ic">
 			{{ form.last_name.errors }}
 			<label for="last_name">Last Name</label>
 			{{ form.last_name }}
@@ -92,13 +92,13 @@ $(document).ready(function(){
 			<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
 		</div>
 		
-		<div class="input-container clearheight">
+		<div class="input-container clearheight" id="cc_cvv_ic">
 			{{ form.cc_cvv.errors }}
 			<label for="cvc">CVC</label>
 			{{ form.cc_cvv }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="date_cc_expiration_ic">
 			{{ form.date_cc_expiration.errors }}
 			<label for="expiration_month">Expiration</label>
 			{{ form.date_cc_expiration }}
@@ -110,25 +110,25 @@ $(document).ready(function(){
 			Billing Address
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="address_ic">
 			{{ form.address.errors }}
 			<label for="street">Street</label>
 			{{ form.address }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="city_ic">
 			{{ form.city.errors }}
 			<label for="city">City</label>
 			{{ form.city }}
 		</div>
 		
-		<div class="input-container clearheight">
+		<div class="input-container clearheight" id="state_ic">
 			{{ form.state.errors }}
 			<label for="state">State</label>
 			{{ form.state }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="zip_ic">
 			{{ form.zip.errors }}
 			<label for="id_zip">Zip</label>
 			{{ form.zip }}

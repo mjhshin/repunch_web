@@ -2,10 +2,16 @@
 
 {% block title %}
 {% if asiss|length == 0 %}
-No users have been charged their monthly bill today, {{ date|date:"F d, Y" }}.
+No users have been charged their monthly bill today.
 {% else %}
-A total of {{ asiss|length }} users have been charged their monthly bill today, {{ date|date:"F d, Y" }}.
+A total of {{ asiss|length }} users have been charged their monthly bill today.
 {% endif %}
+{% endblock %}
+
+{% block title_compliment %}
+<div style="border-top:2px solid #fff;border-bottom:6px solid #fff; background:#fff;color:#ccc;font-size:18px;">
+{{ date }}
+</div>
 {% endblock %}
 
 {% block content %}
@@ -36,7 +42,7 @@ Keep this for your records.
                 {% if key == asis.3.subscriptionType %}
                 {{ val.name }}
                 {% endif %}
-                {% endfor %}
+                {% endfor %} 
             </div>
 		</div>
     </td>
@@ -54,6 +60,7 @@ Keep this for your records.
 					</div>
                     {# END STORE NAME #}
 
+                    <div style="padding:8px;background:#fdfdd7;">
                     {% if not asis.2 %}
                     <div style="padding:2px 0 4px 0;font-size:12px;line-height:16px;">
 	                    <strong>Failed to charge.</strong>
@@ -83,6 +90,7 @@ Keep this for your records.
 					</div>
                     {# END SALE ID #}
                     {% endif %}
+                    </div>
                     
 				</td>
 
