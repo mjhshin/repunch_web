@@ -582,8 +582,10 @@ Parse.Cloud.define("punch", function(request, response) {
 	}
 	
 	function executePush(patronStore) {
-		Parse.Push.send({
-			where: androidInstallationQuery,
+		var punchString = (numPunches == 1) ? "punch" : "punches";
+		var promises = [];
+		promises.push( Parse.Push.send({
+            where: androidInstallationQuery, 
 			data: {
 				name: storeName,
 				id: storeId,
@@ -591,33 +593,26 @@ Parse.Cloud.define("punch", function(request, response) {
 				total_punches: patronStore.get("punch_count"),
 				action: "com.repunch.intent.PUNCH"
 			}
-		}, {
-			success: function() {
-				console.log("Android push was successful");
-			},
-			error: function(error) {
-				response.error("error");
-			}
-		});
-		
-		var punchString = (numPunches == 1) ? "punch" : "punches";
-		
-		Parse.Push.send({
-			where: iosInstallationQuery,
+        }) );
+		promises.push( Parse.Push.send({
+            where: iosInstallationQuery, 
 			data: {
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
-				push_type: "receive_punch"
+				push_type: "punch"
 			}
-		}, {
-			success: function() {
-				console.log("iOS push was successful");
-			},
-			error: function(error) {
-				response.error("error");
-			}
+            
+        }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
 		});
 	}
 	
