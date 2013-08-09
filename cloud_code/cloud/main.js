@@ -601,7 +601,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				name: storeName,
 				id: storeId,
 				num_punches: numPunches,
-				push_type: "receive_punch"
+				push_type: "punch"
 			}
             
         }) );
