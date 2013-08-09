@@ -712,16 +712,16 @@ def test_edit_account():
         ("#id_zip", TEST_SUBSCRIPTION_INFO['zip']),
     )
     test.action_chain(0, selectors, action="send_keys")
-    
     month_el =\
         test.find("//select[@id='id_date_cc_expiration_month']/" +\
-            "option[%s]" % (str(TEST_SUBSCRIPTION_INFO[\
+            "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
                 'date_cc_expiration'].month)), type="xpath")
     year_el =\
         test.find("//select[@id='id_date_cc_expiration_year']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
                 'date_cc_expiration'].year)), type="xpath")
-    month, year = month_el.text, year_el.text
+    month = month_el.get_attribute("value")
+    year = year_el.get_attribute("value")
     month_el.click()
     year_el.click()
     
@@ -735,70 +735,78 @@ def test_edit_account():
     sleep(3)
     
     ##########  Changes to first name are visible
-    parts[2]['success'] = test.find("#id_first_name").text ==\
+    parts[2]['success'] =\
+        test.find("#id_first_name").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['first_name']
     ##########  Changes to first name are saved to parse
     subscription.first_name = None
     parts[3]['success'] = subscription.get("first_name") ==\
         TEST_SUBSCRIPTION_INFO['first_name']
     ##########  Changes to last name are visible
-    parts[4]['success'] = test.find("#id_last_name").text ==\
+    parts[4]['success'] =\
+        test.find("#id_last_name").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['last_name']
     ##########  Changes to last name are saved to parse
     subscription.last_name = None
     parts[5]['success'] = subscription.get("last_name") ==\
         TEST_SUBSCRIPTION_INFO['last_name']
     ##########  Changes to card number are visible
-    parts[6]['success'] = test.find("#id_cc_number").text ==\
-        TEST_SUBSCRIPTION_INFO['cc_number']
+    parts[6]['success'] =\
+        test.find("#id_cc_number").get_attribute("value")[-4:] ==\
+        TEST_SUBSCRIPTION_INFO['cc_number'][-4:]
     ##########  Changes to card number are saved to parse
     subscription.cc_number = None
     parts[7]['success'] = subscription.get("cc_number") ==\
-        TEST_SUBSCRIPTION_INFO['cc_number']
+        TEST_SUBSCRIPTION_INFO['cc_number'][-4:]
     ##########  A paypal credit card id is generated & saved
     # CARD-97223025G70599255KHHCCVQ
     subscription.pp_cc_id = None
     parts[8]['success'] = subscription.get("pp_cc_id").__contains__(\
         "CARD") and len(subscription.get("pp_cc_id")) == 29
     ##########  Changes to cc expiration are visible 
-    parts[10]['success'] = month == test.get_selected("//select" +\
+    parts[9]['success'] = month == test.get_selected("//select" +\
         "[@id='id_date_cc_expiration_month']/option",
-        type="xpath").text and year == test.get_selected(\
+        type="xpath").get_attribute("value") and\
+        year == test.get_selected(\
         "//select[@id='id_date_cc_expiration_year']/option",
-        type="xpath").text
+        type="xpath").get_attribute("value")
     ##########  Changes to cc expiration are saved to parse
     subscription.date_cc_expiration = None
     exp = subscription.get("date_cc_expiration")
-    parts[9]['success'] = exp.month == TEST_SUBSCRIPTION_INFO[\
+    parts[10]['success'] = exp.month == TEST_SUBSCRIPTION_INFO[\
         'date_cc_expiration'].month and exp.year ==\
         TEST_SUBSCRIPTION_INFO['date_cc_expiration'].year
     ##########  Changes to address are visible
-    parts[10]['success'] = test.find("#id_address").text ==\
+    parts[11]['success'] =\
+        test.find("#id_address").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['address']
     ##########  Changes to address are saved to parse 
     subscription.address = None
-    parts[11]['success'] = subscription.get("address") ==\
+    parts[12]['success'] = subscription.get("address") ==\
         TEST_SUBSCRIPTION_INFO['address']
     ##########  Changes to city are visible
-    parts[12]['success'] = test.find("#id_city").text ==\
+    parts[13]['success'] =\
+        test.find("#id_city").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['city']
     ##########  Changes to city are saved to parse 
     subscription.city = None
-    parts[13]['success'] = subscription.get("city") ==\
+    parts[14]['success'] = subscription.get("city") ==\
         TEST_SUBSCRIPTION_INFO['city']
     ##########  Changes to state are visible
-    parts[14]['success'] = test.find("#id_state").text ==\
+    parts[15]['success'] =\
+        test.find("#id_state").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['state']
     ##########  Changes to state are saved to parse 
     subscription.state = None
-    parts[15]['success'] = subscription.get("state") ==\
+    parts[16]['success'] = subscription.get("state") ==\
         TEST_SUBSCRIPTION_INFO['state']
     ##########  Changes to zip are visible
-    parts[16]['success'] = test.find("#id_zip").text ==\
+    parts[17]['success'] =\
+        test.find("#id_zip").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['zip']
     ##########  Changes to zip are saved to parse 
     subscription.zip = None
-    parts[17]['success'] = subscription.get("zip") ==\
+    parts[18]['success'] = subscription.get("zip") ==\
         TEST_SUBSCRIPTION_INFO['zip']
     
     ## Make changes
@@ -812,7 +820,8 @@ def test_edit_account():
         selectors[i] = (selectors[i], "    ")
     test.action_chain(0, selectors, action="send_keys")
     
-    ##########  First name is required TODO
+    ##########  First name is required
+    
     ##########  Last name is required TODO
     ##########  Card number is required TODO
     ##########  Security code (cvc) is required TODO
