@@ -600,8 +600,9 @@ Parse.Cloud.define("punch", function(request, response) {
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				name: storeName,
 				id: storeId,
-				num_punches: numPunches,
-				push_type: "punch"
+				punches: numPunches,
+				total_punches: patronStore.get("punch_count"),
+				push_type: "punch",
 			}
             
         }) );
