@@ -274,8 +274,13 @@ def crop_avatar(request):
         
         avatar = StoreAvatarTmp.objects.filter(session_key=\
             request.session.session_key)
+        # if there are 2 windows with the same session_key editing the 
+        # store avatar, the avatar will be deleted by the first window
+        # to crop. The 2nd window will then have no avatar.
         if not avatar:
-            raise Http404
+            # flag the execution of avatarCropComplete js function
+            data['success'] = True
+            return render(request, 'manage/avatar_crop.djhtml', data)
             
         avatar = avatar[0]
         
