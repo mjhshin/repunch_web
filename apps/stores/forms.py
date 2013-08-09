@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+from random import randint
 import os, re, datetime
 
 from models import Store, StoreAvatarTmp
@@ -124,8 +126,19 @@ class StoreAvatarForm(forms.Form):
     
     image = forms.ImageField(widget=forms.ClearableFileInput(attrs=\
         {"accept":"image/*"}))
+        
    
     def save(self, session_key):    
+        def rename():
+            #'django.core.files.uploadedfile.InMemoryUploadedFile
+            uploaded_img = self.cleaned_data['image']
+            # to avoid path conflicts, append a timestamp
+            # plus a number from 000 to 999
+            uploaded_img._set_name(\
+                "".join(uploaded_img.name.split(".")[:-1]) +\
+                 timezone.now().strftime("%d%H%M%S") +\
+                 str(randint(0, 999)).zfill(3))
+            return uploaded_img
         # remove previous session image
         av = StoreAvatarTmp.objects.filter(session_key=session_key)
         if av:
@@ -135,11 +148,11 @@ class StoreAvatarForm(forms.Form):
             except Exception:
                 pass
             finally:
-                av.avatar = self.cleaned_data['image']
+                av.avatar = rename()
                 av.save()
         else:
             av = StoreAvatarTmp.objects.create(session_key=\
-                session_key, avatar=self.cleaned_data['image'])
+                session_key, avatar=rename())
         return av.avatar
 
 class SubscriptionForm2(forms.Form):

@@ -9,7 +9,7 @@ class SeleniumTest(object):
     Wrapper around selenium - makes life easier.
     """
     
-    # SERVER_URL = "http://www.repunch.com"
+    # SERVER_URL = "https://www.repunch.com"
     SERVER_URL = "http://localhost:8000"
     
     def __init__(self):
