@@ -36,6 +36,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.core import mail
 from dateutil.tz import tzutc
+from smtplib import SMTPServerDisconnected
 import pytz
 
 from libs.dateutil.relativedelta import relativedelta
@@ -48,6 +49,8 @@ from repunch.settings import DEBUG
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        print timezone.now()
+    
         # first count the number of active stores
         store_count = Store.objects().count(active=True)
         end = timezone.now()
@@ -264,18 +267,28 @@ class Command(BaseCommand):
                 
                 # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
-                    send_email_suspicious_activity(\
-                        Account.objects().get(Store=store.objectId),
-                        store, chunk1, chunk2, start, end, conn)
+                    try:
+                        send_email_suspicious_activity(\
+                            Account.objects().get(Store=store.objectId),
+                            store, chunk1, chunk2, start, end, conn)
+                    except SMTPServerDisconnected:
+                        conn = mail.get_connection(fail_silently=(not DEBUG))
+                        conn.open()
+                        send_email_suspicious_activity(\
+                            Account.objects().get(Store=store.objectId),
+                            store, chunk1, chunk2, start, end, conn)
                         
             # end of while loop
             store_count -= LIMIT
             skip += LIMIT
         
         # everything is done. close the connection
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass 
         
-        
+        print timezone.now()
         
         
         

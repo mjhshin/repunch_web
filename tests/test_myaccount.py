@@ -857,7 +857,8 @@ def test_edit_account():
     for selector in selectors:
         field_is_required(*selector)
     
-    ##########  Invalid credit card number shows error TODO
+    ##########  Invalid credit card number shows error
+    
     ##########  Past expiration date is invalid TODO
     ##########  Only the last 4 digits of the card number is shown TODO
     ##########  Not changing the card number does not TODO
