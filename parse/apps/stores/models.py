@@ -311,7 +311,6 @@ class Subscription(ParseObject):
         try:
             res = charge_cc(self, total, description)
         except HTTPError: # wrong credit card info BAD REQUEST (400)
-            # TODO send an email to the admins
             return None
         else:
             invoice = Invoice(

@@ -72,12 +72,12 @@ def send_email_receipt_monthly(asiss, connection=None):
     date_now = timezone.now()
     # for accounts
     for asis in asiss:
-        subscription = asis[3]
-        if not subscription: 
+        invoice = asis[2]
+        if not invoice: # failed to charge user
             continue
+        subscription = asis[3]
         account = asis[0]
         store = asis[1]
-        invoice = asis[2]
         subject = "Repunch Inc. monthly service charge."
         ctx = get_notification_ctx()
         ctx.update({'store': store, 'invoice': invoice,
