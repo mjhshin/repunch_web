@@ -250,6 +250,7 @@ def test_rewards():
         parts[14]['test_message'] = str(e)
     ##########  Description is not required 
     try:
+        # this takes a while
         test.find("#description_ic ul li").text
     except NoSuchElementException:
         parts[15]['success'] = True
@@ -293,39 +294,40 @@ def test_rewards():
         parts[18]['test_message'] = str(e)
     
     
-    ##########  Rewards are initially sorted by Punches TODO
-    ###         from least to greatest
     store.rewards = None
     rewards = store.get('rewards')
+    punches_map = {r['punches']:r for r in rewards}
     ascending = [r['punches'] for r in rewards]
     descending = ascending[:]
-    ##########  Punches is sortable TODO
+    ascending.sort()
+    descending.sort(reverse=True)
+    ##########  Rewards are initially sorted by Punchess
+    ###         from least to greatest
+    try:
+        success = True
+        for i in range(3):
+            if int(test.find("//div[@id='%s']/a/div[1]" %(str(i+1),),
+                type="xpath").text) != ascending[i]:
+                success = False
+                break
+                
+        parts[19]['success'] = success
+    except Exception as e:
+        print e
+        parts[19]['test_message'] = str(e)
+    ##########  Punches is sortable
+    try:
+        test.find("#header-reward_punches").click()
+        
+    except Exception as e:
+        print e
+        parts[20]['test_message'] = str(e)
     ##########  Name is sortable TODO
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
-
-
-
-
-
-
 
 
 

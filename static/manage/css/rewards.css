@@ -49,6 +49,11 @@
 	margin-top:4px;
 }
 
+#header-reward_punches,
+#header-reward_summary {
+    cursor: pointer;
+}
+
 .table-header div {
 	cursor: default;
 }
