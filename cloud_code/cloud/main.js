@@ -597,12 +597,12 @@ Parse.Cloud.define("punch", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
 			data: {
+				push_type: "punch",
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				name: storeName,
-				id: storeId,
+				store_id: storeId,
 				punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
-				push_type: "punch",
 			}
             
         }) );
@@ -1097,13 +1097,12 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		promises.push( Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
+				push_type: "validate_redeem",
 	            title: rewardTitle,
 	            alert: "Successfully redeemed '" + rewardTitle + "'",
-	            push_type: "validate_redeem",
-	            id: storeId, 
-	            store: store.get("store_name"), 
+	            store_id: storeId,
+				patron_store_id: patronStore.id,
 	            punches: numPunches,
-	            patron_store_id: patronStore.id,
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }) );
