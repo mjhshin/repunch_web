@@ -112,7 +112,7 @@ def test_rewards():
         parts[3]['test_message'] = str(e)
     ##########  Redemption count starts at 0
     try:
-    parts[4]['success'] = reward['redemption_count'] == 0
+        parts[4]['success'] = reward['redemption_count'] == 0
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
@@ -127,8 +127,8 @@ def test_rewards():
     # let's add another reward!
     reward2_name = "reward dos"
     reward2_description = "DOS"
-    reward2_punches = 5
-     test.find("//div[@id=0]/a", type="xpath").click()
+    reward2_punches = 10
+    test.find("#add_reward").click()
     sleep(1)
     selectors = (
         ("#id_reward_name", reward2_name),
@@ -151,6 +151,7 @@ def test_rewards():
             ("#id_description", reward1_description),
             ("#id_punches", str(reward1_punches)),
         )
+        test.action_chain(0, selectors, action="clear")
         test.action_chain(0, selectors, action="send_keys")
         test.find("#submit-reward-form").click()
         sleep(5)
@@ -184,7 +185,7 @@ def test_rewards():
         parts[9]['test_message'] = str(e)
     ##########  Clicking delete brings up a confirmation dialog 
     try:
-        test.find("//div[@id=0]/a", type="xpath").click()
+        test.find("//div[@id='0']/a", type="xpath").click()
         sleep(1)
         test.find("#delete-link").click()
         alert = test.switch_to_alert()

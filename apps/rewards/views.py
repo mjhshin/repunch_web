@@ -83,7 +83,7 @@ def edit(request, reward_id):
         if form.is_valid():
             reward = {'reward_name':form.data['reward_name'], 
                 "description":form.data['description'], 
-                "punches":form.data['punches'],
+                "punches":int(form.data['punches']),
                 "redemption_count":0}
                 
             # assign a new reward_id

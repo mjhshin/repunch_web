@@ -130,7 +130,10 @@ class SeleniumTest(object):
                 else:
                     self.find(selector[0],type).send_keys(selector[1])
             elif action == "clear":
-                self.find(selector, type).clear()
+                if type(selector) in (tuple, list):
+                    self.find(selector[0], type).clear()
+                else:
+                    self.find(selector, type).clear()
                     
                     
                     
