@@ -161,7 +161,7 @@ def test_edit_store_details():
     test.open(reverse("store_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=/manage/store/")
+        'manage_login') + "?next=" + reverse("store_index"))
         
     # login
     selectors = (
@@ -169,7 +169,7 @@ def test_edit_store_details():
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(1, selectors, "send_keys") # ACTION!
+    test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)
     
     def click_store_edit():
@@ -674,7 +674,7 @@ def test_edit_account():
     test.open(reverse("store_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=/manage/store/")
+        'manage_login') + "?next=" + reverse("store_index"))
         
     # login
     selectors = (
@@ -682,7 +682,7 @@ def test_edit_account():
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(1, selectors, "send_keys") # ACTION!
+    test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)  
    
     ##########  Update account page reachable
@@ -958,7 +958,7 @@ def test_cancel_account():
     test.open(reverse("store_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=/manage/store/")
+        'manage_login') + "?next=" + reverse("store_index"))
         
     # login
     selectors = (
@@ -966,7 +966,7 @@ def test_cancel_account():
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(1, selectors, "send_keys") # ACTION!
+    test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)  
     
     ##########  Clicking the cancel button brings up a confrmtn dialog
