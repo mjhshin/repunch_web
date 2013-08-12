@@ -1097,7 +1097,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		promises.push( Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
-				push_type: "validate_redeem",
+				push_type: "redeem",
 	            title: rewardTitle,
 	            alert: "Successfully redeemed '" + rewardTitle + "'",
 	            store_id: storeId,
