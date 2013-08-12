@@ -35,19 +35,19 @@
 	
 		<h2>{{ is_new|yesno:"Add New,Edit" }} Reward</h2>
 		
-		<div class="input-container">
+		<div class="input-container" id="reward_name_ic">
 			{{ form.reward_name.errors }}
 			<label for="reward_name">Reward Name</label>
 			{{ form.reward_name }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container" id="description_ic">
 			{{ form.description.errors }}
-			<label for="description" id="label_store_description">Description</label>
+			<label for="id_description" id="label_store_description">Description</label>
 			{{ form.description }}
 		</div>
 		
-		<div class="input-container clearheight">
+		<div class="input-container clearheight" id="punches_ic">
 			{{ form.punches.errors }}
 			<label for="punches">Punches</label>
 			{{ form.punches }}

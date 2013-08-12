@@ -130,10 +130,14 @@ class SeleniumTest(object):
                 else:
                     self.find(selector[0],type).send_keys(selector[1])
             elif action == "clear":
-                if type(selector) in (tuple, list):
+                if self._type(selector) in (tuple, list):
                     self.find(selector[0], type).clear()
                 else:
                     self.find(selector, type).clear()
                     
-                    
-                    
+    def _type(self, obj):
+        """
+        Simply returns the type of an object. This is here because
+        type is rebound to a string in all functions.
+        """
+        return type(obj)
