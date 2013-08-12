@@ -665,7 +665,7 @@ def test_edit_account():
             "generate new paypal credit card id"},
     ]
     section = {
-        "section_name": "Edit store details working properly?",
+        "section_name": "Edit account/subscription working properly?",
         "parts": parts,
     }
     test.results.append(section)
@@ -949,7 +949,7 @@ def test_cancel_account():
             "to false on Parse"},
     ]
     section = {
-        "section_name": "Edit store details working properly?",
+        "section_name": "Cancel account link functional?",
         "parts": parts,
     }
     test.results.append(section)
@@ -1000,7 +1000,8 @@ def test_cancel_account():
         alert = test.switch_to_alert()
         alert.accept()
         sleep(4)
-        parts[3]['success']=test.is_current_url(reverse("public_home")
+        parts[3]['success'] =\
+            test.is_current_url(reverse("public_home"))
     ##########  Clicking OK logs the user out
     except Exception as e:
         print e
