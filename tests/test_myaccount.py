@@ -5,6 +5,7 @@ Selenium tests for dashboard 'My Account' tab.
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoAlertPresentException
 from dateutil.tz import tzutc
 from datetime import datetime
 from time import sleep
@@ -160,7 +161,7 @@ def test_edit_store_details():
     test.open(reverse("store_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=/manage/store/")
+        'manage_login') + "?next=" + reverse("store_index"))
         
     # login
     selectors = (
@@ -168,7 +169,7 @@ def test_edit_store_details():
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(1, selectors, "send_keys") # ACTION!
+    test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)
     
     def click_store_edit():
@@ -659,13 +660,12 @@ def test_edit_account():
         {'test_name': "Invalid credit card number shows error"},
         {'test_name': "Past expiration date is invalid"},
         {'test_name': "Only the last 4 digits of the card number" +\
-            " is shown"},
+            " are shown"},
         {'test_name': "Not changing the card number does not " +\
             "generate new paypal credit card id"},
-        # TODO cancel my account
     ]
     section = {
-        "section_name": "Edit store details working properly?",
+        "section_name": "Edit account/subscription working properly?",
         "parts": parts,
     }
     test.results.append(section)
@@ -674,7 +674,7 @@ def test_edit_account():
     test.open(reverse("store_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=/manage/store/")
+        'manage_login') + "?next=" + reverse("store_index"))
         
     # login
     selectors = (
@@ -682,7 +682,7 @@ def test_edit_account():
         ("#id_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(1, selectors, "send_keys") # ACTION!
+    test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)  
    
     ##########  Update account page reachable
@@ -715,11 +715,11 @@ def test_edit_account():
     month_el =\
         test.find("//select[@id='id_date_cc_expiration_month']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
-                'date_cc_expiration'].month)), type="xpath")
+                'date_cc_expiration'].month),), type="xpath")
     year_el =\
         test.find("//select[@id='id_date_cc_expiration_year']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
-                'date_cc_expiration'].year)), type="xpath")
+                'date_cc_expiration'].year),), type="xpath")
     month = month_el.get_attribute("value")
     year = year_el.get_attribute("value")
     month_el.click()
@@ -793,6 +793,9 @@ def test_edit_account():
     parts[14]['success'] = subscription.get("city") ==\
         TEST_SUBSCRIPTION_INFO['city']
     ##########  Changes to state are visible
+    test.find("//select[@id='id_date_cc_expiration_year']/" +\
+            "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
+                'date_cc_expiration'].year)), type="xpath")
     parts[15]['success'] =\
         test.find("#id_state").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['state']
@@ -858,16 +861,184 @@ def test_edit_account():
         field_is_required(*selector)
     
     ##########  Invalid credit card number shows error
+    try:
+        cc_number = test.find("#id_cc_number")
+        cc_number.clear()
+        cc_number.send_keys("8769233313929990")
+        test.find("#upgrade-form-submit").click()
+        sleep(3)
+        parts[28]['success'] = test.find("#card_number_container " +\
+            "ul.errorlist li").text ==\
+                "Enter a valid credit card number."
+    except Exception as e:
+        print e
+        parts[28]['test_message'] = str(e)
     
-    ##########  Past expiration date is invalid TODO
-    ##########  Only the last 4 digits of the card number is shown TODO
-    ##########  Not changing the card number does not TODO
+    ##########  Past expiration date is invalid
+    if timezone.now().month == 1:
+        # note that if this test is being run on a January, this will 
+        # fail so to prevent that just skip the test if it is January
+        parts[29]['test_message'] = "READ ME. This test has been " +\
+            "skipped because the month is January, which means " +\
+            "that this test will always fail due to limited " +\
+            "select options."
+    else:
+        try:
+            # select january of this year.
+            test.find("//select[@id='id_date_cc_expiration_month']/" +\
+                    "option[@value='1']", type="xpath").click()
+            test.find("//select[@id='id_date_cc_expiration_year']/" +\
+                    "option[@value='%s']" %\
+                    (str(timezone.now().year),), type="xpath").click()
+            test.find("#upgrade-form-submit").click()
+            sleep(3)
+            parts[29]['success'] =\
+                test.find("#date_cc_expiration_ic ul.errorlist " +\
+                "li").text == "Your credit card has expired!"
+        except Exception as e:
+            print e
+            parts[29]['test_message'] = str(e)
+        
+    ##########  Only the last 4 digits of the card number are shown
+    try:
+        test.find("//div[@class='form-options']/a[2]",
+            type="xpath").click()
+        sleep(1)
+        test.find("//div[@id='account-options']/a[1]",
+            type="xpath").click()
+        sleep(3)
+        masked_number =\
+            test.find("#id_cc_number").get_attribute("value")
+        parts[30]['success'] = masked_number[:-4] ==\
+            "************" and str(masked_number[-4:]).isdigit()
+    except Exception as e:
+        print e
+        parts[30]['test_message'] = str(e)
+    
+    ##########  Not changing the card number does not
     ######      generate new paypal credit card id
-    
-    
+    try:
+        subscription.pp_cc_id = None
+        cc_id = subscription.get("pp_cc_id")
+        test.find("#id_cc_cvv").send_keys("123")
+        test.find("#id_recurring").click()
+        test.find("#upgrade-form-submit").click()
+        sleep(5)
+        subscription.pp_cc_id = None
+        parts[31]['success'] = cc_id == subscription.get("pp_cc_id")
+    except Exception as e:
+        print e
+        parts[31]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
+    
+def test_cancel_account():
+    """
+    A test just for the cancel account link.
+    """
+    test = SeleniumTest()
+    parts = [
+        {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Clicking the cancel button brings up a " +\
+            "confirmation dialog"},
+        {'test_name': "Clicking cancel on the dialog dimisses the " +\
+            "dialog and the account remains active"},
+        {'test_name': "Clicking OK logs the user out"},
+        {'test_name': "Clicking OK sets the store's active field " +\
+            "to false on Parse"},
+    ]
+    section = {
+        "section_name": "Cancel account link functional?",
+        "parts": parts,
+    }
+    test.results.append(section)
+    
+    ##########  User needs to be logged in to access page
+    test.open(reverse("store_index")) # ACTION!
+    sleep(1)
+    parts[0]['success'] = test.is_current_url(reverse(\
+        'manage_login') + "?next=" + reverse("store_index"))
+        
+    # login
+    selectors = (
+        ("#id_username", TEST_USER['username']),
+        ("#id_password", TEST_USER['password']),
+        ("", Keys.RETURN)
+    )
+    test.action_chain(0, selectors, "send_keys") # ACTION!
+    sleep(7)  
+    
+    ##########  Clicking the cancel button brings up a confrmtn dialog
+    try:
+        test.find("#deactivate_account").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        parts[1]['success'] = alert.text ==\
+            "Are you sure you want to deactivate your account?"
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
+        
+    ##########  Clicking cancel on the dialog dimisses the 
+    ###         dialog and the account remains active
+    try:
+        alert.dismiss()
+        try:
+            alert.text
+        except NoAlertPresentException:
+            store.active = None
+            parts[2]['success'] = store.get("active")
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
+        
+    ## cancel the account
+    try:
+        test.find("#deactivate_account").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        alert.accept()
+        sleep(4)
+        parts[3]['success'] =\
+            test.is_current_url(reverse("public_home"))
+    ##########  Clicking OK logs the user out
+    except Exception as e:
+        print e
+        parts[3]['test_message'] = str(e)
+        
+    ##########  Clicking OK sets the store's active 
+    ###         field to false on Parse
+    store.active = None
+    parts[4]['success'] = not store.get("active")
+    
+    # undo
+    store.active = True
+    store.update()
+    
+    # END OF ALL TESTS - cleanup
+    return test.tear_down()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

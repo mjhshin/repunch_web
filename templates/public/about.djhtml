@@ -22,7 +22,7 @@
 			<aside class="col1">
 				<h3>Repunch is changing the nature of consumer loyalty.</h3>
 				<h4> More broadly, we are altering the way businesses and their customers interact.<br/>We'll be on our way to achieving our goal when you know your Punch Code better than your birthday (or at least as well as your brother's birthday)!</h4>
-				<img id="team-photo" src="http://placehold.it/890x270" alt="">
+				<img id="team-photo" src="{% static "public/images/team-photo.png" %}" alt="">
 				<p>A distant relative of Repunch's was born in the summer of 2011 as Matt daydreamed about how often he went to the same merchants every week. He surmised that loyalty should be a two-way street and that his favorite places should know just how much he loved them. After months of feedback from business owners and employees, customers, his future Co-founder (Mike Shin), and many many more; that original daydream morphed into a turnkey solution for loyalty, communication, marketing and much more.</p>
 				<p>
 				Fast forward a few more months and you'll find the Repunch team - now consisting of the awesome people detailed below - working in Brooklyn with one goal always in mind: create simple and powerful solutions that make the buying experience more valuable for everyone.</p>

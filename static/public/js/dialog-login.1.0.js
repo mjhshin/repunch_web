@@ -49,7 +49,6 @@ $(document).ready(function(){
         loading.show();
         
         var url = $("#dialog-login input[name=action]").val();
-        var url_redirect = $("#dialog-login-form input[name=redirect-url]").val();
         var data = $("#dialog-login-form").serialize();
         
         function finish(dim){
@@ -71,7 +70,7 @@ $(document).ready(function(){
                 2 - subscription is not active
                 3 - success */
             if (res.code == 3){
-                window.location.replace(url_redirect);
+                window.location.replace(res.redirect_url);
                 var dim = 320;
                 if ($("#dialog-login-message span[name=incorrect]").length > 0){
                     dim += 20;

@@ -40,6 +40,11 @@ def manage_login(request):
                     data['code'] = 2
             else:
                 data['code'] = 3
+                # manually check the next parameter
+                next = request.GET.get("next")
+                if not next:
+                    next = reverse("store_index")
+                data['redirect_url'] = next
                 # user may try to login on another tab when already in
                 try:
                     CometSessionIndex.objects.create(session_key=\

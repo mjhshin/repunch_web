@@ -55,7 +55,7 @@ def test_login_dialog():
         ("", Keys.RETURN)
     )
     try:
-        test.action_chain(1, selectors, "send_keys") # ACTION!
+        test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(3)
         parts[1]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
@@ -99,7 +99,7 @@ def test_login_dialog():
         test.new_driver(save_session_cookie=False)
         test.find("#header-signin-btn").click() # ACTION!
         test.find("#stay_in").click() # ACTION!
-        test.action_chain(1, selectors, "send_keys") # ACTION!
+        test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
         parts[4]["success"] = test.driver.get_cookie(\
             "sessionid")['expiry'] != None
@@ -169,7 +169,7 @@ def test_login_page():
         ("", Keys.RETURN)
     )
     try:
-        test.action_chain(1, selectors, "send_keys") # ACTION!
+        test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(3)
         parts[0]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
@@ -189,7 +189,7 @@ def test_login_page():
         ("", Keys.RETURN)
     )
     try:
-        test.action_chain(1, selectors, "send_keys") # ACTION!
+        test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
         parts[1]["success"] =\
             test.is_current_url(reverse("store_index"))
@@ -214,7 +214,7 @@ def test_login_page():
         test.open(reverse("manage_login")) # ACTION!
         sleep(1)
         test.find("#stay_in").click() # ACTION!
-        test.action_chain(1, selectors, "send_keys") # ACTION!
+        test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
         parts[3]["success"] = test.driver.get_cookie(\
             "sessionid")['expiry'] != None

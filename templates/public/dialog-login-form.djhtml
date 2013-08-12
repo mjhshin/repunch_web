@@ -1,9 +1,8 @@
 {% load static %}
 
-<form id="dialog-login-form" >
+<form id="dialog-login-form" action="">
     {% csrf_token %}
     <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
-	<input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
 
 	<p><label for="id_username">Username:</label> 
 	{# the redirect url to prevent hard-coding anything #}
