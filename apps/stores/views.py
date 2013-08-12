@@ -97,7 +97,7 @@ def edit(request):
                             max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
-        form = StoreForm(request.POST['email'], request.POST)
+        form = StoreForm(account.email, request.POST)
         if form.is_valid(): 
             # build the list of hours in proper format for saving 
             # to Parse. 

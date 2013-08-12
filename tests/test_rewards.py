@@ -123,6 +123,21 @@ def test_rewards():
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
+        
+    # let's add another reward!
+    reward2_name = "reward dos"
+    reward2_description = "DOS"
+    reward2_punches = 5
+     test.find("//div[@id=0]/a", type="xpath").click()
+    sleep(1)
+    selectors = (
+        ("#id_reward_name", reward2_name),
+        ("#id_description", reward2_description),
+        ("#id_punches", str(reward2_punches)),
+    )
+    test.action_chain(0, selectors, action="send_keys")
+    test.find("#submit-reward-form").click()
+    sleep(5)
     
     reward1_name = "reward uno"
     reward1_description = "UNO"
@@ -147,7 +162,7 @@ def test_rewards():
     ##########  The updated reward is saved to parse
     try:
         store.rewards = None
-        reward = store.get("rewards")[0]
+        reward = store.get("rewards")[0] # list is sorted by punches
         parts[7]['success'] = reward['reward_name'] ==\
             reward1_name and\
             reward['description'] == reward1_description and\
@@ -167,19 +182,43 @@ def test_rewards():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  Clicking delete brings up a confirmation dialog TODO
+    ##########  Clicking delete brings up a confirmation dialog 
     try:
-        pass
-    except Exceptio as e:
+        test.find("//div[@id=0]/a", type="xpath").click()
+        sleep(1)
+        test.find("#delete-link").click()
+        alert = test.switch_to_alert()
+        parts[10]['success'] = alert is not None
+    except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
     ##########  Deleting a reward works
-    
-    ##########  The deleted reward is deleted from parse TODO
+    try:
+        alert.accept()
+        sleep(5)
+        parts[11]['success'] =\
+            test.find("//div[@id='rewards_section']/div[@class=" +\
+            "'tr reward']/div[@class='td reward_summary']/span[1]",
+            type="xpath").text == "No Rewards"
+    except Exception as e:
+        print e
+        parts[11]['test_message'] = str(e)
+    ##########  The deleted reward is deleted from parse 
+    try:
+        store.rewards = None
+        rewards = store.get("rewards")
+        
+    except Exception as e:
+        print e
+        parts[12]['test_message'] = str(e)
+        
+        
     ##########  Reward name is required TODO
     ##########  Punches is required TODO
     ##########  Punches must be a number TODO
     ##########  Description is not required TODO
+    
+    
     ##########  Rewards are initially sorted by Punches TODO
     ###         from least to greatest
     ##########  Punches is sortable TODO
