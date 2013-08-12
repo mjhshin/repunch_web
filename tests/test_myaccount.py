@@ -5,6 +5,7 @@ Selenium tests for dashboard 'My Account' tab.
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoAlertPresentException
 from dateutil.tz import tzutc
 from datetime import datetime
 from time import sleep
@@ -939,6 +940,13 @@ def test_cancel_account():
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Clicking the cancel button brings up a " +\
+            "confirmation dialog"},
+        {'test_name': "Clicking cancel on the dialog dimisses the " +\
+            "dialog and the account remains active"},
+        {'test_name': "Clicking OK logs the user out"},
+        {'test_name': "Clicking OK sets the store's active field " +\
+            "to false on Parse"},
     ]
     section = {
         "section_name": "Edit store details working properly?",
@@ -961,6 +969,51 @@ def test_cancel_account():
     test.action_chain(1, selectors, "send_keys") # ACTION!
     sleep(7)  
     
+    ##########  Clicking the cancel button brings up a confrmtn dialog
+    try:
+        test.find("#deactivate_account").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        parts[1]['success'] = alert.text ==\
+            "Are you sure you want to deactivate your account?"
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
+        
+    ##########  Clicking cancel on the dialog dimisses the 
+    ###         dialog and the account remains active
+    try:
+        alert.dismiss()
+        try:
+            alert.text
+        except NoAlertPresentException:
+            store.active = None
+            parts[2]['success'] = store.get("active")
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
+        
+    ## cancel the account
+    try:
+        test.find("#deactivate_account").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        alert.accept()
+        sleep(4)
+        parts[3]['success']=test.is_current_url(reverse("public_home")
+    ##########  Clicking OK logs the user out
+    except Exception as e:
+        print e
+        parts[3]['test_message'] = str(e)
+        
+    ##########  Clicking OK sets the store's active 
+    ###         field to false on Parse
+    store.active = None
+    parts[4]['success'] = not store.get("active")
+    
+    # undo
+    store.active = True
+    store.update()
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
