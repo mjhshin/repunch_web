@@ -370,6 +370,14 @@ def test_edit_store_details():
         int(math.floor(TEST_STORE_INFO['coordinates'][0])) and\
         int(math.floor(store.get("coordinates")[1])) ==\
         int(math.floor(TEST_STORE_INFO['coordinates'][1]))
+        
+    ## revert the email address back
+    click_store_edit()
+    sleep(3)
+    test.find("#id_email").send_keys(TEST_USER['email'])
+    # save!
+    test.find("#save-button").click()
+    sleep(3)
     
     ##########  Entering invalid address shows error
     try:
