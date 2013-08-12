@@ -601,6 +601,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				name: storeName,
 				store_id: storeId,
+				patron_store_id: patronStore.id,
 				punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
 			}
