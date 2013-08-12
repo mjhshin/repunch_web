@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
+from parse.apps.accounts.models import Account
 
 TEST_USER = {
     "username": "clothing",
@@ -14,10 +15,18 @@ TEST_USER = {
     "email": "clothing@vandolf.com",
 }
 
+account = Account.objects().get(username=TEST_USER['username'],
+    include="Store")
+store = account.store
+# start with no rewards
+store.rewards = []
+store.update()
+
 def test_rewards():
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Having no rewards shows a placeholder row"},
         {'test_name': "Adding a reward works"},
         {'test_name': "The new reward is saved to parse"},
         {'test_name': "Updating a reward works"},
@@ -55,8 +64,21 @@ def test_rewards():
     )
     test.action_chain(1, selectors, "send_keys") # ACTION!
     sleep(7)  
-
-    ##########  Adding a reward works TODO
+    ##########  Having no rewards shows a placeholder row 
+    try:
+        parts[1]['success'] =\
+            test.find("//div[@id='rewards_section']/div[@class=" +\
+            "'tr reward']/div[@class='td reward_summary']/span[1]",
+            type="xpath").text == "No Rewards"
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
+    ##########  Adding a reward works 
+    try:
+        test.find
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
     ##########  The new reward is saved to parse TODO
     ##########  Updating a reward works TODO
     ##########  The updated reward is saved to parse TODO
@@ -91,28 +113,6 @@ def test_rewards():
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
