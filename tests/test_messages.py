@@ -136,8 +136,8 @@ def test_messages():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7) 
     
-    def send_message(filter, subject, body, attach_offer=False,
-            exp_date=None):
+    def send_message(filter, subject, body,
+            attach_offer=False, exp_date=None):
         """ Must be called at messages index page """
         test.find("#create_message").click()
         sleep(1)
@@ -157,30 +157,63 @@ def test_messages():
         test.find("#send-now").click()
         sleep(6)
         
-    def message_in_relation(message_id):
-        store.sentMessages = None
-        return store.get("sentMessages", objectId=message_id,
-            count=1, limit=0) == 1
+    def message_in_relation(message_id, test_number):
+        if not message_id:
+            return
             
-    def message_in_page(message_id):
-        rows = test.find("#tab-body-sent div.tr a", multiple=True)
-        for row in rows:
-            # /manage/messages/<objectId>/details
-            if row.get_attribute("href").split("/")[3] == message_id:
-                return True
-        return False
+        store.sentMessages = None
+        parts[test_number]['success'] = store.get("sentMessages", 
+            objectId=message_id, count=1, limit=0) == 1
+            
+    def message_in_page(message_id, test_number):
+        if not message_id:
+            return
+            
+        try:
+            rows = test.find("#tab-body-sent div.tr a", multiple=True)
+            for row in rows:
+                # /manage/messages/<objectId>/details
+                if row.get_attribute("href").split("/")[3] ==\
+                    message_id:
+                    parts[test_number]['success'] = True
+        except Exception as e:
+            print e
+            parts[test_number]['test_message'] = str(e)
         
-    def message_viewable(message_id):
-        test.find("#tab-body-sent div.tr a[href='%s']" %\
-            (reverse("message_details"), args=(message_id,)),).click()
-        sleep(2)
-        return test.is_current_url(reverse("message_details"),
-            args=(message_id,))
+    def message_viewable(message_id, test_number):
+        if not message_id:
+            return
+            
+        try:
+            test.find("#tab-body-sent div.tr a[href='%s']" %\
+                (reverse("message_details",
+                args=(message_id,)),)).click()
+            sleep(2)
+            parts[test_number]['success'] = test.is_current_url(\
+                reverse("message_details"), args=(message_id,))
+        except Exception as e:
+            print e
+            parts[test_number]['test_message'] = str(e)
+        finally:
+            # must go back to messages index for the other tests
+            test.open(reverse("messages_index"))
                 
     ##########  Send message. Filter all. No offer. 
+    message_id = None
+    try:
+        send_message("all", "msg #1", "body #1")
+        parts[1]['success'] =\
+            len(test.find("div.notification.success")) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 2)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 3)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 4)
 
     ##########  Send message. Filter all. With offer. 
     ##########  Message is in store's sentMessages relation. 

@@ -144,7 +144,8 @@ def edit(request, message_id):
                     request.session).get('subscriptionType')
                     
         # refresh the message count - make sure we get the one in the cloud
-        del request.session['message_count']
+        if 'message_count' in request.session:
+            del request.session['message_count']
         message_count = SESSION.get_message_count(request.session)
                                 
         limit_reached = message_count >= sub_type[subType]['max_messages']
