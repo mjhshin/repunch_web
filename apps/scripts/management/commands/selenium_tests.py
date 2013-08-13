@@ -22,7 +22,7 @@ class Command(BaseCommand):
         # PUBLIC PAGES
         #results.extend(test_public_pages())
         # SIGNUP
-        #results.extend(test_signup())
+        results.extend(test_signup())
         # LOGIN (dialog)
         #results.extend(test_login_dialog())
         # LOGIN (dedicated page)
@@ -42,6 +42,6 @@ class Command(BaseCommand):
         #results.extend(test_rewards())
         
         ### MESSAGES
-        results.extend(test_messages())
+        #results.extend(test_messages())
         
         send_email_selenium_test_results(results)

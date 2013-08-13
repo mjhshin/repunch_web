@@ -20,6 +20,7 @@ EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
+EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX = "Welcome to Repunch "
 
 def get_notification_ctx():
     """
@@ -163,7 +164,8 @@ def send_email_signup(account, connection=None):
         template = Template(f.read())
         
     store = account.get("store")
-    subject = "Welcome to Repunch " + store.get_owner_fullname() + "."
+    subject = EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +\
+        store.get_owner_fullname()
     ctx = get_notification_ctx()
     ctx.update({'store':store})
     body = template.render(Context(ctx)).__str__()
