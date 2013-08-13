@@ -136,9 +136,47 @@ def test_messages():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7) 
     
-    
-    ##########  User needs to be logged in to access page. 
+    def send_message(filter, subject, body, attach_offer=False,
+            exp_date=None):
+        """ Must be called at messages index page """
+        test.find("#create_message").click()
+        sleep(1)
+        # set the filter
+        test.find("//select[@id='filter']/option[@value='%s']" %\
+            (filter,), type="xpath").click()
+        # subject
+        test.find("#id_subject").send_keys(subject)
+        # body
+        test.find("#id_body").send_keys(body)
+        # attach_offer
+        if attach_offer:
+            test.find("#id_attach_offer").click()
+            # exp_date
+            test.find("#id_date_offer_expiration").send_keys(exp_date)
+        # submit
+        test.find("#send-now").click()
+        sleep(6)
         
+    def message_in_relation(message_id):
+        store.sentMessages = None
+        return store.get("sentMessages", objectId=message_id,
+            count=1, limit=0) == 1
+            
+    def message_in_page(message_id):
+        rows = test.find("#tab-body-sent div.tr a", multiple=True)
+        for row in rows:
+            # /manage/messages/<objectId>/details
+            if row.get_attribute("href").split("/")[3] == message_id:
+                return True
+        return False
+        
+    def message_viewable(message_id):
+        test.find("#tab-body-sent div.tr a[href='%s']" %\
+            (reverse("message_details"), args=(message_id,)),).click()
+        sleep(2)
+        return test.is_current_url(reverse("message_details"),
+            args=(message_id,))
+                
     ##########  Send message. Filter all. No offer. 
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
