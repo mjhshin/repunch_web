@@ -256,7 +256,7 @@ def test_messages():
     message_id = None
     try:
         send_message("idle", "msg #3", "body #3")
-        parts[9]['success'] = 
+        parts[9]['success'] = # TODO
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)

@@ -111,7 +111,7 @@ $(document).ready(function(){
 				
 				{{ form.date_offer_expiration.errors }}
 				<label for="id_date_offer_expiration">Expiration Date</label>
-				<input type="text" id="id_date_offer_expiration" name="date_offer_expiration" value="{{ form.date_offer_expiration.value|date:'m/d/y h:m A' }}" />
+				<input type="text" id="id_date_offer_expiration" name="date_offer_expiration" value="{{ form.data.date_offer_expiration }}" />
 			</div>
 		</div>
 		
