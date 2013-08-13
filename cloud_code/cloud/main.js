@@ -597,10 +597,10 @@ Parse.Cloud.define("punch", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
 			data: {
-				push_type: "punch",
+				type: "punch",
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
-				name: storeName,
 				store_id: storeId,
+				patron_store_id: patronStore.id,
 				punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
 			}
@@ -1097,8 +1097,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		promises.push( Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
-				push_type: "redeem",
-	            title: rewardTitle,
+				type: "redeem",
 	            alert: "Successfully redeemed '" + rewardTitle + "'",
 	            store_id: storeId,
 				patron_store_id: patronStore.id,
@@ -1325,7 +1324,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 store_id: storeId,
                 store_name: storeName,
                 message_id: messageId,
-                push_type: "receive_message"
+                type: "message"
             }
 		}) );
 		
@@ -1627,7 +1626,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
                 store_id: storeId,
                 sender: senderName,
                 message_status_id: messageStatus.id,
-                push_type: "receive_gift"
+                type: "receive_gift"
 			}
         }) );
 		
@@ -1757,7 +1756,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
                 store_id: storeId,
                 sender: senderName,
                 message_status_id: messageStatus.id,
-                push_type: "receive_gift_reply"
+                type: "gift_reply"
 			}
         }) );
 		
