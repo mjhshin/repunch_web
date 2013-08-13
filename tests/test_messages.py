@@ -7,7 +7,9 @@ from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
+from libs.dateutil.relativedelta import relativedelta
 from tests import SeleniumTest
+from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
@@ -21,8 +23,8 @@ account = Account.objects().get(username=TEST_USER['username'],
 store = account.store
 subscription = store.subscription
 
-# set subscriptionType to middle
-subscription.subscriptionType = 1
+# set subscriptionType to free
+subscription.subscriptionType = 0
 subscription.update()
 
 # clear the sent messages relation
@@ -46,60 +48,65 @@ def test_messages():
     parts = [
         {'test_name': "User needs to be logged in to access page"},
         
+        # FIRST
         {'test_name': "Send message. Filter all. No offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
+        # SECOND
         {'test_name': "Send message. Filter all. With offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
-        {'test_name': "Message limit passed (free) dialog appears"},
+        # THIRD    
+        {'test_name': "Send message. Filter idle. No offer. " +\
+            "Message limit passed (free) dialog appears"},
+        # LIMIT PASSED
         {'test_name': "Upgrading account from the dialog sends the " +\
             "message and upgrades the account to middle"},
         {'test_name': "Email is sent notifying user the upgrade"},
-            
-        {'test_name': "Send message. Filter idle. No offer"},
+        #
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
+        # FOURTH
         {'test_name': "Send message. Filter idle. With offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
-        {'test_name': "Message limit passed (middle) dialog appears"},
+        # FIFTH
+        {'test_name': "Send message. Filter loyal. No offer. " +\
+            "Message limit passed (middle) dialog appears"},
+        # LIMIT PASSED
         {'test_name': "Upgrading account from the dialog sends the" +\
             " message and upgrades the account to heavy"},
         {'test_name': "Email is sent notifying user the upgrade"},
-            
-        {'test_name': "Send message. Filter loyal. No offer"},
+        #
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
+        # SIXTH
         {'test_name': "Send message. Filter loyal. With offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
+        # SEVENTH
         {'test_name': "Send message. Filter all. With offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
+        # EIGHTH
         {'test_name': "Send message. Filter all. With offer"},
-        
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
-        
-        {'test_name': "Message limit passed (heavy) dialog appears"},
+        # NINTH
+        {'test_name': "Send message. Filter all. No offer. " +\
+            "Message limit passed (heavy) dialog appears"},
+        # LIMIT PASSED
         {'test_name': "Account can no longer be upgraded." +\
             "Message cannot be sent"},
+        #
             
         {'test_name': "Subject is required"},
         {'test_name': "Body is required"},
@@ -137,7 +144,7 @@ def test_messages():
     sleep(7) 
     
     def send_message(filter, subject, body,
-            attach_offer=False, exp_date=None):
+            attach_offer=False, offer_title=None, exp_date=None,):
         """ Must be called at messages index page """
         test.find("#create_message").click()
         sleep(1)
@@ -151,11 +158,16 @@ def test_messages():
         # attach_offer
         if attach_offer:
             test.find("#id_attach_offer").click()
+            # offer title
+            if offer_title:
+                test.find("#id_offer_title").send_keys(offer_title)
             # exp_date
-            test.find("#id_date_offer_expiration").send_keys(exp_date)
+            if exp_date:
+                test.find("#id_date_offer_expiration").send_keys(exp_date)
+            
         # submit
         test.find("#send-now").click()
-        sleep(6)
+        sleep(7)
         
     def message_in_relation(message_id, test_number):
         if not message_id:
@@ -172,8 +184,7 @@ def test_messages():
         try:
             rows = test.find("#tab-body-sent div.tr a", multiple=True)
             for row in rows:
-                # /manage/messages/<objectId>/details
-                if row.get_attribute("href").split("/")[3] ==\
+                if row.get_attribute("href").split("/")[5] ==\
                     message_id:
                     parts[test_number]['success'] = True
         except Exception as e:
@@ -183,14 +194,12 @@ def test_messages():
     def message_viewable(message_id, test_number):
         if not message_id:
             return
-            
+        href = reverse("message_details", args=(message_id,))
         try:
             test.find("#tab-body-sent div.tr a[href='%s']" %\
-                (reverse("message_details",
-                args=(message_id,)),)).click()
+                (href,)).click()
             sleep(2)
-            parts[test_number]['success'] = test.is_current_url(\
-                reverse("message_details"), args=(message_id,))
+            parts[test_number]['success'] = test.is_current_url(href)
         except Exception as e:
             print e
             parts[test_number]['test_message'] = str(e)
@@ -198,16 +207,20 @@ def test_messages():
             # must go back to messages index for the other tests
             test.open(reverse("messages_index"))
                 
+    # FIRST
     ##########  Send message. Filter all. No offer. 
     message_id = None
     try:
         send_message("all", "msg #1", "body #1")
-        parts[1]['success'] =\
-            len(test.find("div.notification.success")) > 0
+        parts[1]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
         message_id = test.driver.current_url.split("/")[5]
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
+        
     ##########  Message is in store's sentMessages relation. 
     message_in_relation(message_id, 2)
     ##########  Message is visible in page. 
@@ -215,55 +228,96 @@ def test_messages():
     ##########  Message can be view by clicking on row. 
     message_viewable(message_id, 4)
 
+    # SECOND
     ##########  Send message. Filter all. With offer. 
+    message_id = None
+    try:
+        exp_date = tiemzone.now() + relativedelta(hours=1)
+        send_message("all", "msg #2", "body #2", True, "offer#2",
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        parts[5]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[5]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 6)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 7)
     ##########  Message can be view by clicking on row. 
-
-    ##########  Message limit passed (free) dialog appears. 
-    ##########  Upgrading account from the dialog sends the 
-    ###         message and upgrades the account to middle. 
-    ##########  Email is sent notifying user the upgrade. 
+    message_viewable(message_id, 8) 
         
+    # THIRD
     ##########  Send message. Filter idle. No offer. 
+    ###         Message limit passed (free) dialog appears.
+    message_id = None
+    try:
+        send_message("idle", "msg #3", "body #3")
+        parts[9]['success'] = 
+    except Exception as e:
+        print e
+        parts[9]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
+    # LIMIT PASSED
+    ##########  Upgrading account from the dialog sends the 
+    ###         message and upgrades the account to middle. TODO
+    message_id = test.driver.current_url.split("/")[5]
+    ##########  Email is sent notifying user the upgrade. TODO
+    #
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 12)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 13)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 14) 
 
+    # FOURTH
     ##########  Send message. Filter idle. With offer. 
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
     ##########  Message can be view by clicking on row. 
-
-    ##########  Message limit passed (middle) dialog appears. 
+        
+    # FIFTH
+    ##########  Send message. Filter loyal. No offer. 
+    ###         Message limit passed (middle) dialog appears.
+    # LIMIT PASSED 
     ##########  Upgrading account from the dialog sends the
     ###         message and upgrades the account to heavy. 
     ##########  Email is sent notifying user the upgrade. 
-        
-    ##########  Send message. Filter loyal. No offer. 
+    #
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
     ##########  Message can be view by clicking on row. 
 
+    # SIXTH
     ##########  Send message. Filter loyal. With offer. 
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
     ##########  Message can be view by clicking on row. 
 
+    # SEVENTH
     ##########  Send message. Filter all. With offer. 
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
     ##########  Message can be view by clicking on row. 
 
+    # EIGHTH
     ##########  Send message. Filter all. With offer. 
-
     ##########  Message is in store's sentMessages relation. 
     ##########  Message is visible in page. 
     ##########  Message can be view by clicking on row. 
 
-    ##########  Message limit passed (heavy) dialog appears. 
+    # NINETH
+    ##########  Send message. Filter all. With offer. 
+    ###         Message limit passed (heavy) dialog appears. 
+    # LIMIT PASSED
     ##########  Account can no longer be upgraded
     ###         Message cannot be sent. 
+    #
         
     ##########  Subject is required. 
     ##########  Body is required. 
