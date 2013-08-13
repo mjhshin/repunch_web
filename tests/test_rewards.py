@@ -294,16 +294,16 @@ def test_rewards():
         parts[18]['test_message'] = str(e)
     
     
-    store.rewards = None
-    rewards = store.get('rewards')
-    punches_map = {r['punches']:r for r in rewards}
-    ascending = [r['punches'] for r in rewards]
-    descending = ascending[:]
-    ascending.sort()
-    descending.sort(reverse=True)
     ##########  Rewards are initially sorted by Punchess
     ###         from least to greatest
     try:
+        store.rewards = None
+        rewards = store.get('rewards')
+        punches_map = {r['punches']:r for r in rewards}
+        ascending = [r['punches'] for r in rewards]
+        descending = ascending[:]
+        ascending.sort()
+        descending.sort(reverse=True)
         success = True
         for i in range(3):
             if int(test.find("//div[@id='%s']/a/div[1]" %(str(i+1),),
@@ -318,13 +318,73 @@ def test_rewards():
     ##########  Punches is sortable
     try:
         test.find("#header-reward_punches").click()
-        
+        rows = test.find("//div[@id='rewards_section']/" +\
+            "div[contains(@class, 'reward')]",
+            type="xpath", multiple=True)
+            
+        if len(rows) == len(descending):
+            success = True
+            for i in range(rows):
+                # check both the punches and id
+                row = rows[i]
+                if int(row.text.split("\n")[0]) !=\
+                    descending[i] or int(row.get_attribute("id")) !=\
+                    punches_map[descending[i]]['reward_id']:
+                    success = False
+                    break
+                    
+            parts[20]['success'] = success
+            
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
-    ##########  Name is sortable TODO
-    
-    
+    ##########  Name is sortable
+    try:
+        name_map = {r['reward_name']:r for r in rewards}
+        ascending = [r['reward_name'] for r in rewards]
+        descending = ascending[:]
+        ascending.sort()
+        descending.sort(reverse=True)
+        
+        # ascending order
+        test.find("#header-reward_summary").click()
+        rows = test.find("//div[@id='rewards_section']/" +\
+            "div[contains(@class, 'reward')]",
+            type="xpath", multiple=True)
+            
+        if len(rows) == len(ascending):
+            success1 = True
+            for i in range(rows):
+                # check both the name and id
+                row = rows[i]
+                if int(row.text.split("\n")[1]) !=\
+                    ascending[i] or int(row.get_attribute("id")) !=\
+                    punches_map[ascending[i]]['reward_id']:
+                    success1 = False
+                    break
+                    
+        # descending order
+        test.find("#header-reward_summary").click()
+        rows = test.find("//div[@id='rewards_section']/" +\
+            "div[contains(@class, 'reward')]",
+            type="xpath", multiple=True)
+            
+        if len(rows) == len(descending):
+            success2 = True
+            for i in range(rows):
+                # check both the name and id
+                row = rows[i]
+                if int(row.text.split("\n")[1]) !=\
+                    descending[i] or int(row.get_attribute("id")) !=\
+                    punches_map[descending[i]]['reward_id']:
+                    success2 = False
+                    break
+                    
+            parts[21]['success'] = success1 and success2
+    except Exception as e:
+        print e
+        parts[21]['test_message'] = str(e)
+        
     
     # END OF ALL TESTS - cleanup
     return test.tear_down()
