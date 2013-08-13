@@ -1,5 +1,5 @@
 """
-Selenium tests for dashboard 'My Account' tab.
+Selenium tests for dashboard 'Rewards' tab.
 """
 
 from django.core.urlresolvers import reverse
@@ -73,6 +73,7 @@ def test_rewards():
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(7)  
+    
     ##########  Having no rewards shows a placeholder row 
     try:
         parts[1]['success'] =\

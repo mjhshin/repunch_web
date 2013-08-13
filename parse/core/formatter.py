@@ -8,6 +8,8 @@ from dateutil import parser
 from repunch.settings import USER_CLASS
 
 # should be renamed to QUERY_OPTIONS
+# note that keys constraints will not match anything if it 
+# contains Parse builtins (createdAt, updatedAt, objectId) (id is ok)
 NOT_WHERE_CONSTRAINTS = [
     "include", "count", "limit", "order", "keys", "skip",
 ]

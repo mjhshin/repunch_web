@@ -19,7 +19,7 @@ from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX
 
 TEST_USER = {
     "username": "iusluixylusr",
-    "email": "iusluixylusr@vandolf.com",
+    "email": "vestrel00@gmail.com",
 }
 
 def test_signup():
@@ -33,7 +33,10 @@ def test_signup():
         {'test_name': "Store object created"},
         {'test_name': "Subscription object created"},
         {'test_name': "Settings object created"},
-        {'test_name': "Email about new user sent"},
+        {'test_name': "Email about new user sent to staff"},
+        {'test_name': "Welcome email sent to user"}, # TODO
+        {'test_name': "Email must be unique"}, # TODO
+        {'test_name': "Username must be unique"}, # TODO
         {'test_name': "Store name is required"},
         {'test_name': "Street is required"},
         {'test_name': "City is required"},
@@ -52,6 +55,7 @@ def test_signup():
         {'test_name': "password must not contain whitespace"},
         {'test_name': "password must be at least 6 characters"},
         {'test_name': "password and corfirmation must be the same"},
+        
     ]
     section = {
         "section_name": "Sign up working properly?",
@@ -132,7 +136,7 @@ def test_signup():
         parts[6]['success'] = settings is not None
         
     
-        ##########  Email about new user sent
+        ##########  Email about new user sent to staff
         sleep(5) # wait for the email to register in gmail
         mail = Mail()
         mail.select_sent_mailbox()
@@ -148,6 +152,11 @@ def test_signup():
                 (sent.minute == now.minute or\
                     sent.minute == lb.minute):
                 parts[7]['success'] = True
+                
+        ##########  Welcome email sent to user # TODO
+        
+        ##########  Email must be unique # TODO
+        ##########  Username must be unique # TODO
     
         mail.logout()
         user.delete()
@@ -180,61 +189,61 @@ def test_signup():
     sleep(3)
     
     ##########  Store name is required
-    parts[8]['success'] =\
+    parts[11]['success'] =\
         str(test.find("#store_name_e ul li").text) ==\
             "This field is required."
     ##########  Street is required
-    parts[9]['success'] =\
+    parts[12]['success'] =\
         str(test.find("#street_e ul li").text) ==\
             "This field is required."
     ##########  City is required
-    parts[10]['success'] =\
+    parts[13]['success'] =\
         str(test.find("#city_e ul li").text) ==\
             "This field is required."
     ##########  State is required 
-    parts[11]['success'] =\
+    parts[14]['success'] =\
         str(test.find("#state_e ul li").text) ==\
             "This field is required."
     ##########  Zip is required 
-    parts[12]['success'] =\
+    parts[15]['success'] =\
         str(test.find("#zip_e ul li").text) ==\
             "This field is required."
     ##########  First name is required 
-    parts[13]['success'] =\
+    parts[16]['success'] =\
         str(test.find("#first_name_e ul li").text) ==\
             "This field is required."
     ##########  Last name is required 
-    parts[14]['success'] =\
+    parts[17]['success'] =\
         str(test.find("#last_name_e ul li").text) ==\
             "This field is required."
     ##########  Phone number is required 
-    parts[15]['success'] =\
+    parts[18]['success'] =\
         str(test.find("#phone_number_e ul li").text) ==\
             "This field is required."
     ##########  Email is required 
-    parts[16]['success'] =\
+    parts[19]['success'] =\
         str(test.find("#email_e ul li").text) ==\
             "This field is required."
     ##########  Username is required
     e1, e2 = test.find("#username_e ul li", multiple=True)
-    parts[17]['success'] =\
+    parts[20]['success'] =\
         str(e1.text) == "This field is required." and\
         str(e2.text) == "Must contain only alpha-numeric" +\
             " characters without spaces."
     ##########  Password is required 
     e1, e2 = test.find("#password_e ul li", multiple=True)
-    parts[18]['success'] =\
+    parts[21]['success'] =\
         str(e1.text) == "This field is required." and\
         str(e2.text) == "Must contain only alpha-numeric" +\
             " characters without spaces."
     ##########  Password confirmation is required
     e1, e2 = test.find("#password2_e ul li", multiple=True)
-    parts[19]['success'] =\
+    parts[22]['success'] =\
         str(e1.text) == "This field is required." and\
         str(e2.text) == "Must contain only alpha-numeric" +\
             " characters without spaces."
     ##########  ToS is required 
-    parts[20]['success'] =\
+    parts[23]['success'] =\
         str(test.find("#recurring_e ul li").text) ==\
             "You must accept the Terms & Conditions to continue."
             
@@ -258,7 +267,7 @@ def test_signup():
     # submit
     test.find("#signup-form-submit").click() # ACTION!
     sleep(2)
-    parts[21]['success'] = str(test.find("#street_e ul li").text) ==\
+    parts[24]['success'] = str(test.find("#street_e ul li").text) ==\
         "Enter a valid adress, city, state, and/or zip."
    
     ## no whitespace
@@ -274,10 +283,10 @@ def test_signup():
     test.find("#signup-form-submit").click() # ACTION!
     sleep(2)
     ##########  username must not contain whitespace
-    parts[22]['success'] =str(test.find("#username_e ul li").text) ==\
+    parts[25]['success'] =str(test.find("#username_e ul li").text) ==\
         "Must contain only alpha-numeric characters without spaces."
     ##########  password must not contain whitespace
-    parts[23]['success'] =str(test.find("#password_e ul li").text) ==\
+    parts[26]['success'] =str(test.find("#password_e ul li").text) ==\
         "Must contain only alpha-numeric characters without spaces."
     
     ##########  password must be at least 6 characters
@@ -292,7 +301,7 @@ def test_signup():
     # submit
     test.find("#signup-form-submit").click() # ACTION!
     sleep(2)
-    parts[24]['success'] =\
+    parts[27]['success'] =\
         str(test.find("#password_e ul li").text)== "Ensure this " +\
         "value has at least 6 characters (it has 5)." and\
         str(test.find("#password2_e ul li").text)== "Ensure this " +\
@@ -310,7 +319,7 @@ def test_signup():
     # submit
     test.find("#signup-form-submit").click() # ACTION!
     sleep(2)
-    parts[25]['success'] =str(test.find("#password_e ul li").text) ==\
+    parts[28]['success'] =str(test.find("#password_e ul li").text) ==\
         "Passwords don't match"
     
     

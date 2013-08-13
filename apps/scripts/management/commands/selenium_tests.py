@@ -11,6 +11,7 @@ from tests.test_login_logout import test_login_dialog, test_login_page
 from tests.test_myaccount import test_edit_store_details,\
 test_edit_account, test_cancel_account
 from tests.test_rewards import test_rewards
+from tests.test_messages import test_messages
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -38,6 +39,9 @@ class Command(BaseCommand):
         #results.extend(test_cancel_account())
         
         ### REWARDS
-        results.extend(test_rewards())
+        #results.extend(test_rewards())
+        
+        ### MESSAGES
+        results.extend(test_messages())
         
         send_email_selenium_test_results(results)
