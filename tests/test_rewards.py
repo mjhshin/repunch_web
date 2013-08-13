@@ -324,7 +324,7 @@ def test_rewards():
             
         if len(rows) == len(descending):
             success = True
-            for i in range(rows):
+            for i in range(len(rows)):
                 # check both the punches and id
                 row = rows[i]
                 if int(row.text.split("\n")[0]) !=\
@@ -354,12 +354,12 @@ def test_rewards():
             
         if len(rows) == len(ascending):
             success1 = True
-            for i in range(rows):
+            for i in range(len(rows)):
                 # check both the name and id
                 row = rows[i]
-                if int(row.text.split("\n")[1]) !=\
+                if row.text.split("\n")[1] !=\
                     ascending[i] or int(row.get_attribute("id")) !=\
-                    punches_map[ascending[i]]['reward_id']:
+                    name_map[ascending[i]]['reward_id']:
                     success1 = False
                     break
                     
@@ -371,12 +371,12 @@ def test_rewards():
             
         if len(rows) == len(descending):
             success2 = True
-            for i in range(rows):
+            for i in range(len(rows)):
                 # check both the name and id
                 row = rows[i]
-                if int(row.text.split("\n")[1]) !=\
+                if row.text.split("\n")[1] !=\
                     descending[i] or int(row.get_attribute("id")) !=\
-                    punches_map[descending[i]]['reward_id']:
+                    name_map[descending[i]]['reward_id']:
                     success2 = False
                     break
                     
