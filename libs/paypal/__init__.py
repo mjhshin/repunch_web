@@ -66,7 +66,7 @@ def store_cc(subscription, cc_number, cvv2):
     This uses requests instead of pycurl because pycurl does not work 
     here for some reason.
     
-    returns the result of the api call.
+    returns the result of the api call as dict.
     """
     url = 'https://' + PAYPAL_ENDPOINT + '/v1/vault/credit-card'
     data = json.dumps({
@@ -87,13 +87,13 @@ def store_cc(subscription, cc_number, cvv2):
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-
-    return r.text
+    print r.json()
+    return r.json()
     
 def charge_cc(subscription, total, description):
     """
     Uses that stored credit card via the subscription's pp_cc_id.
-    Returns the result of the payment.
+    Returns the result of the payment as a dict.
     """
     url = 'https://' + PAYPAL_ENDPOINT + '/v1/payments/payment'
     data = json.dumps({
@@ -112,7 +112,7 @@ def charge_cc(subscription, total, description):
         "transactions": [
             {
                 "amount": {
-                    "total": "%.2f" % float(1),
+                    "total": "%.2f" % float(0),
                     "currency": "USD"
                 },
                 "description": description
@@ -125,8 +125,8 @@ def charge_cc(subscription, total, description):
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-    print dir(r)
-    return r.text
+    print r.json()
+    return r.json()
     
 def delete_cc(subscription):
     """

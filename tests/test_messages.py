@@ -78,7 +78,7 @@ def test_messages():
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
         # FIFTH
-        {'test_name': "Send message. Filter loyal. No offer. " +\
+        {'test_name': "Send message. Filter most_loyal. No offer. " +\
             "Message limit passed (middle) dialog appears"},
         # LIMIT PASSED
         {'test_name': "Upgrading account from the dialog sends the" +\
@@ -89,7 +89,7 @@ def test_messages():
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
         # SIXTH
-        {'test_name': "Send message. Filter loyal. With offer"},
+        {'test_name': "Send message. Filter most_loyal. With offer"},
         {'test_name': "Message is in store's sentMessages relation"},
         {'test_name': "Message is visible in page"},
         {'test_name': "Message can be view by clicking on row"},
@@ -301,27 +301,90 @@ def test_messages():
 
     # FOURTH
     ##########  Send message. Filter idle. With offer. 
+    message_id = None
+    try:
+        exp_date = timezone.now() + relativedelta(hours=1)
+        send_message("idle", "msg #4", "body #4", True, "offer#4",
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        parts[15]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[15]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 16)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 17)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 18) 
         
     # FIFTH
-    ##########  Send message. Filter loyal. No offer. 
-    ###         Message limit passed (middle) dialog appears.
-    # LIMIT PASSED 
-    ##########  Upgrading account from the dialog sends the
-    ###         message and upgrades the account to heavy. 
-    ##########  Email is sent notifying user the upgrade. 
-    #
+    ##########  Send message. Filter most_loyal. No offer. 
+    ###         Message limit passed (free) dialog appears.
+    message_id = None
+    try:
+        send_message("most_loyal", "msg #5", "body #5")
+        parts[19]['success'] = test.find("#upgrade") is not None
+    except Exception as e:
+        print e
+        parts[19]['test_message'] = str(e)
+        test.open(reverse("messages_index"))
+    # LIMIT PASSED
+    ##########  Upgrading account from the dialog sends the 
+    ###         message and upgrades the account to middle.
+    try:
+        test.find("#upgrade").click()
+        sleep(2)
+        test.find("#id_cc_cvv").send_keys("123")
+        test.find("#id_recurring").click()
+        test.find("#upgrade-form-submit").click()
+        sleep(5)
+        message_id = test.driver.current_url.split("/")[5]
+        parts[20]['success'] = test.is_current_url(\
+            reverse("message_details", args=(message_id,)))
+    except Exception as e:
+        print e
+        parts[20]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
+    ##########  Email is sent notifying user the upgrade.
+    try:
+        parts[21]['success'] = mail.is_mail_sent(\
+            EMAIL_UPGRADE_SUBJECT)
+    except Exception as e:
+        print e
+        parts[21]['test_message'] = str(e)
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 22)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 23)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 24) 
 
     # SIXTH
-    ##########  Send message. Filter loyal. With offer. 
+    ##########  Send message. Filter most_loyal. With offer. 
+    message_id = None
+    try:
+        exp_date = timezone.now() + relativedelta(hours=1)
+        send_message("most_loyal", "msg #6", "body #6",
+            True, "offer#6", exp_date.strftime(DATE_PICKER_STRFTIME))
+        parts[25]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[25]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 26)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 27)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 28) 
 
     # SEVENTH
     ##########  Send message. Filter all. With offer. 
