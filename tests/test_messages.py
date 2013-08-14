@@ -108,7 +108,8 @@ def test_messages():
             "Message limit passed (heavy) dialog appears"},
         # LIMIT PASSED
         {'test_name': "Account can no longer be upgraded." +\
-            "Message cannot be sent"},
+            "Message cannot be sent. Clicking okay redirects "+\
+            "user to messages index."},
         #
             
         {'test_name': "Subject is required"},
@@ -438,7 +439,7 @@ def test_messages():
     ##########  Send message. Filter all. With offer. 
     ###         Message limit passed (heavy) dialog appears. 
     message_id = None
-    try: # TODO
+    try:
         send_message("all", "msg #9", "body #9")
         parts[37]['success'] = test.element_exists("#maxed_out")
     except Exception as e:
@@ -446,8 +447,8 @@ def test_messages():
         parts[37]['test_message'] = str(e)
         test.open(reverse("messages_index"))
     # LIMIT PASSED
-    ##########  Account can no longer be upgraded
-    ###         Message cannot be sent. 
+    ##########  Account can no longer be upgraded. Msg cannot be sent.
+    ###         Clicking Okay redirects user to messages index.
     try:
         test.find("#maxed_out").click()
         sleep(1)

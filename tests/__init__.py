@@ -13,7 +13,7 @@ class SeleniumTest(object):
     # SERVER_URL = "https://www.repunch.com"
     SERVER_URL = "http://localhost:8000"
     
-    IMPLICITLY_WAIT = 5
+    IMPLICITLY_WAIT = 10
     
     def __init__(self):
         """
@@ -26,7 +26,7 @@ class SeleniumTest(object):
             ... ]
         """
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(IMPLICITLY_WAIT)
+        self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
         self.results = []
         
     def tear_down(self):
@@ -115,7 +115,7 @@ class SeleniumTest(object):
         except NoSuchElementException:
             pass
             
-        self.driver.implicitly_wait(IMPLICITLY_WAIT)
+        self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
         return exists
             
     def action_chain(self, wait_time, selectors, action="click",
