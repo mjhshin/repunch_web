@@ -87,7 +87,7 @@ def store_cc(subscription, cc_number, cvv2):
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-    print r.json()
+        
     return r.json()
     
 def charge_cc(subscription, total, description):
@@ -112,7 +112,7 @@ def charge_cc(subscription, total, description):
         "transactions": [
             {
                 "amount": {
-                    "total": "%.2f" % float(0),
+                    "total": "%.2f" % float(0), # TODO set to total
                     "currency": "USD"
                 },
                 "description": description
@@ -125,7 +125,7 @@ def charge_cc(subscription, total, description):
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-    print r.json()
+        
     return r.json()
     
 def delete_cc(subscription):

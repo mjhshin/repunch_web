@@ -4,7 +4,6 @@ Selenium tests for dashboard 'Rewards' tab.
 
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 
 from tests import SeleniumTest
@@ -252,10 +251,8 @@ def test_rewards():
         parts[14]['test_message'] = str(e)
     ##########  Description is not required 
     try:
-        # this takes a while
-        test.find("#description_ic ul li").text
-    except NoSuchElementException:
-        parts[15]['success'] = True
+        parts[15]['success'] =\
+            test.element_exists("#description_ic ul li")
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)

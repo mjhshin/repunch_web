@@ -61,7 +61,7 @@ class Mail(object):
         if len(mail_ids) > 0:
             sent = self.fetch_date(str(mail_ids[-1]))
             now = timezone.now()
-            lb = now + relativedelta(seconds=-10)
+            lb = now + relativedelta(seconds=-20)
             # make sure that this is the correct email 
             if now.year == sent.year and now.month == sent.month and\
                 now.day == sent.day and now.hour == sent.hour and\

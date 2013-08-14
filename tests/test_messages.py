@@ -275,8 +275,10 @@ def test_messages():
         test.find("#upgrade-form-submit").click()
         sleep(5)
         message_id = test.driver.current_url.split("/")[5]
+        subscription.subscriptionType = None
         parts[10]['success'] = test.is_current_url(\
-            reverse("message_details", args=(message_id,)))
+            reverse("message_details", args=(message_id,))) and\
+            subscription.get("subscriptionType") == 1
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
@@ -334,7 +336,7 @@ def test_messages():
         test.open(reverse("messages_index"))
     # LIMIT PASSED
     ##########  Upgrading account from the dialog sends the 
-    ###         message and upgrades the account to middle.
+    ###         message and upgrades the account to heavy.
     try:
         test.find("#upgrade").click()
         sleep(2)
@@ -343,8 +345,10 @@ def test_messages():
         test.find("#upgrade-form-submit").click()
         sleep(5)
         message_id = test.driver.current_url.split("/")[5]
+        subscription.subscriptionType = None
         parts[20]['success'] = test.is_current_url(\
-            reverse("message_details", args=(message_id,)))
+            reverse("message_details", args=(message_id,))) and\
+            subscription.get("subscriptionType") == 2
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
@@ -388,23 +392,72 @@ def test_messages():
 
     # SEVENTH
     ##########  Send message. Filter all. With offer. 
+    message_id = None
+    try:
+        exp_date = timezone.now() + relativedelta(hours=1)
+        send_message("all", "msg #7", "body #7", True, "offer#7",
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        parts[29]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[29]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 30)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 31)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 32) 
 
     # EIGHTH
     ##########  Send message. Filter all. With offer. 
+    message_id = None
+    try:
+        exp_date = timezone.now() + relativedelta(hours=1)
+        send_message("all", "msg #8", "body #8", True, "offer#8",
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        parts[33]['success'] = len(test.find(\
+            "div.notification.success", multiple=True)) > 0
+        message_id = test.driver.current_url.split("/")[5]
+    except Exception as e:
+        print e
+        parts[33]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
     ##########  Message is in store's sentMessages relation. 
+    message_in_relation(message_id, 34)
     ##########  Message is visible in page. 
+    message_in_page(message_id, 35)
     ##########  Message can be view by clicking on row. 
+    message_viewable(message_id, 36) 
 
-    # NINETH
+    # NINTH
     ##########  Send message. Filter all. With offer. 
     ###         Message limit passed (heavy) dialog appears. 
+    message_id = None
+    try: # TODO
+        send_message("all", "msg #9", "body #9")
+        parts[37]['success'] = test.element_exists("#maxed_out")
+    except Exception as e:
+        print e
+        parts[37]['test_message'] = str(e)
+        test.open(reverse("messages_index"))
     # LIMIT PASSED
     ##########  Account can no longer be upgraded
     ###         Message cannot be sent. 
-    #
+    try:
+        test.find("#maxed_out").click()
+        sleep(1)
+        parts[38]['success'] =\
+            test.is_current_url(reverse("messages_index"))
+    except Exception as e:
+        print e
+        parts[38]['test_message'] = str(e)
+        test.open(reverse("messages_index"))
+    # 
         
     ##########  Subject is required. 
     ##########  Body is required. 
@@ -435,6 +488,7 @@ def test_messages():
     
     
     # END OF ALL TESTS - cleanup
+    mail.logout()
     return test.tear_down() 
     
     

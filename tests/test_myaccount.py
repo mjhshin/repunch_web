@@ -548,7 +548,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[36]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[36]['test_message'] = str(e)
@@ -586,7 +586,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[39]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[39]['test_message'] = str(e)
