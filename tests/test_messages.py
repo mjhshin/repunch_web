@@ -3,6 +3,7 @@ Selenium tests for dashboard 'Messages' tab.
 """
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
@@ -11,39 +12,41 @@ from libs.imap import Mail
 from tests import SeleniumTest
 from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
-from parse.notification import EMAIL_UPGRADE_SUBJECT
+from parse.notifications import EMAIL_UPGRADE_SUBJECT
 
 TEST_USER = {
     "username": "clothing",
     "password": "123456",
 }
 
-account = Account.objects().get(username=TEST_USER['username'],
-    include="Store.Subscription")
-store = account.store
-subscription = store.subscription
-
-# set subscriptionType to free
-subscription.subscriptionType = 0
-subscription.update()
-
-# clear the sent messages relation
-sent_messages = store.get("sentMessages", keys="")
-if sent_messages:
-    store.remove_relation("SentMessages_",
-        [m.objectId for m in sent_messages])
-# clear the received messages relation
-received_messages = store.get("receivedMessages", keys="")
-if received_messages:
-    store.remove_relation("ReceivedMessages_",
-        [m.objectId for m in received_messages])
-        
-# we can clear the list locally but just re-pull from parse
-account = Account.objects().get(username=TEST_USER['username'],
-    include="Store")
-store = account.store
-
 def test_messages():
+    # setup
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+
+    # set subscriptionType to free
+    subscription.subscriptionType = 0
+    subscription.update()
+
+    # clear the sent messages relation
+    sent_messages = store.get("sentMessages", keys="")
+    if sent_messages:
+        store.remove_relation("SentMessages_",
+            [m.objectId for m in sent_messages])
+    # clear the received messages relation
+    received_messages = store.get("receivedMessages", keys="")
+    if received_messages:
+        store.remove_relation("ReceivedMessages_",
+            [m.objectId for m in received_messages])
+            
+    # we can clear the list locally but just re-pull from parse
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -141,7 +144,7 @@ def test_messages():
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
-    sleep(7) 
+    sleep(5) 
     
     def send_message(filter, subject, body,
             attach_offer=False, offer_title=None, exp_date=None,):
@@ -167,7 +170,7 @@ def test_messages():
             
         # submit
         test.find("#send-now").click()
-        sleep(7)
+        sleep(5)
         
     def message_in_relation(message_id, test_number):
         if not message_id:
@@ -260,7 +263,6 @@ def test_messages():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    finally: # must go back to messages index
         test.open(reverse("messages_index"))
     # LIMIT PASSED
     ##########  Upgrading account from the dialog sends the 
@@ -268,16 +270,18 @@ def test_messages():
     try:
         test.find("#upgrade").click()
         sleep(2)
-        test.find("#id_cc_number").send_keys("123")
+        test.find("#id_cc_cvv").send_keys("123")
         test.find("#id_recurring").click()
         test.find("#upgrade-form-submit").click()
-        sleep(8)
+        sleep(5)
         message_id = test.driver.current_url.split("/")[5]
         parts[10]['success'] = test.is_current_url(\
             reverse("message_details", args=(message_id,)))
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
+    finally: # must go back to messages index
+        test.open(reverse("messages_index"))
         
     # open the mail connection
     mail = Mail()

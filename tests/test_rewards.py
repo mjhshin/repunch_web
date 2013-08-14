@@ -16,14 +16,15 @@ TEST_USER = {
     "email": "clothing@vandolf.com",
 }
 
-account = Account.objects().get(username=TEST_USER['username'],
-    include="Store")
-store = account.store
-# start with no rewards
-store.rewards = []
-store.update()
-
 def test_rewards():
+    # setup
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store")
+    store = account.store
+    # start with no rewards
+    store.rewards = []
+    store.update()
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},

@@ -125,8 +125,9 @@ def charge_cc(subscription, total, description):
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-
-    return json.loads(urllib2.urlopen(req).read())
+    res = json.loads(urllib2.urlopen(req).read())
+    print res
+    return res
     
 def delete_cc(subscription):
     """
