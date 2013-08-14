@@ -7,14 +7,15 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from libs.dateutil.relativedelta import relativedelta
+from libs.imap import Mail
 from tests import SeleniumTest
 from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
+from parse.notification import EMAIL_UPGRADE_SUBJECT
 
 TEST_USER = {
     "username": "clothing",
     "password": "123456",
-    "email": "clothing@vandolf.com",
 }
 
 account = Account.objects().get(username=TEST_USER['username'],
@@ -277,10 +278,13 @@ def test_messages():
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
+        
+    # open the mail connection
+    mail = Mail()
     ##########  Email is sent notifying user the upgrade.
     try:
-        # TODO
-        pass
+        parts[11]['success'] = mail.is_mail_sent(\
+            EMAIL_UPGRADE_SUBJECT)
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)

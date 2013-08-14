@@ -19,8 +19,10 @@ from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
 EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
+# declare here for selenium tests use also
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX = "Welcome to Repunch "
+EMAIL_UPGRADE_SUBJECT = "Repunch Inc. Your account has been upgraded."
 
 def get_notification_ctx():
     """
@@ -270,7 +272,7 @@ def send_email_account_upgrade(account, store, package,
             'r') as f:
         template = Template(f.read())
         
-    subject = "Repunch Inc. Your account has been upgraded."
+    subject = EMAIL_UPGRADE_SUBJECT
     ctx = get_notification_ctx()
     ctx.update({'store':store, 'package':package})
     body = template.render(Context(ctx)).__str__()
