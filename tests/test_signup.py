@@ -7,12 +7,10 @@ Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from libs.imap import Mail
-from libs.dateutil.relativedelta import relativedelta
 from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX,\
@@ -136,43 +134,21 @@ def test_signup():
         settings = store.get("settings")
         parts[6]['success'] = settings is not None
         
-        sleep(5) # wait for the email to register in gmail
-    
         ##########  Email about new user sent to staff
+        sleep(5) # wait for the email to register in gmail
+        mail = Mail()
         try:
-            mail = Mail()
-            mail.select_sent_mailbox()
-            mail_ids=mail.search_by_subject(\
+            parts[7]['success'] = mail.is_mail_sent(\
                 EMAIL_SIGNUP_SUBJECT_PREFIX + store.store_name)
-            if len(mail_ids) > 0:
-                sent = mail.fetch_date(str(mail_ids[-1]))
-                now = timezone.now()
-                lb = now + relativedelta(seconds=-10)
-                # make sure that this is the email that was just sent
-                if now.year == sent.year and now.month ==\
-                    sent.month and now.day == sent.day and\
-                    now.hour == sent.hour and (sent.minute ==\
-                    now.minute or sent.minute == lb.minute):
-                    parts[7]['success'] = True
         except Exception as e:
             print e
             parts[7]['test_message'] = str(e)
                 
         ##########  Welcome email sent to user
         try:
-            mail_ids=mail.search_by_subject(\
-                EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +\
+            parts[8]['success'] = mail.is_mail_sent(\
+                EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +
                 store.get_owner_fullname())
-            if len(mail_ids) > 0:
-                sent = mail.fetch_date(str(mail_ids[-1]))
-                now = timezone.now()
-                lb = now + relativedelta(seconds=-10)
-                # make sure that this is the email that was just sent
-                if now.year == sent.year and now.month ==\
-                    sent.month and now.day == sent.day and\
-                    now.hour == sent.hour and (sent.minute ==\
-                    now.minute or sent.minute == lb.minute):
-                    parts[8]['success'] = True
         except Exception as e:
             print e
             parts[8]['test_message'] = str(e)

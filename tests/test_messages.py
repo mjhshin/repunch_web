@@ -3,7 +3,6 @@ Selenium tests for dashboard 'Messages' tab.
 """
 
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
@@ -232,7 +231,7 @@ def test_messages():
     ##########  Send message. Filter all. With offer. 
     message_id = None
     try:
-        exp_date = tiemzone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(hours=1)
         send_message("all", "msg #2", "body #2", True, "offer#2",
             exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[5]['success'] = len(test.find(\
@@ -256,7 +255,7 @@ def test_messages():
     message_id = None
     try:
         send_message("idle", "msg #3", "body #3")
-        parts[9]['success'] = # TODO
+        parts[9]['success'] = test.find("#upgrade") is not None
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
@@ -264,10 +263,26 @@ def test_messages():
         test.open(reverse("messages_index"))
     # LIMIT PASSED
     ##########  Upgrading account from the dialog sends the 
-    ###         message and upgrades the account to middle. TODO
-    message_id = test.driver.current_url.split("/")[5]
-    ##########  Email is sent notifying user the upgrade. TODO
-    #
+    ###         message and upgrades the account to middle.
+    try:
+        test.find("#upgrade").click()
+        sleep(2)
+        test.find("#id_cc_number").send_keys("123")
+        test.find("#id_recurring").click()
+        test.find("#upgrade-form-submit").click()
+        sleep(8)
+        message_id = test.driver.current_url.split("/")[5]
+        parts[10]['success'] = test.is_current_url(\
+            reverse("message_details", args=(message_id,)))
+    except Exception as e:
+        print e
+        parts[10]['test_message'] = str(e)
+    ##########  Email is sent notifying user the upgrade.
+    try:
+        # TODO
+    except Exception as e:
+        print e
+        parts[11]['test_message'] = str(e)
     ##########  Message is in store's sentMessages relation. 
     message_in_relation(message_id, 12)
     ##########  Message is visible in page. 

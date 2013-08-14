@@ -7,12 +7,10 @@ Parse Objects and services so yea.
 """
 
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from libs.imap import Mail
-from libs.dateutil.relativedelta import relativedelta
 from tests import SeleniumTest
 
 from apps.public.forms import SUBJECT_PREFIX
@@ -138,17 +136,12 @@ def test_public_pages():
     ##########  FAQ email sent
     sleep(5) # wait for the email to register in gmail
     mail = Mail()
-    mail.select_sent_mailbox()
-    mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User X")
-    if len(mail_ids) > 0:
-        sent = mail.fetch_date(str(mail_ids[-1]))
-        now = timezone.now()
-        lb = now + relativedelta(seconds=-10)
-        # make sure that this is the correct email that was just sent
-        if now.year == sent.year and now.month == sent.month and\
-            now.day == sent.day and now.hour == sent.hour and\
-            (sent.minute == now.minute or sent.minute == lb.minute):
-            parts[6]['success'] = True
+    try:
+        parts[6]['success'] =\
+            mail.is_mail_sent(SUBJECT_PREFIX + "Test User X")
+    except Exception as e:
+        print e
+        parts[6]['test_message'] = str(e)
             
     ##########  FAQ email form all fields required
     test.open(reverse("public_faq"))
@@ -190,17 +183,12 @@ def test_public_pages():
          
     ##########  Contact Us email sent
     sleep(5) # wait for the email to register in gmail
-    mail.select_sent_mailbox()
-    mail_ids = mail.search_by_subject(SUBJECT_PREFIX + "Test User Y")
-    if len(mail_ids) > 0:
-        sent = mail.fetch_date(str(mail_ids[-1]))
-        now = timezone.now()
-        lb = now + relativedelta(seconds=-10)
-        # make sure that this is the correct email that was just sent
-        if now.year == sent.year and now.month == sent.month and\
-            now.day == sent.day and now.hour == sent.hour and\
-            (sent.minute == now.minute or sent.minute == lb.minute):
-            parts[9]['success'] = True
+    try:
+        parts[9]['success'] =\
+            mail.is_mail_sent(SUBJECT_PREFIX + "Test User Y")
+    except Exception as e:
+        print e
+        parts[9]['test_message'] = str(e)
             
     ##########  Contact Us email form all fields required
     test.open(reverse("public_contact")) # ACTION!

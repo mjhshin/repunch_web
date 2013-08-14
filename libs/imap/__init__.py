@@ -7,6 +7,7 @@ from dateutil.parser import parse
 from dateutil.tz import tzutc
 from django.utils import timezone
 
+from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 
 class Mail(object):
@@ -40,19 +41,35 @@ class Mail(object):
         """ Set the currently opened mailbox to sent mail """
         return self.conn.select(Mail.SENT_MAILBOX, readonly=readonly)
         
-    def search_by_subject(self, subject):
+    def search(self, value, by="SUBJECT"):
         """ 
         Matches the subject with a subject of one of the mails
         in the currently selected mailbox if it exists. 
         Returns the list of ids of all matching emails as strings
         in ascending order.
         """
-        ids = self.conn.search(None, '(SUBJECT "'+\
-            subject + '")')[1][0]
+        ids = self.conn.search(None, '(%s "' % (by,) +\
+            value + '")')[1][0]
         if ids:
             ids = [int(i) for i in ids.split(" ")]
             ids.sort()
         return ids
+        
+    def is_mail_sent(self, value, search_by="SUBJECT"):
+        self.select_sent_mailbox()
+        mail_ids = self.search(SUBJECT_PREFIX + "Test User X", 
+            by=search_by)
+        if len(mail_ids) > 0:
+            sent = self.fetch_date(str(mail_ids[-1]))
+            now = timezone.now()
+            lb = now + relativedelta(seconds=-10)
+            # make sure that this is the correct email 
+            if now.year == sent.year and now.month == sent.month and\
+                now.day == sent.day and now.hour == sent.hour and\
+                (sent.minute == now.minute or\
+                sent.minute == lb.minute):
+                return True
+        return False
         
     def fetch_date(self, ids):
         """ Fetches the date of the email with the given id """
