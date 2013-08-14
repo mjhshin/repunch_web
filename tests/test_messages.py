@@ -280,6 +280,7 @@ def test_messages():
     ##########  Email is sent notifying user the upgrade.
     try:
         # TODO
+        pass
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)

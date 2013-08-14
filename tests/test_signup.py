@@ -68,36 +68,39 @@ def test_signup():
     sleep(1)
     
     ##########  Form submission okay
-    selectors = (
-        ("#id_store_name", "test business"),
-        ("#id_street", "1370 virginia ave 4d"),
-        ("#id_city", "bronx"),
-        ("#id_state", "ny"),
-        ("#id_zip", "10462"),
-        ("#categories", "baker"),
-        ("", Keys.ARROW_DOWN),
-        ("", Keys.RETURN),
-        ("#categories", "fitn"),
-        ("", Keys.ARROW_DOWN),
-        ("", Keys.RETURN),
-        ("#id_first_name", "Testee"),
-        ("#id_last_name", "Bestee"),
-        ("#Ph1", "777"),
-        ("#Ph2", "777"),
-        ("#Ph3", "7777"),
-        ("#id_email", TEST_USER['email']),
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['username']),
-        ("#id_confirm_password", TEST_USER['username']),
-    )
     try:
+        selectors = (
+            ("#categories", "baker"),
+            ("", Keys.ARROW_DOWN),
+            ("", Keys.RETURN),
+            ("#categories", "fitn"),
+            ("", Keys.ARROW_DOWN),
+            ("", Keys.RETURN),
+        )
         test.action_chain(1, selectors, action="send_keys") # ACTION!
+        selectors = (
+            ("#id_store_name", "test business"),
+            ("#id_street", "1370 virginia ave 4d"),
+            ("#id_city", "bronx"),
+            ("#id_state", "ny"),
+            ("#id_zip", "10462"),
+            ("#id_first_name", "Testee"),
+            ("#id_last_name", "Bestee"),
+            ("#Ph1", "777"),
+            ("#Ph2", "777"),
+            ("#Ph3", "7777"),
+            ("#id_email", TEST_USER['email']),
+            ("#id_username", TEST_USER['username']),
+            ("#id_password", TEST_USER['username']),
+            ("#id_confirm_password", TEST_USER['username']),
+        )
+        test.action_chain(0, selectors, action="send_keys") # ACTION!
         # ToS and submit
         selectors = (
             "#id_recurring",
             "#signup-form-submit",
         )
-        test.action_chain(2, selectors) # ACTION!
+        test.action_chain(0, selectors) # ACTION!
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)

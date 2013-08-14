@@ -57,8 +57,7 @@ class Mail(object):
         
     def is_mail_sent(self, value, search_by="SUBJECT"):
         self.select_sent_mailbox()
-        mail_ids = self.search(SUBJECT_PREFIX + "Test User X", 
-            by=search_by)
+        mail_ids = self.search(value)
         if len(mail_ids) > 0:
             sent = self.fetch_date(str(mail_ids[-1]))
             now = timezone.now()
