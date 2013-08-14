@@ -1320,9 +1320,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             where: iosInstallationQuery, 
             data: {
             	alert: storeName + " sent you a message",
-                subject: subject,
                 store_id: storeId,
-                store_name: storeName,
                 message_id: messageId,
                 type: "message"
             }
