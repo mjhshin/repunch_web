@@ -5,7 +5,7 @@ https://github.com/paypal/rest-api-sdk-python
 Reason being unreliable.
 """
 
-import pycurl, json, urllib2
+import pycurl, json, requests
 from StringIO import StringIO
 from django.utils import timezone
 
@@ -63,7 +63,7 @@ def _refresh_access_token():
 def store_cc(subscription, cc_number, cvv2):
     """
     Stores a paypal credit card id to the subscription's ppid.
-    This uses urllib2 instead of pycurl because pycurl does not work 
+    This uses requests instead of pycurl because pycurl does not work 
     here for some reason.
     
     returns the result of the api call.
@@ -82,13 +82,13 @@ def store_cc(subscription, cc_number, cvv2):
         "last_name": "%s" % str(subscription.last_name),
     })
     
-    req = urllib2.Request(url,
+    r = requests.post(url,
         headers = {
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
 
-    return json.loads(urllib2.urlopen(req).read())
+    return r.text
     
 def charge_cc(subscription, total, description):
     """
@@ -112,7 +112,7 @@ def charge_cc(subscription, total, description):
         "transactions": [
             {
                 "amount": {
-                    "total": "%.2f" % float(total),
+                    "total": "%.2f" % float(1),
                     "currency": "USD"
                 },
                 "description": description
@@ -120,14 +120,13 @@ def charge_cc(subscription, total, description):
         ]
     })
     
-    req = urllib2.Request(url,
+    r = requests.post(url,
         headers = {
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + str(get_access_token())
         }, data=data)
-    res = json.loads(urllib2.urlopen(req).read())
-    print res
-    return res
+    print dir(r)
+    return r.text
     
 def delete_cc(subscription):
     """

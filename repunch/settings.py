@@ -86,6 +86,12 @@ else:
     PAYPAL_CLIENT_ID = "AfVmThAEY5V081CmZwFMRiCE642CT5lYeV9Yb3E2SNXC1Ru1L_I0IuZqewwZ"
     PAYPAL_CLIENT_SECRET = "ECNDuRAEYaO8YPFu2pGkoetFEN1tZ0qL1ACuZfKzsECTYV1RxTbB14l9WCdR"
     PAYPAL_ENDPOINT = "api.paypal.com"
+    
+# PAYPAL LIVE credentials
+# endpoint = api.paypal.com
+PAYPAL_CLIENT_ID = "AfVmThAEY5V081CmZwFMRiCE642CT5lYeV9Yb3E2SNXC1Ru1L_I0IuZqewwZ"
+PAYPAL_CLIENT_SECRET = "ECNDuRAEYaO8YPFu2pGkoetFEN1tZ0qL1ACuZfKzsECTYV1RxTbB14l9WCdR"
+PAYPAL_ENDPOINT = "api.paypal.com"
 
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False

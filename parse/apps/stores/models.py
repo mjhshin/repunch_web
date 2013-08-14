@@ -308,9 +308,12 @@ class Subscription(ParseObject):
                         
         Returns the Invoice if success. Or None if not.
         """
+        res = None
         try:
             res = charge_cc(self, total, description)
-        except HTTPError: # wrong credit card info BAD REQUEST (400)
+        # wrong credit card info BAD REQUEST (400)
+        except Exception as e: 
+            print e
             return None
         else:
             invoice = Invoice(
