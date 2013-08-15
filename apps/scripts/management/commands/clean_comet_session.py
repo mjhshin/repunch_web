@@ -40,11 +40,11 @@ class Command(BaseCommand):
                     comet.delete()
             
         # check for dangling cometsessions that did not get terminated
-        for c in comets:
+        for comet in comets:
             # delete if no associated cometsessionindex exists
-            try:
-                CometSession.objects.get(session_key=c.session_key)
-            except CometSession.DoesNotExist:
+            cs = CometSession.objects.filter(\
+                session_key=comet.session_key)
+            for c in cs:
                 c.delete()
       
             
