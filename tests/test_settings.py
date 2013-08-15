@@ -3,6 +3,7 @@ Selenium tests for dashboard 'Settings' tab.
 """
 
 from django.core.urlresolvers import reverse
+from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
@@ -219,7 +220,7 @@ def test_settings():
             test.is_current_url(reverse("account_settings"))
     except Exception as e:
         print e
-        parts[13]['test_message'] =str(e)
+        parts[13]['test_message'] = str(e)
     
     ##########  Clicking cancel changes will not undo the 
     ###         change made to Retailer PIN
@@ -228,14 +229,14 @@ def test_settings():
             test.find("#retialer_pin").text
     except Exception as e:
         print e
-        parts[14]['test_message'] =str(e)
+        parts[14]['test_message'] = str(e)
         
     ##########  Clicking cancel changes will not save 
     ###         changes to punches facebook and punches employee
     try:
         current_ep =\
             test.find("#id_punches_employee").get_attribute("value")
-        current_fbp \
+        current_fbp =\
             test.find("#id_punches_facebook").get_attribute("value")
         test.find("//div[@id='settings-options']/a[2]",
             type="xpath").click()

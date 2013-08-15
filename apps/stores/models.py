@@ -17,6 +17,12 @@ class StoreAvatarTmp(models.Model):
     session_key = models.CharField(max_length=100)
     avatar = models.ImageField(upload_to='tmp/images/avatars')
     
+    def delete(self):
+        try:
+            avatar.delete()
+        except Exception:
+            pass
+    
 
 class Store(models.Model):
     store_name = models.CharField(max_length=255, 

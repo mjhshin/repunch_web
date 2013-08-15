@@ -236,7 +236,7 @@ def test_messages():
     ##########  Send message. Filter all. With offer. 
     message_id = None
     try:
-        exp_date = timezone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(days=1)
         send_message("all", "msg #2", "body #2", True, "offer#2",
             exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[5]['success'] = len(test.find(\
@@ -306,7 +306,7 @@ def test_messages():
     ##########  Send message. Filter idle. With offer. 
     message_id = None
     try:
-        exp_date = timezone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(days=1)
         send_message("idle", "msg #4", "body #4", True, "offer#4",
             exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[15]['success'] = len(test.find(\
@@ -373,7 +373,7 @@ def test_messages():
     ##########  Send message. Filter most_loyal. With offer. 
     message_id = None
     try:
-        exp_date = timezone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(days=1)
         send_message("most_loyal", "msg #6", "body #6",
             True, "offer#6", exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[25]['success'] = len(test.find(\
@@ -395,7 +395,7 @@ def test_messages():
     ##########  Send message. Filter all. With offer. 
     message_id = None
     try:
-        exp_date = timezone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(days=1)
         send_message("all", "msg #7", "body #7", True, "offer#7",
             exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[29]['success'] = len(test.find(\
@@ -417,7 +417,7 @@ def test_messages():
     ##########  Send message. Filter all. With offer. 
     message_id = None
     try:
-        exp_date = timezone.now() + relativedelta(hours=1)
+        exp_date = timezone.now() + relativedelta(days=1)
         send_message("all", "msg #8", "body #8", True, "offer#8",
             exp_date.strftime(DATE_PICKER_STRFTIME))
         parts[33]['success'] = len(test.find(\
@@ -507,7 +507,7 @@ def test_messages():
     try:
         parts[43]['success'] =\
             test.find("#offer_title_e ul li").text ==\
-            "This field is required."
+            "Please enter a title."
     except Exception as e:
         print e
         parts[43]['test_message'] = str(e)
@@ -515,15 +515,16 @@ def test_messages():
     try:
         parts[44]['success'] =\
             test.find("#date_offer_expiration_e ul li").text ==\
-            "This field is required."
+            "Please enter an expiration date."
     except Exception as e:
         print e
         parts[44]['test_message'] = str(e)
         
     ##########  Expiration date must be at a later date. 
     try:
-        test.find("#id_attach_offer").click()
-        exp_date = timezone.now() + relativedelta(hours=-1)
+        # don't click attach offer again!
+        # test.find("#id_attach_offer").click()
+        exp_date = timezone.now() + relativedelta(days=-1)
         test.find("#id_date_offer_expiration").send_keys(\
             exp_date.strftime(DATE_PICKER_STRFTIME))
         test.find("#send-now").click()
@@ -537,8 +538,9 @@ def test_messages():
     
     ##########  Expiration date must be at most 1 year later. 
     try:
-        test.find("#id_attach_offer").click()
-        exp_date = timezone.now() + relativedelta(years=1, hours=1)
+        # don't click attach offer again!
+        # test.find("#id_attach_offer").click()
+        exp_date = timezone.now() + relativedelta(days=367)
         test.find("#id_date_offer_expiration").send_keys(\
             exp_date.strftime(DATE_PICKER_STRFTIME))
         test.find("#send-now").click()

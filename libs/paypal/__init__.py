@@ -112,7 +112,7 @@ def charge_cc(subscription, total, description):
         "transactions": [
             {
                 "amount": {
-                    "total": "%.2f" % float(total), # TODO set to total AND SET TO 1 WHEN TESTING!!!!
+                    "total": "%.2f" % float(0), # TODO set to total
                     "currency": "USD"
                 },
                 "description": description

@@ -12,6 +12,7 @@ from tests.test_myaccount import test_edit_store_details,\
 test_edit_account, test_cancel_account
 from tests.test_rewards import test_rewards
 from tests.test_messages import test_messages
+from tests.test_settings import test_settings
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -42,6 +43,13 @@ class Command(BaseCommand):
         #results.extend(test_rewards())
         
         ### MESSAGES
-        results.extend(test_messages())
+        #results.extend(test_messages())
+        
+        ### SETTINGS
+        results.extend(test_settings())
+        
+        
+        
+        
         
         send_email_selenium_test_results(results)
