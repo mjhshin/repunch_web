@@ -1142,7 +1142,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        where: iosInstallationQuery,
 	        data: {
 				type: "redeem_offer_gift",
-	            alert: "Successfully redeemed '" + rewardTitle + "'",
+	            alert: "Redeemed '" + rewardTitle + "'",
 	            message_status_id: messageStatus.id
 	        }
 	    }) );
