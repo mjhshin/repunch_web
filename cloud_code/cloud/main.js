@@ -1098,7 +1098,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        where: iosInstallationQuery,
 	        data: {
 				type: "redeem",
-	            alert: "Successfully redeemed '" + rewardTitle + "'",
+	            alert: "Redeemed '" + rewardTitle + "'",
 	            store_id: storeId,
 				patron_store_id: patronStore.id,
 	            punches: numPunches,
@@ -1119,11 +1119,17 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	}
 	
 	function executePushOfferGift() {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("patron_id", patron.id);
+		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+		androidInstallationQuery.equalTo("patron_id", patron.id);
+		androidInstallationQuery.equalTo("deviceType", "android");
+		iosInstallationQuery.equalTo("patron_id", patron.id);
+		iosInstallationQuery.equalTo("deviceType", "ios");
 		
-		Parse.Push.send({
-	        where: installationQuery,
+		var promises = [];
+		promises.push( Parse.Push.send({
+	        where: androidInstallationQuery,
 	        data: {
 	            title: rewardTitle,
 	            id: storeId, 
@@ -1131,18 +1137,25 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 				message_status_id: messageStatus.id,
 				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
 	        }
-	    }, {
-	        success: function() {
-				console.log("Push success.");
-				response.success("success");
-				return;
-	        },
-	        error: function(error) {
-				console.log("Push failed.");
-	            response.error("error");
-				return;
+	    }) );
+		promises.push( Parse.Push.send({
+	        where: iosInstallationQuery,
+	        data: {
+				type: "redeem_offer_gift",
+	            alert: "Redeemed '" + rewardTitle + "'",
+	            message_status_id: messageStatus.id
 	        }
-	    });
+	    }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	}
 	
 	function addFacebookPostToPatron() {
