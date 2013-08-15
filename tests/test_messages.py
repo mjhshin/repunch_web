@@ -460,32 +460,108 @@ def test_messages():
         test.open(reverse("messages_index"))
     # 
         
-    ##########  Subject is required. 
+    selectors = (
+        ("#id_subject", "   "),
+        ("#id_body", "   "),
+    )
+    test.action_chain(0, selectors, action="send_keys")
+    test.find("#send-now").click()
+    sleep(1)
+    ##########  Subject is required.
+    try:
+        parts[39]['success'] = test.find("#subject_e ul li").text ==\
+            "This field is required."
+    except Exception as e:
+        print e
+        parts[39]['test_message']= str(e)
     ##########  Body is required. 
+    try:
+        parts[40]['success'] = test.find("#body ul li").test ==\
+            "This field is requrred."
+    except Exception as e:
+        print e
+        parts[40]['test_message'] = str(e)
     ##########  Offer title not required if attach offer off. 
+    try:
+        parts[41]['success'] = not test.element_exists(\
+            "#offer_title_e ul li")
+    except Exception as e:
+        print e
+        parts[41]['test_message'] = str(e)
     ##########  Expiration not required if attach offer off. 
+    try:
+        parts[42]['success'] = not test.element_exists(\
+            "#date_offer_expiration_e ul li")
+    except Exception as e:
+        print e
+        parts[42]['test_message'] = str(e)
+        
+    test.find("#id_attach_offer").click()
+    test.find("#send-now").click()
+    sleep(1)
     ##########  Offer title is required if attach offer on. 
+    try:
+        parts[42]['success'] = test.element_exists(\
+            "#offer_title_e ul li")
+    except Exception as e:
+        print e
+        parts[42]['test_message'] = 
     ##########  Expiration date required if attach offer on. 
+    try:
+        parts[43]['success'] = test.element_exists(\
+            "date_offer_expiration_e ul li")
+    except Exception as e:
+        print e
+        parts[43]['test_message'] = str(e)
+        
     ##########  Expiration date must be at a later date. 
+    try:
+        test.find("#id_attach_offer").click()
+        exp_date = timezone.now() + relativedelta(hours=-1)
+        test.find("#id_date_offer_expiration").send_keys(\
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        test.find("#send-now").click()
+        sleep(1)
+        parts[44]['success'] = test.find(\
+            "#date_offer_expiration_e ul li").text ==\
+            "Please enter an expiration date that is later than today."
+    except Exception as e:
+        print e
+        parts[44]['test_message'] = str(e)
+    
     ##########  Expiration date must be at most 1 year later. 
+    try:
+        test.find("#id_attach_offer").click()
+        exp_date = timezone.now() + relativedelta(years=1, hours=1)
+        test.find("#id_date_offer_expiration").send_keys(\
+            exp_date.strftime(DATE_PICKER_STRFTIME))
+        test.find("#send-now").click()
+        sleep(1)
+        parts[45]['success'] = test.find(\
+            "#date_offer_expriration_e ul li").text ==\
+            "Please enter an expiration date that is less than a year."
+    except EXception as e:
+        print e
+        parts[45]['test_mesage'] = str(e)
 
     ##########  Clicking cancel prompts the user in deletion. 
+    try:
+        test.find("#delete-button").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        parts[46]['success'] = alert.text is not None
+    except Exception as e:
+        print e
+        parts[46]['test_message'] = str(e)
     ##########  Canceling redirects user back to messages index. 
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    try:
+        alert.accept()
+        sleep(1)
+        parts[47]['success'] =\
+            test.is_current_url(reverse("messages_index"))
+    except Exception as e:
+        print e
+        parts[47]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup
