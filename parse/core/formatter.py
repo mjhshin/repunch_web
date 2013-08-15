@@ -25,7 +25,7 @@ def format_date(dateObj):
     """
     if dateObj:
         return { "__type": "Date", 
-            "iso": parser.parse(dateObj.isoformat()) }
+            "iso": parser.parse(dateObj.isoformat()).isoformat() }
 
 def format_pointer(className, objectId):
     """
