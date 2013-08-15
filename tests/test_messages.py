@@ -514,7 +514,7 @@ def test_messages():
     ##########  Expiration date required if attach offer on. 
     try:
         parts[44]['success'] =\
-            test.find("#dat_offer_expiration_e ul li").text ==\
+            test.find("#date_offer_expiration_e ul li").text ==\
             "This field is required."
     except Exception as e:
         print e
