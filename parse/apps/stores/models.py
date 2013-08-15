@@ -49,7 +49,7 @@ class Store(ParseObject):
         # GeoPoint [latitude, longtitude]
         self.coordinates = data.get('coordinates')
         
-        self.punches_facebook = data.get("punches_facebook")  
+        self.punches_facebook = data.get("punches_facebook", 1)  
 
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
