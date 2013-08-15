@@ -1098,7 +1098,7 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        where: iosInstallationQuery,
 	        data: {
 				type: "redeem",
-	            alert: "Successfully redeemed '" + rewardTitle + "'",
+	            alert: "Redeemed '" + rewardTitle + "'",
 	            store_id: storeId,
 				patron_store_id: patronStore.id,
 	            punches: numPunches,
