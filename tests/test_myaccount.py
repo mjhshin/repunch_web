@@ -25,13 +25,6 @@ TEST_USER_INFO = {
 }
 
 IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
-    
-    
-# set the store information
-account =  Account.objects().get(username=TEST_USER['username'],
-    include="Store.Subscription")
-store = account.store
-subscription = store.subscription
 
 STORE_INFO = {
     "store_name": "Vandolf's Women's Clothing Corp",
@@ -46,9 +39,6 @@ STORE_INFO = {
     "neighborhood": "Parkchester",
     "coordinates": [40.83673, -73.862669],
 }
-
-store.update_locally(STORE_INFO, False)
-store.update()
 
 TEST_STORE_INFO = {
     "store_name": "Vandolf's Military Militia",
@@ -82,9 +72,6 @@ SUBSCRIPTION_INFO = {
     "date_pp_valid": None, 
 }
 
-subscription.update_locally(SUBSCRIPTION_INFO, False)
-subscription.update()
-
 TEST_SUBSCRIPTION_INFO = {
     "first_name": "Gundam",
     "last_name": "Wing",
@@ -98,6 +85,18 @@ TEST_SUBSCRIPTION_INFO = {
 }
 
 def test_edit_store_details():
+    # do the setup here so that if this test is commented out, 
+    # other tests will not be affected
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+
+    store.update_locally(STORE_INFO, False)
+    store.update()
+    subscription.update_locally(SUBSCRIPTION_INFO, False)
+    subscription.update()
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -549,7 +548,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[36]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[36]['test_message'] = str(e)
@@ -587,7 +586,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[39]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[39]['test_message'] = str(e)

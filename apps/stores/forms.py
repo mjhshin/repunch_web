@@ -93,11 +93,11 @@ class StoreForm(forms.Form):
     def clean_email(self):
         """ emails are unique """
         e = self.cleaned_data.get('email')
-        if e and Account.objects().get(email=e):
+        if e and Account.objects().count(email=e) > 0:
             # only raise if email is not its own!
             if self.email != e:
                 raise forms.ValidationError("Email is already " +\
-                    "being used")
+                    "being used.")
         return e
                                     
     def clean_street(self):
@@ -324,7 +324,7 @@ class SubscriptionForm3(SubscriptionForm):
 class SettingsForm(forms.Form):
     punches_employee = forms.IntegerField(label=\
                         'Number of punches allowed by an employee'+\
-                        ' at one time', min_value=0)
+                        ' at one time', min_value=1)
     punches_facebook = forms.IntegerField(label=\
                         'Free Punch Allowance for Facebook',
-                                        min_value=0)
+                                        min_value=1)

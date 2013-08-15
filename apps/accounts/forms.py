@@ -31,16 +31,16 @@ class AccountForm(forms.Form):
     def clean_email(self):
         """ emails are unique """
         e = self.cleaned_data.get('email')
-        if e and Account.objects().get(email=e):
-            raise forms.ValidationError("Email is already being used")
+        if e and Account.objects().count(email=e) > 0:
+            raise forms.ValidationError("Email is already being used.")
         return e
 
     def clean_username(self):
         """ usernames are unique """
         u = self.cleaned_data.get('username')
-        if u and Account.objects().get(username=u):
+        if u and Account.objects().count(username=u) > 0:
             raise forms.ValidationError("Username is already being"+\
-                                        " used")
+                                        " used.")
         return u
             
 class LoginForm(forms.Form):

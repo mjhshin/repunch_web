@@ -1312,6 +1312,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 // chain method call
                 addToPatronsInbox(patronStores);
             });
+        }, function(error) {
+            // should not stop just because 1 or more failed
+                addToPatronsInbox(patronStores);
         });
     }
 
@@ -1333,9 +1336,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             where: iosInstallationQuery, 
             data: {
             	alert: storeName + " sent you a message",
-                subject: subject,
                 store_id: storeId,
-                store_name: storeName,
                 message_id: messageId,
                 type: "message"
             }
@@ -1395,12 +1396,12 @@ Parse.Cloud.define("retailer_message", function(request, response) {
       success: function(store) {
         patronStoreQuery = store.relation("PatronStores").query();
         patronStoreQuery.include("Patron");
-        patronStoreQuery.limit(500); // may want to increase to 1000
+        patronStoreQuery.limit(999); 
         // now get the message object
         console.log("RUNNING MESSAGE QUERY");
         messageQuery.get(messageId, {
-			success: function(msg) {
-            	message = msg;
+			success: function(messageResult) {
+            	message = messageResult;
             	if (message.get("message_type") == "offer") {
             	    redeem_available = "yes";
             	} else { // message is a feedback

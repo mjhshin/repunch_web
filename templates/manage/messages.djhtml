@@ -27,7 +27,7 @@
 	{% endif %}
 
     {% if has_patrons %}
-	<a href="{% url 'message_edit' 0 %}" class="button blue">+ Create New Message</a>
+	<a href="{% url 'message_edit' 0 %}" class="button blue" id="create_message">+ Create New Message</a>
 	{% else %}
 	<div class="notification">
 		<div>You currently do not have any customers to send a message to.</div>

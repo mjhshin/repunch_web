@@ -42,19 +42,17 @@ def login(request, requestDict):
                     
     if res and "error" not in res:
         account = Account(**res)
+        account.fetchAll()
         if account.get("account_type") == "store":
             store = account.get('store')
             settings = store.get("settings")
             subscription = store.get("subscription")
         
             if store.get('active'):
-                # flush the session first!
+                # flush the session first to assign a new session_key
                 request.session.flush()
             
                 request.session[SESSION_KEY] = res.get('sessionToken')
-                settings.fetchAll()
-                subscription = store.get("subscription")
-                subscription.fetchAll()
                 
                 # store in session cache
                 request.session['subscription'] = subscription

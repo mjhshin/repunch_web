@@ -264,7 +264,12 @@ class ParseObject(object):
         All ParseObjects have 3 attributes by default:
         objectId, createdAt, updatedAt
         """
+        # these assignments are actually pointless since it gets
+        # formatted in update_locally anyways
         self.objectId = data.get("objectId")
+        # note that createdAt and updatedAt always comes as an iso
+        # string, whereas parse Date objects' iso string are inside
+        # a dict!
         self.createdAt = data.get("createdAt")
         self.updatedAt = data.get("updatedAt")
         self.update_locally(data, create)
@@ -319,6 +324,10 @@ class ParseObject(object):
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
+            elif key.startswith("date_") and\
+                type(value) in (str, unicode):
+                setattr(self, key, 
+                            parser.parse(value) )
             elif key in ("createdAt", "updatedAt") and\
                 type(value) in (str, unicode):
                 setattr(self, key, parser.parse(value) )

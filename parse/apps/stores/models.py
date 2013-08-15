@@ -1,7 +1,6 @@
 """
 Parse equivalence of Django apps.stores.models
 """ 
-from urllib2 import HTTPError
 from importlib import import_module
 from dateutil import parser
 import string, random
@@ -50,7 +49,7 @@ class Store(ParseObject):
         # GeoPoint [latitude, longtitude]
         self.coordinates = data.get('coordinates')
         
-        self.punches_facebook = data.get("punches_facebook")  
+        self.punches_facebook = data.get("punches_facebook", 1)  
 
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
@@ -288,9 +287,10 @@ class Subscription(ParseObject):
     
     def store_cc(self, cc_number, cvv2):
         """ store credit card info. returns True if successful """
+        # TODO verify credit card cvv2 and expiration date!
         try:
             res = store_cc(self, cc_number, cvv2)
-        except HTTPError: # wrong credit card info BAD REQUEST (400)
+        except Exception as e: 
             raise
         else:
             self.pp_cc_id = res['id']
@@ -308,11 +308,16 @@ class Subscription(ParseObject):
                         
         Returns the Invoice if success. Or None if not.
         """
+        res = None
         try:
             res = charge_cc(self, total, description)
-        except HTTPError: # wrong credit card info BAD REQUEST (400)
+        # something went wrong
+        except Exception as e: 
             return None
         else:
+            if res.get("name") == "CREDIT_CARD_REFUSED":
+                return None
+                
             invoice = Invoice(
                 state = res['state'],
                 payment_id = res['id'],

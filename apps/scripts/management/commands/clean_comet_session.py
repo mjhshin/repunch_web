@@ -23,8 +23,13 @@ class Command(BaseCommand):
         now = timezone.now()
         timedout_time = now + relativedelta(hours=\
             -1*LAST_UPDATED_THRESHOLD)
-        # cache a copy of all the current comet indecies
+        # cache a copy of all the current comet indicies
         cometis = CometSessionIndex.objects.all()
+        
+        # its important to cache the cometsession here as well to
+        # avoid gaps
+        comets = CometSession.objects.all()
+        
         for cometi in cometis:
             if cometi.last_updated < timedout_time:
                 cometi.delete()
@@ -34,8 +39,14 @@ class Command(BaseCommand):
                     session_key=cometi.session_key):
                     comet.delete()
             
-            
-            
+        # check for dangling cometsessions that did not get terminated
+        for comet in comets:
+            # delete if no associated cometsessionindex exists
+            cs = CometSession.objects.filter(\
+                session_key=comet.session_key)
+            for c in cs:
+                c.delete()
+      
             
             
             

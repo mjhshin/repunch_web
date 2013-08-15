@@ -195,14 +195,15 @@ def update(request):
                         'manage/account_upgrade.djhtml', data)
                         
             if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
+                request.POST.get("place_order_amount").isdigit() and\
+                int(request.POST.get("place_order_amount")) > 0:
                 amount = int(request.POST.get("place_order_amount"))
                 account = request.session['account']
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
-                if amount > 0:
+                if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount) 
                         
@@ -304,14 +305,15 @@ def upgrade(request):
                         'manage/account_upgrade.djhtml', data)
                         
             if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
+                request.POST.get("place_order_amount").isdigit() and\
+                int(request.POST.get("place_order_amount")) > 0:
                 amount = int(request.POST.get("place_order_amount"))
                 account = request.session['account']
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
-                if amount > 0:
+                if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount)
                         

@@ -2,7 +2,8 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoAlertPresentException,\
+NoSuchElementException
 
 class SeleniumTest(object):
     """
@@ -11,6 +12,8 @@ class SeleniumTest(object):
     
     # SERVER_URL = "https://www.repunch.com"
     SERVER_URL = "http://localhost:8000"
+    
+    IMPLICITLY_WAIT = 10
     
     def __init__(self):
         """
@@ -23,7 +26,7 @@ class SeleniumTest(object):
             ... ]
         """
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
         self.results = []
         
     def tear_down(self):
@@ -102,6 +105,18 @@ class SeleniumTest(object):
         for el in els:
             if el.is_selected():
                 return el
+                
+    def element_exists(self, selector, type="css"):
+        """ Checks if an element exists with no implicit wait """
+        self.driver.implicitly_wait(0)
+        exists = False
+        try:
+            exists = self.find(selector, type) is not None
+        except NoSuchElementException:
+            pass
+            
+        self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
+        return exists
             
     def action_chain(self, wait_time, selectors, action="click",
             type="css"):

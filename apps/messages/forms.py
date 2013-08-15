@@ -5,6 +5,7 @@ from libs.dateutil.relativedelta import relativedelta
 from models import Message
 from libs.repunch.validators import required
 
+DATE_PICKER_STRFTIME = '%m/%d/%Y %I:%M %p'
 
 class MessageForm(forms.Form):
     subject = forms.CharField(max_length=50, validators=[required])
@@ -13,7 +14,7 @@ class MessageForm(forms.Form):
 
     attach_offer = forms.BooleanField(required=False)
     offer_title = forms.CharField(max_length=30, required=False)
-    date_offer_expiration = forms.DateTimeField(input_formats=['%m/%d/%Y %I:%M %p'], required=False)
+    date_offer_expiration = forms.DateTimeField(input_formats=[DATE_PICKER_STRFTIME], required=False)
     num_patrons = forms.CharField(max_length=7, required=False)
     
    
