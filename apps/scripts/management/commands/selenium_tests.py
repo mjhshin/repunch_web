@@ -11,7 +11,8 @@ from tests.test_login_logout import test_login_dialog, test_login_page
 from tests.test_myaccount import test_edit_store_details,\
 test_edit_account, test_cancel_account
 from tests.test_rewards import test_rewards
-from tests.test_messages import test_messages
+from tests.test_messages import test_messages, test_feedbacks
+from tests.test_employees import test_employees
 from tests.test_settings import test_settings
 
 class Command(BaseCommand):
@@ -20,33 +21,39 @@ class Command(BaseCommand):
         
         ####### PUBLIC
         
-        # PUBLIC PAGES
+        # public pages
         #results.extend(test_public_pages())
-        # SIGNUP
+        # signup
         #results.extend(test_signup())
-        # LOGIN (dialog)
+        # login (dialog)
         #results.extend(test_login_dialog())
-        # LOGIN (dedicated page)
+        # login (dedicated page)
         #results.extend(test_login_page())
         
         ####### DASHBOARD
         
         #### MY ACCOUNT
-        ## EDIT STORE DETAILS
+        ## edit store details
         #results.extend(test_edit_store_details())
-        ## EDIT ACCOUNT/SUBSCRIPTION
+        ## edit account/subscription
         #results.extend(test_edit_account())
-        ## CANCEL ACCOUNT
+        ## cancel account
         #results.extend(test_cancel_account())
         
         ### REWARDS
         #results.extend(test_rewards())
         
         ### MESSAGES
-        #results.extend(test_messages())
+        ## messages
+        results.extend(test_messages())
+        ## feedback
+        #results.extend(test_feedbacks()) TODO
+        
+        ### EMPLOYEE
+        #results.extend(test_employees()) TODO
         
         ### SETTINGS
-        results.extend(test_settings())
+        #results.extend(test_settings())
         
         
         

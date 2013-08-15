@@ -78,7 +78,7 @@ def test_settings():
             ("#id_punches_facebook", "5"),
         )
         test.action_chain(0, selectors, action="send_keys")
-        test.find("#settings-form_submit").click()
+        test.find("#settings-form-submit").click()
         sleep(4)
     except Exception as e:
         print e
@@ -118,7 +118,7 @@ def test_settings():
     try:
         selectors = ("#id_punches_employee", "#id_punches_facebook")
         test.action_chain(0, selectors, action="clear")
-        test.find("#settings-form_submit").click()
+        test.find("#settings-form-submit").click()
         sleep(1)
     except Exception:
         pass
@@ -146,7 +146,7 @@ def test_settings():
             ("#id_punches_facebook", "b"), 
         )
         test.action_chain(0, selectors, action="send_keys")
-        test.find("#settings-form_submit").click()
+        test.find("#settings-form-submit").click()
         sleep(1)
     except Exception:
         pass
@@ -166,14 +166,13 @@ def test_settings():
         print e
         parts[8]['test_message'] = tr(e)
         
-        
     try:  
         selectors = (
             ("#id_punches_employee", "-1"), 
             ("#id_punches_facebook", "0"), 
         )
         test.action_chain(0, selectors, action="send_keys")
-        test.find("#settings-form_submit").click()
+        test.find("#settings-form-submit").click()
         sleep(1)
     except Exception:
         pass
@@ -200,7 +199,7 @@ def test_settings():
         parts[11]['success'] = prev_pin != new_pin
     except Exception as e:
         print e
-        parts[11]['test_message'] =str(e)
+        parts[11]['test_message'] = str(e)
     ##########  Changes to Retailer PIN is immediately
     ###         commited to Parse without having to save settings
     try:

@@ -541,16 +541,18 @@ def test_messages():
         # don't click attach offer again!
         # test.find("#id_attach_offer").click()
         exp_date = timezone.now() + relativedelta(days=367)
-        test.find("#id_date_offer_expiration").send_keys(\
+        date_offer = test.find("#id_date_offer_expiration")
+        date_offer.clear()
+        date_offer.send_keys(\
             exp_date.strftime(DATE_PICKER_STRFTIME))
         test.find("#send-now").click()
-        sleep(1)
+        sleep(2)
         parts[46]['success'] = test.find(\
-            "#date_offer_expriration_e ul li").text ==\
+            "#date_offer_expiration_e ul li").text ==\
             "Please enter an expiration date that is less than a year."
     except Exception as e:
         print e
-        parts[46]['test_mesage'] = str(e)
+        parts[46]['test_message'] = str(e)
 
     ##########  Clicking cancel prompts the user in deletion. 
     try:
@@ -577,8 +579,8 @@ def test_messages():
     return test.tear_down() 
     
     
-def test_feedback():
-    pass
+def test_feedbacks():
+    pass # TODO
     
     
     
