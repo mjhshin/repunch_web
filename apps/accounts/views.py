@@ -143,6 +143,7 @@ def refresh(request):
     else:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
+# TODO prompt user to enter valid credit card if charge_cc fails
 @login_required
 @session_comet
 def update(request):
@@ -253,6 +254,7 @@ def update(request):
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
 
+# TODO prompt user to enter valid credit card if charge_cc fails
 @login_required
 @session_comet
 def upgrade(request):

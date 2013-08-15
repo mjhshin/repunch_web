@@ -45,7 +45,7 @@ class Command(BaseCommand):
         
         ### MESSAGES
         ## messages
-        results.extend(test_messages())
+        #results.extend(test_messages())
         ## feedback
         #results.extend(test_feedbacks()) TODO
         

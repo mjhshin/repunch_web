@@ -22,7 +22,7 @@
 		<label for="employee_punches">Number of punches allowed by an employee at one time</label>
 		{{ form.punches_employee }}
 		
-		<div id="punhes_facebook_e">{{ form.punches_facebook.errors }}</div>
+		<div id="punches_facebook_e">{{ form.punches_facebook.errors }}</div>
 		<label for="facebook_free_punches">Free Punch Allowance for Facebook</label>
 		{{ form.punches_facebook }}
 		

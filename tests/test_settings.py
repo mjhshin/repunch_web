@@ -77,9 +77,10 @@ def test_settings():
             ("#id_punches_employee", "5"),
             ("#id_punches_facebook", "5"),
         )
+        test.action_chain(0, selectors, action="clear")
         test.action_chain(0, selectors, action="send_keys")
         test.find("#settings-form-submit").click()
-        sleep(4)
+        sleep(5)
     except Exception as e:
         print e
         
@@ -101,16 +102,16 @@ def test_settings():
     ##########  Changes to Punches employee are saved to Parse
     try:
         settings.punches_employee = None
-        parts[3]['succces'] = settings.get("punches_employee") ==\
-            str(test.find("id_punches_employee").text)
+        parts[3]['success'] = settings.get("punches_employee") ==\
+            int(test.find("#id_punches_employee").get_attribute("value"))
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
     ##########  Changes to Punches facebook are saved to Parse
     try:
         store.punches_facebook = None
-        parts[4]['succces'] = settings.get("punches_facebook") ==\
-            str(test.find("id_punches_facebook").text)
+        parts[4]['success'] = store.get("punches_facebook") ==\
+            int(test.find("#id_punches_facebook").get_attribute("value"))
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
@@ -145,6 +146,7 @@ def test_settings():
             ("#id_punches_employee", "a"), 
             ("#id_punches_facebook", "b"), 
         )
+        test.action_chain(0, selectors, action="clear")
         test.action_chain(0, selectors, action="send_keys")
         test.find("#settings-form-submit").click()
         sleep(1)
@@ -153,24 +155,27 @@ def test_settings():
     
     ##########  Punches employee must be a number
     try:
-        parts[7]['success'] = test.find("#punches_employee_e").text==\
+        parts[7]['success'] =\
+            test.find("#punches_employee_e ul li").text==\
             "Enter a whole number."
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
     ##########  Punches facebook must be a number 
     try:   
-        parts[8]['success'] = test.find("#punches_facebook_e").text==\
+        parts[8]['success'] =\
+            test.find("#punches_facebook_e ul li").text==\
             "Enter a whole number."
     except Exception as e:
         print e
-        parts[8]['test_message'] = tr(e)
+        parts[8]['test_message'] = str(e)
         
     try:  
         selectors = (
             ("#id_punches_employee", "-1"), 
             ("#id_punches_facebook", "0"), 
         )
+        test.action_chain(0, selectors, action="clear")
         test.action_chain(0, selectors, action="send_keys")
         test.find("#settings-form-submit").click()
         sleep(1)
@@ -178,14 +183,16 @@ def test_settings():
         pass
     ##########  Punches employee must be greater than 0
     try:   
-        parts[9]['success'] = test.find("#punches_employee_e").text ==\
+        parts[9]['success'] =\
+            test.find("#punches_employee_e ul li").text ==\
             "Ensure this value is greater than or equal to 1."
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
     ##########  Punches facebook must be greater than 0
     try:   
-        parts[10]['success'] = test.find("#punches_facebook_e").text ==\
+        parts[10]['success'] =\
+            test.find("#punches_facebook_e ul li").text ==\
             "Ensure this value is greater than or equal to 1."
     except Exception as e:
         print e
@@ -194,7 +201,7 @@ def test_settings():
     try:
         prev_pin = test.find("#retailer_pin").text
         test.find("#link_refresh_retailer_pin").click()
-        sleep(4)
+        sleep(10) # yea this takes a while
         new_pin = test.find("#retailer_pin").text
         parts[11]['success'] = prev_pin != new_pin
     except Exception as e:
@@ -225,7 +232,7 @@ def test_settings():
     ###         change made to Retailer PIN
     try:
         parts[14]['success'] = current_pin ==\
-            test.find("#retialer_pin").text
+            test.find("#retailer_pin").text
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
@@ -247,6 +254,13 @@ def test_settings():
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
+        
+    try:
+        # test.find()
+        pass
+    except Exception as e:
+        print e
+        parts[16]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 

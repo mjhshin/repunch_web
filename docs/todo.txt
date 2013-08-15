@@ -2,3 +2,5 @@ Fix TODO in:
     1. repunch.settings
     2. libs.paypal.__init__
     3. parse.apps.stores.models
+    4. apps.public.views
+    5. apps.accounts.views
