@@ -505,7 +505,7 @@ def test_messages():
             "#offer_title_e ul li")
     except Exception as e:
         print e
-        parts[42]['test_message'] = 
+        parts[42]['test_message'] = str(e)
     ##########  Expiration date required if attach offer on. 
     try:
         parts[43]['success'] = test.element_exists(\
