@@ -22,7 +22,7 @@ $(document).ready(function(){
 	</div>
 	{% endif %}
 	
-	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1">&lt; Back to Feedback Inbox</a>
+	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1" id="back_to_feedback">&lt; Back to Feedback Inbox</a>
 	
 	<div class="white-box">
 		<div class="sect meta">
@@ -64,7 +64,7 @@ $(document).ready(function(){
     <div id="message-detail-options" class="form-options">
         {# cannot reply if already replied #}
         {% if not reply %}
-		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue">Reply</a>
+		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue" id="reply-button">Reply</a>
         {% endif %}
 		<a href="{% url 'feedback_delete' feedback_id %}" id="delete-button" class="red">Delete Message</a>
 	</div>

@@ -28,7 +28,7 @@ $(document).ready(function(){
 	</div>
 	{% endif %}
 	
-	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1">&lt; Back to Feedback Inbox</a>
+	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1" id="back_to_feedback">&lt; Back to Feedback Inbox</a>
 	
 	<form action="{% url 'feedback_reply' feedback.objectId %}" method="post" id="message-form">{% csrf_token %}
 		<div class="white-box">

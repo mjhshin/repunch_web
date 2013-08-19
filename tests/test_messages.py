@@ -14,6 +14,7 @@ from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
 from parse.notifications import EMAIL_UPGRADE_SUBJECT
 from parse.utils import cloud_call
+from parse.apps.messages.models import Message
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
@@ -616,6 +617,8 @@ def test_feedbacks():
         {'test_name': "Feedback is initially unread (Parse)"},
         {'test_name': "Clicking the row redirects user to the " +\
             "feedback detail page"},
+        {'test_name': "Clicking back to feedback inbox redirects " +\
+            "user back to messages index with feedback tab active"},
         {'test_name': "Feedback is now read (dashboard)"},
         {'test_name': "Feedback is now read (Parse)"},
         {'test_name': "Clicking reply redirects user to feedback " +\
@@ -628,8 +631,6 @@ def test_feedbacks():
             "sent messages relation with message_Type of feedback"},
         {'test_name': "The reply message is saved in the Patron's " +\
             "received messages relation wrapped in a Message Status"},
-        {'test_name': "Clicking back to feedback inbox redirects " +\
-            "user back to messages index with feedback tab active"},
         {'test_name': "A feedback with a reply does not have a " +\
             "reply button"},
         {'test_name': "Clicking delete message prompts the user " +\
@@ -672,6 +673,19 @@ def test_feedbacks():
         })
         sleep(COMET_PULL_RATE + 1)
         return res
+    
+    def feedback_id(feedback_tr):
+        return fb.find_element_by_css_selector(\
+            "a").get_attribute("href").split("/")[-1]
+        
+    def feedback_unread(feedback_tr):
+        """ check parse if the fb is unread """
+        fb_id = feedback_id(feedback_tr)
+        msg = store.get("receivedMessages" objectId=fb_id)
+        if msg and len(msg) > 0:
+           return not msg[0].is_read
+        
+        return False
         
     ##########  Cloud code send_feedback works
     try:
@@ -692,19 +706,74 @@ def test_feedbacks():
     
     ##########  A new row appears when feedback is received 
     try:
-        parts[3]['success'] = len(test.find("#tab-body-feedback " +\
-            "div.tr", multiple=True)) > 0
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        parts[3]['success'] = len(feedbacks) > 0
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
-    ##########  Feedback is initially unread (dashboard) TODO
-    ##########  Feedback is initially unread (Parse) TODO
+    ##########  Feedback is initially unread (dashboard)
+    try:
+        parts[4]['success'] =\
+            feedbacks[0].get_attribute("class").__contains__("unread")
+    except Exception as e:
+        print e
+        parts[4]['test_message'] = str(e)
+    
+    ##########  Feedback is initially unread (Parse)
+    try:
+        parts[5]['success'] = feedback_unread(feedbacks[0])
+    except Exception as e:
+        print e
+        parts[5]['test_message'] = str(e)
     ##########  Clicking the row redirects user to the 
-    ###         feedback detail page TODO
-    ##########  Feedback is now read (dashboard) TODO
-    ##########  Feedback is now read (Parse) TODO
+    ###         feedback detail page
+    try:
+        feedbacks[0].find_element_by_css_selector("a").click()
+        sleep(2)
+        parts[6]['success'] = test.is_current_url(reverse(\
+            "feedback_details", args=(feedback_id(feedbacks[0]),))
+    except Exception as e:
+        print e
+        parts[6]['test_message'] = str(e)
+    ##########  Clicking back to feedback inbox redirects 
+    ###         user back to messages index with feedback tab active 
+    try:
+        test.find("#back_to_feedback").click()
+        sleep(1)
+        parts[7]['success'] =\
+            test.find("#tab-feedback").get_attribute(\
+            "class").__contains__("active")
+    except Exception as e:
+        print e
+        parts[7]['test_message'] = str(e)
+    ##########  Feedback is now read (dashboard) 
+    try:
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        parts[8]['success'] =  not feedbacks[0].get_attribute(\
+            "class").__contains__("unread")
+    except Exception as e:
+        print e
+        parts[8]['test_message'] = str(e)
+    ##########  Feedback is now read (Parse)
+    try:
+        parts[9]['success'] =  not feedback_unread(feedbacks[0])
+    except Exception as e:
+        print e
+        parts[9]['test_message'] = str(e)
     ##########  Clicking reply redirects user to feedback 
-    ###         reply page TODO
+    ###         reply page
+    try:
+        feedbacks[0].find_element_by_css_selector("a").click()
+        sleep(2)
+        test.find("#reply-button").click()
+        sleep(1)
+        parts[10]['success'] = test.is_current_url(reverse(\
+            "feedback_reply", args=(feedback_id(feedbacks[0]),)))
+    except Exception as e:
+        print e
+        parts[10]['test_message'] = str(e)
     ##########  Reply body is required. TODO
     ##########  Replying redirects user back to feedback
     ###         details TODO
@@ -713,8 +782,6 @@ def test_feedbacks():
     ###         sent messages relation with message_Type of feedback TODO
     ##########  The reply message is saved in the Patron's 
     ###         received messages relation wrapped in a Message Status TODO
-    ##########  Clicking back to feedback inbox redirects 
-    ###         user back to messages index with feedback tab active TODO
     ##########  A feedback with a reply does not have a 
     ###         reply button TODO
     ##########  Clicking delete message prompts the user 
