@@ -2,6 +2,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
+from django.forms.util import ErrorList
 from django.contrib.auth import SESSION_KEY
 from datetime import datetime
 import json, urllib
@@ -143,13 +144,13 @@ def refresh(request):
     else:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
-# TODO prompt user to enter valid credit card if charge_cc fails
 @login_required
 @session_comet
 def update(request):
     data = {'account_nav': True, 'update':True}
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
+    sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
         form = SubscriptionForm3(request.POST)
@@ -174,26 +175,41 @@ def update(request):
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
-            try:
-                d = datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1)
-                subscription.set("date_cc_expiration", 
-                    make_aware_to_utc(d,
-                        SESSION.get_store_timezone(request.session)) )
-                # only store_cc if it is a digit
-                if str(form.data['cc_number']).isdigit():
-                    subscription.store_cc(form.data['cc_number'],
-                                                form.data['cc_cvv'])
-                else:
-                    subscription.update()
+            d = datetime(int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1)
+            subscription.set("date_cc_expiration", 
+                make_aware_to_utc(d,
+                    SESSION.get_store_timezone(request.session)) )
                     
-            except Exception as e:
-                form = SubscriptionForm(subscription.__dict__.copy())
-                form.errors['__all__'] =\
-                    form.error_class([e])
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
+            
+            def invalid_card():
+                # undo changes to subscription!
+                sub = Subscription(**sub_orig)
+                sub.update()
+                
+                # add some asterisk to cc_number
+                if form.initial.get("cc_number"):
+                    form.initial['cc_number'] = "*" * 12 +\
+                        form.initial.get('cc_number')[-4:]
+                errs = form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                            
+            if not res:
+                return invalid_card()
                         
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit() and\
@@ -207,6 +223,8 @@ def update(request):
                 if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount) 
+                else:
+                    return invalid_card()
                         
             if upgraded:  
                 max_users = sub_type[\
@@ -254,7 +272,6 @@ def update(request):
     data['form'] = form
     return render(request, 'manage/account_upgrade.djhtml', data)
 
-# TODO prompt user to enter valid credit card if charge_cc fails
 @login_required
 @session_comet
 def upgrade(request):
@@ -264,6 +281,7 @@ def upgrade(request):
     data = {'account_nav': True, 'upgrade':True}
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
+    sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
         form = SubscriptionForm3(request.POST)
@@ -286,25 +304,45 @@ def upgrade(request):
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
-            try:
-                d = datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1)
-                subscription.set("date_cc_expiration", 
-                    make_aware_to_utc(d,
-                        SESSION.get_store_timezone(request.session)) )
-                # only store_cc if it is a digit
-                if str(form.data['cc_number']).isdigit():
-                    subscription.store_cc(form.data['cc_number'],
-                                                form.data['cc_cvv'])
-                else:
-                    subscription.update()
+            d = datetime(int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1)
+            subscription.set("date_cc_expiration", 
+                make_aware_to_utc(d,
+                    SESSION.get_store_timezone(request.session)) )
                     
-            except Exception as e:
-                form = SubscriptionForm(subscription.__dict__.copy())
-                form.errors['__all__'] = form.error_class([e])
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
+                    
+            def invalid_card():
+                # undo changes to subscription!
+                sub = Subscription(**sub_orig)
+                sub.update()
+                
+                # add some asterisk to cc_number
+                if form.initial.get("cc_number"):
+                    form.initial['cc_number'] = "*" * 12 +\
+                        form.initial.get('cc_number')[-4:]
+                errs = form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
                 data['form'] = form
+                from_limit_reached =\
+                    request.session.get("from_limit_reached")
+                if from_limit_reached:
+                    data['from_limit_reached'] = from_limit_reached
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                    
+            if not res:
+                return invalid_card()
                         
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit() and\
@@ -318,6 +356,8 @@ def upgrade(request):
                 if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount)
+                else:
+                    return invalid_card()
                         
             if upgraded:  
                 max_users = sub_type[\
