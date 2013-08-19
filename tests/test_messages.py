@@ -625,7 +625,7 @@ def test_feedbacks():
         {'test_name': "Clicking reply redirects user to feedback " +\
             "reply page"},
         {'test_name': "Reply body is required."},
-        {'test_name': "Replying redirects user back to feedback" +\
+        {'test_name': "Replying redirects user back to feedback " +\
             "details"},
         {'test_name': "The reply is visible"},
         {'test_name': "The reply message is saved in the store's " +\
@@ -638,7 +638,8 @@ def test_feedbacks():
             "to confirm the deletion"},
         {'test_name': "Deleting the reply only removes the message" +\
             " from the store's sent messages relation"},
-        {'test_name': "The deleted feedback is no longer table"},
+        {'test_name': "The deleted feedback is no longer in " +\
+            "the table"},
         {'test_name': "Multiple feedbacks (testing 3 here) " +\
             "can appear at the same time"},
     ]
@@ -665,24 +666,22 @@ def test_feedbacks():
     
     def send_feedback(subject, body):
         """ This is a consumer action - not dashboard """
-        res = cloud_call("send_feedback", {
+        return cloud_call("send_feedback", {
             "store_id": store.objectId,
             "patron_id": patron.objectId,
             "sender_name": patron.get_fullname(),
             "subject": subject,
             "body": body,
         })
-        sleep(COMET_PULL_RATE + 1)
-        return res
     
     def feedback_id(feedback_tr):
-        return fb.find_element_by_css_selector(\
+        return feedback_tr.find_element_by_css_selector(\
             "a").get_attribute("href").split("/")[-1]
         
     def feedback_unread(feedback_tr):
         """ check parse if the fb is unread """
         fb_id = feedback_id(feedback_tr)
-        msg = store.get("receivedMessages" objectId=fb_id)
+        msg = store.get("receivedMessages", objectId=fb_id)
         if msg and len(msg) > 0:
            return not msg[0].is_read
         
@@ -699,6 +698,7 @@ def test_feedbacks():
     ##########  Notification badge appears if there are
     ###         unread feedbacks
     try:
+        sleep(COMET_PULL_RATE + 1)
         parts[2]['success'] = test.element_exists("#messages-nav " +\
             "a div.nav-item-badge")
     except Exception as e:
@@ -707,6 +707,7 @@ def test_feedbacks():
     
     ##########  A new row appears when feedback is received 
     try:
+        test.find("#tab-feedback").click()
         feedbacks =\
             test.find("#tab-body-feedback div.tr", multiple=True)
         parts[3]['success'] = len(feedbacks) > 0
@@ -730,10 +731,11 @@ def test_feedbacks():
     ##########  Clicking the row redirects user to the 
     ###         feedback detail page
     try:
+        fb_id = feedback_id(feedbacks[0])
         feedbacks[0].find_element_by_css_selector("a").click()
         sleep(2)
         parts[6]['success'] = test.is_current_url(reverse(\
-            "feedback_details", args=(feedback_id(feedbacks[0]),))
+            "feedback_details", args=(fb_id,)))
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
@@ -765,12 +767,13 @@ def test_feedbacks():
         parts[9]['test_message'] = str(e)
     ##########  Clicking reply redirects user to feedback reply page
     try:
+        fb_id = feedback_id(feedbacks[0])
         feedbacks[0].find_element_by_css_selector("a").click()
         sleep(2)
         test.find("#reply-button").click()
         sleep(1)
         parts[10]['success'] = test.is_current_url(reverse(\
-            "feedback_reply", args=(feedback_id(feedbacks[0]),)))
+            "feedback_reply", args=(fb_id,)))
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
@@ -816,9 +819,10 @@ def test_feedbacks():
     ##########  The reply message is saved in the Patron's 
     ###         received messages relation wrapped in a Message Status 
     try:
+        fb_id = feedback_id(feedbacks[0])
         patron.set("receivedMessages", None)
         parts[15]['success'] = len(patron.get("receivedMessages",
-            Message=feedback_id(feedbacks[0]))) > 0
+            Message=fb_id)) > 0
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
@@ -826,34 +830,55 @@ def test_feedbacks():
     try:
         feedbacks[0].find_element_by_css_selector("a").click()
         sleep(2)
-        
+        parts[16]['success'] = test.element_exists(\
+            "#reply-form-submit")
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
     ##########  Clicking delete message prompts the user 
-    ###         to confirm the deletion TODO
+    ###         to confirm the deletion
     try:
-        
+        test.find("#delete-button").click()
+        sleep(1)
+        alert = test.switch_to_alert()
+        parts[17]['success'] = alert.text ==\
+            "Are you sure you want to delete this feedback thread?"
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
     ##########  Deleting the reply only removes the message
-    ###         from the store's sent messages relation TODO
+    ###         from the store's sent messages relation 
     try:
-        
+        alert.accept()
+        sleep(4)
+        store.set("receivedMessages", None)
+        parts[18]['success'] = not store.get("receivedMessages",
+            objectId=fb_id, message_type=FEEDBACK)
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
-    ##########  The deleted feedback is no longer table TODO
+    ##########  The deleted feedback is no longer in the table 
     try:
-        
+        test.find("#tab-feedback").click()
+        sleep(1)
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        parts[19]['success'] = len(feedbacks) == 0
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
     ##########  Multiple feedbacks (testing 3 here) 
-    ###         can appear at the same time TODO
+    ###         can appear at the same time 
     try:
-        
+        send_feedback("feedback #2", "body #2")
+        send_feedback("feedback #3", "body #3")
+        send_feedback("feedback #4", "body #4")
+        sleep(COMET_PULL_RATE + 1)
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        parts[20]['success'] = len(feedbacks) == 3
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
