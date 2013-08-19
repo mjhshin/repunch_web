@@ -90,12 +90,8 @@ def test_edit_store_details():
     account =  Account.objects().get(username=TEST_USER['username'],
         include="Store.Subscription")
     store = account.store
-    subscription = store.subscription
-
     store.update_locally(STORE_INFO, False)
     store.update()
-    subscription.update_locally(SUBSCRIPTION_INFO, False)
-    subscription.update()
     
     test = SeleniumTest()
     parts = [
@@ -373,10 +369,11 @@ def test_edit_store_details():
     ## revert the email address back
     click_store_edit()
     sleep(3)
+    test.find("#id_email").clear()
     test.find("#id_email").send_keys(TEST_USER['email'])
     # save!
     test.find("#save-button").click()
-    sleep(3)
+    sleep(6)
     
     ##########  Entering invalid address shows error
     try:
@@ -634,6 +631,14 @@ def test_edit_store_details():
     
 def test_edit_account():
     # TODO test place_order
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+    subscription.update_locally(SUBSCRIPTION_INFO, False)
+    subscription.update()
+    
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},

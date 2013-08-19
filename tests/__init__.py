@@ -10,8 +10,13 @@ class SeleniumTest(object):
     Wrapper around selenium - makes life easier.
     """
     
-    # SERVER_URL = "https://www.repunch.com"
-    SERVER_URL = "http://localhost:8000"
+    """
+    Note that these tests need to be tested on the production server,
+    not localhost because things that depend on the cloud code pushing
+    notifications are not tested for localhost.
+    """
+    SERVER_URL = "https://www.repunch.com"
+    # SERVER_URL = "http://localhost:8000"
     
     IMPLICITLY_WAIT = 10
     

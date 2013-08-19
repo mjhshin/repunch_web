@@ -364,11 +364,19 @@ def feedback_reply(request, feedback_id):
     
     if request.method == 'POST':
         body = request.POST.get('body')
-        if body == None or len(body) == 0:
+        if body is not None:
+            body = body.strip()
+        else:
+            body = ""
+            
+        data['body'] = body
+        data['from_address'] = store.get("store_name")
+        data['subject'] = 'Re: ' + feedback.get('subject')
+        
+        if len(body) == 0:
             data['error'] = 'Please enter a message.'  
         elif len(body) > 750:
             data['error'] = 'Body must be less than 750 characters.' 
-            data['body'] = body
         # double check if feedback already has a reply
         # should not go here unless it is a hacker 
         elif feedback.get('Reply'):

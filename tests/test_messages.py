@@ -35,11 +35,6 @@ def test_messages():
     if sent_messages:
         store.remove_relation("SentMessages_",
             [m.objectId for m in sent_messages])
-    # clear the received messages relation
-    received_messages = store.get("receivedMessages", keys="")
-    if received_messages:
-        store.remove_relation("ReceivedMessages_",
-            [m.objectId for m in received_messages])
             
     # we can clear the list locally but just re-pull from parse
     account = Account.objects().get(username=TEST_USER['username'],
@@ -127,7 +122,7 @@ def test_messages():
             
     ]
     section = {
-        "section_name": "Messages page working properly?",
+        "section_name": "Sending messages works?",
         "parts": parts,
     }
     test.results.append(section)
@@ -580,7 +575,103 @@ def test_messages():
     
     
 def test_feedbacks():
-    pass # TODO
+    """
+    This test also tests cloud code send_feedback.
+    """
+    # we can clear the list locally but just re-pull from parse
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+    
+    # clear the received messages relation
+    received_messages = store.get("receivedMessages", keys="")
+    if received_messages:
+        store.remove_relation("ReceivedMessages_",
+            [m.objectId for m in received_messages])
+ 
+    test = SeleniumTest()
+    parts = [
+        {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Feedback is initially unread"},
+        {'test_name': "Notification badge appears if there are" +\
+            " unread feedbacks"},
+        {'test_name': "A new row appears when feedback is received"},
+        {'test_name': "Clicking the row redirects user to the " +\
+            "feedback detail page"},
+        {'test_name': "Clicking reply redirects user to feedback " +\
+            "reply page"},
+        {'test_name': "Feedback is initially unread"},
+        
+    ]
+    section = {
+        "section_name": "Receiving messages works?",
+        "parts": parts,
+    }
+    test.results.append(section)
+    
+    ##########  User needs to be logged in to access page
+    test.open(reverse("messages_index")) # ACTION!
+    sleep(1)
+    parts[0]['success'] = test.is_current_url(reverse(\
+        'manage_login') + "?next=" + reverse("messages_index"))
+        
+    # login
+    selectors = (
+        ("#id_username", TEST_USER['username']),
+        ("#id_password", TEST_USER['password']),
+        ("", Keys.RETURN)
+    )
+    test.action_chain(0, selectors, "send_keys") # ACTION!
+    sleep(5) 
+    
+    try:
+        
+        pass
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # END OF ALL TESTS - cleanup
+    return test.tear_down() 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

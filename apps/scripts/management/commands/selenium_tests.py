@@ -20,34 +20,29 @@ class Command(BaseCommand):
         results = []
         
         ####### PUBLIC
-        
-        # public pages
         #results.extend(test_public_pages())
-        # signup
         #results.extend(test_signup())
-        # login (dialog)
         #results.extend(test_login_dialog())
-        # login (dedicated page)
         #results.extend(test_login_page())
         
         ####### DASHBOARD
         
         #### MY ACCOUNT
-        ## edit store details
         #results.extend(test_edit_store_details())
-        ## edit account/subscription
         #results.extend(test_edit_account())
-        ## cancel account
         #results.extend(test_cancel_account())
         
         ### REWARDS
         #results.extend(test_rewards())
         
+        ### ANALYSIS
+        #results.extend(test_trends()) TODO
+        #results.extend(test_breakdown()) TODO
+        #results.extend(test_reward_redemptions()) TODO
+        
         ### MESSAGES
-        ## messages
         #results.extend(test_messages())
-        ## feedback
-        #results.extend(test_feedbacks()) TODO
+        results.extend(test_feedbacks())
         
         ### EMPLOYEE
         #results.extend(test_employees()) TODO
@@ -55,8 +50,9 @@ class Command(BaseCommand):
         ### SETTINGS
         #results.extend(test_settings())
         
-        
-        
+        ### WORKBENCH
+        #results.extend(test_punch()) TODO
+        #results.extend(test_redemptions()) TODO
         
         
         send_email_selenium_test_results(results)
