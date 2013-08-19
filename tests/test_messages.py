@@ -593,16 +593,36 @@ def test_feedbacks():
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
-        {'test_name': "Feedback is initially unread"},
         {'test_name': "Notification badge appears if there are" +\
             " unread feedbacks"},
         {'test_name': "A new row appears when feedback is received"},
+        {'test_name': "Feedback is initially unread (dashboard)"},
+        {'test_name': "Feedback is initially unread (Parse)"},
         {'test_name': "Clicking the row redirects user to the " +\
             "feedback detail page"},
+        {'test_name': "Feedback is now read (dashboard)"},
+        {'test_name': "Feedback is now read (Parse)"},
         {'test_name': "Clicking reply redirects user to feedback " +\
             "reply page"},
-        {'test_name': "Feedback is initially unread"},
-        
+        {'test_name': "Reply body is required."},
+        {'test_name': "Replying redirects user back to feedback" +\
+            "details"},
+        {'test_name': "The reply is visible"},
+        {'test_name': "The reply message is saved in the store's " +\
+            "sent messages relation with message_Type of feedback"},
+        {'test_name': "The reply message is saved in the Patron's " +\
+            "received messages relation wrapped in a Message Status"},
+        {'test_name': "Clicking back to feedback inbox redirects " +\
+            "user back to messages index with feedback tab active"},
+        {'test_name': "A feedback with a reply does not have a " +\
+            "reply button"},
+        {'test_name': "Clicking delete message prompts the user " +\
+            "to confirm the deletion"},
+        {'test_name': "Deleting the reply only removes the message" +\
+            " from the store's sent messages relation"},
+        {'test_name': "The deleted feedback is no longer table"},
+        {'test_name': "Multiple feedbacks (testing 3 here) " +\
+            "can appear at the same time"},
     ]
     section = {
         "section_name": "Receiving messages works?",
@@ -625,27 +645,42 @@ def test_feedbacks():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
     
+    ##########  Notification badge appears if there are
+    ###         unread feedbacks TODO
     try:
-        
         pass
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    ##########  A new row appears when feedback is received TODO
+    ##########  Feedback is initially unread (dashboard) TODO
+    ##########  Feedback is initially unread (Parse) TODO
+    ##########  Clicking the row redirects user to the 
+    ###         feedback detail page TODO
+    ##########  Feedback is now read (dashboard) TODO
+    ##########  Feedback is now read (Parse) TODO
+    ##########  Clicking reply redirects user to feedback 
+    ###         reply page TODO
+    ##########  Reply body is required. TODO
+    ##########  Replying redirects user back to feedback
+    ###         details TODO
+    ##########  The reply is visible TODO
+    ##########  The reply message is saved in the store's 
+    ###         sent messages relation with message_Type of feedback TODO
+    ##########  The reply message is saved in the Patron's 
+    ###         received messages relation wrapped in a Message Status TODO
+    ##########  Clicking back to feedback inbox redirects 
+    ###         user back to messages index with feedback tab active TODO
+    ##########  A feedback with a reply does not have a 
+    ###         reply button TODO
+    ##########  Clicking delete message prompts the user 
+    ###         to confirm the deletion TODO
+    ##########  Deleting the reply only removes the message
+    ###         from the store's sent messages relation TODO
+    ##########  The deleted feedback is no longer table TODO
+    ##########  Multiple feedbacks (testing 3 here) 
+    ###         can appear at the same time TODO
     
     
     
@@ -654,25 +689,6 @@ def test_feedbacks():
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
