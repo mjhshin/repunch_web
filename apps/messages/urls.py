@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('apps.messages.views',
     url(r'^$', 'index', name='messages_index'),
-    # message_id is 0 for now - editing sent messages is nto allowed
+    # message_id is 0 for now - editing sent messages is not allowed
     url(r'^(?P<message_id>0)/edit', 'edit', name='message_edit'),
     url(r'^(?P<message_id>\w+)/delete', 'delete',
                                             name='message_delete'),

@@ -13,9 +13,16 @@ from tests import SeleniumTest
 from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
 from parse.notifications import EMAIL_UPGRADE_SUBJECT
+from parse.utils import cloud_call
+from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
     "username": "clothing",
+    "password": "123456",
+}
+
+TEST_PATRON = {
+    "username": "kira",
     "password": "123456",
 }
 
@@ -584,6 +591,14 @@ def test_feedbacks():
     store = account.store
     subscription = store.subscription
     
+    
+    account = Account.objects().get(username=TEST_PATRON['username'],
+        include="Patron")
+    patron = account.patron
+        
+    # make sure that the account is not used for these tests
+    account = None
+    
     # clear the received messages relation
     received_messages = store.get("receivedMessages", keys="")
     if received_messages:
@@ -593,6 +608,7 @@ def test_feedbacks():
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
+        {'test_name': "Cloud code send_feedback works"},
         {'test_name': "Notification badge appears if there are" +\
             " unread feedbacks"},
         {'test_name': "A new row appears when feedback is received"},
@@ -645,15 +661,42 @@ def test_feedbacks():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
     
-    ##########  Notification badge appears if there are
-    ###         unread feedbacks TODO
+    def send_feedback(subject, body):
+        """ This is a consumer action - not dashboard """
+        res = cloud_call("send_feedback", {
+            "store_id": store.objectId,
+            "patron_id": patron.objectId,
+            "sender_name": patron.get_fullname(),
+            "subject": subject,
+            "body": body,
+        })
+        sleep(COMET_PULL_RATE + 1)
+        return res
+        
+    ##########  Cloud code send_feedback works
     try:
-        pass
+        parts[1]['success'] = send_feedback("feedback #1",
+            "body #1").get("result") == "success"
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
+        
+    ##########  Notification badge appears if there are
+    ###         unread feedbacks
+    try:
+        parts[2]['success'] = test.element_exists("#messages-nav " +\
+            "a div.nav-item-badge")
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
     
-    ##########  A new row appears when feedback is received TODO
+    ##########  A new row appears when feedback is received 
+    try:
+        parts[3]['success'] = len(test.find("#tab-body-feedback " +\
+            "div.tr", multiple=True)) > 0
+    except Exception as e:
+        print e
+        parts[3]['test_message'] = str(e)
     ##########  Feedback is initially unread (dashboard) TODO
     ##########  Feedback is initially unread (Parse) TODO
     ##########  Clicking the row redirects user to the 

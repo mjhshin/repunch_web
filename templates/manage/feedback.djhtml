@@ -22,7 +22,7 @@ $(document).ready(function(){
 	</div>
 	{% endif %}
 	
-	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Feedback Inbox</a>
+	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1">&lt; Back to Feedback Inbox</a>
 	
 	<div class="white-box">
 		<div class="sect meta">

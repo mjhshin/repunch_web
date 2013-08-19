@@ -13,7 +13,7 @@
         $(".not-sortable").unbind("click");
         
         // activate the paginator!
-        paginator($("#get-page-url").val(), ["sent", "feedback"], "sent");
+        paginator($("#get-page-url").val(), ["sent", "feedback"], {% if tab_feedback %}"feedback"{% else %}"sent"{% endif %});
     });
 	</script>
 {% endblock %}
@@ -37,30 +37,30 @@
 	<div class="section"> {# SECTION #}
 		
 		<div class="tab-container">
-			<div class="tab active" id="tab-sent">Sent</div>
+			<div class="tab {% if not tab_feedback %}active{% endif %}" id="tab-sent">Sent</div>
 			{% feedback_unread request.session as fcount %}
 						
-			<div class="tab" id="tab-feedback">Feedback {% if fcount > 0 %}({{ fcount }}){% endif %}</div>
+			<div class="tab {% if tab_feedback %}active{% endif %}" id="tab-feedback">Feedback {% if fcount > 0 %}({{ fcount }}){% endif %}</div>
 		</div>
 		
-		<div class="white-box table tab-body active" id="tab-body-sent">
+		<div class="white-box table tab-body {% if not tab_feedback %}active{% endif %}" id="tab-body-sent">
 			<div class="table-header">
 				<div class="th sorted desc" id="header-date">Date sent <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
-			{% include 'manage/message_chunk.djhtml' %}
+			{% if not tab_feedback %}{% include "manage/message_chunk.djhtml" %}{% endif %}
 			
 		</div>
 	
-		<div class="white-box table tab-body" id="tab-body-feedback">
+		<div class="white-box table tab-body {% if tab_feedback %}active{% endif %}" id="tab-body-feedback">
 			<div class="table-header">
 				<div class="th sorted desc" id="header-feedback-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th" id="header-feedback-from">From <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-feedback-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			
-			{# {% include 'manage/feedback_chunk.djhtml' %} NO NEED TO INCLUDE THIS #}
+			{% if tab_feedback %}{% include "manage/feedback_chunk.djhtml" %}{% endif %}
 			
 		</div>
 		

@@ -104,6 +104,7 @@ def index(request):
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
     
+    data['tab_feedback'] = request.GET.get('tab_feedback')
     return render(request, 'manage/messages.djhtml', data)
 
 
