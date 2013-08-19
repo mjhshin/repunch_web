@@ -14,7 +14,7 @@ from apps.messages.forms import DATE_PICKER_STRFTIME
 from parse.apps.accounts.models import Account
 from parse.notifications import EMAIL_UPGRADE_SUBJECT
 from parse.utils import cloud_call
-from parse.apps.messages.models import Message
+from parse.apps.messages import FEEDBACK
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
@@ -22,6 +22,7 @@ TEST_USER = {
     "password": "123456",
 }
 
+# IMPORTANT! This patron must have a PatronStore with the store above!
 TEST_PATRON = {
     "username": "kira",
     "password": "123456",
@@ -762,8 +763,7 @@ def test_feedbacks():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  Clicking reply redirects user to feedback 
-    ###         reply page
+    ##########  Clicking reply redirects user to feedback reply page
     try:
         feedbacks[0].find_element_by_css_selector("a").click()
         sleep(2)
@@ -774,36 +774,93 @@ def test_feedbacks():
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    ##########  Reply body is required. TODO
-    ##########  Replying redirects user back to feedback
-    ###         details TODO
-    ##########  The reply is visible TODO
+    ##########  Reply body is required. 
+    try:
+        test.find("#body").send_keys("     ")
+        test.find("#reply-form-submit").click()
+        sleep(2)
+        parts[11]['success'] = test.find("div..notification.hide " +\
+            "div").text == "Please enter a message."
+    except Exception as e:
+        print e
+        parts[11]['test_message'] = str(e)
+    ##########  Replying redirects user back to feedback details
+    try:
+        test.find("#body").send_keys("Hey")
+        test.find("#reply-form-submit").click()
+        sleep(5)
+    except Exception as e:
+        print e
+        parts[12]['test_message'] = str(e)
+    ##########  The reply is visible
+    try:
+        parts[13]['success'] = test.find("#reply-box " +\
+            "div.sect.body").text == "Hey"
+    except Exception as e:
+        print e
+        parts[13]['test_message'] = str(e)
     ##########  The reply message is saved in the store's 
-    ###         sent messages relation with message_Type of feedback TODO
+    ###         sent messages relation with message_Type of feedback
+    try:
+        test.find("#back_to_feedback").click()
+        sleep(1)
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
+        store.set("sentMessages", None)
+        parts[14]['success'] = len(store.get("sentMessages",
+            objectId=feedback_id(feedbacks[0]),
+            message_type=FEEDBACK)) > 0
+    except Exception as e:
+        print e
+        parts[14]['test_message'] = str(e)
     ##########  The reply message is saved in the Patron's 
-    ###         received messages relation wrapped in a Message Status TODO
-    ##########  A feedback with a reply does not have a 
-    ###         reply button TODO
+    ###         received messages relation wrapped in a Message Status 
+    try:
+        patron.set("receivedMessages", None)
+        parts[15]['success'] = len(patron.get("receivedMessages",
+            Message=feedback_id(feedbacks[0]))) > 0
+    except Exception as e:
+        print e
+        parts[15]['test_message'] = str(e)
+    ##########  A feedback with a reply does not have a reply button
+    try:
+        feedbacks[0].find_element_by_css_selector("a").click()
+        sleep(2)
+        
+    except Exception as e:
+        print e
+        parts[16]['test_message'] = str(e)
     ##########  Clicking delete message prompts the user 
     ###         to confirm the deletion TODO
+    try:
+        
+    except Exception as e:
+        print e
+        parts[17]['test_message'] = str(e)
     ##########  Deleting the reply only removes the message
     ###         from the store's sent messages relation TODO
+    try:
+        
+    except Exception as e:
+        print e
+        parts[18]['test_message'] = str(e)
     ##########  The deleted feedback is no longer table TODO
+    try:
+        
+    except Exception as e:
+        print e
+        parts[19]['test_message'] = str(e)
     ##########  Multiple feedbacks (testing 3 here) 
     ###         can appear at the same time TODO
-    
-    
-    
-    
+    try:
+        
+    except Exception as e:
+        print e
+        parts[20]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 
-    
-    
-    
-    
-    
     
     
     

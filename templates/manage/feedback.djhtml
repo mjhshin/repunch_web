@@ -41,7 +41,7 @@ $(document).ready(function(){
 
 	<div class="divider" style="height: 20px;"></div>
     {% if reply %}
-	<div class="white-box response">
+	<div class="white-box response" id="reply-box">
 		<div class="sect meta">
 			<label>Date:</label><span>{{ reply|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label>

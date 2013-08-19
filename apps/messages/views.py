@@ -470,7 +470,7 @@ def feedback_delete(request, feedback_id):
                 'Feedback has already been deleted.'}))
                 
     # DO NOT DELETE ANYTHING! Just remove from the store's relation
-    store.remove_relation("ReceivedMessages", [feedback.objectId])
+    store.remove_relation("ReceivedMessages_", [feedback.objectId])
     
     # update messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
