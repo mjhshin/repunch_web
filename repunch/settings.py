@@ -224,7 +224,7 @@ else:
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
 # order placed on smartphones
-PHONE_COST_UNIT_COST = 149
+PHONE_COST_UNIT_COST = 149 # TOD SET TO 149
 # paginator
 PAGINATION_THRESHOLD = 20
 # days given before account is disabled when passed user limit

@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.core import mail 
 from django.utils import timezone
+from django.forms.util import ErrorList
 from datetime import datetime
 import json, pytz
 
@@ -120,10 +121,12 @@ def password_reset(request):
         request_password_reset(request.POST['forgot-pass-email'])}), 
         content_type="application/json")
         
-# TODO remove the tmp objects saved in the request if store cc fails
-# TODO delete all created objects if charge_cc fails and prompt user to enter valid credit card 
+        
 @session_comet  
 def sign_up(request):
+    """
+    Creates User, store, subscription, and settings objects.
+    """
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
     place_order_checked = False
@@ -143,13 +146,8 @@ def sign_up(request):
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
         
-        all_forms_valid = store_form.is_valid() 
-        # we will not check if the account form is valid if 
-        # the tmp object is in the session since it will return false
-        # if the user does not change the username and email
-        if not request.session.get("account-tmp-objectId"):
-            all_forms_valid = all_forms_valid and\
-                account_form.is_valid()
+        all_forms_valid = store_form.is_valid() and\
+            account_form.is_valid()
         if request.POST.get("place_order"):
             place_order_checked = True
             if isdigit(request.POST.get("place_order_amount")):
@@ -213,50 +211,56 @@ def sign_up(request):
 
             # create an empty subscription
             subscription = Subscription(**postDict) 
-            if request.session.get('subscription-tmp-objectId'):
-                subscription.objectId =\
-                    request.session.get('subscription-tmp-objectId')
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
+            subscription.Store = store.objectId 
+            subscription.create()
             
-            #### MAIL CONNECTION OPEN
-            conn = mail.get_connection(fail_silently=(not DEBUG))
-            
-            # create/update settings
-            if request.session.get("settings-tmp-objectId"):
-                settings.objectId =\
-                    request.session.get("settings-tmp-objectId")
-                settings.update()
-            else:
-                settings.create()
+            # create settings
+            settings.create()
                 
-            # create/update store
+            # create store
             store.Settings = settings.objectId
-            if request.session.get("store-tmp-objectId"):
-                store.objectId =\
-                    request.session.get("store-tmp-objectId")
-                store.update()
-            else:
-                store.create()
+            store.Subscription = subscription.objectId
+            store.create()
+            
+            # add the store pointers to settings and subscription
             settings.Store = store.objectId
             settings.update()
+            subscription.Store = store.objectId
+            subscription.update()
             
-            # create/update account
+            # create account
             account.Store = store.objectId
-            if request.session.get("account-tmp-objectId"):
-                account.objectId =\
-                    request.session.get("account-tmp-objectId")
-                # need to get session token before we can update
-                # this is guaranteed to update the User class since
-                # the user may have changed the email or username
-                # to one that already exists TODO?
-                res = parse("GET", "login", query=\
-                            {"username":requestDict.get('username'),
-                             "password":requestDict.get('password')} )
-                if res.get('sessionToken'):
-                    account.update(res.get('sessionToken'))
-            else:
-                account.create()
+            account.create()
+                
+            #### MAIL CONNECTION OPEN
+            conn = mail.get_connection(fail_silently=(not DEBUG))   
+            
+            # call this incase store_cc returns False or 
+            # charge_cc returns None
+            def invalid_card():
+                data['store_form'] =\
+                    StoreSignUpForm(store.__dict__.copy())
+                errs = subscription_form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
+                    
+                # delete the objects created!
+                subscription.delete()
+                settings.delete()
+                store.delete()
+                account.delete()
+                    
+                data["place_order_checked"] = place_order_checked
+                data['store_form'] = store_form
+                data['account_form'] = account_form
+                data['subscription_form'] = subscription_form
+                return render(request,'public/signup.djhtml',data)
+                       
             
             subscription.Store = store.objectId
             if request.POST.get("place_order"):
@@ -272,57 +276,25 @@ def sign_up(request):
                 subscription.zip = request.POST['zip2']
                 subscription.country = request.POST['country2']
                 amount = int(request.POST.get("place_order_amount"))
-                if not request.session.get('subscription-tmp-objectId'):
-                    subscription.create()
-                try:
-                    subscription.store_cc(\
+                subscription.update()
+                res = subscription.store_cc(\
                         subscription_form.data['cc_number'],
                         subscription_form.data['cc_cvv'])
-                except Exception as e:
-                    data['store_form'] = StoreSignUpForm(\
-                        request.session['store-tmp'].__dict__.copy())
-                    subscription_form.errors['__all__'] =\
-                        subscription_form.error_class([e])
                         
-                    # save the objectIds in the session
-                    request.session['subscription-tmp-objectId'] =\
-                        subscription.objectId
-                    request.session['account-tmp-objectId'] =\
-                        account.objectId
-                    request.session['store-tmp-objectId'] =\
-                        store.objectId
-                    request.session['settings-tmp-objectId'] =\
-                        settings.objectId
-                        
-                    data["place_order_checked"] = place_order_checked
-                    data['store_form'] = store_form
-                    data['account_form'] = account_form
-                    data['subscription_form'] = subscription_form
-                    return render(request,'public/signup.djhtml',data)
+                if not res:
+                    return invalid_card()
                 
                 if amount > 0:
                     invoice = subscription.charge_cc(\
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
                         str(amount) + " phones", "smartphone")
-                    send_email_receipt_smartphone(account, 
-                        subscription, invoice, amount)
-            else:
-                # set the subscription fields back to empty!
-                subscription = Subscription()
-                subscription.Store = store.objectId 
-                subscription.subscriptionType = 0
-                subscription.date_last_billed = timezone.now()
-                if not request.session.get('subscription-tmp-objectId'):
-                    subscription.create()
-                else:
-                    subscription.objectId = request.session.get(\
-                        'subscription-tmp-objectId')
-                    subscription.update()
-            
-            # update the store with a pointer to the subscription
-            store.set("Subscription", subscription.objectId)
-            store.update()
+                        
+                    if invoice:
+                        send_email_receipt_smartphone(account, 
+                            subscription, invoice, amount)
+                    else:
+                        return invalid_card()
             
             # need to put username and pass in request
             postDict['username'] = account.username

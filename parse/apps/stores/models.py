@@ -287,12 +287,17 @@ class Subscription(ParseObject):
     
     def store_cc(self, cc_number, cvv2):
         """ store credit card info. returns True if successful """
-        # TODO verify credit card cvv2 and expiration date!
+        # TODO verify credit card cvv2 and expiration date ?!
         try:
             res = store_cc(self, cc_number, cvv2)
         except Exception as e: 
-            raise
+            return False
         else:
+            # something went wrong though this should never occur
+            if not res.ok:
+                return False
+                
+            res = res.json()
             self.pp_cc_id = res['id']
             self.date_pp_valid = parser.parse(res['valid_until'])
             self.update()
@@ -315,9 +320,13 @@ class Subscription(ParseObject):
         except Exception as e: 
             return None
         else:
-            if res.get("name") == "CREDIT_CARD_REFUSED":
+            # maybe because of invalid ccv and/or expiration date
+            # or insufficient funds or if the credit card was refused
+            # for some other reason
+            if not res.ok:
                 return None
                 
+            res = res.json()
             invoice = Invoice(
                 state = res['state'],
                 payment_id = res['id'],
