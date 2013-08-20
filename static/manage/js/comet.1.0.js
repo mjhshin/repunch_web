@@ -322,7 +322,7 @@ $(document).ready(function(){
                 }
                 
                 // Just in case that new rows are moved to approved, rebind the checkbox click event for graphing.
-                rebindEmployeeGraph(); // defined in employees.js
+                rebindEmployees(); // defined in employees.js
                 
             }
             
