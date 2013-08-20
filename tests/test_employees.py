@@ -114,6 +114,38 @@ def test_employees():
             "retailer_pin": retailer_pin,
         })
         
+    def approve():
+        """ 
+        Approves the first pending employee on the table.
+        """
+        test.find("#tab-pending-employees").click()
+        test.find("#tab-body-pending-employees div.tr " +\
+            "div.td.approve a.approve").click()
+        test.switch_to_alert().accept()
+        sleep(2)
+        
+        
+    def deny(): 
+        """ 
+        Denies the first pending employee on the table.
+        """
+        test.find("#tab-pending-employees").click()
+        test.find("#tab-body-pending-employees div.tr " +\
+            "div.td.approve a.deny").click()
+        test.switch_to_alert().accept()
+        sleep(2)
+        
+    def remove():
+        """
+        Removes the first approved employee on the table.
+        """
+        test.find("#tab-approved-employees").click()
+        test.find("#tab-body-approved-employees div.tr " +\
+            "div.td.remove a").click()
+        test.switch_to_alert().accept()
+        sleep(2)
+        
+        
     ##########  Cloud code register_employee works
     try:
         res = register_employee("vandolf1", "estrellado1")
