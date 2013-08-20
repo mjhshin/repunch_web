@@ -496,8 +496,8 @@ def feedback_delete(request, feedback_id):
     # no need to save the store since we just removed from relation
         
     return redirect(reverse('messages_index')+ "?%s" %\
-        urllib.urlencode({'success':\'Feedback has been deleted.',
-            'tab_feedback':1})
+        urllib.urlencode({'success':'Feedback has been deleted.',
+            'tab_feedback':1}))
 
 @login_required
 def delete(request, message_id):
