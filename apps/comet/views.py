@@ -150,9 +150,9 @@ def pull(request):
             emps_deleted = []
             for demp_id in del_emps:
                 if demp_id in emps_approved_copy:
-                    emps_list = emps_approved_list_copy
+                    emps_list = employees_approved_list_copy
                 else:
-                    emps_list = emps_pending_list_copy
+                    emps_list = employees_pending_list_copy
                     
                 for emp in emps_list:
                     if emp.objectId == demp_id:
