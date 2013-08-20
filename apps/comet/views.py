@@ -125,7 +125,7 @@ def pull(request):
         if appr_emps:
             approved = []
             for appr_emp_id in appr_emps:
-                for emp in employees_pending_list:
+                for emp in employees_approved_list:
                     if emp.objectId == appr_emp_id:
                         approved.append(emp.jsonify())
                         break

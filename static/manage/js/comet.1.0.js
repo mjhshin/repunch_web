@@ -319,6 +319,7 @@ $(document).ready(function(){
         }
         
         if (res.hasOwnProperty('employees_approved')){
+            alert(res.employees_approved.length);
             employeesApprovedDeleted(res.employees_approved, "approved");
         } 
         if (res.hasOwnProperty('employees_deleted')){
