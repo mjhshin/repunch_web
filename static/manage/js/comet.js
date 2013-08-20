@@ -302,7 +302,7 @@ $(document).ready(function(){
                 }
                 
                 // update the title and the tab
-                if (count > 0) {
+                if (employees_pending_count > 0) {
                     document.title = "Repunch | (" + employees_pending_count + ") Employees";
                     $("#tab-pending-employees").html("Pending (" + employees_pending_count + ")");
                 } else {
