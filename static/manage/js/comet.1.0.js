@@ -321,6 +321,9 @@ $(document).ready(function(){
                     $("#tab-pending-employees").html("Pending");
                 }
                 
+                // Just in case that new rows are moved to approved, rebind the checkbox click event for graphing.
+                rebindEmployeeGraph(); // defined in employees.js
+                
             }
             
         }

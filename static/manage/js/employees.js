@@ -1,8 +1,14 @@
+
+/**
+    Bind the checkboxes under graph column for each employee.
+**/
+function rebindEmployeeGraph() {
+	$("[name='employee-graph-cb']").click(function(){
+		updateChart();
+	})
+}
+
 $(document).ready(function(){
-	// move to onclick to stopPropagation works?
-	$('.graph input').click(function(event){
-		// return false;
-	});
 	
 	$('.remove img').click(function(event){
 		
@@ -19,10 +25,7 @@ $(document).ready(function(){
 		return confirm("Deny employee?");
 	});
 	
-	
-	$("[name='employee-graph-cb']").click(function(){
-		updateChart();
-	})
+	rebindEmployeeGraph();
 	
 	//tie date selectors to chart
 	$( "#graph-dates > input" ).datepicker({ autoSize: true, onSelect: function(dateText, inst){
