@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from selenium.webdriver.common.keys import Keys
 from time import sleep
+from urllib import urlencode
 
 from libs.dateutil.relativedelta import relativedelta
 from libs.imap import Mail
@@ -629,7 +630,7 @@ def test_feedbacks():
             "details"},
         {'test_name': "The reply is visible"},
         {'test_name': "The reply message is saved in the store's " +\
-            "sent messages relation with message_Type of feedback"},
+            "sent messages relation with message_type of feedback"},
         {'test_name': "The reply message is saved in the Patron's " +\
             "received messages relation wrapped in a Message Status"},
         {'test_name': "A feedback with a reply does not have a " +\
@@ -681,6 +682,7 @@ def test_feedbacks():
     def feedback_unread(feedback_tr):
         """ check parse if the fb is unread """
         fb_id = feedback_id(feedback_tr)
+        store.set("receivedMessages", None)
         msg = store.get("receivedMessages", objectId=fb_id)
         if msg and len(msg) > 0:
            return not msg[0].is_read
@@ -698,7 +700,7 @@ def test_feedbacks():
     ##########  Notification badge appears if there are
     ###         unread feedbacks
     try:
-        sleep(COMET_PULL_RATE + 1)
+        sleep(COMET_PULL_RATE + 2)
         parts[2]['success'] = test.element_exists("#messages-nav " +\
             "a div.nav-item-badge")
     except Exception as e:
@@ -782,7 +784,7 @@ def test_feedbacks():
         test.find("#body").send_keys("     ")
         test.find("#reply-form-submit").click()
         sleep(2)
-        parts[11]['success'] = test.find("div..notification.hide " +\
+        parts[11]['success'] = test.find("div.notification.hide " +\
             "div").text == "Please enter a message."
     except Exception as e:
         print e
@@ -791,6 +793,10 @@ def test_feedbacks():
     try:
         test.find("#body").send_keys("Hey")
         test.find("#reply-form-submit").click()
+        parts[12]['success'] = test.is_current_url(reverse(\
+            "feedback_details", args=(fb_id,)) +\
+            "?%s" % urlencode({'success':\
+            'Reply has been sent.'}))
         sleep(5)
     except Exception as e:
         print e
@@ -803,23 +809,21 @@ def test_feedbacks():
         print e
         parts[13]['test_message'] = str(e)
     ##########  The reply message is saved in the store's 
-    ###         sent messages relation with message_Type of feedback
+    ###         sent messages relation with message_type of feedback
     try:
         test.find("#back_to_feedback").click()
         sleep(1)
-        feedbacks =\
-            test.find("#tab-body-feedback div.tr", multiple=True)
         store.set("sentMessages", None)
+        store.set("receivedMessages", None)
         parts[14]['success'] = len(store.get("sentMessages",
-            objectId=feedback_id(feedbacks[0]),
-            message_type=FEEDBACK)) > 0
+            objectId=store.get("receivedMessages", 
+            objectId=fb_id)[0].Reply, message_type=FEEDBACK)) > 0
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
     ##########  The reply message is saved in the Patron's 
     ###         received messages relation wrapped in a Message Status 
     try:
-        fb_id = feedback_id(feedbacks[0])
         patron.set("receivedMessages", None)
         parts[15]['success'] = len(patron.get("receivedMessages",
             Message=fb_id)) > 0
@@ -828,9 +832,11 @@ def test_feedbacks():
         parts[15]['test_message'] = str(e)
     ##########  A feedback with a reply does not have a reply button
     try:
+        feedbacks =\
+            test.find("#tab-body-feedback div.tr", multiple=True)
         feedbacks[0].find_element_by_css_selector("a").click()
         sleep(2)
-        parts[16]['success'] = test.element_exists(\
+        parts[16]['success'] = not test.element_exists(\
             "#reply-form-submit")
     except Exception as e:
         print e
@@ -862,7 +868,8 @@ def test_feedbacks():
         test.find("#tab-feedback").click()
         sleep(1)
         feedbacks =\
-            test.find("#tab-body-feedback div.tr", multiple=True)
+            test.find("#tab-body-feedback div.tr a[href='%s']" %\
+                (fb_id,), multiple=True)
         parts[19]['success'] = len(feedbacks) == 0
     except Exception as e:
         print e
@@ -873,11 +880,9 @@ def test_feedbacks():
         send_feedback("feedback #2", "body #2")
         send_feedback("feedback #3", "body #3")
         send_feedback("feedback #4", "body #4")
-        sleep(COMET_PULL_RATE + 1)
+        sleep(COMET_PULL_RATE*2 + 2)
         feedbacks =\
-            test.find("#tab-body-feedback div.tr", multiple=True)
-        feedbacks =\
-            test.find("#tab-body-feedback div.tr", multiple=True)
+            test.find("#tab-body-feedback div.tr a", multiple=True)
         parts[20]['success'] = len(feedbacks) == 3
     except Exception as e:
         print e
