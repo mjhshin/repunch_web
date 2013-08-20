@@ -272,6 +272,10 @@ $(document).ready(function(){
                     if (i == emps.length - 1) {
                         row.fadeOut(2000, function(){
                             $(this).remove();
+                            // Now add to the approved tab
+                            if (type == "approved") {
+                                addToEmployeesApproved(emps[i]);
+                            }
                             
                             // place the placeholder if now empty in PENDING
                             if($("#tab-body-pending-employees div.tr").length == 0) {
