@@ -243,7 +243,7 @@ $(document).ready(function(){
                     $("#no-pending-employees").remove();
                 }
             }
-            
+            rebindEmployees(); // defined in employees.js
         }// end employees pending
         
         function employeesApprovedDeleted(emps, type) {
