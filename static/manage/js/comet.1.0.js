@@ -203,6 +203,12 @@ $(document).ready(function(){
 				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>" +
 		        
 		        "</div>" );
+
+            // remove placeholder when empty
+            if ($("#no-approved-employees").length > 0){
+                $("#no-approved-employees").remove();
+            }
+
         }
         
         if (res.hasOwnProperty('employees_pending')){
@@ -242,21 +248,23 @@ $(document).ready(function(){
         
         function employeesApprovedDeleted(emps, type) {
             // pending employees nav 
-            var employees_pending_count = new String(res.employees_pending_count);
+            var employees_pending_count = res.employees_pending_count;
             var mBadge = $("#employees-nav a div.nav-item-badge");
             if (mBadge.length == 1) {
-                mBadge.text(employees_pending_count);
-            } else {
-                mBadge.fadeOut(1000, function(){
-                    $(this).remove();
-                });
+                if (employees_pending_count == 0) {
+                    mBadge.fadeOut(1000, function(){
+                        $(this).remove();
+                    });
+                } else {
+                   mBadge.text(new String(employees_pending_count));
+                }
             }
             
             // Employees page
             var pendingTab = $("#tab-pending-employees");
             if (pendingTab.length > 0) {
                 // move the rows from pending tab to approved tab
-                for (var i=0; i< emps.length; i++) {
+                for (var i=0; i<emps.length; i++) {
                     var row = $("#" + emps[i].objectId);
                     // row.css("background", "#FFFFCB");
                     row.css("background", "#CCFF99");
@@ -267,15 +275,18 @@ $(document).ready(function(){
                         // row.html("Employee has been <span style='color:red;'>REMOVED</span> elsewhere.");
                         row.html("Successfully <span style='color:red;'>REMOVED</span> employee.");
                     }
-                    
+			
+                    // First add to the approved tab. Do it here because the callback function after 2 seconds 
+                    // has the var i as emps.length, which causes employee in addToEmployeesApproved to receiving an undefined employee
+                    if (type == "approved") {
+                        addToEmployeesApproved(emps[i]);
+                    }
+
+                   
                     // the last row to go checks if placeholder is necessary
                     if (i == emps.length - 1) {
                         row.fadeOut(2000, function(){
                             $(this).remove();
-                            // Now add to the approved tab
-                            if (type == "approved") {
-                                addToEmployeesApproved(emps[i]);
-                            }
                             
                             // place the placeholder if now empty in PENDING
                             if($("#tab-body-pending-employees div.tr").length == 0) {
@@ -297,10 +308,6 @@ $(document).ready(function(){
                     } else {
                         row.fadeOut(2000, function(){
                             $(this).remove();
-                            // Now add to the approved tab
-                            if (type == "approved") {
-                                addToEmployeesApproved(emps[i]);
-                            }
                         });
                     }
                 }
@@ -319,7 +326,6 @@ $(document).ready(function(){
         }
         
         if (res.hasOwnProperty('employees_approved')){
-            alert(res.employees_approved.length);
             employeesApprovedDeleted(res.employees_approved, "approved");
         } 
         if (res.hasOwnProperty('employees_deleted')){

@@ -130,13 +130,10 @@ def pull(request):
                         approved.append(emp.jsonify())
                         break
                         
-            if len(employees_pending_list) !=\
-                len(employees_pending_list_copy) and\
-                len(employees_pending_list) > 0:   
+            if len(approved) > 0:
+                data['employees_approved'] = approved
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-            if len(approved) > 0:
-                data['employees_approved'] = emps_approved
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
