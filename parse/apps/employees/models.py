@@ -15,7 +15,6 @@ class Employee(ParseObject):
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
         self.status = data.get("status", PENDING)
-        # must be updated everytime a punch event occurs TODO
         self.lifetime_punches = data.get("lifetime_punches", 0)
 
         self.Punches_ = "Punch"

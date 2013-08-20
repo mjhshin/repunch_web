@@ -38,23 +38,23 @@ class Command(BaseCommand):
         #results.extend(test_rewards())
         
         ### ANALYSIS
-        #results.extend(test_trends()) TODO Thursday
-        #results.extend(test_breakdown()) TODO Thursday
-        #results.extend(test_reward_redemptions()) TODO Thursday
+        #results.extend(test_trends()) TODO Friday
+        #results.extend(test_breakdown()) TODO Friday
+        #results.extend(test_reward_redemptions()) TODO Friday
         
         ### MESSAGES
         #results.extend(test_messages())
-        results.extend(test_feedbacks())
+        #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        results.extend(test_employees())
+        results.extend(test_employees()) # TODAY
         
         ### SETTINGS
         #results.extend(test_settings())
         
         ### WORKBENCH
-        #results.extend(test_punch()) TODO Tuesday
-        #results.extend(test_redemptions()) TODO Wednesday
+        #results.extend(test_punch()) TODO Wednesday
+        #results.extend(test_redemptions()) TODO Thursday
         
         
         send_email_selenium_test_results(results)

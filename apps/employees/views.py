@@ -100,6 +100,9 @@ def delete(request, employee_id):
     }
     comet_receive(store_id, payload)
     
+    # must delete the account associated with the employee
+    Account.objects().get(Employee=employee.objectId,
+        account_type="employee")  
     # delete Punches Pointers to this employee?
     employee.delete()
 
@@ -177,8 +180,11 @@ def deny(request, employee_id):
     }
     comet_receive(store_id, payload)
     
+    # must delete the account associated with the employee
+    Account.objects().get(Employee=employee.objectId,
+        account_type="employee")  
     # delete the employee!
-    employee.delete()
+    employee.delete()  
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))

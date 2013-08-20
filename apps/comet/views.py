@@ -100,17 +100,17 @@ def pull(request):
             tuple(set(emps_pending) - set(emps_pending_copy))
             
         if employees_pending:
-            emps_pending = []
+            pending = []
             for emp_id in employees_pending:
                 for emp in employees_pending_list:
                     if emp.objectId == emp_id:
-                        emps_pending.append(emp.jsonify())
+                        pending.append(emp.jsonify())
                         break
                     
-            if len(emps_pending) > 0:   
+            if len(pending) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-                data['employees_pending'] = emps_pending
+                data['employees_pending'] = pending
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################

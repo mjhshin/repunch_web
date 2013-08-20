@@ -46,6 +46,8 @@ def test_messages():
         store.remove_relation("SentMessages_",
             [m.objectId for m in sent_messages])
             
+    store.set("sentMessages", None)
+            
     # we can clear the list locally but just re-pull from parse
     account = Account.objects().get(username=TEST_USER['username'],
         include="Store.Subscription")
@@ -607,6 +609,8 @@ def test_feedbacks():
     if received_messages:
         store.remove_relation("ReceivedMessages_",
             [m.objectId for m in received_messages])
+            
+    store.set("receivedMessages", None)
  
     test = SeleniumTest()
     parts = [
@@ -616,7 +620,8 @@ def test_feedbacks():
             " unread feedbacks"},
         {'test_name': "A new row appears when feedback is received"},
         {'test_name': "Feedback is initially unread (dashboard)"},
-        {'test_name': "Feedback is initially unread (Parse)"},
+        {'test_name': "Feedback is in store's ReceivedMessages " +\
+            "relation and is initially unread"},
         {'test_name': "Clicking the row redirects user to the " +\
             "feedback detail page"},
         {'test_name': "Clicking back to feedback inbox redirects " +\
@@ -726,7 +731,8 @@ def test_feedbacks():
         print e
         parts[4]['test_message'] = str(e)
     
-    ##########  Feedback is initially unread (Parse)
+    ##########  Feedback is in store's ReceivedMessages
+    ###         relation and is initially unread 
     try:
         parts[5]['success'] = feedback_unread(feedbacks[0])
     except Exception as e:
@@ -765,7 +771,7 @@ def test_feedbacks():
         parts[8]['test_message'] = str(e)
     ##########  Feedback is now read (Parse)
     try:
-        parts[9]['success'] =  not feedback_unread(feedbacks[0])
+        parts[9]['success'] = not feedback_unread(feedbacks[0])
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
@@ -891,7 +897,7 @@ def test_feedbacks():
         send_feedback("feedback #2", "body #2")
         send_feedback("feedback #3", "body #3")
         send_feedback("feedback #4", "body #4")
-        sleep(COMET_PULL_RATE*2 + 2)
+        sleep(COMET_PULL_RATE*3 + 2)
         feedbacks =\
             test.find("#tab-body-feedback div.tr a", multiple=True)
         parts[21]['success'] = len(feedbacks) == 3

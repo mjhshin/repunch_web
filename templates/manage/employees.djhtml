@@ -1,7 +1,7 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}{% load text_tags %}
 
-{% block title %}{% if epcount > 0 %}({{ epcount }}){% endif %} Messages{% endblock %}
+{% block title %}{% if epcount > 0 %}({{ epcount }}){% endif %} Employees{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employees.css" %}" />
 {% endblock %}
