@@ -124,7 +124,6 @@ def test_employees():
         test.switch_to_alert().accept()
         sleep(2)
         
-        
     def deny(): 
         """ 
         Denies the first pending employee on the table.
@@ -144,7 +143,6 @@ def test_employees():
             "div.td.remove a").click()
         test.switch_to_alert().accept()
         sleep(2)
-        
         
     ##########  Cloud code register_employee works
     try:
