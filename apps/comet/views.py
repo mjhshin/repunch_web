@@ -131,7 +131,8 @@ def pull(request):
                         break
                         
             if len(employees_pending_list) !=\
-                len(employees_pending_list_copy):   
+                len(employees_pending_list_copy) and\
+                len(employees_pending_list) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
             if len(emps_approved):

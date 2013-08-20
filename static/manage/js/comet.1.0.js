@@ -264,8 +264,8 @@ $(document).ready(function(){
                         // row.html("Employee has been <span style='color:blue;'>APPROVED</span> elsewhere.");
                         row.html("Successfully <span style='color:blue;'>APPROVED</span> employee.");
                     } else {
-                        // row.html("Employee has been <span style='color:red;'>DENIED</span> elsewhere.");
-                        row.html("Successfully <span style='color:red;'>DENIED</span> employee.");
+                        // row.html("Employee has been <span style='color:red;'>REMOVED</span> elsewhere.");
+                        row.html("Successfully <span style='color:red;'>REMOVED</span> employee.");
                     }
                     
                     // the last row to go checks if placeholder is necessary
