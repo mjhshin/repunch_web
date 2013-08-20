@@ -44,7 +44,7 @@ class Command(BaseCommand):
         
         ### MESSAGES
         #results.extend(test_messages())
-        #results.extend(test_feedbacks())
+        results.extend(test_feedbacks())
         
         ### EMPLOYEE
         results.extend(test_employees())

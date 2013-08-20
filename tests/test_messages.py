@@ -637,6 +637,8 @@ def test_feedbacks():
             "reply button"},
         {'test_name': "Clicking delete message prompts the user " +\
             "to confirm the deletion"},
+        {'test_name': "The user is redirected to messages index " +\
+            "with feedback tab active"},
         {'test_name': "Deleting the reply only removes the message" +\
             " from the store's sent messages relation"},
         {'test_name': "The deleted feedback is no longer in " +\
@@ -852,17 +854,26 @@ def test_feedbacks():
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
-    ##########  Deleting the reply only removes the message
-    ###         from the store's sent messages relation 
+    ##########  The user is redirected to messages index 
+    ###         with feedback tab active
     try:
         alert.accept()
         sleep(4)
-        store.set("receivedMessages", None)
-        parts[18]['success'] = not store.get("receivedMessages",
-            objectId=fb_id, message_type=FEEDBACK)
+        parts[18]['success'] =\
+            test.find("#tab-feedback").get_attribute(\
+            "class").__contains__("active")
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
+    ##########  Deleting the reply only removes the message
+    ###         from the store's sent messages relation 
+    try:
+        store.set("receivedMessages", None)
+        parts[19]['success'] = not store.get("receivedMessages",
+            objectId=fb_id, message_type=FEEDBACK)
+    except Exception as e:
+        print e
+        parts[19]['test_message'] = str(e)
     ##########  The deleted feedback is no longer in the table 
     try:
         test.find("#tab-feedback").click()
@@ -870,10 +881,10 @@ def test_feedbacks():
         feedbacks =\
             test.find("#tab-body-feedback div.tr a[href='%s']" %\
                 (fb_id,), multiple=True)
-        parts[19]['success'] = len(feedbacks) == 0
+        parts[20]['success'] = len(feedbacks) == 0
     except Exception as e:
         print e
-        parts[19]['test_message'] = str(e)
+        parts[20]['test_message'] = str(e)
     ##########  Multiple feedbacks (testing 3 here) 
     ###         can appear at the same time 
     try:
@@ -883,10 +894,10 @@ def test_feedbacks():
         sleep(COMET_PULL_RATE*2 + 2)
         feedbacks =\
             test.find("#tab-body-feedback div.tr a", multiple=True)
-        parts[20]['success'] = len(feedbacks) == 3
+        parts[21]['success'] = len(feedbacks) == 3
     except Exception as e:
         print e
-        parts[20]['test_message'] = str(e)
+        parts[21]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup

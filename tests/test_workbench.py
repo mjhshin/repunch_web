@@ -3,6 +3,7 @@ Selenium tests for dashboard 'Workbench' tab.
 """
 
 from django.core.urlresolvers import reverse
+from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
