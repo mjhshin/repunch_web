@@ -1,15 +1,8 @@
 
 /**
-    Bind the checkboxes under graph column for each employee.
+    Binds on click events to each componenet of each row in the tables.
 **/
-function rebindEmployeeGraph() {
-	$("[name='employee-graph-cb']").click(function(){
-		updateChart();
-	})
-}
-
-$(document).ready(function(){
-	
+function rebindEmployees() {
 	$('.remove img').click(function(event){
 		
 		return confirm("Are you sure you want to remove this employee?");
@@ -25,12 +18,18 @@ $(document).ready(function(){
 		return confirm("Deny employee?");
 	});
 	
-	rebindEmployeeGraph();
+	$("[name='employee-graph-cb']").click(function(){
+		updateChart();
+	});
 	
 	//tie date selectors to chart
 	$( "#graph-dates > input" ).datepicker({ autoSize: true, onSelect: function(dateText, inst){
 		updateChart();
 	} });
+}
+
+$(document).ready(function(){
+	rebindEmployees();
 });
 
 var chart = null;
