@@ -102,7 +102,7 @@ def delete(request, employee_id):
     
     # must delete the account associated with the employee
     Account.objects().get(Employee=employee.objectId,
-        account_type="employee")  
+        account_type="employee").delete()
     # delete Punches Pointers to this employee?
     employee.delete()
 
@@ -182,7 +182,7 @@ def deny(request, employee_id):
     
     # must delete the account associated with the employee
     Account.objects().get(Employee=employee.objectId,
-        account_type="employee")  
+        account_type="employee").delete()
     # delete the employee!
     employee.delete()  
     
