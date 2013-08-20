@@ -47,7 +47,7 @@ class Command(BaseCommand):
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        results.extend(test_employees()) # TODAY
+        results.extend(test_employees()) # Wednesday
         
         ### SETTINGS
         #results.extend(test_settings())
