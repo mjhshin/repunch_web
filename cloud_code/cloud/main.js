@@ -1264,8 +1264,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation);
-	androidInstallationQuery.equalTo('deviceType', 'android');
-	iosInstallationQuery.equalTo('deviceType', 'ios');
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("deviceType", "ios");
 
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0) {
@@ -1342,8 +1342,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             	alert: storeName + " sent you a message",
                 store_id: storeId,
                 message_id: messageId,
-                type: "message",
-				badge: "Increment"
+                type: "message"
             }
 		}) );
 		
