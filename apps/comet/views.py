@@ -125,7 +125,7 @@ def pull(request):
         if appr_emps:
             approved = []
             for appr_emp_id in appr_emps:
-                for emp in employees_approved_list:
+                for emp in employees_pending_list:
                     if emp.objectId == appr_emp_id:
                         approved.append(emp.jsonify())
                         break
@@ -135,7 +135,7 @@ def pull(request):
                 len(employees_pending_list) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-            if len(emps_approved):
+            if len(approved) > 0:
                 data['employees_approved'] = emps_approved
             
         #############################################################
@@ -150,7 +150,7 @@ def pull(request):
         del_emps = tuple(set(emps_copy) - set(emps))
         
         if del_emps:
-            emps_deleted = []
+            deleted = []
             for demp_id in del_emps:
                 if demp_id in emps_approved_copy:
                     emps_list = employees_approved_list_copy
@@ -159,13 +159,13 @@ def pull(request):
                     
                 for emp in emps_list:
                     if emp.objectId == demp_id:
-                        emps_deleted.append(emp.jsonify())
+                        deleted.append(emp.jsonify())
                         break  
                         
-            if len(emps_deleted) > 0:   
+            if len(deleted) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-                data['employees_deleted'] = emps_deleted
+                data['employees_deleted'] = deleted
            
         #############################################################
         # REDEMPTIONS PENDING
