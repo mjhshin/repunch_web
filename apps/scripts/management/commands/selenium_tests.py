@@ -11,6 +11,8 @@ from tests.test_login_logout import test_login_dialog, test_login_page
 from tests.test_myaccount import test_edit_store_details,\
 test_edit_account, test_cancel_account
 from tests.test_rewards import test_rewards
+from tests.test_analysis import test_trends, test_breakdown,\
+test_reward_redemptions
 from tests.test_messages import test_messages, test_feedbacks
 from tests.test_employees import test_employees
 from tests.test_settings import test_settings
@@ -42,10 +44,10 @@ class Command(BaseCommand):
         
         ### MESSAGES
         #results.extend(test_messages())
-        results.extend(test_feedbacks())
+        #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        #results.extend(test_employees()) TODO Tuesday
+        results.extend(test_employees())
         
         ### SETTINGS
         #results.extend(test_settings())
