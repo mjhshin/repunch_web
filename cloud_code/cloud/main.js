@@ -1261,6 +1261,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var filter = request.params.filter; 
     var message, redeem_available;
 	var patron_ids = new Array(); // placeholder
+	
+    var androidInstallationQuery = new Parse.Query(Parse.Installation);
+    var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	androidInstallationQuery.equalTo('deviceType', 'android');
+	iosInstallationQuery.equalTo('deviceType', 'ios');
 
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0) {
@@ -1319,10 +1324,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // call when all tasks are done
     function proceedToPush() {
         console.log("PROCEED TO PUSH");
-	    var androidInstallationQuery = new Parse.Query(Parse.Installation);
-	    var iosInstallationQuery = new Parse.Query(Parse.Installation);
-		androidInstallationQuery.equalTo('deviceType', 'android');
-		iosInstallationQuery.equalTo('deviceType', 'ios');
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
