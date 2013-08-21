@@ -3,10 +3,11 @@ Contains functions used for comet connections.
 """
 from django.contrib.auth import SESSION_KEY
 from django.contrib.sessions.backends.cache import SessionStore
-
+import pytz
 
 from apps.comet.models import CometSession, CometSessionIndex
-from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+from repunch.settings import COMET_RECEIVE_KEY_NAME, TIME_ZONE,\
+COMET_RECEIVE_KEY
 
 from parse import session as SESSION
 from parse.apps.messages import FEEDBACK
@@ -248,7 +249,14 @@ def comet_receive(store_id, postDict):
         # STORE UPDATED ##############################
         updatedStore_one = postDict.get("updatedStore_one")
         if updatedStore_one:
-            session['store'] = Store(**updatedStore_one)
+            store = Store(**updatedStore_one)
+            session['store'] = store
+            try: # also update the store_timezone
+                session['store_timezone'] =\
+                    pytz.timezone(store.get('store_timezone'))
+            except Exception: # assign a default timezone
+                session['store_timezone'] =\
+                    pytz.timezone(TIME_ZONE)
             
         updatedStoreAvatarName_str =\
             postDict.get("updatedStoreAvatarName_str")

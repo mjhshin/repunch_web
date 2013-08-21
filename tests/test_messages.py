@@ -30,6 +30,7 @@ TEST_PATRON = {
 }
 
 def test_messages():
+    # TODO test that patrons are getting the messages!!!
     # setup
     account = Account.objects().get(username=TEST_USER['username'],
         include="Store.Subscription")

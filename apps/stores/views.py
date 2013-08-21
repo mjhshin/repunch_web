@@ -9,7 +9,7 @@ from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 from io import BytesIO
-import json, urllib, urllib2, os
+import json, urllib, urllib2, os, pytz
 
 from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours,\
@@ -18,7 +18,7 @@ from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
-from repunch.settings import MEDIA_ROOT,\
+from repunch.settings import MEDIA_ROOT, TIME_ZONE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
@@ -156,6 +156,13 @@ def edit(request):
             account.update(request.session[SESSION_KEY])
             
             # update the session cache
+            try:
+                request.session['store_timezone'] =\
+                    pytz.timezone(store.store_timezone)
+            except Exception:
+                request.session['store_timezone'] =\
+                    pytz.timezone(TIME_ZONE)
+                
             request.session['account'] = account
             request.session['store'] = store
             

@@ -52,6 +52,8 @@ class Command(BaseCommand):
                     if invoice:
                         subscription.date_last_billed = date_now
                         subscription.update()
+                    # TODO send email and on dashboard prompt user 
+                    # to enter valid cc info
                     asiss.append((account, store, invoice,
                         subscription))
                 

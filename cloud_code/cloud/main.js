@@ -193,15 +193,15 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 			if(error.code == Parse.Error.USERNAME_TAKEN) {
 				console.log("User save failed - username already taken.");
-				response.error(error.code);				
+				response.error(error.code); // code: 141, error: 202
 			
 			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
 			    console.log("User save failed - email already taken.");
-			    response.error(error.code);
+			    response.error(error.code); // code: 141, error: 202 - yea same as username taken
 				
 			} else if(error.code == Parse.Error.INVALID_EMAIL_ADDRESS) {
 			    console.log("User save failed - email is invalid.");
-			    response.error(error.code);
+			    response.error(error.code); // code: 141, error: 125
 				
 			} else {
 				response.error("error");

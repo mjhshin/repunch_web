@@ -146,7 +146,8 @@ def test_employees():
         
     ##########  Cloud code register_employee works
     try:
-        res = register_employee("vandolf1", "estrellado1")
+        res = register_employee("vandolf1", "estrellado1",
+            email="vandestrel@vandolf.com")
         parts[1]['success'] = res.get("result") == "success"
     except Exception as e:
         print e
@@ -173,27 +174,32 @@ def test_employees():
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
-    ##########  Email must be valid (cloud code) TODO
+    ##########  Email must be valid (cloud code)
     try:
-        pass
+        res = register_employee("vman", "vman", email="vmahs@vman")
+        parts[5]['success'] = res['error'] == '125'
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
-    ##########  Email must be unique (cloud code) TODO
+    ##########  Email must be unique (cloud code) 
     try:
-        pass
+        res = register_employee("vman", "vman",
+            email="vandestrel@vandolf.com")
+        parts[6]['success'] = res['error'] == '202'
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
-    ##########  Username must be unique (cloud code) TODO
+    ##########  Username must be unique (cloud code) 
     try:
-        pass
+        res = register_employee("vman", "vman", username="bakery")
+        parts[7]['success'] = res['error'] == '202'
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
-    ##########  Retailer PIN must exist (cloud code) TODO
+    ##########  Retailer PIN must exist (cloud code) 
     try:
-        pass
+        res = register_employee("vman", "vman", retailer_pin="sdgdgs")
+        parts[8]['success'] = res['result'] == "invalid_pin"
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
