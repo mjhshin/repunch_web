@@ -39,7 +39,7 @@
         <form action="" method="POST" id="punch-form" >
 	        {% csrf_token %}
 	        <input type="text" id="punch_code" placeholder="Punch Code"/>
-	        <input type="number" id="punch_amount" placeholder="Amount" min="1" />
+	        <input type="number" id="punch_amount" placeholder="Amount" min="1" max="{{ settings.punches_employee }}"/>
 	        <a class="button blue" onclick="punchit('{% url 'workbench_punch' %}'); return false;"><span>Punch</span></a>
 	        <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
 	            id="punch-loading" />
