@@ -23,7 +23,7 @@ def test_employees():
     """
     # TODO test employee graph
     
-    # clear the employees relation
+    # delete the employees and associated User objects in the relation
     account = Account.objects().get(username=TEST_USER['username'],
         include="Store.Settings")
     store = account.store
@@ -31,8 +31,9 @@ def test_employees():
     
     emps = store.get("employees")
     if emps:
-        store.remove_relation("Employees_",
-            [emp.objectId for emp in emps])
+        for emp in emps:
+            Account.objects().get(Employee=emp.objectId).delete()
+            emp.delete()
     
     store.set("employees", None)  
     
@@ -67,18 +68,18 @@ def test_employees():
         {'test_name': "The employee is deleted from parse"},
         {'test_name': "The account/user is deleted from parse"},
         {'test_name': "Multiple employees (4) registering at once" +\
-            " works"},
+            " shows up in dashboard"},
         {'test_name': "Approving 2 employees in succession works"},
         {'test_name': "Removing 2 employees in succession works"},
         {'test_name': "Denying 2 employees in succession works"},
     ]
     section = {
-        "section_name": "Employees page punching working properly?",
+        "section_name": "Employees page working properly?",
         "parts": parts,
     }
     test.results.append(section)
     
-    ##########  User needs to be logged in to access page
+    print "User needs to be logged in to access page"
     test.open(reverse("employees_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
@@ -119,49 +120,58 @@ def test_employees():
         Approves the first pending employee on the table.
         Also returns the employee id.
         """
+        print "APPROVED"
         test.find("#tab-pending-employees").click()
         row = test.find("#tab-body-pending-employees " +\
             "div.tr")
-        emp_id = row.get_attribute("id")
+        objectId = row.get_attribute("id")
         row.find_element_by_css_selector(\
             "div.td.approve a.approve").click()
+        sleep(1)
         test.switch_to_alert().accept()
         sleep(2)
-        return emp_id
+        return objectId
         
     def deny(): 
         """ 
         Denies the first pending employee on the table.
         Also returns the employee id.
         """
+        print "DENYING"
         test.find("#tab-pending-employees").click()
         row = test.find("#tab-body-pending-employees " +\
             "div.tr")
-        emp_id = row.get_attribute("id")
+        objectId = row.get_attribute("id")
         row.find_element_by_css_selector(\
             "div.td.approve a.deny").click()
+        sleep(1)
         test.switch_to_alert().accept()
-        sleep(2)
-        return emp_id
+        sleep(3)
+        return objectId
         
     def remove():
         """
         Removes the first approved employee on the table.
         Also returns the employee id.
         """
+        print "REMOVING"
         test.find("#tab-approved-employees").click()
-        row = test.find("#tab-body-pending-employees " +\
+        row = test.find("#tab-body-approved-employees " +\
             "div.tr")
-        emp_id = row.get_attribute("id")
+        objectId = row.get_attribute("id")
+        print emp_id
+        row.find_element_by_css_selector("div.td.remove").click()
         row.find_element_by_css_selector("div.td.remove a").click()
+        row.find_element_by_css_selector("div.td.remove a img").click()
+        sleep(1)
         test.switch_to_alert().accept()
-        sleep(2)
-        return emp_id
+        sleep(3)
+        return objectId
         
     first_name, last_name, username, email =\
     "vandolf1", "estrellado", "xmanvmanx", "xmanvman@xman.com"
         
-    ##########  Cloud code register_employee works
+    print "Cloud code register_employee works"
     try:
         res = register_employee(first_name, last_name, username,
             email=email)
@@ -169,20 +179,20 @@ def test_employees():
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
-    ########## Employee is saved in store's Employees relation
+    print "Employee is saved in store's Employees relation"
     try:
         emp = store.get("employees")[0]
         parts[2]['success'] = emp is not None
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
-    ##########  Employee is initially pending (Parse)
+    print "Employee is initially pending (Parse)"
     try:
         parts[3]['success'] = emp.status == PENDING
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
-    ##########  Employee is initially pending (Dashboard)
+    print "Employee is initially pending (Dashboard)"
     try:
         sleep(COMET_PULL_RATE*2 + 1) # wait for dashboard to receive
         test.find("#tab-pending-employees").click()
@@ -191,14 +201,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
-    ##########  Email must be valid (cloud code)
+    print "Email must be valid (cloud code)"
     try:
         res = register_employee("vman", "vman", email="vmahs@vman")
         parts[5]['success'] = res['error'] == '125'
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
-    ##########  Email must be unique (cloud code) 
+    print "Email must be unique (cloud code) "
     try:
         res = register_employee("vman", "vman",
             email=email)
@@ -206,21 +216,21 @@ def test_employees():
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
-    ##########  Username must be unique (cloud code) 
+    print "Username must be unique (cloud code) "
     try:
         res = register_employee("vman", "vman", username=username)
         parts[7]['success'] = res['error'] == '202'
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
-    ##########  Retailer PIN must exist (cloud code) 
+    print "Retailer PIN must exist (cloud code) "
     try:
         res = register_employee("vman", "vman", retailer_pin="sdgdgs")
         parts[8]['success'] = res['result'] == "invalid_pin"
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
-    ##########  Clicking deny prompts the user to confirm
+    print "Clicking deny prompts the user to confirm"
     try:
         test.find("#tab-pending-employees").click()
         test.find("#tab-body-pending-employees div.tr " +\
@@ -230,8 +240,9 @@ def test_employees():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  The user is redirected to employee index
+    print "The user is redirected to employee index"
     try:
+        sleep(1)
         alert.accept()
         sleep(2)
         parts[10]['success'] = test.is_current_url(reverse(\
@@ -240,7 +251,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    ##########  The denied employee is removed from the pending table
+    print "The denied employee is removed from the pending table"
     try:
         parts[11]['success'] = not test.element_exists(\
         "#tab-body-pending-employees div.tr " +\
@@ -248,7 +259,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)
-    ##########  The employee is deleted from parse
+    print "The employee is deleted from parse"
     try:
         store.set("employees", None)
         parts[12]['success'] = store.get("employees",\
@@ -256,15 +267,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[12]['test_message'] = str(e)
-    ##########  The account/user is deleted from parse
+    print "The account/user is deleted from parse"
     try:
         parts[13]['success'] = Account.objects().count(\
             username=username, email=email) == 0
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)
-    ##########  Approving the employee moves it from 
-    ###         pending to approved
+    print "Approving the employee moves it from pending to approved"
     try:
         register_employee(first_name, last_name, username,
             email=email)
@@ -278,7 +288,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
-    ##########  Employee status is set to approved in Parse
+    print "Employee status is set to approved in Parse"
     try:
         store.set("employees", None)
         emp = store.get("employees", first_name=first_name,
@@ -287,14 +297,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
-    ##########  Employee initially has 0 punches
+    print "Employee initially has 0 punches"
     try:
         parts[16]['success'] = emp.lifetime_punches == 0
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
-    ##########  Clicking on the approved employee row 
-    ###         redirects user to employee edit page 
+    print "Clicking on the approved employee row " +\
+        "redirects user to employee edit page "
     try:
         test.find("#tab-approved-employees").click()
         test.find("#tab-body-approved-employees div#%s a" %\
@@ -305,7 +315,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
-    ##########  Clicking delete prompts the user to confirm
+    print "Clicking delete prompts the user to confirm"
     try:
         test.find("#delete-button").click()
         alert = test.switch_to_alert()
@@ -314,8 +324,9 @@ def test_employees():
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
-    ##########  The user is redirected to employee index
+    print "The user is redirected to employee index"
     try:
+        sleep(1)
         alert.accept()
         sleep(2)
         parts[19]['success'] = test.is_current_url(reverse(\
@@ -324,37 +335,41 @@ def test_employees():
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
-    ##########  The deleted employee is removed from the pending table
+    print "The deleted employee is removed from the pending table"
     try:
         parts[20]['success'] = not test.element_exists(\
             "#tab-body-approved-employees div#%s a" %(emp.objectId,))
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
-    ##########  The employee is deleted from parse
+    print "The employee is deleted from parse"
     try:
         store.set("employees", None)
-        parts[21]['succes'] = store.get("employees", 
+        parts[21]['success'] = store.get("employees", 
             objectId=emp.objectId, count=1) == 0
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
-    ##########  The account/user is deleted from parse
+    print "The account/user is deleted from parse"
     try:
         parts[22]['success'] = Account.objects().count(\
             username=username, email=email) == 0
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-    ##########  Multiple employees (4) registering at once works
+    print "Multiple employees (4) registering at once " +\
+        "shows up in dashboard"
     try:
         for i in range(4):
             register_employee(first_name + str(i), last_name + str(i))
         sleep(COMET_PULL_RATE*2 + 2)
+        parts[23]['success'] = len(test.find(\
+            "#tab-body-pending-employees div.tr " +\
+            "div.td.approve a.approve", multiple=True)) == 4
     except Exception as e:
         print e
         parts[23]['test_message'] = str(e)
-    ##########  Approving 2 employees in succession works
+    print "Approving 2 employees in succession works"
     try:
         success = True
         for i in range(2):
@@ -376,7 +391,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[24]['test_message'] = str(e)
-    ##########  Removing 2 employees in succession works
+    print "Removing 2 employees in succession works"
     try:
         success = True
         for i in range(2):
@@ -398,7 +413,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[25]['test_message'] = str(e)
-    ##########  Denying 2 employees in succession works
+    print "Denying 2 employees in succession works"
     try:
         success = True
         for i in range(2):
