@@ -53,7 +53,7 @@ class Command(BaseCommand):
         #results.extend(test_settings())
         
         ### WORKBENCH
-        #results.extend(test_punch()) TODO Wednesday
+        #results.extend(test_punch()) TODO Thursday
         #results.extend(test_redemptions()) TODO Thursday
         
         

@@ -16,6 +16,9 @@
       
       var _trends_graph_url = '{% url 'analysis_index' %}trends/';
       var _breakdown_graph_url = '{% url 'analysis_index' %}breakdown/';
+      $(document).ready(function() {
+        $(".not-sortable").unbind("click");
+      });
     </script>
 
 {% endblock %}
@@ -86,8 +89,8 @@
 		<h2 style="margin-bottom:10px;">Rewards</h2>
 		<div class="white-box table tab-body" style="display: block;">
 			<div class="table-header">
-				<div class="th sorted asc" id="header-reward_name">Name <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
-				<div class="th" id="header-reward_redemptions">Redemptions <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th not-sortable" id="header-reward_name">Name </div>
+				<div class="th not-sortable" id="header-reward_redemptions">Redemptions <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			{% for reward in rewards %}
 		    <div class="tr  {% cycle '' 'odd' %}" id="{{ reward.reward_id }}">

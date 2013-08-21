@@ -18,8 +18,11 @@ from libs.dateutil.relativedelta import relativedelta
 @session_comet
 def index(request):
     data = {'analysis_nav': True}
-    data['rewards'] =\
-            SESSION.get_store(request.session).get("rewards")
+    rewards = SESSION.get_store(request.session).get("rewards")
+    # sort the rewards by redemption count in descending order
+    rewards.sort(key=lambda k: k['redemption_count'], reverse=True)
+    data['rewards'] = rewards
+            
     return render(request, 'manage/analysis.djhtml', data)
 
 @login_required

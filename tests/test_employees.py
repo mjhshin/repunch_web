@@ -122,15 +122,15 @@ def test_employees():
         """
         print "APPROVED"
         test.find("#tab-pending-employees").click()
-        row = test.find("#tab-body-pending-employees " +\
+        approveRow = test.find("#tab-body-pending-employees " +\
             "div.tr")
-        objectId = row.get_attribute("id")
-        row.find_element_by_css_selector(\
+        approveId = approveRow.get_attribute("id")
+        approveRow.find_element_by_css_selector(\
             "div.td.approve a.approve").click()
         sleep(1)
         test.switch_to_alert().accept()
         sleep(2)
-        return objectId
+        return approveId
         
     def deny(): 
         """ 
@@ -139,15 +139,15 @@ def test_employees():
         """
         print "DENYING"
         test.find("#tab-pending-employees").click()
-        row = test.find("#tab-body-pending-employees " +\
+        denyRow = test.find("#tab-body-pending-employees " +\
             "div.tr")
-        objectId = row.get_attribute("id")
-        row.find_element_by_css_selector(\
+        denyId = denyRow.get_attribute("id")
+        denyRow.find_element_by_css_selector(\
             "div.td.approve a.deny").click()
         sleep(1)
         test.switch_to_alert().accept()
         sleep(3)
-        return objectId
+        return denyId
         
     def remove():
         """
@@ -156,17 +156,14 @@ def test_employees():
         """
         print "REMOVING"
         test.find("#tab-approved-employees").click()
-        row = test.find("#tab-body-approved-employees " +\
+        removeRow = test.find("#tab-body-approved-employees " +\
             "div.tr")
-        objectId = row.get_attribute("id")
-        print emp_id
-        row.find_element_by_css_selector("div.td.remove").click()
-        row.find_element_by_css_selector("div.td.remove a").click()
-        row.find_element_by_css_selector("div.td.remove a img").click()
+        removeId = removeRow.get_attribute("id")
+        removeRow.find_element_by_css_selector("div.td.remove a").click()
         sleep(1)
         test.switch_to_alert().accept()
         sleep(3)
-        return objectId
+        return removeId
         
     first_name, last_name, username, email =\
     "vandolf1", "estrellado", "xmanvmanx", "xmanvman@xman.com"
@@ -396,6 +393,7 @@ def test_employees():
         success = True
         for i in range(2):
             emp_id = remove()
+            print emp_id
             # now check if the row is no longer in the pending table
             # and also not the approved table
             test.find("#tab-approved-employees").click()
