@@ -1342,7 +1342,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             	alert: storeName + " sent you a message",
                 store_id: storeId,
                 message_id: messageId,
-                type: "message"
+                type: "message",
+				badge: "Increment"
             }
 		}) );
 		
