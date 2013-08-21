@@ -120,7 +120,12 @@ def get_page(request):
 @login_required
 def punch(request):
     if request.method == "POST" or request.is_ajax():
-        nump = int(request.POST['num_punches'])
+        try:
+            nump = int(request.POST['num_punches'])
+        except ValueError:
+            return HttpResponse(json.dumps({'error': 'float'}),
+                content_type="application/json")
+                
         settings = SESSION.get_settings(request.session)
         if nump > settings.get("punches_employee"):
             return HttpResponse(json.dumps({'error': 'over',

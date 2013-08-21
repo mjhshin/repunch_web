@@ -117,35 +117,49 @@ def test_employees():
     def approve():
         """ 
         Approves the first pending employee on the table.
+        Also returns the employee id.
         """
         test.find("#tab-pending-employees").click()
-        test.find("#tab-body-pending-employees div.tr " +\
+        row = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        emp_id = row.get_attribute("id")
+        row.find_element_by_css_selector(\
             "div.td.approve a.approve").click()
         test.switch_to_alert().accept()
         sleep(2)
+        return emp_id
         
     def deny(): 
         """ 
         Denies the first pending employee on the table.
+        Also returns the employee id.
         """
         test.find("#tab-pending-employees").click()
-        test.find("#tab-body-pending-employees div.tr " +\
+        row = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        emp_id = row.get_attribute("id")
+        row.find_element_by_css_selector(\
             "div.td.approve a.deny").click()
         test.switch_to_alert().accept()
         sleep(2)
+        return emp_id
         
     def remove():
         """
         Removes the first approved employee on the table.
+        Also returns the employee id.
         """
         test.find("#tab-approved-employees").click()
-        test.find("#tab-body-approved-employees div.tr " +\
-            "div.td.remove a").click()
+        row = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        emp_id = row.get_attribute("id")
+        row.find_element_by_css_selector("div.td.remove a").click()
         test.switch_to_alert().accept()
         sleep(2)
+        return emp_id
         
-    first_name, last_name, username, email = "vandolf1", "estrellado",
-        "xmanvmanx", "xmanvman@xman.com"
+    first_name, last_name, username, email =\
+    "vandolf1", "estrellado", "xmanvmanx", "xmanvman@xman.com"
         
     ##########  Cloud code register_employee works
     try:
@@ -188,7 +202,7 @@ def test_employees():
     try:
         res = register_employee("vman", "vman",
             email=email)
-        parts[6]['success'] = res['error'] == '202'
+        parts[6]['success'] = res['error'] == '203'
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
@@ -237,7 +251,7 @@ def test_employees():
     ##########  The employee is deleted from parse
     try:
         store.set("employees", None)
-        parts[12]['success'] = store.get(\
+        parts[12]['success'] = store.get("employees",\
             first_name=first_name, last_name=last_name, count=1) == 0
     except Exception as e:
         print e
@@ -245,7 +259,7 @@ def test_employees():
     ##########  The account/user is deleted from parse
     try:
         parts[13]['success'] = Account.objects().count(\
-            username=username, email=email)
+            username=username, email=email) == 0
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)
@@ -268,7 +282,7 @@ def test_employees():
     try:
         store.set("employees", None)
         emp = store.get("employees", first_name=first_name,
-            last_name=last_name)
+            last_name=last_name)[0]
         parts[15]['success'] = emp.status == APPROVED
     except Exception as e:
         print e
@@ -317,45 +331,95 @@ def test_employees():
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
-    ##########  The employee is deleted from parse TODO
+    ##########  The employee is deleted from parse
     try:
-        pass
+        store.set("employees", None)
+        parts[21]['succes'] = store.get("employees", 
+            objectId=emp.objectId, count=1) == 0
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
-    ##########  The account/user is deleted from parse TODO
+    ##########  The account/user is deleted from parse
     try:
-        pass
+        parts[22]['success'] = Account.objects().count(\
+            username=username, email=email) == 0
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-    ##########  Multiple employees (4) registering at once works TODO
+    ##########  Multiple employees (4) registering at once works
     try:
-        pass
+        for i in range(4):
+            register_employee(first_name + str(i), last_name + str(i))
+        sleep(COMET_PULL_RATE*2 + 2)
     except Exception as e:
         print e
         parts[23]['test_message'] = str(e)
-    ##########  Approving 2 employees in succession works TODO
+    ##########  Approving 2 employees in succession works
     try:
-        pass
+        success = True
+        for i in range(2):
+            emp_id = approve()
+            # now check if the row is in the approved table and no
+            # longer in the pending table
+            test.find("#tab-approved-employees").click()
+            if not test.element_exists(\
+                "#tab-body-approved-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+            test.find("#tab-pending-employees").click()
+            if test.element_exists(\
+                "#tab-body-pending-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+                
+        parts[24]['success'] = success
     except Exception as e:
         print e
         parts[24]['test_message'] = str(e)
-    ##########  Removing 2 employees in succession works TODO
+    ##########  Removing 2 employees in succession works
     try:
-        pass
+        success = True
+        for i in range(2):
+            emp_id = remove()
+            # now check if the row is no longer in the pending table
+            # and also not the approved table
+            test.find("#tab-approved-employees").click()
+            if test.element_exists(\
+                "#tab-body-approved-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+            test.find("#tab-pending-employees").click()
+            if test.element_exists(\
+                "#tab-body-pending-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+                
+        parts[25]['success'] = success
     except Exception as e:
         print e
         parts[25]['test_message'] = str(e)
-    ##########  Denying 2 employees in succession works TODO
+    ##########  Denying 2 employees in succession works
     try:
-        pass
+        success = True
+        for i in range(2):
+            emp_id = deny()
+            # now check if the row is no longer in the pending table
+            # and also not the approved table
+            test.find("#tab-approved-employees").click()
+            if test.element_exists(\
+                "#tab-body-approved-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+            test.find("#tab-pending-employees").click()
+            if test.element_exists(\
+                "#tab-body-pending-employees div#%s a" % (emp_id,)):
+                success = False
+                break
+                
+        parts[26]['success'] = success
     except Exception as e:
         print e
         parts[26]['test_message'] = str(e)
-    
-    
-    
     
     
     # END OF ALL TESTS - cleanup
