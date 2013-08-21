@@ -9,19 +9,6 @@
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/rewards.js" %}"></script>
-	<script>
-    $(document).ready(function(){
-        $('#submit-reward-form').click(function(){
-            if ($("#reward-saving").css("display") != "none"){
-                return false;
-            }
-            $("#reward-saving").show();
-            
-            $('#reward-form').submit(); 
-            return false;
-        }); 
-    });
-    </script>
 {% endblock %}
 
 {% block content %}
@@ -54,7 +41,7 @@
 		</div>
 		
 		<div id="edit-reward-options" class="form-options">
-			<a  class="button blue" id="submit-reward-form">Save Reward</a>
+			<a class="button blue" id="submit-reward-form">Save Reward</a>
 			{% if is_new %}
 				<a href="{% url 'rewards_index' %}" class="red">Cancel</a>
 			{% else %}

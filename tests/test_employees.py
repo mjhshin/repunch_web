@@ -393,7 +393,6 @@ def test_employees():
         success = True
         for i in range(2):
             emp_id = remove()
-            print emp_id
             # now check if the row is no longer in the pending table
             # and also not the approved table
             test.find("#tab-approved-employees").click()

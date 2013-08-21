@@ -1,4 +1,13 @@
 TODO:
+1. replace username with email so email=username and visa versa
+2. allow employees access to dashboard
+3. get rid of account_type
+4. changing description of reward does not reset redemption_count but 
+    changing the name (case insensitive) will prompt about the redemption
+    count being reset to 0.
+5. message save the number of users that received the message
+
+
 1. in monthly_billing and date_passed_user_limit 
 (anywhere that charge_cc is called) add a script to notify the user 
 that the credit card is invalid and new credit card info is required. 
