@@ -1,3 +1,8 @@
+div#description p {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 div#notification{
 	margin-bottom:0;
 }

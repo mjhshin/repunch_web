@@ -2,7 +2,7 @@
 {% load static %}{% load parse_tags %}
 
 {% block title %}Message Details{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 	<script src="{% static "manage/js/message_edit.js" %}"></script>
@@ -37,14 +37,12 @@
 			<label>Subject:</label><span>{{ message|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body"  style="word-wrap: break-word;">
-			{{ message|get:'body' }}
-		</div>
+		<div class="sect body" >{{ message|get:'body' }}</div>
 	</div>
     <br>
     {% if message|get:'offer_title' %}
     <div class="white-box">
-        <div class="sect meta"> {# TODO replace django template tag |date:'m/d/y h:m A' #}
+        <div class="sect meta"> 
 		    <label>Offer Title: </label><span>{{ message|get:'offer_title' }}</span>
             <label>Expiration Date: </label><span>{{ message|get:'date_offer_expiration' }}</span>
 		    <div style="clear: left;"></div>

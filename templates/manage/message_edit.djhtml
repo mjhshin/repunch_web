@@ -3,7 +3,7 @@
 
 {% block title %}Send New Message{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.1.0.css" %}" />
 {% endblock %}
 {% block javascript %}
 <script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>

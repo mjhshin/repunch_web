@@ -2,7 +2,7 @@
 {% load static %}{% load parse_tags %}
 
 {% block title %}Feedback Reply{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
 <script>
 $(document).ready(function(){
@@ -41,10 +41,8 @@ $(document).ready(function(){
 				<label>Subject:</label><span>{{ subject }}</span>
 				<div style="clear: left;"></div>
 			</div>
-			<div class="sect body">
-				<textarea id="body" name="body" style="width: 633px; height: 50px;"
-				    maxlength="750">{{body}}</textarea>
-			</div>
+			<div class="sect body"><textarea id="body" name="body" style="width: 612px; height: 50px;"
+				    maxlength="750">{{body}}</textarea></div>
 		</div>
 		<div id="message-detail-options" class="form-options">
 			<a id="reply-form-submit" class="button blue">Reply</a>
@@ -66,9 +64,7 @@ $(document).ready(function(){
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ feedback|get:'body' }}
-		</div>
+		<div class="sect body">{{ feedback|get:'body' }}</div>
 	</div>
 
 {% endblock %}

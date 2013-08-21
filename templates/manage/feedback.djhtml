@@ -2,7 +2,7 @@
 {% load static %}{% load parse_tags %}
 
 {% block title %}Feedback Details{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
 <script>
 $(document).ready(function(){
@@ -34,9 +34,7 @@ $(document).ready(function(){
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ feedback|get:'body' }}
-		</div>
+		<div class="sect body">{{ feedback|get:'body' }}</div>
 	</div>
 
 	<div class="divider" style="height: 20px;"></div>
@@ -54,9 +52,7 @@ $(document).ready(function(){
 			<label>Subject:</label><span>Re: {{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ reply|get:'body' }}
-		</div>
+		<div class="sect body">{{ reply|get:'body' }}</div>
 	</div>
 	<div class="divider"></div>
     {% endif %}
