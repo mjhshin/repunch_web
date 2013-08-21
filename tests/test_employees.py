@@ -9,7 +9,7 @@ from time import sleep
 from tests import SeleniumTest
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
-from parse.apps.employees import PENDING
+from parse.apps.employees import PENDING, APPROVED
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
@@ -62,7 +62,7 @@ def test_employees():
             " redirects user to employee edit page"},
         {'test_name': "Clicking delete prompts the user to confirm"},
         {'test_name': "The user is redirected to employee index"},
-        {'test_name': "The denied employee is removed from the " +\
+        {'test_name': "The deleted employee is removed from the " +\
             "pending table"},
         {'test_name': "The employee is deleted from parse"},
         {'test_name': "The account/user is deleted from parse"},
@@ -144,10 +144,13 @@ def test_employees():
         test.switch_to_alert().accept()
         sleep(2)
         
+    first_name, last_name, username, email = "vandolf1", "estrellado",
+        "xmanvmanx", "xmanvman@xman.com"
+        
     ##########  Cloud code register_employee works
     try:
-        res = register_employee("vandolf1", "estrellado1",
-            email="vandestrel@vandolf.com")
+        res = register_employee(first_name, last_name, username,
+            email=email)
         parts[1]['success'] = res.get("result") == "success"
     except Exception as e:
         print e
@@ -184,14 +187,14 @@ def test_employees():
     ##########  Email must be unique (cloud code) 
     try:
         res = register_employee("vman", "vman",
-            email="vandestrel@vandolf.com")
+            email=email)
         parts[6]['success'] = res['error'] == '202'
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
     ##########  Username must be unique (cloud code) 
     try:
-        res = register_employee("vman", "vman", username="bakery")
+        res = register_employee("vman", "vman", username=username)
         parts[7]['success'] = res['error'] == '202'
     except Exception as e:
         print e
@@ -203,77 +206,114 @@ def test_employees():
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
-    ##########  Clicking deny prompts the user to confirm TODO
+    ##########  Clicking deny prompts the user to confirm
     try:
-        pass
+        test.find("#tab-pending-employees").click()
+        test.find("#tab-body-pending-employees div.tr " +\
+            "div.td.approve a.deny").click()
+        alert = test.switch_to_alert()
+        parts[9]['success'] = alert.text == "Deny employee?"
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  The user is redirected to employee index TODO
+    ##########  The user is redirected to employee index
     try:
-        pass
+        alert.accept()
+        sleep(2)
+        parts[10]['success'] = test.is_current_url(reverse(\
+            "employees_index") +\
+            "?show_pending&success=Employee+has+been+denied.")
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    ##########  The denied employee is removed from the pending table TODO
+    ##########  The denied employee is removed from the pending table
     try:
-        pass
+        parts[11]['success'] = not test.element_exists(\
+        "#tab-body-pending-employees div.tr " +\
+            "div.td.approve a.approve")
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)
-    ##########  The employee is deleted from parse TODO
+    ##########  The employee is deleted from parse
     try:
-        pass
+        store.set("employees", None)
+        parts[12]['success'] = store.get(\
+            first_name=first_name, last_name=last_name, count=1) == 0
     except Exception as e:
         print e
         parts[12]['test_message'] = str(e)
-    ##########  The account/user is deleted from parse TODO
+    ##########  The account/user is deleted from parse
     try:
-        pass
+        parts[13]['success'] = Account.objects().count(\
+            username=username, email=email)
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)
     ##########  Approving the employee moves it from 
-    ###         pending to approved TODO
+    ###         pending to approved
     try:
-        pass
+        register_employee(first_name, last_name, username,
+            email=email)
+        sleep(COMET_PULL_RATE*2 + 1) # wait for dashboard to receive
+        approve()
+        sleep(2)
+        test.find("#tab-approved-employees").click()
+        parts[14]['success'] = test.element_exists(\
+            "#tab-body-approved-employees " +\
+            "div.tr div.td.remove a")
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
-    ##########  Employee status is set to approved in Parse TODO
+    ##########  Employee status is set to approved in Parse
     try:
-        pass
+        store.set("employees", None)
+        emp = store.get("employees", first_name=first_name,
+            last_name=last_name)
+        parts[15]['success'] = emp.status == APPROVED
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
-    ##########  Employee initially has 0 punches TODO
+    ##########  Employee initially has 0 punches
     try:
-        pass
+        parts[16]['success'] = emp.lifetime_punches == 0
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
     ##########  Clicking on the approved employee row 
-    ###         redirects user to employee edit page  TODO
+    ###         redirects user to employee edit page 
     try:
-        pass
+        test.find("#tab-approved-employees").click()
+        test.find("#tab-body-approved-employees div#%s a" %\
+            (emp.objectId,)).click()
+        sleep(1)
+        parts[17]['success'] = test.is_current_url(reverse(\
+            "employee_edit", args=(emp.objectId,)))
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
-    ##########  Clicking delete prompts the user to confirm TODO
+    ##########  Clicking delete prompts the user to confirm
     try:
-        pass
+        test.find("#delete-button").click()
+        alert = test.switch_to_alert()
+        parts[18]['success'] = alert.text ==\
+            "Are you sure you want to delete this employee?"
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
-    ##########  The user is redirected to employee index TODO
+    ##########  The user is redirected to employee index
     try:
-        pass
+        alert.accept()
+        sleep(2)
+        parts[19]['success'] = test.is_current_url(reverse(\
+            "employees_index") +\
+            "?success=Employee+has+been+deleted.")
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
-    ##########  The denied employee is removed from the pending table TODO
+    ##########  The deleted employee is removed from the pending table
     try:
-        pass
+        parts[20]['success'] = not test.element_exists(\
+            "#tab-body-approved-employees div#%s a" %(emp.objectId,))
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)

@@ -22,27 +22,3 @@ def register_employee(first_name, last_name, username=None,
             "email": email,
             "retailer_pin": retailer_pin,
         })
-        
-        
-first_name, last_name, username, password, email, retailer_pin =\
-    None, None, None, None, None, None
-        
-try:
-    first_name = str(sys.argv[1])
-    last_name = str(sys.argv[2])
-    username = str(sys.argv[3])
-    if username == "0":
-        username = None
-    password = str(sys.argv[4])
-    if password == "0":
-        password = None
-    email = str(sys.argv[5])
-    if email == "0":
-        email = None
-    retailer_pin = str(sys.argv[6])
-    if retailer_pin == "0":
-        retailer_pin = None
-except Exception:
-    pass
-    
-register_employee(first_name, last_name, username, password, email, retailer_pin)
