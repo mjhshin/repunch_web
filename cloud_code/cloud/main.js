@@ -499,17 +499,20 @@ Parse.Cloud.define("punch", function(request, response) {
 	patronStoreQuery.matchesQuery("Store", storeQuery);
 	patronStoreQuery.include("Patron");
 	patronStoreQuery.include("Store");
+	
 	androidInstallationQuery.equalTo("punch_code", punchCode);
 	androidInstallationQuery.equalTo('deviceType', 'android');
 	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 				   
-	patronStoreQuery.first({
-		success: function(patronStoreResult) {
-			if(patronStoreResult == null) { //customer's first punch at this store, need new PatronStore.
+	patronStoreQuery.find({
+		success: function(patronStoreResults) {
+			if(patronStoreResults == null) { //customer's first punch at this store, need new PatronStore.
 				addPatronStore();				
+			} else if(patronStoreResults.length > 1) {
+				console.log("ERROR: more than one PatronStore found.");
 			} else {
-				updatePatronStore(patronStoreResult);
+				updatePatronStore(patronStoreResults[0]);
 			}
 		},
 		error: function(error) {
@@ -1249,8 +1252,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
     var patronStoreQuery; // retrieved below
-    var androidInstallationQuery = new Parse.Query(Parse.Installation);
-    var iosInstallationQuery = new Parse.Query(Parse.Installation);
 	
 	var subject = request.params.subject;
 	var messageId = request.params.message_id;
@@ -1260,9 +1261,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var filter = request.params.filter; 
     var message, redeem_available;
 	var patron_ids = new Array(); // placeholder
-
-	androidInstallationQuery.equalTo('deviceType', 'android');
-	iosInstallationQuery.equalTo('deviceType', 'ios');
+	
+    var androidInstallationQuery = new Parse.Query(Parse.Installation);
+    var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("deviceType", "ios");
 
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0) {
@@ -1321,6 +1324,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // call when all tasks are done
     function proceedToPush() {
         console.log("PROCEED TO PUSH");
+		
 		var promises = [];
 		promises.push( Parse.Push.send({
             where: androidInstallationQuery, 
@@ -1329,7 +1333,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
-                message_id: messageId,
+                message_id: messageId
             }
 		}) );
 		promises.push( Parse.Push.send({
