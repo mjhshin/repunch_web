@@ -94,8 +94,12 @@ def edit(request, reward_id):
   
             if not is_new:
                 msg = 'Reward has been updated.'
-                reward["redemption_count"] =\
-                    old_reward["redemption_count"]
+                # reset the redemtion count?
+                if request.POST.get('reset_red_count'):
+                    reward["redemption_count"] = 0
+                else:
+                    reward["redemption_count"] =\
+                        old_reward["redemption_count"]
                 reward['reward_id'] = old_reward['reward_id']
                 store.array_remove('rewards', [old_reward])
             elif len(ids) == 0: # first reward
@@ -130,7 +134,9 @@ def edit(request, reward_id):
                 "?%s" % urllib.urlencode({'success':msg}))
     else:
         if reward_id >= 0 and reward_id in rewards_map:
-            form = RewardForm(rewards_map[reward_id])
+            reward = rewards_map[reward_id]
+            form = RewardForm(reward)
+            data['reward'] = reward
         else:
             form = RewardForm()
         if not is_new:
@@ -142,8 +148,7 @@ def edit(request, reward_id):
     # update session cache
     request.session['store'] = store
 
-    data['is_new'] = is_new;
-    data['reward'] = reward
+    data['is_new'] = is_new
     data['reward_id'] = reward_id
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)

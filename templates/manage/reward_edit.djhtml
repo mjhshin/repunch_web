@@ -24,7 +24,7 @@
 		
 		<div class="input-container" id="reward_name_ic">
 			{{ form.reward_name.errors }}
-			<label for="reward_name">Reward Name</label>
+			<label for="id_reward_name">Reward Name</label>
 			{{ form.reward_name }}
 		</div>
 		
@@ -36,9 +36,19 @@
 		
 		<div class="input-container clearheight" id="punches_ic">
 			{{ form.punches.errors }}
-			<label for="punches">Punches</label>
+			<label for="id_punches">Punches</label>
 			{{ form.punches }}
 		</div>
+		
+		{% if not is_new and reward %}
+		<div class="input-container clearheight" id="redemption_count">
+			<label >Redeemed: {{ reward.redemption_count }} times  </label>
+			<label id="reset_red_count_label" for="reset_red_count">
+			    Reset Redemption Count</label>
+	        <input id="reset_red_count" name="reset_red_count"
+	            type="checkbox" value="yes"/>
+		</div>
+		{% endif %}
 		
 		<div id="edit-reward-options" class="form-options">
 			<a class="button blue" id="submit-reward-form">Save Reward</a>

@@ -1,15 +1,34 @@
-h2{
+h2 {
 	margin-bottom:6px;
 }
 
-input#id_reward_name{
+input#id_reward_name {
 	width:386px;
 }
 
-input#id_punches{
+input#id_punches {
 	width:100px;
 }
 
-div#photo-edit{
+div#photo-edit {
 	margin:50px 30px 0 0;
+}
+
+#redemption_count label {
+    margin-bottom:0px;
+    margin-right:24px;
+    font-size:0.82em;
+    display:inline-block;
+}
+
+#redemption_count input {
+    margin-left:0px;
+    position:relative;
+    top:10px; left:-14px;
+}
+
+#reset_red_count_label {
+    font: italic normal 0.82em arial, sans-serif;
+    color: #666666;
+    margin-right:0px;
 }
