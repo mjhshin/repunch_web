@@ -3,12 +3,12 @@
 
 {% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.1.0.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
-	<script src="{% static "manage/js/rewards.js" %}"></script>
+	<script src="{% static "manage/js/reward_edit.js" %}"></script>
 {% endblock %}
 
 {% block content %}

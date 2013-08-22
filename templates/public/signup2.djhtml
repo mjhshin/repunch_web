@@ -5,7 +5,7 @@
 
 {% block javascript %}
 <script src="{% static 'public/js/place-order.js' %}"></script>
-<script src="{% static 'public/js/signup.js' %}"></script>
+<script src="{% static 'public/js/signup.1.0.js' %}"></script>
 <script>
 // other
 $(document).ready(function(){

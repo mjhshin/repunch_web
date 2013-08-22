@@ -9,9 +9,9 @@
 {% endblock %}
 
 {% block javascript %}
-<script src="{% static 'public/js/autocomplete.js' %}" type="text/javascript"></script>
+<script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
 <script src="{% static 'public/js/place-order.js' %}"></script>
-<script src="{% static 'public/js/signup.js' %}"></script>
+<script src="{% static 'public/js/signup.1.0.js' %}"></script>
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
 $(document).ready(function(){
