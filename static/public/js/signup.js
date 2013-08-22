@@ -60,7 +60,7 @@ $(document).ready(function(){
         // format the cats first
         var cats = '';
         $(".closable-box").each(function(){
-            cats = cats + $(this).text() + ',';
+            cats = cats + $(this).text() + '|';
         });
         $( "#categories" ).val(cats);
         var data = $("#signup-form").serialize();

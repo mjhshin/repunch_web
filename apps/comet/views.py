@@ -421,6 +421,7 @@ def terminate(request):
             request.session.session_key))
         
         return HttpResponse("ok")
+    return HttpResponse("")
         
 @csrf_exempt  
 def receive(request, store_id):
@@ -434,12 +435,15 @@ def receive(request, store_id):
             Use request.body instead!
     """
     if request.method == "POST" or request.is_ajax():
-        postDict = json.loads(request.body)
+        try:
+            postDict = json.loads(request.body)
+        except Exception:
+            pass
         
         if comet_receive(store_id, postDict):
             return HttpResponse("success")
             
-        return HttpResponse("error")
+    return HttpResponse("error")
         
 
 

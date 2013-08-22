@@ -129,7 +129,6 @@ def sign_up(request):
     """
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
-    place_order_checked = False
     
     def isdigit(string):
         # use because "-1".isdigit() is False
@@ -139,17 +138,26 @@ def sign_up(request):
             return False
         else:
             return True
-    
+            
     if request.method == 'POST' or request.is_ajax():
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
         
+        
+        cats =  request.POST.get("categories")
+        if cats and len(cats) > 0:
+            category_names = cats.split("|")[:-1]
+            # make sure that there are only up to 2 categories
+            while len(category_names) > 2:
+                category_names.pop()
+            data["category_names"] = category_names
+        
         all_forms_valid = store_form.is_valid() and\
             account_form.is_valid()
         if request.POST.get("place_order"):
-            place_order_checked = True
+            data["place_order_checked"] = True
             if isdigit(request.POST.get("place_order_amount")):
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
@@ -179,15 +187,12 @@ def sign_up(request):
             store.set("hours", [])
             store.set("rewards", [])
             store.set("categories", [])
-            names = request.POST.get("categories")
-            if names:
-                for name in names.split(",")[:-1]:
-                    alias = Category.objects.filter(name__iexact=\
-                                                    name)
+            if category_names:
+                for name in category_names:
+                    alias = Category.objects.filter(name__iexact=name)
                     if len(alias) > 0:
-                        alias = alias[0].alias
                         store.categories.append({
-                            "alias":alias,
+                            "alias":alias[0].alias,
                             "name":name })
             # coordinates
             # the call to get map data is actually also in the clean 
@@ -256,7 +261,6 @@ def sign_up(request):
                 store.delete()
                 account.delete()
                     
-                data["place_order_checked"] = place_order_checked
                 data['store_form'] = store_form
                 data['account_form'] = account_form
                 data['subscription_form'] = subscription_form
@@ -333,7 +337,6 @@ def sign_up(request):
         account_form = AccountForm()
         subscription_form = SubscriptionForm2()
         
-    data["place_order_checked"] = place_order_checked
     data['store_form'] = store_form
     data['account_form'] = account_form
     data['subscription_form'] = subscription_form

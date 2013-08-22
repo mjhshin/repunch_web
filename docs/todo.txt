@@ -1,13 +1,11 @@
 ##############################################
 ####################  TODO:
-1. message save the number of users that received the message
-2. maintain the categories input on signup if form errors
-3. randomize punch_code creation (order)
-4. allow employees access to dashboard
+1. allow employees access to dashboard
     - set up permissions
         + allow edit store details
         + allow punching
         + allow redemption
+2. randomize punch_code creation (order)
 
 ##############################################
 ####################  TEST/ FIX TEST:
