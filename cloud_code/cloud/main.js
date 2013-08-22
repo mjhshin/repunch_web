@@ -1248,7 +1248,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
-    var patronStoreQuery; // retrieved below
+    var patronStoreQuery; 
 	
 	var subject = request.params.subject;
 	var messageId = request.params.message_id;
@@ -1257,7 +1257,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	var storeName = request.params.store_name;
     var filter = request.params.filter; 
     var message, redeem_available;
-	var patron_ids = new Array(); // placeholder
+	var patron_ids = new Array(); 
 	
 	
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
@@ -1284,7 +1284,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 }
             });
                 
-            // all tasks are done. Push now.
             proceedToPush();
             return;
         }
@@ -1292,16 +1291,13 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         var pt = patronStores.pop();
         var pat = pt.get("Patron");
         
-        // just in case that there is a null patron
         if(pat == null) {
             return addToPatronsInbox(patronStores);
         }
         
-        // keep track of atron ids for the installationQuery
         patron_ids.push(pat.id);
         
-        console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
-        // ReceivedMessages is a relation to MessageStatus not Message!
+        console.log("Processing patronStore with id: " + pt.id);
         var rel = pat.relation("ReceivedMessages"); 
 	    var messageStatus = new MessageStatus();
         messageStatus.set("Message", message);
@@ -1315,13 +1311,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             });
         }, function(error) {
             // should not stop just because 1 or more failed
-                addToPatronsInbox(patronStores);
+            addToPatronsInbox(patronStores);
         });
     }
-
-    // call when all tasks are done
     function proceedToPush() {
-        console.log("PROCEED TO PUSH");
+        console.log("All tasks done. Push.");
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
@@ -1354,14 +1348,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 			response.error("error");
 			
 		});
-	}// end proceedToPush
+	}
    
     function continueWithPush() {
-        console.log("CONTINUE WITH PUSH");
         // get a subset of patrons
-        if (filter === "all") {
-            // nothing
-        } else if (filter === "idle") {     
+        if (filter === "idle") {     
             patronStoreQuery.lessThan("updatedAt", 
                 new Date(request.params.idle_date) );
         } else if (filter === "most_loyal") {
@@ -1379,29 +1370,25 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                     addToPatronsInbox(arr);
                 });
             });
+            
         } else {
             patronStoreQuery.select("Patron");
-            
-            // adding relation to all patron's ReceivedMessages
             patronStoreQuery.find().then(function(patronStores) {
                 addToPatronsInbox(patronStores);
             });
-        }// end else
+            
+        }
 
-    } // end continueWithPush();
+    }
 
-    console.log("STARTING SCRIPT");
-    // script actually START HERE
     var storeQuery = new Parse.Query(Store);
-    console.log("RUNNING STORE QUERY");
-    // first get the store
+    console.log("Running store query");
     storeQuery.get(storeId, {
       success: function(store) {
         patronStoreQuery = store.relation("PatronStores").query();
         patronStoreQuery.include("Patron");
         patronStoreQuery.limit(999); 
-        // now get the message object
-        console.log("RUNNING MESSAGE QUERY");
+        console.log("Running message query");
         messageQuery.get(messageId, {
 			success: function(messageResult) {
             	message = messageResult;
@@ -1413,12 +1400,16 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             	continueWithPush();
 			}, error: function(object, error) {
                 console.log(error);
+                response.error("error");
 			}
-        }); // end messageQuery
+        }); 
+        
 	}, error: function(object, error) {
             console.log(error);
+            response.error("error");
 		}
-	});// end storeQuery
+		
+	});
  
 }); // end Parse.Cloud.define
 
