@@ -6,7 +6,7 @@ from importlib import import_module
 
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.apps.accounts import sub_type, FREE
-from parse.utils import EXTRA, parse
+from parse.utils import parse
 
 class Account(ParseObject):
     """ Equivalence class of apps.accounts.models.Account 
@@ -23,30 +23,12 @@ class Account(ParseObject):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
-        self.ACL = data.get("ACL")
 
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')
         self.Employee = data.get('Employee')
 
         super(Account, self).__init__(False, **data)
-        
-    def update(self, sessionToken):
-        """ 
-        Override this because we need the sessionToken received from
-        parse login in order to update _User class.
-        """
-        # get the formated data to be put in the request
-        data = self._get_formatted_data()
-        extra = EXTRA.copy()
-        extra["sessionToken"] = sessionToken
-        res = parse("PUT", self.path() + "/" + self.objectId, data,
-            extra=extra)
-        if res and "error" not in res:
-            self.update_locally(res, False)
-            return True
-
-        return False
 
     def get_class(self, className):
         if className == "Patron":

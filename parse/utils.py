@@ -15,10 +15,9 @@ BAD_FILE_CHR = re.compile('[\W_]+')
 
 import traceback
 
-EXTRA = {"cMeta": "json"}
 
 def parse(method, path, data=None, query=None,
-        timeout=None, extra=EXTRA):
+        timeout=None, content_type="application/json"):
     """
     sends a request to parse using specified method, url, data,
     and optionally a query.
@@ -35,22 +34,20 @@ def parse(method, path, data=None, query=None,
     else:
         conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
-    
-    cMeta = extra['cMeta']
 
     rcm = REST_CONNECTION_META.copy()
-    rcm["Content-Type"] = "application/" + cMeta
+    rcm["Content-Type"] = content_type
 
     if method in ("POST", "PUT", "DELETE"):
         if data: # POST & PUT
-            if cMeta == 'json':
+            if content_type == 'application/json':
                 # need to add the parse session token for _User class!
+                # or just include the master key!
                 if method == "PUT" and path.__contains__("_User"):
-                    rcm["X-Parse-Session-Token"] =\
-                        extra['sessionToken']
+                    rcm["X-Parse-Master-Key"] = PARSE_MASTER_KEY
                 conn.request(method, '/' + PARSE_VERSION + '/' +\
                         path, json.dumps(data), rcm)
-            elif cMeta == 'png':
+            elif content_type == 'image/png':
                 conn.request(method, '/' + PARSE_VERSION +\
                         '/' + path, open(data, 'r'), rcm)
         else:
@@ -75,7 +72,8 @@ def parse(method, path, data=None, query=None,
     try:
         result = json.loads(conn.getresponse().read())
     except ValueError as e:
-        if method == "POST" and cMeta in SUPPORTED_IMAGE_FORMATS:
+        if method == "POST" and content_type.split("/")[1] in\
+            SUPPORTED_IMAGE_FORMATS:
             conn.close()
         return None
     conn.close()
@@ -120,12 +118,12 @@ def create_png(file_path, coords=None):
     rescale(file_path, 'png', coords)
     file_name = file_path.split("/")[-1]
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                file_name), file_path, extra={"cMeta":'png'})
+                file_name), file_path, content_type="image/png")
     return res 
 
-def delete_file(name, fType):
+def delete_file(name, content_type):
     """ deletes the given file """   
-    return parse("DELETE", 'files/' + name, extra={"cMeta":fType})
+    return parse("DELETE", 'files/' + name, content_type=content_type)
 
 def cloud_call(func_name, params, timeout=None):
     """ Calls a cloud function with the name func_name and with

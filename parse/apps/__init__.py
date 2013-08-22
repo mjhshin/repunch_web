@@ -6,8 +6,8 @@ from repunch.settings import REST_CONNECTION_META
 # This could be run in different threads for speed but it is only done
 # once so just keep it here.
 if not PunchCode.objects().get(punch_code='00000'):
-    reqs, code, cMeta = [], 0, REST_CONNECTION_META.copy()
-    cMeta["Content-Type"] = "application/json"
+    reqs, code, rcm = [], 0, REST_CONNECTION_META.copy()
+    rcm["Content-Type"] = "application/json"
     while code < 100000:
         reqs.append({
             "method": "POST",
@@ -24,7 +24,7 @@ if not PunchCode.objects().get(punch_code='00000'):
             connection = httplib.HTTPSConnection('api.parse.com', 443)
             connection.connect()
             connection.request('POST', '/1/batch', json.dumps({
-                   "requests": reqs, "limit":0 }), cMeta)
+                   "requests": reqs, "limit":0 }), rcm)
             connection.getresponse().read()
             # clear the reqs
             reqs = []

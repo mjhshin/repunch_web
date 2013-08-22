@@ -153,7 +153,7 @@ def edit(request):
             
             # update the account
             account.email = request.POST['email']
-            account.update(request.session[SESSION_KEY])
+            account.update()
             
             # update the session cache
             try:
@@ -323,7 +323,7 @@ def crop_avatar(request):
         
         # need to remove old file
         if old_avatar:
-            delete_file(old_avatar, 'png')
+            delete_file(old_avatar, 'image/png')
         
         # flag the execution of avatarCropComplete js function
         data['success'] = True
