@@ -297,6 +297,11 @@ class ParseObject(object):
                 (key.islower() and key.startswith("_")) or\
                 (key not in self.__dict__ and not create):
                 continue
+                
+            # handle ACL right away
+            if key == "ACL":
+                setattr(self, key, value)
+                continue
 
             # Pointers attrs- store the objectId and create cache
             # attr if whole data is included
@@ -378,7 +383,8 @@ class ParseObject(object):
             self.update_locally(res, False)
             # fill up the Pointer cache attributes 
             for key, value in self.__dict__.copy().iteritems():
-                if key[0].isupper() and not key.endswith("_"):
+                if key[0].isupper() and not key.endswith("_") and\
+                    not key == "ACL":
                     self.get(key[0].lower() + key[1:])
             return True
         return False
@@ -692,7 +698,8 @@ class ParseObject(object):
                 continue
 
             # Pointers
-            if key[0].isupper() and not key.endswith("_"):
+            if key[0].isupper() and not key.endswith("_") and\
+                key != "ACL":
                 # use pointer meta value as classname if exist
                 if "_" + key.lower() in self.__dict__:
                     data[key] =\

@@ -4,7 +4,8 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
 
-	<p><label for="id_username">Username:</label> 
+    {# Simply using email as the username as well #}
+	<p><label for="id_username">Email:</label> 
 	{# the redirect url to prevent hard-coding anything #}
 	<input type="text" name="username" id="id_username"></p>
 	

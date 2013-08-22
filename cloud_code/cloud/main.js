@@ -1259,6 +1259,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var message, redeem_available;
 	var patron_ids = new Array(); // placeholder
 	
+	
     var androidInstallationQuery = new Parse.Query(Parse.Installation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation);
 	androidInstallationQuery.equalTo("deviceType", "android");

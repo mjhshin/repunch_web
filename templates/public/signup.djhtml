@@ -69,7 +69,7 @@ function validate(which, next) {
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_three.png" %}" alt=""></div>
-						<p class="step-des">Ready roll!<br/> Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
+						<p class="step-des">Ready to roll!<br/> Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
 					</div>
 				</div>
 				
@@ -155,10 +155,6 @@ function validate(which, next) {
 					<div id="email_e">{{ account_form.email.errors }}</div>
 					<label for="id_email">Your Email Address</label>
 					{{ account_form.email }}
-					
-					<div id="username_e">{{ account_form.username.errors }}</div>
-					<label for="id_username">Your User Name</label>
-					{{ account_form.username }}
 					
 					<div id="password_e">{{ account_form.password.errors }}</div>
 					<label for="id_password">Create Password</label>

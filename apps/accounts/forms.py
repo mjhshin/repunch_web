@@ -9,9 +9,11 @@ from libs.repunch.validators import required, alphanumeric_no_space
 from parse.apps.accounts.models import Account
 
 class AccountForm(forms.Form):   
+    """
     username = forms.CharField(min_length=3, max_length=30,
                 widget=forms.TextInput(attrs={'pattern':".{3,30}"}),
                 validators=[required, alphanumeric_no_space])
+    """
     password = forms.CharField(min_length=6,
             widget=forms.PasswordInput(attrs={'pattern':".{6,}"}),
             validators=[required, alphanumeric_no_space])
@@ -34,17 +36,19 @@ class AccountForm(forms.Form):
         if e and Account.objects().count(email=e) > 0:
             raise forms.ValidationError("Email is already being used.")
         return e
-
+    
+    """
     def clean_username(self):
-        """ usernames are unique """
+    # usernames are unique
         u = self.cleaned_data.get('username')
         if u and Account.objects().count(username=u) > 0:
             raise forms.ValidationError("Username is already being"+\
                                         " used.")
         return u
+    """
             
 class LoginForm(forms.Form):
-    username = forms.CharField(validators=[required, alphanumeric_no_space])
+    username = forms.CharField(validators=[required]) #, alphanumeric_no_space])
     password = forms.CharField(widget=forms.PasswordInput(),
         validators=[required, alphanumeric_no_space])
 

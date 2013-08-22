@@ -70,8 +70,9 @@ def create():
             store.update()
             
             # create the account
-            account = Account.objects().create(username=name, 
-                password=name, email=name+"@"+name+".com", 
+            email=name+"@"+name+".com"
+            account = Account.objects().create(username=email, 
+                password=name, email=email, 
                 Store=store.objectId)
             
             # update the pointers

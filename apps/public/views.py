@@ -205,6 +205,8 @@ def sign_up(request):
 
             # create account
             account = Account(**postDict)
+            # username = email
+            account.set("username", postDict['email'])
             account.set_password(request.POST.get('password'))
             account.set("store", store)
 
@@ -295,6 +297,8 @@ def sign_up(request):
                     else:
                         return invalid_card()
             
+            # note that username has been fed the email
+            # this shouldn't change anything though shouldn't matter
             # need to put username and pass in request
             postDict['username'] = account.username
             postDict['password'] = account.password

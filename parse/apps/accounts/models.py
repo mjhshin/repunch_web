@@ -19,9 +19,11 @@ class Account(ParseObject):
     """
 
     def __init__(self, **data):
+        # note that we are using the email as the username also
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
+        self.ACL = data.get("ACL")
 
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')

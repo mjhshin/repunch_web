@@ -36,6 +36,7 @@ def login(request, requestDict):
     if request.session.get('account'):
         return request.session.get('account')
     
+    # note that email is the same as username
     res = parse("GET", "login", query=\
                 {"username":requestDict.get('username'),
                  "password":requestDict.get('password')} )
