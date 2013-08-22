@@ -29,6 +29,23 @@ class Account(ParseObject):
         self.Employee = data.get('Employee')
 
         super(Account, self).__init__(False, **data)
+        
+    
+    def update(self, save_password=False):
+        # get the formated data to be put in the request
+        data = self._get_formatted_data()
+        
+        # this is actually unnecessary since parse will not save 
+        # the given password if it is None.
+        if not save_password:
+            del data['password']
+            
+        res = parse("PUT", self.path() + "/" + self.objectId, data)
+        if res and "error" not in res:
+            self.update_locally(res, False)
+            return True
+
+        return False
 
     def get_class(self, className):
         if className == "Patron":
@@ -42,13 +59,6 @@ class Account(ParseObject):
         """ sets the password to a hashed new_pass """
         # self.password = hash_password(new_pass)
         self.password = new_pass
-
-    def get_sents_available(self):
-        """
-        returns how many messages can be sent this month
-        """
-        # TODO
-        return None
     
     def is_free(self):
 		return self.get('store').get('subscription').get('subscriptionType') == 0
