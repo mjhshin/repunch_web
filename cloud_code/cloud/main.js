@@ -1237,8 +1237,6 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //  Patron's ReceivedMessages but rather the original message itself,
 //  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
-//  This looks at the store's PatronStore relation!!!
-//
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
    
@@ -1248,6 +1246,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
+    var storeQuery = new Parse.Query(Store);
     var patronStoreQuery; 
 	
 	var subject = request.params.subject;
@@ -1265,6 +1264,59 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	androidInstallationQuery.equalTo("deviceType", "android");
 	iosInstallationQuery.equalTo("deviceType", "ios");
 
+    storeQuery.get(storeId).then(function(storeResult) {
+        patronStoreQuery = storeResult.relation("PatronStores").query();
+        patronStoreQuery.include("Patron");
+        patronStoreQuery.limit(999); 
+        
+        return messageQuery.get(messageId);
+        
+    }, function(error) {
+		console.log("Store query failed.");
+		response.error("error");
+    }).then(function(messageResult) {
+        message = messageResult;
+        if (message.get("message_type") == "offer") {
+            redeem_available = "yes";
+        } else { // message is a feedback
+            redeem_available = "no";
+        }
+        continueWithPush();
+    }, function(error) {
+        console.log("Message query failed");
+        response.error("error");
+                
+    }).then(function() {
+        if (filter === "one"){
+            console.log("Filter is one, this is a reply.");
+            patronQuery.get(request.params.patron_id).then(function(patron) {
+                patronStoreQuery.equalTo("Patron", patron);
+                patronStoreQuery.first().then(function(pst) {
+                    var arr = new Array(pst);
+                    addToPatronsInbox(arr);
+                });
+            });
+            
+        } else {
+            if (filter === "idle") {     
+                console.log("Filter is idle");
+                patronStoreQuery.lessThan("updatedAt", 
+                    new Date(request.params.idle_date) );
+            } else if (filter === "most_loyal") {
+                console.log("Filter is modt_loyal");
+                patronStoreQuery.descending("all_time_punches");
+                patronStoreQuery.limit(request.params.num_patrons);
+            }  
+            
+            patronStoreQuery.select("Patron");
+            patronStoreQuery.find().then(function(patronStores) {
+                addToPatronsInbox(patronStores);
+            });
+            
+        }
+        
+    });
+    
     function addToPatronsInbox(patronStores) {
         if (patronStores.length == 0) {
             if (filter === "one"){
@@ -1314,6 +1366,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             addToPatronsInbox(patronStores);
         });
     }
+    
     function proceedToPush() {
         console.log("All tasks done. Push.");
 		
@@ -1349,67 +1402,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 			
 		});
 	}
-   
-    function continueWithPush() {
-        // get a subset of patrons
-        if (filter === "idle") {     
-            patronStoreQuery.lessThan("updatedAt", 
-                new Date(request.params.idle_date) );
-        } else if (filter === "most_loyal") {
-            // get the top X (where X is num_patrons) number patrons sorted by their all_time_punches
-            patronStoreQuery.descending("all_time_punches");
-            patronStoreQuery.limit(request.params.num_patrons);
-        }  
-
-        if (filter === "one"){
-            // first get the patron
-            patronQuery.get(request.params.patron_id).then(function(patron) {
-                patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.first().then(function(pst) {
-                    var arr = new Array(pst);
-                    addToPatronsInbox(arr);
-                });
-            });
-            
-        } else {
-            patronStoreQuery.select("Patron");
-            patronStoreQuery.find().then(function(patronStores) {
-                addToPatronsInbox(patronStores);
-            });
-            
-        }
-
-    }
-
-    var storeQuery = new Parse.Query(Store);
-    console.log("Running store query");
-    storeQuery.get(storeId, {
-      success: function(store) {
-        patronStoreQuery = store.relation("PatronStores").query();
-        patronStoreQuery.include("Patron");
-        patronStoreQuery.limit(999); 
-        console.log("Running message query");
-        messageQuery.get(messageId, {
-			success: function(messageResult) {
-            	message = messageResult;
-            	if (message.get("message_type") == "offer") {
-            	    redeem_available = "yes";
-            	} else { // message is a feedback
-            	    redeem_available = "no";
-            	}
-            	continueWithPush();
-			}, error: function(object, error) {
-                console.log(error);
-                response.error("error");
-			}
-        }); 
-        
-	}, error: function(object, error) {
-            console.log(error);
-            response.error("error");
-		}
-		
-	});
  
 }); // end Parse.Cloud.define
 
