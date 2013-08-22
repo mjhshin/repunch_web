@@ -213,7 +213,10 @@ def edit(request, message_id):
             request.session.save()
 
             # push notification
-            cloud_call("retailer_message", params)
+            res = cloud_call("retailer_message", params)
+            if "error" not in res and res.get("result"):
+                message.set("receiver_count",
+                    res.get("result").get("receiver_count"))
             
             if DEBUG:
                 payload = {
@@ -224,6 +227,18 @@ def edit(request, message_id):
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
+            # update the sent messages
+            messages_sent = SESSION.get_messages_sent_list(session)
+            i_remove = -1
+            for i, ms in enumerate(messages_sent):
+                if ms.objectId == message.objectId:
+                    i_remove = i
+                    break
+            if i_remove != -1:
+                messages_sent.pop(i_remove)
+                messages_sent.insert(0, message)
+            session['messages_sent_list'] = messages_sent
+                        
             request.session.update(session)
 
             return HttpResponseRedirect(message.get_absolute_url())

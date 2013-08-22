@@ -1255,7 +1255,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
     var filter = request.params.filter; 
-    var message, redeem_available;
+    var message, receiver_count, redeem_available;
 	var patron_ids = new Array(); 
 	
 	
@@ -1268,7 +1268,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         patronStoreQuery = storeResult.relation("PatronStores").query();
         patronStoreQuery.include("Patron");
         patronStoreQuery.limit(999); 
-        
         return messageQuery.get(messageId);
         
     }, function(error) {
@@ -1292,6 +1291,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 patronStoreQuery.equalTo("Patron", patron);
                 patronStoreQuery.first().then(function(pst) {
                     var arr = new Array(pst);
+                    receiver_count = 1;
                     addToPatronsInbox(arr);
                 });
             });
@@ -1309,6 +1309,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             
             patronStoreQuery.select("Patron");
             patronStoreQuery.find().then(function(patronStores) {
+                receiver_count = patronStores.length;
                 addToPatronsInbox(patronStores);
             });
             
@@ -1317,24 +1318,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     });
     
     function addToPatronsInbox(patronStores) {
-        if (patronStores.length == 0) {
-            if (filter === "one"){
-                androidInstallationQuery.equalTo("patron_id", patronId);
-				iosInstallationQuery.equalTo("patron_id", patronId);
-            } else {
-                androidInstallationQuery.containedIn("patron_id", patron_ids);
-				iosInstallationQuery.containedIn("patron_id", patron_ids);
-            }
-            Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: { 'Content-Type': 'application/json'},
-                body: {
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                    newMessage: message,
-                }
-            });
-                
+        if (patronStores.length == 0) { 
             proceedToPush();
             return;
         }
@@ -1366,8 +1350,30 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         });
     }
     
-    function proceedToPush() {
-        console.log("All tasks done. Push.");
+    function proceedToPush() { 
+        message.set("receiver_count", receiver_count);
+        message.save().then(function() {
+            Parse.Cloud.httpRequest({
+                method: 'POST',
+                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
+                headers: { 'Content-Type': 'application/json'},
+                body: {
+                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    newMessage: message,
+                }
+            });
+        }, function(error) {
+            console.log("Message save failed");
+        });
+    
+    
+        if (filter === "one"){
+            androidInstallationQuery.equalTo("patron_id", patronId);
+			iosInstallationQuery.equalTo("patron_id", patronId);
+        } else {
+            androidInstallationQuery.containedIn("patron_id", patron_ids);
+			iosInstallationQuery.containedIn("patron_id", patron_ids);
+        }
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
@@ -1393,7 +1399,10 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success({
+			    "result":"success",
+			    "receiver_count": receiver_count,
+			});
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");

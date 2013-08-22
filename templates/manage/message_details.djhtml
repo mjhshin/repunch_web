@@ -20,7 +20,12 @@
 	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Message Inbox</a>
 
     <div class="notification success">
-		<div>Sent: {{ message.createdAt }} to group 
+        {# TODO remove check on receiver_count once database has been cleared! #}
+		<div>Sent: {{ message.createdAt }} to
+		{% if message.receiver_count %}
+		{{ message.receiver_count }} {% if message.receiver_count > 1 %}people{% else %}person{% endif %} in 
+		{% endif %}
+		group 
 		{% for filter in filters %}
 		    {% if filter.0 == message.filter %}
 		        "{{ filter.1 }}."
