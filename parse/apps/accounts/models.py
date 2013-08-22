@@ -22,10 +22,7 @@ class Account(ParseObject):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
-        # strings : store, employee, patron
-        self.account_type = data.get('account_type')
 
-        # two of these are null
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')
         self.Employee = data.get('Employee')

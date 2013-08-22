@@ -205,7 +205,6 @@ def sign_up(request):
 
             # create account
             account = Account(**postDict)
-            account.account_type = "store"
             account.set_password(request.POST.get('password'))
             account.set("store", store)
 

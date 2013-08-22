@@ -2,7 +2,7 @@
 ####################  TODO:
 1. replace username with email so email=username and visa versa
 2. allow employees access to dashboard
-3. get rid of account_type
+4. randomize punch_code creation (order)
 5. message save the number of users that received the message
 6. maintain the categories input on signup if form errors
 

@@ -71,7 +71,6 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		console.log("User fetch success.");
 		user = userResult;
 		userResult.set("Patron", patron);
-		userResult.set("account_type", "patron");
 		
 		if(email != null) {
 			userResult.set("email", email);
@@ -171,7 +170,6 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("Employee save success.");
 
 			user = new Parse.User();
-			user.set("account_type", "employee");
 			user.set("username", username);
 			user.set("password", password);
 			user.set("email", email);
