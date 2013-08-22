@@ -1281,7 +1281,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         } else { // message is a feedback
             redeem_available = "no";
         }
-        continueWithPush();
     }, function(error) {
         console.log("Message query failed");
         response.error("error");
