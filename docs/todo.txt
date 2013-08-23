@@ -1,10 +1,7 @@
 ##############################################
 ####################  TODO:
 1. allow employees access to dashboard
-    - set up permissions
-        + allow edit store details
-        + allow punching
-        + allow redemption
+    - update current stores ACLs!
 
 ##############################################
 ####################  TEST/ FIX TEST:

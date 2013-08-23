@@ -25,14 +25,6 @@
 	</div>
 	{% endif %}
 		
-		{% if employee.objectId %}
-		<div id="photo-edit">
-			<div id="edit-employees-options" class="form-options">
-			    <a href="{% url 'employee_delete' employee_id %}" id="delete-button" style="color:red;">Delete Employee</a>
-		    </div>
-		</div>
-		{% endif %}
-		
 		<h2>{{ form.data.last_name }}, {{ form.data.first_name }}</h2>
 		<div class="input-container info">
         <span>{{ form.data.email }}</span>	    
@@ -66,6 +58,27 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		
+		<div class="section" style="margin-top:20px;">
+		    <form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
+		        <label for="ACL">Access Level</label>
+		        <select name="ACL" id="ACL">
+		            <option value="faa">Full Admin Access</option>
+		            <option value="apr">Allow Punch/Redeem</option>
+		            <option value="na">No Access</option>
+		        </select>
+		    </form>
+        </div>
+		
+		
+		<div class="form-options" style="background:yellow;">
+			<a class="button blue" id="save-button">Save Changes</a>
+			<a href="{% url 'store_index' %}" class="red">Cancel</a>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
+		            id="employee-loading" 
+		            style="display:block;position:relative;top:5px;left:4px;"/>
+		    <a href="{% url 'employee_delete' employee_id %}" id="delete-button" style="color:red;float:right;">Delete Employee</a>
 		</div>
 
 {% endblock %}

@@ -241,14 +241,11 @@ def sign_up(request):
             account.create()
             
             # create the store ACL with the account having r/w access
-            # So this is how the ACL will be used for the Store class
-            # 1) it is publicly readable and writable by everyone
-            #   - the reason for this is that taking away write access
-            #     
-            # 2) 
             store.ACL = {
-                
+                "*": {"read": True, "write": True},
+                account.objectId: {"read": True, "write": True},
             }
+            store.owner_id = account.objectId
             store.update()
                 
             #### MAIL CONNECTION OPEN

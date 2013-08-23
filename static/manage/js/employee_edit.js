@@ -1,4 +1,15 @@
 $(document).ready(function(){
+
+	$('#save-button').click(function(){
+        if ($("#employee-saving").css("display") != "none") {
+            return false;
+        }
+        $("#employee-saving").show();
+
+        $('#employee-form').submit(); 
+        return false;
+    }); 
+
 	// move to onclick to stopPropagation works?
 	$('a#delete-button').click(function(event){
 		

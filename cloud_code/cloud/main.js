@@ -1,25 +1,5 @@
 ////////////////////////////////////////////////////
 //
-// This is just a test, delete this!
-//
-////////////////////////////////////////////////////
-Parse.Cloud.define("save_store", function(request, response) {
-    var Store = Parse.Object.extend("Store");
-    var storeQuery = new Parse.Query(Store);
-    storeQuery.get(request.params.store_id).then(function(storeResult) {
-        storeResult.set("store_name", "test");
-        return storeResult.save();
-    }).then(function(storeResult) {
-        response.success(storeResult);
-    }, function(error) {
-        response.error(error);
-    });
-
-});
-
-
-////////////////////////////////////////////////////
-//
 //
 //
 ////////////////////////////////////////////////////

@@ -32,6 +32,9 @@ class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
     def __init__(self, **data):
         self.active = data.get('active', False)
+        # the owner_id is the objectId of the original account that 
+        # created this object at signup
+        self.owner_id = data.get("owner_id")
         self.store_name = data.get('store_name')
         self.street = data.get("street")
         self.city = data.get('city')

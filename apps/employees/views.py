@@ -57,17 +57,39 @@ def edit(request, employee_id):
             
     if not employee or not acc:
         raise Http404
-        
-    if request.GET.get("success"):
-        data['success'] = request.GET.get("success")
-    if request.GET.get("error"):
-        data['error'] = request.GET.get("error")
+    
+    if request.method == "POST":
+        store = SESSION.get_store(session)
+        post_acl = request.POST["ACL"]
+        # faa = Full Admin Access
+        if post_acl == "faa":
+            store.ACL[acc.objectId] = {"read": True, "write": True}
+        # apr = allow punch/redeem
+        elif post_acl == "apr":
+            store.ACL[acc.objectId] = {"read": True}
+        # na = no access
+        elif post_acl == "na":
+            if acc.objectId in store.ACL:
+                del store.ACL[acc.objectId]
+                
+        store.update()
+        request.session['store'] = store
+        # notify other dashboards of this change
+        payload = {
+            COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            "updatedStore_one":store.jsonify()
+        }
+        comet_receive(store.objectId, payload)
         
     form = EmployeeForm(employee.__dict__.copy())
     form.data['email'] = acc.get('email')
     
     data['form'] = form
     data['employee'] = employee
+    
+    # need to determine the employee's ACL
+    
+    data['employee_acl'] = emplo
 
     return render(request, 'manage/employee_edit.djhtml', data)
 

@@ -43,7 +43,7 @@ def login(request, requestDict):
                     
     if res and "error" not in res:
         account = Account(**res)
-        account.fetchAll()
+        account.fetch_all()
         # if the User object has a store then we are good to go
         if account.get("store"): 
             store = account.get('store')

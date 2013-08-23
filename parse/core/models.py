@@ -236,6 +236,9 @@ class ParseObject(object):
 
 
     """
+    
+    # Parse object built-ins - these cannot be used in the get method
+    BUILTINS = ("objectId", "createdAt", "updatedAt", "ACL")
 
     @classmethod
     def objects(cls):  
@@ -266,6 +269,9 @@ class ParseObject(object):
         All ParseObjects also, optionally, has another attribute:
             ACL
         """
+        #for builtin in ParseObject.BUILTINS:
+        #    setattr(self, builtin, data.get(builtin))
+        
         # these assignments are actually pointless since it gets
         # formatted in update_locally anyways
         self.objectId = data.get("objectId")
@@ -375,7 +381,7 @@ class ParseObject(object):
         """
         return None
 
-    def fetchAll(self):
+    def fetch_all(self):
         """
         Gets all of this object's data from parse and update all
         of its value locally. This includes pulling each pointer for
@@ -420,8 +426,9 @@ class ParseObject(object):
         then the cache will be set to None. If count is given,
         then this method will return the count and not the list.
         """
-        # assuming all objects have these by default
-        if attr in ("createdAt", "updatedAt"):
+        # all objects have these by default. These should not be  
+        # manually set to None!
+        if attr in ParseObject.BUILTINS:
             return self.__dict__.get(attr)
             
         if self.__dict__.get(attr) is not None:
