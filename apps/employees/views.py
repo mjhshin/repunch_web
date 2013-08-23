@@ -16,6 +16,8 @@ from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
@@ -58,18 +60,14 @@ def edit(request, employee_id):
             
     if not employee or not acc:
         raise Http404
-    
+
     if request.method == "POST":
         post_acl = request.POST["ACL"]
-        print post_acl
-        # faa = Full Admin Access
-        if post_acl == "faa":
+        if post_acl == ACCESS_ADMIN:
             store.ACL[acc.objectId] = {"read": True, "write": True}
-        # apr = allow punch/redeem
-        elif post_acl == "apr":
+        elif post_acl == ACCESS_PUNCHREDEEM:
             store.ACL[acc.objectId] = {"read": True}
-        # na = no access
-        elif post_acl == "na":
+        elif post_acl == ACCESS_NONE:
             if acc.objectId in store.ACL:
                 del store.ACL[acc.objectId]
                 
@@ -92,20 +90,14 @@ def edit(request, employee_id):
     form = EmployeeForm(employee.__dict__.copy())
     form.data['email'] = acc.get('email')
     
-    data['form'] = form
-    data['employee'] = employee
-    
-    # need to determine the employee's ACL
-    if acc.objectId in store.ACL:
-        emp_acl = store.ACL[acc.objectId]
-        if emp_acl.get("read") and emp_acl.get("write"):
-            employee_acl = "faa"
-        else: # only read
-            employee_acl = "apr"
-    else:
-        employee_acl = "na"
-    
-    data['employee_acl'] = employee_acl
+    data.update({
+        'ACCESS_ADMIN': ACCESS_ADMIN,
+        'ACCESS_PUNCHREDEEM': ACCESS_PUNCHREDEEM,
+        'ACCESS_NONE': ACCESS_NONE,
+        'form': form,
+        'employee': employee,
+        'employee_acl': store.get_access_level(acc),
+    })
 
     return render(request, 'manage/employee_edit.djhtml', data)
 

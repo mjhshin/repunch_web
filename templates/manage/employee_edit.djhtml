@@ -37,9 +37,9 @@
 		    <form action="{% url 'employee_edit' employee_id %}" method="POST" id="employee-form">{% csrf_token %}
 		        <label for="ACL">Access Level:</label>
 		        <select name="ACL" id="ACL">
-		            <option value="faa" {% if employee_acl == "faa" %}selected{% endif %}>Full Admin Access</option>
-		            <option value="apr" {% if employee_acl == "apr" %}selected{% endif %}>Allow Punch/Redeem</option>
-		            <option value="na" {% if employee_acl == "na" %}selected{% endif %}>No Access</option>
+		            <option value="{{ACCESS_ADMIN}}" {% if employee_acl == ACCESS_ADMIN %}selected{% endif %}>Full Admin Access</option>
+		            <option value="{{ACCESS_PUNCHREDEEM}}" {% if employee_acl == ACCESS_PUNCHREDEEM %}selected{% endif %}>Allow Punch/Redeem</option>
+		            <option value="{{ACCESS_NONE}}" {% if employee_acl == ACCESS_NONE %}selected{% endif %}>No Access</option>
 		        </select>
 		    </form>
         </div>

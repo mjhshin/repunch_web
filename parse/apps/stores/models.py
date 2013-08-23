@@ -11,6 +11,8 @@ from libs.paypal import store_cc, charge_cc
 from parse.core.models import ParseObject
 from repunch.settings import TIME_ZONE
 from libs.repunch import rputils
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
 
 DAYS = ((1, 'Sunday'),
 		(2, 'Monday'),
@@ -99,6 +101,17 @@ class Store(ParseObject):
     def get_owner_fullname(self):
         return self.first_name.capitalize()+\
                 " " + self.last_name.capitalize()
+                
+    def get_access_level(self, account):
+        """ Returns the access level of the given account """
+        if account.objectId in self.ACL:
+            acl = self.ACL[account.objectId]
+            if acl.get("read") and acl.get("write"):
+                return ACCESS_ADMIN
+            else: # read only
+                return ACCESS_PUNCHREDEEM
+        else:
+            return ACCESS_NONE
    
     def get_full_address(self):
         """
