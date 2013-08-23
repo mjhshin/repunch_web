@@ -88,13 +88,7 @@ $(document).ready(function(){
                     messageContainer.css("width", "250px");
                     messageContainer.html("<span style='color:#DF7401;position:relative;top:4px;'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
-                } else if (res.code == 4){
-                    // go to part 2
-                    // uncomment below when credit card info is brought back on sign up
-                    // window.location.replace(url_signup2);
-                }
-                // active subscription. redirect to dashboard.
-                else if (res.code == 3){
+                } else if (res.code == 3){ // active subscription. redirect to dashboard.
                     messageContainer.html("<span style='color:green;'>Redirecting to dashboard.</span>");
                     window.location.replace(url_redirect);
                 }

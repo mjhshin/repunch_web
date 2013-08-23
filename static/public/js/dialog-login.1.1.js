@@ -85,6 +85,10 @@ $(document).ready(function(){
                 messageContainer.html("<span name='incorrect'>The email or password you entered is incorrect.</span>");
                 finish(340);
                 loading.hide();
+            } else if (res.code == 4){
+                messageContainer.html("<span name='incorrect'>You do not have permission to access the dashboard.</span>");
+                finish(340);
+                loading.hide();
             } else {
                 // same as 1 but may want to change later
                 //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");

@@ -330,7 +330,7 @@ def sign_up(request):
                 # 1 - bad login credentials
                 # 2 - subscription is not active
                 # 3 - success (login now)
-                # 4 - go to part 2
+                # 4 - employee no access - never should be this though
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:

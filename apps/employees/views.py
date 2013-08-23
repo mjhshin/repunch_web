@@ -73,6 +73,10 @@ def edit(request, employee_id):
             if acc.objectId in store.ACL:
                 del store.ACL[acc.objectId]
                 
+        # need to store a pointer to the employee's account
+        acc.Store = store.objectId
+        acc.update()
+                
         store.update()
         request.session['store'] = store
         # notify other dashboards of this change

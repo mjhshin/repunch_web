@@ -30,7 +30,8 @@ def login(request, requestDict):
     Returns an Account object if the account subscription is active 
     and username and passwords are good. Otherwise, 0 if bad login 
     credentials (wrong pass or pointer to store does not exist) 
-    and 1 if subscription is not active.
+    and 1 if subscription is not active,
+    2 if employee but no access.
     """
     # first check if the request is already logged in 
     if request.session.get('account'):
@@ -44,8 +45,13 @@ def login(request, requestDict):
     if res and "error" not in res:
         account = Account(**res)
         account.fetch_all()
+        store = account.store
         # if the User object has a store then we are good to go
-        if account.get("store"): 
+        if store: 
+            # check if employee with no access level
+            if account.objectId not in store.ACL:
+                return 2
+            
             store = account.get('store')
             settings = store.get("settings")
             subscription = store.get("subscription")

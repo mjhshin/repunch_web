@@ -5,10 +5,10 @@
     - orignal store owner always have full admin access
 
 ##############################################
-####################  TEST/ FIX TEST:
+####################  TEST (ADD/FIX):
 1. reset redemption count (rewad edit)
 2. username is same as email (signup)
-3. save buttons - page access limits (a bunch of tests here...)
+3. ACL - login, page access, etc. (this is a LOT)
 
 #######
 1. in monthly_billing and date_passed_user_limit 

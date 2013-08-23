@@ -26,6 +26,7 @@ def manage_login(request):
         1 - bad login credentials
         2 - subscription is not active
         3 - success
+        4 - employee with no access
     """
     data = {"code":-1}
     if request.method == 'POST' or request.is_ajax():
@@ -38,6 +39,8 @@ def manage_login(request):
                     data['code'] = 1 
                 elif c == 1:
                     data['code'] = 2
+                elif c == 2:
+                    data['code'] = 4
             else:
                 data['code'] = 3
                 # manually check the next parameter
