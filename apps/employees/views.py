@@ -54,13 +54,14 @@ def edit(request, employee_id):
             break
             
     acc = Account.objects().get(Employee=employee.objectId)
+    store = SESSION.get_store(request.session)
             
     if not employee or not acc:
         raise Http404
     
     if request.method == "POST":
-        store = SESSION.get_store(session)
         post_acl = request.POST["ACL"]
+        print post_acl
         # faa = Full Admin Access
         if post_acl == "faa":
             store.ACL[acc.objectId] = {"read": True, "write": True}
@@ -81,6 +82,9 @@ def edit(request, employee_id):
         }
         comet_receive(store.objectId, payload)
         
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has been updated.'}))
+        
     form = EmployeeForm(employee.__dict__.copy())
     form.data['email'] = acc.get('email')
     
@@ -88,8 +92,16 @@ def edit(request, employee_id):
     data['employee'] = employee
     
     # need to determine the employee's ACL
+    if acc.objectId in store.ACL:
+        emp_acl = store.ACL[acc.objectId]
+        if emp_acl.get("read") and emp_acl.get("write"):
+            employee_acl = "faa"
+        else: # only read
+            employee_acl = "apr"
+    else:
+        employee_acl = "na"
     
-    data['employee_acl'] = emplo
+    data['employee_acl'] = employee_acl
 
     return render(request, 'manage/employee_edit.djhtml', data)
 

@@ -2,12 +2,13 @@
 ####################  TODO:
 1. allow employees access to dashboard
     - update current stores ACLs!
+    - orignal store owner always have full admin access
 
 ##############################################
 ####################  TEST/ FIX TEST:
 1. reset redemption count (rewad edit)
 2. username is same as email (signup)
-
+3. save buttons - page access limits (a bunch of tests here...)
 
 #######
 1. in monthly_billing and date_passed_user_limit 

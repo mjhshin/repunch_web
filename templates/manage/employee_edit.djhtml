@@ -24,11 +24,26 @@
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
-		
-		<h2>{{ form.data.last_name }}, {{ form.data.first_name }}</h2>
-		<div class="input-container info">
-        <span>{{ form.data.email }}</span>	    
-        </div><br /><br />
+	    
+	    <div id="employee-header">
+		    <h2>{{ form.data.last_name|capfirst }}, {{ form.data.first_name|capfirst }}</h2>
+		    <div class="input-container info">
+            <span>{{ form.data.email }}</span>	    
+            </div>
+        </div>
+        
+        
+		<div id="employee-form-div">
+		    <form action="{% url 'employee_edit' employee_id %}" method="POST" id="employee-form">{% csrf_token %}
+		        <label for="ACL">Access Level:</label>
+		        <select name="ACL" id="ACL">
+		            <option value="faa" {% if employee_acl == "faa" %}selected{% endif %}>Full Admin Access</option>
+		            <option value="apr" {% if employee_acl == "apr" %}selected{% endif %}>Allow Punch/Redeem</option>
+		            <option value="na" {% if employee_acl == "na" %}selected{% endif %}>No Access</option>
+		        </select>
+		    </form>
+        </div>
+        
     
 		<div class="input-container info" id="date_added">
 			<label>Date Added</label>
@@ -40,7 +55,7 @@
 			<span>{{ employee|get:'lifetime_punches' }}</span>
 		</div>
 		
-		<div class="section" style="margin-top:20px;">
+		<div class="section" style="margin:20px 0px;">
 			<div class="section-title">Punch History</div>
 			<div class="white-box table" id="tab-body-punches">
 				<div class="table-header">
@@ -60,25 +75,13 @@
 			</div>
 		</div>
 		
-		<div class="section" style="margin-top:20px;">
-		    <form action="{% url 'employee_edit' employee_id %}" method="post" id="employee-form">{% csrf_token %}
-		        <label for="ACL">Access Level</label>
-		        <select name="ACL" id="ACL">
-		            <option value="faa">Full Admin Access</option>
-		            <option value="apr">Allow Punch/Redeem</option>
-		            <option value="na">No Access</option>
-		        </select>
-		    </form>
-        </div>
-		
-		
-		<div class="form-options" style="background:yellow;">
+		<div class="form-options">
 			<a class="button blue" id="save-button">Save Changes</a>
 			<a href="{% url 'store_index' %}" class="red">Cancel</a>
-		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
-		            id="employee-loading" 
-		            style="display:block;position:relative;top:5px;left:4px;"/>
-		    <a href="{% url 'employee_delete' employee_id %}" id="delete-button" style="color:red;float:right;">Delete Employee</a>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}"  id="employee-saving" />
 		</div>
+		
+		
+		<a href="{% url 'employee_delete' employee_id %}" id="delete-button" class="red">Delete Employee</a>
 
 {% endblock %}

@@ -1,20 +1,37 @@
 #date_added{
-	clear:left;
-}
-
-#photo-edit{
-    position:relative;
-	margin:50px 40px 0 0;
-    left:40px; top:50px;
-}
-
-#photo-edit #edit-employees-options a {
-    color:white;
+	clear:left; 
 }
 
 .form-options{
-	clear:left !important;
-    
+    clear: left;
+	width:260px;
+}
+
+#employee-saving {
+    display:none;
+    position:relative; top:5px;left:4px;
+}
+
+#delete-button {
+    float:right;
+    position:relative; top:34px; right:6px;
+}
+
+#employee-form label {
+    margin-top: 2px;
+}
+
+#employee-header {
+    display:inline-block;
+    float:left; clear:left;
+    margin-bottom: 30px;
+    width:460px;
+}
+
+#employee-form-div {
+    display:inline-block;
+    float:right; clear:right;
+    width:180px;
 }
 
 /* punch table styles */
