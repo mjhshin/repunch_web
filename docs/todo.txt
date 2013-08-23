@@ -5,7 +5,6 @@
         + allow edit store details
         + allow punching
         + allow redemption
-2. randomize punch_code creation (order)
 
 ##############################################
 ####################  TEST/ FIX TEST:

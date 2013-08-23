@@ -262,11 +262,14 @@ class ParseObject(object):
         In the above example name is inserted but not age.
 
         All ParseObjects have 3 attributes by default:
-        objectId, createdAt, updatedAt
+            objectId, createdAt, updatedAt
+        All ParseObjects also, optionally, has another attribute:
+            ACL
         """
         # these assignments are actually pointless since it gets
         # formatted in update_locally anyways
         self.objectId = data.get("objectId")
+        self.ACL = data.get("ACL")
         # note that createdAt and updatedAt always comes as an iso
         # string, whereas parse Date objects' iso string are inside
         # a dict!
