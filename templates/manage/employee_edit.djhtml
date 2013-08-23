@@ -3,11 +3,11 @@
 
 {% block title %}Edit Employee{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.0.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/employee_edit.js" %}"></script>
+	<script src="{% static "manage/js/employee_edit.1.0.js" %}"></script>
 	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
 	<script type="text/javascript">
 		var _order_by = 'date_punched';
