@@ -7,11 +7,11 @@ from repunch import settings
 from libs.repunch.validators import required
 
 class RewardForm(forms.Form):
-    reward_name = forms.CharField(max_length=75,
+    reward_name = forms.CharField(max_length=40,
         validators=[required])
-    description = forms.CharField(max_length=255, 
+    description = forms.CharField(max_length=125, 
         widget=forms.Textarea(\
-        attrs={"maxlength":255}), required=False)
+        attrs={"maxlength":125}), required=False)
     punches = forms.IntegerField(min_value=1)
         
 class RewardAvatarForm(forms.Form):
