@@ -1629,12 +1629,9 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-                alert: "You've received a gift from " + senderName,
-                subject: subject,
-                store_id: storeId,
-                sender: senderName,
+                alert: senderName + " sent you a gift",
                 message_status_id: messageStatus.id,
-                type: "receive_gift"
+                type: "gift"
 			}
         }) );
 		
