@@ -1655,7 +1655,6 @@ Parse.Cloud.define("send_gift", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("reply_to_gift", function(request, response) {
 	var messageId = request.params.message_id;
-	var patronId = request.params.patron_id;
 	var senderName = request.params.sender_name;
 	var body = request.params.body;
 	
