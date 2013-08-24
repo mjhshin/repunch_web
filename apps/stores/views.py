@@ -22,12 +22,14 @@ COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required
 
 @login_required
+@access_required
 def index(request):
     data = {'account_nav': True}
     
@@ -39,6 +41,7 @@ def index(request):
     return render(request, 'manage/store_details.djhtml', data)
 
 @login_required
+@access_required
 def edit(request):
     account = request.session['account']
     store = SESSION.get_store(request.session)
