@@ -9,7 +9,6 @@ from dateutil.tz import tzutc
 from math import ceil
 import urllib, json
 
-from parse.decorators import session_comet
 from parse.comet import comet_receive
 from parse import session as SESSION
 from parse.utils import cloud_call, make_aware_to_utc
@@ -77,7 +76,6 @@ def get_page(request):
 
 
 @login_required
-@session_comet  
 def index(request):
     data = {'messages_nav': True}
     
@@ -109,7 +107,6 @@ def index(request):
 
 
 @login_required
-@session_comet  
 def edit(request, message_id):
     store = SESSION.get_store(request.session)
 
@@ -295,7 +292,6 @@ def edit(request, message_id):
     return render(request, 'manage/message_edit.djhtml', data)
 
 @login_required
-@session_comet  
 def details(request, message_id):
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
@@ -315,7 +311,6 @@ def details(request, message_id):
 
 # FEEDBACK ------------------------------------------
 @login_required
-@session_comet  
 def feedback(request, feedback_id):
     data = {'messages_nav': True, 'feedback_id':feedback_id,
              "store_name":\
@@ -357,7 +352,6 @@ def feedback(request, feedback_id):
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
-@session_comet  
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -466,7 +460,6 @@ def feedback_reply(request, feedback_id):
     return render(request, 'manage/feedback_reply.djhtml', data)
 
 @login_required
-@session_comet  
 def feedback_delete(request, feedback_id):
     store = SESSION.get_store(request.session)
     # get from the messages_received_list in session cache

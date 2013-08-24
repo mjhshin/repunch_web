@@ -49,7 +49,7 @@ def login(request, requestDict):
         # if the User object has a store then we are good to go
         if store: 
             # check if employee with no access level
-            if account.objectId not in store.ACL:
+            if not store.has_access(account):
                 return 2
             
             store = account.get('store')

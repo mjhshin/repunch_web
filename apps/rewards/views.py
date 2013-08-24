@@ -4,14 +4,12 @@ from django.http import Http404, HttpResponseRedirect
 import urllib, json
 
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
-from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.auth.decorators import login_required
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
 @login_required
-@session_comet
 def index(request):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
@@ -52,7 +50,6 @@ def index(request):
 
 
 @login_required
-@session_comet
 def edit(request, reward_id):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
@@ -154,7 +151,6 @@ def edit(request, reward_id):
     return render(request, 'manage/reward_edit.djhtml', data)
 
 @login_required
-@session_comet
 def delete(request, reward_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)

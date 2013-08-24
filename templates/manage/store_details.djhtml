@@ -29,6 +29,7 @@ $(document).ready(function() {
 
 {% with store=request.session.store %}
 	<!-- possibly move to header -->
+	{% account_is_admin request.session as is_admin %}
 	{% account_alert request.session as alert %}
 	{% if alert > 0 %}
 	<div class="notification">
@@ -65,9 +66,12 @@ $(document).ready(function() {
 	    {% if request.session.has_store_avatar and store|get:'store_avatar' %}
 	        <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	    {% else %}
+	        {% if is_admin %}
 	        <a href="{% url 'store_avatar' %}" id="upload-avatar">
+	        <img src="{% static "manage/images/store_avatar_placeholder.png" %}"" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/></a>
+	        {% else %}
 	        <img src="{% static "manage/images/store_avatar_placeholder.png" %}"" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	        </a>
+	        {% endif %}
         {% endif %}
 			<div id="store-details-content-right">
 				<div id="address">
@@ -97,7 +101,9 @@ $(document).ready(function() {
 			<div class="clear">&nbsp;</div>
 		</div>
 		
+		{% if is_admin %}
 		<a href="{% url 'store_edit'  %}" class="button blue">Edit Store Details</a>
+		{% endif %}
 	</div>
 	
 	<div class="section">
@@ -131,10 +137,12 @@ $(document).ready(function() {
 		</div>
 		{% endwith %}
 		<div id="account-options" class="form-options">
+		    {% if is_admin %}
 			<a href="{% url 'account_update' %}" class="button blue">
 				Update Account
 			</a>
 			<a href="{% url 'account_deactivate' %}" class="red" id="deactivate_account">Cancel My Account</a>
+			{% endif %}
 		</div>
 	</div>
     {% endwith %}

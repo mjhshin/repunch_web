@@ -8,7 +8,6 @@ from datetime import datetime
 import urllib, json
 
 from parse.utils import make_aware_to_utc
-from parse.decorators import session_comet
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.comet import comet_receive
@@ -23,7 +22,6 @@ from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
-@session_comet
 def index(request):
     data = {'employees_nav': True}
     
@@ -42,7 +40,6 @@ def index(request):
     return render(request, 'manage/employees.djhtml', data)
 
 @login_required
-@session_comet
 def edit(request, employee_id):
     data = {'employees_nav': True, 'employee_id': employee_id}
     
@@ -102,7 +99,6 @@ def edit(request, employee_id):
     return render(request, 'manage/employee_edit.djhtml', data)
 
 @login_required
-@session_comet
 def delete(request, employee_id):
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
@@ -140,7 +136,6 @@ def delete(request, employee_id):
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
 @login_required
-@session_comet
 def approve(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
@@ -181,7 +176,6 @@ def approve(request, employee_id):
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
 @login_required
-@session_comet
 def deny(request, employee_id):
     """ this actually deletes the employee object! """
     # get from the employees_pending_list in session cache

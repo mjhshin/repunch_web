@@ -12,7 +12,6 @@ from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
-from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.auth.decorators import login_required
@@ -54,7 +53,6 @@ def activate(request):
     return HttpResponse("Bad request")
     
 @login_required
-@session_comet
 def deactivate(request):
     """
     This does not delete anything! It merely sets the store's active
@@ -66,7 +64,6 @@ def deactivate(request):
     return redirect(reverse('manage_logout'))
 
 @login_required
-@session_comet
 def settings(request):
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)
@@ -145,7 +142,6 @@ def refresh(request):
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 @login_required
-@session_comet
 def update(request):
     data = {'account_nav': True, 'update':True}
     store = SESSION.get_store(request.session)
@@ -273,7 +269,6 @@ def update(request):
     return render(request, 'manage/account_upgrade.djhtml', data)
 
 @login_required
-@session_comet
 def upgrade(request):
     """ 
     same as update except this also handles redirects from message

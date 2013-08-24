@@ -45,6 +45,11 @@ def account_alert(session):
     elif percent >= 1.0:
         return 2
     return 0
+    
+
+@register.assignment_tag
+def account_is_admin(session):
+    return SESSION.get_store(session).is_admin(session['account'])
         
 @register.simple_tag
 def account_message_usage(session, percent_of=None):

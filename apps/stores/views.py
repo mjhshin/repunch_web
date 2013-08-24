@@ -11,7 +11,6 @@ from datetime import datetime
 from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
-from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours,\
 StoreAvatarTmp
 from apps.stores.forms import StoreForm, StoreAvatarForm
@@ -29,7 +28,6 @@ from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required
 
 @login_required
-@session_comet
 def index(request):
     data = {'account_nav': True}
     
@@ -41,11 +39,14 @@ def index(request):
     return render(request, 'manage/store_details.djhtml', data)
 
 @login_required
-@session_comet
 def edit(request):
-    data = {'account_nav': True}
     account = request.session['account']
     store = SESSION.get_store(request.session)
+    # only admins may access this page! redirect others to index!
+    if not store.is_admin(account):
+        return redirect(reverse("store_index"))
+    
+    data = {'account_nav': True}
     # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
     
@@ -258,15 +259,18 @@ def get_avatar(request):
         store = SESSION.get_store(request.session)
         return HttpResponse(store.get("store_avatar_url"))
         
+    raise Http404
 
 @login_required
 @csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
-            
     if request.method == "POST":
         data = {}
         store = SESSION.get_store(request.session)
+        # only admins may access this view! 
+        if not store.is_admin(request.session['account']):
+            raise Http404
         
         old_avatar = None
         if store.get("store_avatar"):
@@ -332,7 +336,7 @@ def crop_avatar(request):
         request.session['store'] = store
         return render(request, 'manage/avatar_crop.djhtml', data)
     
-    
+    raise Http404
     
     
     

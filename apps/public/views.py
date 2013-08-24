@@ -9,7 +9,6 @@ import json, pytz
 
 from forms import ContactForm
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
-from parse.decorators import session_comet
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup,\
 send_email_receipt_smartphone
@@ -28,17 +27,14 @@ from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores.models import Store, Subscription,\
 Settings
 
-@session_comet
 def terms_mobile(request):
     return render(request, "public/terms-mobile.djhtml",
         get_notification_ctx())
         
-@session_comet
 def privacy_mobile(request):
     return render(request, "public/privacy-mobile.djhtml",
         get_notification_ctx())
 
-@session_comet
 def index(request):
     if request.session.get('account') is not None and\
         request.session.get('store') is not None and\
@@ -48,7 +44,6 @@ def index(request):
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)
 
-@session_comet
 def learn(request):
     data = {'learn_nav': True}
     
@@ -57,26 +52,21 @@ def learn(request):
     data['types'] = types
     return render(request, 'public/learn.djhtml', data)
 
-@session_comet
 def faq(request):
     data = {'faq_nav': True}
     data['form'] = ContactForm() # An unbound form
     return render(request, 'public/faq.djhtml', data)
 
-@session_comet
 def about(request):
     data = {'about_nav': True}
     return render(request, 'public/about.djhtml', data)
 
-@session_comet 
 def terms(request):
     return render(request, 'public/terms.djhtml')
 
-@session_comet
 def privacy(request):
     return render(request, 'public/privacy.djhtml')
 
-@session_comet
 def contact(request):
     if request.method == 'POST': 
         form = ContactForm(request.POST) 
@@ -88,11 +78,9 @@ def contact(request):
 
     return render(request, 'public/contact.djhtml', {'form': form, })
 
-@session_comet
 def thank_you(request):
     return render(request, 'public/thank_you.djhtml')
 
-@session_comet
 def jobs(request):
     return render(request, 'public/jobs.djhtml')
 
@@ -122,7 +110,6 @@ def password_reset(request):
         content_type="application/json")
         
         
-@session_comet  
 def sign_up(request):
     """
     Creates User, store, subscription, and settings objects.

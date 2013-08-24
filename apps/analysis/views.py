@@ -6,7 +6,6 @@ from datetime import timedelta, datetime
 import json
 
 from parse.utils import make_aware_to_utc
-from parse.decorators import session_comet
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.core.advanced_queries import relational_query
@@ -15,7 +14,6 @@ from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
 @login_required
-@session_comet
 def index(request):
     data = {'analysis_nav': True}
     rewards = SESSION.get_store(request.session).get("rewards")

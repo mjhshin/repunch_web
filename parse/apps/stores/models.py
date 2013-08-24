@@ -103,15 +103,28 @@ class Store(ParseObject):
                 " " + self.last_name.capitalize()
                 
     def get_access_level(self, account):
-        """ Returns the access level of the given account """
+        """ Returns the access level of the given account 
+            ACCESS_ADMIN = {"read": True, "write": True}
+            ACCESS_PUNCHREDEEM = {"read": True}
+            ACCESS_NONE = /not in ACL/
+        """
         if account.objectId in self.ACL:
             acl = self.ACL[account.objectId]
             if acl.get("read") and acl.get("write"):
                 return ACCESS_ADMIN
-            else: # read only
+            elif acl.get("read"):
                 return ACCESS_PUNCHREDEEM
-        else:
-            return ACCESS_NONE
+        return ACCESS_NONE
+            
+    def is_admin(self, account):
+        """ Returns true if the account has full admin access """
+        return self.get_access_level(account) == ACCESS_ADMIN
+        
+    def has_access(self, account):
+        """ 
+        Returns true if the account does not have an ACL = ACCESS_NONE
+        """
+        return self.get_access_level(account) != ACCESS_NONE
    
     def get_full_address(self):
         """

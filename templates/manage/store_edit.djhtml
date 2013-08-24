@@ -1,6 +1,8 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
 	{{ block.super }}
