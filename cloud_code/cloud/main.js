@@ -505,7 +505,7 @@ Parse.Cloud.define("punch", function(request, response) {
 				   
 	patronStoreQuery.find({
 		success: function(patronStoreResults) {
-			if(patronStoreResults == null) { //customer's first punch at this store, need new PatronStore.
+			if(patronStoreResults[0] == null) { //customer's first punch at this store, need new PatronStore.
 				addPatronStore();				
 			} else if(patronStoreResults.length > 1) {
 				console.log("ERROR: more than one PatronStore found.");
