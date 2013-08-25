@@ -1756,9 +1756,6 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
             where: iosInstallationQuery, 
             data: {
                 alert: "You've received a reply to your gift to " + senderName,
-                subject: "RE: " + subject,
-                store_id: storeId,
-                sender: senderName,
                 message_status_id: messageStatus.id,
                 type: "gift_reply"
 			}
@@ -1766,7 +1763,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success(message);
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");
