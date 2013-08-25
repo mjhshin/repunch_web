@@ -359,7 +359,7 @@ def feedback(request, feedback_id):
 
 @login_required
 @access_required
-@admin_only(reverse_url="messages_index", reverse_postfix="?tab_feedback=1")
+@admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -468,7 +468,7 @@ def feedback_reply(request, feedback_id):
     return render(request, 'manage/feedback_reply.djhtml', data)
 
 @login_required
-@admin_only
+@admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_delete(request, feedback_id):
     store = SESSION.get_store(request.session)
     # get from the messages_received_list in session cache

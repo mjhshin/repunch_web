@@ -11,6 +11,7 @@ from parse.utils import make_aware_to_utc
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
@@ -22,6 +23,7 @@ from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
+@access_required
 def index(request):
     data = {'employees_nav': True}
     
@@ -40,6 +42,8 @@ def index(request):
     return render(request, 'manage/employees.djhtml', data)
 
 @login_required
+@access_required
+@admin_only(reverse_url="employees_index")
 def edit(request, employee_id):
     data = {'employees_nav': True, 'employee_id': employee_id}
     
@@ -99,6 +103,7 @@ def edit(request, employee_id):
     return render(request, 'manage/employee_edit.djhtml', data)
 
 @login_required
+@admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
@@ -136,6 +141,7 @@ def delete(request, employee_id):
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
 @login_required
+@admin_only(reverse_url="employees_index")
 def approve(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
@@ -176,6 +182,7 @@ def approve(request, employee_id):
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
 @login_required
+@admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
     """ this actually deletes the employee object! """
     # get from the employees_pending_list in session cache

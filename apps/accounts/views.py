@@ -54,7 +54,7 @@ def activate(request):
     return HttpResponse("Bad request")
     
 @login_required
-@admin_only
+@admin_only(reverse_url="store_index")
 def deactivate(request):
     """
     This does not delete anything! It merely sets the store's active

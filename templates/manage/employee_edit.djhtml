@@ -1,6 +1,8 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load parse_tags %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Edit Employee{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.0.css" %}" />

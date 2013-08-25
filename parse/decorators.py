@@ -3,6 +3,7 @@ from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.utils.decorators import available_attrs
 from functools import wraps
+from urllib import urlencode
 
 from parse import session as SESSION
 
@@ -43,9 +44,12 @@ def _admin_only(reverse_url, reverse_postfix, except_method):
                 return view_func(request, *args, **kwargs)
             else:
                 if reverse_url:
-                    reversed_url = reverse(reverse_url)
+                    reversed_url = reverse(reverse_url) + "?%s" %\
+                        urlencode({'error': "Permission denied"})
+                    
                     if reverse_postfix:
-                        reversed_url = reversed_url + reverse_postfix
+                        reversed_url =\
+                            reversed_url + "&" + reverse_postfix
                     return redirect(reversed_url)
                 else:
                     raise Http404
