@@ -1,9 +1,11 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}{% load parse_tags %}{% load account_tags %}
 
 {% block title %}Feedback Details{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
+{% account_is_admin request.session as is_admin %}
+{% if is_admin %}
 <script>
 $(document).ready(function(){
     $('#delete-button').click(function(){
@@ -11,10 +13,12 @@ $(document).ready(function(){
     });
 });
 </script>
+{% endif %}
 {% endblock %}
 
 
 {% block content %}
+	{% account_is_admin request.session as is_admin %}
 	
 	{% if error or success %}
 	<div class="notification {% if success %}success{% endif %} hide">
@@ -57,6 +61,7 @@ $(document).ready(function(){
 	<div class="divider"></div>
     {% endif %}
 
+    {% if is_admin %}
     <div id="message-detail-options" class="form-options">
         {# cannot reply if already replied #}
         {% if not reply %}
@@ -64,6 +69,6 @@ $(document).ready(function(){
         {% endif %}
 		<a href="{% url 'feedback_delete' feedback_id %}" id="delete-button" class="red">Delete Message</a>
 	</div>
-    
+    {% endif %}
 
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}
+{% load static %}{% load store_tags %}{% load account_tags %}
 
 {% block title %}{% if fcount > 0 %}({{ fcount }}){% endif %} Messages{% endblock %}
 {% block styles %}
@@ -20,18 +20,22 @@
 
 
 {% block content %}
+	{% account_is_admin request.session as is_admin %}
+	
 	{% if error or success %}
 	<div class="notification {% if success %}success{% endif %} hide">
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
 
-    {% if has_patrons %}
-	<a href="{% url 'message_edit' 0 %}" class="button blue" id="create_message">+ Create New Message</a>
-	{% else %}
-	<div class="notification">
-		<div>You currently do not have any customers to send a message to.</div>
-	</div>
+    {% if is_admin %}
+        {% if has_patrons %}
+	    <a href="{% url 'message_edit' 0 %}" class="button blue" id="create_message">+ Create New Message</a>
+	    {% else %}
+	    <div class="notification">
+		    <div>You currently do not have any customers to send a message to.</div>
+	    </div>
+	    {% endif %}
 	{% endif %}
 	
 	<div class="section"> {# SECTION #}

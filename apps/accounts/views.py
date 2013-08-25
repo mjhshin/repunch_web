@@ -14,6 +14,7 @@ from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import SMARTPHONE
@@ -53,6 +54,7 @@ def activate(request):
     return HttpResponse("Bad request")
     
 @login_required
+@admin_only
 def deactivate(request):
     """
     This does not delete anything! It merely sets the store's active
@@ -64,6 +66,8 @@ def deactivate(request):
     return redirect(reverse('manage_logout'))
 
 @login_required
+@access_required
+@admin_only(except_method="GET")
 def settings(request):
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)

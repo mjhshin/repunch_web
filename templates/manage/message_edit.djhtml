@@ -1,6 +1,8 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Send New Message{% endblock %}
 {% block styles %}
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.1.0.css" %}" />

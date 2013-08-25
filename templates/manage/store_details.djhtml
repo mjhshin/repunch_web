@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block javascript %}
+{% account_is_admin request.session as is_admin %}
+{% if is_admin %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
 <script>
 $(document).ready(function() {
@@ -20,6 +22,7 @@ $(document).ready(function() {
     });
 });
 </script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
