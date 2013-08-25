@@ -1596,7 +1596,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 			
 	}).then(function(patronStore) {
 		console.log("PatronStore fetch was successful.");
-		if() {}
+		//if() {}
 		patronStore.increment("punch_count", -1*giftPunches);
 		return patronStore.save();
 		
