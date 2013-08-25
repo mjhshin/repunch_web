@@ -12,6 +12,7 @@ import urllib, json
 from parse.comet import comet_receive
 from parse import session as SESSION
 from parse.utils import cloud_call, make_aware_to_utc
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -76,6 +77,7 @@ def get_page(request):
 
 
 @login_required
+@access_required
 def index(request):
     data = {'messages_nav': True}
     
@@ -107,6 +109,8 @@ def index(request):
 
 
 @login_required
+@access_required
+@admin_only(reverse_url="messages_index")
 def edit(request, message_id):
     store = SESSION.get_store(request.session)
 
@@ -292,6 +296,7 @@ def edit(request, message_id):
     return render(request, 'manage/message_edit.djhtml', data)
 
 @login_required
+@access_required
 def details(request, message_id):
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
@@ -311,6 +316,7 @@ def details(request, message_id):
 
 # FEEDBACK ------------------------------------------
 @login_required
+@access_required
 def feedback(request, feedback_id):
     data = {'messages_nav': True, 'feedback_id':feedback_id,
              "store_name":\
@@ -352,6 +358,8 @@ def feedback(request, feedback_id):
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
+@access_required
+@admin_only(reverse_url="messages_index", reverse_postfix="?tab_feedback=1")
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -460,6 +468,7 @@ def feedback_reply(request, feedback_id):
     return render(request, 'manage/feedback_reply.djhtml', data)
 
 @login_required
+@admin_only
 def feedback_delete(request, feedback_id):
     store = SESSION.get_store(request.session)
     # get from the messages_received_list in session cache
@@ -508,6 +517,9 @@ def feedback_delete(request, feedback_id):
             'tab_feedback':1}))
 
 @login_required
+@access_required
+@admin_only(reverse_url="messages_index")
 def delete(request, message_id):
+    """ cannot delete a message! """
     return HttpResponse("error")
 
