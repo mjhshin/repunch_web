@@ -22,7 +22,7 @@ COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
-from parse.decorators import access_required
+from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
@@ -42,12 +42,10 @@ def index(request):
 
 @login_required
 @access_required
+@admin_only("store_index")
 def edit(request):
     account = request.session['account']
     store = SESSION.get_store(request.session)
-    # only admins may access this page! redirect others to index!
-    if not store.is_admin(account):
-        return redirect(reverse("store_index"))
     
     data = {'account_nav': True}
     # fake a store to construct HoursFormset - probably not necessary
@@ -265,15 +263,13 @@ def get_avatar(request):
     raise Http404
 
 @login_required
+@admin_only(None)
 @csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
     if request.method == "POST":
         data = {}
         store = SESSION.get_store(request.session)
-        # only admins may access this view! 
-        if not store.is_admin(request.session['account']):
-            raise Http404
         
         old_avatar = None
         if store.get("store_avatar"):
