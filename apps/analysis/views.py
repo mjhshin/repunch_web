@@ -8,12 +8,14 @@ import json
 from parse.utils import make_aware_to_utc
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
+from parse.decorators import access_required
 from parse.core.advanced_queries import relational_query
 from parse.auth.decorators import login_required
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
 @login_required
+@access_required
 def index(request):
     data = {'analysis_nav': True}
     rewards = SESSION.get_store(request.session).get("rewards")
