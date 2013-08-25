@@ -1755,7 +1755,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-                alert: "You've received a reply to your gift to " + senderName,
+                alert: senderName + " replied to your gift",
                 message_status_id: messageStatus.id,
                 type: "gift_reply"
 			}
