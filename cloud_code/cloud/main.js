@@ -1042,7 +1042,14 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 						
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
-			response.success("insufficient");
+			patronStore.set("pending_reward", false);
+			patronStore.save().then(function() {
+			    console.log("PatronStore save success");
+				response.success("insufficient");
+			}, function(error) {
+			    console.log("PatronStore save fail");
+			    response.error("error");
+	        });
 			
 		} else {
 			console.log("PatronStore has enough punches.");
@@ -1589,6 +1596,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 			
 	}).then(function(patronStore) {
 		console.log("PatronStore fetch was successful.");
+		if() {}
 		patronStore.increment("punch_count", -1*giftPunches);
 		return patronStore.save();
 		
