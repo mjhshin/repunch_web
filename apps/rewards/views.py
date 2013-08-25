@@ -53,7 +53,7 @@ def index(request):
 
 @login_required
 @access_required
-@admin_only("rewards_index")
+@admin_only(reverse_url="rewards_index")
 def edit(request, reward_id):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
@@ -155,7 +155,7 @@ def edit(request, reward_id):
     return render(request, 'manage/reward_edit.djhtml', data)
 
 @login_required
-@admin_only("rewards_index")
+@admin_only(reverse_url="rewards_index")
 def delete(request, reward_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)

@@ -25,9 +25,11 @@ def access_required(view_func):
             return redirect(reverse("manage_logout"))
     return decorator
     
-def admin_only(reverse_url):
+def _admin_only(reverse_url, except_method):
     """
     Redirects the user to the given reverse_url if not admin.
+    The user will not be redirected if the request.method is in
+    except_method, which is a tuple with possible values GET &| POST.
     This will raise an Http404 if reverse_url is None.
     
     *NOTE* that assumes that the user is logged in!
@@ -35,7 +37,9 @@ def admin_only(reverse_url):
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            if SESSION.get_store(request.session).is_admin(request.session['account']):
+            if SESSION.get_store(request.session).is_admin(\
+                request.session['account']) or (except_method and\
+                request.method in except_method):
                 return view_func(request, *args, **kwargs)
             else:
                 if reverse_url:
@@ -44,3 +48,20 @@ def admin_only(reverse_url):
                     raise Http404
         return _wrapped_view
     return decorator
+
+
+def admin_only(function=None, reverse_url=None, except_method=None):
+    """
+    Redirects the user to the given reverse_url if not admin.
+    This will raise an Http404 if reverse_url is None.
+    
+    *NOTE* that assumes that the user is logged in!
+    """
+    
+    actual_decorator = _admin_only(
+        reverse_url=reverse_url,
+        except_method=except_method
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator

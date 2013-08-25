@@ -42,7 +42,7 @@ def index(request):
 
 @login_required
 @access_required
-@admin_only("store_index")
+@admin_only(reverse_url="store_index")
 def edit(request):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -263,7 +263,7 @@ def get_avatar(request):
     raise Http404
 
 @login_required
-@admin_only(None)
+@admin_only
 @csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
