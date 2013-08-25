@@ -10,8 +10,11 @@ def access_required(view_func):
     """
     Logs out the user if he has an ACL of ACCESS_NONE.
     It is true that users with no access may not be able to log in.
-    However, this decorator takes care of the care where a logged in
-    user is stripped of access priviledge.
+    However, this decorator takes care of the case where a logged in
+    user's ACL is changed to ACCESS_NONE.
+    
+    This decorator should only be used on views that return an
+    HttpResponse/rendered page - not redirects or if done with ajax.
     
     *NOTE* that assumes that the user is logged in!
     """
@@ -26,6 +29,8 @@ def admin_only(reverse_url):
     """
     Redirects the user to the given reverse_url if not admin.
     This will raise an Http404 if reverse_url is None.
+    
+    *NOTE* that assumes that the user is logged in!
     """
     def decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
