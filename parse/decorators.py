@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.decorators import available_attrs
 from functools import wraps
 from urllib import urlencode
+import json
 
 from parse import session as SESSION
 
@@ -19,18 +20,21 @@ def _access_required(http_response, content_type):
     
     *NOTE* that assumes that the user is logged in!
     """
-    def decorator(view_func):
+    def _access_required_decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             if SESSION.get_store(request.session).has_access(request.session['account']):
                 return view_func(request, *args, **kwargs)
             else:
                 if http_response:
-                    return HttpResponse(http_response, content_type=content_type)
+                    resp = http_response
+                    if content_type == "application/json":
+                        resp = json.dumps(http_response)
+                    return HttpResponse(resp, content_type=content_type)
                 else:
                     return redirect(reverse("manage_logout"))
         return _wrapped_view
-    return decorator
+    return _access_required_decorator
 
 
 def access_required(function=None, http_response=None, content_type="application/json"):
@@ -44,18 +48,22 @@ def access_required(function=None, http_response=None, content_type="application
     a redirect to logout won't be executed. 
     
     *NOTE* that assumes that the user is logged in!
+    *NOTE* there is no need to use this decorator if the _admin_only
+    decorator is used in the same view because the admin_only decorator
+    will cause redirects to views using this decorator if ACL changes or
+    ACL of user is not admin to begin with =)
     """
-    
     actual_decorator = _access_required(
         http_response=http_response,
-        content_type=content_type,
+        content_type=content_type
     )
     if function:
         return actual_decorator(function)
     return actual_decorator
     
     
-def _admin_only(reverse_url, reverse_postfix, except_method):
+def _admin_only(reverse_url, reverse_postfix, except_method,
+    http_response, content_type):
     """
     Redirects the user to the given reverse_url if not admin.
     The user will not be redirected if the request.method is in
@@ -64,7 +72,7 @@ def _admin_only(reverse_url, reverse_postfix, except_method):
     
     *NOTE* that assumes that the user is logged in!
     """
-    def decorator(view_func):
+    def _admin_only_decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             if SESSION.get_store(request.session).is_admin(\
@@ -80,25 +88,33 @@ def _admin_only(reverse_url, reverse_postfix, except_method):
                         reversed_url =\
                             reversed_url + "&" + reverse_postfix
                     return redirect(reversed_url)
+                elif http_response:
+                    resp = http_response
+                    if content_type == "application/json":
+                        resp = json.dumps(http_response)
+                    return HttpResponse(resp, content_type=content_type)
                 else:
                     raise Http404
         return _wrapped_view
-    return decorator
+    return _admin_only_decorator
 
 
 def admin_only(function=None, reverse_url=None, reverse_postfix=None,
-    except_method=None):
+    except_method=None, http_response=None, content_type="application/json"):
     """
-    Redirects the user to the given reverse_url if not admin.
-    This will raise an Http404 if reverse_url is None.
+    If user is not adming, redirects to the given reverse_url (if provided)
+    or returns an http_response (if provided).
+    If reverse_url or http_response is not given, an Http404 is raised.
     
+    *NOTE* that only reverse_url or http_response should be provided!
     *NOTE* that assumes that the user is logged in!
     """
-    
     actual_decorator = _admin_only(
         reverse_url=reverse_url,
         reverse_postfix=reverse_postfix,
-        except_method=except_method
+        except_method=except_method,
+        http_response=http_response,
+        content_type=content_type
     )
     if function:
         return actual_decorator(function)

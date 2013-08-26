@@ -41,7 +41,6 @@ def index(request):
     return render(request, 'manage/store_details.djhtml', data)
 
 @login_required
-@access_required
 @admin_only(reverse_url="store_index")
 def edit(request):
     account = request.session['account']
@@ -191,7 +190,11 @@ def edit(request):
          
     return common(form)
 
+# this accessed only through the edit_store detail page, which
+# requires admin access but this might be useful somewhere else
+# so the admin_only decorator is not used
 @login_required
+@access_required(http_response="Access denied", content_type="text/plain")
 def hours_preview(request):
     HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
     
@@ -208,6 +211,8 @@ def hours_preview(request):
     
     
 @login_required
+@access_required(http_response="<h1>Access denied</h1>",\
+content_type="text/html")
 @csrf_exempt
 def avatar(request):
     data = {}
@@ -253,7 +258,10 @@ def avatar(request):
     data['url'] = reverse('store_avatar')
     return render(request, 'manage/avatar_upload.djhtml', data)
     
+# TODO http_response on access_required should be a link to an image
 @login_required
+@access_required(http_response="<h1>Access denied</h1>",\
+content_type="text/html")
 def get_avatar(request):
     """ returns the store's avatar url """
     if request.method == "GET" or request.is_ajax():
@@ -263,7 +271,8 @@ def get_avatar(request):
     raise Http404
 
 @login_required
-@admin_only
+@admin_only(http_response="<h1>Permission denied</h1>",\
+content_type="text/html")
 @csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """

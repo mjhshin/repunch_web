@@ -21,6 +21,12 @@ function updateBreakdownGraph()
         type: "GET",
         cache:false, // required to kill internet explorer 304 bug
         success: function(jsonData){
+            if (jsonData.hasOwnProperty("error")){
+                alert(jsonData.error);
+                $("#breakdown-loading").hide();
+                return;
+            }
+        
             var options = {
                 	legend: {position: 'bottom', alignment: 'start'},
                 	//chartArea: { left: 0, top: 0},
@@ -83,6 +89,12 @@ function updateTrendsGraph()
         type: "GET",
         cache: false, // required to kill internet explorer 304 bug
         success: function(jsonData){
+            if (jsonData.hasOwnProperty("error")){
+                alert(jsonData.error);
+                $("#trends-loading").hide();
+                return;
+            }
+            
             var options = {
 	            legend: {position: 'bottom', alignment: 'start'},
 	            //chartArea: { left: 0, top: 0},

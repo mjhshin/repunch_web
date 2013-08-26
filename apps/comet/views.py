@@ -11,12 +11,14 @@ import json, socket, thread
 
 from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
+from parse.decorators import access_required
 from parse.auth.decorators import login_required
 from apps.comet.models import CometSession, CometSessionIndex
 from parse.comet import comet_receive
 from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE
 
 @login_required
+@access_required(http_response={"result":-2})
 def pull(request):
     """
     This is where the comet approach is put into play.

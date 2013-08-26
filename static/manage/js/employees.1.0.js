@@ -74,6 +74,11 @@ function updateChart()
         data: data,
         cache: false, // required to kill internet explorer 304 bug
         success: function(jsonData){
+            if (jsonData.hasOwnProperty("error")) {
+                alert(jsonData.error);
+                return;
+            }
+            
             var options = {
                 	legend: {position: 'bottom', alignment: 'start'},
                 	//chartArea: { left: 0, top: 0},

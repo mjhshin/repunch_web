@@ -66,7 +66,6 @@ def deactivate(request):
     return redirect(reverse('manage_logout'))
 
 @login_required
-@access_required
 @admin_only(except_method="GET")
 def settings(request):
     data = {'settings_nav': True}
@@ -115,7 +114,7 @@ def settings(request):
     return render(request, 'manage/settings.djhtml', data)
 
 @login_required
-@admin_only
+@admin_only(http_response={"error": "Permission denied"})
 def refresh(request):
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):
@@ -147,7 +146,6 @@ def refresh(request):
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 @login_required
-@access_required
 @admin_only(reverse_url="store_index")
 def update(request):
     data = {'account_nav': True, 'update':True}
@@ -276,7 +274,6 @@ def update(request):
     return render(request, 'manage/account_upgrade.djhtml', data)
 
 @login_required
-@access_required
 @admin_only(reverse_url="store_index")
 def upgrade(request):
     """ 

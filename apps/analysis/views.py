@@ -26,6 +26,7 @@ def index(request):
     return render(request, 'manage/analysis.djhtml', data)
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def trends_graph(request, data_type=None, start=None, end=None ):
     store = SESSION.get_store(request.session)
     store_timezone = SESSION.get_store_timezone(request.session)
@@ -131,6 +132,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def breakdown_graph(request, data_type=None, filter=None, range=None):
     store = SESSION.get_store(request.session)
     store_timezone = SESSION.get_store_timezone(request.session)

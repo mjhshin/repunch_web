@@ -42,7 +42,6 @@ def index(request):
     return render(request, 'manage/employees.djhtml', data)
 
 @login_required
-@access_required
 @admin_only(reverse_url="employees_index")
 def edit(request, employee_id):
     data = {'employees_nav': True, 'employee_id': employee_id}
@@ -97,7 +96,7 @@ def edit(request, employee_id):
         'ACCESS_NONE': ACCESS_NONE[0],
         'form': form,
         'employee': employee,
-        'employee_acl': store.get_access_level(acc),
+        'employee_acl': store.get_access_level(acc)[0],
     })
 
     return render(request, 'manage/employee_edit.djhtml', data)
@@ -105,8 +104,6 @@ def edit(request, employee_id):
 @login_required
 @admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
-    # Note that since this view
-
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
         request.session)
@@ -222,6 +219,7 @@ def deny(request, employee_id):
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
 @login_required
+@access_required(http_response="Access Denied", content_type="text/plain")
 def punches(request, employee_id):
     data = {'employee_id': employee_id}
     
@@ -267,6 +265,7 @@ def punches(request, employee_id):
     return render(request, 'manage/employee_punches.djhtml', data)
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def graph(request):
     store_timezone = SESSION.get_store_timezone(request.session)
     

@@ -52,7 +52,6 @@ def index(request):
 
 
 @login_required
-@access_required
 @admin_only(reverse_url="rewards_index")
 def edit(request, reward_id):
     data = {'rewards_nav': True}

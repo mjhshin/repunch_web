@@ -20,12 +20,15 @@ $(document).ready(function(){
     // need to have included redemptions.js above this script!   
     
     function mainComet(res, status, xhr) {
-        // goes here if there are no changes
         if (res.hasOwnProperty("result")){
-            if (res.result == 0){
+            if (res.result == 0){ // no changes - re-request
                 makeRequest();
                 return;
-            } else if (res.result == -1) {
+            } else if (res.result == -1) { // request terminated
+                return;
+            } else if (res.result == -2) { // access taken away
+                alert("You have lost your access priviledges");
+                location.reload();
                 return;
             }
         } 

@@ -24,6 +24,8 @@ from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
 @login_required
+@access_required(http_response="<div class='tr'>Access denied</div>",\
+content_type="text/html")
 def get_page(request):
     """
     Returns the corresponding chunk of rows in html to plug into
@@ -109,7 +111,6 @@ def index(request):
 
 
 @login_required
-@access_required
 @admin_only(reverse_url="messages_index")
 def edit(request, message_id):
     store = SESSION.get_store(request.session)
@@ -358,7 +359,6 @@ def feedback(request, feedback_id):
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
-@access_required
 @admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_reply(request, feedback_id):
     account = request.session['account']
@@ -517,7 +517,6 @@ def feedback_delete(request, feedback_id):
             'tab_feedback':1}))
 
 @login_required
-@access_required
 @admin_only(reverse_url="messages_index")
 def delete(request, message_id):
     """ cannot delete a message! """
