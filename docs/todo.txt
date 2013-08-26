@@ -3,6 +3,7 @@
 1. allow employees access to dashboard
     - update current stores ACLs!
     - orignal store owner always have full admin access
+        + if their account has an employee, the ACL cannot be changed!
 
 ##############################################
 ####################  TEST (ADD/FIX):

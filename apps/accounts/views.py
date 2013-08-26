@@ -115,6 +115,7 @@ def settings(request):
     return render(request, 'manage/settings.djhtml', data)
 
 @login_required
+@admin_only
 def refresh(request):
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):
@@ -146,6 +147,8 @@ def refresh(request):
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 @login_required
+@access_required
+@admin_only(reverse_url="store_index")
 def update(request):
     data = {'account_nav': True, 'update':True}
     store = SESSION.get_store(request.session)
@@ -273,6 +276,8 @@ def update(request):
     return render(request, 'manage/account_upgrade.djhtml', data)
 
 @login_required
+@access_required
+@admin_only(reverse_url="store_index")
 def upgrade(request):
     """ 
     same as update except this also handles redirects from message
