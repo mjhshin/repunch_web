@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/punch.1.0.js" %}"></script>
+	<script src="{% static "manage/js/punch.1.1.js" %}"></script>
 	<script src="{% static "manage/js/paginator.js" %}"></script>
 	<script src="{% static "manage/js/redemptions.js" %}"></script>
 	<script>
