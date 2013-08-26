@@ -8,9 +8,12 @@ choose to stay signed in, then we still get a dangling session_key.
 
 These checks are in place so that currently logged in sessions are 
 not affected by this script.
+
+This script may also be used to force log out all users.
 """
 
 from django.core.management.base import BaseCommand
+from django.contrib.sessions.backends.cache import SessionStore
 from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
@@ -20,6 +23,12 @@ LAST_UPDATED_THRESHOLD = 24 # in hours
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        """
+        posible values in args:
+            - force : terminate ALL sessions - even active ones
+        """
+        force = "force" in args
+    
         now = timezone.now()
         timedout_time = now + relativedelta(hours=\
             -1*LAST_UPDATED_THRESHOLD)
@@ -31,7 +40,9 @@ class Command(BaseCommand):
         comets = CometSession.objects.all()
         
         for cometi in cometis:
-            if cometi.last_updated < timedout_time:
+            if cometi.last_updated < timedout_time or force:
+                session = SessionStore(cometi.session_key)
+                session.flush()
                 cometi.delete()
                 # also delete associated cometsessions 
                 # (there shouldn't be any at all though)
