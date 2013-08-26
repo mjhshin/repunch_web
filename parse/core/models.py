@@ -727,6 +727,10 @@ class ParseObject(object):
             # GeoPoint
             elif key == "coordinates" and value:
                 data[key] = format_geopoint(value[0], value[1])
+            elif key == "ACL":
+                # note that ACL must be a hash/dict!!!
+                if value is not None and type(value) is dict:
+                    data[key] = value
             # regular attributes
             else:
                 data[key] = value

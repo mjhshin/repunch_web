@@ -120,6 +120,10 @@ class Store(ParseObject):
         """ Returns true if the account has full admin access """
         return self.get_access_level(account) == ACCESS_ADMIN
         
+    def is_owner(self, account):
+        """ Returns true if the account is the owner of the store """
+        return self.owner_id == account.objectId
+        
     def has_access(self, account):
         """ 
         Returns true if the account does not have an ACL = ACCESS_NONE

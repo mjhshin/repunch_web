@@ -71,10 +71,6 @@ def edit(request, employee_id):
             if acc.objectId in store.ACL:
                 del store.ACL[acc.objectId]
                 
-        # need to store a pointer to the employee's account
-        acc.Store = store.objectId
-        acc.update()
-                
         store.update()
         request.session['store'] = store
         # notify other dashboards of this change
@@ -104,6 +100,11 @@ def edit(request, employee_id):
 @login_required
 @admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
+    """ 
+    This will also remove the employee from the ACL,
+    delete the employee object and also delete the Parse.User object
+    if and only if it has no pointer to a Store or a Patron.
+    """
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
         request.session)
@@ -121,10 +122,31 @@ def delete(request, employee_id):
     request.session['employees_approved_list'] =\
         employees_approved_list
         
-    # must delete the account associated with the employee
-    Account.objects().get(Employee=employee.objectId).delete()
+    # TODO ##############
+    # delete the account associated with the employee if the account
+    # does not have a 
+    acc = Account.objects().get(Employee=employee.objectId)
     # delete Punches Pointers to this employee?
     employee.delete()
+    acc.delete()
+    
+    store = SESSION.get_store(request.session)
+    if acc.objectId in store.ACL:
+        del store.ACL[acc.objectId]
+                
+    # need to store a pointer to the employee's account
+    acc.Store = store.objectId
+    acc.update()
+                
+    store.update()
+    request.session['store'] = store
+    # notify other dashboards of this change
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "updatedStore_one":store.jsonify()
+    }
+    comet_receive(store.objectId, payload)
+    ##########################
 
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
@@ -180,6 +202,7 @@ def approve(request, employee_id):
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
+# TODO cannot delete the account!
 @login_required
 @admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
