@@ -312,12 +312,14 @@ def sign_up(request):
             user_login = login(request, postDict)
             if user_login != None:
                 data = {"code":-1}
+                # response effects - not login returns
                 # -1 - invalid request
                 # 0 - invalid form input
                 # 1 - bad login credentials
                 # 2 - subscription is not active
                 # 3 - success (login now)
                 # 4 - employee no access - never should be this though
+                # 5 - employee is not approved - never should be
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:

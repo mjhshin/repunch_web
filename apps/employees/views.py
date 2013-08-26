@@ -122,21 +122,19 @@ def delete(request, employee_id):
     request.session['employees_approved_list'] =\
         employees_approved_list
         
-    # TODO ##############
-    # delete the account associated with the employee if the account
-    # does not have a 
-    acc = Account.objects().get(Employee=employee.objectId)
-    # delete Punches Pointers to this employee?
     employee.delete()
-    acc.delete()
+    # delete the account associated with the employee if the account
+    # does not have a pointer to a Store and/or a Patron
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc.Store and not acc.Patron:
+        acc.delete()
+    else: # just set the Employee pointer to None
+        acc.Employee = None
+        acc.update()
     
     store = SESSION.get_store(request.session)
     if acc.objectId in store.ACL:
         del store.ACL[acc.objectId]
-                
-    # need to store a pointer to the employee's account
-    acc.Store = store.objectId
-    acc.update()
                 
     store.update()
     request.session['store'] = store
@@ -202,7 +200,6 @@ def approve(request, employee_id):
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
-# TODO cannot delete the account!
 @login_required
 @admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
@@ -224,10 +221,16 @@ def deny(request, employee_id):
     request.session['employees_pending_list'] =\
         employees_pending_list
         
-    # must delete the account associated with the employee
-    Account.objects().get(Employee=employee.objectId).delete()
     # delete the employee!
     employee.delete()  
+    # delete the account associated with the employee if the account
+    # does not have a pointer to a Store and/or a Patron
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc.Store and not acc.Patron:
+        acc.delete()
+    else: # just set the Employee pointer to None
+        acc.Employee = None
+        acc.update()
         
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId

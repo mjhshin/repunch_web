@@ -5,10 +5,11 @@ Authentication backend for Parse
 import hashlib, uuid, pytz
 from django.contrib.auth import SESSION_KEY
 
+from libs.repunch import rputils
 from repunch.settings import PAGINATION_THRESHOLD
 from parse.utils import parse
 from parse.apps.accounts.models import Account
-from libs.repunch import rputils
+from parse.apps.employees import PENDING
 
 def hash_password(password):
     """ returns the hash of the raw password """
@@ -31,7 +32,7 @@ def login(request, requestDict):
     and username and passwords are good. Otherwise, 0 if bad login 
     credentials (wrong pass or pointer to store does not exist) 
     and 1 if subscription is not active,
-    2 if employee but no access.
+    2 if employee but no access, 3 if employee is still pending.
     """
     # first check if the request is already logged in 
     if request.session.get('account'):
@@ -45,14 +46,27 @@ def login(request, requestDict):
     if res and "error" not in res:
         account = Account(**res)
         account.fetch_all()
-        store = account.store
+        
+        # TODO in the future when an account may have a Store and
+        # Employee, we need to differentiate which 1 the user
+        # wants to login as. 
+        if account.Employee:
+            store = account.employee.get("store")
+            employee = account.employee
+            account_type = "employee"
+        elif account.Store:
+            store = account.store
+            account_type = "store"
+        
         # if the User object has a store then we are good to go
         if store: 
-            # check if employee with no access level
-            if not store.has_access(account):
+            if account_type == "employee" and\
+                employee.status == PENDING:
+                return 3
+            # check if employee with no access level or still pending
+            elif not store.has_access(account):
                 return 2
             
-            store = account.get('store')
             settings = store.get("settings")
             subscription = store.get("subscription")
         

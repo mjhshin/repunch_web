@@ -69,9 +69,6 @@ def test_employees():
         {'test_name': "The account/user is deleted from parse"},
         {'test_name': "Multiple employees (4) registering at once" +\
             " shows up in dashboard"},
-        {'test_name': "Approving 2 employees in succession works"},
-        {'test_name': "Removing 2 employees in succession works"},
-        {'test_name': "Denying 2 employees in succession works"},
     ]
     section = {
         "section_name": "Employees page working properly?",
@@ -366,72 +363,6 @@ def test_employees():
     except Exception as e:
         print e
         parts[23]['test_message'] = str(e)
-    print "Approving 2 employees in succession works"
-    try:
-        success = True
-        for i in range(2):
-            emp_id = approve()
-            # now check if the row is in the approved table and no
-            # longer in the pending table
-            test.find("#tab-approved-employees").click()
-            if not test.element_exists(\
-                "#tab-body-approved-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-            test.find("#tab-pending-employees").click()
-            if test.element_exists(\
-                "#tab-body-pending-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-                
-        parts[24]['success'] = success
-    except Exception as e:
-        print e
-        parts[24]['test_message'] = str(e)
-    print "Removing 2 employees in succession works"
-    try:
-        success = True
-        for i in range(2):
-            emp_id = remove()
-            # now check if the row is no longer in the pending table
-            # and also not the approved table
-            test.find("#tab-approved-employees").click()
-            if test.element_exists(\
-                "#tab-body-approved-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-            test.find("#tab-pending-employees").click()
-            if test.element_exists(\
-                "#tab-body-pending-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-                
-        parts[25]['success'] = success
-    except Exception as e:
-        print e
-        parts[25]['test_message'] = str(e)
-    print "Denying 2 employees in succession works"
-    try:
-        success = True
-        for i in range(2):
-            emp_id = deny()
-            # now check if the row is no longer in the pending table
-            # and also not the approved table
-            test.find("#tab-approved-employees").click()
-            if test.element_exists(\
-                "#tab-body-approved-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-            test.find("#tab-pending-employees").click()
-            if test.element_exists(\
-                "#tab-body-pending-employees div#%s a" % (emp_id,)):
-                success = False
-                break
-                
-        parts[26]['success'] = success
-    except Exception as e:
-        print e
-        parts[26]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup
