@@ -22,3 +22,20 @@ def get(parseObject, attr):
 def get_sub_type(level):
     """ returns the sub dict corresponding to the level """
     return sub_type[level]
+    
+    
+@register.filter
+def get_total_punches(punches_map):
+    """ 
+    Returns the total number of punches in the list of Punches.
+    punches_map is a list of dicts with a key "punch"
+    
+    e.g. punches_map = [{
+        "punch": PunchObject, ...
+    }, ...]
+    """
+    total = 0
+    for p_map in punches_map:
+        # incase that punches was saved as a str- which should never b
+        total += int(p_map['punch'].punches)
+    return total
