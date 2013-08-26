@@ -153,18 +153,22 @@ $(document).ready(function(){
                 day = "0" + day;
             }
             var dStr = month + "/" + day + "/" + year;
+            var approve_div = "";
+            if ($("#header-approve").length > 0) {
+                approve_div = "<div class='td approve'>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
+			        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/deny' class='employee deny'>" +
+			        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
+		        "</div>";
+            }
             $("#tab-body-pending-employees div.table-header").after(
                 "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
 		        
 		        "<div class='td first_name_pending'>" + employee.first_name.trimToDots(12) + "</div>" +
 		        "<div class='td last_name_pending'>" + employee.last_name.trimToDots(12) + "</div>" +
 		        "<div class='td date_added_pending'>" + dStr + "</div>" +
-		        "<div class='td approve'>" +
-			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
-			        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
-			    "<a href='/manage/employees/" + employee.objectId + "/deny' class='employee deny'>" +
-			        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
-		        "</div>" +
+		        approve_div +
 		        "</div>" );
         }
         
@@ -186,6 +190,12 @@ $(document).ready(function(){
                 day = "0" + day;
             }
             var dStr = month + "/" + day + "/" + year;
+            var remove_div = "";
+            // if this header is not present, then the user does not have permission to remove
+            if ($("#header-remove").length > 0) {
+                remove_div = "<div class='td remove'><a href='/manage/employees/" + employee.objectId + "/delete' >" + 
+				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>";
+            }
             $("#tab-body-approved-employees div.table-header").after(
                 "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
 		        
@@ -199,9 +209,7 @@ $(document).ready(function(){
 		        "<div class='td punches_approved'>" +  new String(employee.lifetime_punches) + "</div></a>" +
 		        
 				"<div class='td graph'><input type='checkbox' name='employee-graph-cb' value='" + employee.objectId + "' /></div>" + 
-				"<div class='td remove'><a href='/manage/employees/" + employee.objectId + "/delete' >" + 
-				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>" +
-		        
+		        remove_div +
 		        "</div>" );
 
             // remove placeholder when empty
