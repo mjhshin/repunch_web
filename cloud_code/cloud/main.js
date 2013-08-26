@@ -1035,8 +1035,6 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			
 		} else if(isOfferOrGift) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
-			patron = patronStore.get("Patron");
-
 			redeemReward.set("is_redeemed", true);
 			redeemReward.save().then(function() {
 			    console.log("RedeemReward save success");
