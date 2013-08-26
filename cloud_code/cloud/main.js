@@ -1139,9 +1139,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
 
-		androidInstallationQuery.equalTo("patron_id", patron.id);
+		androidInstallationQuery.equalTo("patron_id", patronId);
 		androidInstallationQuery.equalTo("deviceType", "android");
-		iosInstallationQuery.equalTo("patron_id", patron.id);
+		iosInstallationQuery.equalTo("patron_id", patronId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
 		
 		var promises = [];
