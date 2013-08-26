@@ -85,6 +85,9 @@ function punchit(url){
                 } else if (res.error == "float") {
                     $("#punch-form").append("<div id='punch-notification' class='notification hide'>" +
                         "<div><span>Please enter a whole number.</span></div></div>");
+                } else if (res.error == "permission_denied") { 
+                    $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+                    "<div><span>Permission denied.<span></div></div>");
                 } else {
                     $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
                     "<div><span>Failed to punch customer.<span></div></div>");

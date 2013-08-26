@@ -52,6 +52,8 @@ def index(request):
     return render(request, 'manage/workbench.djhtml', data)
     
 @login_required
+@access_required(http_response="<div class='tr'>Access denied</div>",\
+content_type="text/html")
 def get_page(request):
     """
     Returns a generated html to plug in the tables.
@@ -118,6 +120,7 @@ def get_page(request):
     return HttpResponse("Bad request")
     
 @login_required
+@access_required(http_response={"error":"permission_denied"})
 def punch(request):
     if request.method == "POST" or request.is_ajax():
         try:
@@ -148,6 +151,7 @@ def punch(request):
         content_type="application/json")
     
 @login_required
+@access_required(http_response={"error":"permission_denied"})
 def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success,
     2 if insufficient, 3 if already validated, 
