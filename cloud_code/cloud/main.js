@@ -996,8 +996,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	redeemRewardQuery.include(["PatronStore.Patron"]);
 	redeemRewardQuery.include("MessageStatus");
 	
-	storeQuery.get(storeId).then(function(store)
+	storeQuery.get(storeId).then(function(storeResult)
 	{
+		store = storeResult;
+		
 	    if (!isOfferOrGift) {
 	        var reward_id = parseInt(rewardId);
 	        var rewards = store.get("rewards");
