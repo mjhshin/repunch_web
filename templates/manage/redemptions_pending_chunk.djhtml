@@ -18,7 +18,8 @@
 	<div class="td redemption_title">
 	{{ redemp.title|trim_to_dots:18 }}</div>
 	<div class="td redemption_punches">
-	{{ redemp.num_punches }}</div>
+    {% if redemp.num_punches > 0 %}{{ redemp.num_punches }}{% else %}-{% endif %}
+	</div>
 	<div class="td redemption_redeem" style="margin-top:4px;">
 	    <a name="{{redemp.objectId}}" style="color:blue;cursor:pointer;">
 	        <img src="{% static 'manage/images/icon_green-check.png' %}" alt="Approve" /></a>

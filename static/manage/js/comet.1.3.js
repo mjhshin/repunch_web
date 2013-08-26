@@ -427,6 +427,10 @@ $(document).ready(function(){
                             minute = "0" + minute;
                         }
                         d = hour + ":" + minute + " " + ampm;
+                        var red_punches = new String(redemptions_pending[i].num_punches);
+                        if (red_punches == "0") {
+                            red_punches = "-";
+                        }
                         var rowStr = "<div class='tr " + odd + "' " + 
                             "id='"+ redemptions_pending[i].objectId + "'>" +
 		                    "<input type='hidden'" + 
@@ -438,7 +442,7 @@ $(document).ready(function(){
 		                    "<div class='td redemption_title'>" +
 				            redemptions_pending[i].title.trimToDots(18) + "</div>" +
 				            "<div class='td redemption_punches'>" +
-				            redemptions_pending[i].num_punches + "</div>" +
+				            red_punches + "</div>" +
 				            "<div class='td redemption_redeem' style='margin-top:4px;'>" +
 				            
 	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +

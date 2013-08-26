@@ -1,6 +1,8 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load util_tags %}{% load parse_tags %}
 
+{# NOTE that this page and all of its contents are accessible by any1 with acces to the dashboard #}
+
 {% block title %}{% if redcount > 0 %}({{ redcount }}){% endif %} Workbench{% endblock %}
 {% block styles %}	
 <link href="{% static "manage/css/workbench.css" %}" rel="stylesheet" />

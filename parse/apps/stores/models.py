@@ -124,7 +124,7 @@ class Store(ParseObject):
         """ 
         Returns true if the account does not have an ACL = ACCESS_NONE
         """
-        return self.get_access_level(account) != ACCESS_NONE
+        return self.get_access_level(account)[1] > ACCESS_NONE[1]
    
     def get_full_address(self):
         """

@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils.decorators import available_attrs
 from functools import wraps
@@ -7,7 +7,7 @@ from urllib import urlencode
 
 from parse import session as SESSION
 
-def access_required(view_func):
+def _access_required(http_response, content_type):
     """
     Logs out the user if he has an ACL of ACCESS_NONE.
     It is true that users with no access may not be able to log in.
@@ -19,12 +19,41 @@ def access_required(view_func):
     
     *NOTE* that assumes that the user is logged in!
     """
-    def decorator(request, *args, **kwargs):
-        if SESSION.get_store(request.session).has_access(request.session['account']):
-            return view_func(request, *args, **kwargs)
-        else:
-            return redirect(reverse("manage_logout"))
+    def decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if SESSION.get_store(request.session).has_access(request.session['account']):
+                return view_func(request, *args, **kwargs)
+            else:
+                if http_response:
+                    return HttpResponse(http_response, content_type=content_type)
+                else:
+                    return redirect(reverse("manage_logout"))
+        return _wrapped_view
     return decorator
+
+
+def access_required(function=None, http_response=None, content_type="application/json"):
+    """
+    Logs out the user if he has an ACL of ACCESS_NONE.
+    It is true that users with no access may not be able to log in.
+    However, this decorator takes care of the case where a logged in
+    user's ACL is changed to ACCESS_NONE.
+    
+    Ajax returns should return an http_reponse of something so that
+    a redirect to logout won't be executed. 
+    
+    *NOTE* that assumes that the user is logged in!
+    """
+    
+    actual_decorator = _access_required(
+        http_response=http_response,
+        content_type=content_type,
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+    
     
 def _admin_only(reverse_url, reverse_postfix, except_method):
     """

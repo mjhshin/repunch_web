@@ -64,11 +64,11 @@ def edit(request, employee_id):
 
     if request.method == "POST":
         post_acl = request.POST["ACL"]
-        if post_acl == ACCESS_ADMIN:
+        if post_acl == ACCESS_ADMIN[0]:
             store.ACL[acc.objectId] = {"read": True, "write": True}
-        elif post_acl == ACCESS_PUNCHREDEEM:
+        elif post_acl == ACCESS_PUNCHREDEEM[0]:
             store.ACL[acc.objectId] = {"read": True}
-        elif post_acl == ACCESS_NONE:
+        elif post_acl == ACCESS_NONE[0]:
             if acc.objectId in store.ACL:
                 del store.ACL[acc.objectId]
                 
@@ -92,9 +92,9 @@ def edit(request, employee_id):
     form.data['email'] = acc.get('email')
     
     data.update({
-        'ACCESS_ADMIN': ACCESS_ADMIN,
-        'ACCESS_PUNCHREDEEM': ACCESS_PUNCHREDEEM,
-        'ACCESS_NONE': ACCESS_NONE,
+        'ACCESS_ADMIN': ACCESS_ADMIN[0],
+        'ACCESS_PUNCHREDEEM': ACCESS_PUNCHREDEEM[0],
+        'ACCESS_NONE': ACCESS_NONE[0],
         'form': form,
         'employee': employee,
         'employee_acl': store.get_access_level(acc),
@@ -105,6 +105,8 @@ def edit(request, employee_id):
 @login_required
 @admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
+    # Note that since this view
+
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
         request.session)

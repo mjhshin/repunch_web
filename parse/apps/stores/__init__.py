@@ -4,9 +4,9 @@ MONTHLY = "monthly"
 SMARTPHONE = "smartphone"
 
 # Access levels per account basis
-ACCESS_ADMIN = "faa" # full admin access
-ACCESS_PUNCHREDEEM = "apr" # allow punch redeem
-ACCESS_NONE = "na" # no access
+ACCESS_ADMIN = ("faa", 10) # full admin access
+ACCESS_PUNCHREDEEM = ("apr", 5) # allow punch redeem
+ACCESS_NONE = ("na", 0) # no access
 
 def format_phone_number(num_str):
     """
