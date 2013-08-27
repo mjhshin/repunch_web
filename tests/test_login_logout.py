@@ -1,5 +1,7 @@
 """
 Selenium test for login and logout.
+
+NOTE that the email is used as the username!
 """
 
 from django.core.urlresolvers import reverse
@@ -12,13 +14,14 @@ from parse.apps.accounts.models import Account
 TEST_USER = {
     "username": "clothing",
     "password": "123456",
-    "email": "vandolf@repunch.com",
 }
 
 def test_login_dialog():
     """
     The dialog opened by clicking business signin in all public pages.
     """
+    account = Account.objects().get(username=TEST_USER['username'])
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "Login dialog showing up"},
@@ -59,7 +62,7 @@ def test_login_dialog():
         sleep(3)
         parts[1]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
-                "The username or password you entered is incorrect."
+                "The email or password you entered is incorrect."
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
@@ -125,7 +128,7 @@ def test_login_dialog():
         sleep(3)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@name='forgot-pass-email']", type="xpath").send_keys(\
-                TEST_USER['email'])
+                account.email)
         sleep(1)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
@@ -143,6 +146,8 @@ def test_login_page():
     """
     The dedicated login page.
     """
+    account = Account.objects().get(username=TEST_USER['username'])
+    
     test = SeleniumTest()
     parts = [ 
         {'test_name': "Wrong login credentials show error"},
@@ -173,7 +178,7 @@ def test_login_page():
         sleep(3)
         parts[0]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
-                "The username or password you entered is incorrect."
+                "The email or password you entered is incorrect."
     except Exception as e:
         print e
         parts[0]['test_message'] = str(e)
@@ -241,7 +246,7 @@ def test_login_page():
         sleep(3)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@name='forgot-pass-email']", type="xpath").send_keys(\
-                TEST_USER['email'])
+                account.email)
         sleep(1)
         test.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
