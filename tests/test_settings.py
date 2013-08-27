@@ -40,7 +40,7 @@ def test_settings():
         {'test_name': "Punches employee must be a number"},
         {'test_name': "Punches facebook must be a number."},
         {'test_name': "Punches employee must be greater than 0"},
-        {'test_name': "Punches facebook must be greater than 0"},
+        {'test_name': "Punches facebook must be greater than or = 0"},
         {'test_name': "Retailer PIN is refreshable"},
         {'test_name': "Changes to Retailer PIN is immediately " +\
             "commited to Parse without having to save settings."},
@@ -173,7 +173,7 @@ def test_settings():
     try:  
         selectors = (
             ("#id_punches_employee", "-1"), 
-            ("#id_punches_facebook", "0"), 
+            ("#id_punches_facebook", "-1"), 
         )
         test.action_chain(0, selectors, action="clear")
         test.action_chain(0, selectors, action="send_keys")
@@ -189,11 +189,11 @@ def test_settings():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  Punches facebook must be greater than 0
+    ##########  Punches facebook must be greater than or equal to 0
     try:   
         parts[10]['success'] =\
             test.find("#punches_facebook_e ul li").text ==\
-            "Ensure this value is greater than or equal to 1."
+            "Ensure this value is greater than or equal to 0."
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
@@ -254,13 +254,6 @@ def test_settings():
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
-        
-    try:
-        # test.find()
-        pass
-    except Exception as e:
-        print e
-        parts[16]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 

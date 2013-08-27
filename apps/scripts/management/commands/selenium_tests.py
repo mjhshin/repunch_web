@@ -24,8 +24,8 @@ class Command(BaseCommand):
         ####### PUBLIC
         #results.extend(test_public_pages())
         #results.extend(test_signup())
-        results.extend(test_login_dialog())
-        results.extend(test_login_page())
+        #results.extend(test_login_dialog())
+        #results.extend(test_login_page())
         
         ####### DASHBOARD
         
@@ -50,7 +50,7 @@ class Command(BaseCommand):
         #results.extend(test_employees()) # TODO FINISH
         
         ### SETTINGS
-        #results.extend(test_settings())
+        results.extend(test_settings())
         
         ### WORKBENCH
         #results.extend(test_punch()) TODO 

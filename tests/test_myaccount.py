@@ -949,6 +949,10 @@ def test_cancel_account():
     """
     A test just for the cancel account link.
     """
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store")
+    store = account.store
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},

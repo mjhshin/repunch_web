@@ -252,7 +252,7 @@ def test_rewards():
     ##########  Description is not required 
     try:
         parts[15]['success'] =\
-            test.element_exists("#description_ic ul li")
+            not test.element_exists("#description_ic ul li")
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
