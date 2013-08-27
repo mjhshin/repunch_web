@@ -327,4 +327,4 @@ class SettingsForm(forms.Form):
                         ' at one time', min_value=1)
     punches_facebook = forms.IntegerField(label=\
                         'Free Punch Allowance for Facebook',
-                                        min_value=1)
+                                        min_value=0)
