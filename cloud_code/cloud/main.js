@@ -423,8 +423,12 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 		if(acceptPost) {
 			var store = patronStore.get("Store");
 			var freePunches = store.get("punches_facebook");
-		
-			store.relation("FacebookPosts").add( patronStore.get("FacebookPost") );
+			
+			var facebookPost = patronStore.get("FacebookPost");
+			
+			if(facebookPost != null) {
+				store.relation("FacebookPosts").add(facebookPost);
+			}
 		
 			patronStore.increment("all_time_punches", freePunches);
 			patronStore.increment("punch_count", freePunches);
