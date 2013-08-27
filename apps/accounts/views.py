@@ -23,17 +23,24 @@ from parse.utils import make_aware_to_utc
 from parse.notifications import send_email_receipt_smartphone,\
 send_email_account_upgrade
 
+from django.core.mail import send_mail
+
 @csrf_exempt
 def activate(request):
     """
     Handles account activation from email form sent at user sign up.
     """
+    data = str(request.method)
     if request.method == "POST":
+        data = data + " POST 1"
         store_id = request.POST['store_id']
+        data = data + " POST 2"
         act_id = request.POST['act_id']
+        data = data + " AccountActivate"
         act = AccountActivate.objects.filter(id=act_id,
                 store_id=store_id)
         if len(act) > 0:
+            data = data + " acts > 0"
             act = act[0]
             if not act.is_used: # exist and unused!
                 act.is_used = True
@@ -49,8 +56,11 @@ def activate(request):
                     return HttpResponse("Account/store not found.")    
             else: # used
                 return HttpResponse("This form has already "+\
-                    "been used.")                
+                    "been used.")  
     
+    send_mail("ACTIVATE", data, "vandolf@repunch.com", 
+            ["vandolf@repunch.com",], fail_silently=True)
+            
     return HttpResponse("Bad request")
     
 @login_required
