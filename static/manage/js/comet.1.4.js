@@ -27,8 +27,12 @@ $(document).ready(function(){
             } else if (res.result == -1) { // request terminated
                 return;
             } else if (res.result == -2) { // access taken away
-                alert("You have lost your access priviledges");
-                location.reload();
+                alert("You have lost your access priviledges!");
+                location.reload(true);
+                return;
+            } else if (res.result == -3) { // logged out
+                alert("You have been logged out!");
+                location.reload(true);
                 return;
             }
         } 

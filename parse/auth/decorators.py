@@ -2,16 +2,18 @@
 A modified version of django.contrib.auth.decorators.login_required
 """
 
-import urlparse
+import urlparse, json
 from functools import wraps
 from django.utils import timezone
+from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
 from django.utils.decorators import available_attrs
 
 from parse import session as SESSION
 
-def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+def user_passes_test(test_func, login_url, redirect_field_name,
+    http_response, content_type):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -29,6 +31,14 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
                 timezone.activate(SESSION.get_store_timezone(\
                     request.session))
                 return view_func(request, *args, **kwargs)
+                
+            # if http_response is provided and content_type is json
+            # and request.is_ajax then this request if from comet.js
+            if request.is_ajax() and http_response and\
+                content_type == "application/json":
+                return HttpResponse(json.dumps(http_response),
+                    content_type=content_type)
+                
             path = request.build_absolute_uri()
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url.
@@ -44,7 +54,8 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     return decorator
 
 
-def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None,
+    http_response=None, content_type="application/json"):
     """
     Decorator for views that checks that the user is logged in,
     redirecting to the log-in page if necessary.
@@ -58,8 +69,10 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     actual_decorator = user_passes_test(
         lambda req: req.session.get('account') and\
                     req.session[SESSION_KEY],
-                    login_url=login_url,
-                    redirect_field_name=redirect_field_name
+        login_url=login_url,
+        redirect_field_name=redirect_field_name,
+        http_response=http_response,
+        content_type=content_type,
     )
     if function:
         return actual_decorator(function)

@@ -17,7 +17,7 @@ from apps.comet.models import CometSession, CometSessionIndex
 from parse.comet import comet_receive
 from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE
 
-@login_required
+@login_required(http_response={"result": -3})
 @access_required(http_response={"result":-2})
 def pull(request):
     """
@@ -289,7 +289,9 @@ def pull(request):
         else:
             request.session.flush()
         
-        try: # respond
+        ############################################################
+        # Respond ###########################################
+        try: 
             return HttpResponse(json.dumps(data), 
                         content_type="application/json")
         except (IOError, socket.error) as e: # broken pipe/socket. 
@@ -357,7 +359,18 @@ def pull(request):
                 scomet.delete()
             except CometSession.DoesNotExist:
                 pass # do nothing
-            return comet(session_copy)
+            try:
+                return comet(session_copy)
+            except KeyError:
+                # if a key error occurs then that probably means that
+                # the session has been flushed- was logged out by user
+                # or forcefully by server =)
+                # now time to flag existing tabs.
+                try: 
+                    return HttpResponse(json.dumps({"result": -3}), 
+                                content_type="application/json")
+                except (IOError, socket.error) as e: # broken pipe/socket. 
+                    thread.exit() # exit silently
         else: # nothing new, sleep for a bit
             sleep(COMET_PULL_RATE)
             
