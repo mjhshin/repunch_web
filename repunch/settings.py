@@ -54,10 +54,8 @@ else:
 # for template rendering
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
-    ABSOLUTE_HOST_ALIAS = ABSOLUTE_HOST
 else:
-    ABSOLUTE_HOST = 'repunch.com'
-    ABSOLUTE_HOST_ALIAS = "repunch.com"
+    ABSOLUTE_HOST = 'www.repunch.com'
 
 # PARSE 
 PARSE_VERSION = '1'

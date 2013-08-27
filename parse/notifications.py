@@ -16,7 +16,7 @@ from django.template import Template, Context, loader
 from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
-EMAIL_HOST_USER, STATIC_URL, ABSOLUTE_HOST_ALIAS, DEBUG,\
+EMAIL_HOST_USER, STATIC_URL, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
 # declare here for selenium tests use also
@@ -29,7 +29,6 @@ def get_notification_ctx():
     Cannot declare as a constant. The reverse method crashes the app.
     """
     return {
-        'ABSOLUTE_HOST_ALIAS':ABSOLUTE_HOST_ALIAS,
         'ABSOLUTE_HOST':ABSOLUTE_HOST,
         'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
         'STORE_INDEX':reverse('store_index'),
