@@ -86,8 +86,10 @@ def test_signup():
             ("#Ph2", "777"),
             ("#Ph3", "7777"),
             ("#id_email", TEST_USER['email']),
-            ("#id_password", TEST_USER['email']),
-            ("#id_confirm_password", TEST_USER['email']),
+            ("#id_password", 
+                TEST_USER['email'].replace("@", "").replace(".", "")),
+            ("#id_confirm_password",
+                TEST_USER['email'].replace("@", "").replace(".", "")),
         )
         test.action_chain(0, selectors, action="send_keys") # ACTION!
         # ToS and submit
@@ -109,10 +111,11 @@ def test_signup():
     try:
         time_img =\
             test.driver.find_element_by_id("signing-up-time")
-        while not time_img.is_displayed():
+        while not time_img.is_displayed() and\
+            time_waited < max_wait_time:
             sleep(1)
             time_waited += 1
-        parts[2]['success'] = time_waited < 10
+        parts[2]['success'] = time_waited < max_wait_time
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
@@ -258,7 +261,7 @@ def test_signup():
         print e
         parts[16]['test_message'] = str(e)
     ##########  Phone number is required 
-        try:
+    try:
         parts[17]['success'] =\
             str(test.find("#phone_number_e ul li").text) ==\
                 "This field is required."
@@ -361,7 +364,7 @@ def test_signup():
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
         parts[24]['success'] =\
-            str(test.find("#password_e ul li").text) ==
+            str(test.find("#password_e ul li").text) ==\
             "Ensure this value has at least 6 characters " +\
             "(it has 5)." and str(test.find(\
             "#password2_e ul li").text)== "Ensure this " +\
