@@ -386,4 +386,6 @@ def comet_receive(store_id, postDict):
         # need to save session to commit modifications
         session.modified = True
         session.save()
+        
+    return True
             
