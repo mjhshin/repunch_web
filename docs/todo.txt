@@ -3,6 +3,8 @@
 1. allow employees access to dashboard
     - orignal store owner always have full admin access
         + if their account has an employee, the ACL cannot be changed!
+        
+2. fix tooltip on signup and edit subscription
 
 ##############################################
 ####################  TEST (ADD/FIX):

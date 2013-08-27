@@ -409,13 +409,13 @@ def test_rewards():
         # now test
         test.find("//div[@id='2']/a", type="xpath").click()
         sleep(1)
-        red_count = int(test.find("#redemption_count").split(" ")[1])
+        red_count = int(test.find("#redemption_count").text.split(" ")[1])
         test.find("#reset_red_count").click()
         test.find("#submit-reward-form").click()
         sleep(5)
         test.find("//div[@id='2']/a", type="xpath").click()
         new_red_count =\
-            int(test.find("#redemption_count").split(" ")[1])
+            int(test.find("#redemption_count").text.split(" ")[1])
         parts[22]['success'] = new_red_count == 0 and red_count !=\
             new_red_count
     except Exception as e:
