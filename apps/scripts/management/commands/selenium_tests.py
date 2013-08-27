@@ -47,10 +47,10 @@ class Command(BaseCommand):
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        #results.extend(test_employees()) # TODO FINISH
+        results.extend(test_employees()) # TODO FINISH
         
         ### SETTINGS
-        results.extend(test_settings())
+        #results.extend(test_settings())
         
         ### WORKBENCH
         #results.extend(test_punch()) TODO 

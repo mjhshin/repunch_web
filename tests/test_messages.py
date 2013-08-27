@@ -19,13 +19,13 @@ from parse.apps.messages import FEEDBACK
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
 }
 
 # IMPORTANT! This patron must have a PatronStore with the store above!
 TEST_PATRON = {
-    "username": "kira",
+    "username": "kira@vandolf.com",
     "password": "123456",
 }
 

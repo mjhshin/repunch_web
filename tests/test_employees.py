@@ -13,7 +13,7 @@ from parse.apps.employees import PENDING, APPROVED
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
 }
 
@@ -117,7 +117,6 @@ def test_employees():
         Approves the first pending employee on the table.
         Also returns the employee id.
         """
-        print "APPROVED"
         test.find("#tab-pending-employees").click()
         approveRow = test.find("#tab-body-pending-employees " +\
             "div.tr")
@@ -134,7 +133,6 @@ def test_employees():
         Denies the first pending employee on the table.
         Also returns the employee id.
         """
-        print "DENYING"
         test.find("#tab-pending-employees").click()
         denyRow = test.find("#tab-body-pending-employees " +\
             "div.tr")
@@ -151,7 +149,6 @@ def test_employees():
         Removes the first approved employee on the table.
         Also returns the employee id.
         """
-        print "REMOVING"
         test.find("#tab-approved-employees").click()
         removeRow = test.find("#tab-body-approved-employees " +\
             "div.tr")
@@ -163,7 +160,7 @@ def test_employees():
         return removeId
         
     first_name, last_name, username, email =\
-    "vandolf1", "estrellado", "xmanvmanx", "xmanvman@xman.com"
+    "vandolf1", "estrellado", "xmanvman@xman.com", "xmanvman@xman.com"
         
     print "Cloud code register_employee works"
     try:

@@ -10,9 +10,8 @@ from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
-    "email": "clothing@vandolf.com",
 }
 
 def test_rewards():

@@ -152,8 +152,9 @@ def edit(request):
                     
             store.update()
             
-            # update the account
+            # update the account - email = username!
             account.email = request.POST['email']
+            account.username = request.POST['email']
             account.update()
             
             # update the session cache

@@ -9,7 +9,7 @@ from time import sleep
 from tests import SeleniumTest
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
 }
 
