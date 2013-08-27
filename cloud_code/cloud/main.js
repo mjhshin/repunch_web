@@ -1654,7 +1654,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
             data: {
                 alert: senderName + " sent you a gift",
                 message_status_id: messageStatus.id,
-                type: "gift"
+                type: "gift",
+				badge: "Increment"
 			}
         }) );
 		
@@ -1780,7 +1781,8 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
             data: {
                 alert: senderName + " replied to your gift",
                 message_status_id: messageStatus.id,
-                type: "gift_reply"
+                type: "gift_reply",
+				badge: "Increment"
 			}
         }) );
 		
