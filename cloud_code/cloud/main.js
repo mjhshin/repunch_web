@@ -93,7 +93,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		if(error.code == Parse.Error.EMAIL_TAKEN) {
 			console.log("User save failed because this email is already taken.");
-			response.error(error);
+			response.error(error.message);
 			deleteAccount();
 			
 		} else {
