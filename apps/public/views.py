@@ -133,7 +133,8 @@ def sign_up(request):
         subscription_form = SubscriptionForm2(request.POST)
         
         
-        cats =  request.POST.get("categories")
+        cats = request.POST.get("categories")
+        category_names = None
         if cats and len(cats) > 0:
             category_names = cats.split("|")[:-1]
             # make sure that there are only up to 2 categories

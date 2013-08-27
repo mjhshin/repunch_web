@@ -8,10 +8,12 @@ from django.utils import timezone
 from django.contrib.auth import logout
 import json, thread
 
+from libs.repunch.rputils import delete_after_delay
 from parse import session as SESSION
 from parse.auth import login
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSession, CometSessionIndex
+from repunch.settings import COMET_PULL_RATE
 
 def manage_login(request):
     """
@@ -81,11 +83,14 @@ def manage_logout(request):
     except CometSessionIndex.DoesNotExist:
         pass
     
-    # also delete ALL the cometsessions associated with the request
+    # set all related cometsessions to modified to flag all existing
+    # tabs of the logout and delete them after a delay
     cs = CometSession.objects.filter(session_key=\
         request.session.session_key)
     for c in cs:
-        c.delete()
+        c.modified = True
+        c.save()
+    delete_after_delay(cs, COMET_PULL_RATE + 3)
     request.session.flush()
     return redirect(reverse('public_home'))
 
