@@ -6,7 +6,6 @@
 
 ##############################################
 ####################  TEST (ADD/FIX):
-1. reset redemption count (rewad edit)
 3. ACL - login, page access, etc. (this is a LOT)
 
 #######

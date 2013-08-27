@@ -14,28 +14,27 @@ from tests.test_rewards import test_rewards
 from tests.test_analysis import test_trends, test_breakdown,\
 test_reward_redemptions
 from tests.test_messages import test_messages, test_feedbacks
-from tests.test_employees import test_employees
+from tests.test_employees import test_employees, test_employee_access
 from tests.test_settings import test_settings
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         results = []
         
-        ####### PUBLIC
+        ####### PUBLIC #########################################
         #results.extend(test_public_pages())
         #results.extend(test_signup())
         #results.extend(test_login_dialog())
         #results.extend(test_login_page())
         
-        ####### DASHBOARD
-        
+        ####### DASHBOARD #########################################
         #### MY ACCOUNT
         #results.extend(test_edit_store_details())
         #results.extend(test_edit_account())
         #results.extend(test_cancel_account())
         
         ### REWARDS
-        #results.extend(test_rewards())
+        results.extend(test_rewards())
         
         ### ANALYSIS
         #results.extend(test_trends()) TODO 
@@ -47,7 +46,8 @@ class Command(BaseCommand):
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        results.extend(test_employees()) # TODO FINISH
+        #results.extend(test_employees())
+        #results.extend(test_employee_access()) # TODO FINISH
         
         ### SETTINGS
         #results.extend(test_settings())

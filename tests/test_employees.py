@@ -76,7 +76,7 @@ def test_employees():
     }
     test.results.append(section)
     
-    print "User needs to be logged in to access page"
+    ##########  User needs to be logged in to access page"
     test.open(reverse("employees_index")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
@@ -162,7 +162,7 @@ def test_employees():
     first_name, last_name, username, email =\
     "vandolf1", "estrellado", "xmanvman@xman.com", "xmanvman@xman.com"
         
-    print "Cloud code register_employee works"
+    ##########  Cloud code register_employee works"
     try:
         res = register_employee(first_name, last_name, username,
             email=email)
@@ -170,20 +170,20 @@ def test_employees():
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
-    print "Employee is saved in store's Employees relation"
+    ##########  Employee is saved in store's Employees relation"
     try:
         emp = store.get("employees")[0]
         parts[2]['success'] = emp is not None
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
-    print "Employee is initially pending (Parse)"
+    ##########  Employee is initially pending (Parse)"
     try:
         parts[3]['success'] = emp.status == PENDING
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
-    print "Employee is initially pending (Dashboard)"
+    ##########  Employee is initially pending (Dashboard)"
     try:
         sleep(COMET_PULL_RATE*2 + 1) # wait for dashboard to receive
         test.find("#tab-pending-employees").click()
@@ -192,14 +192,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
-    print "Email must be valid (cloud code)"
+    ##########  Email must be valid (cloud code)"
     try:
         res = register_employee("vman", "vman", email="vmahs@vman")
         parts[5]['success'] = res['error'] == '125'
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
-    print "Email must be unique (cloud code) "
+    ##########  Email must be unique (cloud code) "
     try:
         res = register_employee("vman", "vman",
             email=email)
@@ -207,21 +207,21 @@ def test_employees():
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
-    print "Username must be unique (cloud code) "
+    ##########  Username must be unique (cloud code) "
     try:
         res = register_employee("vman", "vman", username=username)
         parts[7]['success'] = res['error'] == '202'
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
-    print "Retailer PIN must exist (cloud code) "
+    ##########  Retailer PIN must exist (cloud code) "
     try:
         res = register_employee("vman", "vman", retailer_pin="sdgdgs")
         parts[8]['success'] = res['result'] == "invalid_pin"
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
-    print "Clicking deny prompts the user to confirm"
+    ##########  Clicking deny prompts the user to confirm"
     try:
         test.find("#tab-pending-employees").click()
         test.find("#tab-body-pending-employees div.tr " +\
@@ -231,7 +231,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    print "The user is redirected to employee index"
+    ##########  The user is redirected to employee index"
     try:
         sleep(1)
         alert.accept()
@@ -242,7 +242,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    print "The denied employee is removed from the pending table"
+    ##########  The denied employee is removed from the pending table"
     try:
         parts[11]['success'] = not test.element_exists(\
         "#tab-body-pending-employees div.tr " +\
@@ -250,7 +250,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)
-    print "The employee is deleted from parse"
+    ##########  The employee is deleted from parse"
     try:
         store.set("employees", None)
         parts[12]['success'] = store.get("employees",\
@@ -258,14 +258,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[12]['test_message'] = str(e)
-    print "The account/user is deleted from parse"
+    ##########  The account/user is deleted from parse"
     try:
         parts[13]['success'] = Account.objects().count(\
             username=username, email=email) == 0
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)
-    print "Approving the employee moves it from pending to approved"
+    ##########  Approving the employee moves it from pending to approved"
     try:
         register_employee(first_name, last_name, username,
             email=email)
@@ -279,7 +279,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
-    print "Employee status is set to approved in Parse"
+    ##########  Employee status is set to approved in Parse"
     try:
         store.set("employees", None)
         emp = store.get("employees", first_name=first_name,
@@ -288,13 +288,13 @@ def test_employees():
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
-    print "Employee initially has 0 punches"
+    ##########  Employee initially has 0 punches"
     try:
         parts[16]['success'] = emp.lifetime_punches == 0
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
-    print "Clicking on the approved employee row " +\
+    ##########  Clicking on the approved employee row " +\
         "redirects user to employee edit page "
     try:
         test.find("#tab-approved-employees").click()
@@ -306,7 +306,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
-    print "Clicking delete prompts the user to confirm"
+    ##########  Clicking delete prompts the user to confirm"
     try:
         test.find("#delete-button").click()
         alert = test.switch_to_alert()
@@ -315,7 +315,7 @@ def test_employees():
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
-    print "The user is redirected to employee index"
+    ##########  The user is redirected to employee index"
     try:
         sleep(1)
         alert.accept()
@@ -326,14 +326,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
-    print "The deleted employee is removed from the pending table"
+    ##########  The deleted employee is removed from the pending table"
     try:
         parts[20]['success'] = not test.element_exists(\
             "#tab-body-approved-employees div#%s a" %(emp.objectId,))
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
-    print "The employee is deleted from parse"
+    ##########  The employee is deleted from parse"
     try:
         store.set("employees", None)
         parts[21]['success'] = store.get("employees", 
@@ -341,14 +341,14 @@ def test_employees():
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
-    print "The account/user is deleted from parse"
+    ##########  The account/user is deleted from parse"
     try:
         parts[22]['success'] = Account.objects().count(\
             username=username, email=email) == 0
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-    print "Multiple employees (4) registering at once " +\
+    ##########  Multiple employees (4) registering at once " +\
         "shows up in dashboard"
     try:
         for i in range(4):
@@ -364,3 +364,90 @@ def test_employees():
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 
+    
+    
+# TODO
+TEST_EMPLOYEE = {
+    "username": "clothing@vandolf.com",
+    "password": "123456",
+}
+    
+    
+def test_employee_access():
+    """
+    Tests for employee dashboard access.
+    """
+    # TODO test employee graph
+    
+    # delete the employees and associated User objects in the relation
+    account = Account.objects().get(username=TEST_EMPLOYEE['username'],
+        include="Store.Settings")
+    store = account.store
+    settings = store.settings
+    
+    emps = store.get("employees")
+    if emps:
+        for emp in emps:
+            Account.objects().get(Employee=emp.objectId).delete()
+            emp.delete()
+    
+    store.set("employees", None)  
+    
+    test = SeleniumTest()
+    parts = [
+        {"test_name" : "User needs to be logged in to access page"},
+        
+    ]
+    section = {
+        "section_name":\
+            "Employee dashboard access working as expected?",
+        "parts": parts,
+    }
+    test.results.append(section)
+    
+    ##########  User needs to be logged in to access page
+    test.open(reverse("store_index")) # ACTION!
+    sleep(1)
+    parts[0]['success'] = test.is_current_url(reverse(\
+        'manage_login') + "?next=" + reverse("employees_index"))
+        
+    # login
+    selectors = (
+        ("#id_username", TEST_EMPLOYEE['username']),
+        ("#id_password", TEST_EMPLOYEE['password']),
+        ("", Keys.RETURN)
+    )
+    test.action_chain(0, selectors, "send_keys") # ACTION!
+    sleep(5) 
+    
+    def register_employee(first_name, last_name, username=None, 
+        password=None, email=None, retailer_pin=None):
+        
+        if username is None: 
+            username = first_name
+        if password is None: 
+            password = first_name
+        if email is None: 
+            email = first_name + "@" + last_name + ".com"
+        if retailer_pin is None: 
+            retailer_pin = settings.retailer_pin
+            
+        return cloud_call("register_employee", {
+            "first_name": first_name,
+            "last_name": last_name,
+            "username": username,
+            "password": password,
+            "email": email,
+            "retailer_pin": retailer_pin,
+        })
+        
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    

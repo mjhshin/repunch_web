@@ -51,6 +51,8 @@ def test_rewards():
             "from least to greatest"},
         {'test_name': "Punches is sortable"},
         {'test_name': "Name is sortable"},
+        {'test_name': "Updating a reward with the reset redemption" +\
+            " count option resets the redemption count to 0"},
     ]
     section = {
         "section_name": "Rewards page working properly?",
@@ -382,6 +384,43 @@ def test_rewards():
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
+        
+    ##########  Updating a reward with the reset redemption
+    ###         count option resets the redemption count to 0 TODO
+    try:
+        # logout
+        test.find("#link-logout").click()
+        sleep(1)
+        # modify store the rewards redemption count
+        store.rewards = None
+        for r in store.get("rewards"):
+            r['redemption_count'] = 99
+        store.update()
+        # login
+        test.open(reverse("rewards_index")) # ACTION!
+        sleep(1)
+        selectors = (
+        ("#id_username", TEST_USER['username']),
+        ("#id_password", TEST_USER['password']),
+        ("", Keys.RETURN)
+        )
+        test.action_chain(0, selectors, "send_keys") # ACTION!
+        sleep(7)
+        # now test
+        test.find("div#2 a").click()
+        sleep(1)
+        red_count = int(test.find("#redemption_count").split(" ")[1])
+        test.find("#reset_red_count").click()
+        test.find("#submit-reward-form").click()
+        sleep(5)
+        test.find("div#2 a").click()
+        new_red_count =\
+            int(test.find("#redemption_count").split(" ")[1])
+        parts[22]['success'] = new_red_count == 0 and red_count !=\
+            new_red_count
+    except Exception as e:
+        print e
+        parts[22]['test_message'] = str(e)
         
     
     # END OF ALL TESTS - cleanup
