@@ -1072,10 +1072,12 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			{
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
 			    executePushReward();
+				
 			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
 					addFacebookPostToPatron();
+				} else {
+					postToServer(redeemReward);
 				}
-				postToServer(redeemReward);
 				
 			}, function(error) {
 			    console.log("PatronStore and RedeemReward save fail (in parallel).");
@@ -1196,9 +1198,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 		}).then(function() {
 			console.log("PatronStore save success.");
-			return;
+			postToServer(redeemReward);
 	
-			}, function(error) {
+		}, function(error) {
 			console.log("PatronStore save failed.");
 			response.error("error");
 			return;
