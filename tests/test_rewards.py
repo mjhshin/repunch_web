@@ -407,13 +407,13 @@ def test_rewards():
         test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
         # now test
-        test.find("div#2 a").click()
+        test.find("//div[@id='2']/a", type="xpath").click()
         sleep(1)
         red_count = int(test.find("#redemption_count").split(" ")[1])
         test.find("#reset_red_count").click()
         test.find("#submit-reward-form").click()
         sleep(5)
-        test.find("div#2 a").click()
+        test.find("//div[@id='2']/a", type="xpath").click()
         new_red_count =\
             int(test.find("#redemption_count").split(" ")[1])
         parts[22]['success'] = new_red_count == 0 and red_count !=\

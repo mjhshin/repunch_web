@@ -79,6 +79,7 @@ $(document).ready(function(){
                 if (res.code == 2){
                     // subscription not active. Tell them.
                     $( "#dialog-signup" ).dialog({ 
+                        title: "Sign up complete", 
                         minHeight: 110, maxHeight: 110,
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
@@ -86,7 +87,7 @@ $(document).ready(function(){
                         } });
                     $("#signing-up-time").show();
                     messageContainer.css("width", "250px");
-                    messageContainer.html("<span style='color:#DF7401;position:relative;top:4px;'>"+
+                    messageContainer.html("<span style='color:#DF7401;position:relative;top:-4px;left:14px'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
                 } else if (res.code == 3){ // active subscription. redirect to dashboard.
                     messageContainer.html("<span style='color:green;'>Redirecting to dashboard.</span>");
