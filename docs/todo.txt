@@ -1,14 +1,12 @@
 ##############################################
 ####################  TODO:
 1. allow employees access to dashboard
-    - update current stores ACLs!
     - orignal store owner always have full admin access
         + if their account has an employee, the ACL cannot be changed!
 
 ##############################################
 ####################  TEST (ADD/FIX):
 1. reset redemption count (rewad edit)
-2. username is same as email (signup)
 3. ACL - login, page access, etc. (this is a LOT)
 
 #######

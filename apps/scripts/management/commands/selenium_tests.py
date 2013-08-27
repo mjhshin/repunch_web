@@ -30,12 +30,12 @@ class Command(BaseCommand):
         ####### DASHBOARD
         
         #### MY ACCOUNT
-        results.extend(test_edit_store_details())
-        results.extend(test_edit_account())
-        results.extend(test_cancel_account())
+        #results.extend(test_edit_store_details())
+        #results.extend(test_edit_account())
+        #results.extend(test_cancel_account())
         
         ### REWARDS
-        results.extend(test_rewards())
+        #results.extend(test_rewards())
         
         ### ANALYSIS
         #results.extend(test_trends()) TODO 
@@ -43,14 +43,14 @@ class Command(BaseCommand):
         #results.extend(test_reward_redemptions()) TODO 
         
         ### MESSAGES
-        results.extend(test_messages())
+        #results.extend(test_messages())
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
         #results.extend(test_employees()) # TODO FINISH
         
         ### SETTINGS
-        results.extend(test_settings())
+        #results.extend(test_settings())
         
         ### WORKBENCH
         #results.extend(test_punch()) TODO 
