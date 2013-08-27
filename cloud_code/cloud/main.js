@@ -1074,7 +1074,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			    executePushReward();
 				
 			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
-					addFacebookPostToPatron();
+					addFacebookPostToPatron(redeemReward);
 				} else {
 					postToServer(redeemReward);
 				}
@@ -1177,7 +1177,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		});
 	}
 	
-	function addFacebookPostToPatron()
+	function addFacebookPostToPatron(redeemReward)
 	{
 		var freeFacebookPunches = store.get("punches_facebook");
 	
