@@ -32,15 +32,15 @@ def activate(request):
     """
     data = str(request.method)
     if request.method == "POST":
-        data = data + " POST 1"
+        data = data + ", " + request.POST['store_id']
         store_id = request.POST['store_id']
-        data = data + " POST 2"
+        data = data + ", " + request.POST['act_id']
         act_id = request.POST['act_id']
         data = data + " AccountActivate"
         act = AccountActivate.objects.filter(id=act_id,
                 store_id=store_id)
         if len(act) > 0:
-            data = data + " acts > 0"
+            data = data + ", acts > 0"
             act = act[0]
             if not act.is_used: # exist and unused!
                 act.is_used = True
@@ -49,12 +49,18 @@ def activate(request):
                 if store:
                     store.active = True
                     store.update()
+                    send_mail("ACTIVATE", data, "vandolf@repunch.com", 
+                            ["vandolf@repunch.com",], fail_silently=True)
                     return HttpResponse(store.get(\
                         "store_name").capitalize() +\
                         " has been activated.")
                 else:
+                    send_mail("ACTIVATE", data, "vandolf@repunch.com", 
+                            ["vandolf@repunch.com",], fail_silently=True)
                     return HttpResponse("Account/store not found.")    
             else: # used
+                send_mail("ACTIVATE", data, "vandolf@repunch.com", 
+                        ["vandolf@repunch.com",], fail_silently=True)
                 return HttpResponse("This form has already "+\
                     "been used.")  
     
