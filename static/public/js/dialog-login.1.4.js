@@ -67,7 +67,7 @@ $(document).ready(function(){
                 messageContainer.html("<span name='incorrect'>Please enter your email.</span>");
                 return false;
             }
-	    } if (unLength > 0 && pwLength == 0) {
+	    } else if (unLength > 0 && pwLength == 0) {
 	        signInButton.attr("disabled", "disabled");
 	        signInButton.removeClass("active").addClass("disabled");
 	        if (submit) {
@@ -76,7 +76,6 @@ $(document).ready(function(){
                 return false;
             }
 	    } else {
-	        alert("YO");
 	        signInButton.removeAttr("disabled");
 	        signInButton.removeClass("disabled").addClass("active");
 	        if (submit) {
@@ -104,7 +103,7 @@ $(document).ready(function(){
     $("#forgot-pass-form input[type=submit]").click(function(){
         // make the ajax call
         $.post($("#forgot-pass-form input[name=action]").val(), 
-                    $("#forgot-pass-form").serialize(), function(res){
+                $("#forgot-pass-form").serialize(), function(res){
             if (res.res){
                 $("#forgot-pass-form").html("<span style='color:green;'>Password Reset form sent.</span>");
             } else {
@@ -191,26 +190,25 @@ $(document).ready(function(){
         return false;
     }
     
+    var submitEvent = {data:{submit:true}};
+    
     // LOGIN
     signInButton.click(function(){
-        if (!signInButton.hasClass("active")) {
+        if (!validateInputs(submitEvent)) {
             return false;
         }
-        
-        executeSignIn();
-        
+        return executeSignIn();
     });
     
-    
-	
-	// handle the enter key
+    // handle the enter key
 	$("#dialog-login-form").keypress(function(event) {
         if (event.which == 13) {
             event.preventDefault();
-            if (!signInButton.hasClass("active")) {
+            
+            if (!validateInputs(submitEvent)) {
                 return false;
             }
-            executeSignIn();
+            return executeSignIn();
         }
     });
     
