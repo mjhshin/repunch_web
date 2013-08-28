@@ -44,7 +44,7 @@
 		
 		{% if not is_new and reward %}
 		<div class="input-container clearheight" id="redemption_count">
-			<label >Redeemed: {{ reward.redemption_count }} times  </label>
+			<label >Redeemed: {{ reward.redemption_count }} time{% if reward.redemption_count != 1 %}s{% endif %}  </label>
 			<label id="reset_red_count_label" for="reset_red_count">
 			    Reset Redemption Count</label>
 	        <input id="reset_red_count" name="reset_red_count"

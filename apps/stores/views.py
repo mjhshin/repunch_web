@@ -52,7 +52,7 @@ def edit(request):
     
     def common(form):
         hours_map = {}
-        # group up the days that aare in the same row
+        # group up the days that are in the same row
         if store.get("hours"):
             for hour in store.get("hours"):
                 key = (hour['close_time'], hour['open_time'])

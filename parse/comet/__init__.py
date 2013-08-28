@@ -94,6 +94,7 @@ def comet_receive(store_id, postDict):
         # MESSAGE SENT ##################################
         # need to check if this new message is an original message 
         # or a reply to a feedback (the message sent by the patron)!
+        # also may increment the message count!
         newMessage = postDict.get("newMessage")
         if newMessage:
             messages_received_ids =\
@@ -106,6 +107,9 @@ def comet_receive(store_id, postDict):
             if m.objectId not in messages_sent_ids and\
                 m.message_type != FEEDBACK:
                 messages_sent_list.insert(0, m)
+                if 'message_count' in session:
+                    session['message_count'] =\
+                        int(session['message_count']) + 1
             # update an existing feedback
             if m.objectId in messages_received_ids and\
                 m.message_type == FEEDBACK:
@@ -117,7 +121,6 @@ def comet_receive(store_id, postDict):
             session['messages_received_list'] =\
                 messages_received_list
             session['messages_sent_list'] = messages_sent_list
-          
         
         #############################################################
         # EMPLOYEES_PENDING ##################################
