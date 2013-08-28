@@ -21,7 +21,7 @@ $(document).ready(function(){
 	    
 	$( "#header-signin-btn" ).click(function() {
 		$( "#dialog-login" ).dialog( "open" );
-		$("#id_username").focus();
+		$("#login_username").focus();
 		return false;
 	});
 	
@@ -31,8 +31,8 @@ $(document).ready(function(){
     var fpdiv = $("#forgot-pass-form-div");
     var messageContainer = $("#dialog-login-message");
 	
-    var username = $("#id_username");
-    var password = $("#id_password");
+    var username = $("#login_username");
+    var password = $("#login_password");
 	
 	// initialize the signin button
 	var signInButton = $("#dialog-login-form input[type=submit]");
@@ -86,7 +86,7 @@ $(document).ready(function(){
 	}
 	
 	// add the listeners to username and password fields
-	$("#id_username, #id_password").keyup({submit:false}, validateInputs);
+	$("#login_username, #login_password").keyup({submit:false}, validateInputs);
 	
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
@@ -147,13 +147,13 @@ $(document).ready(function(){
                 finish(dim);
             } else if (res.code == 2){
                 messageContainer.html("<span>Your account is not active.</span>");
-                $("#id_password").removeClass("input-text-error");
+                $("#login_password").removeClass("input-text-error");
                 loading.hide();
                 finish(320);
             } else if (res.code == 1){
                 //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
                 messageContainer.html("<span name='incorrect'>Incorrect email or password.</span>");
-                var pass = $("#id_password");
+                var pass = $("#login_password");
                 pass.addClass("input-text-error");
                 pass.val('');
                 pass.focus();
@@ -161,19 +161,19 @@ $(document).ready(function(){
                 finish(320);
             } else if (res.code == 4){
                 messageContainer.html("<span name='incorrect'>You do not have permission to access the dashboard.</span>");
-                $("#id_password").removeClass("input-text-error");
+                $("#login_password").removeClass("input-text-error");
                 loading.hide();
                 finish(340);
             } else if (res.code == 5){
                 messageContainer.html("<span name='incorrect'>You are not yet approved.</span>");
-                $("#id_password").removeClass("input-text-error");
+                $("#login_password").removeClass("input-text-error");
                 loading.hide();
                 finish(320);
             } else {
                 // same as 1 but may want to change later
                 //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
                 messageContainer.html("<span name='incorrect'>Incorrect email or password.</span>");
-                var pass = $("#id_password");
+                var pass = $("#login_password");
                 pass.addClass("input-text-error");
                 pass.val('');
                 pass.focus();
@@ -182,7 +182,7 @@ $(document).ready(function(){
             }
         }).fail(function(){  // should not go here unless server error
             messageContainer.html("<span name='incorrect'>Error. Please try again.</span>");
-            $("#id_password").removeClass("input-text-error");
+            $("#login_password").removeClass("input-text-error");
             loading.hide();
             finish(320);
         });

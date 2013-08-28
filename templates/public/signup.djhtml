@@ -4,8 +4,9 @@
 {% block title %}Sign-up{% endblock %}
 
 {% block styles %}
-<link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
-<style>select { margin-top:2px; }</style>
+<style>
+select { margin-top:2px; }
+</style>
 {% endblock %}
 
 {% block javascript %}
@@ -23,9 +24,7 @@ $(document).ready(function(){
     $("#Ph2").val(p_num.substring(3,6));
     $("#Ph3").val(p_num.substring(6,10));
     
-    $( ".question_mark" ).tooltip({
-      track: true
-    });
+    $(".question_mark").tooltip();
     
     {# inialize categories content if available #}
     {% if category_names %}

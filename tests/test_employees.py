@@ -366,21 +366,21 @@ def test_employees():
     return test.tear_down() 
     
     
-# TODO
 TEST_EMPLOYEE = {
-    "username": "clothing@vandolf.com",
+    "username": "employee@vandolf.com",
     "password": "123456",
 }
-    
     
 def test_employee_access():
     """
     Tests for employee dashboard access.
+    This tests any user with ACL of ACCESS_PUNCHREDEEM and NO_ACCESS.
+    Tests for ACCESS_ADMIN are not necessary since all other tests
+    involving the store owner covers it.
     """
-    # TODO test employee graph
     
     # delete the employees and associated User objects in the relation
-    account = Account.objects().get(username=TEST_EMPLOYEE['username'],
+    account = Account.objects().get(email=TEST_USER['email'],
         include="Store.Settings")
     store = account.store
     settings = store.settings
@@ -390,35 +390,7 @@ def test_employee_access():
         for emp in emps:
             Account.objects().get(Employee=emp.objectId).delete()
             emp.delete()
-    
-    store.set("employees", None)  
-    
-    test = SeleniumTest()
-    parts = [
-        {"test_name" : "User needs to be logged in to access page"},
-        
-    ]
-    section = {
-        "section_name":\
-            "Employee dashboard access working as expected?",
-        "parts": parts,
-    }
-    test.results.append(section)
-    
-    ##########  User needs to be logged in to access page
-    test.open(reverse("store_index")) # ACTION!
-    sleep(1)
-    parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=" + reverse("employees_index"))
-        
-    # login
-    selectors = (
-        ("#id_username", TEST_EMPLOYEE['username']),
-        ("#id_password", TEST_EMPLOYEE['password']),
-        ("", Keys.RETURN)
-    )
-    test.action_chain(0, selectors, "send_keys") # ACTION!
-    sleep(5) 
+    store.set("employees", None) 
     
     def register_employee(first_name, last_name, username=None, 
         password=None, email=None, retailer_pin=None):
@@ -439,7 +411,109 @@ def test_employee_access():
             "password": password,
             "email": email,
             "retailer_pin": retailer_pin,
-        })
+        }) 
+        
+    # register the test employee
+    register_employee("employee", "empy", username=TEST_EMPLOYEE[\
+        'username'], email=TEST_EMPLOYEE[\
+        'username'], password=TEST_EMPLOYEE['password'])
+    
+    test = SeleniumTest()
+    parts = [
+        {"test_name" : "Pending employee has no access"},
+        {"test_name" : "Approved employee initially has no access"},
+        {"test_name" : "Employee with ACCESS_NONE cannot login " +\
+            "using  the login dialog",
+        {"test_name" : "Employee with ACCESS_NONE cannot login " +\
+            "using the dedicated login page"},
+        {"test_name" : "Employee with ACCESS_PUNCHREDEEM can " +\
+            "login to the dashboard through the login dialog"},
+        {"test_name" : "Employee with ACCESS_PUNCHREDEEM can " +\
+            "login to the dashboard through the dedicated dialog pg"},
+            
+        {"test_name" : "My Account accessible"},
+        {"test_name" : "No edit store detail button"},
+        {"test_name" : "Requesting edit store detail through url " +\
+            "redirects user to store details"},
+        {"test_name" : "No update account button"},
+        {"test_name" : "Requesting update account through url " +\
+            "redirects user to store details"},
+        {"test_name" : "No cancel my account button"},
+        {"test_name" : "Requesting cancel my account through url " +\
+            "redirects user to store details"},
+            
+        {"test_name" : "Rewards accessible"},
+        {"test_name" : "No create new reward button"},
+        {"test_name" : "Requesting create new reward through url " +\
+            "redirects user to rewards index"},
+        {"test_name" : "Rewards are not clickable"},
+        {"test_name" : "Requesting edit reward through url " +\
+            "redirects user to rewards index"},
+            
+        {"test_name" : "Messages accessible"},
+        {"test_name" : "No create new message button"},
+        {"test_name" : "Requesting create new message through url " +\
+            "redirects user to messages index"},
+        {"test_name" : "Sent messages are viewable"},
+        {"test_name" : "Feedbacks are viewable"},
+        {"test_name" : "No reply button"},
+        {"test_name" : "Requesting reply through url " +\
+            "redirects user to messages index"},
+        {"test_name" : "No delete message button"},
+        {"test_name" : "Requesting delete message through url " +\
+            "redirects user to messages index"}
+        
+        {"test_name" : "Analysis accessible"},
+        
+        {"test_name" : "Employees accessible"},
+        {"test_name" : "Approved employees are not clickable"},
+        {"test_name" : "Requesting edit employee through url " +\
+            "redirects user to employees index"},
+        {"test_name" : "No remove button in approved employees"},
+        {"test_name" : "Requesting remove employee through url " +\
+            "redirects user to employees index"},
+        {"test_name" : "No deny button in pending employees"},
+        {"test_name" : "Requesting deny employee through url " +\
+            "redirects user to employees index"},
+        {"test_name" : "No approve button in pending employees"},
+        {"test_name" : "Requesting approve employee through url " +\
+            "redirects user to employees index"},
+        
+        {"test_name" : "Settings accessible"},
+        {"test_name" : "No refresh button for retailer pin"},
+        {"test_name" : "Requesting refresh through url returns " +\
+            "a json object with error Permission denied"},
+        {"test_name" : "Punches employee is readonly"},
+        {"test_name" : "Punches facebook is readonly"},
+        {"test_name" : "No save button"},
+        {"test_name" : "No cancel changes button"},
+            
+        {"test_name" : "Workbench accessible"},
+        {"test_name" : "Employee can punch"},
+        {"test_name" : "Employee can reject redeem"},
+        {"test_name" : "Employee can validate redeem"},
+        
+    ]
+    section = {
+        "section_name":\
+            "Employee dashboard access working as expected?",
+        "parts": parts,
+    }
+    test.results.append(section)
+    
+    ##########  User needs to be logged in to access page
+    test.open(reverse("employees_index")) # ACTION!
+    sleep(1)
+        
+    # login
+    selectors = (
+        ("#id_username", TEST_EMPLOYEE['username']),
+        ("#id_password", TEST_EMPLOYEE['password']),
+        ("", Keys.RETURN)
+    )
+    test.action_chain(0, selectors, "send_keys") # ACTION!
+    sleep(5) 
+    
         
         
     

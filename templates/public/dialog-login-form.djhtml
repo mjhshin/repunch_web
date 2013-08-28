@@ -5,12 +5,12 @@
     <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
 
     {# Simply using email as the username as well #}
-	<p><label for="id_username">Email:</label> 
+	<p><label for="login_username">Email:</label> 
 	{# the redirect url to prevent hard-coding anything #}
-	<input type="text" name="username" id="id_username"></p>
+	<input type="text" name="username" id="login_username"></p>
 	
-	<p><label for="id_password">Password:</label> 
-	<input type="password" name="password" id="id_password"></p>
+	<p><label for="login_password">Password:</label> 
+	<input type="password" name="password" id="login_password"></p>
 	
 	<div id="dialog-login-message"></div>
 	
