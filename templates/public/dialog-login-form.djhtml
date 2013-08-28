@@ -16,7 +16,16 @@
 	
 	<input type="submit" value="Sign in" />
 	<div id="stay-signed-in">
-	<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label for="stay_in">&nbsp;Stay signed in?</label>
+	<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label id="stay_in_label" for="stay_in">&nbsp;Stay signed in?</label>
+	<!-- The below script fixes the internet explorer bug where the label or the checkbox cannot be clicked -->
+	<script>
+	function toggleStayIn(){
+	    var stayIn = document.getElementById("stay_in");
+	    stay_in.checked = !stay_in.checked;
+	}
+	document.getElementById("stay_in").onclick = toggleStayIn;
+	document.getElementById("stay_in_label").onclick = toggleStayIn;
+	</script>
 	</div>
 	
     <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="logging in..."

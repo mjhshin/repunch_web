@@ -228,7 +228,7 @@ a.button.orange{
 }
 
 #forgot-pass-form-div input[type=submit]:hover{
-    background-color: #427edd;
+    background-color: #ccc;
 }
 
 #forgot-pass-form a:hover {
