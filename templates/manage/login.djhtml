@@ -16,7 +16,9 @@
 	<div id="site-frame" style="width:330px;">
 		<div id="header" style="width:330px;margin-left:auto; margin-right:auto;">
 			<div id="header-left">
+			    <a href="{% url 'public_home' %}">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
+				</a>
 			</div>
 		</div>
 		<div id="content-frame">

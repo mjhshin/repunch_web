@@ -130,6 +130,12 @@ a.button.orange{
 }
 
 /** login dialog styles **/
+.input-text-error {
+    outline: none;
+    border-color: #dd4b39;
+    box-shadow: 0 0 10px #dd4b39;
+}
+
 #dialog-login {
 	background: url("../images/bkg_content.png") repeat scroll left top white;
 }
@@ -141,11 +147,13 @@ a.button.orange{
 
 .ui-widget-header.ui-dialog-titlebar {
 	background: url("../images/bkg_header.png") repeat-x scroll left bottom white;
+	color: #444; 
     border-bottom: 1px solid #CCCCCC;
     height: 25px;
     line-height: 25px;
     padding: 0 15px;
 }
+
 #dialog-login-form p{ margin: 0px 0px 10px 0px; }
 
 #dialog-login-form label{
@@ -156,7 +164,7 @@ a.button.orange{
 	margin: 15px 0 10px;
 }
 
-#dialog-login-form input{
+#dialog-login-form input {
 	height:28px; width:268px;
 	border:1px solid #CCC;
 	border-radius: 4px;
@@ -201,7 +209,26 @@ a.button.orange{
 }
 
 #forgot-pass-form-div {
-    margin-top:6px;
+    margin-top:6px; 
+}
+
+#forgot-pass-form-div input {
+	height:22px; width:180px;
+	border:1px solid #CCC;
+	border-radius: 4px;
+	padding: 0 6px;
+	font-size:14px;
+	color:#666;
+    margin-right:10px;
+}
+
+#forgot-pass-form-div input[type=submit] {
+    width:60px;
+    font-weight:bold;
+}
+
+#forgot-pass-form-div input[type=submit]:hover{
+    background-color: #427edd;
 }
 
 #forgot-pass-form a:hover {
