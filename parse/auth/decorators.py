@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.sessions.backends.cache import SessionStore
 from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
 from django.utils.decorators import available_attrs
 
@@ -38,6 +39,10 @@ def user_passes_test(test_func, login_url, redirect_field_name,
                     # goes here if the session has been flushed and
                     # a request attempts to access a flushed key
                     # e.g. request.session['account']
+                    
+                    # make sure that the session before returning 
+                    # is empty
+                    request.session.flush()
                     return redirect(reverse("manage_login"))
                 
             # if http_response is provided and content_type is json
