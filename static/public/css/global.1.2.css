@@ -173,7 +173,8 @@ a.button.orange{
 	color:#666;
 }
 
-#dialog-login-form input[type=submit] {
+#dialog-login-form input[type=submit].active,
+#dialog-login-form input[type=submit].disabled {
     position:relative; top:10px;
     width:80px;
     font-weight:bold;
@@ -181,8 +182,17 @@ a.button.orange{
     border:1px solid #3079ed;
 }
 
-#dialog-login-form input[type=submit]:hover{
+#dialog-login-form input[type=submit].active:hover{
     background-color: #427edd;
+}
+
+#dialog-login-form input[type=submit].disabled {
+    background-color: #ccc; color: white;
+    border:1px solid #bbb;
+}
+
+#dialog-login-form input[type=submit].disabled:hover{
+    background-color: #ccc;
 }
 
 #stay-signed-in input[type=checkbox]{

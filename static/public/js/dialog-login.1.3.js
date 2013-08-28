@@ -4,7 +4,7 @@
 
 $(document).ready(function(){
 
-    //login dialog
+    // prep the login dialog
 	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
 	    title: "Business Sign In",
 	    show: {
@@ -24,13 +24,71 @@ $(document).ready(function(){
 		$("#id_username").focus();
 		return false;
 	});
-
-    ////////////////////////////////
+	
+	
     var dl = $( "#dialog-login" );
     var loadingHeight = 10;
     var fpdiv = $("#forgot-pass-form-div");
     var messageContainer = $("#dialog-login-message");
+	
+    var username = $("#id_username");
+    var password = $("#id_password");
+	
+	// initialize the signin button
+	var signInButton = $("#dialog-login-form input[type=submit]");
+    signInButton.attr("disabled", "disabled");
+    signInButton.removeClass("active").addClass("disabled");
+        
+    function finish(dim){
+        if (fpdiv.css("display") != "none"){
+            dl.dialog( "option", "height", dim + 50 );
+        } else {
+            dl.dialog( "option", "height", dim );
+        }
+    }
     
+    function validateInputs(event) {
+        var submit = event.data.submit;
+	    var unLength = $.trim(username.val()).length;
+	    var pwLength = $.trim(password.val()).length;
+	    if (unLength == 0 && pwLength == 0) {
+	        signInButton.attr("disabled", "disabled");
+	        signInButton.removeClass("active").addClass("disabled");
+	        if (submit) {
+	            finish(320);
+                messageContainer.html("<span name='incorrect'>Enter your email and password.</span>");
+                return false;
+            }
+	    } else if (unLength == 0 && pwLength > 0) {
+	        signInButton.attr("disabled", "disabled");
+	        signInButton.removeClass("active").addClass("disabled");
+	        if (submit) {
+	            finish(320);
+                messageContainer.html("<span name='incorrect'>Please enter your email.</span>");
+                return false;
+            }
+	    } if (unLength > 0 && pwLength == 0) {
+	        signInButton.attr("disabled", "disabled");
+	        signInButton.removeClass("active").addClass("disabled");
+	        if (submit) {
+	            finish(320);
+                messageContainer.html("<span name='incorrect'>Please enter your password.</span>");
+                return false;
+            }
+	    } else {
+	        alert("YO");
+	        signInButton.removeAttr("disabled");
+	        signInButton.removeClass("disabled").addClass("active");
+	        if (submit) {
+	            return true;
+	        }
+	    }
+	    
+	}
+	
+	// add the listeners to username and password fields
+	$("#id_username, #id_password").keyup({submit:false}, validateInputs);
+	
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
         if (fpdiv.css("display") != "none"){
@@ -58,9 +116,7 @@ $(document).ready(function(){
         return false;
     });
     
-    // LOGIN
-    $("#dialog-login-form input[type=submit]").click(function(){
-    
+    function executeSignIn() {
         var loading = $("#logging-in");
         // prevent multiple button clicks
         if (loading.css("display") != "none"){
@@ -72,14 +128,6 @@ $(document).ready(function(){
         
         var url = $("#dialog-login input[name=action]").val();
         var data = $("#dialog-login-form").serialize();
-        
-        function finish(dim){
-            if (fpdiv.css("display") != "none"){
-                dl.dialog( "option", "height", dim + 50 );
-            } else {
-                dl.dialog( "option", "height", dim );
-            }
-        }
         
         // make the login request to the server
         // if success, redirect to store index page
@@ -141,6 +189,29 @@ $(document).ready(function(){
         });
         
         return false;
+    }
+    
+    // LOGIN
+    signInButton.click(function(){
+        if (!signInButton.hasClass("active")) {
+            return false;
+        }
+        
+        executeSignIn();
+        
+    });
+    
+    
+	
+	// handle the enter key
+	$("#dialog-login-form").keypress(function(event) {
+        if (event.which == 13) {
+            event.preventDefault();
+            if (!signInButton.hasClass("active")) {
+                return false;
+            }
+            executeSignIn();
+        }
     });
     
 });
