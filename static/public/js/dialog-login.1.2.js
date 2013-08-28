@@ -4,6 +4,27 @@
 
 $(document).ready(function(){
 
+    //login dialog
+	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
+	    title: "Business Sign In",
+	    show: {
+            effect: "slide",
+            duration: 300
+        },
+	    hide: {
+            effect: "slide",
+            duration: 300
+        },
+	    minWidth: 330, minHeight: 316,
+	    maxWidth: 330, maxHeight: 350,
+	    height: 310, width: 330 });
+	    
+	$( "#header-signin-btn" ).click(function() {
+		$( "#dialog-login" ).dialog( "open" );
+		return false;
+	});
+
+    ////////////////////////////////
     var dl = $( "#dialog-login" );
     var loadingHeight = 10;
     var fpdiv = $("#forgot-pass-form-div");

@@ -28,6 +28,14 @@ $(document).ready(function(){
     $( "#dialog-signup" ).dialog({ autoOpen: false, modal: true, 
         beforeClose: function(event, ui) { return false; }, 
         title: "Signing up",
+	    show: {
+            effect: "slide",
+            duration: 300
+        },
+	    hide: {
+            effect: "slide",
+            duration: 300
+        },
         resizable: false,
         minWidth: 330, minHeight: 120,
         maxWidth: 330, maxHeight: 120, });
