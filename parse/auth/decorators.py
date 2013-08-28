@@ -4,6 +4,8 @@ A modified version of django.contrib.auth.decorators.login_required
 
 import urlparse, json
 from functools import wraps
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from django.conf import settings
@@ -30,7 +32,13 @@ def user_passes_test(test_func, login_url, redirect_field_name,
                 # to cyclic imports
                 timezone.activate(SESSION.get_store_timezone(\
                     request.session))
-                return view_func(request, *args, **kwargs)
+                try:
+                    return view_func(request, *args, **kwargs)
+                except KeyError:
+                    # goes here if the session has been flushed and
+                    # a request attempts to access a flushed key
+                    # e.g. request.session['account']
+                    return redirect(reverse("manage_login"))
                 
             # if http_response is provided and content_type is json
             # and request.is_ajax then this request if from comet.js
