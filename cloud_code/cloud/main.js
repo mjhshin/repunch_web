@@ -1295,7 +1295,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         message = messageResult;
         if (message.get("message_type") == "offer") {
             redeem_available = "yes";
-        } else { // message is a feedback
+        } else {
             redeem_available = "no";
         }
     }, function(error) {
@@ -1304,23 +1304,22 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 
     }).then(function() {
         if (filter === "one"){
-            console.log("Filter is one, this is a reply.");
             patronQuery.get(request.params.patron_id).then(function(patron) {
                 patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.first().then(function(pst) {
-                    var arr = new Array(pst);
+                patronStoreQuery.first().then(function(patronStore) {
                     receiver_count = 1;
-                    addToPatronsInbox(arr);
+                    return addToPatronsInbox(new Array(patronStore));
+                }).then(function() {
+                    console.log("Feedback message status created. Proceeding to push.");
+                    proceedToPush();
                 });
             });
             
         } else {
-            if (filter === "idle") {     
-                console.log("Filter is idle");
+            if (filter === "idle") {
                 patronStoreQuery.lessThan("updatedAt", 
                     new Date(request.params.idle_date) );
             } else if (filter === "most_loyal") {
-                console.log("Filter is modt_loyal");
                 patronStoreQuery.descending("all_time_punches");
                 patronStoreQuery.limit(request.params.num_patrons);
             }  
@@ -1328,44 +1327,54 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             patronStoreQuery.select("Patron");
             patronStoreQuery.find().then(function(patronStores) {
                 receiver_count = patronStores.length;
-                addToPatronsInbox(patronStores);
+                return addToPatronsInbox(patronStores);
+            }).then(function() {
+                console.log("All message status created. Proceeding to push.");
+                proceedToPush();
             });
             
         }
         
     });
     
-    function addToPatronsInbox(patronStores) {
-        if (patronStores.length == 0) { 
-            proceedToPush();
-            return;
-        }
-        
-        var pt = patronStores.pop();
-        var pat = pt.get("Patron");
-        
-        if(pat == null) {
-            return addToPatronsInbox(patronStores);
-        }
-        
-        patron_ids.push(pat.id);
-        
-        console.log("Processing patronStore with id: " + pt.id);
-        var rel = pat.relation("ReceivedMessages"); 
+    function createMessageStatus(patron) { 
+        var promise = new Parse.Promise();
+        var receivedMessages = patron.relation("ReceivedMessages"); 
 	    var messageStatus = new MessageStatus();
         messageStatus.set("Message", message);
         messageStatus.set("is_read", false);
         messageStatus.set("redeem_available", redeem_available);
         messageStatus.save().then(function(messageStatusResult) {
-            rel.add(messageStatusResult);
-            pat.save().then(function() {
-                // chain method call
-                addToPatronsInbox(patronStores);
+            receivedMessages.add(messageStatusResult);
+            patron.save().then(function() {
+                promise.resolve();
             });
         }, function(error) {
-            // should not stop just because 1 or more failed
-            addToPatronsInbox(patronStores);
+            // promise should still resolve
+            promise.resolve();
         });
+        
+        return promise;
+    }
+    
+    function addToPatronsInbox(patronStores) {
+        var promises = [];
+        // for some reason _.each says patronStores is undefined
+        // also do not use for var i in array method- good ol' var i=0 is best
+        for (var i=0; i < patronStores.length; i++) {
+            var patron = patronStores[i].get("Patron");
+            // there should not be any null patrons
+            // null patrons will cause receiver_count to not match len of patron_ids
+            if(patron == null) {
+                console.log("PatronStore with id: " + patronStores[i].id + " has a null patron");
+            } else {
+                patron_ids.push(patron.id);
+                console.log("Processing patronStore with id: " + patronStores[i].id);
+                promises.push(createMessageStatus(patron));
+            }
+        }
+        
+        return Parse.Promise.when(promises);
     }
     
     function proceedToPush() { 
