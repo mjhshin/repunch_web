@@ -9,7 +9,7 @@
 	<link href="{% static 'manage/css/login.css' %}" rel="stylesheet" />   
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'public/js/dialog-login.1.7.js' %}" type="text/javascript"></script>
+    <script src="{% static 'public/js/dialog-login.1.8.js' %}" type="text/javascript"></script>
 	
 </head>
 <body>

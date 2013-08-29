@@ -134,6 +134,8 @@ $(document).ready(function(){
         }
         // show the loading indicator
         dl.dialog( "option", "height", dl.dialog( "option", "height") + loadingHeight );
+        // need to make sure that dialog stays at the same position
+        dl.dialog("widget").css({top: origTop});
         loading.show();
         
         var url = $("#dialog-login input[name=action]").val();
