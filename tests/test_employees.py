@@ -526,307 +526,307 @@ def test_employee_access():
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[1]['test_message'] = str(e)
     ##########  Employee with ACCESS_NONE cannot login 
     ###         using  the login dialog  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[2]['test_message'] = str(e)
     ##########  Employee with ACCESS_NONE cannot login 
     ###         using the dedicated login page  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[3]['test_message'] = str(e)
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[4]['test_message'] = str(e)
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the dedicated dialog pg  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[5]['test_message'] = str(e)
         
     ##########  My Account accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[6]['test_message'] = str(e)
     ##########  No edit store detail button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[7]['test_message'] = str(e)
     ##########  Requesting edit store detail through url 
     ###         redirects user to store details  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[8]['test_message'] = str(e)
     ##########  No update account button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[9]['test_message'] = str(e)
     ##########  Requesting update account through url 
     ###         redirects user to store details  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[10]['test_message'] = str(e)
     ##########  No cancel my account button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[11]['test_message'] = str(e)
     ##########  Requesting cancel my account through url 
     ###         redirects user to store details  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[12]['test_message'] = str(e)
         
     ##########  Rewards accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[13]['test_message'] = str(e)
     ##########  No create new reward button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[14]['test_message'] = str(e)
     ##########  Requesting create new reward through url 
     ###         redirects user to rewards index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[15]['test_message'] = str(e)
     ##########  Rewards are not clickable  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[16]['test_message'] = str(e)
     ##########  Requesting edit reward through url 
     ###         redirects user to rewards index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[17]['test_message'] = str(e)
         
     ##########  Messages accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[18]['test_message'] = str(e)
     ##########  No create new message button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[19]['test_message'] = str(e)
     ##########  Requesting create new message through url 
     ###         redirects user to messages index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[20]['test_message'] = str(e)
     ##########  Sent messages are viewable  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[21]['test_message'] = str(e)
     ##########  Feedbacks are viewable  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[22]['test_message'] = str(e)
     ##########  No reply button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[23]['test_message'] = str(e)
     ##########  Requesting reply through url 
     ###         redirects user to messages index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[24]['test_message'] = str(e)
     ##########  No delete message button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[25]['test_message'] = str(e)
     ##########  Requesting delete message through url 
     ###         redirects user to messages index  TODO 
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[26]['test_message'] = str(e)
     
     ##########  Analysis accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[27]['test_message'] = str(e)
     
     ##########  Employees accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[28]['test_message'] = str(e)
     ##########  Approved employees are not clickable  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[29]['test_message'] = str(e)
     ##########  Requesting edit employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[30]['test_message'] = str(e)
     ##########  No remove button in approved employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[31]['test_message'] = str(e)
     ##########  Requesting remove employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[32]['test_message'] = str(e)
     ##########  No deny button in pending employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[33]['test_message'] = str(e)
     ##########  Requesting deny employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[34]['test_message'] = str(e)
     ##########  No approve button in pending employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[35]['test_message'] = str(e)
     ##########  Requesting approve employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[36]['test_message'] = str(e)
     
     ##########  Settings accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[37]['test_message'] = str(e)
     ##########  No refresh button for retailer pin  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[38]['test_message'] = str(e)
     ##########  Requesting refresh through url returns 
     ###         a json object with error Permission denied  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[39]['test_message'] = str(e)
     ##########  Punches employee is readonly  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[40]['test_message'] = str(e)
     ##########  Punches facebook is readonly  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[41]['test_message'] = str(e)
     ##########  No save button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[42]['test_message'] = str(e)
     ##########  No cancel changes button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[43]['test_message'] = str(e)
         
     ##########  Workbench accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[44]['test_message'] = str(e)
     ##########  Employee can punch  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[45]['test_message'] = str(e)
     ##########  Employee can reject redeem  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[46]['test_message'] = str(e)
     ##########  Employee can validate redeem  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[0]['test_message'] = str(e)
+        parts[47]['test_message'] = str(e)
 
 
 

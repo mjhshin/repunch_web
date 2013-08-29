@@ -218,9 +218,9 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			response.success("success");
 			
 			Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + store.id,
-                headers: { 'Content-Type': 'application/json'},
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + store.id,
+                headers: { "Content-Type": "application/json"},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     pendingEmployee: employee, 
@@ -325,9 +325,9 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		
 	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: { 
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                 patronStore_num: patronStoreCount,
@@ -691,7 +691,6 @@ Parse.Cloud.define("punch", function(request, response) {
                 }
 				
 		}).then(function(patronStoreCount){
-		    console.log("Moved on to next promise.");
 		    if (isNewPatronStore) {
 		        console.log("Retrieved new PatronStore count");
 		        postBody.patronStore_num = patronStoreCount;
@@ -702,9 +701,9 @@ Parse.Cloud.define("punch", function(request, response) {
 		        console.log("Posting to server");
 		        postBody.cometrkey = "f2cwxn35cxyoq8723c78wnvy";
 		        Parse.Cloud.httpRequest({
-                    method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                    headers: { 'Content-Type': 'application/json'},
+                    method: "POST",
+                    url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                    headers: { "Content-Type": "application/json"},
                     body: postBody, 
                 });
             }
@@ -836,9 +835,9 @@ Parse.Cloud.define("request_redeem", function(request, response)
 		}).then(function() {
 		    console.log("Pushing to server");
 	        Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: {'Content-Type': 'application/json'},
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                headers: {"Content-Type": "application/json"},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     pendingRedemption: redeemReward, 
@@ -847,7 +846,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                     console.log(httpResponse.text);
                 },
                 error: function(httpResponse) {
-                    console.error('Request failed with response code ' + httpResponse.status);
+                    console.error("Request failed with response code " + httpResponse.status);
                 }
             });
             
@@ -959,9 +958,9 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	    
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                 deletedRedemption: redeemReward,
@@ -1236,9 +1235,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        postBody.updatedReward = updatedReward;
 	    }
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: postBody
         });
 	}
@@ -1382,18 +1381,18 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         message.set("receiver_count", receiver_count);
         message.save().then(function() {
             Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: { 'Content-Type': 'application/json'},
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                headers: { "Content-Type": "application/json"},
                 body: {
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     newMessage: message,
                 },
                 success: function(httpResponse) {
-                    console.error('Push to server succeeded with ' + httpResponse.text);
+                    console.error("Push to server succeeded with " + httpResponse.text);
                 },
                 error: function(httpResponse) {
-                    console.error('Push to server failed with response code ' + httpResponse.status);
+                    console.error("Push to server failed with response code " + httpResponse.status);
                 }
             });
             
@@ -1519,9 +1518,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 				
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                 newFeedback: message,
