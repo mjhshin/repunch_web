@@ -1005,6 +1005,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 	    if (!isOfferOrGift) {
 	        var reward_id = parseInt(rewardId);
+	        
 	        var rewards = store.get("rewards");
 		    // update the store's rewards redemption_count
 		    for (var i=0; i<rewards.length; i++) {
@@ -1074,8 +1075,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			Parse.Promise.when(promises).then(function()
 			{
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
-			    executePushReward();
-				
+			    
 			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
 					addFacebookPostToPatron(redeemReward);
 				} else {
@@ -1227,6 +1227,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 	function postToServer(redeemReward)
 	{
+	    executePushReward();
+	    
+	    console.log("Posting to server");
 	    var postBody = {
             "cometrkey": "f2cwxn35cxyoq8723c78wnvy",
 	        approvedRedemption: redeemReward,
