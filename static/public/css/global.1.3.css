@@ -276,6 +276,10 @@ a.button.orange{
 
 /*** page styles ***/
 /*******************/
+.repunch-blue {
+    color: #0965ad;
+}
+
 .page-title{
     color:#0a71c1;
     font-size:2.7em;
@@ -408,9 +412,14 @@ a.button.orange{
 	font-weight:normal;
 }
 
+#home-col-left h1,
+#home-col-right h1 {
+    font-size:2.4em;
+}
+
 .home-col p{
-    color:#144796;
-    font-size:18px;
+    color:#0965ad;
+    font-size:16px;
     font-weight:bold;
     line-height:21px;
 	margin:5px 0 30px;
@@ -419,6 +428,10 @@ a.button.orange{
 
 #home-col-left{
 	float:left;
+}
+
+#home-col-left p{
+    margin-top:34px;
 }
 
 #home-col-left .button.orange{
@@ -716,7 +729,7 @@ a.button.orange{
 
 #faq-content h3{
 	margin:0px;
-	color:#254d7e;
+	color:#0965ad;
 	font-size:16px;
 	line-height:20px;
 	letter-spacing:0.8px;
@@ -807,7 +820,7 @@ a.button.orange{
 }
 
 #about-content h3.content-header {
-	color:#254d7e;
+	color:#0965ad;
 	font-size:2.40em;
 	margin:8px 0px;
 }
@@ -903,11 +916,11 @@ a.button.orange{
 }
 
 #the-team-title{
-	color:#254d7e;
+	color:#0965ad;
 	margin:32px 0 25px;
 	margin-bottom:50px; margin-top:50px;
 	text-align:center;
-	font-size:2.4em;
+	font-size:3.4em;
 }
 
 .the-team-member{
