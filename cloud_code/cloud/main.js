@@ -1378,6 +1378,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     }
     
     function proceedToPush() { 
+        console.log("Pushing to server");
         message.set("receiver_count", receiver_count);
         message.save().then(function() {
             Parse.Cloud.httpRequest({
@@ -1387,8 +1388,15 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 body: {
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     newMessage: message,
+                },
+                success: function(httpResponse) {
+                    console.error('Push to server succeeded with ' + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error('Push to server failed with response code ' + httpResponse.status);
                 }
             });
+            
         }, function(error) {
             console.log("Message save failed");
         });
