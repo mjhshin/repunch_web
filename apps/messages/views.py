@@ -204,7 +204,7 @@ def edit(request, message_id):
                     
             # update store session cache
             request.session['store'] = store
-            # save the session now! cloud_call may take a bit!
+            # save session- cloud_call may take a while!
             request.session.save()
 
             # push notification
@@ -212,25 +212,16 @@ def edit(request, message_id):
             if "error" not in res and res.get("result"):
                 message.set("receiver_count",
                     res.get("result").get("receiver_count"))
+                    
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "newMessage":message.jsonify()
+            }
+            comet_receive(store.objectId, payload)
             
-            if DEBUG:
-                payload = {
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "newMessage":message.jsonify()
-                }
-                comet_receive(store.objectId, payload)
-            
+            # Note that the new message is saved in comet_receive
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
-            # update the sent messages
-            
-            # update messages_sent_list in session cache
-            messages_sent_list = SESSION.get_messages_sent_list(\
-                request.session)
-            messages_sent_list.insert(0, message)
-            request.session['messages_sent_list'] =\
-                messages_sent_list
-                        
             request.session.update(session)
 
             return HttpResponseRedirect(message.get_absolute_url())
@@ -419,12 +410,11 @@ def feedback_reply(request, feedback_id):
                 "patron_id":feedback.get('patron_id'),
             })
             
-            if DEBUG:
-                payload = {
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "newMessage":feedback.jsonify()
-                }
-                comet_receive(store.objectId, payload)
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "newMessage":feedback.jsonify()
+            }
+            comet_receive(store.objectId, payload)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)

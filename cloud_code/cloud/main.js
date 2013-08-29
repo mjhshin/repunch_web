@@ -1254,6 +1254,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 //  Patron's ReceivedMessages but rather the original message itself,
 //  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
+//  Note that this does not need to post to server because this is only called server side!
+//  Meaning the notification is done withing the server.
+//
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
    
@@ -1297,6 +1300,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         } else {
             redeem_available = "no";
         }
+            
     }, function(error) {
         console.log("Message query failed");
         response.error("error");
@@ -1306,8 +1310,10 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             patronQuery.get(request.params.patron_id).then(function(patron) {
                 patronStoreQuery.equalTo("Patron", patron);
                 patronStoreQuery.first().then(function(patronStore) {
-                    receiver_count = 1;
                     return addToPatronsInbox(new Array(patronStore));
+                }).then(function() {
+                    message.set("receiver_count", 1);
+                    return message.save();
                 }).then(function() {
                     console.log("Feedback message status created. Proceeding to push.");
                     proceedToPush();
@@ -1327,6 +1333,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             patronStoreQuery.find().then(function(patronStores) {
                 receiver_count = patronStores.length;
                 return addToPatronsInbox(patronStores);
+            }).then(function() {
+                message.set("receiver_count", receiver_count);
+                return message.save();
             }).then(function() {
                 console.log("All message status created. Proceeding to push.");
                 proceedToPush();
@@ -1377,30 +1386,6 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     }
     
     function proceedToPush() { 
-        console.log("Pushing to server");
-        message.set("receiver_count", receiver_count);
-        message.save().then(function() {
-            Parse.Cloud.httpRequest({
-                method: "POST",
-                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
-                headers: { "Content-Type": "application/json"},
-                body: {
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                    newMessage: message,
-                },
-                success: function(httpResponse) {
-                    console.error("Push to server succeeded with " + httpResponse.text);
-                },
-                error: function(httpResponse) {
-                    console.error("Push to server failed with response code " + httpResponse.status);
-                }
-            });
-            
-        }, function(error) {
-            console.log("Message save failed");
-        });
-    
-    
         if (filter === "one"){
             androidInstallationQuery.equalTo("patron_id", patronId);
 			iosInstallationQuery.equalTo("patron_id", patronId);
