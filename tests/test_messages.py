@@ -708,7 +708,7 @@ def test_feedbacks():
     ##########  Notification badge appears if there are
     ###         unread feedbacks
     try:
-        sleep(COMET_PULL_RATE + 2)
+        sleep(COMET_PULL_RATE*2 + 2)
         parts[2]['success'] = test.element_exists("#messages-nav " +\
             "a div.nav-item-badge")
     except Exception as e:

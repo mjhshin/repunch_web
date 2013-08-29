@@ -42,12 +42,12 @@ class Command(BaseCommand):
         #results.extend(test_reward_redemptions()) TODO 
         
         ### MESSAGES
-        results.extend(test_messages())
-        results.extend(test_feedbacks())
+        #results.extend(test_messages())
+        #results.extend(test_feedbacks())
         
         ### EMPLOYEE
         #results.extend(test_employees())
-        #results.extend(test_employee_access()) # TODO FINISH
+        results.extend(test_employee_access()) # TODO FINISH
         
         ### SETTINGS
         #results.extend(test_settings())

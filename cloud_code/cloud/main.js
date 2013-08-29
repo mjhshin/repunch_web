@@ -1042,7 +1042,6 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			redeemReward.set("is_redeemed", true);
 			redeemReward.save().then(function() {
 			    console.log("RedeemReward save success");
-				updateMessageStatus();
 				postToServer(redeemReward);
 			}, function(error) {
 			    console.log("RedeemReward save fail");
@@ -1227,7 +1226,11 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 	function postToServer(redeemReward)
 	{
-	    executePushReward();
+	    if(isOfferOrGift) {
+			updateMessageStatus();
+	    } else {
+	        executePushReward();
+	    }
 	    
 	    console.log("Posting to server");
 	    var postBody = {
