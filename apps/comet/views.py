@@ -453,7 +453,7 @@ def receive(request, store_id):
         try:
             postDict = json.loads(request.body)
         except Exception:
-            pass
+            return HttpResponse("error")
         
         if comet_receive(store_id, postDict):
             return HttpResponse("success")

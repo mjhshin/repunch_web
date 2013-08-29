@@ -379,6 +379,10 @@ def comet_receive(store_id, postDict):
             continue
         processCometReceivedDict(session, postDict)
         
+        # need to save session to commit modifications
+        session.modified = True
+        session.save()
+        
         # flag all threads with this session_key that new stuff
         CometSession.objects.update()
         for comet in CometSession.objects.filter(session_key=\
@@ -386,9 +390,6 @@ def comet_receive(store_id, postDict):
             comet.modified = True
             comet.save()
                     
-        # need to save session to commit modifications
-        session.modified = True
-        session.save()
         
     return True
             
