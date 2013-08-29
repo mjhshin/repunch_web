@@ -4,6 +4,8 @@
 
 $(document).ready(function(){
 
+    var origTop;
+
     // prep the login dialog
 	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
 	    title: "Business Sign In",
@@ -11,24 +13,17 @@ $(document).ready(function(){
 	    minWidth: 330, minHeight: 316,
 	    maxWidth: 330, maxHeight: 350,
 	    height: 310, width: 330,
-	    show: {
-            effect: "slideDown",
-            duration: 100,
-        },
-	    hide: {
-            effect: "slideUp",
-            duration: 100
-        },
         open: function(event, ui) {
             var self = $(this);
             var container = $(window);
-            self.dialog("widget").animate({top: (container.height()/2)-(self.outerHeight()/2), opacity:1.0}, {duration: 500});
+            origTop = (container.height()/2.0)-(self.outerHeight()/1.3);
+            self.dialog("widget").animate({top: origTop, opacity:1.0}, {duration: 300});
         },
         beforeClose: function(event, ui) {
             var self = $(this);
             var container = $(window);
-            self.dialog("widget").animate({top: -1*container.outerHeight(), opacity:0}, {duration: 500});
-        }
+            self.dialog("widget").animate({top: -1*self.outerHeight(), opacity:0}, {duration: 300});
+        },
         }).dialog("widget").css({opacity:0});
 	    
 	$( "#header-signin-btn" ).click(function() {
@@ -57,6 +52,8 @@ $(document).ready(function(){
         } else {
             dl.dialog( "option", "height", dim );
         }
+        // need to make sure that dialog stays at the same position
+        dl.dialog("widget").css({top: origTop});
     }
     
     function validateInputs(event) {
@@ -107,6 +104,8 @@ $(document).ready(function(){
         }
         // adjust the height
         dl.dialog( "option", "height", 360 );
+        // need to make sure that dialog stays at the same position
+        dl.dialog("widget").css({top: origTop});
         // show the input
         fpdiv.fadeIn(1000);
         
