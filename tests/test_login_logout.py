@@ -62,7 +62,7 @@ def test_login_dialog():
         sleep(3)
         parts[1]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
-                "The email or password you entered is incorrect."
+                "Incorrect email or password."
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
@@ -178,7 +178,7 @@ def test_login_page():
         sleep(3)
         parts[0]["success"] =\
             str(test.find("#dialog-login-message").text) ==\
-                "The email or password you entered is incorrect."
+                "Incorrect email or password."
     except Exception as e:
         print e
         parts[0]['test_message'] = str(e)
