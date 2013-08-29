@@ -35,8 +35,8 @@ def test_punch():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -67,8 +67,8 @@ def test_redemptions():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!

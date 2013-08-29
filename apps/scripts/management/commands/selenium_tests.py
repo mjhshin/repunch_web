@@ -22,10 +22,10 @@ class Command(BaseCommand):
         results = []
         
         ####### PUBLIC #########################################
-        #results.extend(test_public_pages())
-        #results.extend(test_signup())
-        #results.extend(test_login_dialog())
-        #results.extend(test_login_page())
+        results.extend(test_public_pages())
+        results.extend(test_signup())
+        results.extend(test_login_dialog())
+        results.extend(test_login_page())
         
         ####### DASHBOARD #########################################
         #### MY ACCOUNT
@@ -34,7 +34,7 @@ class Command(BaseCommand):
         #results.extend(test_cancel_account())
         
         ### REWARDS
-        results.extend(test_rewards())
+        #results.extend(test_rewards())
         
         ### ANALYSIS
         #results.extend(test_trends()) TODO

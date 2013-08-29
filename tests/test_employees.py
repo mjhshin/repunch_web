@@ -84,8 +84,8 @@ def test_employees():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -423,7 +423,7 @@ def test_employee_access():
         {"test_name" : "Pending employee has no access"},
         {"test_name" : "Approved employee initially has no access"},
         {"test_name" : "Employee with ACCESS_NONE cannot login " +\
-            "using  the login dialog",
+            "using  the login dialog"},
         {"test_name" : "Employee with ACCESS_NONE cannot login " +\
             "using the dedicated login page"},
         {"test_name" : "Employee with ACCESS_PUNCHREDEEM can " +\
@@ -461,7 +461,7 @@ def test_employee_access():
             "redirects user to messages index"},
         {"test_name" : "No delete message button"},
         {"test_name" : "Requesting delete message through url " +\
-            "redirects user to messages index"}
+            "redirects user to messages index"}, 
         
         {"test_name" : "Analysis accessible"},
         
@@ -507,8 +507,8 @@ def test_employee_access():
         
     # login
     selectors = (
-        ("#id_username", TEST_EMPLOYEE['username']),
-        ("#id_password", TEST_EMPLOYEE['password']),
+        ("#login_username", TEST_EMPLOYEE['username']),
+        ("#login_password", TEST_EMPLOYEE['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!

@@ -68,8 +68,8 @@ def test_rewards():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -386,7 +386,7 @@ def test_rewards():
         parts[21]['test_message'] = str(e)
         
     ##########  Updating a reward with the reset redemption
-    ###         count option resets the redemption count to 0 TODO
+    ###         count option resets the redemption count to 0
     try:
         # logout
         test.find("#link-logout").click()
@@ -400,8 +400,8 @@ def test_rewards():
         test.open(reverse("rewards_index")) # ACTION!
         sleep(1)
         selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
         )
         test.action_chain(0, selectors, "send_keys") # ACTION!

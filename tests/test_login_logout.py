@@ -53,8 +53,8 @@ def test_login_dialog():
     
     ##########  Wrong login credentials show error
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password'] + "sdg"),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password'] + "sdg"),
         ("", Keys.RETURN)
     )
     try:
@@ -68,13 +68,13 @@ def test_login_dialog():
         parts[1]['test_message'] = str(e)
         
     # clear the input fields
-    test.find("#id_username").clear()
-    test.find("#id_password").clear()
+    test.find("#login_username").clear()
+    test.find("#login_password").clear()
         
     ##########  Successful login redirects to dashboard
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     try:
@@ -94,8 +94,8 @@ def test_login_dialog():
     ##########  Having the stay signed in option
     ##########  sets the sessionid's cookie expiry to a number
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     try:
@@ -169,8 +169,8 @@ def test_login_page():
     
     ##########  Wrong login credentials show error
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password'] + "sdg"),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password'] + "sdg"),
         ("", Keys.RETURN)
     )
     try:
@@ -184,13 +184,13 @@ def test_login_page():
         parts[0]['test_message'] = str(e)
         
     # clear the input fields
-    test.find("#id_username").clear()
-    test.find("#id_password").clear()
+    test.find("#login_username").clear()
+    test.find("#login_password").clear()
         
     ##########  Successful login redirects to dashboard
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     try:
@@ -210,8 +210,8 @@ def test_login_page():
     ##########  Having the stay signed in option
     ##########  sets the sessionid's cookie expiry to a number
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     try:
