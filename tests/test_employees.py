@@ -353,7 +353,7 @@ def test_employees():
     try:
         for i in range(4):
             register_employee(first_name + str(i), last_name + str(i))
-        sleep(COMET_PULL_RATE*2 + 2)
+        sleep(COMET_PULL_RATE*2 + 3)
         parts[23]['success'] = len(test.find(\
             "#tab-body-pending-employees div.tr " +\
             "div.td.approve a.approve", multiple=True)) == 4
@@ -514,14 +514,83 @@ def test_employee_access():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
     
+    
+    ##########  Pending employee has no access  TODO
+    ##########  Approved employee initially has no access  TODO
+    ##########  Employee with ACCESS_NONE cannot login 
+    ###         using  the login dialog  TODO
+    ##########  Employee with ACCESS_NONE cannot login 
+    ###         using the dedicated login page  TODO
+    ##########  Employee with ACCESS_PUNCHREDEEM can 
+    ###         login to the dashboard through the login dialog  TODO
+    ##########  Employee with ACCESS_PUNCHREDEEM can 
+    ###         login to the dashboard through the dedicated dialog pg  TODO
         
+    ##########  My Account accessible  TODO
+    ##########  No edit store detail button  TODO
+    ##########  Requesting edit store detail through url 
+    ###         redirects user to store details  TODO
+    ##########  No update account button  TODO
+    ##########  Requesting update account through url 
+    ###         redirects user to store details  TODO
+    ##########  No cancel my account button  TODO
+    ##########  Requesting cancel my account through url 
+    ###         redirects user to store details  TODO
         
+    ##########  Rewards accessible  TODO
+    ##########  No create new reward button  TODO
+    ##########  Requesting create new reward through url 
+    ###         redirects user to rewards index  TODO
+    ##########  Rewards are not clickable  TODO
+    ##########  Requesting edit reward through url 
+    ###         redirects user to rewards index  TODO
+        
+    ##########  Messages accessible  TODO
+    ##########  No create new message button  TODO
+    ##########  Requesting create new message through url 
+    ###         redirects user to messages index  TODO
+    ##########  Sent messages are viewable  TODO
+    ##########  Feedbacks are viewable  TODO
+    ##########  No reply button  TODO
+    ##########  Requesting reply through url 
+    ###         redirects user to messages index  TODO
+    ##########  No delete message button  TODO
+    ##########  Requesting delete message through url 
+    ###         redirects user to messages index  TODO 
     
+    ##########  Analysis accessible  TODO
     
+    ##########  Employees accessible  TODO
+    ##########  Approved employees are not clickable  TODO
+    ##########  Requesting edit employee through url 
+    ###         redirects user to employees index  TODO
+    ##########  No remove button in approved employees  TODO
+    ##########  Requesting remove employee through url 
+    ###         redirects user to employees index  TODO
+    ##########  No deny button in pending employees  TODO
+    ##########  Requesting deny employee through url 
+    ###         redirects user to employees index  TODO
+    ##########  No approve button in pending employees  TODO
+    ##########  Requesting approve employee through url 
+    ###         redirects user to employees index  TODO
     
-    
-    
-    
-    
-    
-    
+    ##########  Settings accessible  TODO
+    ##########  No refresh button for retailer pin  TODO
+    ##########  Requesting refresh through url returns 
+    ###         a json object with error Permission denied  TODO
+    ##########  Punches employee is readonly  TODO
+    ##########  Punches facebook is readonly  TODO
+    ##########  No save button  TODO
+    ##########  No cancel changes button  TODO
+        
+    ##########  Workbench accessible  TODO
+    ##########  Employee can punch  TODO
+    ##########  Employee can reject redeem  TODO
+    ##########  Employee can validate redeem  TODO
+
+
+
+
+
+
+

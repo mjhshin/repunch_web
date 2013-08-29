@@ -898,7 +898,7 @@ def test_feedbacks():
         send_feedback("feedback #2", "body #2")
         send_feedback("feedback #3", "body #3")
         send_feedback("feedback #4", "body #4")
-        sleep(COMET_PULL_RATE*3 + 2)
+        sleep(COMET_PULL_RATE*3 + 4)
         feedbacks =\
             test.find("#tab-body-feedback div.tr a", multiple=True)
         parts[21]['success'] = len(feedbacks) == 3
