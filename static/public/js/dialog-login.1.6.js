@@ -7,17 +7,29 @@ $(document).ready(function(){
     // prep the login dialog
 	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
 	    title: "Business Sign In",
-	    show: {
-            effect: "slide",
-            duration: 300
-        },
-	    hide: {
-            effect: "slide",
-            duration: 300
-        },
+        position: { at: "top" },
 	    minWidth: 330, minHeight: 316,
 	    maxWidth: 330, maxHeight: 350,
-	    height: 310, width: 330 });
+	    height: 310, width: 330,
+	    show: {
+            effect: "slideDown",
+            duration: 100,
+        },
+	    hide: {
+            effect: "slideUp",
+            duration: 100
+        },
+        open: function(event, ui) {
+            var self = $(this);
+            var container = $(window);
+            self.dialog("widget").animate({top: (container.height()/2)-(self.outerHeight()/2), opacity:1.0}, {duration: 500});
+        },
+        beforeClose: function(event, ui) {
+            var self = $(this);
+            var container = $(window);
+            self.dialog("widget").animate({top: -1*container.outerHeight(), opacity:0}, {duration: 500});
+        }
+        }).dialog("widget").css({opacity:0});
 	    
 	$( "#header-signin-btn" ).click(function() {
 		$( "#dialog-login" ).dialog( "open" );

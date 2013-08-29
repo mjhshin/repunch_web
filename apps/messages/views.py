@@ -180,13 +180,6 @@ def edit(request, message_id):
             # add to the store's relation
             store.add_relation("SentMessages_", [message.objectId]) 
             success_message = "Message has been sent."
-            
-            # update messages_sent_list in session cache
-            messages_sent_list = SESSION.get_messages_sent_list(\
-                request.session)
-            messages_sent_list.insert(0, message)
-            request.session['messages_sent_list'] =\
-                messages_sent_list
                 
             # update the message_count
             message_count += 1
@@ -230,16 +223,13 @@ def edit(request, message_id):
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
             # update the sent messages
-            messages_sent = SESSION.get_messages_sent_list(session)
-            i_remove = -1
-            for i, ms in enumerate(messages_sent):
-                if ms.objectId == message.objectId:
-                    i_remove = i
-                    break
-            if i_remove != -1:
-                messages_sent.pop(i_remove)
-                messages_sent.insert(0, message)
-            session['messages_sent_list'] = messages_sent
+            
+            # update messages_sent_list in session cache
+            messages_sent_list = SESSION.get_messages_sent_list(\
+                request.session)
+            messages_sent_list.insert(0, message)
+            request.session['messages_sent_list'] =\
+                messages_sent_list
                         
             request.session.update(session)
 
