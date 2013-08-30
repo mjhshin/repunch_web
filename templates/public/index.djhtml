@@ -4,7 +4,21 @@
 {% block title %}Home{% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static "public/js/jquery.slides.min.js" %}"></script>
-	<script type="text/javascript" src="{% static "public/js/home.js" %}"></script>
+	<script>
+    $(document).ready(function()
+    {
+	    // Home slideshow
+	    $('#home-slideshow').slidesjs({
+		    width:960,
+		    height:540,
+		    navigation:{effect:'fade'},
+		    pagination:{effect:'fade'},
+		    effect:{
+			    fade:{speed: 400}
+		    }
+	    });		
+    });
+	</script>
 {% endblock %}
 
 

@@ -9,7 +9,14 @@
 
 {% block javascript %}
 	<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
-	<script type="text/javascript" src="{% static "public/js/about.js" %}"></script>
+	<script>
+    $(document).ready(function()
+    {
+	    $('.the-team-member.tooltip').tooltipster({
+		    theme:'.re-punch'
+	    });
+    });
+	</script>
 {% endblock %}
 
 {% block pageblock %}
@@ -84,14 +91,14 @@
 				{# END EMIL #}
 				
 				{# UNKNOWN #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><div style='margin:10px;'><h4>This could be you.</h4></div></div>">
+				<div class="the-team-member">
 				    <a href="{% url 'public_jobs' %}">
 					<div class="member-picture-border">
 						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.png');"></div>
 					</div>
 					</a>
 					<h2 class="member-name">You</h2>
-					<div class="member-title">Job Title</div>
+					<div class="member-title"></div>
 				</div>
 				{# END UNKNOWN #}
 				
