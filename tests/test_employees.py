@@ -413,10 +413,23 @@ def test_employee_access():
             "retailer_pin": retailer_pin,
         }) 
         
-    # register the test employee
-    register_employee("employee", "empy", username=TEST_EMPLOYEE[\
-        'username'], email=TEST_EMPLOYEE[\
-        'username'], password=TEST_EMPLOYEE['password'])
+    try:
+        # register the test employee
+        register_employee("employee", "empy", username=TEST_EMPLOYEE[\
+            'username'], email=TEST_EMPLOYEE[\
+            'username'], password=TEST_EMPLOYEE['password'])
+        # login TODO
+        test.find("#tab-pending-employees").click()
+        approveRow = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        approveRow.find_element_by_css_selector(\
+            "div.td.approve a.approve").click()
+        sleep(1)
+        test.switch_to_alert().accept()
+        sleep(2)
+    except Exception as e:
+        print e
+        
     
     test = SeleniumTest()
     parts = [

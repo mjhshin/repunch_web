@@ -32,7 +32,7 @@
 				<h2 id="the-team-title">The Team</h2>
 				
 				{# MATTHEW #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Matthew Tervooren</h4><p><span>University of Michigan, B.A. in Economics</span></p><div>In the rare instances when Matt's mind wanders away from all things Repunch, he is probably:<ul><li>Exploring the inexhaustible variety of NYC</li><li>Rooting for University of Michigan sports</li><li>Playing tennis or golf</li><li>Reading Hemingway or watching Tarantino</li><li>Surfing or playing wiffle ball on the beach</li><li>Following every movement of the Dutch national soccer team</li></ul></div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Matthew Tervooren</h4><p><span>Co-Founder & CEO</span></p><div>In the rare instances when Matt's mind wanders away from all things Repunch, he is probably:<ul><li>Exploring the inexhaustible variety of NYC</li><li>Rooting for University of Michigan sports</li><li>Playing tennis or golf</li><li>Reading Hemingway or watching Tarantino</li><li>Surfing or playing wiffle ball on the beach</li><li>Following every movement of the Dutch national soccer team</li></ul></div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_matthew.png' %}" /></div>
 					</div>
@@ -42,7 +42,7 @@
 				{# END MATTHEW #}
 				
 				{# SHIN #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Michael Shin</h4><p><span>Former Graphics Hardware Engineer at Intel</span><span>University of Michigan, B.S.E. in Computer Engineering</span></p><div>Michael is an aspiring generalist. In addition to drinking too much coffee, he spends his days developing the iOS and Android apps, as well as the backend.<br/><br/>In his free time, Michael can usually be found somewhere in Brooklyn reading and drinking whiskey or IPA's. He also enjoys cooking, live music, backpacking and sports of any kind.<br/><br/>Before Repunch, Michael was a graphics hardware engineer at Intel where he worked on GPU simulation. Michael holds his BS in Computer Engineering from the University of Michigan.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Michael Shin</h4><p><span>Co-Founder & CTO</span></p><div>Michael is an aspiring generalist. In addition to drinking too much coffee, he spends his days developing the iOS and Android apps, as well as the backend.<br/><br/>In his free time, Michael can usually be found somewhere in Brooklyn reading and drinking whiskey or IPA's. He also enjoys cooking, live music, backpacking and sports of any kind.<br/><br/>Before Repunch, Michael was a graphics hardware engineer at Intel where he worked on GPU simulation. Michael holds his BS in Computer Engineering from the University of Michigan.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_shin.png' %}" /></div>
 					</div>
@@ -52,7 +52,7 @@
 				{# END SHIN #}
 				
 				{# ANDREW #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Andrew Tervooren</h4><p><span>Board of Advisors for Big Apple Entrepreneur Network</span><span>Rutgers Unversity, B.A. in Communication</span></p><div>After graduating from Rutgers University, where Andrew was Captain of the Men's Tennis Team, he worked in the Literary Department of the entertainment company, William Morris Endeavor.<br/><br/>He enjoys sports and travel. The next hobbies he would like to pick up: Cooking and Photography. Andrew leads Repunch's marketing efforts.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Andrew Tervooren</h4><p><span>VP of Marketing & Business Development</span></p><div>After graduating from Rutgers University, where Andrew was Captain of the Men's Tennis Team, he worked in the Literary Department of the entertainment company, William Morris Endeavor.<br/><br/>He enjoys sports and travel. The next hobbies he would like to pick up: Cooking and Photography. Andrew leads Repunch's marketing efforts.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_andrew.png' %}" /></div>
 					</div>
@@ -62,7 +62,7 @@
 				{# END ANDREW #}
 				
 				{# VANDOLF #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Vandolf Estrellado</h4><p><span>Python/Django Developer</span><span>City College of New York, B.S. in Computer Science</span></p><div>Discovered web development in his senior year in College and immediately fell in love with it. Now works as Repunch's web developer.<br/><br/>In his spare time, Vandolf loves to work on developing his video games, drawing sprites, and learning new recipes to compliment his daily workout routine.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Vandolf Estrellado</h4><p><span>Web Developer</span></p><div>Discovered web development in his senior year in College and immediately fell in love with it. Now works as Repunch's web developer.<br/><br/>In his spare time, Vandolf loves to work on developing his video games, drawing sprites, and learning new recipes to compliment his daily workout routine.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_vandolf.png' %}" /></div>
 					</div>
@@ -74,7 +74,7 @@
 				<div style="clear:both;"></div>
 				
 				{# EMIL #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Emil Landron</h4><p><span>iOS Developer</span><span>City College of New York, B.S. in Computer Science</span></p><div>Born in the Dominican Republic, came to NY on 2004,  likes to play baseball, and action/adventure games. His Favorite place to eat Buffalo Wild Wings.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Emil Landron</h4><p><span>iOS Developer</span></p><div>Born in the Dominican Republic, came to NY on 2004,  likes to play baseball, and action/adventure games. His Favorite place to eat Buffalo Wild Wings.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_emil.png' %}" /></div>
 					</div>
