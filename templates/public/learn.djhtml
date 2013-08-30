@@ -44,7 +44,7 @@ ul.orangy li {
 
 
 ul.orangy li:before {
-    content: "*";
+    content: "";
     position:relative; top:4px;
     margin-right:8px;
     font-size:2em;
@@ -102,7 +102,7 @@ ul.not-orangy li:before {
 			<div id="learn-bottom-tabs-contents">
 				<div id="tabRewardsBody" class="tab active">
 					<aside class="col1">
-						<h2><!--<img src="{% static "public/images/icon_star-orange.png" %}" alt="">-->Customize Rewards for your Loyal Patrons</h2><br />
+						<h2><!--<img src="{% static "public/images/icon_star-orange.png" %}" alt="">-->Customize Rewards for Your Loyal Patrons</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue">SUPER SIMPLE</span> <div>Easily create rewards that are unique to your business.</div></li>
 							<li><span class="bold blue">CHANGE IT UP</span> <div>You can change or edit rewards at any time.</div></li>
@@ -110,11 +110,11 @@ ul.not-orangy li:before {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-rewards.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabMessagesBody" class="tab">
-					<aside class="col1" style="width:330px;">
+					<aside class="col1">
 						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized<br>Messages and Offers</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue">NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in. <span class="italic georgia">-- Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
@@ -122,11 +122,11 @@ ul.not-orangy li:before {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-messages.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabFeedbackBody" class="tab">
-					<aside class="col1" style="width:330px;">
+					<aside class="col1" >
 						<h2><!--<img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="">--> Gather Valuable Feedback</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue">CUSTOMER IS ALWAYS RIGHT</span> <div>View feedback from your customers privately within the Repunch Dashboard. <span class="italic georgia">-- Joe thinks you should host a trivia night. Sally wishes you would open an hour earlier. Jason thinks you should start offering chocolate croissants.</span></div></li>
@@ -134,7 +134,7 @@ ul.not-orangy li:before {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-feedbacks.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabAnalyticsBody" class="tab">
@@ -148,23 +148,23 @@ ul.not-orangy li:before {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-analytics.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabSocialBody" class="tab">
-					<aside class="col1">
-						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Social Media Exposure and Gifting</h2><br />
+					<aside class="col1" >
+						<h2>Social Media Exposure and Gifting</h2><br />
 						<ul class="orangy">
 							<li><span class="blue bold">SOCIAL MEDIA INTEGRATION</span> <div>Encourage customers to share their Repunch activity on Facebook by granting them extra punches. <span class="italic georgia">-- Dish Matt an extra couple punches for telling all of his friends on Facebook about your store.</div></span></li>
 							<li><span class="blue bold">GIFTING</span> <div>Customers bring their friends to your store by earning rewards and "gifting" them to their friends.</div></li>
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-placeholder.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-social.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabPlans-pricingBody" class="tab">
-					<aside class="col1" style="width:100%; padding-top:0;">
+					<aside class="col1" style="width:500px;">
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
 							<li><span class="blue bold">GET STARTED FOR FREE</span></li>
@@ -188,7 +188,10 @@ ul.not-orangy li:before {
 					        </ul>
 			    			
 						</ul>
-                    </aside>						
+                    </aside>		
+					<aside class="col2">
+						<img src="{% static "public/images/img_iphone-get_going.png" %}" alt="">
+					</aside>				
 				</div>						
 			</div>
 		</section>

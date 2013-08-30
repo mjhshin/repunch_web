@@ -1,6 +1,8 @@
+from django.core.urlresolvers import reverse
 from time import sleep
 
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoAlertPresentException,\
 NoSuchElementException
@@ -43,10 +45,38 @@ class SeleniumTest(object):
         
     def open(self, url="/"):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))
+        
+    def login(self, username, password, url=None, final_sleep=5):
+        """ 
+        This should only be used when not yet logged in! 
+        If the url is provided, then this will use the dedicated login
+        page. Otherwise, the login dialog is used.
+        """
+        if url:
+            self.open(url)
+            sleep(1)
+        else:
+            self.open(reverse("public_home"))
+            sleep(1)
+            self.find("#header-signin-btn").click()
+            
+        selectors = (
+            ("#login_username", username),
+            ("#login_password", password),
+            ("", Keys.RETURN)
+        )
+        self.action_chain(0, selectors, "send_keys")
+        sleep(final_sleep) 
+    
+    def logout(self):
+        """ Clicks the logout button on the dashboard """
+        self.find("#link-logout").click()
+        sleep(2)
    
     def is_current_url(self, url):
         """
-        returns True if the current url is equal to url """
+        returns True if the current url is equal to url 
+        """
         return self.driver.current_url == SeleniumTest.SERVER_URL+url
     
     def new_driver(self, save_session_cookie=True):

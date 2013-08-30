@@ -608,21 +608,21 @@ a.button.orange{
 	overflow:hidden;
 }
 
-#learn-bottom-tabs-contents .tab{
-	width:720px;
+#learn-bottom-tabs-contents .tab {
+	width:840px;
 	display:none;
 	min-height:300px;
 	padding-top:45px;
 	overflow:hidden;
 	margin:0 auto;	
-	}
+}
 
 #learn-bottom-tabs-contents .tab.active{
 	display:block;
 }
 
 #learn-bottom-tabs-contents .tab .col1{
-	width:300px; 
+	width:440px; 
 	float:left;
 	font-size:15px;
 	padding-top:30px;

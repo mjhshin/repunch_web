@@ -380,7 +380,7 @@ def test_employee_access():
     """
     
     # delete the employees and associated User objects in the relation
-    account = Account.objects().get(email=TEST_USER['email'],
+    account = Account.objects().get(email=TEST_USER['username'],
         include="Store.Settings")
     store = account.store
     settings = store.settings
@@ -413,28 +413,10 @@ def test_employee_access():
             "retailer_pin": retailer_pin,
         }) 
         
-    try:
-        # register the test employee
-        register_employee("employee", "empy", username=TEST_EMPLOYEE[\
-            'username'], email=TEST_EMPLOYEE[\
-            'username'], password=TEST_EMPLOYEE['password'])
-        # login TODO
-        test.find("#tab-pending-employees").click()
-        approveRow = test.find("#tab-body-pending-employees " +\
-            "div.tr")
-        approveRow.find_element_by_css_selector(\
-            "div.td.approve a.approve").click()
-        sleep(1)
-        test.switch_to_alert().accept()
-        sleep(2)
-    except Exception as e:
-        print e
-        
-    
     test = SeleniumTest()
     parts = [
         {"test_name" : "Pending employee has no access"},
-        {"test_name" : "Approved employee initially has no access"},
+        {"test_name" : "Approved employee initially not in store ACL"},
         {"test_name" : "Employee with ACCESS_NONE cannot login " +\
             "using  the login dialog"},
         {"test_name" : "Employee with ACCESS_NONE cannot login " +\
@@ -514,43 +496,76 @@ def test_employee_access():
     }
     test.results.append(section)
     
-    ##########  User needs to be logged in to access page
-    test.open(reverse("employees_index")) # ACTION!
-    sleep(1)
-        
-    # login
-    selectors = (
-        ("#login_username", TEST_EMPLOYEE['username']),
-        ("#login_password", TEST_EMPLOYEE['password']),
-        ("", Keys.RETURN)
-    )
-    test.action_chain(0, selectors, "send_keys") # ACTION!
-    sleep(5) 
-    
-    
-    ##########  Pending employee has no access  TODO
     try:
-        pass
+        # register the test employee
+        register_employee("employee", "empy", username=TEST_EMPLOYEE[\
+            'username'], email=TEST_EMPLOYEE[\
+            'username'], password=TEST_EMPLOYEE['password'])
+        sleep(1)
+        employee_acc = Account.objects().get(username=TEST_EMPLOYEE[\
+            'username'], include="Employee")
+        employee = employee_acc.employee
+    except Exception as e:
+        print e
+        
+    ##########  Pending employee has no access 
+    try:
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            reverse("employees_index"), final_sleep=1)
+        parts[0]['success'] =\
+            test.find("#dialog-login-message").text ==\
+            "You are not yet approved."
     except Exception as e:
         print e
         parts[0]['test_message'] = str(e)
-    ##########  Approved employee initially has no access  TODO
+        
     try:
-        pass
+        # login to approve
+        test.login(TEST_USER['username'], TEST_USER['password'],
+            reverse("employees_index"))
+        # approve
+        test.find("#tab-pending-employees").click()
+        approveRow = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        approveRow.find_element_by_css_selector(\
+            "div.td.approve a.approve").click()
+        sleep(1)
+        test.switch_to_alert().accept()
+        sleep(2)
+        test.logout()
+    except Exception as e:
+        print e
+        
+    ##########  Approved employee initially not in store ACL  
+    try:
+        # store.ACL = None cannot retrieve Parse built-ins!
+        account = Account.objects().get(email=TEST_USER['username'],
+            include="Store.Settings")
+        store = account.store
+        parts[1]['success'] = employee_acc.objectId not in store.ACL
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
+        
     ##########  Employee with ACCESS_NONE cannot login 
-    ###         using  the login dialog  TODO
+    ###         using the login dialog 
     try:
-        pass
+        test.login(TEST_EMPLOYEE['username'],
+            TEST_EMPLOYEE['password'], final_sleep=1)
+        parts[2]['success'] =\
+            test.find("#dialog-login-message").text ==\
+            "You do not have permission to access the dashboard."
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
     ##########  Employee with ACCESS_NONE cannot login 
-    ###         using the dedicated login page  TODO
+    ###         using the dedicated login page 
     try:
-        pass
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            reverse("employees_index"), final_sleep=1)
+        parts[3]['success'] =\
+            test.find("#dialog-login-message").text ==\
+            "You do not have permission to access the dashboard."
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
@@ -842,8 +857,7 @@ def test_employee_access():
         parts[47]['test_message'] = str(e)
 
 
-
-
-
+    # END OF ALL TESTS - cleanup
+    return test.tear_down() 
 
 
