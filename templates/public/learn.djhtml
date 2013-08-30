@@ -150,7 +150,7 @@ ul.not-orangy li:before {
 				</div>
 				<div id="tabSocialBody" class="tab">
 					<aside class="col1" >
-						<h2><!--<img src="{% static "public/images/icon_avatar-gray.png" %}" alt="">-->Social Media Exposure and Gifting</h2><br />
+						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Social Media Exposure and Gifting</h2><br />
 						<ul class="orangy">
 							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">SOCIAL MEDIA INTEGRATION</span> <div>Encourage customers to share their Repunch activity on Facebook by granting them extra punches. <span class="italic georgia">-- Dish Matt an extra couple punches for telling all of his friends on Facebook about your store.</div></span></li>
 							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">GIFTING</span> <div>Customers bring their friends to your store by earning rewards and "gifting" them to their friends.</div></li>
@@ -164,22 +164,22 @@ ul.not-orangy li:before {
 					<aside class="col1" style="width:500px;">
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
-							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">GET STARTED FOR FREE</span></li>
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">GET STARTED FOR FREE</span></li>
 							<ul class="not-orangy">
 								<li>You only begin paying a modest monthly fee once you have a significant number of users getting punched at your store.</li>
 								<li>As you enter into paid tiers, you gain access to special services like premium marketing campaigns.</li>
 							</ul>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">EASY SETUP</span>
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">EASY SETUP</span>
 							<ul class="not-orangy" style="position:relative;top:-4px;">
 								<li>No hardware or POS integration required - you can be up and running in minutes!</li>
 					        </ul>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">CHOOSE HOW TO PUNCH AND REDEEM</span></li>
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">CHOOSE HOW TO PUNCH AND REDEEM</span></li>
 							<ul class="not-orangy">
 								<li>Input consumers' Punch Codes right into the dashboard, which you can have open on your internet-enabled POS, computer, or tablet.</li>
 								<li>Use our Retailer Mobile App. Your employees can download the app onto their devices and then begin granting punches once you grant them permission.</li>
 								<li>If you would prefer to have Smartphone(s) specifically to run the Retailer App, we can supply these to you at cost.</li>
 							</ul>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_avatar-orange.png" %}" alt="" class="ul-points">PREVENT FRAUD</span></li> 
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">PREVENT FRAUD</span></li> 
 							<ul class="not-orangy">
 							    <li>We automatically let you know about any suspicious activity that may occur. Details include the name of the employee and the abnormal quantity or time of the punches.</li>
 					        </ul>
