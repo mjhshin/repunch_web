@@ -622,10 +622,10 @@ a.button.orange{
 }
 
 #learn-bottom-tabs-contents .tab .col1{
-	width:300px;
+	width:300px; 
 	float:left;
 	font-size:15px;
-	padding-top:45px;
+	padding-top:30px;
 }
 
 #learn-bottom-tabs-contents .tab .col1 h2{
@@ -643,7 +643,8 @@ a.button.orange{
 	padding:0px;
 }
 
-#learn-bottom-tabs-contents .tab  .col2{
+#learn-bottom-tabs-contents .tab  .col2 {
+    margin-top: 20px;
 	width:320px;
 	float:right;
 }
@@ -727,11 +728,12 @@ a.button.orange{
 	background:transparent url("../images/bkg_shadow.png") no-repeat 0 0;
 }
 
-#faq-content h3{
-	margin:0px;
+#faq-content h3 {
+	margin:0px; padding: 0px;
 	color:#0965ad;
+	font-weight: bold;
 	font-size:16px;
-	line-height:20px;
+	line-height:18px;
 	letter-spacing:0.8px;
 }
 
@@ -918,7 +920,7 @@ a.button.orange{
 #the-team-title{
 	color:#0965ad;
 	margin:32px 0 25px;
-	margin-bottom:50px; margin-top:50px;
+	margin-bottom:70px; margin-top:50px;
 	text-align:center;
 	font-size:3.4em;
 }
@@ -957,11 +959,6 @@ a.button.orange{
 .re-punch .tooltipBox{
     max-width:500px;
 }
-.re-punch .tooltipster-content h4{
-	border:0px; margin-bottom:2px;
-	padding:0 10px;
-	color:#254D7E;
-}
 	
 .re-punch .tooltipster-content p,
 .re-punch .tooltipster-content span,
@@ -975,19 +972,29 @@ a.button.orange{
 }
 
 
+.re-punch .tooltipster-content h4{
+	border:0px; margin-bottom:2px;
+	padding:0 10px;
+	color:#0965ad;
+	font-size:1.5em;
+}
+
 .re-punch .tooltipster-content div {
-    padding:18px 10px;
+    padding:14px;
+    font-size: 1.05em;
+    line-height:20px;
 }
 
 .re-punch .tooltipster-content p span {
-    font-size:0.8em;
+    font-size:1em;
+    font-weight: bold;
     padding:0px 0px;
     float:left;
 }
 
 .member-picture-border{
-	width:155px;
-	height:155px;
+	width:160px;
+	height:160px;
 	padding:3px;
 	background:#FFF;
 	overflow:hidden;
@@ -1003,8 +1010,8 @@ a.button.orange{
 .member-picture, 
 .member-picture img{
 	background:#CCC;
-	width:155px;
-	height:155px;
+	width:160px;
+	height:160px;
 	
 	border-radius:25px;
 	-o-border-radius:25px;
@@ -1015,13 +1022,14 @@ a.button.orange{
 
 .member-name{
 	margin:20px 0 10px;
+	font-size:1.7em;
 	font-weight:bold;
 	text-align:center;
 }
 
 .member-title{
 	margin:0;
-	font-size:14px;
+	font-size:16px;
 	text-align:center;
 	max-width:164px;
 }
@@ -1423,7 +1431,7 @@ line-height: 15px;
 }
 
 .blue {
-color: #144796;
+color: #0965ad;
 }
 
 .bold {

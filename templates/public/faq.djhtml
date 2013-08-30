@@ -64,7 +64,7 @@ jQuery(document).ready(function() {
 	<div id="page-content">
 		<div id="faq-content">
 			<aside class="col1">
-            		<h2>Repunch for Consumers</h2>
+            		<h1>Repunch for Consumers</h1>
 				<div id="accordion-wrapper">
 					<div class="accordionButton">
 						<h3>What is Repunch?</h3>
@@ -145,7 +145,7 @@ jQuery(document).ready(function() {
 					<p>We apologize if you run into any such issues. Please contact us immediately and we will fix it asap.</p>
 					</div>
 				</div>
-				<h2>Repunch for Retailers</h2>
+				<h1>Repunch for Retailers</h1>
 				<div id="accordion-wrapper">
 					<div class="accordionButton">
 						<h3>How do I become a Repunch retailer?</h3>

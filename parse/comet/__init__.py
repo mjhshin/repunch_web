@@ -383,13 +383,12 @@ def comet_receive(store_id, postDict):
         session.modified = True
         session.save()
         
-        # flag all threads with this session_key that new stuff
+        # flag all threads with this session_key about the new stuff
         CometSession.objects.update()
         for comet in CometSession.objects.filter(session_key=\
             scomet.session_key):
             comet.modified = True
             comet.save()
-                    
-        
+                 
     return True
             

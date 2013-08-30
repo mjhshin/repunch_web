@@ -67,7 +67,7 @@
 						<div class="member-picture"><img src="{% static 'public/images/prof_vandolf.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Vandolf Estrellado</h2>
-					<div class="member-title">Back-end Engineer</div>
+					<div class="member-title">Web Developer</div>
 				</div>
 				{# END VANDOLF #}
 				
