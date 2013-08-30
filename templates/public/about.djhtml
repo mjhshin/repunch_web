@@ -94,7 +94,7 @@
 				<div class="the-team-member">
 				    <a href="{% url 'public_jobs' %}">
 					<div class="member-picture-border">
-						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.1.0.png');"></div>
+						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.1.1.png');"></div>
 					</div>
 					</a>
 					<h2 class="member-name">You</h2>
