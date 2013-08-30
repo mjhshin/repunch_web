@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}{% load parse_tags %}{% load account_tags %}
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
@@ -20,6 +20,9 @@
 
 
 {% block content %}
+
+    {# Check if this employee (not this account) is the owner #}
+	{% employee_is_owner request.session employee_id as employee_is_owner %}
 	
 	{% if error or success %}
 	<div class="notification {% if success %}success{% endif %} hide">
@@ -39,9 +42,14 @@
 		    <form action="{% url 'employee_edit' employee_id %}" method="POST" id="employee-form">{% csrf_token %}
 		        <label for="ACL">Access Level:</label>
 		        <select name="ACL" id="ACL">
+		            {# Need to make sure that if this employee is the store owner, he always have full admin access #}
+		            {% if employee_is_owner %}
+		            <option value="{{ACCESS_ADMIN}}" {% if employee_acl == ACCESS_ADMIN %}selected{% endif %}>Full Admin Access</option>
+		            {% else %}
 		            <option value="{{ACCESS_ADMIN}}" {% if employee_acl == ACCESS_ADMIN %}selected{% endif %}>Full Admin Access</option>
 		            <option value="{{ACCESS_PUNCHREDEEM}}" {% if employee_acl == ACCESS_PUNCHREDEEM %}selected{% endif %}>Allow Punch/Redeem</option>
 		            <option value="{{ACCESS_NONE}}" {% if employee_acl == ACCESS_NONE %}selected{% endif %}>No Access</option>
+		            {% endif %}
 		        </select>
 		    </form>
         </div>
