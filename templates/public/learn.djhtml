@@ -73,7 +73,7 @@ ul.not-orangy li:before {
 }
 
 .ul-points {
-    width:10px; height:10px;
+    width:3%; height:3%;
     margin-right:7px;
 }
 
