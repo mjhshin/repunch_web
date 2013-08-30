@@ -42,7 +42,7 @@
 				{# END MATTHEW #}
 				
 				{# SHIN #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Michael Shin</h4><p><span>Former Graphics Hardware Engineer at Intel</span><span>University of Michigan, B.S.E. in Computer Engineering</span></p><div>Insert description and stuff here. Insert description and stuff here.Insert description and stuff here.Insert description and stuff here.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Michael Shin</h4><p><span>Former Graphics Hardware Engineer at Intel</span><span>University of Michigan, B.S.E. in Computer Engineering</span></p><div>Michael is an aspiring generalist. In addition to drinking too much coffee, he spends his days developing the iOS and Android apps, as well as the backend.<br/><br/>In his free time, Michael can usually be found somewhere in Brooklyn reading and drinking whiskey or IPA's. He also enjoys cooking, live music, backpacking and sports of any kind.<br/><br/>Before Repunch, Michael was a graphics hardware engineer at Intel where he worked on GPU simulation. Michael holds his BS in Computer Engineering from the University of Michigan.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_shin.png' %}" /></div>
 					</div>
