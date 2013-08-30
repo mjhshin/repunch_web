@@ -51,7 +51,7 @@
 				{# SHIN #}
 				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Michael Shin</h4><p><span>Co-Founder & CTO</span></p><div>Michael is an aspiring generalist. In addition to drinking too much coffee, he spends his days developing the iOS and Android apps, as well as the backend.<br/><br/>In his free time, Michael can usually be found somewhere in Brooklyn reading and drinking whiskey or IPA's. He also enjoys cooking, live music, backpacking and sports of any kind.<br/><br/>Before Repunch, Michael was a graphics hardware engineer at Intel where he worked on GPU simulation. Michael holds his BS in Computer Engineering from the University of Michigan.</div></div>">
 					<div class="member-picture-border">
-						<div class="member-picture"><img src="{% static 'public/images/prof_shin.png' %}" /></div>
+						<div class="member-picture"><img src="{% static 'public/images/prof_shin.1.0.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Michael Shin</h2>
 					<div class="member-title">Co-Founder & CTO</div>
@@ -94,7 +94,7 @@
 				<div class="the-team-member">
 				    <a href="{% url 'public_jobs' %}">
 					<div class="member-picture-border">
-						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.png');"></div>
+						<div class="member-picture" style="background-image:url('/static/public/images/unknown_member.1.0.png');"></div>
 					</div>
 					</a>
 					<h2 class="member-name">You</h2>
