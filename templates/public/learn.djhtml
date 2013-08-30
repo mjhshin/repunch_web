@@ -100,7 +100,7 @@ ul.not-orangy li:before {
 			<div id="learn-bottom-tabs-contents">
 				<div id="tabRewardsBody" class="tab active">
 					<aside class="col1">
-						<h2><!--<img src="{% static "public/images/icon_star-orange.png" %}" alt="">-->Customize Rewards for Your Loyal Patrons</h2><br />
+						<h2><!--<img src="{% static "public/images/icon_star-orange.png" %}" alt="">-->Customize Your Rewards</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue"><img src="{% static "public/images/icon_star-orange.png" %}" alt="" class="ul-points">SUPER SIMPLE</span> <div>Easily create rewards that are unique to your business.</div></li>
 							<li><span class="bold blue"><img src="{% static "public/images/icon_star-orange.png" %}" alt="" class="ul-points">CHANGE IT UP</span> <div>You can change or edit rewards at any time.</div></li>
