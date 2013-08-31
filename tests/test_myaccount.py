@@ -111,6 +111,12 @@ def test_edit_store_details():
         {'test_name': "Changes to phone number are saved to Parse"},
         {'test_name': "Changes to email are visible"},
         {'test_name': "Changes to email are saved to Parse"},
+        
+        {'test_name': "Changing the email also changes the " +\
+            "username (Parse)"}, # TODO
+        {'test_name': "Changing the email also changes the " +\
+            "username (Dashboard)"}, # TODO
+        
         {'test_name': "Changes to hours are visible"},
         {'test_name': "Changes to hours are saved to Parse"},
         {'test_name': "Changing the zip changes the store_timezone"},

@@ -76,7 +76,7 @@ def edit(request, employee_id):
         # notify other dashboards of this change
         payload = {
             COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            "updatedStore_one":store.jsonify()
+            "updatedStore":store.jsonify()
         }
         comet_receive(store.objectId, payload)
         
@@ -141,7 +141,7 @@ def delete(request, employee_id):
     # notify other dashboards of this change
     payload = {
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "updatedStore_one":store.jsonify()
+        "updatedStore":store.jsonify()
     }
     comet_receive(store.objectId, payload)
     ##########################

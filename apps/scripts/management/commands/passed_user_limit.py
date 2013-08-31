@@ -70,7 +70,7 @@ class Command(BaseCommand):
                     # notify the dashboards of these changes
                     payload={
                         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                        "updatedSubscription_one": sub.jsonify()
+                        "updatedSubscription": sub.jsonify()
                     }
                     if not DEBUG:
                         requests.post(COMET_REQUEST_RECEIVE + sub.Store,
@@ -233,7 +233,7 @@ class Command(BaseCommand):
                     # notify the dashboards of these changes
                     payload={
                         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                        "updatedSubscription_one": sub.jsonify()
+                        "updatedSubscription": sub.jsonify()
                     }
                     if not DEBUG:
                         requests.post(COMET_REQUEST_RECEIVE + sub.Store,

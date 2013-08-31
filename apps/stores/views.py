@@ -171,7 +171,8 @@ def edit(request):
             # notify other dashboards of this change
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedStore_one":store.jsonify()
+                "updatedStore": store.jsonify(),
+                "updatedAccount": account.jsonify()
             }
             comet_receive(store.objectId, payload)
             

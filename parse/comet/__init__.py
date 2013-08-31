@@ -15,6 +15,7 @@ from parse.apps.messages.models import Message
 from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
+from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store, Subscription, Settings
 
 def comet_receive(store_id, postDict):
@@ -25,26 +26,28 @@ def comet_receive(store_id, postDict):
     Note that postDict must be contain values that are jsonified!
     
     This adds to the related session's cache:
-        updatedStore_one = request.POST.get("updatedStore_one")
-        updatedSubscription_one = request.POST.get("updatedStore_one")
-        updatedSettings_one = request.POST.get("updatedSettings_one")
-        patronStore_num = request.POST.get("patronStore_num")
-        newReward = request.POST.get("newReward")
-        deletedReward = request.POST.get("deletedReward")
-        updatedReward = request.POST.get("updatedReward")
-        newMessage = request.POST.get("newMessage")
-        newFeedback = request.POST.get("newFeedback")
-        deletedFeedback = request.POST.get("deletedFeedback")
-        pendingEmployee = request.POST.get("pendingEmployee")
-        approvedEmployee = request.POST.get("approvedEmployee")
-        deletedEmployee = request.POST.get("deletedEmployee")
-        updatedEmployeePunch =request.POST.get("updatedEmployeePunch")
-        pendingRedemption = request.POST.get("pendingRedemption")
-        approvedRedemption = request.POST.get("approvedRedemption")
-        deletedRedemption = request.POST.get("deletedRedemption")
+        updatedAccount
+        updatedStore 
+        updatedSubscription
+        updatedSettings 
+        newReward 
+        deletedReward
+        updatedReward 
+        newMessage
+        newFeedback 
+        deletedFeedback 
+        pendingEmployee
+        approvedEmployee 
+        deletedEmployee 
+        updatedEmployeePunch
+        pendingRedemption
+        approvedRedemption 
+        deletedRedemption 
+        
         updatedStoreAvatarName_str
         updatedStoreAvatarUrl_str
         updatedPunchesFacebook_int
+        patronStore_int = request.POST.get("patronStore_int")
         
     Note that since each CometSession is no longer unique to 1 session
     we need to keep track of the session_keys that have already been 
@@ -250,9 +253,9 @@ def comet_receive(store_id, postDict):
                
         #############################################################
         # STORE UPDATED ##############################
-        updatedStore_one = postDict.get("updatedStore_one")
-        if updatedStore_one:
-            store = Store(**updatedStore_one)
+        updatedStore = postDict.get("updatedStore")
+        if updatedStore:
+            store = Store(**updatedStore)
             session['store'] = store
             try: # also update the store_timezone
                 session['store_timezone'] =\
@@ -282,11 +285,17 @@ def comet_receive(store_id, postDict):
             session['store'] = store
             
         #############################################################
+        # ACCOUNT UPDATED ##############################
+        updatedAccount = postDict.get("updatedAccount")
+        if updatedAccount:
+            session['account'] = Account(**updatedAccount)
+                    
+        #############################################################
         # SUBSCRIPTION UPDATED ##############################
-        updatedSubscription_one =\
-            postDict.get("updatedSubscription_one")
-        if updatedSubscription_one:
-            subscription = Subscription(**updatedSubscription_one)
+        updatedSubscription =\
+            postDict.get("updatedSubscription")
+        if updatedSubscription:
+            subscription = Subscription(**updatedSubscription)
             store = session["store"]
             store.set('subscription', subscription)
             store.set('Subscription', subscription.objectId)
@@ -295,9 +304,9 @@ def comet_receive(store_id, postDict):
             
         #############################################################
         # SETTINGS UPDATED ##############################
-        updatedSettings_one = postDict.get("updatedSettings_one")
-        if updatedSettings_one:
-            settings = Settings(**updatedSettings_one)
+        updatedSettings = postDict.get("updatedSettings")
+        if updatedSettings:
+            settings = Settings(**updatedSettings)
             store = session["store"]
             store.set('settings', settings)
             store.set("Settings", settings.objectId)
@@ -361,10 +370,10 @@ def comet_receive(store_id, postDict):
            
         #############################################################
         # PATRONSTORE_COUNT ##################################
-        patronStore_num = postDict.get('patronStore_num')
-        if patronStore_num:
-            patronStore_num = int(patronStore_num)
-            session['patronStore_count'] = patronStore_num
+        patronStore_int = postDict.get('patronStore_int')
+        if patronStore_int:
+            patronStore_int = int(patronStore_int)
+            session['patronStore_count'] = patronStore_int
     # check if key is present and valid
     if postDict.get(COMET_RECEIVE_KEY_NAME) != COMET_RECEIVE_KEY:
         return False

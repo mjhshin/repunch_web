@@ -89,7 +89,7 @@ def settings(request):
             # notify other dashboards of this changes
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings_one":settings.jsonify(),
+                "updatedSettings":settings.jsonify(),
                 "updatedPunchesFacebook_int":\
                     store.punches_facebook,
             }
@@ -134,7 +134,7 @@ def refresh(request):
             store = SESSION.get_store(request.session)
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings_one":settings.jsonify()
+                "updatedSettings":settings.jsonify()
             }
             comet_receive(store.objectId, payload)
             
@@ -251,7 +251,7 @@ def update(request):
             # notify other dashboards of these changes
             payload={
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSubscription_one":subscription.jsonify()
+                "updatedSubscription":subscription.jsonify()
             }
             comet_receive(store.objectId, payload)
             
@@ -384,7 +384,7 @@ def upgrade(request):
             # notify other dashboards of these changes
             payload={
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSubscription_one":subscription.jsonify()
+                "updatedSubscription":subscription.jsonify()
             }
             comet_receive(store.objectId, payload)
             

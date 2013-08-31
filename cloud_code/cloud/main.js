@@ -330,7 +330,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
             headers: { "Content-Type": "application/json"},
             body: { 
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                patronStore_num: patronStoreCount,
+                patronStore_int: patronStoreCount,
             }
         });
         
@@ -693,7 +693,7 @@ Parse.Cloud.define("punch", function(request, response) {
 		}).then(function(patronStoreCount){
 		    if (isNewPatronStore) {
 		        console.log("Retrieved new PatronStore count");
-		        postBody.patronStore_num = patronStoreCount;
+		        postBody.patronStore_int = patronStoreCount;
 		    }
 		    
 		    // Let the server know if any changes occured
