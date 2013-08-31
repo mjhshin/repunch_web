@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.core import mail 
 from django.utils import timezone
 from django.forms.util import ErrorList
 from datetime import datetime
@@ -235,9 +234,6 @@ def sign_up(request):
             }
             store.owner_id = account.objectId
             store.update()
-                
-            #### MAIL CONNECTION OPEN
-            conn = mail.get_connection(fail_silently=(not DEBUG))   
             
             # call this incase store_cc returns False or 
             # charge_cc returns None
@@ -305,9 +301,6 @@ def sign_up(request):
             
             # send matt and new user a pretty email.
             send_email_signup(account)
-            
-            # MAIL CONNECTION CLOSE
-            conn.close()
 
             # auto login
             user_login = login(request, postDict)

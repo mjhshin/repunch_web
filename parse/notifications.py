@@ -1,5 +1,11 @@
 """
-Emails notifications
+Emails notifications.
+
+If a connection is provided, then that connection will be used to
+send the email in the same thread.
+
+If a connection is NOT provided, then a connection is created and
+the sending occurs in a new thread.
 """
 
 from importlib import import_module
@@ -109,7 +115,10 @@ def send_email_receipt_monthly(asiss, connection=None):
         
         _send_emails(emails, connection)
         
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
 
 def send_email_receipt_smartphone(account, subscription, invoice,
     amount, connection=None):
@@ -158,7 +167,10 @@ def send_email_receipt_smartphone(account, subscription, invoice,
         
         _send_emails(emails, connection)
     
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
 
 def send_email_signup(account, connection=None):
     """
@@ -209,7 +221,10 @@ def send_email_signup(account, connection=None):
         
         _send_emails(emails, connection)
     
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
     
 def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         start, end, connection=None):
@@ -240,7 +255,10 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         
         _send_emails([email], connection)
     
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
     
 def send_email_passed_user_limit(account, store, package,
         connection=None):
@@ -268,7 +286,10 @@ def send_email_passed_user_limit(account, store, package,
         
         _send_emails([email], connection)
     
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
    
 def send_email_account_upgrade(account, store, package,
         connection=None):
@@ -295,7 +316,10 @@ def send_email_account_upgrade(account, store, package,
         
         _send_emails([email], connection)
    
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
 
 def send_email_selenium_test_results(tests, connection=None):
     """
@@ -326,7 +350,10 @@ def send_email_selenium_test_results(tests, connection=None):
         
         _send_emails([email], connection)
    
-    Thread(target=_wrapper).start()
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
     
     
     
