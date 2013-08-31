@@ -3,6 +3,7 @@ Emails notifications
 """
 
 from importlib import import_module
+from threading import Thread
 import pytz
 
 from django.core import mail
@@ -66,142 +67,149 @@ def send_email_receipt_monthly(asiss, connection=None):
         ...
     ]
     """
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-receipt-monthly.html", 'r') as f:
-        template = Template(f.read())
-    emails = []
-    date_30_ago = timezone.now() + relativedelta(days=-30)
-    date_now = timezone.now()
-    # for accounts
-    for asis in asiss:
-        invoice = asis[2]
-        if not invoice: # failed to charge user
-            continue
-        subscription = asis[3]
-        account = asis[0]
-        store = asis[1]
-        subject = "Repunch Inc. monthly service charge."
+    def _wrapper():
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-receipt-monthly.html", 'r') as f:
+            template = Template(f.read())
+        emails = []
+        date_30_ago = timezone.now() + relativedelta(days=-30)
+        date_now = timezone.now()
+        # for accounts
+        for asis in asiss:
+            invoice = asis[2]
+            if not invoice: # failed to charge user
+                continue
+            subscription = asis[3]
+            account = asis[0]
+            store = asis[1]
+            subject = "Repunch Inc. monthly service charge."
+            ctx = get_notification_ctx()
+            ctx.update({'store': store, 'invoice': invoice,
+                "date_30_ago":date_30_ago, "date_now":date_now,
+                "sub_type":sub_type, "subscription":subscription})
+            body = template.render(Context(ctx)).__str__()
+                    
+            email = mail.EmailMultiAlternatives(subject,
+                        strip_tags(body), to=[account.get('email')])
+            email.attach_alternative(body, 'text/html')
+            emails.append(email)
+        # for ORDER_PLACED_EMAILS
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-receipt-monthly-admin.html", 'r') as f:
+            template = Template(f.read())
+        date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+        subject = "Monthly billing results : " + date.strftime("%b %d %Y")
         ctx = get_notification_ctx()
-        ctx.update({'store': store, 'invoice': invoice,
-            "date_30_ago":date_30_ago, "date_now":date_now,
-            "sub_type":sub_type, "subscription":subscription})
+        ctx.update({'asiss': asiss, "date":date, "sub_type":sub_type})
         body = template.render(Context(ctx)).__str__()
-                
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), to=ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
         emails.append(email)
-    # for ORDER_PLACED_EMAILS
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-receipt-monthly-admin.html", 'r') as f:
-        template = Template(f.read())
-    date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
-    subject = "Monthly billing results : " + date.strftime("%b %d %Y")
-    ctx = get_notification_ctx()
-    ctx.update({'asiss': asiss, "date":date, "sub_type":sub_type})
-    body = template.render(Context(ctx)).__str__()
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=ORDER_PLACED_EMAILS)
-    email.attach_alternative(body, 'text/html')
-    emails.append(email)
-    
-    _send_emails(emails, connection)
+        
+        _send_emails(emails, connection)
+        
+    Thread(target=_wrapper).start()
 
 def send_email_receipt_smartphone(account, subscription, invoice,
     amount, connection=None):
     """
     Sends the user and ORDER_PLACED_EMAILS pretty receipt.
     """
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-receipt-smartphone.html", 'r') as f:
-        template = Template(f.read())
-   
-    store = account.get("store")
-    # for account
-    subject = "Repunch Inc. transaction receipt."
-    ctx = get_notification_ctx()
-    ctx.update({
-            'store': store,
-            'amount': amount,
-            'invoice': invoice,
-            'for_customer': True})
-    body = template.render(Context(ctx)).__str__()
-            
-    emails = []
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=[account.get('email')])
-    email.attach_alternative(body, 'text/html')
-    emails.append(email)
+    def _wrapper():
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-receipt-smartphone.html", 'r') as f:
+            template = Template(f.read())
+       
+        store = account.get("store")
+        # for account
+        subject = "Repunch Inc. transaction receipt."
+        ctx = get_notification_ctx()
+        ctx.update({
+                'store': store,
+                'amount': amount,
+                'invoice': invoice,
+                'for_customer': True})
+        body = template.render(Context(ctx)).__str__()
+                
+        emails = []
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+        
+        # for ORDER_PLACED_EMAILS
+        subject = "Smartphone(s) purchased by " +\
+             store.get_owner_fullname() + "."
+        ctx = get_notification_ctx()
+        ctx.update({
+                'account': account,
+                'subscription': subscription,
+                'store': store,
+                'amount': amount,
+                'invoice': invoice,
+                'sub_type': sub_type,
+                'for_customer': False})
+        body = template.render(Context(ctx)).__str__()
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+        
+        _send_emails(emails, connection)
     
-    # for ORDER_PLACED_EMAILS
-    subject = "Smartphone(s) purchased by " +\
-         store.get_owner_fullname() + "."
-    ctx = get_notification_ctx()
-    ctx.update({
-            'account': account,
-            'subscription': subscription,
-            'store': store,
-            'amount': amount,
-            'invoice': invoice,
-            'sub_type': sub_type,
-            'for_customer': False})
-    body = template.render(Context(ctx)).__str__()
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=ORDER_PLACED_EMAILS)
-    email.attach_alternative(body, 'text/html')
-    emails.append(email)
-    
-    _send_emails(emails, connection)
-    
+    Thread(target=_wrapper).start()
 
 def send_email_signup(account, connection=None):
     """
     Sends a welcome notification to the account and 
     ORDER_PLACED_EMAILS.
     """
-    # for new account
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification.html", 'r') as f:
-        template = Template(f.read())
+    def _wrapper():
+        # for new account
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification.html", 'r') as f:
+            template = Template(f.read())
+            
+        store = account.get("store")
+        subject = EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +\
+            store.get_owner_fullname()
+        ctx = get_notification_ctx()
+        ctx.update({'store':store})
+        body = template.render(Context(ctx)).__str__()
+        emails = []
         
-    store = account.get("store")
-    subject = EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +\
-        store.get_owner_fullname()
-    ctx = get_notification_ctx()
-    ctx.update({'store':store})
-    body = template.render(Context(ctx)).__str__()
-    emails = []
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+        
+        # for ORDER_PLACED_EMAILS
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-newuser.html", 'r') as f:
+            template = Template(f.read())
+        
+        subject = EMAIL_SIGNUP_SUBJECT_PREFIX +\
+            account.get("store").get("store_name")
+        AccountActivate = getattr(import_module('apps.accounts.models'),
+                                    "AccountActivate")
+        ctx = get_notification_ctx()
+        ctx.update({
+            'account': account,
+            'store': account.get("store"),
+            'activate': AccountActivate.objects.create(\
+            				store_id=store.objectId),
+        })
+        body = template.render(Context(ctx)).__str__()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+        
+        _send_emails(emails, connection)
     
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=[account.get('email')])
-    email.attach_alternative(body, 'text/html')
-    emails.append(email)
-    
-    # for ORDER_PLACED_EMAILS
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-newuser.html", 'r') as f:
-        template = Template(f.read())
-    
-    subject = EMAIL_SIGNUP_SUBJECT_PREFIX +\
-        account.get("store").get("store_name")
-    AccountActivate = getattr(import_module('apps.accounts.models'),
-                                "AccountActivate")
-    ctx = get_notification_ctx()
-    ctx.update({
-        'account': account,
-        'store': account.get("store"),
-        'activate': AccountActivate.objects.create(\
-        				store_id=store.objectId),
-    })
-    body = template.render(Context(ctx)).__str__()
-    
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=ORDER_PLACED_EMAILS)
-    email.attach_alternative(body, 'text/html')
-    emails.append(email)
-    
-    _send_emails(emails, connection)
-    
+    Thread(target=_wrapper).start()
     
 def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         start, end, connection=None):
@@ -210,78 +218,84 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
     See the detect_suspicious_activity management command docstring.
     Note that start and end are utc dates.
     """
-    # need to activate the store's timezone for template rendering!
-    timezone.activate(pytz.timezone(store.store_timezone))
-    
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-suspicious-activity.html",
-            'r') as f:
-        template = Template(f.read())
+    def _wrapper():
+        # need to activate the store's timezone for template rendering!
+        timezone.activate(pytz.timezone(store.store_timezone))
         
-    subject = "Repunch Inc. Suspicious activity has been detected " +\
-                "at " + store.store_name + "."
-    ctx = get_notification_ctx()
-    ctx.update({'store':store, 'start':start, 'end':end, 
-                'chunks':(chunk1, chunk2)})
-    body = template.render(Context(ctx)).__str__()
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-suspicious-activity.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        subject = "Repunch Inc. Suspicious activity has been detected " +\
+                    "at " + store.store_name + "."
+        ctx = get_notification_ctx()
+        ctx.update({'store':store, 'start':start, 'end':end, 
+                    'chunks':(chunk1, chunk2)})
+        body = template.render(Context(ctx)).__str__()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
     
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=[account.get('email')])
-    email.attach_alternative(body, 'text/html')
-    
-    _send_emails([email], connection)
-    
+    Thread(target=_wrapper).start()
     
 def send_email_passed_user_limit(account, store, package,
         connection=None):
     """
     Used by management command passed_user_limit.
     """
-    # need to activate the store's timezone for template rendering!
-    timezone.activate(pytz.timezone(store.store_timezone))
-    
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-passed-user-limit.html",
-            'r') as f:
-        template = Template(f.read())
+    def _wrapper():
+        # need to activate the store's timezone for template rendering!
+        timezone.activate(pytz.timezone(store.store_timezone))
         
-    subject = "Repunch Inc. Alert. Your store, " +\
-        store.get("store_name") + " has passed the user limit."
-    ctx = get_notification_ctx()
-    ctx.update({'store':store, 'package':package})
-    body = template.render(Context(ctx)).__str__()
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-passed-user-limit.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        subject = "Repunch Inc. Alert. Your store, " +\
+            store.get("store_name") + " has passed the user limit."
+        ctx = get_notification_ctx()
+        ctx.update({'store':store, 'package':package})
+        body = template.render(Context(ctx)).__str__()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
     
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=[account.get('email')])
-    email.attach_alternative(body, 'text/html')
-    
-    _send_emails([email], connection)
-    
+    Thread(target=_wrapper).start()
    
 def send_email_account_upgrade(account, store, package,
         connection=None):
     """
     User for notifying users that their account has been upgraded.
     """
-    # need to activate the store's timezone for template rendering!
-    timezone.activate(pytz.timezone(store.store_timezone))
-    
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-account-upgraded.html",
-            'r') as f:
-        template = Template(f.read())
+    def _wrapper():
+        # need to activate the store's timezone for template rendering!
+        timezone.activate(pytz.timezone(store.store_timezone))
         
-    subject = EMAIL_UPGRADE_SUBJECT
-    ctx = get_notification_ctx()
-    ctx.update({'store':store, 'package':package})
-    body = template.render(Context(ctx)).__str__()
-    
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=[account.get('email')])
-    email.attach_alternative(body, 'text/html')
-    
-    _send_emails([email], connection)
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-account-upgraded.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        subject = EMAIL_UPGRADE_SUBJECT
+        ctx = get_notification_ctx()
+        ctx.update({'store':store, 'package':package})
+        body = template.render(Context(ctx)).__str__()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
    
+    Thread(target=_wrapper).start()
 
 def send_email_selenium_test_results(tests, connection=None):
     """
@@ -294,23 +308,25 @@ def send_email_selenium_test_results(tests, connection=None):
             ...
         ]
     """
-    with open(FS_SITE_DIR +\
-        "/templates/manage/notification-selenium-test-results.html",
-            'r') as f:
-        template = Template(f.read())
+    def _wrapper():
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-selenium-test-results.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+        subject = "Repunch Inc. Selenium test results."
+        ctx = get_notification_ctx()
+        ctx.update({'date':date, 'tests':tests})
+        body = template.render(Context(ctx)).__str__()
         
-    date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
-    subject = "Repunch Inc. Selenium test results."
-    ctx = get_notification_ctx()
-    ctx.update({'date':date, 'tests':tests})
-    body = template.render(Context(ctx)).__str__()
-    
-    email = mail.EmailMultiAlternatives(subject,
-                strip_tags(body), to=(ADMINS[0][1], ))
-    email.attach_alternative(body, 'text/html')
-    
-    _send_emails([email], connection)
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=(ADMINS[0][1], ))
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
    
+    Thread(target=_wrapper).start()
     
     
     

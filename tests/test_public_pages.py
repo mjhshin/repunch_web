@@ -84,7 +84,7 @@ def test_public_pages():
            reverse("public_about") + "']", type="xpath").click()
     selectors = [] 
     # about member photos
-    for i in range(1, 7):
+    for i in range(1, 6):
         selectors.append("//div[@id='the-team']/" +\
             "div[@class='the-team-member tooltip'][" +\
             str(i) + "]")

@@ -22,7 +22,7 @@ class Command(BaseCommand):
         results = []
         
         ####### PUBLIC #########################################
-        #results.extend(test_public_pages())
+        results.extend(test_public_pages())
         #results.extend(test_signup())
         #results.extend(test_login_dialog())
         #results.extend(test_login_page())
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         
         ### EMPLOYEE
         #results.extend(test_employees())
-        results.extend(test_employee_access()) # TODO FINISH
+        #results.extend(test_employee_access()) # TODO FINISH
         
         ### SETTINGS
         #results.extend(test_settings())
