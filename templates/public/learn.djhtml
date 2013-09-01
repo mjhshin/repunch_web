@@ -57,7 +57,7 @@ ul.orangy li div {
 
 ul.not-orangy {
     list-style-type:none;
-    position:relative; top:-14px;
+    position:relative; top:-34px;
 }
 
 ul.not-orangy li { 
@@ -170,8 +170,8 @@ ul.not-orangy li:before {
 								<li>You only begin paying a modest monthly fee once you have a significant number of users getting punched at your store.</li>
 								<li>As you enter into paid tiers, you gain access to special services like premium marketing campaigns.</li>
 							</ul>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">EASY SETUP</span>
-							<ul class="not-orangy" style="position:relative;top:-4px;">
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">EASY SETUP</span></li>
+							<ul class="not-orangy">
 								<li>No hardware or POS integration required - you can be up and running in minutes!</li>
 					        </ul>
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">CHOOSE HOW TO PUNCH AND REDEEM</span></li>
