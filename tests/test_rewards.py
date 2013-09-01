@@ -140,7 +140,6 @@ def test_rewards():
     reward3_name = "reward tres"
     reward3_description = "TRES"
     reward3_punches = 12
-    test.find("#add_reward").click()
     reward4_name = "reward quatro"
     reward4_description = "QUATRO"
     reward4_punches = 15
