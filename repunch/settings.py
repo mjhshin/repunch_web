@@ -68,6 +68,7 @@ REST_CONNECTION_META = {
        "X-Parse-Application-Id": PARSE_APPLICATION_ID,
        "X-Parse-REST-API-Key":REST_API_KEY
 }
+PARSE_BATCH_LIMIT = 50
 
 USER_CLASS = "Account"
 

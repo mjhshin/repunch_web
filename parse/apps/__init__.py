@@ -1,6 +1,6 @@
 import json, httplib
 from parse.apps.patrons.models import PunchCode
-from repunch.settings import REST_CONNECTION_META
+from repunch.settings import REST_CONNECTION_META, PARSE_BATCH_LIMIT
 
 # Make sure that the PunchCode table exist. If not, create and populate.
 # This could be run in different threads for speed but it is only done
@@ -19,8 +19,8 @@ if not PunchCode.objects().get(punch_code='00000'):
                 }
         })
         code += 1
-        # send a request every 50 requests in the cache 
-        if code % 50 == 0 or code == 99999:
+        # send a request every PARSE_BATCH_LIMIT requests in the cache 
+        if code % PARSE_BATCH_LIMIT == 0 or code == 99999:
             connection = httplib.HTTPSConnection('api.parse.com', 443)
             connection.connect()
             connection.request('POST', '/1/batch', json.dumps({

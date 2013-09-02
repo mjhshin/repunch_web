@@ -7,7 +7,7 @@ from dateutil import parser
 import json, httplib, urllib, re
 from PIL import Image
 
-from repunch.settings import PARSE_VERSION,\
+from repunch.settings import PARSE_VERSION, PARSE_BATCH_LIMIT,\
 REST_CONNECTION_META, SUPPORTED_IMAGE_FORMATS,\
 PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as PID
 
@@ -84,16 +84,23 @@ def batch(method, parse_objects):
     Create (POST), update (PUT), or delete (DELETE) multiple
     parse objects in a single call to Parse.
     
+    The limit is PARSE_BATCH_LIMIT (50) parse_objects per batch!
+    
     Note that the master key is used here just in case one of the
     parse_objects is a User object and method is update.
     This will also mean that ACLs are ignored here.
     """
     reqs = []
     for po in parse_objects:
+        if method == "POST": 
+            path = '/' + PARSE_VERSION + '/' + po.path()
+        else:
+            path = '/' + PARSE_VERSION + '/' + po.path() + '/' +\
+                po.objectId
         reqs.append({
             "method": method,
-            "path": '/' + PARSE_VERSION + '/' + po.path(),
-            "body": po.jsonify()
+            "path": path,
+            "body": po._get_formatted_data()
         })
     payload = json.dumps({"requests": reqs})
     
@@ -102,10 +109,10 @@ def batch(method, parse_objects):
     rcm["Content-Type"] = "application/json"
     conn = httplib.HTTPSConnection('api.parse.com', 443)
     conn.connect()
-    conn.request(method, '/' + PARSE_VERSION + '/'  + "batch",
+    conn.request("POST", '/' + PARSE_VERSION + '/'  + "batch",
         payload, rcm)
      
-    return json.loads(connection.getresponse().read())
+    return json.loads(conn.getresponse().read())
 
 def rescale(image_path, img_format, crop_coords=None,
         dst_width=PID[0], dst_height=PID[1]):
