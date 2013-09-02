@@ -66,32 +66,28 @@ def send_email_failed_charge(account, store, subscription,
     Sends an email to the account holder.
     """
     def _wrapper():
+        # need to activate the store's timezone for template rendering!
+        timezone.activate(pytz.timezone(store.store_timezone))
         with open(FS_SITE_DIR +\
-            "/templates/manage/notification-receipt-monthly.html", 'r') as f:
+            "/templates/manage/notification-receipt-monthly-failed.html", 'r') as f:
             template = Template(f.read())
-        # for accounts
-        for asis in asiss:
-            # TODO
-            date_30_ago = timezone.now() + relativedelta(days=-30)
-            date_now = timezone.now()
-            invoice = asis[2]
-            if not invoice: # failed to charge user
-                continue
-            subscription = asis[3]
-            account = asis[0]
-            store = asis[1]
-            subject = "Repunch Inc. monthly service charge."
-            ctx = get_notification_ctx()
-            ctx.update({'store': store, 'invoice': invoice,
-                "date_30_ago":date_30_ago, "date_now":date_now,
-                "sub_type":sub_type, "subscription":subscription})
-            body = template.render(Context(ctx)).__str__()
-                    
-            email = mail.EmailMultiAlternatives(subject,
-                        strip_tags(body), to=[account.get('email')])
-            email.attach_alternative(body, 'text/html')
+        date_30_ago = subscription.date_last_billed +\
+            relativedelta(days=-30)
+        date_now = subscription.date_last_billed.replace()
+        date_disable = subscription.date_last_billed +\
+            relativedelta(days=14) # 14 days like date_passed_user_lim
+        subject = "Repunch Inc. important service notice."
+        ctx = get_notification_ctx()
+        ctx.update({'store': store, "date_disable":date_disable,
+            "date_30_ago":date_30_ago, "date_now":date_now,
+            "sub_type":sub_type, "subscription":subscription})
+        body = template.render(Context(ctx)).__str__()
+                
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
             
-        _send_emails([email,], connection)
+        _send_emails([email], connection)
     
     if connection:
         _wrapper()
@@ -125,6 +121,7 @@ def send_email_receipt_monthly(asiss, connection=None):
             subscription = asis[3]
             account = asis[0]
             store = asis[1]
+            timezone.activate(pytz.timezone(store.store_timezone))
             date_30_ago = subscription.date_last_billed +\
                 relativedelta(days=-30)
             date_now = subscription.date_last_billed.replace()
@@ -134,6 +131,7 @@ def send_email_receipt_monthly(asiss, connection=None):
                 "date_30_ago":date_30_ago, "date_now":date_now,
                 "sub_type":sub_type, "subscription":subscription})
             body = template.render(Context(ctx)).__str__()
+            timezone.deactivate()
                     
             email = mail.EmailMultiAlternatives(subject,
                         strip_tags(body), to=[account.get('email')])

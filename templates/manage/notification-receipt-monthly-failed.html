@@ -1,0 +1,26 @@
+{% extends "manage/notification.html" %}
+
+{% block title %}
+We have failed to charge you for your monthly membership with Repunch.
+{% endblock %}
+
+{% block content %}
+<p>
+Hey {{ store.get_owner_fullname }},
+</p>
+<p>
+{# NOTE that date_30_ago and date_now isn't necessarily 30 days ago from when this was ran and now #}
+We have failed to charge you for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
+</p>
+
+<p>
+The credit card information you provided was either incorrect or it does not have enough funds.
+Please update your credit card information by logging into your 
+<a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{STORE_INDEX}}">dashboard</a> and updating your account.
+</p>
+
+<p>
+Your account will be disabled on {{ date_disable|date:"F d, Y" }} if you fail to pay your monthly membership.
+</p>
+
+{% endblock %}

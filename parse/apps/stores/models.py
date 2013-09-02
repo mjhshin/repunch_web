@@ -345,7 +345,12 @@ class Subscription(ParseObject):
                         from repunch.com." 
                         
         Returns the Invoice if success. Or None if not.
+        If this subscription does not have a pp_cc_id then None 
+        is returned immediately.
         """
+        if not self.pp_cc_id or len(self.pp_cc_id) == 0:
+            return None
+            
         res = None
         try:
             res = charge_cc(self, total, description)
