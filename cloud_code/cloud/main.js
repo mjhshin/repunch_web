@@ -419,34 +419,48 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 	patronStoreQuery.include("Store");
 	patronStoreQuery.include("Patron");
 	
-	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
+	patronStoreQuery.get(patronStoreId).then(function(patronStore)
+	{
 		console.log("PatronStore fetch success.");
 		
-		if(acceptPost) {
-			var store = patronStore.get("Store");
-			var freePunches = store.get("punches_facebook");
+		if(acceptPost)
+		{
+			var facebookPost = patronStore.get("FacebookPost");
+			
+			if(facebookPost != null)
+			{
+				var store = patronStore.get("Store");
+				var freePunches = store.get("punches_facebook");
 		
-			store.relation("FacebookPosts").add( patronStore.get("FacebookPost") );
+				store.relation("FacebookPosts").add( facebookPost );
 		
-			patronStore.increment("all_time_punches", freePunches);
-			patronStore.increment("punch_count", freePunches);
-			patronStore.set("FacebookPost", null);
+				patronStore.increment("all_time_punches", freePunches);
+				patronStore.increment("punch_count", freePunches);
+				patronStore.set("FacebookPost", null);
 		
-			var promises = [];
-			promises.push( store.save() );
-			promises.push( patronStore.save() );
+				var promises = [];
+				promises.push( store.save() );
+				promises.push( patronStore.save() );
 	
-			Parse.Promise.when(promises).then(function() {
-				console.log("Store and PatronStore save success (in parallel).");
-				response.success("success");
-				return;
+				Parse.Promise.when(promises).then(function() {
+					console.log("Store and PatronStore save success (in parallel).");
+					response.success("success");
+					return;
 		
-			}, function(error) {
-				console.log("Store and PatronStore save fail (in parallel).");
-				response.error("error");
-				return;
-      	  });
-		} else {
+				}, function(error) {
+					console.log("Store and PatronStore save fail (in parallel).");
+					response.error("error");
+					return;
+      	  		});
+			}
+			else
+			{
+				console.log("PatronStore has a null pointer to FacebookPost");
+				response.error("error"); //TODO: once app handles this, we can change to success code.
+			}
+		}
+		else
+		{
 			console.log("User declined to post to Facebook");
 			patronStore.set("FacebookPost", null);
 			patronStore.save().then(function() {
