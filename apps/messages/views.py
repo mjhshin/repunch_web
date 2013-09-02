@@ -128,13 +128,14 @@ def edit(request, message_id):
     data['mp_slider_max'] = mp
     
     if request.method == 'POST' or (request.method == "GET" and\
-        request.GET.get("send_message")):
+        request.GET.get("send_message") and "message_b4_upgrade" in\
+        request.session):
         
         # 404 if no patrons 
         if not store.get("patronStores", count=1, limit=0):
             raise Http404
             
-        if (request.method == "GET" and request.GET.get("send_message")):
+        if request.method == "GET":
             postDict = request.session['message_b4_upgrade'].copy()
             # cleanup temp vars in session
             del request.session['message_b4_upgrade']

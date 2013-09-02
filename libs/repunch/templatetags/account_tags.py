@@ -4,7 +4,7 @@ from dateutil import parser
 from datetime import datetime
 
 from parse.utils import parse
-from parse.apps.accounts import sub_type
+from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.accounts.models import Account
 from parse import session as SESSION
 
@@ -17,28 +17,33 @@ def account_user_usage(session, percent_of=None):
         
     num_patrons = SESSION.get_patronStore_count(session)
     
-    if atype['max_users'] == -1:
+    if atype['max_users'] == UNLIMITED:
         percent = 0
     else:
         # may cause division by 0!!!
-        percent = num_patrons / atype['max_users']
-        if(percent > 1):
-            percent = 1
+        percent = float(num_patrons) / float(atype['max_users'])
+        if(percent > 1.0):
+            percent = 1.0
     
     if percent_of != None:
         return int(percent * percent_of)
             
-    return percent;
+    return percent
 
 @register.assignment_tag
-def account_alert(session):
+def account_alert_users(session):
     atype = sub_type[SESSION.get_subscription(\
                 session).get('subscriptionType')]
     
     num_patrons = SESSION.get_patronStore_count(session)
-        
-    # may cause division by 0!!!
-    percent = float(num_patrons) / float(atype['max_users'])
+    
+    if atype['max_users'] == UNLIMITED:
+        percent = 0
+    else:
+        # may cause division by 0!!!
+        percent = float(num_patrons) / float(atype['max_users'])
+        if(percent > 1.0):
+            percent = 1.0
     
     #if they are at 80 percent of their users, alert
     if percent >= .8:
@@ -46,6 +51,17 @@ def account_alert(session):
     elif percent >= 1.0:
         return 2
     return 0
+    
+    
+@register.assignment_tag
+def account_alert_billing(session):
+    sub = SESSION.get_subscription(session)
+    if sub.get('subscriptionType') != 0 and not
+        sub.date_charge_failed:
+        return True
+        
+    return False
+        
     
 
 @register.assignment_tag

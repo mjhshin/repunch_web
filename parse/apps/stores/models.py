@@ -261,6 +261,10 @@ class Subscription(ParseObject):
         self.date_passed_user_limit =\
             data.get("date_passed_user_limit")
             
+        # like passed user limit but instead for failure to charge
+        # credit card in monthly billing
+        self.date_charge_failed = data.get("date_charge_failed")
+            
         # use to bill monthly! ONLY USE for determining when to charge
         # monthly bill for premium accounts- not for smartphones or
         # other services!

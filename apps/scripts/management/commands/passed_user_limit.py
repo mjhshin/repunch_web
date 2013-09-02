@@ -1,5 +1,6 @@
 """
-This script scans through all active stores that have reached their 
+This will check and set the date_passed_user_limit for stores first.
+Then scans through all active stores that have reached their 
 user limit. If a store has reached their user limit, then the store
 owner is sent an email notification with the date in which the
 associated account will be disabled only if their credit card info
@@ -10,8 +11,7 @@ notification.
 Email send flow: now, 4 days, 8 days, 12 days
 Account disabled: 14th day from now
 
-NOTE that this does not detect date_passed_user_limit!
-It must be set somewhere else (comet view)
+NOTE that .
 """
 
 from django.utils import timezone
@@ -32,9 +32,14 @@ COMET_RECEIVE_KEY
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        now = timezone.now()
+        
+        # first scan though all the stores and set their
+        # date_passed_user_limit if so
+        
+        
         conn = mail.get_connection(fail_silently=(not DEBUG))
         conn.open()
-        now = timezone.now()
         # 1st day time range
         day1_end = now.replace()
         day1_start = day1_end + relativedelta(hours=-24)
@@ -198,6 +203,16 @@ class Command(BaseCommand):
                 date_passed_user_limit__gte=day14_start,
                 limit=LIMIT, skip=skip, order="createdAt"):
                 package = { "status": "disabled" }
+                
+                # deactivate the store
+                sub.store.active = False
+                sub.store.update()
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedStore":store.jsonify(),
+                }
+                comet_receive(subscription.Store, payload)
+                
                 try:
                     send_email_passed_user_limit(Account.objects().get(\
                         Store=sub.Store), sub.store, package, conn)
@@ -355,6 +370,16 @@ class Command(BaseCommand):
                 date_passed_user_limit__gte=day14_start,
                 limit=LIMIT, skip=skip, order="createdAt"):
                 package = { "status": "disabled" }
+                
+                # deactivate the store
+                sub.store.active = False
+                sub.store.update()
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedStore":store.jsonify(),
+                }
+                comet_receive(subscription.Store, payload)
+                
                 try:
                     send_email_passed_user_limit(Account.objects().get(\
                         Store=sub.Store), sub.store, package, conn)

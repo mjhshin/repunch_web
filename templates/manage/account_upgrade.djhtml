@@ -38,25 +38,27 @@ $(document).ready(function(){
 
 {% block content %}
 
-	{% account_alert request.session as alert %}
+	{% account_alert_users request.session as alert_users %}
 	
-	{% if error or success %}
-	<div class="notification {% if success %}success{% endif %} hide">
-		<div>{{ error }}{{ success }}</div>
+	{% if from_limit_reached %}
+    <div class="notification">
+		<div>Your message will be sent after you succesfully upgrade your account.</div>
+	</div>
+	{% elif alert_users == 2 %}
+    <div class="notification">
+		<div>You have passed your user limit. Your account will be upgrade once you update your account with valid credit card information.</div>
 	</div>
 	{% endif %}
+	
 	{% if form.non_field_errors %}
 	<div class="notification">
 		<div>{{ form.non_field_errors }}</div>
 	</div>
 	{% endif %}
-	{% if from_limit_reached %}
-    <div class="notification">
-		<div>Your message will be sent after you succesfully upgrade your account.</div>
-	</div>
-	{% elif alert == 2 %}
-    <div class="notification">
-		<div>You have passed your user limit. Your account will be upgrade once you update your account with valid credit card info.</div>
+	
+	{% if error or success %}
+	<div class="notification {% if success %}success{% endif %} hide">
+		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
 	

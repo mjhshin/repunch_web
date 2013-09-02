@@ -1,7 +1,8 @@
 {% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}{% load parse_tags %}
 
 {# ASSIGNMENTS UP HERE TO MAKE IT GLOBAL #}
-{% account_alert request.session as alert %}
+{% account_alert_users request.session as alert_users %}
+{% account_alert_billing request.session as alert_billing %}
 {% feedback_unread request.session as fcount %}
 {% employees_pending request.session as epcount %}
 {% redemptions_pending request.session as redcount %}
@@ -66,7 +67,7 @@
 					<a href="{% url 'store_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
 						<span class="nav-item-title">My Account</span>
-						{% if alert != 0 %}
+						{% if alert_users != 0 or alert_billing %}
 						<div class="nav-item-badge">!</div>
 						{% endif %}
 					</a>

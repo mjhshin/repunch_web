@@ -312,7 +312,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		response.error("error");
 		return;
 		
-	}).then(function(patron) {
+	}).then(function(store) {
 		console.log("Store save success.");
 		// calling response.success here will prevent the following promises from executing!
 		// response.success(patronStore);

@@ -60,8 +60,12 @@ class Command(BaseCommand):
                         subscription.date_last_billed =\
                             subscription.date_last_billed +\
                             relativedelta(days=30)
+                        subscription.date_charge_failed=None
                         subscription.update()
                     else:
+                        subscription.date_charge_failed=timezone.now()
+                        subscription.update()
+                    
                         # notify user via email- payment is done via 
                         # dashboard to also validate cc realtime
                         # 1st day time range

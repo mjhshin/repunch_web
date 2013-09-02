@@ -374,6 +374,7 @@ def comet_receive(store_id, postDict):
         if patronStore_int:
             patronStore_int = int(patronStore_int)
             session['patronStore_count'] = patronStore_int
+            
     # check if key is present and valid
     if postDict.get(COMET_RECEIVE_KEY_NAME) != COMET_RECEIVE_KEY:
         return False
