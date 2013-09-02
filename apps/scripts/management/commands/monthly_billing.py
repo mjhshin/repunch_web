@@ -50,12 +50,27 @@ class Command(BaseCommand):
                     invoice = subscription.charge_cc(\
                             sub_cost, "description", MONTHLY)
                     if invoice:
-                        subscription.date_last_billed = date_now
+                        subscription.date_last_billed =\
+                            subscription.date_last_billed +\
+                            relativedelta(days=-30)
                         subscription.update()
-                    # TODO send email and on dashboard prompt user 
-                    # to enter valid cc info
+                        # if the charge failed before
+                        if subscription.date_charge_failed:
+                            subscription.date_charge_failed = None
+                            subscription.update()
+                    else:
+                        # set the date_charge_failed if none
+                        if not subscription.date_charge_failed:
+                            subscription.date_charge_failed =\
+                                timezone.now()
+                            subscription.update()
+                        # send the user an email every day # TODO
+                        
+                    
                     asiss.append((account, store, invoice,
                         subscription))
+                        
+                # TODO comet_receive - update the logged in users' subscriptions
                 
             # end of while loop
             sub_count -= LIMIT
