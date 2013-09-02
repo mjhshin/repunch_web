@@ -25,6 +25,8 @@ class Message(ParseObject):
         self.store_id = data.get("store_id")
         # empty if message sent by store NEW
         self.patron_id = data.get('patron_id')
+        # number of patrons that received this message
+        self.receiver_count = data.get("receiver_count")
         
         # not used by the dashboard
         self.gift_description = data.get("gift_description")

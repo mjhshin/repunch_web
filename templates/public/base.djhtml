@@ -12,7 +12,7 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/global.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/global.1.5.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
 	
@@ -21,77 +21,9 @@
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
-	<script src="{% static 'manage/js/global.js' %}"></script>
-    {# AUTO COMPLETE Categories #}
-    <script src="{% static 'public/js/autocomplete.js' %}" type="text/javascript"></script>
-    <script src="{% static 'public/js/dialog-login.1.0.js' %}" type="text/javascript"></script>
+    <script src="{% static 'public/js/dialog-login.1.8.js' %}" type="text/javascript"></script>
 	
 	{% block javascript %}{% endblock %}
-
-{# --------------------- #}
-	
-<!---Accordion Javascript--->
-<script type="text/javascript">
-
-jQuery(document).ready(function() {
-	 
-	//ACCORDION BUTTON ACTION (ON CLICK DO THE FOLLOWING)
-	jQuery('.accordionButton').click(function() {
-
-		//REMOVE THE ON CLASS FROM ALL BUTTONS
-		jQuery('.accordionButton').removeClass('on');
-		  
-		//NO MATTER WHAT WE CLOSE ALL OPEN SLIDES
-	 	jQuery('.accordionContent').slideUp('normal');
-   
-		//IF THE NEXT SLIDE WASN'T OPEN THEN OPEN IT
-		if(jQuery(this).next().is(':hidden') == true) {
-			
-			//ADD THE ON CLASS TO THE BUTTON
-			jQuery(this).addClass('on');
-			  
-			//OPEN THE SLIDE
-			jQuery(this).next().slideDown('normal');
-		 } 
-		  
-	 });
-	  
-	
-	/*** REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
-	
-	//ADDS THE .OVER CLASS FROM THE STYLESHEET ON MOUSEOVER 
-	jQuery('.accordionButton').mouseover(function() {
-		jQuery(this).addClass('over');
-		
-	//ON MOUSEOUT REMOVE THE OVER CLASS
-	}).mouseout(function() {
-		jQuery(this).removeClass('over');										
-	});
-	
-	/*** END REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
-	
-	
-	/********************************************************************************************************************
-	CLOSES ALL S ON PAGE LOAD
-	********************************************************************************************************************/	
-	jQuery('.accordionContent').hide();
-	
-	
-	//login dialog
-	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
-	    title: "Business Sign In",
-	    minWidth: 330, minHeight: 316,
-	    maxWidth: 330, maxHeight: 350,
-	    height: 310, width: 330 });
-	    
-	$( "#header-signin-btn" ).click(function() {
-		$( "#dialog-login" ).dialog( "open" );
-		return false;
-	});
-
-});
-</script>
-<!---Accordion Javascript--->
 </head>
 <body>
 	<header id="header-wrapper">

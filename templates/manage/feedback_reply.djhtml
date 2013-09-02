@@ -1,8 +1,10 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load parse_tags %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Feedback Reply{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
 <script>
 $(document).ready(function(){
@@ -28,7 +30,7 @@ $(document).ready(function(){
 	</div>
 	{% endif %}
 	
-	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Feedback Inbox</a>
+	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1" id="back_to_feedback">&lt; Back to Feedback Inbox</a>
 	
 	<form action="{% url 'feedback_reply' feedback.objectId %}" method="post" id="message-form">{% csrf_token %}
 		<div class="white-box">
@@ -41,10 +43,8 @@ $(document).ready(function(){
 				<label>Subject:</label><span>{{ subject }}</span>
 				<div style="clear: left;"></div>
 			</div>
-			<div class="sect body">
-				<textarea id="body" name="body" style="width: 633px; height: 50px;"
-				    maxlength="750">{{body}}</textarea>
-			</div>
+			<div class="sect body"><textarea id="body" name="body" style="width: 612px; height: 50px;"
+				    maxlength="750">{{body}}</textarea></div>
 		</div>
 		<div id="message-detail-options" class="form-options">
 			<a id="reply-form-submit" class="button blue">Reply</a>
@@ -66,9 +66,7 @@ $(document).ready(function(){
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ feedback|get:'body' }}
-		</div>
+		<div class="sect body">{{ feedback|get:'body' }}</div>
 	</div>
 
 {% endblock %}

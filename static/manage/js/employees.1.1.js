@@ -1,9 +1,8 @@
-$(document).ready(function(){
-	// move to onclick to stopPropagation works?
-	$('.graph input').click(function(event){
-		// return false;
-	});
-	
+
+/**
+    Binds on click events to each componenet of each row in the tables.
+**/
+function rebindEmployees() {
 	$('.remove img').click(function(event){
 		
 		return confirm("Are you sure you want to remove this employee?");
@@ -19,15 +18,18 @@ $(document).ready(function(){
 		return confirm("Deny employee?");
 	});
 	
-	
 	$("[name='employee-graph-cb']").click(function(){
 		updateChart();
-	})
+	});
 	
 	//tie date selectors to chart
 	$( "#graph-dates > input" ).datepicker({ autoSize: true, onSelect: function(dateText, inst){
 		updateChart();
 	} });
+}
+
+$(document).ready(function(){
+	rebindEmployees();
 });
 
 var chart = null;
@@ -72,6 +74,11 @@ function updateChart()
         data: data,
         cache: false, // required to kill internet explorer 304 bug
         success: function(jsonData){
+            if (jsonData.hasOwnProperty("error")) {
+                alert(jsonData.error);
+                return;
+            }
+            
             var options = {
                 	legend: {position: 'bottom', alignment: 'start'},
                 	//chartArea: { left: 0, top: 0},

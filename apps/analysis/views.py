@@ -6,23 +6,27 @@ from datetime import timedelta, datetime
 import json
 
 from parse.utils import make_aware_to_utc
-from parse.decorators import session_comet
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
+from parse.decorators import access_required
 from parse.core.advanced_queries import relational_query
 from parse.auth.decorators import login_required
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
 @login_required
-@session_comet
+@access_required
 def index(request):
     data = {'analysis_nav': True}
-    data['rewards'] =\
-            SESSION.get_store(request.session).get("rewards")
+    rewards = SESSION.get_store(request.session).get("rewards")
+    # sort the rewards by redemption count in descending order
+    rewards.sort(key=lambda k: k['redemption_count'], reverse=True)
+    data['rewards'] = rewards
+            
     return render(request, 'manage/analysis.djhtml', data)
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def trends_graph(request, data_type=None, start=None, end=None ):
     store = SESSION.get_store(request.session)
     store_timezone = SESSION.get_store_timezone(request.session)
@@ -128,6 +132,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
 
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def breakdown_graph(request, data_type=None, filter=None, range=None):
     store = SESSION.get_store(request.session)
     store_timezone = SESSION.get_store_timezone(request.session)

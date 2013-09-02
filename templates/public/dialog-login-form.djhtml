@@ -4,18 +4,19 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="{% url 'repunch.views.manage_login' %}" />
 
-	<p><label for="id_username">Username:</label> 
+    {# Simply using email as the username as well #}
+	<p><label for="login_username">Email:</label> 
 	{# the redirect url to prevent hard-coding anything #}
-	<input type="text" name="username" id="id_username"></p>
+	<input type="text" name="username" id="login_username"></p>
 	
-	<p><label for="id_password">Password:</label> 
-	<input type="password" name="password" id="id_password"></p>
+	<p><label for="login_password">Password:</label> 
+	<input type="password" name="password" id="login_password"></p>
 	
 	<div id="dialog-login-message"></div>
 	
 	<input type="submit" value="Sign in" />
 	<div id="stay-signed-in">
-	<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label for="stay_in">&nbsp;Stay signed in?</label>
+	<input type="checkbox" id="stay_in" name="stay_in" value="yes" /><label id="stay_in_label" for="stay_in">&nbsp;Stay signed in?</label>
 	</div>
 	
     <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="logging in..."

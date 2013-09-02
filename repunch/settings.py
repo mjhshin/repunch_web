@@ -54,22 +54,21 @@ else:
 # for template rendering
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
-    ABSOLUTE_HOST_ALIAS = ABSOLUTE_HOST
 else:
-    ABSOLUTE_HOST = 'repunch.com'
-    ABSOLUTE_HOST_ALIAS = "repunch.com"
+    ABSOLUTE_HOST = 'www.repunch.com'
 
 # PARSE 
 PARSE_VERSION = '1'
 PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
 PARSE_MASTER_KEY = 'K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB'
 REST_API_KEY = "LVlPD43KJK4oGsP5f8ItFCA7RD4fwahTKQYRudod"
-PARSE_IMAGE_DIMENSIONS = (300, 300)
+PARSE_IMAGE_DIMENSIONS = (200, 200)
 SUPPORTED_IMAGE_FORMATS = ("png", "jpg", "jpeg")
 REST_CONNECTION_META = {
        "X-Parse-Application-Id": PARSE_APPLICATION_ID,
        "X-Parse-REST-API-Key":REST_API_KEY
 }
+PARSE_BATCH_LIMIT = 50
 
 USER_CLASS = "Account"
 
@@ -217,7 +216,7 @@ else:
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
 # order placed on smartphones
-PHONE_COST_UNIT_COST = 149
+PHONE_COST_UNIT_COST = 149 # TOD SET TO 149
 # paginator
 PAGINATION_THRESHOLD = 20
 # days given before account is disabled when passed user limit

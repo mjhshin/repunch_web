@@ -1,6 +1,8 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
 	{{ block.super }}
@@ -106,7 +108,7 @@
 	            $("#Ph2").val(p_num.substring(3,6));
 	            $("#Ph3").val(p_num.substring(6,10));
 	            
-	            
+	            // note that the submit is involved in store_edit.js
                 $("#account-edit-form").submit(function(){
                     // update the phone number's value
                     $("#id_phone_number").val(new String($("#Ph1").val()) + 

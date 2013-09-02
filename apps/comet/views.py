@@ -11,12 +11,14 @@ import json, socket, thread
 
 from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
+from parse.decorators import access_required
 from parse.auth.decorators import login_required
 from apps.comet.models import CometSession, CometSessionIndex
 from parse.comet import comet_receive
 from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE
 
-@login_required
+@login_required(http_response={"result": -3})
+@access_required(http_response={"result":-2})
 def pull(request):
     """
     This is where the comet approach is put into play.
@@ -100,17 +102,17 @@ def pull(request):
             tuple(set(emps_pending) - set(emps_pending_copy))
             
         if employees_pending:
-            emps_pending = []
+            pending = []
             for emp_id in employees_pending:
                 for emp in employees_pending_list:
                     if emp.objectId == emp_id:
-                        emps_pending.append(emp.jsonify())
+                        pending.append(emp.jsonify())
                         break
                     
-            if len(emps_pending) > 0:   
+            if len(pending) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-                data['employees_pending'] = emps_pending
+                data['employees_pending'] = pending
         
         #############################################################
         # EMPLOYEES APPROVED (pending to approved) #################
@@ -123,17 +125,17 @@ def pull(request):
             tuple(set(emps_approved) - set(emps_approved_copy))
         
         if appr_emps:
-            emps_approved = []
+            approved = []
             for appr_emp_id in appr_emps:
                 for emp in employees_approved_list:
                     if emp.objectId == appr_emp_id:
-                        emps_approved.append(emp.jsonify())
+                        approved.append(emp.jsonify())
                         break
                         
-            if len(emps_pending) > 0:   
+            if len(approved) > 0:
+                data['employees_approved'] = approved
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-                data['employees_approved'] = emps_approved
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!
@@ -147,22 +149,22 @@ def pull(request):
         del_emps = tuple(set(emps_copy) - set(emps))
         
         if del_emps:
-            emps_deleted = []
+            deleted = []
             for demp_id in del_emps:
                 if demp_id in emps_approved_copy:
-                    emps_list = emps_approved_list_copy
+                    emps_list = employees_approved_list_copy
                 else:
-                    emps_list = emps_pending_list_copy
+                    emps_list = employees_pending_list_copy
                     
                 for emp in emps_list:
                     if emp.objectId == demp_id:
-                        emps_deleted.append(emp.jsonify())
+                        deleted.append(emp.jsonify())
                         break  
                         
-            if len(emps_deleted) > 0:   
+            if len(deleted) > 0:   
                 data['employees_pending_count'] =\
                     len(employees_pending_list)
-                data['employees_deleted'] = emps_deleted
+                data['employees_deleted'] = deleted
            
         #############################################################
         # REDEMPTIONS PENDING
@@ -287,7 +289,9 @@ def pull(request):
         else:
             request.session.flush()
         
-        try: # respond
+        ############################################################
+        # Respond ###########################################
+        try: 
             return HttpResponse(json.dumps(data), 
                         content_type="application/json")
         except (IOError, socket.error) as e: # broken pipe/socket. 
@@ -355,7 +359,18 @@ def pull(request):
                 scomet.delete()
             except CometSession.DoesNotExist:
                 pass # do nothing
-            return comet(session_copy)
+            try:
+                return comet(session_copy)
+            except KeyError:
+                # if a key error occurs then that probably means that
+                # the session has been flushed- was logged out by user
+                # or forcefully by server =)
+                # now time to flag existing tabs.
+                try: 
+                    return HttpResponse(json.dumps({"result": -3}), 
+                                content_type="application/json")
+                except (IOError, socket.error) as e: # broken pipe/socket. 
+                    thread.exit() # exit silently
         else: # nothing new, sleep for a bit
             sleep(COMET_PULL_RATE)
             
@@ -421,6 +436,7 @@ def terminate(request):
             request.session.session_key))
         
         return HttpResponse("ok")
+    return HttpResponse("")
         
 @csrf_exempt  
 def receive(request, store_id):
@@ -434,12 +450,15 @@ def receive(request, store_id):
             Use request.body instead!
     """
     if request.method == "POST" or request.is_ajax():
-        postDict = json.loads(request.body)
+        try:
+            postDict = json.loads(request.body)
+        except Exception:
+            return HttpResponse("error")
         
         if comet_receive(store_id, postDict):
             return HttpResponse("success")
             
-        return HttpResponse("error")
+    return HttpResponse("error")
         
 
 

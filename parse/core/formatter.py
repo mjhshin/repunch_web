@@ -21,11 +21,11 @@ WHERE_OPTIONS = [
 def format_date(dateObj):
     """
     Returns the Parse Date __type of the given
-    datetime.date or datetime.datetime object or None.
+    datetime.date or datetime.datetime object.
     """
     if dateObj:
-        return { "__type": "Date",
-          "iso": parser.parse(dateObj.isoformat()).isoformat() }
+        return { "__type": "Date", 
+            "iso": parser.parse(dateObj.isoformat()).isoformat() }
 
 def format_pointer(className, objectId):
     """

@@ -1,0 +1,51 @@
+#date_added{
+	clear:left; 
+}
+
+.form-options{
+    clear: left;
+	width:260px;
+}
+
+#employee-saving {
+    display:none;
+    position:relative; top:5px;left:4px;
+}
+
+#delete-button {
+    float:right;
+    position:relative; top:34px; right:6px;
+}
+
+#employee-form label {
+    margin-top: 2px;
+}
+
+#employee-header {
+    display:inline-block;
+    float:left; clear:left;
+    margin-bottom: 30px;
+    width:460px;
+}
+
+#employee-form-div {
+    display:inline-block;
+    float:right; clear:right;
+    width:180px;
+}
+
+/* punch table styles */
+#header-date_punched, .date_punched {
+	width:100px;
+}
+#header-time, .time {
+	width:100px;
+}
+#header-customer, .customer {
+	width:200px;
+}
+#header-punches, .punches {
+	width:110px;
+}
+
+#load-row a { font-weight: bold; cursor: pointer; }

@@ -1,14 +1,15 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}{% load parse_tags %}{% load account_tags %}
 
 {% block title %}Settings{% endblock %}
 {% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/settings.css" %}" />{% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/settings.js" %}"></script>
+	<script src="{% static "manage/js/settings.1.0.js" %}"></script>
 {% endblock %}
 
 
 {% block content %}
+	{% account_is_admin request.session as is_admin %}
 	<form action="{% url 'account_settings' %}" method="post" id="settings-form">{% csrf_token %}
 		{% if error or success %}
 		<div class="notification {% if success %}success{% endif %} hide">
@@ -18,32 +19,45 @@
 		
 		<h2>Settings</h2>
 		
-		{{ form.punches_employee.errors }}
+		<div id="punches_employee_e">{{ form.punches_employee.errors }}</div>
 		<label for="employee_punches">Number of punches allowed by an employee at one time</label>
+		{% if is_admin %}
 		{{ form.punches_employee }}
+		{% else %}
+		<input id="id_punches_employee" name="punches_employee" type="text" value="{{ form.punches_employee.value }}" readonly/>
+		{% endif %}
 		
-		{{ form.punches_facebook.errors }}
+		<div id="punches_facebook_e">{{ form.punches_facebook.errors }}</div>
 		<label for="facebook_free_punches">Free Punch Allowance for Facebook</label>
+		{% if is_admin %}
 		{{ form.punches_facebook }}
+		{% else %}
+		<input id="id_punches_facebook" name="punches_facebook" type="text" value="{{ form.punches_facebook.value }}" readonly/>
+		{% endif %}
 		
 		<div style="clear: left">&nbsp;</div>
 		
 		{% if settings  %}
 		<label for="retailer_pin">Retailer PIN</label>
-		<div id="retailer_pin">{{ settings|get:'retailer_pin'  }}</div> <a href="{% url 'refresh_retailer_pin' %}" id="link_refresh_retailer_pin"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_pin" /></a>
+		<div id="retailer_pin">{{ settings|get:'retailer_pin'  }}</div> 
+		{% if is_admin %}
+		<a href="{% url 'refresh_retailer_pin' %}" id="link_refresh_retailer_pin"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_pin" /></a>
 		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
 			        id="retailer-pin-loading" style="display:none;position:relative;top:-10px;"/>
+        {% endif %}
 		{% endif %}
 		
+		{% if is_admin %}
 		<div id="settings-options" class="form-options">
 			<a id="settings-form-submit"
 			    class="button blue">Save Settings</a>
-			<a href="{% url 'store_index' %}" class="red">Cancel changes</a>
+			<a href="{% url 'account_settings' %}" class="red">Cancel changes</a>
 			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
 		            alt="processing punch request..." 
 		            id="settings-saving" 
             style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
+		{% endif %}
 
 	</form>
 {% endblock %}

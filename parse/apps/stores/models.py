@@ -1,7 +1,6 @@
 """
 Parse equivalence of Django apps.stores.models
 """ 
-from urllib2 import HTTPError
 from importlib import import_module
 from dateutil import parser
 import string, random
@@ -12,6 +11,8 @@ from libs.paypal import store_cc, charge_cc
 from parse.core.models import ParseObject
 from repunch.settings import TIME_ZONE
 from libs.repunch import rputils
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
 
 DAYS = ((1, 'Sunday'),
 		(2, 'Monday'),
@@ -33,6 +34,9 @@ class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
     def __init__(self, **data):
         self.active = data.get('active', False)
+        # the owner_id is the objectId of the original account that 
+        # created this object at signup
+        self.owner_id = data.get("owner_id")
         self.store_name = data.get('store_name')
         self.street = data.get("street")
         self.city = data.get('city')
@@ -50,7 +54,7 @@ class Store(ParseObject):
         # GeoPoint [latitude, longtitude]
         self.coordinates = data.get('coordinates')
         
-        self.punches_facebook = data.get("punches_facebook")  
+        self.punches_facebook = data.get("punches_facebook", 1)  
 
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
@@ -97,6 +101,34 @@ class Store(ParseObject):
     def get_owner_fullname(self):
         return self.first_name.capitalize()+\
                 " " + self.last_name.capitalize()
+                
+    def get_access_level(self, account):
+        """ Returns the access level of the given account 
+            ACCESS_ADMIN = {"read": True, "write": True}
+            ACCESS_PUNCHREDEEM = {"read": True}
+            ACCESS_NONE = /not in ACL/
+        """
+        if account.objectId in self.ACL:
+            acl = self.ACL[account.objectId]
+            if acl.get("read") and acl.get("write"):
+                return ACCESS_ADMIN
+            elif acl.get("read"):
+                return ACCESS_PUNCHREDEEM
+        return ACCESS_NONE
+            
+    def is_admin(self, account):
+        """ Returns true if the account has full admin access """
+        return self.get_access_level(account) == ACCESS_ADMIN
+        
+    def is_owner(self, account):
+        """ Returns true if the account is the owner of the store """
+        return self.owner_id == account.objectId
+        
+    def has_access(self, account):
+        """ 
+        Returns true if the account does not have an ACL = ACCESS_NONE
+        """
+        return self.get_access_level(account)[1] > ACCESS_NONE[1]
    
     def get_full_address(self):
         """
@@ -228,7 +260,7 @@ class Subscription(ParseObject):
         # MUST be set back to None if not in use!!!!
         self.date_passed_user_limit =\
             data.get("date_passed_user_limit")
-        
+            
         # use to bill monthly! ONLY USE for determining when to charge
         # monthly bill for premium accounts- not for smartphones or
         # other services!
@@ -288,11 +320,17 @@ class Subscription(ParseObject):
     
     def store_cc(self, cc_number, cvv2):
         """ store credit card info. returns True if successful """
+        # TODO verify credit card cvv2 and expiration date ?!
         try:
             res = store_cc(self, cc_number, cvv2)
-        except HTTPError: # wrong credit card info BAD REQUEST (400)
-            raise
+        except Exception as e: 
+            return False
         else:
+            # something went wrong though this should never occur
+            if not res.ok:
+                return False
+                
+            res = res.json()
             self.pp_cc_id = res['id']
             self.date_pp_valid = parser.parse(res['valid_until'])
             self.update()
@@ -307,12 +345,26 @@ class Subscription(ParseObject):
                         from repunch.com." 
                         
         Returns the Invoice if success. Or None if not.
+        If this subscription does not have a pp_cc_id then None 
+        is returned immediately.
         """
+        if not self.pp_cc_id or len(self.pp_cc_id) == 0:
+            return None
+            
+        res = None
         try:
             res = charge_cc(self, total, description)
-        except HTTPError: # wrong credit card info BAD REQUEST (400)
+        # something went wrong
+        except Exception as e: 
             return None
         else:
+            # maybe because of invalid ccv and/or expiration date
+            # or insufficient funds or if the credit card was refused
+            # for some other reason
+            if not res.ok:
+                return None
+                
+            res = res.json()
             invoice = Invoice(
                 state = res['state'],
                 payment_id = res['id'],

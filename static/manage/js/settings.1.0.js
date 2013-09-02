@@ -27,12 +27,15 @@ $(document).ready(function(){
                 type: "GET",
                 cache:false, // required to kill internet explorer 304 bug
                 success: function(data) {
-				    if(data.success)
-				    {
+                    if (data.hasOwnProperty("error")) {
+                        alert(data.error);
+                        loading.hide();
+                        return;
+                    }   
+                                    
+				    if(data.success) {
 					    $('#retailer_pin').addClass('refreshed').html(data.retailer_pin);
-				    }
-				    else
-				    {
+				    } else {
 					    alert("Error refreshing Retailer ID. Please contact your administrator.");
 				    }
 		            loading.hide();

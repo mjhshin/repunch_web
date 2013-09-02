@@ -4,14 +4,14 @@ from django.http import Http404, HttpResponseRedirect
 import urllib, json
 
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
-from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import admin_only, access_required
 from parse.auth.decorators import login_required
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
 @login_required
-@session_comet
+@access_required
 def index(request):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
@@ -52,7 +52,7 @@ def index(request):
 
 
 @login_required
-@session_comet
+@admin_only(reverse_url="rewards_index")
 def edit(request, reward_id):
     data = {'rewards_nav': True}
     store = SESSION.get_store(request.session)
@@ -94,8 +94,12 @@ def edit(request, reward_id):
   
             if not is_new:
                 msg = 'Reward has been updated.'
-                reward["redemption_count"] =\
-                    old_reward["redemption_count"]
+                # reset the redemtion count?
+                if request.POST.get('reset_red_count'):
+                    reward["redemption_count"] = 0
+                else:
+                    reward["redemption_count"] =\
+                        old_reward["redemption_count"]
                 reward['reward_id'] = old_reward['reward_id']
                 store.array_remove('rewards', [old_reward])
             elif len(ids) == 0: # first reward
@@ -130,7 +134,9 @@ def edit(request, reward_id):
                 "?%s" % urllib.urlencode({'success':msg}))
     else:
         if reward_id >= 0 and reward_id in rewards_map:
-            form = RewardForm(rewards_map[reward_id])
+            reward = rewards_map[reward_id]
+            form = RewardForm(reward)
+            data['reward'] = reward
         else:
             form = RewardForm()
         if not is_new:
@@ -142,14 +148,13 @@ def edit(request, reward_id):
     # update session cache
     request.session['store'] = store
 
-    data['is_new'] = is_new;
-    data['reward'] = reward
+    data['is_new'] = is_new
     data['reward_id'] = reward_id
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
 @login_required
-@session_comet
+@admin_only(reverse_url="rewards_index")
 def delete(request, reward_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)

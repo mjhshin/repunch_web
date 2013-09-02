@@ -1,4 +1,4 @@
-{% extends "manage/notification.html" %}
+{% extends "manage/notification.html" %}{% load parse_tags %}
 
 {% block title %}
 Suspicious activity has been detected.
@@ -48,7 +48,7 @@ From {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}
 		    <div style="background-color:#555;text-transform:uppercase;color:#fff;font-weight:bold;text-align:center;font-size:9px;line-height:14px;padding:0 4px;">
                 Punches</div>
 			<div style="background-color:#fff;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
-                {{ ch.punches|length }}
+                {{ ch.punches|get_total_punches }}
             </div>
 		</div>
     </td>

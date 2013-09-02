@@ -9,27 +9,27 @@ from django.http.request import QueryDict
 from django.forms.models import inlineformset_factory
 from datetime import datetime
 from io import BytesIO
-import json, urllib, urllib2, os
+import json, urllib, urllib2, os, pytz
 
-from parse.decorators import session_comet
 from apps.stores.models import Store as dStore, Hours as dHours,\
 StoreAvatarTmp
 from apps.stores.forms import StoreForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
-from repunch.settings import MEDIA_ROOT,\
+from repunch.settings import MEDIA_ROOT, TIME_ZONE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png, cloud_call
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required
 
 @login_required
-@session_comet
+@access_required
 def index(request):
     data = {'account_nav': True}
     
@@ -41,17 +41,18 @@ def index(request):
     return render(request, 'manage/store_details.djhtml', data)
 
 @login_required
-@session_comet
+@admin_only(reverse_url="store_index")
 def edit(request):
-    data = {'account_nav': True}
     account = request.session['account']
     store = SESSION.get_store(request.session)
+    
+    data = {'account_nav': True}
     # fake a store to construct HoursFormset - probably not necessary
     dstore_inst = dStore()
     
     def common(form):
         hours_map = {}
-        # group up the days that aare in the same row
+        # group up the days that are in the same row
         if store.get("hours"):
             for hour in store.get("hours"):
                 key = (hour['close_time'], hour['open_time'])
@@ -151,18 +152,27 @@ def edit(request):
                     
             store.update()
             
-            # update the account
+            # update the account - email = username!
             account.email = request.POST['email']
-            account.update(request.session[SESSION_KEY])
+            account.username = request.POST['email']
+            account.update()
             
             # update the session cache
+            try:
+                request.session['store_timezone'] =\
+                    pytz.timezone(store.store_timezone)
+            except Exception:
+                request.session['store_timezone'] =\
+                    pytz.timezone(TIME_ZONE)
+                
             request.session['account'] = account
             request.session['store'] = store
             
             # notify other dashboards of this change
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedStore_one":store.jsonify()
+                "updatedStore": store.jsonify(),
+                "updatedAccount": account.jsonify()
             }
             comet_receive(store.objectId, payload)
             
@@ -182,7 +192,11 @@ def edit(request):
          
     return common(form)
 
+# this accessed only through the edit_store detail page, which
+# requires admin access but this might be useful somewhere else
+# so the admin_only decorator is not used
 @login_required
+@access_required(http_response="Access denied", content_type="text/plain")
 def hours_preview(request):
     HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
     
@@ -199,6 +213,8 @@ def hours_preview(request):
     
     
 @login_required
+@access_required(http_response="<h1>Access denied</h1>",\
+content_type="text/html")
 @csrf_exempt
 def avatar(request):
     data = {}
@@ -244,19 +260,24 @@ def avatar(request):
     data['url'] = reverse('store_avatar')
     return render(request, 'manage/avatar_upload.djhtml', data)
     
+# TODO http_response on access_required should be a link to an image
 @login_required
+@access_required(http_response="<h1>Access denied</h1>",\
+content_type="text/html")
 def get_avatar(request):
     """ returns the store's avatar url """
     if request.method == "GET" or request.is_ajax():
         store = SESSION.get_store(request.session)
         return HttpResponse(store.get("store_avatar_url"))
         
+    raise Http404
 
 @login_required
+@admin_only(http_response="<h1>Permission denied</h1>",\
+content_type="text/html")
 @csrf_exempt
 def crop_avatar(request):
     """ takes in crop coordinates and creates a new png image """
-            
     if request.method == "POST":
         data = {}
         store = SESSION.get_store(request.session)
@@ -316,7 +337,7 @@ def crop_avatar(request):
         
         # need to remove old file
         if old_avatar:
-            delete_file(old_avatar, 'png')
+            delete_file(old_avatar, 'image/png')
         
         # flag the execution of avatarCropComplete js function
         data['success'] = True
@@ -325,7 +346,7 @@ def crop_avatar(request):
         request.session['store'] = store
         return render(request, 'manage/avatar_crop.djhtml', data)
     
-    
+    raise Http404
     
     
     

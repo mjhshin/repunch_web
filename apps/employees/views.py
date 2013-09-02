@@ -8,20 +8,22 @@ from datetime import datetime
 import urllib, json
 
 from parse.utils import make_aware_to_utc
-from parse.decorators import session_comet
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
-@session_comet
+@access_required
 def index(request):
     data = {'employees_nav': True}
     
@@ -40,7 +42,7 @@ def index(request):
     return render(request, 'manage/employees.djhtml', data)
 
 @login_required
-@session_comet
+@admin_only(reverse_url="employees_index")
 def edit(request, employee_id):
     data = {'employees_nav': True, 'employee_id': employee_id}
     
@@ -54,26 +56,55 @@ def edit(request, employee_id):
             break
             
     acc = Account.objects().get(Employee=employee.objectId)
+    store = SESSION.get_store(request.session)
             
     if not employee or not acc:
         raise Http404
+
+    if request.method == "POST":
+        post_acl = request.POST["ACL"]
+        if post_acl == ACCESS_ADMIN[0]:
+            store.ACL[acc.objectId] = {"read": True, "write": True}
+        elif post_acl == ACCESS_PUNCHREDEEM[0]:
+            store.ACL[acc.objectId] = {"read": True}
+        elif post_acl == ACCESS_NONE[0]:
+            if acc.objectId in store.ACL:
+                del store.ACL[acc.objectId]
+                
+        store.update()
+        request.session['store'] = store
+        # notify other dashboards of this change
+        payload = {
+            COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            "updatedStore":store.jsonify()
+        }
+        comet_receive(store.objectId, payload)
         
-    if request.GET.get("success"):
-        data['success'] = request.GET.get("success")
-    if request.GET.get("error"):
-        data['error'] = request.GET.get("error")
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has been updated.'}))
         
     form = EmployeeForm(employee.__dict__.copy())
     form.data['email'] = acc.get('email')
     
-    data['form'] = form
-    data['employee'] = employee
+    data.update({
+        'ACCESS_ADMIN': ACCESS_ADMIN[0],
+        'ACCESS_PUNCHREDEEM': ACCESS_PUNCHREDEEM[0],
+        'ACCESS_NONE': ACCESS_NONE[0],
+        'form': form,
+        'employee': employee,
+        'employee_acl': store.get_access_level(acc)[0],
+    })
 
     return render(request, 'manage/employee_edit.djhtml', data)
 
 @login_required
-@session_comet
+@admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
+    """ 
+    This will also remove the employee from the ACL,
+    delete the employee object and also delete the Parse.User object
+    if and only if it has no pointer to a Store or a Patron.
+    """
     # get from the employees_approved_list in session cache
     employees_approved_list = SESSION.get_employees_approved_list(\
         request.session)
@@ -90,6 +121,30 @@ def delete(request, employee_id):
     employees_approved_list.pop(i_remove)   
     request.session['employees_approved_list'] =\
         employees_approved_list
+        
+    employee.delete()
+    # delete the account associated with the employee if the account
+    # does not have a pointer to a Store and/or a Patron
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc.Store and not acc.Patron:
+        acc.delete()
+    else: # just set the Employee pointer to None
+        acc.Employee = None
+        acc.update()
+    
+    store = SESSION.get_store(request.session)
+    if acc.objectId in store.ACL:
+        del store.ACL[acc.objectId]
+                
+    store.update()
+    request.session['store'] = store
+    # notify other dashboards of this change
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "updatedStore":store.jsonify()
+    }
+    comet_receive(store.objectId, payload)
+    ##########################
 
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
@@ -100,14 +155,12 @@ def delete(request, employee_id):
     }
     comet_receive(store_id, payload)
     
-    # delete Punches Pointers to this employee?
-    employee.delete()
 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
 @login_required
-@session_comet
+@admin_only(reverse_url="employees_index")
 def approve(request, employee_id):
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
@@ -148,7 +201,7 @@ def approve(request, employee_id):
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
 @login_required
-@session_comet
+@admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
     """ this actually deletes the employee object! """
     # get from the employees_pending_list in session cache
@@ -168,6 +221,17 @@ def deny(request, employee_id):
     request.session['employees_pending_list'] =\
         employees_pending_list
         
+    # delete the employee!
+    employee.delete()  
+    # delete the account associated with the employee if the account
+    # does not have a pointer to a Store and/or a Patron
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc.Store and not acc.Patron:
+        acc.delete()
+    else: # just set the Employee pointer to None
+        acc.Employee = None
+        acc.update()
+        
     # notify other dashboards of this change
     store_id = SESSION.get_store(request.session).objectId
     deleted_employee = Employee(objectId=employee.objectId)
@@ -177,13 +241,11 @@ def deny(request, employee_id):
     }
     comet_receive(store_id, payload)
     
-    # delete the employee!
-    employee.delete()
-    
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
 @login_required
+@access_required(http_response="Access Denied", content_type="text/plain")
 def punches(request, employee_id):
     data = {'employee_id': employee_id}
     
@@ -229,6 +291,7 @@ def punches(request, employee_id):
     return render(request, 'manage/employee_punches.djhtml', data)
 
 @login_required
+@access_required(http_response={"error": "Access denied"})
 def graph(request):
     store_timezone = SESSION.get_store_timezone(request.session)
     

@@ -70,7 +70,7 @@ function onRedeem(rowId, action){
                     if (rcount < 1){
                         // workbench nav badge
                         if (rBadge.length == 1){
-                            rBadge.fadeOut(1000, function(){
+                            rBadge.fadeOut(700, function(){
                                 $(this).remove();
                             });
                         }

@@ -20,12 +20,19 @@ $(document).ready(function(){
     // need to have included redemptions.js above this script!   
     
     function mainComet(res, status, xhr) {
-        // goes here if there are no changes
         if (res.hasOwnProperty("result")){
-            if (res.result == 0){
+            if (res.result == 0){ // no changes - re-request
                 makeRequest();
                 return;
-            } else if (res.result == -1) {
+            } else if (res.result == -1) { // request terminated
+                return;
+            } else if (res.result == -2) { // access taken away
+                alert("You have lost your access priviledges!");
+                location.reload(true);
+                return;
+            } else if (res.result == -3) { // logged out
+                alert("You have been logged out!");
+                location.reload(true);
                 return;
             }
         } 
@@ -153,18 +160,22 @@ $(document).ready(function(){
                 day = "0" + day;
             }
             var dStr = month + "/" + day + "/" + year;
+            var approve_div = "";
+            if ($("#header-approve").length > 0) {
+                approve_div = "<div class='td approve'>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
+			        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
+			    "<a href='/manage/employees/" + employee.objectId + "/deny' class='employee deny'>" +
+			        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
+		        "</div>";
+            }
             $("#tab-body-pending-employees div.table-header").after(
                 "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
 		        
 		        "<div class='td first_name_pending'>" + employee.first_name.trimToDots(12) + "</div>" +
 		        "<div class='td last_name_pending'>" + employee.last_name.trimToDots(12) + "</div>" +
 		        "<div class='td date_added_pending'>" + dStr + "</div>" +
-		        "<div class='td approve'>" +
-			    "<a href='/manage/employees/" + employee.objectId + "/approve' class='employee approve'>" +
-			        "<img src='/static/manage/images/icon_green-check.png' alt='Approve' /></a>" +
-			    "<a href='/manage/employees/" + employee.objectId + "/deny' class='employee deny'>" +
-			        "<img src='/static/manage/images/icon_red-x.png' alt='Deny' /></a>" +
-		        "</div>" +
+		        approve_div +
 		        "</div>" );
         }
         
@@ -186,6 +197,12 @@ $(document).ready(function(){
                 day = "0" + day;
             }
             var dStr = month + "/" + day + "/" + year;
+            var remove_div = "";
+            // if this header is not present, then the user does not have permission to remove
+            if ($("#header-remove").length > 0) {
+                remove_div = "<div class='td remove'><a href='/manage/employees/" + employee.objectId + "/delete' >" + 
+				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>";
+            }
             $("#tab-body-approved-employees div.table-header").after(
                 "<div class='tr " + odd + " unread' id='" + employee.objectId + "' >" +
 		        
@@ -199,10 +216,14 @@ $(document).ready(function(){
 		        "<div class='td punches_approved'>" +  new String(employee.lifetime_punches) + "</div></a>" +
 		        
 				"<div class='td graph'><input type='checkbox' name='employee-graph-cb' value='" + employee.objectId + "' /></div>" + 
-				"<div class='td remove'><a href='/manage/employees/" + employee.objectId + "/delete' >" + 
-				"<img src='/static/manage/images/icon_red-x.png' alt='Remove' /></a></div>" +
-		        
+		        remove_div +
 		        "</div>" );
+
+            // remove placeholder when empty
+            if ($("#no-approved-employees").length > 0){
+                $("#no-approved-employees").remove();
+            }
+
         }
         
         if (res.hasOwnProperty('employees_pending')){
@@ -237,26 +258,28 @@ $(document).ready(function(){
                     $("#no-pending-employees").remove();
                 }
             }
-            
+            rebindEmployees(); // defined in employees.js
         }// end employees pending
         
         function employeesApprovedDeleted(emps, type) {
             // pending employees nav 
-            var employees_pending_count = new String(res.employees_pending_count);
+            var employees_pending_count = res.employees_pending_count;
             var mBadge = $("#employees-nav a div.nav-item-badge");
             if (mBadge.length == 1) {
-                mBadge.text(employees_pending_count);
-            } else {
-                mBadge.fadeOut(1000, function(){
-                    $(this).remove();
-                });
+                if (employees_pending_count == 0) {
+                    mBadge.fadeOut(1000, function(){
+                        $(this).remove();
+                    });
+                } else {
+                   mBadge.text(new String(employees_pending_count));
+                }
             }
             
             // Employees page
             var pendingTab = $("#tab-pending-employees");
             if (pendingTab.length > 0) {
                 // move the rows from pending tab to approved tab
-                for (var i=0; i< emps.length; i++) {
+                for (var i=0; i<emps.length; i++) {
                     var row = $("#" + emps[i].objectId);
                     // row.css("background", "#FFFFCB");
                     row.css("background", "#CCFF99");
@@ -264,10 +287,17 @@ $(document).ready(function(){
                         // row.html("Employee has been <span style='color:blue;'>APPROVED</span> elsewhere.");
                         row.html("Successfully <span style='color:blue;'>APPROVED</span> employee.");
                     } else {
-                        // row.html("Employee has been <span style='color:red;'>DENIED</span> elsewhere.");
-                        row.html("Successfully <span style='color:red;'>DENIED</span> employee.");
+                        // row.html("Employee has been <span style='color:red;'>REMOVED</span> elsewhere.");
+                        row.html("Successfully <span style='color:red;'>REMOVED</span> employee.");
                     }
-                    
+			
+                    // First add to the approved tab. Do it here because the callback function after 2 seconds 
+                    // has the var i as emps.length, which causes employee in addToEmployeesApproved to receiving an undefined employee
+                    if (type == "approved") {
+                        addToEmployeesApproved(emps[i]);
+                    }
+
+                   
                     // the last row to go checks if placeholder is necessary
                     if (i == emps.length - 1) {
                         row.fadeOut(2000, function(){
@@ -293,22 +323,21 @@ $(document).ready(function(){
                     } else {
                         row.fadeOut(2000, function(){
                             $(this).remove();
-                            // Now add to the approved tab
-                            if (type == "approved") {
-                                addToEmployeesApproved(emps[i]);
-                            }
                         });
                     }
                 }
                 
                 // update the title and the tab
-                if (count > 0) {
+                if (employees_pending_count > 0) {
                     document.title = "Repunch | (" + employees_pending_count + ") Employees";
                     $("#tab-pending-employees").html("Pending (" + employees_pending_count + ")");
                 } else {
                     document.title = "Repunch | Employees";
                     $("#tab-pending-employees").html("Pending");
                 }
+                
+                // Just in case that new rows are moved to approved, rebind the checkbox click event for graphing.
+                rebindEmployees(); // defined in employees.js
                 
             }
             
@@ -405,6 +434,10 @@ $(document).ready(function(){
                             minute = "0" + minute;
                         }
                         d = hour + ":" + minute + " " + ampm;
+                        var red_punches = new String(redemptions_pending[i].num_punches);
+                        if (red_punches == "0") {
+                            red_punches = "-";
+                        }
                         var rowStr = "<div class='tr " + odd + "' " + 
                             "id='"+ redemptions_pending[i].objectId + "'>" +
 		                    "<input type='hidden'" + 
@@ -416,7 +449,7 @@ $(document).ready(function(){
 		                    "<div class='td redemption_title'>" +
 				            redemptions_pending[i].title.trimToDots(18) + "</div>" +
 				            "<div class='td redemption_punches'>" +
-				            redemptions_pending[i].num_punches + "</div>" +
+				            red_punches + "</div>" +
 				            "<div class='td redemption_redeem' style='margin-top:4px;'>" +
 				            
 	                        "<a name='" + redemptions_pending[i].objectId + "' style='color:blue;cursor:pointer;'>" +

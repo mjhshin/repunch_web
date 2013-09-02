@@ -60,7 +60,7 @@ $(document).ready(function(){
         // format the cats first
         var cats = '';
         $(".closable-box").each(function(){
-            cats = cats + $(this).text() + ',';
+            cats = cats + $(this).text() + '|';
         });
         $( "#categories" ).val(cats);
         var data = $("#signup-form").serialize();
@@ -79,6 +79,7 @@ $(document).ready(function(){
                 if (res.code == 2){
                     // subscription not active. Tell them.
                     $( "#dialog-signup" ).dialog({ 
+                        title: "Sign up complete", 
                         minHeight: 110, maxHeight: 110,
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
@@ -86,15 +87,9 @@ $(document).ready(function(){
                         } });
                     $("#signing-up-time").show();
                     messageContainer.css("width", "250px");
-                    messageContainer.html("<span style='color:#DF7401;position:relative;top:4px;'>"+
+                    messageContainer.html("<span style='color:#DF7401;position:relative;top:-4px;left:14px'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
-                } else if (res.code == 4){
-                    // go to part 2
-                    // uncomment below when credit card info is brought back on sign up
-                    // window.location.replace(url_signup2);
-                }
-                // active subscription. redirect to dashboard.
-                else if (res.code == 3){
+                } else if (res.code == 3){ // active subscription. redirect to dashboard.
                     messageContainer.html("<span style='color:green;'>Redirecting to dashboard.</span>");
                     window.location.replace(url_redirect);
                 }

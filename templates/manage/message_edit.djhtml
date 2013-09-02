@@ -1,9 +1,11 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}Send New Message{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/message_edit.1.0.css" %}" />
 {% endblock %}
 {% block javascript %}
 <script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>
@@ -35,7 +37,7 @@ $(document).ready(function(){
 					You currently have the highest level of subscription. 
 					Please contact us for further support.<br/>
 					<a class="button blue" style="margin-top: 10px;"
-					    href="{% url 'messages_index' %}" >Okay</a>
+					    href="{% url 'messages_index' %}" id="maxed_out">Okay</a>
 					<span style="clear: left; display: block;"></span>
 					{% else %}
 					This message cannot be sent because you have reached your maximum messages sent for this month. Click on the "Upgrade Account" button to upgrade your account to send more messages for this month.
@@ -92,11 +94,11 @@ $(document).ready(function(){
         </div>
         </span>
 	
-		{{ form.subject.errors }}
+		<div id="subject_e">{{ form.subject.errors }}</div>
 		<label for="subject">Subject</label>
 		{{ form.subject }}
 		
-		{{ form.body.errors }}
+		<div id="body_e">{{ form.body.errors }}</div>
 		<label for="body">Body</label>
 		{{ form.body }}
 		
@@ -105,11 +107,11 @@ $(document).ready(function(){
 				{{ form.attach_offer }}<label for="id_attach_offer">Attach Offer</label>
 			</div>
 			<div id="offer-details" style="display: {% if form.attach_offer.value == True %}block{% else %}none{% endif %};">
-				{{ form.offer_title.errors }}
+				<div id="offer_title_e">{{ form.offer_title.errors }}</div>
 				<label for="id_offer_title">Offer Title</label>
 				{{ form.offer_title }}
 				
-				{{ form.date_offer_expiration.errors }}
+				<div id="date_offer_expiration_e">{{ form.date_offer_expiration.errors }}</div>
 				<label for="id_date_offer_expiration">Expiration Date</label>
 				<input type="text" id="id_date_offer_expiration" name="date_offer_expiration" value="{{ form.data.date_offer_expiration }}" />
 			</div>

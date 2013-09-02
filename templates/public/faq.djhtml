@@ -3,16 +3,68 @@
 
 {% block title %}FAQ{% endblock %}
 
+{% block javascript %}
+<!---Accordion Javascript--->
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+	 
+	//ACCORDION BUTTON ACTION (ON CLICK DO THE FOLLOWING)
+	jQuery('.accordionButton').click(function() {
+
+		//REMOVE THE ON CLASS FROM ALL BUTTONS
+		jQuery('.accordionButton').removeClass('on');
+		  
+		//NO MATTER WHAT WE CLOSE ALL OPEN SLIDES
+	 	jQuery('.accordionContent').slideUp('normal');
+   
+		//IF THE NEXT SLIDE WASN'T OPEN THEN OPEN IT
+		if(jQuery(this).next().is(':hidden') == true) {
+			
+			//ADD THE ON CLASS TO THE BUTTON
+			jQuery(this).addClass('on');
+			  
+			//OPEN THE SLIDE
+			jQuery(this).next().slideDown('normal');
+		 } 
+		  
+	 });
+	  
+	
+	/*** REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
+	
+	//ADDS THE .OVER CLASS FROM THE STYLESHEET ON MOUSEOVER 
+	jQuery('.accordionButton').mouseover(function() {
+		jQuery(this).addClass('over');
+		
+	//ON MOUSEOUT REMOVE THE OVER CLASS
+	}).mouseout(function() {
+		jQuery(this).removeClass('over');										
+	});
+	
+	/*** END REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
+	
+	
+	/********************************************************************************************************************
+	CLOSES ALL S ON PAGE LOAD
+	********************************************************************************************************************/	
+	jQuery('.accordionContent').hide();
+
+});
+</script>
+<!---Accordion Javascript--->
+{% endblock %}
+
 
 {% block pageblock %}
 <section id="page-wrapper">
     <div class="page-title-container">
-    <h1 class="page-title">Frequently Answered Questions</h1>
+    <h1 class="page-title">Frequently Asked Questions</h1>
     </div>
 	<div id="page-content">
 		<div id="faq-content">
 			<aside class="col1">
-            		<h2>Repunch for Consumers</h2>
+            		<h1>Repunch for Consumers</h1>
 				<div id="accordion-wrapper">
 					<div class="accordionButton">
 						<h3>What is Repunch?</h3>
@@ -93,7 +145,7 @@
 					<p>We apologize if you run into any such issues. Please contact us immediately and we will fix it asap.</p>
 					</div>
 				</div>
-				<h2>Repunch for Retailers</h2>
+				<h1>Repunch for Retailers</h1>
 				<div id="accordion-wrapper">
 					<div class="accordionButton">
 						<h3>How do I become a Repunch retailer?</h3>

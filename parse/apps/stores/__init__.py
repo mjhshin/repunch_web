@@ -3,6 +3,11 @@
 MONTHLY = "monthly"
 SMARTPHONE = "smartphone"
 
+# Access levels per account basis
+ACCESS_ADMIN = ("faa", 10) # full admin access
+ACCESS_PUNCHREDEEM = ("apr", 5) # allow punch redeem
+ACCESS_NONE = ("na", 0) # no access
+
 def format_phone_number(num_str):
     """
     Takes in a string 7187371994 and outputs (718) 737-1994.

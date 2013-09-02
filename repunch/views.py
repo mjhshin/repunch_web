@@ -8,13 +8,13 @@ from django.utils import timezone
 from django.contrib.auth import logout
 import json, thread
 
+from libs.repunch.rputils import delete_after_delay
 from parse import session as SESSION
-from parse.decorators import session_comet
 from parse.auth import login
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSession, CometSessionIndex
+from repunch.settings import COMET_PULL_RATE
 
-@session_comet
 def manage_login(request):
     """
     Handle s ajax request from login-dialog.
@@ -26,6 +26,8 @@ def manage_login(request):
         1 - bad login credentials
         2 - subscription is not active
         3 - success
+        4 - employee with no access
+        5 - employee pending
     """
     data = {"code":-1}
     if request.method == 'POST' or request.is_ajax():
@@ -38,6 +40,10 @@ def manage_login(request):
                     data['code'] = 1 
                 elif c == 1:
                     data['code'] = 2
+                elif c == 2:
+                    data['code'] = 4
+                elif c == 3:
+                    data['code'] = 5
             else:
                 data['code'] = 3
                 # manually check the next parameter
@@ -65,7 +71,6 @@ def manage_login(request):
     return HttpResponse(json.dumps(data), 
         content_type="application/json")
 
-@session_comet
 def manage_logout(request):
     # need to do this before flushing the session because the session
     # key will change after the flush!
@@ -78,15 +83,17 @@ def manage_logout(request):
     except CometSessionIndex.DoesNotExist:
         pass
     
-    # also delete ALL the cometsessions associated with the request
+    # set all related cometsessions to modified to flag all existing
+    # tabs of the logout and delete them after a delay
     cs = CometSession.objects.filter(session_key=\
         request.session.session_key)
     for c in cs:
-        c.delete()
+        c.modified = True
+        c.save()
+    delete_after_delay(cs, COMET_PULL_RATE + 3)
     request.session.flush()
     return redirect(reverse('public_home'))
 
-@session_comet
 def manage_terms(request):
     return render(request, 'manage/terms.djhtml')
     

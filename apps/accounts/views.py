@@ -2,6 +2,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
+from django.forms.util import ErrorList
 from django.contrib.auth import SESSION_KEY
 from datetime import datetime
 import json, urllib
@@ -11,9 +12,9 @@ from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
 SubscriptionForm3
-from parse.decorators import session_comet
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import SMARTPHONE
@@ -53,7 +54,7 @@ def activate(request):
     return HttpResponse("Bad request")
     
 @login_required
-@session_comet
+@admin_only(reverse_url="store_index")
 def deactivate(request):
     """
     This does not delete anything! It merely sets the store's active
@@ -65,7 +66,7 @@ def deactivate(request):
     return redirect(reverse('manage_logout'))
 
 @login_required
-@session_comet
+@admin_only(except_method="GET")
 def settings(request):
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)
@@ -88,7 +89,7 @@ def settings(request):
             # notify other dashboards of this changes
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings_one":settings.jsonify(),
+                "updatedSettings":settings.jsonify(),
                 "updatedPunchesFacebook_int":\
                     store.punches_facebook,
             }
@@ -113,6 +114,7 @@ def settings(request):
     return render(request, 'manage/settings.djhtml', data)
 
 @login_required
+@admin_only(http_response={"error": "Permission denied"})
 def refresh(request):
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):
@@ -132,7 +134,7 @@ def refresh(request):
             store = SESSION.get_store(request.session)
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings_one":settings.jsonify()
+                "updatedSettings":settings.jsonify()
             }
             comet_receive(store.objectId, payload)
             
@@ -144,11 +146,12 @@ def refresh(request):
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
 @login_required
-@session_comet
+@admin_only(reverse_url="store_index")
 def update(request):
     data = {'account_nav': True, 'update':True}
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
+    sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
         form = SubscriptionForm3(request.POST)
@@ -173,38 +176,56 @@ def update(request):
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
-            try:
-                d = datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1)
-                subscription.set("date_cc_expiration", 
-                    make_aware_to_utc(d,
-                        SESSION.get_store_timezone(request.session)) )
-                # only store_cc if it is a digit
-                if str(form.data['cc_number']).isdigit():
-                    subscription.store_cc(form.data['cc_number'],
-                                                form.data['cc_cvv'])
-                else:
-                    subscription.update()
+            d = datetime(int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1)
+            subscription.set("date_cc_expiration", 
+                make_aware_to_utc(d,
+                    SESSION.get_store_timezone(request.session)) )
                     
-            except Exception as e:
-                form = SubscriptionForm(subscription.__dict__.copy())
-                form.errors['__all__'] =\
-                    form.error_class([e])
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
+            
+            def invalid_card():
+                # undo changes to subscription!
+                sub = Subscription(**sub_orig)
+                sub.update()
+                
+                # add some asterisk to cc_number
+                if form.initial.get("cc_number"):
+                    form.initial['cc_number'] = "*" * 12 +\
+                        form.initial.get('cc_number')[-4:]
+                errs = form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                            
+            if not res:
+                return invalid_card()
                         
             if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
+                request.POST.get("place_order_amount").isdigit() and\
+                int(request.POST.get("place_order_amount")) > 0:
                 amount = int(request.POST.get("place_order_amount"))
                 account = request.session['account']
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
-                if amount > 0:
+                if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount) 
+                else:
+                    return invalid_card()
                         
             if upgraded:  
                 max_users = sub_type[\
@@ -230,7 +251,7 @@ def update(request):
             # notify other dashboards of these changes
             payload={
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSubscription_one":subscription.jsonify()
+                "updatedSubscription":subscription.jsonify()
             }
             comet_receive(store.objectId, payload)
             
@@ -253,7 +274,7 @@ def update(request):
     return render(request, 'manage/account_upgrade.djhtml', data)
 
 @login_required
-@session_comet
+@admin_only(reverse_url="store_index")
 def upgrade(request):
     """ 
     same as update except this also handles redirects from message
@@ -261,6 +282,7 @@ def upgrade(request):
     data = {'account_nav': True, 'upgrade':True}
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
+    sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
         form = SubscriptionForm3(request.POST)
@@ -283,37 +305,60 @@ def upgrade(request):
             # subscription.update() called in store_cc
             subscription.update_locally(request.POST.dict(), False)
             
-            try:
-                d = datetime(int(request.POST['date_cc_expiration_year']),
-                        int(request.POST['date_cc_expiration_month']), 1)
-                subscription.set("date_cc_expiration", 
-                    make_aware_to_utc(d,
-                        SESSION.get_store_timezone(request.session)) )
-                # only store_cc if it is a digit
-                if str(form.data['cc_number']).isdigit():
-                    subscription.store_cc(form.data['cc_number'],
-                                                form.data['cc_cvv'])
-                else:
-                    subscription.update()
+            d = datetime(int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1)
+            subscription.set("date_cc_expiration", 
+                make_aware_to_utc(d,
+                    SESSION.get_store_timezone(request.session)) )
                     
-            except Exception as e:
-                form = SubscriptionForm(subscription.__dict__.copy())
-                form.errors['__all__'] = form.error_class([e])
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
+                    
+            def invalid_card():
+                # undo changes to subscription!
+                sub = Subscription(**sub_orig)
+                sub.update()
+                
+                # add some asterisk to cc_number
+                if form.initial.get("cc_number"):
+                    form.initial['cc_number'] = "*" * 12 +\
+                        form.initial.get('cc_number')[-4:]
+                errs = form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
                 data['form'] = form
+                from_limit_reached =\
+                    request.session.get("from_limit_reached")
+                if from_limit_reached:
+                    data['from_limit_reached'] = from_limit_reached
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
+                    
+            if not res:
+                return invalid_card()
                         
             if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
+                request.POST.get("place_order_amount").isdigit() and\
+                int(request.POST.get("place_order_amount")) > 0:
                 amount = int(request.POST.get("place_order_amount"))
                 account = request.session['account']
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
                     str(amount) + " phones", SMARTPHONE)
-                if amount > 0:
+                if invoice:
                     send_email_receipt_smartphone(account, 
                         subscription, invoice, amount)
+                else:
+                    return invalid_card()
                         
             if upgraded:  
                 max_users = sub_type[\
@@ -339,7 +384,7 @@ def upgrade(request):
             # notify other dashboards of these changes
             payload={
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSubscription_one":subscription.jsonify()
+                "updatedSubscription":subscription.jsonify()
             }
             comet_receive(store.objectId, payload)
             

@@ -11,37 +11,50 @@ from tests.test_login_logout import test_login_dialog, test_login_page
 from tests.test_myaccount import test_edit_store_details,\
 test_edit_account, test_cancel_account
 from tests.test_rewards import test_rewards
-from tests.test_messages import test_messages
+from tests.test_analysis import test_trends, test_breakdown,\
+test_reward_redemptions
+from tests.test_messages import test_messages, test_feedbacks
+from tests.test_employees import test_employees, test_employee_access
+from tests.test_settings import test_settings
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         results = []
         
-        ####### PUBLIC
-        
-        # PUBLIC PAGES
+        ####### PUBLIC #########################################
         #results.extend(test_public_pages())
-        # SIGNUP
         #results.extend(test_signup())
-        # LOGIN (dialog)
         #results.extend(test_login_dialog())
-        # LOGIN (dedicated page)
         #results.extend(test_login_page())
         
-        ####### DASHBOARD
-        
+        ####### DASHBOARD #########################################
         #### MY ACCOUNT
-        ## EDIT STORE DETAILS
-        #results.extend(test_edit_store_details())
-        ## EDIT ACCOUNT/SUBSCRIPTION
+        results.extend(test_edit_store_details()) # TODO added 2 more here
         #results.extend(test_edit_account())
-        ## CANCEL ACCOUNT
         #results.extend(test_cancel_account())
         
         ### REWARDS
         #results.extend(test_rewards())
         
+        ### ANALYSIS
+        #results.extend(test_trends()) TODO
+        #results.extend(test_breakdown()) TODO 
+        #results.extend(test_reward_redemptions()) TODO 
+        
         ### MESSAGES
         results.extend(test_messages())
+        #results.extend(test_feedbacks())
+        
+        ### EMPLOYEE
+        #results.extend(test_employees())
+        #results.extend(test_employee_access()) # TODO FINISH
+        
+        ### SETTINGS
+        #results.extend(test_settings())
+        
+        ### WORKBENCH
+        #results.extend(test_punch()) TODO 
+        #results.extend(test_redemptions()) TODO 
+        
         
         send_email_selenium_test_results(results)

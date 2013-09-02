@@ -4,7 +4,21 @@
 {% block title %}Home{% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static "public/js/jquery.slides.min.js" %}"></script>
-	<script type="text/javascript" src="{% static "public/js/home.js" %}"></script>
+	<script>
+    $(document).ready(function()
+    {
+	    // Home slideshow
+	    $('#home-slideshow').slidesjs({
+		    width:960,
+		    height:540,
+		    navigation:{effect:'fade'},
+		    pagination:{effect:'fade'},
+		    effect:{
+			    fade:{speed: 400}
+		    }
+	    });		
+    });
+	</script>
 {% endblock %}
 
 
@@ -16,13 +30,13 @@
 		</div>
 		<br/>
 		<aside id="home-col-left" class="home-col bottom-shadow">
-			<h1 style="font-size:2.6em;">Businesses</h1>
-			<p style="margin-top:34px;">Reward your customers' loyalty and interact with them in valuable new ways</p>
+			<h1>Businesses</h1>
+			<p>Reward your customers' loyalty and interact with them in valuable new ways</p>
 			<a href="{% url 'public_signup' %}" class="button orange" style="margin-top:50px;">Sign-Up Today</a>
 			<img class="boximage" src="{% static "public/images/img_left-home-box.png" %}" alt="">
 		</aside>
 		<aside id="home-col-right" class="home-col bottom-shadow">
-			<h1 style="font-size:2.6em;">Customers</h1>
+			<h1>Customers</h1>
 			<p>Have fun while you earn rewards at your favorite local spots</p>
 			<div id="home-dowload-app">
 				<h2>download the free app</h2>

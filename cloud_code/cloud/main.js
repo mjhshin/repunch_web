@@ -71,7 +71,6 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		console.log("User fetch success.");
 		user = userResult;
 		userResult.set("Patron", patron);
-		userResult.set("account_type", "patron");
 		
 		if(email != null) {
 			userResult.set("email", email);
@@ -94,7 +93,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		if(error.code == Parse.Error.EMAIL_TAKEN) {
 			console.log("User save failed because this email is already taken.");
-			response.error(error);
+			response.error(error.message);
 			deleteAccount();
 			
 		} else {
@@ -171,7 +170,6 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("Employee save success.");
 
 			user = new Parse.User();
-			user.set("account_type", "employee");
 			user.set("username", username);
 			user.set("password", password);
 			user.set("email", email);
@@ -193,15 +191,15 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 			if(error.code == Parse.Error.USERNAME_TAKEN) {
 				console.log("User save failed - username already taken.");
-				response.error(error.code);				
+				response.error(error.code); // code: 141, error: 202
 			
 			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
 			    console.log("User save failed - email already taken.");
-			    response.error(error.code);
+			    response.error(error.code); // code: 141, error: 203
 				
 			} else if(error.code == Parse.Error.INVALID_EMAIL_ADDRESS) {
 			    console.log("User save failed - email is invalid.");
-			    response.error(error.code);
+			    response.error(error.code); // code: 141, error: 125
 				
 			} else {
 				response.error("error");
@@ -220,9 +218,9 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			response.success("success");
 			
 			Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + store.id,
-                headers: { 'Content-Type': 'application/json'},
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + store.id,
+                headers: { "Content-Type": "application/json"},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     pendingEmployee: employee, 
@@ -327,12 +325,12 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		
 	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: { 
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                patronStore_num: patronStoreCount,
+                patronStore_int: patronStoreCount,
             }
         });
         
@@ -410,7 +408,8 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 //
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("facebook_post", function(request, response) {
+Parse.Cloud.define("facebook_post", function(request, response)
+{
 	var patronStoreId = request.params.patron_store_id;
 	var acceptPost = (request.params.accept == "true");
 	
@@ -422,7 +421,7 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 	patronStoreQuery.get(patronStoreId).then(function(patronStore)
 	{
 		console.log("PatronStore fetch success.");
-		
+
 		if(acceptPost)
 		{
 			var facebookPost = patronStore.get("FacebookPost");
@@ -474,8 +473,7 @@ Parse.Cloud.define("facebook_post", function(request, response) {
 				return;
 			});
 		}
-		
-		
+				
 	}, function(error) {
 		console.log("PatronStore fetch fail.");
 		response.error("error");
@@ -513,17 +511,20 @@ Parse.Cloud.define("punch", function(request, response) {
 	patronStoreQuery.matchesQuery("Store", storeQuery);
 	patronStoreQuery.include("Patron");
 	patronStoreQuery.include("Store");
+	
 	androidInstallationQuery.equalTo("punch_code", punchCode);
 	androidInstallationQuery.equalTo('deviceType', 'android');
 	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 				   
-	patronStoreQuery.first({
-		success: function(patronStoreResult) {
-			if(patronStoreResult == null) { //customer's first punch at this store, need new PatronStore.
+	patronStoreQuery.find({
+		success: function(patronStoreResults) {
+			if(patronStoreResults[0] == null) { //customer's first punch at this store, need new PatronStore.
 				addPatronStore();				
+			} else if(patronStoreResults.length > 1) {
+				console.log("ERROR: more than one PatronStore found.");
 			} else {
-				updatePatronStore(patronStoreResult);
+				updatePatronStore(patronStoreResults[0]);
 			}
 		},
 		error: function(error) {
@@ -700,10 +701,9 @@ Parse.Cloud.define("punch", function(request, response) {
                 }
 				
 		}).then(function(patronStoreCount){
-		    console.log("Moved on to next promise.");
 		    if (isNewPatronStore) {
 		        console.log("Retrieved new PatronStore count");
-		        postBody.patronStore_num = patronStoreCount;
+		        postBody.patronStore_int = patronStoreCount;
 		    }
 		    
 		    // Let the server know if any changes occured
@@ -711,9 +711,9 @@ Parse.Cloud.define("punch", function(request, response) {
 		        console.log("Posting to server");
 		        postBody.cometrkey = "f2cwxn35cxyoq8723c78wnvy";
 		        Parse.Cloud.httpRequest({
-                    method: 'POST',
-                    url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                    headers: { 'Content-Type': 'application/json'},
+                    method: "POST",
+                    url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                    headers: { "Content-Type": "application/json"},
                     body: postBody, 
                 });
             }
@@ -732,7 +732,9 @@ Parse.Cloud.define("punch", function(request, response) {
 //
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("request_redeem", function(request, response) {
+Parse.Cloud.define("request_redeem", function(request, response)
+{
+	var patronId = request.params.patron_id;
 	var storeId = request.params.store_id;
 	var patronStoreId = request.params.patron_store_id;
 	var rewardTitle = request.params.title;
@@ -748,68 +750,66 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 	var Message = Parse.Object.extend("Message");
 	
 	var redeemReward = new RedeemReward();
+	redeemReward.set("patron_id", patronId);
 	redeemReward.set("customer_name", customerName);	
 	redeemReward.set("is_redeemed", false);
 	redeemReward.set("title", rewardTitle);
 	
 	var patronStore = new PatronStore();
-	patronStore.id = patronStoreId;
-	redeemReward.set("PatronStore", patronStore);	
 	
-	if(isOfferOrGift) {
+	if(isOfferOrGift)
+	{
 		var MessageStatus = Parse.Object.extend("MessageStatus");
 		var messageStatus = new MessageStatus();
 		messageStatus.id = messageStatusId;
 		redeemReward.set("num_punches", 0);
 		redeemReward.set("MessageStatus", messageStatus);
-	} else {
+		
+		executeRedeemRequest();
+	}
+	else
+	{
+		patronStore.id = patronStoreId;
+		redeemReward.set("PatronStore", patronStore);	
 		redeemReward.set("num_punches", numPunches);
 		redeemReward.set("reward_id", rewardId);
+	
+		var patronStoreQuery = new Parse.Query(PatronStore);
+		patronStoreQuery.get(patronStoreId).then(function(patronStore)
+		{
+			console.log("PatronStore fetch success.");
+		
+			if(patronStore.get("pending_reward") == true)
+			{
+				console.log("PatronStore already has pending reward");
+				response.success("pending");
+				return;
+			}
+			else
+			{
+				patronStore.set("pending_reward", true);
+				patronStore.save().then(function(patronStore)
+				{
+					console.log("PatronStore save success.");
+					executeRedeemRequest();
+
+				}, function(error) {
+					console.log("PatronStore save failed.");
+					response.error("error");
+					return;
+				});
+			}				
+		}, function(error) {
+			console.log("PatronStore fetch failed.");
+			response.error("error");
+			return;		
+		});
 	}
 	
-	var patronStoreQuery = new Parse.Query(PatronStore);
-	patronStoreQuery.get(patronStoreId).then(function(patronStore) {
-		console.log("PatronStore fetch success.");
-		
-		if(isOfferOrGift) {
-			patronStore.save().then(function(patronStore) {
-				console.log("PatronStore save success.");
-				executeRedeemRequest();
-
-			}, function(error) {
-				console.log("PatronStore save failed.");
-				response.error("error");
-				return;
-			
-			});
-			
-		} else if(patronStore.get("pending_reward") == true) {
-			console.log("PatronStore already has pending reward");
-			response.success("pending");
-			return;
-		
-		} else {
-			patronStore.set("pending_reward", true);
-			patronStore.save().then(function(patronStore) {
-				console.log("PatronStore save success.");
-				executeRedeemRequest();
-
-			}, function(error) {
-				console.log("PatronStore save failed.");
-				response.error("error");
-				return;
-			
-			});
-		}
-					
-	}, function(error) {
-		console.log("PatronStore fetch failed.");
-		response.error("error");
-		return;		
-	});
-	
-	function executeRedeemRequest() {
-		redeemReward.save().then(function(redeemReward) {
+	function executeRedeemRequest()
+	{
+		redeemReward.save().then(function(redeemReward)
+		{
 			console.log("RedeemReward save success.");
 			var storeQuery = new Parse.Query(Store);
 			return storeQuery.get(storeId);
@@ -845,9 +845,9 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 		}).then(function() {
 		    console.log("Pushing to server");
 	        Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: {'Content-Type': 'application/json'},
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                headers: {"Content-Type": "application/json"},
                 body: { 
                     "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                     pendingRedemption: redeemReward, 
@@ -856,7 +856,7 @@ Parse.Cloud.define("request_redeem", function(request, response) {
                     console.log(httpResponse.text);
                 },
                 error: function(httpResponse) {
-                    console.error('Request failed with response code ' + httpResponse.status);
+                    console.error("Request failed with response code " + httpResponse.status);
                 }
             });
             
@@ -895,11 +895,12 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 		var MessageStatus = Parse.Object.extend("MessageStatus");
 		var messageStatusQuery = new Parse.Query(MessageStatus);
 		
-		messageStatusQuery.get(messageStatusId).then(function(messageStatus) {
+		messageStatusQuery.get(messageStatusId).then(function(messageStatus)
+		{
 			console.log("MessageStatus query success.");
 			messageStatus.set("redeem_available", "pending");
 			return messageStatus.save();
-		
+				
 		}, function(error) {
 			console.log("MessageStatus query failed.");
 			response.error("error");
@@ -927,7 +928,8 @@ Parse.Cloud.define("request_redeem", function(request, response) {
 // the MessageStatus's redeem_available will be set 'no'.
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("reject_redeem", function(request, response) {
+Parse.Cloud.define("reject_redeem", function(request, response)
+{
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	
@@ -937,9 +939,11 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	
 	redeemRewardQuery.include("MessageStatus");
 	redeemRewardQuery.include("PatronStore");
-	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult) {
+	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult)
+	{
 	    redeemReward = redeemRewardResult;
 	    messageStatus = redeemReward.get("MessageStatus");
+		
 	    if (messageStatus != null) { // offer/gift
             messageStatus.set("redeem_available", 'no');
             return messageStatus.save();
@@ -952,7 +956,8 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	}).then(function() {
 	    if (messageStatus == null) {
 	        var patronStore = redeemReward.get("PatronStore");
-	        if (patronStore != null){
+			
+	        if (patronStore != null) {
 	            patronStore.set("pending_reward", false);
 	            return patronStore.save();
 	        }
@@ -963,9 +968,9 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 	    
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                 deletedRedemption: redeemReward,
@@ -983,29 +988,35 @@ Parse.Cloud.define("reject_redeem", function(request, response) {
 // 
 //
 ////////////////////////////////////////////////////
-Parse.Cloud.define("validate_redeem", function(request, response) {
+Parse.Cloud.define("validate_redeem", function(request, response)
+{
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	var rewardId = request.params.reward_id;
+	
 	var isOfferOrGift = (rewardId == null);
 	
-	var numPunches, rewardTitle, store, patron, patronStore,
+	var numPunches, rewardTitle, store, patron, patronId, patronStore,
 	    updatedReward, messageStatus;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var Store = Parse.Object.extend("Store");
 	var MessageStatus = Parse.Object.extend("MessageStatus");
+	
 	var storeQuery = new Parse.Query(Store);
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	redeemRewardQuery.include(["PatronStore.Patron"]);
 	redeemRewardQuery.include("MessageStatus");
 	
-	storeQuery.get(storeId).then(function(storeResult) {
-	    store = storeResult;
+	storeQuery.get(storeId).then(function(storeResult)
+	{
+		store = storeResult;
+		
 	    if (!isOfferOrGift) {
 	        var reward_id = parseInt(rewardId);
-	        var rewards = storeResult.get("rewards");
+	        
+	        var rewards = store.get("rewards");
 		    // update the store's rewards redemption_count
 		    for (var i=0; i<rewards.length; i++) {
 		        if (rewards[i].reward_id == reward_id) {
@@ -1017,8 +1028,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		            break;
 		        }
 		    }
-		    storeResult.set("rewards", rewards);	
-		    return storeResult.save();
+		    store.set("rewards", rewards);	
+		    return store.save();
 		}
 		
 	}).then(function() {
@@ -1030,23 +1041,17 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		numPunches = redeemReward.get("num_punches");
 		rewardTitle = redeemReward.get("title");
 		messageStatus = redeemReward.get("MessageStatus");
+		patronId = redeemReward.get("patron_id");
 		
-		if(patronStore == null) {
-			console.log("PatronStore is null.");
-			response.success("removed");
-			
-		} else if(redeemReward.get("is_redeemed") == true) {
+		if(redeemReward.get("is_redeemed") == true) {
 			console.log("RedeemReward has already been validated");
 			response.success("validated");
 			
 		} else if(isOfferOrGift) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
-			patron = patronStore.get("Patron");
-
 			redeemReward.set("is_redeemed", true);
 			redeemReward.save().then(function() {
 			    console.log("RedeemReward save success");
-				updateMessageStatus(true); //boolean argument since we probably will add ability to reject redeem in future
 				postToServer(redeemReward);
 			}, function(error) {
 			    console.log("RedeemReward save fail");
@@ -1055,7 +1060,15 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 						
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
-			response.success("insufficient");
+			patronStore.set("pending_reward", false);
+			patronStore.save().then(function()
+			{
+			    console.log("PatronStore save success");
+				response.success("insufficient");
+			}, function(error) {
+			    console.log("PatronStore save fail");
+			    response.error("error");
+	        });
 			
 		} else {
 			console.log("PatronStore has enough punches.");
@@ -1068,13 +1081,16 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			promises.push( patronStore.save() );
 			promises.push( redeemReward.save() );
 			
-			Parse.Promise.when(promises).then(function() {
+			Parse.Promise.when(promises).then(function()
+			{
 			    console.log("PatronStore and RedeemReward save success (in parallel).");
-			    executePushReward();
+			    
 			    if(patron.get("facebook_id") != null && store.get("punches_facebook") > 0) {
-					addFacebookPostToPatron();
+					addFacebookPostToPatron(redeemReward);
+				} else {
+					postToServer(redeemReward);
 				}
-				postToServer(redeemReward);
+				
 			}, function(error) {
 			    console.log("PatronStore and RedeemReward save fail (in parallel).");
 			    response.error("error");
@@ -1087,13 +1103,14 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 			
 	});
 	
-	function executePushReward() {
+	function executePushReward()
+	{
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
 
-		androidInstallationQuery.equalTo("patron_id", patron.id);
+		androidInstallationQuery.equalTo("patron_id", patronId);
 		androidInstallationQuery.equalTo("deviceType", "android");
-		iosInstallationQuery.equalTo("patron_id", patron.id);
+		iosInstallationQuery.equalTo("patron_id", patronId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
 		
 		var promises = [];
@@ -1112,10 +1129,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        where: iosInstallationQuery,
 	        data: {
 				type: "redeem",
-	            alert: "Successfully redeemed '" + rewardTitle + "'",
+	            alert: "Redeemed '" + rewardTitle + "'",
 	            store_id: storeId,
-				patron_store_id: patronStore.id,
-	            punches: numPunches,
+				reward_title: rewardTitle,
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }) );
@@ -1132,12 +1148,19 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	    
 	}
 	
-	function executePushOfferGift() {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("patron_id", patron.id);
+	function executePushOfferGift()
+	{
+		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+		androidInstallationQuery.equalTo("patron_id", patronId);
+		androidInstallationQuery.equalTo("deviceType", "android");
+		iosInstallationQuery.equalTo("patron_id", patronId);
+		iosInstallationQuery.equalTo("deviceType", "ios");
 		
-		Parse.Push.send({
-	        where: installationQuery,
+		var promises = [];
+		promises.push( Parse.Push.send({
+	        where: androidInstallationQuery,
 	        data: {
 	            title: rewardTitle,
 	            id: storeId, 
@@ -1145,21 +1168,29 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 				message_status_id: messageStatus.id,
 				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
 	        }
-	    }, {
-	        success: function() {
-				console.log("Push success.");
-				response.success("success");
-				return;
-	        },
-	        error: function(error) {
-				console.log("Push failed.");
-	            response.error("error");
-				return;
+	    }) );
+		promises.push( Parse.Push.send({
+	        where: iosInstallationQuery,
+	        data: {
+				type: "redeem_offer_gift",
+	            alert: "Redeemed '" + rewardTitle + "'",
+	            message_status_id: messageStatus.id
 	        }
-	    });
+	    }) );
+		
+		Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			response.success("success");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
 	}
 	
-	function addFacebookPostToPatron() {
+	function addFacebookPostToPatron(redeemReward)
+	{
 		var freeFacebookPunches = store.get("punches_facebook");
 	
 		var FacebookPost = Parse.Object.extend("FacebookPost");
@@ -1179,28 +1210,21 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	
 		}).then(function() {
 			console.log("PatronStore save success.");
-			return;
+			postToServer(redeemReward);
 	
-			}, function(error) {
+		}, function(error) {
 			console.log("PatronStore save failed.");
 			response.error("error");
 			return;
 		});
 	}
 	
-	function updateMessageStatus(isAccepted) {
-		if(isAccepted) {
-			messageStatus.set("redeem_available", "no");
-		} else {
-			messageStatus.set("redeem_available", "yes");
-		}
-		
+	function updateMessageStatus()
+	{
+		messageStatus.set("redeem_available", "no");	
 		messageStatus.save().then(function() {
 			console.log("MessageStatus save success.");
-			
-			if(isAccepted) {
-				executePushOfferGift();
-			}
+			executePushOfferGift();
 					
 		}, function(error) {
 			console.log("MessageStatus save failed.");
@@ -1210,7 +1234,15 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 		});
 	}
 	
-	function postToServer(redeemReward){
+	function postToServer(redeemReward)
+	{
+	    if(isOfferOrGift) {
+			updateMessageStatus();
+	    } else {
+	        executePushReward();
+	    }
+	    
+	    console.log("Posting to server");
 	    var postBody = {
             "cometrkey": "f2cwxn35cxyoq8723c78wnvy",
 	        approvedRedemption: redeemReward,
@@ -1219,9 +1251,9 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 	        postBody.updatedReward = updatedReward;
 	    }
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: postBody
         });
 	}
@@ -1238,7 +1270,8 @@ Parse.Cloud.define("validate_redeem", function(request, response) {
 //  Patron's ReceivedMessages but rather the original message itself,
 //  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
-//  This looks at the store's PatronStore relation!!!
+//  Note that this does not need to post to server because this is only called server side!
+//  Meaning the notification is done withing the server.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
@@ -1249,9 +1282,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var Patron = Parse.Object.extend("Patron");
     var messageQuery = new Parse.Query(Message);
     var patronQuery = new Parse.Query(Patron);
-    var patronStoreQuery; // retrieved below
-    var androidInstallationQuery = new Parse.Query(Parse.Installation);
-    var iosInstallationQuery = new Parse.Query(Parse.Installation);
+    var storeQuery = new Parse.Query(Store);
+    var patronStoreQuery; 
 	
 	var subject = request.params.subject;
 	var messageId = request.params.message_id;
@@ -1259,66 +1291,125 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
     var filter = request.params.filter; 
-    var message, redeem_available;
-	var patron_ids = new Array(); // placeholder
+    var message, receiver_count, redeem_available;
+	var patron_ids = new Array(); 
+	
+	
+    var androidInstallationQuery = new Parse.Query(Parse.Installation);
+    var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("deviceType", "ios");
 
-	androidInstallationQuery.equalTo('deviceType', 'android');
-	iosInstallationQuery.equalTo('deviceType', 'ios');
-
-    function addToPatronsInbox(patronStores) {
-        if (patronStores.length == 0) {
-            if (filter === "one"){
-                androidInstallationQuery.equalTo("patron_id", patronId);
-				iosInstallationQuery.equalTo("patron_id", patronId);
-            } else {
-                androidInstallationQuery.containedIn("patron_id", patron_ids);
-				iosInstallationQuery.containedIn("patron_id", patron_ids);
-            }
-            Parse.Cloud.httpRequest({
-                method: 'POST',
-                url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-                headers: { 'Content-Type': 'application/json'},
-                body: {
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                    newMessage: message,
-                }
-            });
+    storeQuery.get(storeId).then(function(storeResult) {
+        patronStoreQuery = storeResult.relation("PatronStores").query();
+        patronStoreQuery.include("Patron");
+        patronStoreQuery.limit(999); 
+        return messageQuery.get(messageId);
+        
+    }, function(error) {
+		console.log("Store query failed.");
+		response.error("error");
+    }).then(function(messageResult) {
+        message = messageResult;
+        if (message.get("message_type") == "offer") {
+            redeem_available = "yes";
+        } else {
+            redeem_available = "no";
+        }
+            
+    }, function(error) {
+        console.log("Message query failed");
+        response.error("error");
                 
-            // all tasks are done. Push now.
-            proceedToPush();
-            return;
+    }).then(function() {
+        if (filter === "one"){
+            patronQuery.get(request.params.patron_id).then(function(patron) {
+                patronStoreQuery.equalTo("Patron", patron);
+                patronStoreQuery.first().then(function(patronStore) {
+                    return addToPatronsInbox(new Array(patronStore));
+                }).then(function() {
+                    message.set("receiver_count", 1);
+                    return message.save();
+                }).then(function() {
+                    console.log("Feedback message status created. Proceeding to push.");
+                    proceedToPush();
+                });
+            });
+            
+        } else {
+            if (filter === "idle") {
+                patronStoreQuery.lessThan("updatedAt", 
+                    new Date(request.params.idle_date) );
+            } else if (filter === "most_loyal") {
+                patronStoreQuery.descending("all_time_punches");
+                patronStoreQuery.limit(request.params.num_patrons);
+            }  
+            
+            patronStoreQuery.select("Patron");
+            patronStoreQuery.find().then(function(patronStores) {
+                receiver_count = patronStores.length;
+                return addToPatronsInbox(patronStores);
+            }).then(function() {
+                message.set("receiver_count", receiver_count);
+                return message.save();
+            }).then(function() {
+                console.log("All message status created. Proceeding to push.");
+                proceedToPush();
+            });
+            
         }
         
-        var pt = patronStores.pop();
-        var pat = pt.get("Patron");
-        
-        // just in case that there is a null patron
-        if(pat == null) {
-            return addToPatronsInbox(patronStores);
-        }
-        
-        // keep track of atron ids for the installationQuery
-        patron_ids.push(pat.id);
-        
-        console.log("NOW FETCHING PATRON FOR patronStore ID " + pt.id);
-        // ReceivedMessages is a relation to MessageStatus not Message!
-        var rel = pat.relation("ReceivedMessages"); 
+    });
+    
+    function createMessageStatus(patron) { 
+        var promise = new Parse.Promise();
+        var receivedMessages = patron.relation("ReceivedMessages"); 
 	    var messageStatus = new MessageStatus();
         messageStatus.set("Message", message);
         messageStatus.set("is_read", false);
         messageStatus.set("redeem_available", redeem_available);
         messageStatus.save().then(function(messageStatusResult) {
-            rel.add(messageStatusResult);
-            pat.save().then(function() {
-                // chain method call
-                addToPatronsInbox(patronStores);
+            receivedMessages.add(messageStatusResult);
+            patron.save().then(function() {
+                promise.resolve();
             });
+        }, function(error) {
+            // promise should still resolve
+            promise.resolve();
         });
+        
+        return promise;
     }
-
-    // call when all tasks are done
-    function proceedToPush() {
-        console.log("PROCEED TO PUSH");
+    
+    function addToPatronsInbox(patronStores) {
+        var promises = [];
+        // for some reason _.each says patronStores is undefined
+        // also do not use for var i in array method- good ol' var i=0 is best
+        for (var i=0; i < patronStores.length; i++) {
+            var patron = patronStores[i].get("Patron");
+            // there should not be any null patrons
+            // null patrons will cause receiver_count to not match len of patron_ids
+            if(patron == null) {
+                console.log("PatronStore with id: " + patronStores[i].id + " has a null patron");
+            } else {
+                patron_ids.push(patron.id);
+                console.log("Processing patronStore with id: " + patronStores[i].id);
+                promises.push(createMessageStatus(patron));
+            }
+        }
+        
+        return Parse.Promise.when(promises);
+    }
+    
+    function proceedToPush() { 
+        if (filter === "one"){
+            androidInstallationQuery.equalTo("patron_id", patronId);
+			iosInstallationQuery.equalTo("patron_id", patronId);
+        } else {
+            androidInstallationQuery.containedIn("patron_id", patron_ids);
+			iosInstallationQuery.containedIn("patron_id", patron_ids);
+        }
+		
 		var promises = [];
 		promises.push( Parse.Push.send({
             where: androidInstallationQuery, 
@@ -1327,7 +1418,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 subject: subject,
                 store_id: storeId,
                 store_name: storeName,
-                message_id: messageId,
+                message_id: messageId
             }
 		}) );
 		promises.push( Parse.Push.send({
@@ -1336,84 +1427,24 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             	alert: storeName + " sent you a message",
                 store_id: storeId,
                 message_id: messageId,
-                type: "message"
+                type: "message",
+				badge: "Increment"
             }
 		}) );
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success({
+			    "result":"success",
+			    "receiver_count": receiver_count,
+			});
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");
 			response.error("error");
 			
 		});
-	}// end proceedToPush
-   
-    function continueWithPush() {
-        console.log("CONTINUE WITH PUSH");
-        // get a subset of patrons
-        if (filter === "all") {
-            // nothing
-        } else if (filter === "idle") {     
-            patronStoreQuery.lessThan("updatedAt", 
-                new Date(request.params.idle_date) );
-        } else if (filter === "most_loyal") {
-            // get the top X (where X is num_patrons) number patrons sorted by their all_time_punches
-            patronStoreQuery.descending("all_time_punches");
-            patronStoreQuery.limit(request.params.num_patrons);
-        }  
-
-        if (filter === "one"){
-            // first get the patron
-            patronQuery.get(request.params.patron_id).then(function(patron) {
-                patronStoreQuery.equalTo("Patron", patron);
-                patronStoreQuery.first().then(function(pst) {
-                    var arr = new Array(pst);
-                    addToPatronsInbox(arr);
-                });
-            });
-        } else {
-            patronStoreQuery.select("Patron");
-            
-            // adding relation to all patron's ReceivedMessages
-            patronStoreQuery.find().then(function(patronStores) {
-                addToPatronsInbox(patronStores);
-            });
-        }// end else
-
-    } // end continueWithPush();
-
-    console.log("STARTING SCRIPT");
-    // script actually START HERE
-    var storeQuery = new Parse.Query(Store);
-    console.log("RUNNING STORE QUERY");
-    // first get the store
-    storeQuery.get(storeId, {
-      success: function(store) {
-        patronStoreQuery = store.relation("PatronStores").query();
-        patronStoreQuery.include("Patron");
-        patronStoreQuery.limit(500); // may want to increase to 1000
-        // now get the message object
-        console.log("RUNNING MESSAGE QUERY");
-        messageQuery.get(messageId, {
-			success: function(msg) {
-            	message = msg;
-            	if (message.get("message_type") == "offer") {
-            	    redeem_available = "yes";
-            	} else { // message is a feedback
-            	    redeem_available = "no";
-            	}
-            	continueWithPush();
-			}, error: function(object, error) {
-                console.log(error);
-			}
-        }); // end messageQuery
-	}, error: function(object, error) {
-            console.log(error);
-		}
-	});// end storeQuery
+	}
  
 }); // end Parse.Cloud.define
 
@@ -1488,9 +1519,9 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 				
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
-            method: 'POST',
-            url: 'https://www.repunch.com/manage/comet/receive/' + storeId,
-            headers: { 'Content-Type': 'application/json'},
+            method: "POST",
+            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            headers: { "Content-Type": "application/json"},
             body: {
                 "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
                 newFeedback: message,
@@ -1593,8 +1624,13 @@ Parse.Cloud.define("send_gift", function(request, response) {
 			
 	}).then(function(patronStore) {
 		console.log("PatronStore fetch was successful.");
-		patronStore.increment("punch_count", -1*giftPunches);
-		return patronStore.save();
+		if(patronStore.get("punch_count") < giftPunches) {
+			console.log("PatronStore has insufficient punches");
+			response.success("insufficient");
+		} else {
+			patronStore.increment("punch_count", -1*giftPunches);
+			return patronStore.save();
+		}
 		
 	}, function(error) {
 		console.log("PatronStore fetch was failed.");
@@ -1633,12 +1669,10 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-                alert: "You've received a gift from " + senderName,
-                subject: subject,
-                store_id: storeId,
-                sender: senderName,
+                alert: senderName + " sent you a gift",
                 message_status_id: messageStatus.id,
-                type: "receive_gift"
+                type: "gift",
+				badge: "Increment"
 			}
         }) );
 		
@@ -1662,7 +1696,6 @@ Parse.Cloud.define("send_gift", function(request, response) {
 ////////////////////////////////////////////////////
 Parse.Cloud.define("reply_to_gift", function(request, response) {
 	var messageId = request.params.message_id;
-	var patronId = request.params.patron_id;
 	var senderName = request.params.sender_name;
 	var body = request.params.body;
 	
@@ -1763,18 +1796,16 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-                alert: "You've received a reply to your gift to " + senderName,
-                subject: "RE: " + subject,
-                store_id: storeId,
-                sender: senderName,
+                alert: senderName + " replied to your gift",
                 message_status_id: messageStatus.id,
-                type: "gift_reply"
+                type: "gift_reply",
+				badge: "Increment"
 			}
         }) );
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success(message);
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");

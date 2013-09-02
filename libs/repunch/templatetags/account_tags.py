@@ -5,6 +5,7 @@ from datetime import datetime
 
 from parse.utils import parse
 from parse.apps.accounts import sub_type
+from parse.apps.accounts.models import Account
 from parse import session as SESSION
 
 register = template.Library()
@@ -45,6 +46,16 @@ def account_alert(session):
     elif percent >= 1.0:
         return 2
     return 0
+    
+
+@register.assignment_tag
+def account_is_admin(session):
+    return SESSION.get_store(session).is_admin(session['account'])
+    
+@register.assignment_tag
+def employee_is_owner(session, employee_id):
+    account = Account.objects().get(Employee=employee_id)
+    return SESSION.get_store(session).is_owner(account)
         
 @register.simple_tag
 def account_message_usage(session, percent_of=None):

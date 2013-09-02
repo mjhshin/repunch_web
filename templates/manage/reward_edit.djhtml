@@ -1,27 +1,16 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load parse_tags %}
 
+{# NOTE only accounts with full admin access may access this page!!! #}
+
 {% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.1.0.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
-	<script src="{% static "manage/js/rewards.js" %}"></script>
-	<script>
-    $(document).ready(function(){
-        $('#submit-reward-form').click(function(){
-            if ($("#reward-saving").css("display") != "none"){
-                return false;
-            }
-            $("#reward-saving").show();
-            
-            $('#reward-form').submit(); 
-            return false;
-        }); 
-    });
-    </script>
+	<script src="{% static "manage/js/reward_edit.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -37,7 +26,7 @@
 		
 		<div class="input-container" id="reward_name_ic">
 			{{ form.reward_name.errors }}
-			<label for="reward_name">Reward Name</label>
+			<label for="id_reward_name">Reward Name</label>
 			{{ form.reward_name }}
 		</div>
 		
@@ -49,12 +38,22 @@
 		
 		<div class="input-container clearheight" id="punches_ic">
 			{{ form.punches.errors }}
-			<label for="punches">Punches</label>
+			<label for="id_punches">Punches</label>
 			{{ form.punches }}
 		</div>
 		
+		{% if not is_new and reward %}
+		<div class="input-container clearheight" id="redemption_count">
+			<label >Redeemed: {{ reward.redemption_count }} time{% if reward.redemption_count != 1 %}s{% endif %}  </label>
+			<label id="reset_red_count_label" for="reset_red_count">
+			    Reset Redemption Count</label>
+	        <input id="reset_red_count" name="reset_red_count"
+	            type="checkbox" value="yes"/>
+		</div>
+		{% endif %}
+		
 		<div id="edit-reward-options" class="form-options">
-			<a  class="button blue" id="submit-reward-form">Save Reward</a>
+			<a class="button blue" id="submit-reward-form">Save Reward</a>
 			{% if is_new %}
 				<a href="{% url 'rewards_index' %}" class="red">Cancel</a>
 			{% else %}

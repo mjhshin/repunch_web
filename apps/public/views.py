@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.core import mail 
 from django.utils import timezone
+from django.forms.util import ErrorList
 from datetime import datetime
 import json, pytz
 
 from forms import ContactForm
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
-from parse.decorators import session_comet
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup,\
 send_email_receipt_smartphone
@@ -27,17 +26,14 @@ from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores.models import Store, Subscription,\
 Settings
 
-@session_comet
 def terms_mobile(request):
     return render(request, "public/terms-mobile.djhtml",
         get_notification_ctx())
         
-@session_comet
 def privacy_mobile(request):
     return render(request, "public/privacy-mobile.djhtml",
         get_notification_ctx())
 
-@session_comet
 def index(request):
     if request.session.get('account') is not None and\
         request.session.get('store') is not None and\
@@ -47,7 +43,6 @@ def index(request):
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)
 
-@session_comet
 def learn(request):
     data = {'learn_nav': True}
     
@@ -56,26 +51,21 @@ def learn(request):
     data['types'] = types
     return render(request, 'public/learn.djhtml', data)
 
-@session_comet
 def faq(request):
     data = {'faq_nav': True}
     data['form'] = ContactForm() # An unbound form
     return render(request, 'public/faq.djhtml', data)
 
-@session_comet
 def about(request):
     data = {'about_nav': True}
     return render(request, 'public/about.djhtml', data)
 
-@session_comet 
 def terms(request):
     return render(request, 'public/terms.djhtml')
 
-@session_comet
 def privacy(request):
     return render(request, 'public/privacy.djhtml')
 
-@session_comet
 def contact(request):
     if request.method == 'POST': 
         form = ContactForm(request.POST) 
@@ -87,11 +77,9 @@ def contact(request):
 
     return render(request, 'public/contact.djhtml', {'form': form, })
 
-@session_comet
 def thank_you(request):
     return render(request, 'public/thank_you.djhtml')
 
-@session_comet
 def jobs(request):
     return render(request, 'public/jobs.djhtml')
 
@@ -120,11 +108,13 @@ def password_reset(request):
         request_password_reset(request.POST['forgot-pass-email'])}), 
         content_type="application/json")
         
-@session_comet  
+        
 def sign_up(request):
+    """
+    Creates User, store, subscription, and settings objects.
+    """
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
-    place_order_checked = False
     
     def isdigit(string):
         # use because "-1".isdigit() is False
@@ -134,22 +124,27 @@ def sign_up(request):
             return False
         else:
             return True
-    
+            
     if request.method == 'POST' or request.is_ajax():
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
         
-        all_forms_valid = store_form.is_valid() 
-        # we will not check if the account form is valid if 
-        # the tmp object is in the session since it will return false
-        # if the user does not change the username and email
-        if not request.session.get("account-tmp-objectId"):
-            all_forms_valid = all_forms_valid and\
-                account_form.is_valid()
+        
+        cats = request.POST.get("categories")
+        category_names = None
+        if cats and len(cats) > 0:
+            category_names = cats.split("|")[:-1]
+            # make sure that there are only up to 2 categories
+            while len(category_names) > 2:
+                category_names.pop()
+            data["category_names"] = category_names
+        
+        all_forms_valid = store_form.is_valid() and\
+            account_form.is_valid()
         if request.POST.get("place_order"):
-            place_order_checked = True
+            data["place_order_checked"] = True
             if isdigit(request.POST.get("place_order_amount")):
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
@@ -179,15 +174,12 @@ def sign_up(request):
             store.set("hours", [])
             store.set("rewards", [])
             store.set("categories", [])
-            names = request.POST.get("categories")
-            if names:
-                for name in names.split(",")[:-1]:
-                    alias = Category.objects.filter(name__iexact=\
-                                                    name)
+            if category_names:
+                for name in category_names:
+                    alias = Category.objects.filter(name__iexact=name)
                     if len(alias) > 0:
-                        alias = alias[0].alias
                         store.categories.append({
-                            "alias":alias,
+                            "alias":alias[0].alias,
                             "name":name })
             # coordinates
             # the call to get map data is actually also in the clean 
@@ -205,56 +197,67 @@ def sign_up(request):
 
             # create account
             account = Account(**postDict)
-            account.account_type = "store"
+            # username = email
+            account.set("username", postDict['email'])
             account.set_password(request.POST.get('password'))
             account.set("store", store)
 
             # create an empty subscription
             subscription = Subscription(**postDict) 
-            if request.session.get('subscription-tmp-objectId'):
-                subscription.objectId =\
-                    request.session.get('subscription-tmp-objectId')
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
+            subscription.Store = store.objectId 
+            subscription.create()
             
-            #### MAIL CONNECTION OPEN
-            conn = mail.get_connection(fail_silently=(not DEBUG))
-            
-            # create/update settings
-            if request.session.get("settings-tmp-objectId"):
-                settings.objectId =\
-                    request.session.get("settings-tmp-objectId")
-                settings.update()
-            else:
-                settings.create()
+            # create settings
+            settings.create()
                 
-            # create/update store
+            # create store
             store.Settings = settings.objectId
-            if request.session.get("store-tmp-objectId"):
-                store.objectId =\
-                    request.session.get("store-tmp-objectId")
-                store.update()
-            else:
-                store.create()
+            store.Subscription = subscription.objectId
+            store.create()
+            
+            # add the store pointers to settings and subscription
             settings.Store = store.objectId
             settings.update()
+            subscription.Store = store.objectId
+            subscription.update()
             
-            # create/update account
+            # create account
             account.Store = store.objectId
-            if request.session.get("account-tmp-objectId"):
-                account.objectId =\
-                    request.session.get("account-tmp-objectId")
-                # need to get session token before we can update
-                # this is guaranteed to update the User class since
-                # the user may have changed the email or username
-                # to one that already exists TODO?
-                res = parse("GET", "login", query=\
-                            {"username":requestDict.get('username'),
-                             "password":requestDict.get('password')} )
-                if res.get('sessionToken'):
-                    account.update(res.get('sessionToken'))
-            else:
-                account.create()
+            account.create()
+            
+            # create the store ACL with the account having r/w access
+            store.ACL = {
+                "*": {"read": True, "write": True},
+                account.objectId: {"read": True, "write": True},
+            }
+            store.owner_id = account.objectId
+            store.update()
+            
+            # call this incase store_cc returns False or 
+            # charge_cc returns None
+            def invalid_card():
+                data['store_form'] =\
+                    StoreSignUpForm(store.__dict__.copy())
+                errs = subscription_form._errors.setdefault(\
+                    "cc_number", ErrorList())
+                errs.append("Invalid credit " +\
+                    "card. Please make sure that you provide " +\
+                    "correct credit card information and that you " +\
+                    "have sufficient funds, then try again.")
+                    
+                # delete the objects created!
+                subscription.delete()
+                settings.delete()
+                store.delete()
+                account.delete()
+                    
+                data['store_form'] = store_form
+                data['account_form'] = account_form
+                data['subscription_form'] = subscription_form
+                return render(request,'public/signup.djhtml',data)
+                       
             
             subscription.Store = store.objectId
             if request.POST.get("place_order"):
@@ -270,78 +273,47 @@ def sign_up(request):
                 subscription.zip = request.POST['zip2']
                 subscription.country = request.POST['country2']
                 amount = int(request.POST.get("place_order_amount"))
-                if not request.session.get('subscription-tmp-objectId'):
-                    subscription.create()
-                try:
-                    subscription.store_cc(\
+                subscription.update()
+                res = subscription.store_cc(\
                         subscription_form.data['cc_number'],
                         subscription_form.data['cc_cvv'])
-                except Exception as e:
-                    data['store_form'] = StoreSignUpForm(\
-                        request.session['store-tmp'].__dict__.copy())
-                    subscription_form.errors['__all__'] =\
-                        subscription_form.error_class([e])
                         
-                    # save the objectIds in the session
-                    request.session['subscription-tmp-objectId'] =\
-                        subscription.objectId
-                    request.session['account-tmp-objectId'] =\
-                        account.objectId
-                    request.session['store-tmp-objectId'] =\
-                        store.objectId
-                    request.session['settings-tmp-objectId'] =\
-                        settings.objectId
-                        
-                    data["place_order_checked"] = place_order_checked
-                    data['store_form'] = store_form
-                    data['account_form'] = account_form
-                    data['subscription_form'] = subscription_form
-                    return render(request,'public/signup.djhtml',data)
+                if not res:
+                    return invalid_card()
                 
                 if amount > 0:
                     invoice = subscription.charge_cc(\
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
                         str(amount) + " phones", "smartphone")
-                    send_email_receipt_smartphone(account, 
-                        subscription, invoice, amount)
-            else:
-                # set the subscription fields back to empty!
-                subscription = Subscription()
-                subscription.Store = store.objectId 
-                subscription.subscriptionType = 0
-                subscription.date_last_billed = timezone.now()
-                if not request.session.get('subscription-tmp-objectId'):
-                    subscription.create()
-                else:
-                    subscription.objectId = request.session.get(\
-                        'subscription-tmp-objectId')
-                    subscription.update()
+                        
+                    if invoice:
+                        send_email_receipt_smartphone(account, 
+                            subscription, invoice, amount)
+                    else:
+                        return invalid_card()
             
-            # update the store with a pointer to the subscription
-            store.set("Subscription", subscription.objectId)
-            store.update()
-            
+            # note that username has been fed the email
+            # this shouldn't change anything though shouldn't matter
             # need to put username and pass in request
             postDict['username'] = account.username
             postDict['password'] = account.password
             
             # send matt and new user a pretty email.
             send_email_signup(account)
-            
-            # MAIL CONNECTION CLOSE
-            conn.close()
 
             # auto login
             user_login = login(request, postDict)
             if user_login != None:
                 data = {"code":-1}
+                # response effects - not login returns
                 # -1 - invalid request
                 # 0 - invalid form input
                 # 1 - bad login credentials
                 # 2 - subscription is not active
                 # 3 - success (login now)
-                # 4 - go to part 2
+                # 4 - employee no access - never should be this though
+                # 5 - employee is not approved - never should be
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:
@@ -356,213 +328,8 @@ def sign_up(request):
         account_form = AccountForm()
         subscription_form = SubscriptionForm2()
         
-    data["place_order_checked"] = place_order_checked
     data['store_form'] = store_form
     data['account_form'] = account_form
     data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)
         
-"""
-# DO NOT DELETE THIS! This may be used again when we decide to bring
-back credit card section in the signup process.
-@session_comet
-def sign_up2(request):
-    # Second part of the signup process.
-    data = {'sign_up_nav': True}
-    
-    if request.method == 'POST' or request.is_ajax():
-        # some keys are (were) repeated so must catch this at init
-        subscription_form = SubscriptionForm2(request.POST)
-        
-        if subscription_form.is_valid() and\
-            request.session['store-tmp'] and\
-            request.session['settings-tmp'] and\
-            request.session['account-tmp']:
-            
-            postDict = request.POST.dict()
-            
-            store = request.session['store-tmp']
-            settings = request.session['settings-tmp']
-            account = request.session['account-tmp']
-
-            # create subscription
-            subscription = Subscription(**postDict)
-            tz = pytz.timezone(store.store_timezone)
-            exp = make_aware_to_utc(datetime(\
-                int(postDict['date_cc_expiration_year']),
-                int(postDict['date_cc_expiration_month']), 1), tz)
-            subscription.set("date_cc_expiration", exp)
-            subscription.subscriptionType = 0
-            # use date last billed as a flag for the 30 day 
-            # monthly membership renewal (for message sending)
-            subscription.date_last_billed = timezone.now()
-            # make sure to use the correct POST info
-            subscription.first_name = request.POST['first_name2']
-            subscription.last_name  = request.POST['last_name2']
-            subscription.city = request.POST['city2']
-            subscription.state = request.POST['state2']
-            subscription.zip = request.POST['zip2']
-            subscription.country = request.POST['country2']
-            subscription.create()
-
-            # create store
-            store.Subscription = subscription.objectId
-            
-            # finally create everything
-            settings.create()
-            store.Settings = settings.objectId
-            store.create()
-            settings.Store = store.objectId
-            settings.update()
-            account.Store = store.objectId
-            account.create()
-            
-            # set the subscription's store (uppdate called in store_cc
-            subscription.Store = store.objectId
-            try:
-                subscription.store_cc(subscription_form.data['cc_number'],
-                                subscription_form.data['cc_cvv'])
-            except Exception as e:
-                data['store_form'] = StoreSignUpForm(\
-                    request.session['store-tmp'].__dict__.copy())
-                subscription_form.errors['__all__'] =\
-                    subscription_form.error_class([e])
-                data['subscription_form'] = subscription_form
-                return render(request, 'public/signup2.djhtml', data)
-            
-            # need to put username and pass in request
-            requestDict = request.POST.dict().copy()
-            requestDict['username'] = account.username
-            requestDict['password'] = account.password
-            
-            ####
-            conn = mail.get_connection(fail_silently=(not DEBUG))
-            
-            if request.POST.get("place_order") and\
-                request.POST.get("place_order_amount").isdigit():
-                amount = int(request.POST.get("place_order_amount"))
-                if amount > 0:
-                    invoice = subscription.charge_cc(\
-                        PHONE_COST_UNIT_COST*amount,
-                        "Order placed for " +\
-                        str(amount) + " phones", "smartphone")
-                    send_email_receipt_smartphone(account, subscription, invoice, amount)
-            
-            # send matt and new user a pretty email.
-            send_email_signup(account)
-            
-            conn.close()
-
-            # auto login
-            user_login = login(request, requestDict)
-            if user_login != None:
-                data = {"code":-1}
-                # -1 - invalid request
-                # 0 - invalid form input
-                # 1 - bad login credentials
-                # 2 - subscription is not active
-                # 3 - success (login now)
-                # 4 - go to part 2
-                if type(user_login) is int: # subscription not active
-                    data['code'] = 2
-                else:
-                    # required for datetime awareness!
-                    rputils.set_timezone(request, tz)
-                    data['code'] = 3
-                return HttpResponse(json.dumps(data), 
-                            content_type="application/json")
-            else:
-                # should never go here 
-                pass
-    elif not (request.session['store-tmp'] and\
-            request.session['settings-tmp'] and\
-            request.session['account-tmp']):
-        return render(request, 'public/signup.djhtml', data)
-    else:
-        subscription_form = SubscriptionForm2()
-
-    data['store_form'] = StoreSignUpForm(\
-        request.session['store-tmp'].__dict__.copy())
-    data['subscription_form'] = subscription_form
-    return render(request, 'public/signup2.djhtml', data)
-
-@session_comet  
-def sign_up(request):
-    # renders the signup page on GET and returns a json object on POST.
-    data = {'sign_up_nav': True}
-    
-    if request.method == 'POST' or request.is_ajax():
-        # some keys are repeated so must catch this at init
-        store_form = StoreSignUpForm(request.POST)
-        account_form = AccountForm(request.POST)
-        
-        if store_form.is_valid() and account_form.is_valid():
-            postDict = request.POST.dict()
-
-            # create store
-            tz = rputils.get_timezone(request.POST.get("zip"))
-            store = Store(**postDict)
-            store.store_timezone = tz.zone
-            # set defaults for these guys to prevent 
-            # ParseObjects from making parse calls repeatedly
-            store.punches_facebook = 0
-            # format the phone number
-            store.phone_number =\
-                format_phone_number(request.POST['phone_number'])
-            store.set("store_description", "The " + store.store_name)
-            store.set("hours", [])
-            store.set("rewards", [])
-            store.set("categories", [])
-            names = request.POST.get("categories")
-            if names:
-                for name in names.split(",")[:-1]:
-                    alias = Category.objects.filter(name__iexact=\
-                                                    name)
-                    if len(alias) > 0:
-                        alias = alias[0].alias
-                        store.categories.append({
-                            "alias":alias,
-                            "name":name })
-            # coordinates
-            # the call to get map data is actually also in the clean 
-            full_address = " ".join(\
-                store.get_full_address().split(", "))
-            map_data = rputils.get_map_data(full_address)
-            store.set("coordinates", map_data.get("coordinates"))
-            store.set("neighborhood", 
-                store.get_best_fit_neighborhood(\
-                    map_data.get("neighborhood")))
-            
-            # create settings
-            settings = Settings(Store=store.objectId)
-            store.set('settings', settings)
-
-            # create account
-            account = Account(**postDict)
-            account.account_type = "store"
-            account.set_password(request.POST.get('password'))
-            account.set("store", store)
-            
-            # Create and save store up to Parse (do in part 2)
-            # store.create()
-            request.session['store-tmp'] = store
-            request.session['settings-tmp'] = settings
-            request.session['account-tmp'] = account
-            
-            # -1 - invalid request
-            # 0 - invalid form input
-            # 1 - bad login credentials
-            # 2 - subscription is not active
-            # 3 - success (login now)
-            # 4 - go to part 2
-            return HttpResponse(json.dumps({"code":4}), 
-                            content_type="application/json")
-           
-    else:
-        store_form = StoreSignUpForm()
-        account_form = AccountForm()
-        
-    data['store_form'] = store_form
-    data['account_form'] = account_form
-    return render(request, 'public/signup.djhtml', data)
-"""

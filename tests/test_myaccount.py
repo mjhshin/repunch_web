@@ -15,7 +15,7 @@ from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
     "email": "clothing@vandolf.com",
 }
@@ -25,13 +25,6 @@ TEST_USER_INFO = {
 }
 
 IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
-    
-    
-# set the store information
-account =  Account.objects().get(username=TEST_USER['username'],
-    include="Store.Subscription")
-store = account.store
-subscription = store.subscription
 
 STORE_INFO = {
     "store_name": "Vandolf's Women's Clothing Corp",
@@ -46,9 +39,6 @@ STORE_INFO = {
     "neighborhood": "Parkchester",
     "coordinates": [40.83673, -73.862669],
 }
-
-store.update_locally(STORE_INFO, False)
-store.update()
 
 TEST_STORE_INFO = {
     "store_name": "Vandolf's Military Militia",
@@ -82,9 +72,6 @@ SUBSCRIPTION_INFO = {
     "date_pp_valid": None, 
 }
 
-subscription.update_locally(SUBSCRIPTION_INFO, False)
-subscription.update()
-
 TEST_SUBSCRIPTION_INFO = {
     "first_name": "Gundam",
     "last_name": "Wing",
@@ -98,6 +85,14 @@ TEST_SUBSCRIPTION_INFO = {
 }
 
 def test_edit_store_details():
+    # do the setup here so that if this test is commented out, 
+    # other tests will not be affected
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    store.update_locally(STORE_INFO, False)
+    store.update()
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -116,6 +111,12 @@ def test_edit_store_details():
         {'test_name': "Changes to phone number are saved to Parse"},
         {'test_name': "Changes to email are visible"},
         {'test_name': "Changes to email are saved to Parse"},
+        
+        {'test_name': "Changing the email also changes the " +\
+            "username (Parse)"}, # TODO
+        {'test_name': "Changing the email also changes the " +\
+            "username (Dashboard)"}, # TODO
+        
         {'test_name': "Changes to hours are visible"},
         {'test_name': "Changes to hours are saved to Parse"},
         {'test_name': "Changing the zip changes the store_timezone"},
@@ -165,8 +166,8 @@ def test_edit_store_details():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -374,10 +375,11 @@ def test_edit_store_details():
     ## revert the email address back
     click_store_edit()
     sleep(3)
+    test.find("#id_email").clear()
     test.find("#id_email").send_keys(TEST_USER['email'])
     # save!
     test.find("#save-button").click()
-    sleep(3)
+    sleep(6)
     
     ##########  Entering invalid address shows error
     try:
@@ -549,7 +551,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[36]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[36]['test_message'] = str(e)
@@ -587,7 +589,7 @@ def test_edit_store_details():
             type="xpath").click()
         sleep(1)
         parts[39]['success'] =\
-            test.find("#edit-store-options") is not None
+            test.element_exists("#edit-store-options")
     except Exception as e:
         print e
         parts[39]['test_message'] = str(e)
@@ -635,6 +637,14 @@ def test_edit_store_details():
     
 def test_edit_account():
     # TODO test place_order
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store.Subscription")
+    store = account.store
+    subscription = store.subscription
+    subscription.update_locally(SUBSCRIPTION_INFO, False)
+    subscription.update()
+    
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -686,8 +696,8 @@ def test_edit_account():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -945,6 +955,10 @@ def test_cancel_account():
     """
     A test just for the cancel account link.
     """
+    account =  Account.objects().get(username=TEST_USER['username'],
+        include="Store")
+    store = account.store
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -970,8 +984,8 @@ def test_cancel_account():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!

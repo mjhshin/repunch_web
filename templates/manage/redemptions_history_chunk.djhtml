@@ -14,7 +14,8 @@
     <div class="td redemption_title-past">
     {{ redemp.title|trim_to_dots:18 }}</div>
     <div class="td redemption_punches-past">
-    {{ redemp.num_punches }}</div>
+    {% if redemp.num_punches > 0 %}{{ redemp.num_punches }}{% else %}-{% endif %}
+    </div>
     <div class="td redemption_redeem-past">
     </div>
 </div>

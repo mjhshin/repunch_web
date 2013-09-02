@@ -1,9 +1,11 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}{% load parse_tags %}{% load account_tags %}
 
 {% block title %}Feedback Details{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
 {% block javascript %}
+{% account_is_admin request.session as is_admin %}
+{% if is_admin %}
 <script>
 $(document).ready(function(){
     $('#delete-button').click(function(){
@@ -11,10 +13,12 @@ $(document).ready(function(){
     });
 });
 </script>
+{% endif %}
 {% endblock %}
 
 
 {% block content %}
+	{% account_is_admin request.session as is_admin %}
 	
 	{% if error or success %}
 	<div class="notification {% if success %}success{% endif %} hide">
@@ -22,7 +26,7 @@ $(document).ready(function(){
 	</div>
 	{% endif %}
 	
-	<a class="breadcrumb" href="{% url 'messages_index' %}">&lt; Back to Feedback Inbox</a>
+	<a class="breadcrumb" href="{% url 'messages_index' %}?tab_feedback=1" id="back_to_feedback">&lt; Back to Feedback Inbox</a>
 	
 	<div class="white-box">
 		<div class="sect meta">
@@ -34,14 +38,12 @@ $(document).ready(function(){
 			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ feedback|get:'body' }}
-		</div>
+		<div class="sect body">{{ feedback|get:'body' }}</div>
 	</div>
 
 	<div class="divider" style="height: 20px;"></div>
     {% if reply %}
-	<div class="white-box response">
+	<div class="white-box response" id="reply-box">
 		<div class="sect meta">
 			<label>Date:</label><span>{{ reply|get:'createdAt'|date:"m/d/y" }}</span>
 			<label>From:</label>
@@ -54,20 +56,19 @@ $(document).ready(function(){
 			<label>Subject:</label><span>Re: {{ feedback|get:'subject' }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">
-			{{ reply|get:'body' }}
-		</div>
+		<div class="sect body">{{ reply|get:'body' }}</div>
 	</div>
 	<div class="divider"></div>
     {% endif %}
 
+    {% if is_admin %}
     <div id="message-detail-options" class="form-options">
         {# cannot reply if already replied #}
         {% if not reply %}
-		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue">Reply</a>
+		<a href="{% url 'feedback_reply' feedback_id %}" class="button blue" id="reply-button">Reply</a>
         {% endif %}
 		<a href="{% url 'feedback_delete' feedback_id %}" id="delete-button" class="red">Delete Message</a>
 	</div>
-    
+    {% endif %}
 
 {% endblock %}

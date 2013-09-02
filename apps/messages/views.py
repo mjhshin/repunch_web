@@ -9,10 +9,10 @@ from dateutil.tz import tzutc
 from math import ceil
 import urllib, json
 
-from parse.decorators import session_comet
 from parse.comet import comet_receive
 from parse import session as SESSION
 from parse.utils import cloud_call, make_aware_to_utc
+from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
@@ -24,6 +24,8 @@ from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
 @login_required
+@access_required(http_response="<div class='tr'>Access denied</div>",\
+content_type="text/html")
 def get_page(request):
     """
     Returns the corresponding chunk of rows in html to plug into
@@ -77,7 +79,7 @@ def get_page(request):
 
 
 @login_required
-@session_comet  
+@access_required
 def index(request):
     data = {'messages_nav': True}
     
@@ -104,11 +106,12 @@ def index(request):
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
     
+    data['tab_feedback'] = request.GET.get('tab_feedback')
     return render(request, 'manage/messages.djhtml', data)
 
 
 @login_required
-@session_comet  
+@admin_only(reverse_url="messages_index")
 def edit(request, message_id):
     store = SESSION.get_store(request.session)
 
@@ -177,13 +180,6 @@ def edit(request, message_id):
             # add to the store's relation
             store.add_relation("SentMessages_", [message.objectId]) 
             success_message = "Message has been sent."
-            
-            # update messages_sent_list in session cache
-            messages_sent_list = SESSION.get_messages_sent_list(\
-                request.session)
-            messages_sent_list.insert(0, message)
-            request.session['messages_sent_list'] =\
-                messages_sent_list
                 
             # update the message_count
             message_count += 1
@@ -208,19 +204,22 @@ def edit(request, message_id):
                     
             # update store session cache
             request.session['store'] = store
-            # save the session now! cloud_call may take a bit!
+            # save session- cloud_call may take a while!
             request.session.save()
 
             # push notification
-            cloud_call("retailer_message", params)
+            res = cloud_call("retailer_message", params)
+            if "error" not in res and res.get("result"):
+                message.set("receiver_count",
+                    res.get("result").get("receiver_count"))
+                    
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "newMessage":message.jsonify()
+            }
+            comet_receive(store.objectId, payload)
             
-            if DEBUG:
-                payload = {
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "newMessage":message.jsonify()
-                }
-                comet_receive(store.objectId, payload)
-            
+            # Note that the new message is saved in comet_receive
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
             request.session.update(session)
@@ -279,7 +278,7 @@ def edit(request, message_id):
     return render(request, 'manage/message_edit.djhtml', data)
 
 @login_required
-@session_comet  
+@access_required
 def details(request, message_id):
     # get from the messages_sent_list in session cache
     messages_sent_list = SESSION.get_messages_sent_list(\
@@ -299,7 +298,7 @@ def details(request, message_id):
 
 # FEEDBACK ------------------------------------------
 @login_required
-@session_comet  
+@access_required
 def feedback(request, feedback_id):
     data = {'messages_nav': True, 'feedback_id':feedback_id,
              "store_name":\
@@ -341,7 +340,7 @@ def feedback(request, feedback_id):
     return render(request, 'manage/feedback.djhtml', data)
 
 @login_required
-@session_comet  
+@admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_reply(request, feedback_id):
     account = request.session['account']
     store = SESSION.get_store(request.session)
@@ -364,11 +363,19 @@ def feedback_reply(request, feedback_id):
     
     if request.method == 'POST':
         body = request.POST.get('body')
-        if body == None or len(body) == 0:
+        if body is not None:
+            body = body.strip()
+        else:
+            body = ""
+            
+        data['body'] = body
+        data['from_address'] = store.get("store_name")
+        data['subject'] = 'Re: ' + feedback.get('subject')
+        
+        if len(body) == 0:
             data['error'] = 'Please enter a message.'  
         elif len(body) > 750:
             data['error'] = 'Body must be less than 750 characters.' 
-            data['body'] = body
         # double check if feedback already has a reply
         # should not go here unless it is a hacker 
         elif feedback.get('Reply'):
@@ -403,12 +410,11 @@ def feedback_reply(request, feedback_id):
                 "patron_id":feedback.get('patron_id'),
             })
             
-            if DEBUG:
-                payload = {
-                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "newMessage":feedback.jsonify()
-                }
-                comet_receive(store.objectId, payload)
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "newMessage":feedback.jsonify()
+            }
+            comet_receive(store.objectId, payload)
             
             # make sure we have the latest session to save!
             session = SessionStore(request.session.session_key)
@@ -442,7 +448,7 @@ def feedback_reply(request, feedback_id):
     return render(request, 'manage/feedback_reply.djhtml', data)
 
 @login_required
-@session_comet  
+@admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_delete(request, feedback_id):
     store = SESSION.get_store(request.session)
     # get from the messages_received_list in session cache
@@ -461,7 +467,7 @@ def feedback_delete(request, feedback_id):
                 'Feedback has already been deleted.'}))
                 
     # DO NOT DELETE ANYTHING! Just remove from the store's relation
-    store.remove_relation("ReceivedMessages", [feedback.objectId])
+    store.remove_relation("ReceivedMessages_", [feedback.objectId])
     
     # update messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
@@ -486,9 +492,13 @@ def feedback_delete(request, feedback_id):
         
     # no need to save the store since we just removed from relation
         
-    return redirect(reverse('messages_index')+ "?%s" % urllib.urlencode({'success': 'Feedback has been deleted.'}))
+    return redirect(reverse('messages_index')+ "?%s" %\
+        urllib.urlencode({'success':'Feedback has been deleted.',
+            'tab_feedback':1}))
 
 @login_required
+@admin_only(reverse_url="messages_index")
 def delete(request, message_id):
+    """ cannot delete a message! """
     return HttpResponse("error")
 

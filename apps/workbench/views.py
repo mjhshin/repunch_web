@@ -9,16 +9,16 @@ from math import ceil
 import json
 
 from libs.dateutil.relativedelta import relativedelta
-from parse.decorators import session_comet
 from parse.utils import cloud_call
 from parse.comet import comet_receive
+from parse.decorators import access_required
 from parse.auth.decorators import login_required
 from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
 @login_required
-@session_comet
+@access_required
 def index(request):
     """
     Renders the first 20 most recent pending and approved/denied
@@ -52,6 +52,8 @@ def index(request):
     return render(request, 'manage/workbench.djhtml', data)
     
 @login_required
+@access_required(http_response="<div class='tr'>Access denied</div>",\
+content_type="text/html")
 def get_page(request):
     """
     Returns a generated html to plug in the tables.
@@ -118,9 +120,15 @@ def get_page(request):
     return HttpResponse("Bad request")
     
 @login_required
+@access_required(http_response={"error":"permission_denied"})
 def punch(request):
     if request.method == "POST" or request.is_ajax():
-        nump = int(request.POST['num_punches'])
+        try:
+            nump = int(request.POST['num_punches'])
+        except ValueError:
+            return HttpResponse(json.dumps({'error': 'float'}),
+                content_type="application/json")
+                
         settings = SESSION.get_settings(request.session)
         if nump > settings.get("punches_employee"):
             return HttpResponse(json.dumps({'error': 'over',
@@ -143,6 +151,7 @@ def punch(request):
         content_type="application/json")
     
 @login_required
+@access_required(http_response={"error":"permission_denied"})
 def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success,
     2 if insufficient, 3 if already validated, 

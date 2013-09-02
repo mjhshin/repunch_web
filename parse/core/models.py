@@ -236,6 +236,9 @@ class ParseObject(object):
 
 
     """
+    
+    # Parse object built-ins - these cannot be used in the get method
+    BUILTINS = ("objectId", "createdAt", "updatedAt", "ACL")
 
     @classmethod
     def objects(cls):  
@@ -262,9 +265,20 @@ class ParseObject(object):
         In the above example name is inserted but not age.
 
         All ParseObjects have 3 attributes by default:
-        objectId, createdAt, updatedAt
+            objectId, createdAt, updatedAt
+        All ParseObjects also, optionally, has another attribute:
+            ACL
         """
+        #for builtin in ParseObject.BUILTINS:
+        #    setattr(self, builtin, data.get(builtin))
+        
+        # these assignments are actually pointless since it gets
+        # formatted in update_locally anyways
         self.objectId = data.get("objectId")
+        self.ACL = data.get("ACL")
+        # note that createdAt and updatedAt always comes as an iso
+        # string, whereas parse Date objects' iso string are inside
+        # a dict!
         self.createdAt = data.get("createdAt")
         self.updatedAt = data.get("updatedAt")
         self.update_locally(data, create)
@@ -291,6 +305,11 @@ class ParseObject(object):
             if (key.endswith("_") and key[0].isupper()) or\
                 (key.islower() and key.startswith("_")) or\
                 (key not in self.__dict__ and not create):
+                continue
+                
+            # handle ACL right away
+            if key == "ACL":
+                setattr(self, key, value)
                 continue
 
             # Pointers attrs- store the objectId and create cache
@@ -319,6 +338,10 @@ class ParseObject(object):
             elif key.startswith("date_") and type(value) is dict:
                 setattr(self, key, 
                             parser.parse(value.get('iso')) )
+            elif key.startswith("date_") and\
+                type(value) in (str, unicode):
+                setattr(self, key, 
+                            parser.parse(value) )
             elif key in ("createdAt", "updatedAt") and\
                 type(value) in (str, unicode):
                 setattr(self, key, parser.parse(value) )
@@ -358,7 +381,7 @@ class ParseObject(object):
         """
         return None
 
-    def fetchAll(self):
+    def fetch_all(self):
         """
         Gets all of this object's data from parse and update all
         of its value locally. This includes pulling each pointer for
@@ -369,7 +392,8 @@ class ParseObject(object):
             self.update_locally(res, False)
             # fill up the Pointer cache attributes 
             for key, value in self.__dict__.copy().iteritems():
-                if key[0].isupper() and not key.endswith("_"):
+                if key[0].isupper() and not key.endswith("_") and\
+                    not key == "ACL":
                     self.get(key[0].lower() + key[1:])
             return True
         return False
@@ -402,8 +426,9 @@ class ParseObject(object):
         then the cache will be set to None. If count is given,
         then this method will return the count and not the list.
         """
-        # assuming all objects have these by default
-        if attr in ("createdAt", "updatedAt"):
+        # all objects have these by default. These should not be  
+        # manually set to None!
+        if attr in ParseObject.BUILTINS:
             return self.__dict__.get(attr)
             
         if self.__dict__.get(attr) is not None:
@@ -683,7 +708,8 @@ class ParseObject(object):
                 continue
 
             # Pointers
-            if key[0].isupper() and not key.endswith("_"):
+            if key[0].isupper() and not key.endswith("_") and\
+                key != "ACL":
                 # use pointer meta value as classname if exist
                 if "_" + key.lower() in self.__dict__:
                     data[key] =\
@@ -701,6 +727,10 @@ class ParseObject(object):
             # GeoPoint
             elif key == "coordinates" and value:
                 data[key] = format_geopoint(value[0], value[1])
+            elif key == "ACL":
+                # note that ACL must be a hash/dict!!!
+                if value is not None and type(value) is dict:
+                    data[key] = value
             # regular attributes
             else:
                 data[key] = value

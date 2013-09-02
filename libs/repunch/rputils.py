@@ -4,6 +4,7 @@ from libs.dateutil.relativedelta import relativedelta
 from datetime import timedelta, datetime
 from django.utils import timezone
 from PIL import Image
+from threading import Timer
 import json, time, pytz, httplib, urllib
 
 def rescale(image_path, width=400, height=400):
@@ -132,4 +133,12 @@ def get_timezone(zip_code):
         conn.close()
         
     return pytz.timezone(timezone.get_default_timezone_name())
+    
+    
+def delete_after_delay(to_del, delay):
+    def _delete():
+        for each in to_del:
+            each.delete()
+    t = Timer(delay, _delete)
+    t.start()
         

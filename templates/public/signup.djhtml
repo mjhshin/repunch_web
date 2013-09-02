@@ -5,16 +5,13 @@
 
 {% block styles %}
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
-<style>
-select {
-    margin-top:2px;
-}
-</style>
+<style>select { margin-top:2px; }</style>
 {% endblock %}
 
 {% block javascript %}
+<script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
 <script src="{% static 'public/js/place-order.js' %}"></script>
-<script src="{% static 'public/js/signup.js' %}"></script>
+<script src="{% static 'public/js/signup.1.2.js' %}"></script>
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
 $(document).ready(function(){
@@ -26,9 +23,15 @@ $(document).ready(function(){
     $("#Ph2").val(p_num.substring(3,6));
     $("#Ph3").val(p_num.substring(6,10));
     
-    $( ".question_mark" ).tooltip({
-      track: true
-    });
+    $(".question_mark").tooltip();
+    
+    {# inialize categories content if available #}
+    {% if category_names %}
+        {% for name in category_names %}
+            addToCategoriesBox("{{name}}");
+        {% endfor %}
+    {% endif %}
+    
 });
 
 // stolen from http://www.codingforums.com/showthread.php?t=202208
@@ -69,7 +72,7 @@ function validate(which, next) {
 					<div class="step-box">
 						<span>step</span>
 						<div class="step-img bottom-shadow"><img src="{% static "public/images/icon_three.png" %}" alt=""></div>
-						<p class="step-des">Ready roll!<br/> Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
+						<p class="step-des">Ready to roll!<br/> Start granting punches and interacting with your customers through the Mobile App and the Dashboard.</p>
 					</div>
 				</div>
 				
@@ -155,10 +158,6 @@ function validate(which, next) {
 					<div id="email_e">{{ account_form.email.errors }}</div>
 					<label for="id_email">Your Email Address</label>
 					{{ account_form.email }}
-					
-					<div id="username_e">{{ account_form.username.errors }}</div>
-					<label for="id_username">Your User Name</label>
-					{{ account_form.username }}
 					
 					<div id="password_e">{{ account_form.password.errors }}</div>
 					<label for="id_password">Create Password</label>
@@ -324,13 +323,13 @@ function validate(which, next) {
 <div id="dialog-signup" style="display:none;">
     <img src="{% static 'manage/images/ajax-loader.gif' %}"
     alt="processing signup form..." id="signing-up" 
-    style="position:relative;top:7px;margin-right:8px;display:inline-block;"/>
+    style="position:relative;top:16px;margin-left:8px;margin-right:6px;display:inline-block;"/>
     <div id="dialog-signup-message" 
-        style="display:inline-block;position:relative;top:6px;left:10px;width:220px;">
+        style="display:inline-block;position:relative;top:14px;left:10px;width:220px;">
     Processing your information.<br/>Please wait.
     </div>
     <img src="{% static 'public/images/icon_clock-orange.png' %}"
     alt="processing signup form..." id="signing-up-time"
-    style="position:absolute;top:16px;left:290px;"/>
+    style="position:relative;top:-4px;left:-6px;"/>
 </div>
 {% endblock %}

@@ -4,26 +4,25 @@ Selenium tests for dashboard 'Rewards' tab.
 
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 
 from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing",
+    "username": "clothing@vandolf.com",
     "password": "123456",
-    "email": "clothing@vandolf.com",
 }
 
-account = Account.objects().get(username=TEST_USER['username'],
-    include="Store")
-store = account.store
-# start with no rewards
-store.rewards = []
-store.update()
-
 def test_rewards():
+    # setup
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store")
+    store = account.store
+    # start with no rewards
+    store.rewards = []
+    store.update()
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
@@ -52,6 +51,8 @@ def test_rewards():
             "from least to greatest"},
         {'test_name': "Punches is sortable"},
         {'test_name': "Name is sortable"},
+        {'test_name': "Updating a reward with the reset redemption" +\
+            " count option resets the redemption count to 0"},
     ]
     section = {
         "section_name": "Rewards page working properly?",
@@ -67,8 +68,8 @@ def test_rewards():
         
     # login
     selectors = (
-        ("#id_username", TEST_USER['username']),
-        ("#id_password", TEST_USER['password']),
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
@@ -139,7 +140,6 @@ def test_rewards():
     reward3_name = "reward tres"
     reward3_description = "TRES"
     reward3_punches = 12
-    test.find("#add_reward").click()
     reward4_name = "reward quatro"
     reward4_description = "QUATRO"
     reward4_punches = 15
@@ -251,10 +251,8 @@ def test_rewards():
         parts[14]['test_message'] = str(e)
     ##########  Description is not required 
     try:
-        # this takes a while
-        test.find("#description_ic ul li").text
-    except NoSuchElementException:
-        parts[15]['success'] = True
+        parts[15]['success'] =\
+            not test.element_exists("#description_ic ul li")
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
@@ -385,6 +383,43 @@ def test_rewards():
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
+        
+    ##########  Updating a reward with the reset redemption
+    ###         count option resets the redemption count to 0
+    try:
+        # logout
+        test.find("#link-logout").click()
+        sleep(1)
+        # modify store the rewards redemption count
+        store.rewards = None
+        for r in store.get("rewards"):
+            r['redemption_count'] = 99
+        store.update()
+        # login
+        test.open(reverse("rewards_index")) # ACTION!
+        sleep(1)
+        selectors = (
+        ("#login_username", TEST_USER['username']),
+        ("#login_password", TEST_USER['password']),
+        ("", Keys.RETURN)
+        )
+        test.action_chain(0, selectors, "send_keys") # ACTION!
+        sleep(7)
+        # now test
+        test.find("//div[@id='2']/a", type="xpath").click()
+        sleep(1)
+        red_count = int(test.find("#redemption_count").text.split(" ")[1])
+        test.find("#reset_red_count").click()
+        test.find("#submit-reward-form").click()
+        sleep(5)
+        test.find("//div[@id='2']/a", type="xpath").click()
+        new_red_count =\
+            int(test.find("#redemption_count").text.split(" ")[1])
+        parts[22]['success'] = new_red_count == 0 and red_count !=\
+            new_red_count
+    except Exception as e:
+        print e
+        parts[22]['test_message'] = str(e)
         
     
     # END OF ALL TESTS - cleanup
