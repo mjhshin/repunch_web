@@ -9,6 +9,7 @@ You have been charged ${{ invoice.total }} for your membership with Repunch.
 Hey {{ store.get_owner_fullname }},
 </p>
 <p>
+{# NOTE that date_30_ago and date_now isn't necessarily 30 days ago from when this was ran and now #}
 We have charged you for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
 </p>
 

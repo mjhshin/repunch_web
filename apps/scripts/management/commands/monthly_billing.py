@@ -8,11 +8,14 @@ from django.core.management.base import BaseCommand
 
 from libs.dateutil.relativedelta import relativedelta
 from parse.core.advanced_queries import pointer_query
+from parse.comet import comet_receive
 from parse.apps.stores import MONTHLY
 from parse.apps.stores.models import Subscription
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type
 from parse.notifications import send_email_receipt_monthly
+from repunch.settings import COMET_RECEIVE_KEY_NAME,\
+COMET_RECEIVE_KEY
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -41,7 +44,9 @@ class Command(BaseCommand):
                 sub_cost = sub_type[subscription.get(\
                             "subscriptionType")]["monthly_cost"]
                 if sub_cost == 0: # FREE account
-                    subscription.date_last_billed = date_now
+                    subscription.date_last_billed =\
+                        subscription.date_last_billed +\
+                        relativedelta(days=30)
                     subscription.update()
                 else:
                     account = Account.objects().get(Store=\
@@ -52,26 +57,23 @@ class Command(BaseCommand):
                     if invoice:
                         subscription.date_last_billed =\
                             subscription.date_last_billed +\
-                            relativedelta(days=-30)
+                            relativedelta(days=30)
                         subscription.update()
-                        # if the charge failed before
-                        if subscription.date_charge_failed:
-                            subscription.date_charge_failed = None
-                            subscription.update()
                     else:
-                        # set the date_charge_failed if none
-                        if not subscription.date_charge_failed:
-                            subscription.date_charge_failed =\
-                                timezone.now()
-                            subscription.update()
-                        # send the user an email every day # TODO
+                        # send the user an email TODO
+                        # payment is done via the dashboard so that 
+                        # the credit card may also be validated
                         
-                    
                     asiss.append((account, store, invoice,
                         subscription))
                         
-                # TODO comet_receive - update the logged in users' subscriptions
-                
+                # update the logged in users' subscriptions
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedSubscription":subscription.jsonify()
+                }
+                comet_receive(subscription.Store, payload)
+                        
             # end of while loop
             sub_count -= LIMIT
             skip += LIMIT

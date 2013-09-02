@@ -78,6 +78,34 @@ def parse(method, path, data=None, query=None,
         return None
     conn.close()
     return result
+    
+def batch(method, parse_objects):
+    """
+    Create (POST), update (PUT), or delete (DELETE) multiple
+    parse objects in a single call to Parse.
+    
+    Note that the master key is used here just in case one of the
+    parse_objects is a User object and method is update.
+    This will also mean that ACLs are ignored here.
+    """
+    reqs = []
+    for po in parse_objects:
+        reqs.append({
+            "method": method,
+            "path": '/' + PARSE_VERSION + '/' + po.path(),
+            "body": po.jsonify()
+        })
+    payload = json.dumps({"requests": reqs})
+    
+    rcm = REST_CONNECTION_META.copy()
+    rcm["X-Parse-Master-Key"] = PARSE_MASTER_KEY
+    rcm["Content-Type"] = "application/json"
+    conn = httplib.HTTPSConnection('api.parse.com', 443)
+    conn.connect()
+    conn.request(method, '/' + PARSE_VERSION + '/'  + "batch",
+        payload, rcm)
+     
+    return json.loads(connection.getresponse().read())
 
 def rescale(image_path, img_format, crop_coords=None,
         dst_width=PID[0], dst_height=PID[1]):

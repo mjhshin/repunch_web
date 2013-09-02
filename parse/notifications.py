@@ -117,8 +117,6 @@ def send_email_receipt_monthly(asiss, connection=None):
             "/templates/manage/notification-receipt-monthly.html", 'r') as f:
             template = Template(f.read())
         emails = []
-        date_30_ago = timezone.now() + relativedelta(days=-30)
-        date_now = timezone.now()
         # for accounts
         for asis in asiss:
             invoice = asis[2]
@@ -127,6 +125,9 @@ def send_email_receipt_monthly(asiss, connection=None):
             subscription = asis[3]
             account = asis[0]
             store = asis[1]
+            date_30_ago = subscription.date_last_billed +\
+                relativedelta(days=-30)
+            date_now = subscription.date_last_billed.replace()
             subject = "Repunch Inc. monthly service charge."
             ctx = get_notification_ctx()
             ctx.update({'store': store, 'invoice': invoice,

@@ -1,7 +1,5 @@
 ##############################################
 ####################  TODO:
-1. in monthly_billing and date_passed_user_limit 
-(anywhere that charge_cc is called) add a script to notify the user 
-that the credit card is invalid and new credit card info is required. 
-This will be the same as date_passed_user_limit.
+1. test passed user limit script
+2. test monthly billing
 2. fix tooltip on signup and edit subscription

@@ -18,9 +18,10 @@ from django.utils import timezone
 from django.core import mail
 from django.core.management.base import BaseCommand
 from smtplib import SMTPServerDisconnected
-import requests, json
+import json
 
 from libs.dateutil.relativedelta import relativedelta
+from parse.comet import comet_receive
 from parse.notifications import send_email_passed_user_limit
 from parse.apps.accounts import sub_type
 from parse.apps.accounts.models import Account
@@ -72,9 +73,7 @@ class Command(BaseCommand):
                         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                         "updatedSubscription": sub.jsonify()
                     }
-                    if not DEBUG:
-                        requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                            data=json.dumps(payload), verify=False)
+                    comet_receive(sub.Store, payload)
                     package = {
                         "status": "upgraded",
                         "sub_type": sub_type[0]["name"],
@@ -235,9 +234,7 @@ class Command(BaseCommand):
                         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                         "updatedSubscription": sub.jsonify()
                     }
-                    if not DEBUG:
-                        requests.post(COMET_REQUEST_RECEIVE + sub.Store,
-                            data=json.dumps(payload), verify=False)
+                    comet_receive(sub.Store, payload)
                     package = {
                         "status": "upgraded",
                         "sub_type": sub_type[1]["name"],

@@ -261,11 +261,6 @@ class Subscription(ParseObject):
         self.date_passed_user_limit =\
             data.get("date_passed_user_limit")
             
-        # like date_passed_user_limit but used for the case where
-        # a stored paypal cc failed to be charged because invalid
-        self.date_charge_failed =\
-            data.get("date_charge_failed")
-        
         # use to bill monthly! ONLY USE for determining when to charge
         # monthly bill for premium accounts- not for smartphones or
         # other services!

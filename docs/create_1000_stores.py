@@ -4,6 +4,7 @@ Accounts (Users), Stores, Settings, and Subscriptions.
 """
 
 from libs.repunch import rputils
+from django.utils import timezone
 
 from parse.utils import parse, create_png
 from parse.apps.accounts.models import Account
@@ -30,7 +31,8 @@ def create():
             
             # create the Subscription
             subscription = Subscription.objects().create(first_name=\
-                name, last_name=name, zip=str(10100+i))
+                name, last_name=name, zip=str(10100+i),
+                date_last_billed=timezone.now())
                 
             # create the store
             store = Store.objects().create(\
