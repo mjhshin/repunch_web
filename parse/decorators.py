@@ -10,10 +10,12 @@ from parse import session as SESSION
 
 def _access_required(http_response, content_type):
     """
-    Logs out the user if he has an ACL of ACCESS_NONE.
+    Logs out the user if he has an ACL of ACCESS_NONE or the store
+    is not active.
     It is true that users with no access may not be able to log in.
     However, this decorator takes care of the case where a logged in
-    user's ACL is changed to ACCESS_NONE.
+    user's ACL is changed to ACCESS_NONE or if the store's active
+    field has been set to False
     
     This decorator should only be used on views that return an
     HttpResponse/rendered page - not redirects or if done with ajax.
@@ -23,7 +25,9 @@ def _access_required(http_response, content_type):
     def _access_required_decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
-            if SESSION.get_store(request.session).has_access(request.session['account']):
+            store = SESSION.get_store(request.session)
+            if store.has_access(request.session['account']) and\
+                store.active:
                 return view_func(request, *args, **kwargs)
             else:
                 if http_response:

@@ -13,7 +13,8 @@ from parse.apps.stores import MONTHLY
 from parse.apps.stores.models import Subscription
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type
-from parse.notifications import send_email_receipt_monthly
+from parse.notifications import send_email_receipt_monthly,\
+send_email_failed_charge
 from repunch.settings import COMET_RECEIVE_KEY_NAME,\
 COMET_RECEIVE_KEY
 
@@ -21,10 +22,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         get all of the subscriptions whose stores are active & who
-        have been last billed 30 days ago.
+        have been last billed 30+ days ago.
         IMPORTANT! This includes accounts of type FREE, which are
-        not charged or included in the email notifications- simply
-        set the date last billed to now.
+        not charged or included in the email notifications
         """
         date_30_ago = timezone.now() + relativedelta(days=-30)
         date_now = timezone.now()
@@ -41,6 +41,7 @@ class Command(BaseCommand):
                     "Store", {"active":True}, limit=LIMIT,
                     skip=skip, order="createdAt")['results']:
                 subscription = Subscription(**each)
+                update_store = False
                 sub_cost = sub_type[subscription.get(\
                             "subscriptionType")]["monthly_cost"]
                 if sub_cost == 0: # FREE account
@@ -48,30 +49,66 @@ class Command(BaseCommand):
                         subscription.date_last_billed +\
                         relativedelta(days=30)
                     subscription.update()
-                else:
+                else: # PAID account
                     account = Account.objects().get(Store=\
                                 subscription.get("Store"))
                     store = account.get("store")
                     invoice = subscription.charge_cc(\
                             sub_cost, "description", MONTHLY)
+                    send_user_email = True
                     if invoice:
                         subscription.date_last_billed =\
                             subscription.date_last_billed +\
                             relativedelta(days=30)
                         subscription.update()
                     else:
-                        # send the user an email TODO
-                        # payment is done via the dashboard so that 
-                        # the credit card may also be validated
+                        # notify user via email- payment is done via 
+                        # dashboard to also validate cc realtime
+                        # 1st day time range
+                        day1_end = date_now.replace()
+                        day1_start = day1_end + relativedelta(hours=-24)
+                        # 4th day time range
+                        day4_end = date_now + relativedelta(days=-4)
+                        day4_start = day4_end + relativedelta(hours=-24)
+                        # 8th day time range
+                        day8_end = date_now + relativedelta(days=-8)
+                        day8_start = day8_end + relativedelta(hours=-24)
+                        # 14th day time range
+                        day14_end = date_now + relativedelta(days=-14)
+                        day14_start = day14_end + relativedelta(hours=-24)
+                        # only send email after 1, 4, and 8 days
+                        last_billed = subscription.date_last_billed
+                        if (last_billed >= day1_start and\
+                            last_billed <= day1_end) or\
+                            (last_billed >= day4_start and\
+                            last_billed <= day4_end) or\
+                            (last_billed >= day8_start and\
+                            last_billed <= day8_end):
+                            send_email_failed_charge(account, store,
+                                subscription)
+                        # disable account on 14th day
+                        elif last_billed >= day14_start and\
+                            last_billed <= day14_end:
+                            store.active = False
+                            store.update()
+                            update_store = True
+                            send_email_failed_charge(account, store,
+                                subscription, account_disabled=True)
+                        else:
+                            send_user_email = False
                         
-                    asiss.append((account, store, invoice,
-                        subscription))
+                    # do not send email after account deactivation
+                    if send_user_email:
+                        asiss.append((account, store, invoice,
+                            subscription))
                         
-                # update the logged in users' subscriptions
+                # update the logged in users' subscription and store
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "updatedSubscription":subscription.jsonify()
                 }
+                if store and update_store:
+                    payload.update({"updatedStore":store.jsonify()})
                 comet_receive(subscription.Store, payload)
                         
             # end of while loop

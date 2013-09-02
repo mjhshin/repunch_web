@@ -60,7 +60,7 @@ def _send_emails(emails, connection=None):
         conn.close()
         
 def send_email_failed_charge(account, store, subscription,
-    connection=None):
+    account_disabled=False, connection=None):
     """
     Called in monthly billing if charging cc failed.
     Sends an email to the account holder.
@@ -80,6 +80,7 @@ def send_email_failed_charge(account, store, subscription,
         ctx = get_notification_ctx()
         ctx.update({'store': store, "date_disable":date_disable,
             "date_30_ago":date_30_ago, "date_now":date_now,
+            "account_disabled": account_disabled,
             "sub_type":sub_type, "subscription":subscription})
         body = template.render(Context(ctx)).__str__()
                 
