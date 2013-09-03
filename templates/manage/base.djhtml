@@ -17,7 +17,7 @@
 	    href="{% static 'public/images/favicon.png' %}" />
 	
 	<!-- include page specific css -->
-	<link href="{% static 'manage/css/global.1.1.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.1.2.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
 	
