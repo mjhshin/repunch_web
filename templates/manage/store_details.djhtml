@@ -57,7 +57,8 @@ $(document).ready(function() {
 	<div class="notification">
 	    <div>
         <span style="color:red">ALERT!</span> We have failed to charge you for your monthly membership.<br/>
-        The credit card information you provided may be incorrect or it may not have enough funds.<br/>
+        The credit card information you provided may be incorrect or<br/> 
+        the credit card may not have enough funds.<br/><br/>
 	    Please make a payment by <a href="{% url 'account_update' %}" >updating your account information</a> for continued service.
 		</div>
 	</div>

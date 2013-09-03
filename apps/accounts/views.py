@@ -213,7 +213,7 @@ def update(request):
             
             if not res:
                 return invalid_card()
-                
+            
             # if monthly billing failed
             if subscription.date_charge_failed:
                 sub_cost = sub_type[subscription.get(\
@@ -226,7 +226,8 @@ def update(request):
                         relativedelta(days=30)
                     subscription.date_charge_failed = None
                     subscription.update()
-                    send_email_receipt_monthly_success(account, 
+                    send_email_receipt_monthly_success(\
+                        request.session['account'], 
                         store, subscription, invoice) 
                 else:
                     return invalid_card()
@@ -377,7 +378,8 @@ def upgrade(request):
                         relativedelta(days=30)
                     subscription.date_charge_failed = None
                     subscription.update()
-                    send_email_receipt_monthly_success(account, 
+                    send_email_receipt_monthly_success(\
+                        request.session['account'], 
                         store, subscription, invoice) 
                 else:
                     return invalid_card()

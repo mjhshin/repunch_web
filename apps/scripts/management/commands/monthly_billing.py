@@ -66,6 +66,9 @@ class Command(BaseCommand):
                         subscription.update()
                     else:
                         subscription.date_charge_failed = date_now
+                        # force entering new credit card!
+                        subscription.cc_number = None
+                        subscription.date_cc_expiration = None
                         subscription.update()
                     
                         # notify user via email- payment is done via 

@@ -16,7 +16,7 @@ Purchase made by
 Hey {{ store.get_owner_fullname }},
 </p>
 <p>
-This is an invoice for your recent purchase of smartphones.
+This is an invoice for your recent purchase of {{ amount }} smartphone{% if amount > 1 %}s{% endif %}.
 </p>
 {% endif %}
 

@@ -177,10 +177,10 @@ $(document).ready(function(){
 
     <div class="form-options">
         {% if update %}
-		<a class="button blue" id="upgrade-form-submit">Update{% if monthly_billing %} & Pay{% endif %}</a>
+		<a class="button blue" id="upgrade-form-submit">Update{% if alert_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 		{% elif upgrade %}
-		<a class="button blue" id="upgrade-form-submit">Upgrade{% if monthly_billing %} & Pay{% endif %}</a>
+		<a class="button blue" id="upgrade-form-submit">Upgrade{% if alert_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
 		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
