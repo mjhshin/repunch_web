@@ -15,21 +15,24 @@
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
 $(document).ready(function(){
-    var p_num = "{{ store_form.phone_number.value }}";
-    if (p_num == "None"){
-        return;
-    }
-    $("#Ph1").val(p_num.substring(0,3));
-    $("#Ph2").val(p_num.substring(3,6));
-    $("#Ph3").val(p_num.substring(6,10));
-    
-    
     {# inialize categories content if available #}
     {% if category_names %}
         {% for name in category_names %}
             addToCategoriesBox("{{name}}");
         {% endfor %}
     {% endif %}
+    
+    function initPhoneNumber() {
+        var p_num = "{{ store_form.phone_number.value }}";
+        if (p_num == "None"){
+            return;
+        }
+        $("#Ph1").val(p_num.substring(0,3));
+        $("#Ph2").val(p_num.substring(3,6));
+        $("#Ph3").val(p_num.substring(6,10));
+    }
+    initPhoneNumber();
+    
     
 });
 
