@@ -101,7 +101,7 @@ def send_email_receipt_monthly_success(account, store, subscription,
     invoice, connection=None):
     """
     Called in monthly billing if charging cc was successful.
-    Sends an email to the account holder.
+    Sends an email to the account holder and ORDER_PLACED_EMAILS
     """
     def _wrapper():
         # need to activate the store's timezone for template rendering!
@@ -116,18 +116,34 @@ def send_email_receipt_monthly_success(account, store, subscription,
             relativedelta(days=-30)
         date_now = subscription.date_last_billed.replace()
         ##########
+        emails = []
         subject = EMAIL_MONTHLY_SUBJECT
         ctx = get_notification_ctx()
         ctx.update({'store': store, 'invoice': invoice,
+            "account": account, "subscription":subscription,
             "date_30_ago":date_30_ago, "date_now":date_now,
             "sub_type":sub_type, "subscription":subscription})
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
                 
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), to=[account.get('email')])
         email.attach_alternative(body, 'text/html')
-            
-        _send_emails([email], connection)
+        emails.append(email)
+        
+        # for ORDER_PLACED_EMAILS
+        subject = "Monthly billing payment by " +\
+            store.get_owner_fullname() + "."
+        timezone.activate(pytz.timezone(TIME_ZONE))
+        ctx.update({"for_admin": True})
+        body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+        email.attach_alternative(body, 'text/html')
+        emails.append(email)
+        
+        _send_emails(emails, connection)
     
     if connection:
         _wrapper()
@@ -189,7 +205,9 @@ def send_email_receipt_monthly_batch(asiss, connection=None):
         subject = "Monthly billing results : " + date.strftime("%b %d %Y")
         ctx = get_notification_ctx()
         ctx.update({'asiss': asiss, "date":date, "sub_type":sub_type})
+        timezone.activate(pytz.timezone(TIME_ZONE))
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), to=ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
@@ -213,6 +231,7 @@ def send_email_receipt_smartphone(account, subscription, invoice,
             template = Template(f.read())
        
         store = account.get("store")
+        timezone.activate(pytz.timezone(store.store_timezone))
         # for account
         subject = "Repunch Inc. transaction invoice."
         ctx = get_notification_ctx()
@@ -222,6 +241,7 @@ def send_email_receipt_smartphone(account, subscription, invoice,
                 'invoice': invoice,
                 'for_customer': True})
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
                 
         emails = []
         email = mail.EmailMultiAlternatives(subject,
@@ -241,7 +261,10 @@ def send_email_receipt_smartphone(account, subscription, invoice,
                 'invoice': invoice,
                 'sub_type': sub_type,
                 'for_customer': False})
+                
+        timezone.activate(pytz.timezone(TIME_ZONE))
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), to=ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
@@ -294,7 +317,9 @@ def send_email_signup(account, connection=None):
             'activate': AccountActivate.objects.create(\
             				store_id=store.objectId),
         })
+        timezone.activate(pytz.timezone(TIME_ZONE))
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
         
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), to=ORDER_PLACED_EMAILS)
@@ -424,7 +449,9 @@ def send_email_selenium_test_results(tests, connection=None):
         subject = "Repunch Inc. Selenium test results."
         ctx = get_notification_ctx()
         ctx.update({'date':date, 'tests':tests})
+        timezone.activate(pytz.timezone(TIME_ZONE))
         body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
         
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), to=(ADMINS[0][1], ))

@@ -1,10 +1,50 @@
 {% extends "manage/notification.html" %}
 
 {% block title %}
+{% if for_admin %}
+{{ store.get_owner_fullname }} has paid his monthly subscription fee.
+{% else %}
 You have been charged ${{ invoice.total }} for your membership with Repunch.
+{% endif %}
 {% endblock %}
 
 {% block content %}
+
+{% if for_admin %}
+<strong>ACCOUNT INFO</strong>
+<ul>
+    <li><span style="color:#545454;font-weight:bold;">Business name:</span>
+    {{ store.store_name }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Owner name:</span>
+    {{ store.first_name|capfirst }}
+    {{ store.last_name|capfirst }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Store ID:</span>
+    {{ store.objectId }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Username:</span>
+    {{ account.username }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Email:</span>
+    {{ account.email }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Phone number:</span>
+    {{ store.phone_number }}
+    </li>
+    <li><span style="color:#545454;font-weight:bold;">Subscription Type:</span>
+    {% for key, val in sub_type.iteritems %}
+    {% if key == subscription.subscriptionType %}
+    {{ val.name }}
+    {% endif %}
+    {% endfor %}
+    </li>
+</ul>
+<strong>PAYPAL INVOICE</strong>
+{{ invoice.as_ul|safe }}
+<br/>
+
+{% else %}
 <p style="">
 Hey {{ store.get_owner_fullname }},
 </p>
@@ -23,5 +63,6 @@ We have charged you for your membership from {{ date_30_ago|date:"F d, Y" }} to 
 <span style="color:#545454;font-weight:bold;">Total (USD):</span> ${{ invoice.total }}<br/>
 <span style="color:#545454;font-weight:bold;">Transaction ID:</span> {{ invoice.sale_id }}<br/>
 </p>
+{% endif %}
 
 {% endblock %}
