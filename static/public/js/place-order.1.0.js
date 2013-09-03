@@ -4,6 +4,8 @@
 
 $(document).ready(function(){
 
+    $( ".question_mark" ).tooltip({track: true});
+
     $("#place_order").click(function(){
         $("#place_order_span").toggle(this.checked);
         

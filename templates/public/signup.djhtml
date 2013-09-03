@@ -10,7 +10,7 @@
 
 {% block javascript %}
 <script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
-<script src="{% static 'public/js/place-order.js' %}"></script>
+<script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script src="{% static 'public/js/signup.1.2.js' %}"></script>
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
@@ -23,7 +23,6 @@ $(document).ready(function(){
     $("#Ph2").val(p_num.substring(3,6));
     $("#Ph3").val(p_num.substring(6,10));
     
-    $(".question_mark").tooltip();
     
     {# inialize categories content if available #}
     {% if category_names %}

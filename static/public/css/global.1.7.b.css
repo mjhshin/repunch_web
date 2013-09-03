@@ -1232,7 +1232,7 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 	text-align:center;
 }
 
-#footer-links a{
+#footer-links span{
 	color:#AFAFAF;
 	letter-spacing: normal;
 	margin:0 13px;

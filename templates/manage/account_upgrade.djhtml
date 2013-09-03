@@ -5,14 +5,7 @@
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/upgradeaccount.css" %}" />{% endblock %}
 
 {% block javascript %}
-<script src="{% static 'public/js/place-order.js' %}"></script>
-<script>
-$(document).ready(function(){
-    $( ".question_mark" ).tooltip({
-      track: true
-    });
-});
-</script>
+<script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script>
     $(document).ready(function(){
         var pf = $("#processing-form");

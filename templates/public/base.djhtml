@@ -13,7 +13,7 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/global.1.7.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/global.1.7.b.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/login.1.0.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
@@ -60,7 +60,7 @@
 				</li>
 			</ul>
 			<div id="footer-links">
-				<a href="#">&copy; 2013 Repunch. All Rights Reserved.</a>
+				<span>&copy; 2013 Repunch. All Rights Reserved.</span>
 			</div>
 		</div>
 	</footer>
