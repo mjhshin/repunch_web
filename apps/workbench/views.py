@@ -67,7 +67,7 @@ def get_page(request):
                 SESSION.get_redemptions_pending(request.session)
             # sort
             header_map = {
-                "redemption_time":"createdAt",
+                "redemption_time":"createdAt", # IMPORTANT DIFF!
                 "redemption_customer_name": "customer_name",
                 "redemption_title": "title",
                 "redemption_punches": "num_punches",
@@ -91,7 +91,7 @@ def get_page(request):
                 SESSION.get_redemptions_past(request.session)
             # sort
             header_map = {
-                "redemption_time-past":"createdAt",
+                "redemption_time-past":"updatedAt", # IMPORTANT DIFF!
                 "redemption_customer_name-past": "customer_name",
                 "redemption_title-past": "title",
                 "redemption_punches-past": "num_punches", 

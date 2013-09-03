@@ -522,35 +522,37 @@ $(document).ready(function(){
             // tab
             var pendingTab = $("#tab-pending-redemptions");
             if (pendingTab.length >0){
-                // remove the rows
-                for (var i=0; i< redemps.length; i++){
-                    var row = $("#" + redemps[i].objectId);
-                    // row.css("background", "#FFFFCB");
-                    row.css("background", "#CCFF99");
-                    if (type == "approved") {
-                        // row.html("Redemption has been <span style='color:blue;'>APPROVED</span> elsewhere.");
-                        row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
-                    } else {
-                        // row.html("Redemption has been <span style='color:red;'>DENIED</span> elsewhere.");
-                        row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
-                    }
-                    // the last row to go checks if placeholder is necessary
-                    if (i == redemps.length - 1) {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                            
-                            // place the placeholder if now empty
-                            if($("#redemptions-nav a div.nav-item-badge").length == 0) {
-                                $("#tab-body-pending-redemptions div.table-header").after(
-                                    "<div class='tr' id='no-redemptions'>" +
-                                    "<div class='td'>No Redemptions</div>" +
-                                    "</div>");
-                            }
-                        });
-                    } else {
-                        row.fadeOut(2000, function(){
-                            $(this).remove();
-                        });
+                if (pendingTab.hasClass("active")) {
+                    // remove the rows
+                    for (var i=0; i< redemps.length; i++){
+                        var row = $("#" + redemps[i].objectId);
+                        // row.css("background", "#FFFFCB");
+                        row.css("background", "#CCFF99");
+                        if (type == "approved") {
+                            // row.html("Redemption has been <span style='color:blue;'>APPROVED</span> elsewhere.");
+                            row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
+                        } else {
+                            // row.html("Redemption has been <span style='color:red;'>DENIED</span> elsewhere.");
+                            row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
+                        }
+                        // the last row to go checks if placeholder is necessary
+                        if (i == redemps.length - 1) {
+                            row.fadeOut(2000, function(){
+                                $(this).remove();
+                                
+                                // place the placeholder if now empty
+                                if($("#redemptions-nav a div.nav-item-badge").length == 0) {
+                                    $("#tab-body-pending-redemptions div.table-header").after(
+                                        "<div class='tr' id='no-redemptions'>" +
+                                        "<div class='td'>No Redemptions</div>" +
+                                        "</div>");
+                                }
+                            });
+                        } else {
+                            row.fadeOut(2000, function(){
+                                $(this).remove();
+                            });
+                        }
                     }
                 }
                 
