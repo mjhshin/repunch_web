@@ -7,6 +7,7 @@ from django.contrib.auth import SESSION_KEY
 
 from libs.repunch import rputils
 from repunch.settings import PAGINATION_THRESHOLD
+from parse import session as SESSION
 from parse.utils import parse
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING
@@ -81,8 +82,11 @@ def login(request, requestDict):
                 request.session['settings'] = settings
                 request.session['store'] = store
                 request.session['account'] = account
+                SESSION.get_message_count(request.session)
+                SESSION.get_patronStore_count(request.session)
                 
                 if store.get('store_timezone'):
+                    # the store timezone is inserted into the request
                     rputils.set_timezone(request, 
                         pytz.timezone(store.get('store_timezone')))
                         
