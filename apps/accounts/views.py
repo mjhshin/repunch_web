@@ -11,8 +11,7 @@ from apps.accounts.models import AccountActivate
 from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
-from apps.stores.forms import SettingsForm, SubscriptionForm,\
-SubscriptionForm3
+from apps.stores.forms import SettingsForm, SubscriptionForm
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
@@ -156,7 +155,7 @@ def update(request):
     sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
-        form = SubscriptionForm3(request.POST)
+        form = SubscriptionForm(request.POST)
         form.subscription = subscription # to validate cc_number
         if form.is_valid():       
             # upgrade account if date_passed_user_limit is on
@@ -205,7 +204,7 @@ def update(request):
                         'manage/account_upgrade.djhtml', data)
                     
             res = True
-            # only store_cc if it is a digit
+            # only store_cc if it is a digit (new)
             if str(form.data['cc_number']).isdigit():
                 res = subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
@@ -280,7 +279,7 @@ def update(request):
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm3()
+        form = SubscriptionForm()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         if form.initial.get("cc_number"):
@@ -306,7 +305,7 @@ def upgrade(request):
     sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
-        form = SubscriptionForm3(request.POST)
+        form = SubscriptionForm(request.POST)
         form.subscription = subscription # to validate cc_number
         if form.is_valid(): 
             # should fetch the most up-to-date subscription first
@@ -357,7 +356,7 @@ def upgrade(request):
                         'manage/account_upgrade.djhtml', data)
                     
             res = True
-            # only store_cc if it is a digit
+            # only store_cc if it is a digit (new)
             if str(form.data['cc_number']).isdigit():
                 res = subscription.store_cc(form.data['cc_number'],
                                             form.data['cc_cvv'])
@@ -439,7 +438,7 @@ def upgrade(request):
                         urllib.urlencode({'success':\
                             'Your account has been updated.'}))
     else:
-        form = SubscriptionForm3()
+        form = SubscriptionForm()
         form.initial = subscription.__dict__.copy()
         # add some asterisk to cc_number
         if form.initial.get("cc_number"):

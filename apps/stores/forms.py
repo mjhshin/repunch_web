@@ -222,6 +222,10 @@ class SubscriptionForm2(forms.Form):
         return data
         
 class SubscriptionForm(forms.Form):
+    """
+    Use for existing subscriptions. Reason is to not validate credit
+    card number but rather just check if it matches the one on record.
+    """
     first_name = forms.CharField(max_length=50,
                     validators=[alphanumeric, required])
     last_name = forms.CharField(max_length=50,
@@ -242,59 +246,7 @@ class SubscriptionForm(forms.Form):
     cc_cvv = forms.CharField(validators=[required, numeric])
     recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
     
-    def clean(self, *args, **kwargs):
-        super(SubscriptionForm, self).clean()
-        cleaned_data = self.cleaned_data
-        
-        # if cc_number doesn't exists, it is because we already 
-        # have an error
-        if 'cc_number' in cleaned_data:
-            cc = cleaned_data['cc_number']
-            mask = (len(cc)-4)*'*'
-            mask += cc[-4:]
-            cleaned_data['cc_number'] = mask
-        
-            # credit card processing will go here
-            # raise forms.ValidationError("Error processing credit"+\
-            #                            " card!")
-        
-        return cleaned_data
     
-    def clean_recurring(self):
-        data = self.cleaned_data['recurring']
-        if not data:
-            raise forms.ValidationError("You must accept the Terms"+\
-                                    " & Conditions to continue.")
-        return data
-    
-    def clean_date_cc_expiration(self):
-        data = self.cleaned_data['date_cc_expiration']
-        now = datetime.datetime.now()
-        if data.year == now.year:
-            if data.month < now.month:
-                raise forms.ValidationError("Your credit card has"+\
-                                            " expired!")
-            
-        return data
-    
-    def clean_cc_number(self):
-        data = self.cleaned_data['cc_number']
-        data = re.sub("[^0-9]", "", data) 
-
-        if rpccutils.validate_checksum(data) == False:
-            raise forms.ValidationError("Enter a valid credit card"+\
-                                        " number.")
-        if rpccutils.validate_cc_type(data) == False:
-            raise forms.ValidationError("Credit card type is not"+\
-                                        " accepted.")
-        
-        return data
-        
-class SubscriptionForm3(SubscriptionForm):
-    """
-    Use for existing subscriptions. Reason is to not validate credit
-    card number but rather just check if it matches the one on record.
-    """
     def clean_cc_number(self):
         """ do not validate_checksum """
         data = str(self.cleaned_data['cc_number'])
@@ -319,6 +271,23 @@ class SubscriptionForm3(SubscriptionForm):
     def clean(self, *args, **kwargs):
         """ override the clean method. """
         return self.cleaned_data
+    
+    def clean_recurring(self):
+        data = self.cleaned_data['recurring']
+        if not data:
+            raise forms.ValidationError("You must accept the Terms"+\
+                                    " & Conditions to continue.")
+        return data
+    
+    def clean_date_cc_expiration(self):
+        data = self.cleaned_data['date_cc_expiration']
+        now = datetime.datetime.now()
+        if data.year == now.year:
+            if data.month < now.month:
+                raise forms.ValidationError("Your credit card has"+\
+                                            " expired!")
+            
+        return data
         
                
 class SettingsForm(forms.Form):
