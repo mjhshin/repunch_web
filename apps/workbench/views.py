@@ -269,9 +269,6 @@ def redeem(request):
                     del_red = redemptions_pending.pop(i_remove)
                     session['redemptions_pending'] =\
                         redemptions_pending
-                        
-                request.session.update(session)
-                    
                     if DEBUG:
                         store_id =\
                             SESSION.get_store(session).objectId
@@ -281,6 +278,7 @@ def redeem(request):
                         }
                         comet_receive(store_id, payload)
                         
+                request.session.update(session)
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
                                 
