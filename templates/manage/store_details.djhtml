@@ -39,14 +39,14 @@ $(document).ready(function() {
 	<div class="notification">
 	    <div>
 	    {% if alert_users == 2  %}
-	        ALERT! You have passed your maximum number users.
-	        Please upgrade your account info for continued service.
+	        <span style="color:red">ALERT!</span> You have passed your maximum number users.<br/>
+		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
 	    {% else %}
-		    WARNING! Your are reaching your maximum number of users.
+		    You are reaching your maximum number of users.<br/>
 		    {% if request.session.subscription.pp_cc_id %}
 		    Your account will automatically be upgraded once you've passed your limit.
 		    {% else %}
-		    Please <a href="{% url 'account_update' %}" >update your account info</a> for continued service.
+		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
 		    {% endif %}
 	    {% endif %}
 		</div>
@@ -56,9 +56,9 @@ $(document).ready(function() {
     {% if alert_billing %}
 	<div class="notification">
 	    <div>
-        ALERT! We have failed to charge your for your monthly membership.
-        The credit card information you provided may be incorrect or it may not have enough funds.
-	    Please <a href="{% url 'account_update' %}" >update your account info</a> for continued service.
+        <span style="color:red">ALERT!</span> We have failed to charge you for your monthly membership.<br/>
+        The credit card information you provided may be incorrect or it may not have enough funds.<br/>
+	    Please make a payment by <a href="{% url 'account_update' %}" >updating your account information</a> for continued service.
 		</div>
 	</div>
     {% endif %}

@@ -52,17 +52,14 @@ def account_alert_users(session):
         return 2
     return 0
     
-    
 @register.assignment_tag
 def account_alert_billing(session):
     sub = SESSION.get_subscription(session)
-    if sub.get('subscriptionType') != 0 and not
+    if sub.get('subscriptionType') != 0 and\
         sub.date_charge_failed:
         return True
         
     return False
-        
-    
 
 @register.assignment_tag
 def account_is_admin(session):

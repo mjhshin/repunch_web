@@ -9,8 +9,7 @@ We have failed to charge you for your monthly membership with Repunch.
 Hey {{ store.get_owner_fullname }},
 </p>
 <p>
-{# NOTE that date_30_ago and date_now isn't necessarily 30 days ago from when this was ran and now #}
-We have failed to charge you for your membership from {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
+We have failed to charge you for your membership from {{ subscription.date_last_billed|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
 </p>
 
 <p>

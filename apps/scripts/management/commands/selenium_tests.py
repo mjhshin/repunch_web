@@ -29,7 +29,7 @@ class Command(BaseCommand):
         
         ####### DASHBOARD #########################################
         #### MY ACCOUNT
-        results.extend(test_edit_store_details()) # TODO added 2 more here
+        #results.extend(test_edit_store_details()) # TODO added 2 more here
         #results.extend(test_edit_account())
         #results.extend(test_cancel_account())
         
@@ -37,12 +37,12 @@ class Command(BaseCommand):
         #results.extend(test_rewards())
         
         ### ANALYSIS
-        #results.extend(test_trends()) TODO
-        #results.extend(test_breakdown()) TODO 
-        #results.extend(test_reward_redemptions()) TODO 
+        #results.extend(test_trends()) todo
+        #results.extend(test_breakdown()) todo
+        #results.extend(test_reward_redemptions()) todo 
         
         ### MESSAGES
-        results.extend(test_messages())
+        #results.extend(test_messages())
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE

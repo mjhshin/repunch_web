@@ -1,5 +1,6 @@
 """
 This will check and set the date_passed_user_limit for stores first.
+
 Then scans through all active stores that have reached their 
 user limit. If a store has reached their user limit, then the store
 owner is sent an email notification with the date in which the
@@ -11,7 +12,8 @@ notification.
 Email send flow: now, 4 days, 8 days, 12 days
 Account disabled: 14th day from now
 
-NOTE that .
+Make sure that this script is ran 2 hours before the monthly billing
+to prevent collision with changes to subscription!
 """
 
 from django.utils import timezone
@@ -33,11 +35,66 @@ COMET_RECEIVE_KEY
 class Command(BaseCommand):
     def handle(self, *args, **options):
         now = timezone.now()
+        b4_now = now + relativedelta(hours=-1)
+        
+        # get 500 subscriptions at a time
+        LIMIT = 500
         
         # first scan though all the stores and set their
         # date_passed_user_limit if so
+        #### SUB_TYPE 0
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            date_passed_user_limit=None, subscriptionType=0)
+        max_users = sub_type[0]['max_users']
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=0, include="Store", 
+                date_passed_user_limit=None,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                store = sub.store
+                if store.get("patronStores", count=1, limit=0) >\
+                    max_users:
+                    sub.date_passed_user_limit = b4_now
+                    sub.update()
+                    # notify the dashboards of these changes
+                    payload={
+                        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                        "updatedSubscription": sub.jsonify()
+                    }
+                    comet_receive(sub.Store, payload)
+                    
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT   
+            
+        #### SUB_TYPE 1
+        skip = 0
+        sub_count = Subscription.objects().count(\
+            date_passed_user_limit=None, subscriptionType=1)
+        max_users = sub_type[1]['max_users']
+        while sub_count > 0:
+            for sub in Subscription.objects().filter(\
+                subscriptionType=1, include="Store", 
+                date_passed_user_limit=None,
+                limit=LIMIT, skip=skip, order="createdAt"):
+                store = sub.store
+                if store.get("patronStores", count=1, limit=0) >\
+                    max_users:
+                    sub.date_passed_user_limit = b4_now
+                    sub.update()
+                    # notify the dashboards of these changes
+                    payload={
+                        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                        "updatedSubscription": sub.jsonify()
+                    }
+                    comet_receive(sub.Store, payload)
+                    
+            # end of while loop
+            sub_count -= LIMIT
+            skip += LIMIT   
         
-        
+        ################
         conn = mail.get_connection(fail_silently=(not DEBUG))
         conn.open()
         # 1st day time range
@@ -53,8 +110,6 @@ class Command(BaseCommand):
         day14_end = now + relativedelta(days=-14)
         day14_start = day14_end + relativedelta(hours=-24)
         
-        # get 500 subscriptions at a time
-        LIMIT = 500
         
         #### SUB_TYPE 0
         ## 1st day

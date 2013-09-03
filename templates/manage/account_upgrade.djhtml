@@ -39,14 +39,24 @@ $(document).ready(function(){
 {% block content %}
 
 	{% account_alert_users request.session as alert_users %}
+	{% account_alert_billing request.session as alert_billing %}
 	
 	{% if from_limit_reached %}
     <div class="notification">
 		<div>Your message will be sent after you succesfully upgrade your account.</div>
 	</div>
-	{% elif alert_users == 2 %}
+	{% endif %}
+	
+	{% if alert_users == 2 %}
     <div class="notification">
-		<div>You have passed your user limit. Your account will be upgrade once you update your account with valid credit card information.</div>
+		<div>You have passed your user limit.<br/> Your account will be upgraded once you update your account with valid credit card information.</div>
+	</div>
+	{% endif %}
+	
+	
+	{% if alert_billing %}
+    <div class="notification">
+		<div>Please enter a valid credit card to make your monthly membership payment.</div>
 	</div>
 	{% endif %}
 	
@@ -61,9 +71,6 @@ $(document).ready(function(){
 		<div>{{ error }}{{ success }}</div>
 	</div>
 	{% endif %}
-	
-
-	<h2>{% if account.is_free %}Upgrade Account{% else %}{% endif %}</h2>
 	
     {# action specified via script below #}
 	<form method="post" id="upgrade-form">{% csrf_token %}
@@ -170,10 +177,10 @@ $(document).ready(function(){
 
     <div class="form-options">
         {% if update %}
-		<a class="button blue" id="upgrade-form-submit">Update</a>
+		<a class="button blue" id="upgrade-form-submit">Update{% if monthly_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 		{% elif upgrade %}
-		<a class="button blue" id="upgrade-form-submit">Upgrade</a>
+		<a class="button blue" id="upgrade-form-submit">Upgrade{% if monthly_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
 		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."

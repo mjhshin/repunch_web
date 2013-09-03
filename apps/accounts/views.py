@@ -8,6 +8,7 @@ from datetime import datetime
 import json, urllib
 
 from apps.accounts.models import AccountActivate
+from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps.stores.forms import SettingsForm, SubscriptionForm,\
@@ -17,11 +18,12 @@ from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts import sub_type, UNLIMITED
-from parse.apps.stores import SMARTPHONE
+from parse.apps.stores import SMARTPHONE, MONTHLY
 from parse.apps.stores.models import Settings, Store, Subscription
 from parse.utils import make_aware_to_utc
-from parse.notifications import send_email_receipt_smartphone,\
-send_email_account_upgrade
+from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
+send_email_receipt_smartphone, send_email_account_upgrade,\
+send_email_receipt_monthly_success
 
 @csrf_exempt
 def activate(request):
@@ -182,14 +184,7 @@ def update(request):
                 make_aware_to_utc(d,
                     SESSION.get_store_timezone(request.session)) )
                     
-            res = True
-            # only store_cc if it is a digit
-            if str(form.data['cc_number']).isdigit():
-                res = subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv'])
-            else:
-                subscription.update()
-            
+                    
             def invalid_card():
                 # undo changes to subscription!
                 sub = Subscription(**sub_orig)
@@ -208,9 +203,35 @@ def update(request):
                 data['form'] = form
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
-                            
+                    
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
+            
             if not res:
                 return invalid_card()
+                
+            # if monthly billing failed
+            if subscription.date_charge_failed:
+                sub_cost = sub_type[subscription.get(\
+                            "subscriptionType")]["monthly_cost"]
+                invoice = subscription.charge_cc(\
+                        sub_cost, EMAIL_MONTHLY_SUBJECT, MONTHLY)
+                if invoice:
+                    subscription.date_last_billed =\
+                        subscription.date_last_billed +\
+                        relativedelta(days=30)
+                    subscription.date_charge_failed = None
+                    subscription.update()
+                    send_email_receipt_monthly_success(account, 
+                        store, subscription, invoice) 
+                else:
+                    return invalid_card()
+            ###########
                         
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit() and\
@@ -277,7 +298,7 @@ def update(request):
 @admin_only(reverse_url="store_index")
 def upgrade(request):
     """ 
-    same as update except this also handles redirects from message
+    same as update except this also handles redirects from message.
     """
     data = {'account_nav': True, 'upgrade':True}
     store = SESSION.get_store(request.session)
@@ -311,13 +332,6 @@ def upgrade(request):
                 make_aware_to_utc(d,
                     SESSION.get_store_timezone(request.session)) )
                     
-            res = True
-            # only store_cc if it is a digit
-            if str(form.data['cc_number']).isdigit():
-                res = subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv'])
-            else:
-                subscription.update()
                     
             def invalid_card():
                 # undo changes to subscription!
@@ -342,8 +356,33 @@ def upgrade(request):
                 return render(request, 
                         'manage/account_upgrade.djhtml', data)
                     
+            res = True
+            # only store_cc if it is a digit
+            if str(form.data['cc_number']).isdigit():
+                res = subscription.store_cc(form.data['cc_number'],
+                                            form.data['cc_cvv'])
+            else:
+                subscription.update()
             if not res:
                 return invalid_card()
+                
+            # if monthly billing failed
+            if subscription.date_charge_failed:
+                sub_cost = sub_type[subscription.get(\
+                            "subscriptionType")]["monthly_cost"]
+                invoice = subscription.charge_cc(\
+                        sub_cost, EMAIL_MONTHLY_SUBJECT, MONTHLY)
+                if invoice:
+                    subscription.date_last_billed =\
+                        subscription.date_last_billed +\
+                        relativedelta(days=30)
+                    subscription.date_charge_failed = None
+                    subscription.update()
+                    send_email_receipt_monthly_success(account, 
+                        store, subscription, invoice) 
+                else:
+                    return invalid_card()
+            ###########
                         
             if request.POST.get("place_order") and\
                 request.POST.get("place_order_amount").isdigit() and\

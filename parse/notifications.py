@@ -30,6 +30,7 @@ ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX = "Welcome to Repunch "
 EMAIL_UPGRADE_SUBJECT = "Repunch Inc. Your account has been upgraded."
+EMAIL_MONTHLY_SUBJECT = "Repunch Inc. monthly service charge."
 
 def get_notification_ctx():
     """
@@ -59,7 +60,7 @@ def _send_emails(emails, connection=None):
     if not connection:
         conn.close()
         
-def send_email_failed_charge(account, store, subscription,
+def send_email_receipt_monthly_failed(account, store, subscription,
     account_disabled=False, connection=None):
     """
     Called in monthly billing if charging cc failed.
@@ -71,15 +72,16 @@ def send_email_failed_charge(account, store, subscription,
         with open(FS_SITE_DIR +\
             "/templates/manage/notification-receipt-monthly-failed.html", 'r') as f:
             template = Template(f.read())
-        date_30_ago = subscription.date_last_billed +\
-            relativedelta(days=-30)
-        date_now = subscription.date_last_billed.replace()
-        date_disable = subscription.date_last_billed +\
-            relativedelta(days=14) # 14 days like date_passed_user_lim
+        # variable names are misleading here ><
+        date_now = subscription.date_last_billed +\
+            relativedelta(days=30)
+        #########
+        # the 14 day sequence just like passed user limit
+        date_disable = date_now + relativedelta(days=14)
         subject = "Repunch Inc. important service notice."
         ctx = get_notification_ctx()
         ctx.update({'store': store, "date_disable":date_disable,
-            "date_30_ago":date_30_ago, "date_now":date_now,
+            "date_now":date_now,
             "account_disabled": account_disabled,
             "sub_type":sub_type, "subscription":subscription})
         body = template.render(Context(ctx)).__str__()
@@ -95,7 +97,44 @@ def send_email_failed_charge(account, store, subscription,
     else:
         Thread(target=_wrapper).start()
         
-def send_email_receipt_monthly(asiss, connection=None):
+def send_email_receipt_monthly_success(account, store, subscription,
+    invoice, connection=None):
+    """
+    Called in monthly billing if charging cc was successful.
+    Sends an email to the account holder.
+    """
+    def _wrapper():
+        # need to activate the store's timezone for template rendering!
+        timezone.activate(pytz.timezone(store.store_timezone))
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-receipt-monthly.html", 'r') as f:
+            template = Template(f.read())
+        # assumes that subscription's date_last_billed has been 
+        # updated prior to this
+        # variable names are misleading here ><
+        date_30_ago = subscription.date_last_billed +\
+            relativedelta(days=-30)
+        date_now = subscription.date_last_billed.replace()
+        ##########
+        subject = EMAIL_MONTHLY_SUBJECT
+        ctx = get_notification_ctx()
+        ctx.update({'store': store, 'invoice': invoice,
+            "date_30_ago":date_30_ago, "date_now":date_now,
+            "sub_type":sub_type, "subscription":subscription})
+        body = template.render(Context(ctx)).__str__()
+                
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), to=[account.get('email')])
+        email.attach_alternative(body, 'text/html')
+            
+        _send_emails([email], connection)
+    
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
+        
+def send_email_receipt_monthly_batch(asiss, connection=None):
     """
     Sends users a receipt and sends ORDER_PLACED_EMAILS
     an email containing a list 
@@ -123,10 +162,14 @@ def send_email_receipt_monthly(asiss, connection=None):
             account = asis[0]
             store = asis[1]
             timezone.activate(pytz.timezone(store.store_timezone))
+            # assumes that subscription's date_last_billed has been 
+            # updated prior to this
+            # variable names are misleading here ><
             date_30_ago = subscription.date_last_billed +\
                 relativedelta(days=-30)
             date_now = subscription.date_last_billed.replace()
-            subject = "Repunch Inc. monthly service charge."
+            #############
+            subject = EMAIL_MONTHLY_SUBJECT
             ctx = get_notification_ctx()
             ctx.update({'store': store, 'invoice': invoice,
                 "date_30_ago":date_30_ago, "date_now":date_now,
@@ -171,7 +214,7 @@ def send_email_receipt_smartphone(account, subscription, invoice,
        
         store = account.get("store")
         # for account
-        subject = "Repunch Inc. transaction receipt."
+        subject = "Repunch Inc. transaction invoice."
         ctx = get_notification_ctx()
         ctx.update({
                 'store': store,

@@ -13,8 +13,8 @@ from parse.apps.stores import MONTHLY
 from parse.apps.stores.models import Subscription
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type
-from parse.notifications import send_email_receipt_monthly,\
-send_email_failed_charge
+from parse.notifications import send_email_receipt_monthly_batch,\
+send_email_receipt_monthly_failed
 from repunch.settings import COMET_RECEIVE_KEY_NAME,\
 COMET_RECEIVE_KEY
 
@@ -51,34 +51,36 @@ class Command(BaseCommand):
                     subscription.update()
                 else: # PAID account
                     account = Account.objects().get(Store=\
-                                subscription.get("Store"))
+                                subscription.get("Store"),
+                                include="Store")
                     store = account.get("store")
                     invoice = subscription.charge_cc(\
-                            sub_cost, "description", MONTHLY)
+                            sub_cost, "Repunch Inc. Recurring " +\
+                            "monthly subscription charge", MONTHLY)
                     send_user_email = True
                     if invoice:
                         subscription.date_last_billed =\
                             subscription.date_last_billed +\
                             relativedelta(days=30)
-                        subscription.date_charge_failed=None
+                        subscription.date_charge_failed = None
                         subscription.update()
                     else:
-                        subscription.date_charge_failed=timezone.now()
+                        subscription.date_charge_failed = date_now
                         subscription.update()
                     
                         # notify user via email- payment is done via 
                         # dashboard to also validate cc realtime
                         # 1st day time range
-                        day1_end = date_now.replace()
+                        day1_end = date_30_ago.replace()
                         day1_start = day1_end + relativedelta(hours=-24)
                         # 4th day time range
-                        day4_end = date_now + relativedelta(days=-4)
+                        day4_end = date_30_ago + relativedelta(days=-4)
                         day4_start = day4_end + relativedelta(hours=-24)
                         # 8th day time range
-                        day8_end = date_now + relativedelta(days=-8)
+                        day8_end = date_30_ago + relativedelta(days=-8)
                         day8_start = day8_end + relativedelta(hours=-24)
                         # 14th day time range
-                        day14_end = date_now + relativedelta(days=-14)
+                        day14_end = date_30_ago + relativedelta(days=-14)
                         day14_start = day14_end + relativedelta(hours=-24)
                         # only send email after 1, 4, and 8 days
                         last_billed = subscription.date_last_billed
@@ -88,7 +90,7 @@ class Command(BaseCommand):
                             last_billed <= day4_end) or\
                             (last_billed >= day8_start and\
                             last_billed <= day8_end):
-                            send_email_failed_charge(account, store,
+                            send_email_receipt_monthly_failed(account, store,
                                 subscription)
                         # disable account on 14th day
                         elif last_billed >= day14_start and\
@@ -96,7 +98,7 @@ class Command(BaseCommand):
                             store.active = False
                             store.update()
                             update_store = True
-                            send_email_failed_charge(account, store,
+                            send_email_receipt_monthly_failed(account, store,
                                 subscription, account_disabled=True)
                         else:
                             send_user_email = False
@@ -120,7 +122,7 @@ class Command(BaseCommand):
             skip += LIMIT
             
         # everything is done - send the emails
-        send_email_receipt_monthly(asiss)
+        send_email_receipt_monthly_batch(asiss)
         
         
         
