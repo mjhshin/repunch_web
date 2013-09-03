@@ -45,7 +45,7 @@ ul.orangy li {
 
 ul.orangy li span.bold { 
     position:relative; top:-4px;
-	font: normal 16px 'Cabin', sans-serif;
+	font: bold 16px 'Cabin', sans-serif;
 }
 
 ul.orangy li span.italic { 
@@ -73,11 +73,11 @@ ul.orangy li div {
 	<div id="page-content">
 		<section id="learn-bottom">
 			<nav id="learn-bottom-menu" class="bottom-shadow">
-				<a href="#" id="tabRewards" class="active"><img src="{% static "public/images/icon_star-orange.png" %}" alt=""> Rewards</a>
+				<a href="#" id="tabRewards" class="active"><img src="{% static "public/images/icon_star-orange.png" %}" alt="" style="margin-bottom:4px;"> Rewards</a>
 				<a href="#" id="tabMessages"><img src="{% static "public/images/icon_mail-gray.png" %}" alt=""> Messages</a>
 				<a href="#" id="tabFeedback"><img src="{% static "public/images/icon_chat-bubble-gray.png" %}" alt=""> Feedback</a>
-				<a href="#" id="tabAnalytics"><img src="{% static "public/images/icon_graph-gray.png" %}" alt=""> Analytics</a>
-				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt=""> Social</a>
+				<a href="#" id="tabAnalytics"><img src="{% static "public/images/icon_graph-gray.png" %}" alt="" style="margin-bottom:4px;"> Analytics</a>
+				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt="" style="margin-bottom:4px;"> Social</a>
 				<a href="#" id="tabPlans-pricing"><img src="{% static "public/images/icon_tag-gray.png" %}" alt=""> Let's Get Going</a>
 			</nav>
 			<div id="learn-bottom-tabs-contents">
@@ -98,8 +98,8 @@ ul.orangy li div {
 					<aside class="col1">
 						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized Messages and Offers</h2><br />
 						<ul class="orangy">
-							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
-							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
 						</ul>
 					</aside>
 					<aside class="col2">
@@ -110,7 +110,7 @@ ul.orangy li div {
 					<aside class="col1" >
 						<h2><!--<img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="">--> Gather Valuable Feedback</h2><br />
 						<ul class="orangy">
-							<li><span class="bold blue"><img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="" class="ul-points">CUSTOMER IS ALWAYS RIGHT</span> <div>View feedback from your customers privately within the Repunch Dashboard.<br/><span class="italic georgia">Joe thinks you should host a trivia night. Sally wishes you would open an hour earlier. Jason thinks you should start offering chocolate croissants.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="" class="ul-points">CUSTOMER IS ALWAYS RIGHT</span> <div>View feedback from your customers privately within the Repunch Dashboard.<br/><br/><span class="italic georgia">Joe thinks you should host a trivia night. Sally wishes you would open an hour earlier. Jason thinks you should start offering chocolate croissants.</span></div></li>
 							<li><span class="bold blue"><img src="{% static "public/images/icon_chat-bubble-orange.png" %}" alt="" class="ul-points">RESPOND</span> <div>Learn what your patrons think, and respond directly to them!</div></li>
 						</ul>
 					</aside>
