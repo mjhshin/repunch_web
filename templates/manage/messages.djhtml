@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/paginator.js" %}"></script>
+	<script src="{% static "manage/js/paginator.1.0.js" %}"></script>
 	<script>
     $(document).ready(function(){
         $(".not-sortable").unbind("click");

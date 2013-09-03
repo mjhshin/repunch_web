@@ -10,7 +10,7 @@
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/punch.1.1.js" %}"></script>
-	<script src="{% static "manage/js/paginator.js" %}"></script>
+	<script src="{% static "manage/js/paginator.1.0.js" %}"></script>
 	<script src="{% static "manage/js/redemptions.js" %}"></script>
 	<script>
 	

@@ -166,7 +166,6 @@ paginate = function (pagUrl, which, getCallback) {
             if (numLeft <= 1) { 
                 numLeft = 1;
             }
-            alert("left: " + numLeft + ", right: " + numRight + ", pagCount: " + pagCount + ", diff: " + diff);
             
             var countTmp = numLeft - 1;
             $(".pag-unit").each(function() {
