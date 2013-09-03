@@ -91,7 +91,7 @@ ul.orangy li div {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-rewards.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-rewards.1.0.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabMessagesBody" class="tab">
@@ -103,7 +103,7 @@ ul.orangy li div {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-messages.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-messages.1.0.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabFeedbackBody" class="tab">
@@ -115,7 +115,7 @@ ul.orangy li div {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-feedbacks.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-feedbacks.1.0.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabAnalyticsBody" class="tab">
@@ -129,7 +129,7 @@ ul.orangy li div {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-analytics.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-analytics.1.0.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabSocialBody" class="tab">
@@ -141,7 +141,7 @@ ul.orangy li div {
 						</ul>
 					</aside>
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-social.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-social.1.0.png" %}" alt="">
 					</aside>
 				</div>
 				<div id="tabPlans-pricingBody" class="tab">
@@ -156,7 +156,7 @@ ul.orangy li div {
 						</ul>
                     </aside>		
 					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-get_going.png" %}" alt="">
+						<img src="{% static "public/images/img_iphone-get_going.1.0.png" %}" alt="">
 					</aside>				
 				</div>						
 			</div>
