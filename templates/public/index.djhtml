@@ -33,7 +33,7 @@
 			<h1>Businesses</h1>
 			<p>Reward your customers' loyalty and interact with them in valuable new ways</p>
 			<a href="{% url 'public_signup' %}" class="button orange">Sign Up Today</a>
-			<img class="boximage" src="{% static "public/images/img_left-home-box.png" %}" alt="">
+			<img class="boximage" src="{% static "public/images/img_left-home-box.1.0.png" %}" alt="">
 		</aside>
 		<aside id="home-col-right" class="home-col bottom-shadow">
 			<h1>Customers</h1>

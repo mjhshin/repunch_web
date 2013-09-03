@@ -185,7 +185,7 @@ function validate(which, next) {
 				        {% if place_order_amount_error %}
 				        <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
 				        {% endif %}
-						<label for="place_order">Order Smartphones
+						<label for="place_order">Order Smartphones:
 						    </label>
 					    {% if place_order_checked %}
 						<span id="place_order_span">
@@ -193,8 +193,7 @@ function validate(which, next) {
 						<span style="display:none;"
 						        id="place_order_span">
 				        {% endif %}
-						        
-						    <label>: amount&nbsp;&nbsp;</label>
+						   amount&nbsp;&nbsp;
 						    <input type="number" min="1"  step="1" 
 						        name="place_order_amount" 
 						        style="width:40px;" value="1" />
