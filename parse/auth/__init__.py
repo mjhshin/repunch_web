@@ -77,23 +77,28 @@ def login(request, requestDict):
             
                 request.session[SESSION_KEY] = res.get('sessionToken')
                 
-                # store in session cache
+                # load all cache data!
+                # IMPORTANT for parse.comet.receive to work properly
+                # reason is that if user stays in 1 page, not all
+                # cache data is loaded and things go wrong-
+                # e.g. sending message from window 1 does not update
+                # the message count in window 2
                 request.session['subscription'] = subscription
                 request.session['settings'] = settings
                 request.session['store'] = store
                 request.session['account'] = account
-                SESSION.get_message_count(request.session)
-                SESSION.get_patronStore_count(request.session)
+                SESSION.load_all(request.session)
                 
-                if store.get('store_timezone'):
-                    # the store timezone is inserted into the request
-                    rputils.set_timezone(request, 
-                        pytz.timezone(store.get('store_timezone')))
+                # moved to SESSION.load_all
+                #if store.get('store_timezone'):
+                #    # the store timezone is inserted into the request
+                #    rputils.set_timezone(request, 
+                #        pytz.timezone(store.get('store_timezone')))
                         
                 # for stores that have not yet uploaded a store avatar
                 # need to set this back to True on upload success
-                request.session['has_store_avatar'] =\
-                    store.get("store_avatar") is not None
+                #request.session['has_store_avatar'] =\
+                #    store.get("store_avatar") is not None
                         
                 # If value is None, the session reverts to using 
                 # the global session expiry policy.

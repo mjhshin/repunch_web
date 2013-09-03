@@ -215,3 +215,28 @@ def get_message_count(session):
     else:
         message_count = session['message_count']
     return message_count
+    
+def load_all(session, commit=True):
+    """
+    Loads calls all loadeers for each in SESSION_CACHE
+    """
+    get_store(session)
+    get_redemptions_pending(session)
+    get_redemptions_past(session)
+    get_store_timezone(session)
+    get_patronStore_count(session)
+    get_messages_sent_list(session)
+    get_messages_received_list(session)
+    get_employees_pending_list(session)
+    get_employees_approved_list(session)
+    get_subscription(session)
+    get_settings(session)
+    get_message_count(session)
+    
+    session['has_store_avatar'] =\
+        get_store(session).get("store_avatar") is not None
+    
+    if commit:
+        session.save()
+    
+    
