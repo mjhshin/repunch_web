@@ -81,7 +81,7 @@
 				<div style="clear:both;"></div>
 				
 				{# EMIL #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Emil Landron</h4><p><span>iOS Developer</span></p><div>Born in the Dominican Republic, came to NY on 2004,  likes to play baseball, and action/adventure games. His Favorite place to eat Buffalo Wild Wings.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Emil Landron</h4><p><span>iOS Developer</span></p><div>Born in the Dominican Republic. Emil came to New York in 2004. He likes to play baseball and action/adventure games. His favorite place to eat- Buffalo Wild Wings.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_emil.png' %}" /></div>
 					</div>
