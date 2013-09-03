@@ -45,6 +45,7 @@ ul.orangy li {
 
 ul.orangy li span.bold { 
     position:relative; top:-4px;
+	font: normal 16px 'Cabin', sans-serif;
 }
 
 ul.orangy li span.italic { 
@@ -95,7 +96,7 @@ ul.orangy li div {
 				</div>
 				<div id="tabMessagesBody" class="tab">
 					<aside class="col1">
-						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized<br>Messages and Offers</h2><br />
+						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized Messages and Offers</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
 							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>

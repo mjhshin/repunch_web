@@ -3,6 +3,17 @@
 
 {% block title %}Jobs{% endblock %}
 
+{% block styles %}
+<style>
+h2 {
+	font: normal 24px/10px 'Cabin', sans-serif;
+}  
+
+div {
+	font: normal 14px 'Cabin', sans-serif;
+}
+</style>
+{% endblock %}
 
 {% block pageblock %}
 <section id="page-wrapper">
@@ -13,7 +24,7 @@
 		<div id="about-content">
 			<aside class="col1">
 				<h2>Interested in joining the Repunch team?</h2>
-				<h3 style="line-height:80%;">We are always looking for amazing engineers and marketing aficionados. Reach out to us at <a class="repunch-blue"  href="mailto:jobs@repunch.com">jobs@repunch.com</a>.</h3>
+				<div>We are always looking for amazing engineers and marketing aficionados. Reach out to us at <a class="repunch-blue"  href="mailto:jobs@repunch.com">jobs@repunch.com</a>.</div>
 			</aside>
 			<aside class="col2">
 				

@@ -8,6 +8,10 @@
 #about-content p {
     font-size:1.0em;
 }
+
+h3 {
+	font: bold 16px 'Cabin', sans-serif;
+}
 </style>
 {% endblock %}
 
