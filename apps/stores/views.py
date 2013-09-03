@@ -23,7 +23,7 @@ from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
-from parse.utils import delete_file, create_png, cloud_call
+from parse.utils import delete_file, create_png
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required

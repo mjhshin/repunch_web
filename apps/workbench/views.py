@@ -144,9 +144,15 @@ def punch(request):
         res = cloud_call("punch", data)
         if 'error' not in res:
             res['patron_name'] = res['result']
+            # always make sure to get the latest session since the session 
+            # will be saved on return!!!                    
+            request.session.update(SessionStore(request.session.session_key))
             return HttpResponse(json.dumps(res), 
                     content_type="application/json")
 
+    # always make sure to get the latest session since the session 
+    # will be saved on return!!!                    
+    request.session.update(SessionStore(request.session.session_key))
     return HttpResponse(json.dumps({'error': 'error'}),
         content_type="application/json")
     
@@ -181,12 +187,13 @@ def redeem(request):
                     "redeem_id":redeemId,
                     "store_id":store.get("objectId"),
                     })
+                    
+        # retrieve latest session since user may click a bunch 
+        # of redemptions consecutively
+        session = SessionStore(request.session.session_key)
             
         # success result removed means patronstore is null!
         if 'error' not in res:
-            # retrieve latest session since user may click a bunch 
-            # of redemptions consecutively
-            session = SessionStore(request.session.session_key)
             redemptions_pending =\
                     SESSION.get_redemptions_pending(session)
             i_remove, result = -1, res.get("result")
@@ -240,8 +247,9 @@ def redeem(request):
                 if i_remove != -1: 
                     session['redemptions_pending'] =\
                         redemptions_pending
-                    # request.session will be saved after return
-                    request.session.update(session)
+                        
+                # request.session will be saved after return
+                request.session.update(session)
                 
                 if result and result == "insufficient":
                     return HttpResponse(json.dumps({"result":2}), 
@@ -261,7 +269,8 @@ def redeem(request):
                     del_red = redemptions_pending.pop(i_remove)
                     session['redemptions_pending'] =\
                         redemptions_pending
-                    request.session.update(session)
+                        
+                request.session.update(session)
                     
                     if DEBUG:
                         store_id =\
@@ -277,9 +286,14 @@ def redeem(request):
                                 
         elif 'error' in res:
             if res['error'] == "deleted":
+            
+                request.session.update(session)
                 return HttpResponse(json.dumps({"result":5}), 
                             content_type="application/json")
                         
+    # always make sure to get the latest session since the session 
+    # will be saved on return!!!                    
+    request.session.update(SessionStore(request.session.session_key))
     return HttpResponse(json.dumps({"result":0}), 
                     content_type="application/json")
                        
