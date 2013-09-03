@@ -182,9 +182,7 @@ def edit(request, message_id):
             store.add_relation("SentMessages_", [message.objectId]) 
             success_message = "Message has been sent."
                 
-            # update the message_count
-            message_count += 1
-            request.session['message_count'] = message_count
+            # message_count updated in comet_receive!
 
             params = {
                 "store_id":store.objectId,
