@@ -77,7 +77,9 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     is that the test for authentication is now using the sessionToken
     retrieved from Parse.
     
-    This also sets the timezone to the store's timezone.
+    This also does a couple of things:
+        - sets the timezone to the store's timezone
+        - if a KeyError occurs, the user is logged out
     """
     actual_decorator = user_passes_test(
         lambda req: req.session.get('account') and\

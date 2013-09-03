@@ -13,7 +13,7 @@
 /************/
 body{
 	color:#707070;
-	font:12px/18px Tahoma, Geneva, sans-serif;
+	font:12px/18px sans-serif;
 	background:#444 url(../images/bkg_dark-texture.png) repeat;
 }
 
@@ -93,7 +93,7 @@ a.button.orange{
 
 #header-menu{
 	float:right;
-	font-size:17px;
+	font: normal 17px 'Cabin', sans-serif;
 	line-height:17px;
 }
 
@@ -120,7 +120,7 @@ a.button.orange{
 	float:right;
 	padding:0 10px;
 	display:block;
-	font-weight:bold;
+	font:bold 1.2em 'Cabin', sans-serif;
 	line-height:24px;
 	background:#235091;
 	text-decoration:none;
@@ -282,7 +282,7 @@ a.button.orange{
 
 .page-title{
     color:#0a71c1;
-    font-size:2.7em;
+    font-size:2. 0em;
     margin: 40px 0px; margin-top:30px;
 }
 
@@ -414,13 +414,12 @@ a.button.orange{
 
 #home-col-left h1,
 #home-col-right h1 {
-    font-size:2.4em;
+	font: bold 2.4em 'Cabin', sans-serif;
 }
 
 .home-col p{
     color:#0965ad;
-    font-size:16px;
-    font-weight:bold;
+	font: normal 17px 'Cabin', sans-serif;
     line-height:21px;
 	margin:5px 0 30px;
     padding-right:275px;
@@ -430,14 +429,8 @@ a.button.orange{
 	float:left;
 }
 
-#home-col-left p{
-    margin-top:34px;
-}
-
-#home-col-left .button.orange{
-	position:absolute;
-	top:190px;
-	left:25px;
+#home-col-left a{
+	font: normal 16px/34px 'Cabin', sans-serif;
 }
 
 #home-col-right{
@@ -1359,6 +1352,7 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 	padding:19px 7px 0;
 	margin-left:5px;
 	margin-right:15px;
+	font: normal 16px 'Cabin', sans-serif;
 }
 
 #footer-menu li.menuitem a{
@@ -1373,11 +1367,10 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 
 #footer-menu li.menuitem:last-child{
 	margin-left:0px;
-	font-style:italic;
 	margin-right:20px;
-	font-family:Georgia, serif;
+	font: italic 15px 'Cabin', sans-serif;
 	text-shadow: 0px 0px 3px #000;
-	}
+}
 
 #footer-links{
 	margin-top:9px;

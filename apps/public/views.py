@@ -166,7 +166,7 @@ def sign_up(request):
             store.store_timezone = tz.zone
             # set defaults for these guys to prevent 
             # ParseObjects from making parse calls repeatedly
-            store.punches_facebook = 0
+            store.punches_facebook = 1
             # format the phone number
             store.phone_number =\
                 format_phone_number(request.POST['phone_number'])
