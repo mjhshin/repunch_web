@@ -3,10 +3,14 @@ Authentication backend for Parse
 """
 
 import hashlib, uuid, pytz
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from django.contrib.auth import SESSION_KEY
 
 from libs.repunch import rputils
-from repunch.settings import PAGINATION_THRESHOLD
+from libs.repunch.rputils import delete_after_delay
+from apps.comet.models import CometSession, CometSessionIndex
+from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE
 from parse import session as SESSION
 from parse.utils import parse
 from parse.apps.accounts.models import Account
@@ -16,6 +20,27 @@ def hash_password(password):
     """ returns the hash of the raw password """
     # NOT USED ATM
     return hashlib.sha1(password).hexdigest()
+    
+
+def logout(request, reverse_url):
+    session_key = request.session.session_key
+    # flush immediately
+    request.session.flush()
+    # first delete the CometSessionIndex
+    try:
+        csi = CometSessionIndex.objects.get(session_key=session_key)
+        csi.delete()
+    except CometSessionIndex.DoesNotExist:
+        pass
+    
+    # set all related cometsessions to modified to flag all existing
+    # tabs of the logout and delete them after a delay
+    cs = CometSession.objects.filter(session_key=session_key)
+    for c in cs:
+        c.modified = True
+        c.save()
+    delete_after_delay(cs, COMET_PULL_RATE + 3)
+    return redirect(reverse(reverse_url))
 
 def login(request, requestDict):
     """ 

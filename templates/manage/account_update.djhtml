@@ -42,7 +42,7 @@
 	
 	{% if alert_users == 2 %}
     <div class="notification">
-		<div>You have passed your user limit.<br/> Your account will be upgraded once you update your account with valid credit card information.</div>
+		<div>You have passed your user limit.<br/> Your account will be upgraded once you update your account with a valid credit card.</div>
 	</div>
 	{% endif %}
 	

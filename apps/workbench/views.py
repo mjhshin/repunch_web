@@ -145,13 +145,15 @@ def punch(request):
         if 'error' not in res:
             res['patron_name'] = res['result']
             # always make sure to get the latest session since the session 
-            # will be saved on return!!!                    
+            # will be saved on return!!!            
+            request.session.clear()        
             request.session.update(SessionStore(request.session.session_key))
             return HttpResponse(json.dumps(res), 
                     content_type="application/json")
 
     # always make sure to get the latest session since the session 
-    # will be saved on return!!!                    
+    # will be saved on return!!!     
+    request.session.clear()                           
     request.session.update(SessionStore(request.session.session_key))
     return HttpResponse(json.dumps({'error': 'error'}),
         content_type="application/json")
@@ -249,6 +251,7 @@ def redeem(request):
                         redemptions_pending
                         
                 # request.session will be saved after return
+                request.session.clear()
                 request.session.update(session)
                 
                 if result and result == "insufficient":
@@ -277,20 +280,22 @@ def redeem(request):
                             "deletedRedemption":del_red.jsonify()
                         }
                         comet_receive(store_id, payload)
-                        
+               
+                request.session.clear()
                 request.session.update(session)
                 return HttpResponse(json.dumps({"result":4}), 
                                 content_type="application/json")
                                 
         elif 'error' in res:
             if res['error'] == "deleted":
-            
+                request.session.clear()
                 request.session.update(session)
                 return HttpResponse(json.dumps({"result":5}), 
                             content_type="application/json")
                         
     # always make sure to get the latest session since the session 
-    # will be saved on return!!!                    
+    # will be saved on return!!!       
+    request.session.clear()             
     request.session.update(SessionStore(request.session.session_key))
     return HttpResponse(json.dumps({"result":0}), 
                     content_type="application/json")

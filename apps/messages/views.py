@@ -220,8 +220,8 @@ def edit(request, message_id):
             
             # Note that the new message is saved in comet_receive
             # make sure we have the latest session to save!
-            session = SessionStore(request.session.session_key)
-            request.session.update(session)
+            request.session.clear()
+            request.session.update(SessionStore(request.session.session_key))
 
             return HttpResponseRedirect(message.get_absolute_url())
             
@@ -415,8 +415,8 @@ def feedback_reply(request, feedback_id):
             comet_receive(store.objectId, payload)
             
             # make sure we have the latest session to save!
-            session = SessionStore(request.session.session_key)
-            request.session.update(session)
+            request.session.clear()
+            request.session.update(SessionStore(request.session.session_key))
 
             return redirect(reverse('feedback_details', 
                         args=(feedback.objectId,)) +\

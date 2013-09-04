@@ -285,6 +285,7 @@ def pull(request):
         # need to check if we are still logged in
         session = SessionStore(request.session.session_key)
         if 'account' in session and SESSION_KEY in session:
+            request.session.clear()
             request.session.update(session)
         else:
             request.session.flush()
@@ -341,6 +342,7 @@ def pull(request):
                 # need to check if we are still logged in
                 session = SessionStore(request.session.session_key)
                 if 'account' in session and SESSION_KEY in session:
+                    request.session.clear()
                     request.session.update(session)
                 else:
                     request.session.flush()
@@ -393,6 +395,7 @@ def pull(request):
     session = SessionStore(request.session.session_key)
     # need to check if we are still logged in
     if 'account' in session and SESSION_KEY in session:
+        request.session.clear()
         request.session.update(session)
     else:
         request.session.flush()
@@ -432,6 +435,7 @@ def terminate(request):
             pass # do nothing
             
         # make sure that the latest session data is saved!
+        request.session.clear()
         request.session.update(SessionStore(\
             request.session.session_key))
         

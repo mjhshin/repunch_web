@@ -162,7 +162,6 @@ def update(request):
              
     store = SESSION.get_store(request.session)
     subscription = SESSION.get_subscription(request.session)
-    sub_orig = subscription.__dict__.copy()
     
     if request.method == 'POST':
         form = SubscriptionForm(request.POST)
@@ -214,10 +213,6 @@ def update(request):
                     
                     
             def invalid_card():
-                # undo changes to subscription!
-                sub = Subscription(**sub_orig)
-                sub.update()
-                
                 # add some asterisk to cc_number
                 if form.initial.get("cc_number"):
                     form.initial['cc_number'] = "*" * 12 +\
@@ -236,9 +231,7 @@ def update(request):
             # only store_cc if it is a digit (new)
             if str(form.data['cc_number']).isdigit():
                 res = subscription.store_cc(form.data['cc_number'],
-                                            form.data['cc_cvv'])
-            else:
-                subscription.update()
+                                        form.data['cc_cvv'], False)
             if not res:
                 return invalid_card()
             
@@ -292,6 +285,10 @@ def update(request):
                 }
                 send_email_account_upgrade(request.session['account'],
                     store, package)
+            
+            # Important that this is last since invalid_card may be
+            # returned!
+            subscription.update()
             
             # update the session cache
             request.session['store'] = store

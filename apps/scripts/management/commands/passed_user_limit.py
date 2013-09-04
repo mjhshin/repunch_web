@@ -42,6 +42,7 @@ class Command(BaseCommand):
         
         # first scan though all the stores and set their
         # date_passed_user_limit if so
+        # TODO optimize with a relational query? possible with Parse?
         #### SUB_TYPE 0
         skip = 0
         sub_count = Subscription.objects().count(\
@@ -68,6 +69,7 @@ class Command(BaseCommand):
             sub_count -= LIMIT
             skip += LIMIT   
             
+        # TODO optimize with a relational query? possible with Parse?
         #### SUB_TYPE 1
         skip = 0
         sub_count = Subscription.objects().count(\
@@ -264,9 +266,9 @@ class Command(BaseCommand):
                 sub.store.update()
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "updatedStore":store.jsonify(),
+                    "updatedStore":sub.store.jsonify(),
                 }
-                comet_receive(subscription.Store, payload)
+                comet_receive(sub.Store, payload)
                 
                 try:
                     send_email_passed_user_limit(Account.objects().get(\
@@ -431,9 +433,9 @@ class Command(BaseCommand):
                 sub.store.update()
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                    "updatedStore":store.jsonify(),
+                    "updatedStore":sub.store.jsonify(),
                 }
-                comet_receive(subscription.Store, payload)
+                comet_receive(sub.Store, payload)
                 
                 try:
                     send_email_passed_user_limit(Account.objects().get(\

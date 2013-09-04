@@ -322,9 +322,8 @@ class Subscription(ParseObject):
         
         return False
     
-    def store_cc(self, cc_number, cvv2):
+    def store_cc(self, cc_number, cvv2, update=True):
         """ store credit card info. returns True if successful """
-        # TODO verify credit card cvv2 and expiration date ?!
         try:
             res = store_cc(self, cc_number, cvv2)
         except Exception as e: 
@@ -337,7 +336,8 @@ class Subscription(ParseObject):
             res = res.json()
             self.pp_cc_id = res['id']
             self.date_pp_valid = parser.parse(res['valid_until'])
-            self.update()
+            if update:
+                self.update()
             return True       
 
     def charge_cc(self, total, description, type):

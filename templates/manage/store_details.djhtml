@@ -39,12 +39,12 @@ $(document).ready(function() {
 	<div class="notification">
 	    <div>
 	    {% if alert_users == 2  %}
-	        <span style="color:red">ALERT!</span> You have passed your maximum number users.<br/>
+	        <span style="color:red">ALERT!</span> You have passed your maximum number users.<br/><br/>
 		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
 	    {% else %}
 		    You are reaching your maximum number of users.<br/>
 		    {% if request.session.subscription.pp_cc_id %}
-		    Your account will automatically be upgraded once you've passed your limit.
+		    Your account will automatically be upgraded once you've passed your limit.<br/><br/>
 		    {% else %}
 		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
 		    {% endif %}

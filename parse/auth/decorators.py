@@ -14,6 +14,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
 from django.utils.decorators import available_attrs
 
 from parse import session as SESSION
+from parse.auth import logout
 
 def user_passes_test(test_func, login_url, redirect_field_name,
     http_response, content_type):
@@ -29,21 +30,18 @@ def user_passes_test(test_func, login_url, redirect_field_name,
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, *args, **kwargs):
             if test_func(request):
-                # may not want to import parse.session here due
-                # to cyclic imports
-                timezone.activate(SESSION.get_store_timezone(\
-                    request.session))
-                try:
-                    return view_func(request, *args, **kwargs)
-                except KeyError:
-                    # goes here if the session has been flushed and
-                    # a request attempts to access a flushed key
-                    # e.g. request.session['account']
-                    
-                    # make sure that the session before returning 
-                    # is empty
-                    request.session.flush()
-                    return redirect(reverse("manage_login"))
+                if SESSION.get_store(request.session) and\
+                    SESSION.get_store(request.session).active:
+                    # may not want to import parse.session here due
+                    # to cyclic imports
+                    timezone.activate(SESSION.get_store_timezone(\
+                        request.session))
+                    try:
+                        return view_func(request, *args, **kwargs)
+                    except KeyError:
+                        return logout(request, "manage_login")
+                else:
+                    return logout(request, "manage_login")
                 
             # if http_response is provided and content_type is json
             # and request.is_ajax then this request if from comet.js
@@ -79,6 +77,7 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     
     This also does a couple of things:
         - sets the timezone to the store's timezone
+        - if the store's active field is set to False, the user is logged out
         - if a KeyError occurs, the user is logged out
     """
     actual_decorator = user_passes_test(

@@ -325,6 +325,7 @@ def crop_avatar(request):
         store.update()
         
         session["store"] = store
+        request.session.clear()
         request.session.update(session)
         
         # notify other dashboards of this change

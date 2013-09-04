@@ -32,8 +32,8 @@ def account_user_usage(session, percent_of=None):
 
 @register.assignment_tag
 def account_alert_users(session):
-    atype = sub_type[SESSION.get_subscription(\
-                session).get('subscriptionType')]
+    subscription = SESSION.get_subscription(session)
+    atype = sub_type[subscription.get('subscriptionType')]
     
     num_patrons = SESSION.get_patronStore_count(session)
     
@@ -46,10 +46,10 @@ def account_alert_users(session):
             percent = 1.0
     
     #if they are at 80 percent of their users, alert
-    if percent >= .8:
-        return 1
-    elif percent >= 1.0:
+    if percent >= 1.0 or subscription.date_passed_user_limit:
         return 2
+    elif percent >= .8:
+        return 1
     return 0
     
 @register.assignment_tag

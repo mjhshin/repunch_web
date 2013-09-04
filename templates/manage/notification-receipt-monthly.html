@@ -11,6 +11,8 @@ You have been charged ${{ invoice.total }} for your membership with Repunch.
 {% block content %}
 
 {% if for_admin %}
+<p><span style="color:#545454;font-weight:bold;">Billing period:</span> {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}</p>
+
 <strong>ACCOUNT INFO</strong>
 <ul>
     <li><span style="color:#545454;font-weight:bold;">Business name:</span>
