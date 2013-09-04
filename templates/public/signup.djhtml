@@ -113,36 +113,50 @@ function validate(which, next) {
 					{{ store_form.street }}
 					
 					<div class="clear-both"></div>
-					<div class="floated">
+					<div class="floated" 
+					    {% if not store_form.city.errors and store_form.state.errors or store_form.zip.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 						<div id="city_e">{{ store_form.city.errors }}</div>
 						<label for="id_city">City</label>
 						{{ store_form.city }}
 					</div>
-					<div class="floated">
+					<div class="floated"
+					    {% if not store_form.state.errors and store_form.city.errors or store_form.zip.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 						<div id="state_e">{{ store_form.state.errors }}</div>
 						<label for="state">State</label>
 						{{ store_form.state }}
 					</div>
-					<div class="floated">
+					<div class="floated"
+					    {% if not store_form.zip.errors and store_form.state.errors or store_form.city.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 						<div id="zip_e">{{ store_form.zip.errors }}</div>
 						<label for="zip">Zip</label>
 						{{ store_form.zip }}
 					</div>
 					<div class="clear-both"></div>
 					
-					<p>Store Data</p>
 					<div id="categories-box" class="ui-widget" >
                           <label for="categories">Categories <span style="font-size:0.8em;position:relative;top:0px;">(limit of 2)</span></label>
                           <input id="categories" name="categories" />
                     </div>
 					
 					<p id="account_info">Account Information</p>
-					<div class="floated">
+					<div class="floated"
+					    {% if not store_form.first_name.errors and store_form.last_name.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 						<div id="first_name_e">{{ store_form.first_name.errors }}</div>
 						<label for="id_first_name">Your First Name</label>
 						{{ store_form.first_name }}
 					</div>
-					<div class="floated">
+					<div class="floated"
+					    {% if not store_form.last_name.errors and store_form.first_name.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 						<div id="last_name_e">{{ store_form.last_name.errors }}</div>
 						<label for="id_last_name">Your Last Name</label>
 						{{ store_form.last_name }}
@@ -187,7 +201,7 @@ function validate(which, next) {
 				        {% if place_order_amount_error %}
 				        <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
 				        {% endif %}
-						<label for="place_order">Order Smartphones:
+						<label for="place_order">Order Repunch-enabled devices:
 						    </label>
 					    {% if place_order_checked %}
 						<span id="place_order_span">
@@ -204,7 +218,7 @@ function validate(which, next) {
 						<img class="question_mark" 
 						    src="{% static 'public/images/question_mark.png' %}" 
 						    style="position:relative;top:4px;left:4px;"
-						    title="You can order smartphones from us. We will charge you $149 for each smartphone.You can order these within the Dashboard at any time." />
+						    title="<p>$149/device.</p><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App. Remember that we will automatically notify you via email if we detect any suspicious punching activity. You can also order these at anytime after signing up.</p>" />
 					</div>
 
                     {# CREDIT CARD SECTION #}

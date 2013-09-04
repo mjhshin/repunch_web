@@ -992,11 +992,10 @@ float: right;
 	}
 
 #signup-content .col1 h2{
-	color:#314f8b;
-	font: normal 22px/24px 'Cabin', sans-serif;
+	color:#0965ad;
+	font: normal 24px/24px 'Cabin', sans-serif;
 	margin:0px;
-	letter-spacing:0.9px;
-	font-weight:normal;
+	letter-spacing:normal;
 }
 
 #signup-content .col2{

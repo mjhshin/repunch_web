@@ -158,7 +158,7 @@
 			<img class="question_mark"
 			    src="{% static 'public/images/question_mark.png' %}" 
 			    style="position:relative;top:4px;left:4px;"
-			    title="You can order smartphones from us. We will charge you $149 for each smartphone." />
+			    title="<p>$149/device.</p><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch" />
 		</div>
 		
 		<div style="clear: left;"></div>
