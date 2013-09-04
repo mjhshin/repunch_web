@@ -3,7 +3,7 @@
 
 {% block title %}
 {% if for_customer %}
-Thank you for your purchase of {{ amount }} iPod touch{% if amount > 1 %}es{% endif %}.
+Thank you for your purchase of {{ amount }} iPod Touch{% if amount > 1 %}es{% endif %}.
 {% else %}
 Purchase made by 
 {{ store.first_name|capfirst }} {{ store.last_name|capfirst }}
@@ -16,12 +16,12 @@ Purchase made by
 Hey {{ store.get_owner_fullname }},
 </p>
 <p>
-This is an invoice for your recent purchase of {{ amount }} iPod touch{% if amount > 1 %}es{% endif %}.
+This is an invoice for your recent purchase of {{ amount }} iPod Touch{% if amount > 1 %}es{% endif %}.
 </p>
 {% endif %}
 
 <p style="">
-<span style="color:#545454;font-weight:bold;">Merchandise:</span> iPod touch{% if amount > 1 %}s{% endif %}<br/>
+<span style="color:#545454;font-weight:bold;">Merchandise:</span> iPod Touch{% if amount > 1 %}s{% endif %}<br/>
 <span style="color:#545454;font-weight:bold;">Quantity:</span> {{ amount }}<br/>
 <span style="color:#545454;font-weight:bold;">Total (USD):</span> ${{ invoice.total }}<br/><br/>
 

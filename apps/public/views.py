@@ -285,7 +285,7 @@ def sign_up(request):
                     invoice = subscription.charge_cc(\
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
-                        str(amount) + " iPod touch", IPOD)
+                        str(amount) + " iPod Touch", IPOD)
                         
                     if invoice:
                         send_email_receipt_ipod(account, 

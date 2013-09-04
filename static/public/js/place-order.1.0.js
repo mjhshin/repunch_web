@@ -1,10 +1,13 @@
 /*
-    Script involving placing iPod touch order form input.
+    Script involving placing iPod Touch order form input.
+    Tooltipster must be imported before this.
 */
 
 $(document).ready(function(){
 
-    $( ".question_mark" ).tooltip({track: true});
+    $('.question_mark').tooltipster({
+		    theme:'.re-punch'
+	    });
 
     $("#place_order").click(function(){
         $("#place_order_span").toggle(this.checked);

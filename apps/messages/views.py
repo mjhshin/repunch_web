@@ -319,7 +319,8 @@ def feedback(request, feedback_id):
     if not feedback:
         return redirect(reverse('messages_index')+ "?%s" %\
              urllib.urlencode({'error':\
-                'Feedback has already been deleted.'}))
+                'Feedback has already been deleted.',
+                "tab_feedback":1}))
     
     if not feedback.is_read:
         feedback.is_read = True

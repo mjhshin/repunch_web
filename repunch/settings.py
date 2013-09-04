@@ -215,7 +215,7 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
-# order placed on iPod touch
+# order placed on iPod Touch
 PHONE_COST_UNIT_COST = 149 # TOD SET TO 149
 # paginator
 PAGINATION_THRESHOLD = 20

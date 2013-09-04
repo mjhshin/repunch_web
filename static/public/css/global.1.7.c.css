@@ -783,66 +783,6 @@ a.button.orange{
 	margin:0px 20px 50px; 
 }
 
-.re-punch{
-	width:450px;
-	border:2px solid #4C4C4C;
-	background:#4C4C4C;
-	
-	border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-}
-.re-punch .tooltipster-content{
-	padding:3px;
-	font-size:14px;
-	line-height:16px;
-	font-family:Arial, sans-serif;
-	background:transparent url("../images/bkg_content.png") repeat 0 0;
-	
-	border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-}
-
-.re-punch .tooltipBox{
-    max-width:500px;
-}
-	
-.re-punch .tooltipster-content p,
-.re-punch .tooltipster-content span,
-.re-punch .tooltipster-content div, 
-.re-punch .tooltipster-content u,
-.re-punch .tooltipster-content u li{
-	margin:0;
-	color:#707070!important;
-	padding:0 10px;
-	clear:both;
-}
-
-
-.re-punch .tooltipster-content h4{
-	border:0px; margin-bottom:2px;
-	padding:0 10px;
-	color:#0965ad;
-	font: normal 1.5em 'Cabin', sans-serif;
-}
-
-.re-punch .tooltipster-content div {
-    padding:14px;
-    font-size: 1.05em;
-    line-height:20px;
-}
-
-.re-punch .tooltipster-content p span {
-	font: bold 1em 'Cabin', sans-serif;
-    padding:0px 0px;
-    float:left;
-}
-
 .member-picture-border{
 	width:160px;
 	height:160px;

@@ -5,11 +5,14 @@
 
 {% block styles %}
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
+<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 <style>select { margin-top:2px; }</style>
 {% endblock %}
 
 {% block javascript %}
 <script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
+<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
 <script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script src="{% static 'public/js/signup.1.2.js' %}"></script>
 <script type = "text/javascript">
@@ -223,7 +226,7 @@ function validate(which, next) {
 						<img class="question_mark" 
 						    src="{% static 'public/images/question_mark.png' %}" 
 						    style="position:relative;top:4px;left:4px;"
-						    title="<p>$149/device.</p><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App. Remember that we will automatically notify you via email if we detect any suspicious punching activity. You can also order these at anytime after signing up.</p>" />
+						    title="<div class='tooltipBox'><h4>$149/device</h4><div><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App.</p><br/><p>Remember that we will automatically notify you via email if we detect any suspicious punching activity.</p><br/><p>You can also order these at anytime after signing up.</p></div></div>" />
 					</div>
 
                     {# CREDIT CARD SECTION #}

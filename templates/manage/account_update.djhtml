@@ -2,9 +2,14 @@
 {% load static %}{% load account_tags %}
 
 {% block title %}Account {% if update %}Update{% else %}Upgrade{% endif %}{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/account_update.css" %}" />{% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/account_update.1.0.css" %}" />
+<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
+{% endblock %}
 
 {% block javascript %}
+<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
 <script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script>
     $(document).ready(function(){
@@ -167,21 +172,20 @@
 			        value="yes" id="place_order" />
 	        {% endif %}
 			<label for="place_order">Order Repunch-enabled devices:</label>
-		    {% if place_order_checked %}
-			<span id="place_order_span">
-	        {% else %}
-			<span style="display:none;"
-			        id="place_order_span">
-	        {% endif %}
+		    
+			<span id="place_order_span"
+			    {% if not place_order_checked %}
+			    style="display:none;"
+			    {% endif %}>
 			    amount&nbsp;&nbsp;
 			    <input type="number" min="1"  step="1" 
 			        name="place_order_amount" 
-			        style="width:40px;" value="1" />
+			        style="width:40px;height:26px;" value="1" />
 			</span>
 			<img class="question_mark"
 			    src="{% static 'public/images/question_mark.png' %}" 
 			    style="position:relative;top:4px;left:4px;"
-			    title="<p>$149/device.</p><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch" />
+			    title="<div class='tooltipBox'><h4>$149/device</h4><div><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App.</p><br/><p>Remember that we will automatically notify you via email if we detect any suspicious punching activity.</p></div></div>" />
 		</div>
 		
 		<div style="clear: left;"></div>

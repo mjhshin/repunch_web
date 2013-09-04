@@ -1,6 +1,7 @@
 ##############################################
 ####################  TODO:
-1. test passed user limit script
-2. test monthly billing
-
-3. fix tooltip on signup and edit subscription
+1. DEBUG multiple tabs, signing out while sending message relogs user.
+    - parse.auth.decorators
+    - parse.auth.__init__
+    - apps.comet.views
+    - apps.messages.views - edit()
