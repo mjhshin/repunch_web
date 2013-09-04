@@ -88,6 +88,9 @@ function punchit(url){
                 } else if (res.error == "permission_denied") { 
                     $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
                     "<div><span>Permission denied.<span></div></div>");
+                } else if (res.error == "PATRON_NOT_FOUND") { 
+                    $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+                    "<div><span>A customer with that Punch Code was not found.<span></div></div>");
                 } else {
                     $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
                     "<div><span>Failed to punch customer.<span></div></div>");

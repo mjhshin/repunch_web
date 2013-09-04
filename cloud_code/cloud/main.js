@@ -968,7 +968,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
         
 	}, function(error) {
 		console.log("RedeemReward fetch failed.");
-		response.error("deleted"); // rejected/deleted before
+		response.error("REDEEMREWARD_NOT_FOUND"); // rejected/deleted before
 		
 	}).then(function() {
 	    if (messageStatus == null) {
@@ -1116,7 +1116,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 	}, function(error) {
 			console.log("RedeemReward fetch failed.");
-			response.error("deleted"); // goes here if it has been deleted
+			response.error("REDEEMREWARD_NOT_FOUND"); // goes here if it has been deleted
 			
 	});
 	

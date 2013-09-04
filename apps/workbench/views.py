@@ -150,6 +150,14 @@ def punch(request):
             request.session.update(SessionStore(request.session.session_key))
             return HttpResponse(json.dumps(res), 
                     content_type="application/json")
+        else:
+            if res['error'] == "PATRON_NOT_FOUND":
+                request.session.clear()
+                request.session.update(session)
+                return HttpResponse(json.dumps({"result":\
+                    "PATRON_NOT_FOUND"}), 
+                    content_type="application/json")
+            
 
     # always make sure to get the latest session since the session 
     # will be saved on return!!!     
@@ -287,7 +295,7 @@ def redeem(request):
                                 content_type="application/json")
                                 
         elif 'error' in res:
-            if res['error'] == "deleted":
+            if res['error'] == "REDEEMREWARD_NOT_FOUND":
                 request.session.clear()
                 request.session.update(session)
                 return HttpResponse(json.dumps({"result":5}), 

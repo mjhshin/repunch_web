@@ -47,6 +47,9 @@ def user_passes_test(test_func, login_url, redirect_field_name,
             # and request.is_ajax then this request if from comet.js
             if request.is_ajax() and http_response and\
                 content_type == "application/json":
+                # no need to update session- if it got here then the session is empty
+                #request.session.clear()
+                #request.session.update(SessionStore(request.session.session_key))
                 return HttpResponse(json.dumps(http_response),
                     content_type=content_type)
                 
@@ -60,6 +63,9 @@ def user_passes_test(test_func, login_url, redirect_field_name,
                 (not login_netloc or login_netloc == current_netloc)):
                 path = request.get_full_path()
             from django.contrib.auth.views import redirect_to_login
+            # no need to update session- if it got here then the session is empty
+            #request.session.clear()
+            #request.session.update(SessionStore(request.session.session_key))
             return redirect_to_login(path, login_url, redirect_field_name)
         return _wrapped_view
     return decorator

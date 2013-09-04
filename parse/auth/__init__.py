@@ -30,7 +30,8 @@ def logout(request, reverse_url):
     print "Logged out"
     print "SESSION KEY: " + session_key
     print SessionStore(session_key)._get_session()
-    print "ABOVE IS SESSIONSTORE CONTENT"
+    print "NEW SESSION KEY: " + request.session.session_key
+    
     # first delete the CometSessionIndex
     try:
         csi = CometSessionIndex.objects.get(session_key=session_key)
