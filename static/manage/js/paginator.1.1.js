@@ -58,10 +58,10 @@ getPage = function (pagUrl, pageNum, type, order, header, getCallback){
     Called initially right after loading page and when tabs are clicked.
 */
 paginate = function (pagUrl, which, getCallback) {
-    var pagCount, pagThreshold = $("#pag-threshold").val(),
+    var pagThreshold = $("#pag-threshold").val(),
         pagContainer = $("#pag-container"), pagPage = $("#pag-page");
     var pagCountInput = $("#pag-page-" + which + "-count");
-    pagCount = Math.ceil(parseFloat($("#" + which + "-count").val()) / parseFloat(pagThreshold));
+    var pagCount = Math.ceil(parseFloat($("#" + which + "-count").val()) / parseFloat(pagThreshold));
     // update the current page count
     pagCountInput.val(new String(pagCount));
     
@@ -118,12 +118,12 @@ paginate = function (pagUrl, which, getCallback) {
         if (self.text() == "first") {
             pageNumStr = "1";
         } else if(self.text() == "last") {
-            pageNumStr = pagCount;
+            pageNumStr = new String(pagCount);
         } else {
             pageNumStr = self.text();
         }
         
-        getPage(pagUrl, pageNumStr, type, order, header.attr("id").substring("header-".length), getCallback); 
+        getPage(pagUrl, parseInt(pageNumStr), type, order, header.attr("id").substring("header-".length), getCallback); 
         
         // renumber the units if passed the threshold;
         if (pagCount > MAX_PAG_UNIT_COUNT) {
@@ -209,8 +209,21 @@ onHeaderClick = function(event){
     if (self.hasClass("desc")){ order = "desc"; } 
     else { order = "asc"; }
     var page = $("#pag-container a.pag-unit.active");
+    // if first and last pag-units are present
+    var pagThreshold = $("#pag-threshold").val();
+    var pagCount = Math.ceil(parseFloat($("#" + which + "-count").val()) / parseFloat(pagThreshold));
+    var pageNumStr;
+    if (page.text() == "first") {
+        pageNumStr = "1";
+    } else if(page.text() == "last") {
+        pageNumStr = new String(pagCount);
+    } else {
+        pageNumStr = self.text();
+    }
+    
+    
     if (page.length > 0){
-        getPage(pagUrl, parseInt(page.text()), activeTab, order, el, getCallback);
+        getPage(pagUrl, parseInt(pageNumStr), activeTab, order, el, getCallback);
     } else {
         getPage(pagUrl, 1, activeTab, order, el, getCallback);
     }
