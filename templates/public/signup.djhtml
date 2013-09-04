@@ -114,24 +114,30 @@ function validate(which, next) {
 					
 					<div class="clear-both"></div>
 					<div class="floated" 
-					    {% if not store_form.city.errors and store_form.state.errors or store_form.zip.errors %}
-					    style="margin-top:28px;"
+					    {% if not store_form.city.errors %}
+					        {% if store_form.state.errors or store_form.zip.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
 					    {% endif %}>
 						<div id="city_e">{{ store_form.city.errors }}</div>
 						<label for="id_city">City</label>
 						{{ store_form.city }}
 					</div>
 					<div class="floated"
-					    {% if not store_form.state.errors and store_form.city.errors or store_form.zip.errors %}
-					    style="margin-top:28px;"
+					    {% if not store_form.state.errors %}
+					        {% if store_form.city.errors or store_form.zip.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
 					    {% endif %}>
 						<div id="state_e">{{ store_form.state.errors }}</div>
 						<label for="state">State</label>
 						{{ store_form.state }}
 					</div>
 					<div class="floated"
-					    {% if not store_form.zip.errors and store_form.state.errors or store_form.city.errors %}
-					    style="margin-top:28px;"
+					    {% if not store_form.zip.errors %}
+					        {% if store_form.state.errors or store_form.city.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
 					    {% endif %}>
 						<div id="zip_e">{{ store_form.zip.errors }}</div>
 						<label for="zip">Zip</label>
@@ -229,13 +235,19 @@ function validate(which, next) {
                     {% endif %}
                     
 					<p id="cc_info">Credit Card Information</p>
-					<div class="floated">
+					<div class="floated"
+					    {% if not subscription_form.first_name2.errors and subscription_form.last_name2.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 					<div id="first_name2_e">{{ subscription_form.first_name2.errors }}</div>
 					<label for="id_first_name2">First Name</label>
 					{{ subscription_form.first_name2 }}
 					</div>
 					
-					<div class="floated">
+					<div class="floated"
+					    {% if not subscription_form.last_name2.errors and subscription_form.first_name2.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 					<div id="last_name2_e">{{ subscription_form.last_name2.errors }}</div>
 					<label for="id_last_name2">Last Name</label>
 					{{ subscription_form.last_name2 }}
@@ -254,13 +266,19 @@ function validate(which, next) {
 					</div>
 					
 					
-					<div class="floated">
+					<div class="floated"
+					    {% if not subscription_form.cc_cvv.errors and subscription_form.date_cc_expiration.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 					<div id="cc_cvv_e">{{ subscription_form.cc_cvv.errors }}</div>
 					<label for="id_cvc">CVC</label>
 					{{ subscription_form.cc_cvv }}
 					</div>
 				
-					<div class="floated">
+					<div class="floated"
+					    {% if not subscription_form.date_cc_expiration.errors and subscription_form.cc_cvv.errors %}
+					    style="margin-top:28px;"
+					    {% endif %}>
 					<div id="date_cc_expiration_e">{{ subscription_form.date_cc_expiration.errors }}</div>
 					<label for="id_expiration_month">Expiration</label>
 					{{ subscription_form.date_cc_expiration }}
@@ -279,16 +297,31 @@ function validate(which, next) {
 					
 					<div class="clear-both"></div>
 					<div class="floated">
-						<div id="city2_e">{{ subscription_form.city2.errors }}</div>
+						<div id="city2_e"
+					    {% if not subscription_form.city2.errors %}
+					        {% if subscription_form.state2.errors or subscription_form.zip2.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
+					    {% endif %}>{{ subscription_form.city2.errors }}</div>
 						<label for="id_city2">City</label>
 						{{ subscription_form.city2 }}
 					</div>
-					<div class="floated">					
+					<div class="floated"
+					    {% if not subscription_form.state2.errors %}
+					        {% if subscription_form.zip2.errors or subscription_form.city2.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
+					    {% endif %}>					
 						<div id="state2_e">{{ subscription_form.state2.errors }}</div>
 						<label for="id_state2">State</label>
 						{{ subscription_form.state2 }}
 					</div>
-					<div class="floated">
+					<div class="floated"
+					    {% if not subscription_form.zip2.errors %} 
+					        {% if subscription_form.state2.errors or subscription_form.city2.errors %}
+					        style="margin-top:28px;"
+					        {% endif %}
+					    {% endif %}>
 						<div id="zip2_e">{{ subscription_form.zip2.errors }}</div>
 						<label for="id_zip2">Zip</label>
 						{{ subscription_form.zip2 }}
