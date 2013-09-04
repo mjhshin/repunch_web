@@ -211,7 +211,7 @@ onHeaderClick = function(event){
     var page = $("#pag-container a.pag-unit.active");
     // if first and last pag-units are present
     var pagThreshold = $("#pag-threshold").val();
-    var pagCount = Math.ceil(parseFloat($("#" + which + "-count").val()) / parseFloat(pagThreshold));
+    var pagCount = Math.ceil(parseFloat($("#" + activeTab + "-count").val()) / parseFloat(pagThreshold));
     var pageNumStr;
     if (page.text() == "first") {
         pageNumStr = "1";
