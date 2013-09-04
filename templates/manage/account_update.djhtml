@@ -1,22 +1,22 @@
 {% extends "manage/base.djhtml" %}
 {% load static %}{% load account_tags %}
 
-{% block title %}Account Upgrade{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/upgradeaccount.css" %}" />{% endblock %}
+{% block title %}Account {% if update %}Update{% else %}Upgrade{% endif %}{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/account_update.css" %}" />{% endblock %}
 
 {% block javascript %}
 <script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script>
     $(document).ready(function(){
         var pf = $("#processing-form");
-        $("#upgrade-form-submit").click(function(){
-            var uForm = $('#upgrade-form');
+        $("#update-form-submit").click(function(){
+            var uForm = $('#update-form');
             {% if update %}
             uForm.attr("action",
                 "{% url 'account_update' %}");
             {% elif upgrade %}
             uForm.attr("action",
-                "{% url 'account_upgrade' %}");
+                "{% url 'account_update' %}" + "?do_upgrade=1");
             {% endif %}
             // only proceed if not processing a form
             if (pf.css("display") == "none"){
@@ -66,19 +66,25 @@
 	{% endif %}
 	
     {# action specified via script below #}
-	<form method="post" id="upgrade-form">{% csrf_token %}
+	<form method="post" id="update-form">{% csrf_token %}
 	<div class="section first">
 		<div class="section-title">
 			Credit Card Information
 		</div>
 		
-		<div class="input-container" id="first_name_ic">
+		<div class="input-container" id="first_name_ic"
+		    {% if not form.first_name.errors and form.last_name.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ form.first_name.errors }}
 			<label for="first_name">First Name</label>
 			{{ form.first_name }}
 		</div>
 		
-		<div class="input-container" id="last_name_ic">
+		<div class="input-container" id="last_name_ic"
+		    {% if not form.last_name.errors and form.first_name.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ form.last_name.errors }}
 			<label for="last_name">Last Name</label>
 			{{ form.last_name }}
@@ -94,13 +100,19 @@
 			<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
 		</div>
 		
-		<div class="input-container clearheight" id="cc_cvv_ic">
+		<div class="input-container clearheight" id="cc_cvv_ic"
+		    {% if not form.cc_cvv.errors and form.date_cc_expiration.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ form.cc_cvv.errors }}
 			<label for="cvc">CVC</label>
 			{{ form.cc_cvv }}
 		</div>
 		
-		<div class="input-container" id="date_cc_expiration_ic">
+		<div class="input-container" id="date_cc_expiration_ic"
+		    {% if not form.date_cc_expiration.errors and form.cc_cvv.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ form.date_cc_expiration.errors }}
 			<label for="expiration_month">Expiration</label>
 			{{ form.date_cc_expiration }}
@@ -142,15 +154,26 @@
 		</div>
 		
 		<div style="clear: left;"></div>
+        {% if place_order_amount_error %}
+        <ul class="errorlist" style="position:relative;top:8px;"><li>{{ place_order_amount_error }}</li></ul>
+        {% endif %}
 		<div class="input-container"
 		        id="place_order_container">
+		    {% if place_order_checked %}
+			<input type="checkbox" name="place_order"
+			        value="yes" id="place_order" checked/>
+	        {% else %}
 			<input type="checkbox" name="place_order"
 			        value="yes" id="place_order" />
-			<label for="place_order">Order Smartphones
-			    </label>
+	        {% endif %}
+			<label for="place_order">Order Repunch-enabled devices:</label>
+		    {% if place_order_checked %}
+			<span id="place_order_span">
+	        {% else %}
 			<span style="display:none;"
 			        id="place_order_span">
-			    <label>: amount&nbsp;&nbsp;</label>
+	        {% endif %}
+			    amount&nbsp;&nbsp;
 			    <input type="number" min="1"  step="1" 
 			        name="place_order_amount" 
 			        style="width:40px;" value="1" />
@@ -162,7 +185,7 @@
 		</div>
 		
 		<div style="clear: left;"></div>
-		<div class="input-container" id="recurring_charge_container">
+		<div class="input-container" id="recurring_charge_container" {% if form.recurring.errors %}style="margin-top:10px;"{% endif %}>
 			{{ form.recurring.errors }}
 			{{ form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'manage_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
 		</div>
@@ -170,10 +193,10 @@
 
     <div class="form-options">
         {% if update %}
-		<a class="button blue" id="upgrade-form-submit">Update{% if alert_billing %} & Pay{% endif %}</a>
+		<a class="button blue" id="update-form-submit">Update{% if alert_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'store_index' %}" class="red">Back</a>
 		{% elif upgrade %}
-		<a class="button blue" id="upgrade-form-submit">Upgrade{% if alert_billing %} & Pay{% endif %}</a>
+		<a class="button blue" id="update-form-submit">Upgrade{% if alert_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
 		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."

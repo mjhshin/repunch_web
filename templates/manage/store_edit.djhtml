@@ -61,25 +61,43 @@
 			{{ form.street }}
 		</div>
 		
-		<div class="input-container clearheight">
+		<div class="input-container clearheight" 
+		    {% if not form.city.errors %}
+		        {% if form.state.errors or form.zip.errors %}
+		        style="margin-top:24px;"
+		        {% endif %}
+		    {% endif %}>
 			<div id="city_e">{{ form.city.errors }}</div>
 			<label for="id_city">City</label>
 			{{ form.city }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container"
+		    {% if not form.state.errors %}
+		        {% if form.city.errors or form.zip.errors %}
+		        style="margin-top:24px;"
+		        {% endif %}
+		    {% endif %}>
 			<div id="state_e">{{ form.state.errors }}</div>
 			<label for="id_state">State</label>
 			{{ form.state }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container"
+		    {% if not form.zip.errors %}
+		        {% if form.state.errors or form.city.errors %}
+		        style="margin-top:24px;"
+		        {% endif %}
+		    {% endif %}>
 			<div id="zip_e">{{ form.zip.errors }}</div>
 			<label for="id_zip">Zip</label>
 			{{ form.zip }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container"
+		    {% if form.city.errors or form.state.errors or form.zip.errors %}
+	        style="margin-top:24px;"
+		    {% endif %}>
 			<div id="country_e">{{ form.country.errors }}</div>
 			<label for="country">Country</label>
 			<select name="country" id="country">

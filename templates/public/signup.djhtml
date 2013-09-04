@@ -194,6 +194,9 @@ function validate(which, next) {
 					<input type="hidden" name="country" id="id_country" value="US" />
 					
 					<div style="clear: left;"></div>
+			        {% if place_order_amount_error %}
+			        <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
+			        {% endif %}
 					<div class="input-container"
 					        id="place_order_container"
 					        style="margin-bottom: 15px;">
@@ -204,11 +207,7 @@ function validate(which, next) {
 						<input type="checkbox" name="place_order"
 						        value="yes" id="place_order" />
 				        {% endif %}
-				        {% if place_order_amount_error %}
-				        <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
-				        {% endif %}
-						<label for="place_order">Order Repunch-enabled devices:
-						    </label>
+						<label for="place_order">Order Repunch-enabled devices:</label>
 					    {% if place_order_checked %}
 						<span id="place_order_span">
 				        {% else %}

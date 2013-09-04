@@ -11,6 +11,7 @@ from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup,\
 send_email_receipt_smartphone
+from apps import isdigit
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
@@ -115,15 +116,6 @@ def sign_up(request):
     """
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
-    
-    def isdigit(string):
-        # use because "-1".isdigit() is False
-        try:
-            int(string)
-        except:
-            return False
-        else:
-            return True
             
     if request.method == 'POST' or request.is_ajax():
         # some keys are repeated so must catch this at init
@@ -143,6 +135,8 @@ def sign_up(request):
         
         all_forms_valid = store_form.is_valid() and\
             account_form.is_valid()
+            
+        ### Bad form of validation lol
         if request.POST.get("place_order"):
             data["place_order_checked"] = True
             if isdigit(request.POST.get("place_order_amount")):
@@ -154,6 +148,11 @@ def sign_up(request):
                     all_forms_valid = False
                     data["place_order_amount_error"] =\
                         "Amount must be greater than 0."
+            else:
+                all_forms_valid = False
+                data["place_order_amount_error"] =\
+                    "Amount must be a number greater than 0."
+                
         else:
             subscription_form = SubscriptionForm2()
         

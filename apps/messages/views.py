@@ -240,13 +240,12 @@ def edit(request, message_id):
             data['error'] = "The form you submitted has errors."
     else:
         # check if the incoming request is for an account upgrade
-        do_upgrade = request.GET.get("account_upgrade") 
-        if do_upgrade and do_upgrade.isdigit() and\
-            int(do_upgrade) == 1:
+        if request.GET.get("do_upgrade"):
             # flag the upgrade view
             request.session["from_limit_reached"] = True
             # redirect to upgrade account 
-            return HttpResponseRedirect(reverse("account_upgrade"))
+            return HttpResponseRedirect(reverse("account_update") +\
+                "?do_upgrade=1")
             
         if message_id in (0, '0'):
             form = MessageForm()

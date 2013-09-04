@@ -744,7 +744,7 @@ def test_edit_account():
     year_el.click()
     
     test.find("#id_recurring").click()
-    test.find("#upgrade-form-submit").click()
+    test.find("#update-form-submit").click()
     sleep(5)
     
     # back to update account page
@@ -841,7 +841,7 @@ def test_edit_account():
         selectors[i] = (selectors[i], "    ")
     test.action_chain(0, selectors, action="send_keys")
     
-    test.find("#upgrade-form-submit").click()
+    test.find("#update-form-submit").click()
     sleep(3)
     
     ##########  First name is required
@@ -883,7 +883,7 @@ def test_edit_account():
         cc_number = test.find("#id_cc_number")
         cc_number.clear()
         cc_number.send_keys("8769233313929990")
-        test.find("#upgrade-form-submit").click()
+        test.find("#update-form-submit").click()
         sleep(3)
         parts[28]['success'] = test.find("#card_number_container " +\
             "ul.errorlist li").text ==\
@@ -908,7 +908,7 @@ def test_edit_account():
             test.find("//select[@id='id_date_cc_expiration_year']/" +\
                     "option[@value='%s']" %\
                     (str(timezone.now().year),), type="xpath").click()
-            test.find("#upgrade-form-submit").click()
+            test.find("#update-form-submit").click()
             sleep(3)
             parts[29]['success'] =\
                 test.find("#date_cc_expiration_ic ul.errorlist " +\
@@ -940,7 +940,7 @@ def test_edit_account():
         cc_id = subscription.get("pp_cc_id")
         test.find("#id_cc_cvv").send_keys("123")
         test.find("#id_recurring").click()
-        test.find("#upgrade-form-submit").click()
+        test.find("#update-form-submit").click()
         sleep(5)
         subscription.pp_cc_id = None
         parts[31]['success'] = cc_id == subscription.get("pp_cc_id")

@@ -167,6 +167,7 @@ def cloud_call(func_name, params, timeout=None):
             params, timeout=timeout)
             
             
+# These dont belong here...
 def make_aware_to_utc(dtime, tzone):
     """
     Takes in an unaware datetime object, makes it aware using the 

@@ -43,7 +43,7 @@ $(document).ready(function(){
 					This message cannot be sent because you have reached your maximum messages sent for this month. Click on the "Upgrade Account" button to upgrade your account to send more messages for this month.
 					<br/>
 					<a id="upgrade" class="button blue" style="margin-top: 10px;"
-					    href="{% url 'message_edit' message_id %}?account_upgrade=1" >Upgrade Account</a>
+					    href="{% url 'message_edit' message_id %}?do_upgrade=1" >Upgrade Account</a>
 					<span style="clear: left; display: block;"></span>
 					{% endif %}
 				</div>
