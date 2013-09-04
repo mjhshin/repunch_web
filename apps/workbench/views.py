@@ -152,8 +152,8 @@ def punch(request):
                     content_type="application/json")
         else:
             if res['error'] == "PATRON_NOT_FOUND":
-                request.session.clear()
-                request.session.update(session)
+                request.session.clear()        
+                request.session.update(SessionStore(request.session.session_key))
                 return HttpResponse(json.dumps({"error":\
                     "PATRON_NOT_FOUND"}), 
                     content_type="application/json")
