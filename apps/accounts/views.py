@@ -328,6 +328,12 @@ def update(request):
         if form.initial.get("cc_number"):
             form.initial['cc_number'] = "*" * 12 +\
                 form.initial.get('cc_number')[-4:]
+                
+        if do_upgrade:    
+            from_limit_reached =\
+                request.session.get("from_limit_reached")
+            if from_limit_reached:
+                data['from_limit_reached'] = from_limit_reached
             
     # update the session cache
     request.session['store'] = store

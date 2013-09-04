@@ -281,7 +281,7 @@ def test_messages():
         sleep(2)
         test.find("#id_cc_cvv").send_keys("123")
         test.find("#id_recurring").click()
-        test.find("#upgrade-form-submit").click()
+        test.find("#update-form-submit").click()
         sleep(5)
         message_id = test.driver.current_url.split("/")[5]
         subscription.subscriptionType = None
@@ -351,7 +351,7 @@ def test_messages():
         sleep(2)
         test.find("#id_cc_cvv").send_keys("123")
         test.find("#id_recurring").click()
-        test.find("#upgrade-form-submit").click()
+        test.find("#update-form-submit").click()
         sleep(5)
         message_id = test.driver.current_url.split("/")[5]
         subscription.subscriptionType = None
