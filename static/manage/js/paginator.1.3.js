@@ -218,7 +218,7 @@ onHeaderClick = function(event){
     } else if(page.text() == "last") {
         pageNumStr = new String(pagCount);
     } else {
-        pageNumStr = self.text();
+        pageNumStr = page.text();
     }
     
     
