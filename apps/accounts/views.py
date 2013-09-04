@@ -18,11 +18,11 @@ from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required
 from parse.apps.accounts import sub_type, UNLIMITED
-from parse.apps.stores import SMARTPHONE, MONTHLY
+from parse.apps.stores import IPOD, MONTHLY
 from parse.apps.stores.models import Settings, Store, Subscription
 from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
-send_email_receipt_smartphone, send_email_account_upgrade,\
+send_email_receipt_ipod, send_email_account_upgrade,\
 send_email_receipt_monthly_success
 
 @csrf_exempt
@@ -262,9 +262,9 @@ def update(request):
                 invoice = subscription.charge_cc(\
                     PHONE_COST_UNIT_COST*amount,
                     "Order placed for " +\
-                    str(amount) + " phones", SMARTPHONE)
+                    str(amount) + " phones", IPOD)
                 if invoice:
-                    send_email_receipt_smartphone(account, 
+                    send_email_receipt_ipod(account, 
                         subscription, invoice, amount) 
                 else:
                     return invalid_card()

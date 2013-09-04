@@ -1,7 +1,7 @@
 
 # payment types
 MONTHLY = "monthly"
-SMARTPHONE = "smartphone"
+IPOD = "ipod"
 
 # Access levels per account basis
 ACCESS_ADMIN = ("faa", 10) # full admin access

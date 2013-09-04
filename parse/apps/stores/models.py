@@ -208,7 +208,7 @@ class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
     def __init__(self, **data):
         # use type to distinguish between different types of payments
-        # monthly, smartphone
+        # MONTHLY, IPOD (check _stores._init__)
         self.type = data.get("type")
         self.state = data.get('state')
         self.payment_id = data.get('payment_id')
@@ -266,7 +266,7 @@ class Subscription(ParseObject):
         self.date_charge_failed = data.get("date_charge_failed")
             
         # use to bill monthly! ONLY USE for determining when to charge
-        # monthly bill for premium accounts- not for smartphones or
+        # monthly bill for premium accounts- not for ipods or
         # other services!
         self.date_last_billed = data.get("date_last_billed")
         

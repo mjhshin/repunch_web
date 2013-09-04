@@ -10,7 +10,7 @@ from forms import ContactForm
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup,\
-send_email_receipt_smartphone
+send_email_receipt_ipod
 from apps import isdigit
 from apps.db_static.models import Category
 from apps.accounts.forms import AccountForm
@@ -24,6 +24,7 @@ from parse.utils import make_aware_to_utc, parse
 from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type, UNLIMITED
+from parse.apps.stores import IPOD
 from parse.apps.stores.models import Store, Subscription,\
 Settings
 
@@ -284,10 +285,10 @@ def sign_up(request):
                     invoice = subscription.charge_cc(\
                         PHONE_COST_UNIT_COST*amount,
                         "Order placed for " +\
-                        str(amount) + " phones", "smartphone")
+                        str(amount) + " iPod touch", IPOD)
                         
                     if invoice:
-                        send_email_receipt_smartphone(account, 
+                        send_email_receipt_ipod(account, 
                             subscription, invoice, amount)
                     else:
                         return invalid_card()

@@ -284,6 +284,10 @@ def pull(request):
         # to the SessionStore(session_key) key!
         # need to check if we are still logged in
         session = SessionStore(request.session.session_key)
+        print "RETURNING COMET"
+        print "RETURNING COMET"
+        print "SESSION KEY: " + request.session.session_key
+        print session._get_session()
         if 'account' in session and SESSION_KEY in session:
             request.session.clear()
             request.session.update(session)
@@ -368,6 +372,8 @@ def pull(request):
                 # the session has been flushed- was logged out by user
                 # or forcefully by server =)
                 # now time to flag existing tabs.
+                request.session.clear()
+                print "KeyError at comet views"
                 try: 
                     return HttpResponse(json.dumps({"result": -3}), 
                                 content_type="application/json")

@@ -1,5 +1,5 @@
 /*
-    Script involving placing smartphone order form input.
+    Script involving placing iPod touch order form input.
 */
 
 $(document).ready(function(){

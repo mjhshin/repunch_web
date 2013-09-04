@@ -220,14 +220,14 @@ def send_email_receipt_monthly_batch(asiss, connection=None):
     else:
         Thread(target=_wrapper).start()
 
-def send_email_receipt_smartphone(account, subscription, invoice,
+def send_email_receipt_ipod(account, subscription, invoice,
     amount, connection=None):
     """
     Sends the user and ORDER_PLACED_EMAILS pretty receipt.
     """
     def _wrapper():
         with open(FS_SITE_DIR +\
-            "/templates/manage/notification-receipt-smartphone.html", 'r') as f:
+            "/templates/manage/notification-receipt-ipod.html", 'r') as f:
             template = Template(f.read())
        
         store = account.get("store")
@@ -250,7 +250,7 @@ def send_email_receipt_smartphone(account, subscription, invoice,
         emails.append(email)
         
         # for ORDER_PLACED_EMAILS
-        subject = "Smartphone(s) purchased by " +\
+        subject = "iPod Touch(es) purchased by " +\
              store.get_owner_fullname() + "."
         ctx = get_notification_ctx()
         ctx.update({

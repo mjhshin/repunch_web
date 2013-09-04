@@ -6,6 +6,7 @@ import hashlib, uuid, pytz
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import SESSION_KEY
+from django.contrib.sessions.backends.cache import SessionStore
 
 from libs.repunch import rputils
 from libs.repunch.rputils import delete_after_delay
@@ -26,6 +27,10 @@ def logout(request, reverse_url):
     session_key = request.session.session_key
     # flush immediately
     request.session.flush()
+    print "Logged out"
+    print "SESSION KEY: " + session_key
+    print SessionStore(session_key)._get_session()
+    print "ABOVE IS SESSIONSTORE CONTENT"
     # first delete the CometSessionIndex
     try:
         csi = CometSessionIndex.objects.get(session_key=session_key)
