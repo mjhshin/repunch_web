@@ -544,7 +544,7 @@ Parse.Cloud.define("punch", function(request, response)
 			if(patronResult == null)
 			{
 				console.log("Patron not found");
-				response.error("error");
+				response.error("PATRON_NOT_FOUND");
 			}
 			else
 			{
