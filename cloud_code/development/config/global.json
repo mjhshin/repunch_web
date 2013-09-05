@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "RepunchDev": {
+            "applicationId": "r9QrVhpx3wguChA9X9oe2GFGZwTUtrYyHOHpNWxb", 
+            "masterKey": "XIiZlcZjzh547FJvWWLlZhrNojXM2PXqA0W9C321"
+        }, 
+        "_default": {
+            "link": "RepunchDev"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.10"
+    }
+}

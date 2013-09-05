@@ -15,14 +15,18 @@ cd $PROJECT_NAME
 sudo apt-get install python-pip python-dev build-essential 
 sudo apt-get install git
 sudo apt-get install mysql-server mysql-client
+sudo apt-get install python-mysqldb
 sudo apt-get install apache2
 sudo apt-get install libapache2-mod-python
-sudo apt-get install python-mysqldb
 sudo apt-get install libapache2-mod-wsgi
 sudo apt-get install memcached
 
 sudo pip install Django
-sudo pip install -r requirements.txt
+sudo pip install django-extensions
+sudo pip install python-memcached
+sudo pip install requests
+
+# also install PIL manually
 
 mkdir $PROJECT_NAME
 cd $PROJECT_NAME

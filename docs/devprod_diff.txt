@@ -1,0 +1,15 @@
+#############################################################
+########## Production vs Development code differences
+###################
+
+1. Cloud code - post url
+    dev:    http://dev.repunch.com/manage/comet/receive/
+    prod:   https://www.repunch.com/manage/comet/receive/
+    
+2. Cloud code - post key
+    dev:    "cometrkey": "384ncocoacxpvgrwecwy",
+    prod:   "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+    
+3. Django settings - the whole thing. Changes to settings must
+    be carefully transferred over.
+   
