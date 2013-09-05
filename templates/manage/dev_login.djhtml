@@ -13,7 +13,7 @@
     div#content-frame { width: 300px; }
     div#site-frame { width: 330px; }
     div#main-content { min-height: 160px; height:180px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
-    div#header-left span { position:relative; left:76px; font: bold italic 0.8em serif; color:#0965ad }
+    div#header-left span { position:relative; left:46px; font: bold italic 0.8em serif; color:#0965ad }
     input { width: 280px; }
     input[type=submit]{ width: 296px; margin-top:10px; background-color: #4c8ffb; color: white; }
     input[type=submit]:hover{ background-color: #427edd; }
@@ -30,7 +30,7 @@
 			<div id="header-left">
 			    <a href="{% url 'public_home' %}">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
-				<span class="x">ENGINEER LOGIN</span>
+				<span>ENGINEER LOGIN</span>
 				</a>
 			</div>
 		</div>
