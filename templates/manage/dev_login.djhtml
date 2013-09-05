@@ -1,0 +1,63 @@
+{% load static %}<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Repunch Engineer | Login</title>
+	
+	<!-- include page specific css -->
+	<link href="{% static 'manage/css/global.1.2.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/login.1.0.css' %}" rel="stylesheet" />   
+	
+	<style>
+	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
+    div#content-frame { width: 300px; }
+    div#site-frame { width: 330px; }
+    div#main-content { min-height: 160px; height:180px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
+    div#header-left span { position:relative; left:76px; font: bold italic 0.8em serif; color:#0965ad }
+    input { width: 280px; }
+    input[type=submit]{ width: 296px; margin-top:10px; background-color: #4c8ffb; color: white; }
+    input[type=submit]:hover{ background-color: #427edd; }
+    form div { width: 296px; color: red; font-size:0.8em; text-align:center; margin-top:10px; }
+	</style>
+	
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
+    <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
+	
+</head>
+<body>
+	<div id="site-frame">
+		<div id="header">
+			<div id="header-left">
+			    <a href="{% url 'public_home' %}">
+				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
+				<span class="x">ENGINEER LOGIN</span>
+				</a>
+			</div>
+		</div>
+		<div id="content-frame">
+			<div id="main-content">
+				
+				<form action="{% url 'manage_dev_login' %}" method="POST">
+                    {% csrf_token %}
+
+	                <p><label for="username">Username:</label> 
+	                <input type="text" name="username" id="username" value="{{ username }}"></p>
+	
+	                <p><label for="password">Password:</label> 
+	                <input type="password" name="password" id="password" ></p>
+	
+	                <input type="submit" value="Sign in" />
+	                
+	                <div>{{ error }}</div>
+	                
+                </form>
+				
+			</div><!-- close main-content -->
+			<div class="clear">&nbsp;</div>
+		</div><!-- close content-frame -->
+	</div><!-- close site-frame -->
+	<div id="footer">
+		<img src="{% static "manage/images/logo_footer.png" %}" alt="Repunch" id="logo-footer" />
+	</div>
+</body>
+</html>

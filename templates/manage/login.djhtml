@@ -9,10 +9,10 @@
 	<link href="{% static 'manage/css/login.1.0.css' %}" rel="stylesheet" />   
 	
 	<style>
-	div#header { margin-top: 20px; }
+	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
     div#content-frame { width: 300px; }
-    div#site-frame { width: 300px; }
-    div#main-content { width: 250px; min-height: 200px; }
+    div#site-frame { width: 330px; }
+    div#main-content { min-height: 200px; height:250px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
 	</style>
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
@@ -21,8 +21,8 @@
 	
 </head>
 <body>
-	<div id="site-frame" style="width:330px;">
-		<div id="header" style="width:330px;margin-left:auto; margin-right:auto;">
+	<div id="site-frame">
+		<div id="header" >
 			<div id="header-left">
 			    <a href="{% url 'public_home' %}">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
@@ -30,7 +30,7 @@
 			</div>
 		</div>
 		<div id="content-frame">
-			<div id="main-content" style="height:250px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto;">
+			<div id="main-content" >
 				
 				{% include 'public/dialog-login-form.djhtml' %}
 				

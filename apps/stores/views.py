@@ -26,8 +26,9 @@ from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -40,6 +41,7 @@ def index(request):
     
     return render(request, 'manage/store_details.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="store_index")
 def edit(request):
@@ -195,6 +197,7 @@ def edit(request):
 # this accessed only through the edit_store detail page, which
 # requires admin access but this might be useful somewhere else
 # so the admin_only decorator is not used
+@dev_login_required
 @login_required
 @access_required(http_response="Access denied", content_type="text/plain")
 def hours_preview(request):
@@ -213,6 +216,7 @@ def hours_preview(request):
     
     
 @login_required
+@dev_login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
 @csrf_exempt
@@ -260,7 +264,7 @@ def avatar(request):
     data['url'] = reverse('store_avatar')
     return render(request, 'manage/avatar_upload.djhtml', data)
     
-# TODO http_response on access_required should be a link to an image
+@dev_login_required
 @login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
@@ -272,6 +276,7 @@ def get_avatar(request):
         
     raise Http404
 
+@dev_login_required
 @login_required
 @admin_only(http_response="<h1>Permission denied</h1>",\
 content_type="text/html")

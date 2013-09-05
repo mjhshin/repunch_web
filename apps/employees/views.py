@@ -12,7 +12,7 @@ from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
@@ -22,6 +22,7 @@ from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -41,6 +42,7 @@ def index(request):
     
     return render(request, 'manage/employees.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="employees_index")
 def edit(request, employee_id):
@@ -97,6 +99,7 @@ def edit(request, employee_id):
 
     return render(request, 'manage/employee_edit.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="employees_index")
 def delete(request, employee_id):
@@ -159,6 +162,7 @@ def delete(request, employee_id):
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has been deleted.'}))
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="employees_index")
 def approve(request, employee_id):
@@ -200,6 +204,7 @@ def approve(request, employee_id):
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been approved.'}))
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
@@ -244,6 +249,7 @@ def deny(request, employee_id):
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))
 
+@dev_login_required
 @login_required
 @access_required(http_response="Access Denied", content_type="text/plain")
 def punches(request, employee_id):
@@ -270,7 +276,8 @@ def punches(request, employee_id):
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
      
-    # TODO limit of 200 applies - remove paginator!
+    # TODO limit of 200 applies - remove paginator
+    # and use skip with limit!
     ps = employee.get('punches', order=order_by, limit=200)
     if not ps:
         ps = []
@@ -290,6 +297,7 @@ def punches(request, employee_id):
     
     return render(request, 'manage/employee_punches.djhtml', data)
 
+@dev_login_required
 @login_required
 @access_required(http_response={"error": "Access denied"})
 def graph(request):
@@ -359,6 +367,7 @@ def graph(request):
 
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
 
+@dev_login_required
 @login_required
 def avatar(request, employee_id):
     """

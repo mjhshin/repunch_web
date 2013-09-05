@@ -13,7 +13,7 @@ from parse.comet import comet_receive
 from parse import session as SESSION
 from parse.utils import cloud_call, make_aware_to_utc
 from parse.decorators import access_required, admin_only
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.messages.models import Message
 from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
@@ -23,6 +23,7 @@ COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
+@dev_login_required
 @login_required
 @access_required(http_response="<div class='tr'>Access denied</div>",\
 content_type="text/html")
@@ -78,6 +79,7 @@ def get_page(request):
     return HttpResponse("Bad request")
 
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -110,6 +112,7 @@ def index(request):
     return render(request, 'manage/messages.djhtml', data)
 
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index")
 def edit(request, message_id):
@@ -279,6 +282,7 @@ def edit(request, message_id):
 
     return render(request, 'manage/message_edit.djhtml', data)
 
+@dev_login_required
 @login_required
 @access_required
 def details(request, message_id):
@@ -299,6 +303,7 @@ def details(request, message_id):
 
 
 # FEEDBACK ------------------------------------------
+@dev_login_required
 @login_required
 @access_required
 def feedback(request, feedback_id):
@@ -342,6 +347,7 @@ def feedback(request, feedback_id):
     
     return render(request, 'manage/feedback.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_reply(request, feedback_id):
@@ -450,6 +456,7 @@ def feedback_reply(request, feedback_id):
     
     return render(request, 'manage/feedback_reply.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_delete(request, feedback_id):
@@ -499,6 +506,7 @@ def feedback_delete(request, feedback_id):
         urllib.urlencode({'success':'Feedback has been deleted.',
             'tab_feedback':1}))
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index")
 def delete(request, message_id):

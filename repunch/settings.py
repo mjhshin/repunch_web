@@ -5,6 +5,7 @@ import os
 
 # Set this to True to DISABLE Django user authentication
 PRODUCTION_SERVER = True
+DEVELOPMENT_TOKEN = "dev_token"
 
 # SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
 DEBUG = True
@@ -197,6 +198,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'repunch.urls'
 LOGIN_URL = '/manage/'
+LOGIN_URL_DEV = '/repunch-engineer-login/'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'repunch.wsgi.application'

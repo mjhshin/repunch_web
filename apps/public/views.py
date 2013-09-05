@@ -20,6 +20,7 @@ from libs.repunch import rputils
 
 from repunch.settings import STATIC_URL
 from parse.auth import login
+from parse.auth.decorators import dev_login_required
 from parse.utils import make_aware_to_utc, parse
 from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
@@ -36,6 +37,7 @@ def privacy_mobile(request):
     return render(request, "public/privacy-mobile.djhtml",
         get_notification_ctx())
 
+@dev_login_required
 def index(request):
     if request.session.get('account') is not None and\
         request.session.get('store') is not None and\
@@ -45,6 +47,7 @@ def index(request):
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)
 
+@dev_login_required
 def learn(request):
     data = {'learn_nav': True}
     
@@ -53,21 +56,26 @@ def learn(request):
     data['types'] = types
     return render(request, 'public/learn.djhtml', data)
 
+@dev_login_required
 def faq(request):
     data = {'faq_nav': True}
     data['form'] = ContactForm() # An unbound form
     return render(request, 'public/faq.djhtml', data)
 
+@dev_login_required
 def about(request):
     data = {'about_nav': True}
     return render(request, 'public/about.djhtml', data)
 
+@dev_login_required
 def terms(request):
     return render(request, 'public/terms.djhtml')
 
+@dev_login_required
 def privacy(request):
     return render(request, 'public/privacy.djhtml')
 
+@dev_login_required
 def contact(request):
     if request.method == 'POST': 
         form = ContactForm(request.POST) 
@@ -79,9 +87,11 @@ def contact(request):
 
     return render(request, 'public/contact.djhtml', {'form': form, })
 
+@dev_login_required
 def thank_you(request):
     return render(request, 'public/thank_you.djhtml')
 
+@dev_login_required
 def jobs(request):
     return render(request, 'public/jobs.djhtml')
 
@@ -101,7 +111,8 @@ def categories(request):
                     content_type="application/json")
     else:
         return HttpResponse('')
-        
+     
+@dev_login_required   
 def password_reset(request):
     """
     Calls Parse's requestPasswordReset
@@ -111,6 +122,7 @@ def password_reset(request):
         content_type="application/json")
         
         
+@dev_login_required
 def sign_up(request):
     """
     Creates User, store, subscription, and settings objects.

@@ -11,6 +11,11 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK, BASIC, OFFER
 
+# Note another thing in the session is the 
+# django.contrib.auth.SESSION_KEY ehose value is the Parse
+# session token received on login
+
+# If not PRODUCTION_SERVER, the DEVELOPMENT_TOKEN may also be here
 SESSION_CACHE = [
     # temps
     'message_count',

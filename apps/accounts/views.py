@@ -16,7 +16,7 @@ from apps.stores.forms import SettingsForm, SubscriptionForm
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import IPOD, MONTHLY
 from parse.apps.stores.models import Settings, Store, Subscription
@@ -55,6 +55,7 @@ def activate(request):
     
     return HttpResponse("Bad request")
     
+@dev_login_required
 @login_required
 @admin_only(reverse_url="store_index")
 def deactivate(request):
@@ -67,6 +68,7 @@ def deactivate(request):
     store.update()
     return redirect(reverse('manage_logout'))
 
+@dev_login_required
 @login_required
 @admin_only(except_method="GET")
 def settings(request):
@@ -115,6 +117,7 @@ def settings(request):
     data['settings'] = settings
     return render(request, 'manage/settings.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(http_response={"error": "Permission denied"})
 def refresh(request):
@@ -147,6 +150,7 @@ def refresh(request):
     else:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="store_index")
 def update(request):

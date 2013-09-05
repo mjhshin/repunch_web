@@ -7,9 +7,10 @@ from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import admin_only, access_required
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from apps.rewards.forms import RewardForm, RewardAvatarForm
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -51,6 +52,7 @@ def index(request):
     return render(request, 'manage/rewards.djhtml', data)
 
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="rewards_index")
 def edit(request, reward_id):
@@ -153,6 +155,7 @@ def edit(request, reward_id):
     data['form'] = form
     return render(request, 'manage/reward_edit.djhtml', data)
 
+@dev_login_required
 @login_required
 @admin_only(reverse_url="rewards_index")
 def delete(request, reward_id):
@@ -192,6 +195,7 @@ def delete(request, reward_id):
                 'Reward has been removed.'}))
 
 
+@dev_login_required
 @login_required
 def avatar(request, reward_id):
     """

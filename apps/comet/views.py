@@ -12,11 +12,12 @@ import json, socket, thread
 from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
 from parse.decorators import access_required
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from apps.comet.models import CometSession, CometSessionIndex
 from parse.comet import comet_receive
 from repunch.settings import REQUEST_TIMEOUT, COMET_PULL_RATE
 
+@dev_login_required
 @login_required(http_response={"result": -3})
 @access_required(http_response={"result":-2})
 def pull(request):
@@ -421,6 +422,7 @@ def pull(request):
     except (IOError, socket.error) as e:
         thread.exit() # exit silently
         
+@dev_login_required
 @login_required
 def terminate(request):
     """

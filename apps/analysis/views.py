@@ -10,10 +10,11 @@ from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.decorators import access_required
 from parse.core.advanced_queries import relational_query
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -25,6 +26,7 @@ def index(request):
             
     return render(request, 'manage/analysis.djhtml', data)
 
+@dev_login_required
 @login_required
 @access_required(http_response={"error": "Access denied"})
 def trends_graph(request, data_type=None, start=None, end=None ):
@@ -129,8 +131,7 @@ def trends_graph(request, data_type=None, start=None, end=None ):
         
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
 
-
-
+@dev_login_required
 @login_required
 @access_required(http_response={"error": "Access denied"})
 def breakdown_graph(request, data_type=None, filter=None, range=None):

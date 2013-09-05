@@ -38,7 +38,10 @@ urlpatterns = patterns('',
             views.manage_parse_invalid_link, 
             name='manage_parse_invalid_link'),
             
-
+    #### dev login
+    url(r'^repunch-engineer-login/$', views.manage_dev_login,
+        name='manage_dev_login'),
+            
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

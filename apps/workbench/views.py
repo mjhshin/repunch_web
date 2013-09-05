@@ -12,11 +12,12 @@ from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.comet import comet_receive
 from parse.decorators import access_required
-from parse.auth.decorators import login_required
+from parse.auth.decorators import login_required, dev_login_required
 from parse import session as SESSION
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 
+@dev_login_required
 @login_required
 @access_required
 def index(request):
@@ -51,6 +52,7 @@ def index(request):
     
     return render(request, 'manage/workbench.djhtml', data)
     
+@dev_login_required
 @login_required
 @access_required(http_response="<div class='tr'>Access denied</div>",\
 content_type="text/html")
@@ -119,6 +121,7 @@ def get_page(request):
         
     return HttpResponse("Bad request")
     
+@dev_login_required
 @login_required
 @access_required(http_response={"error":"permission_denied"})
 def punch(request):
@@ -166,6 +169,7 @@ def punch(request):
     return HttpResponse(json.dumps({'error': 'error'}),
         content_type="application/json")
     
+@dev_login_required
 @login_required
 @access_required(http_response={"error":"permission_denied"})
 def redeem(request):
