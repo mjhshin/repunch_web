@@ -11,7 +11,8 @@ from django.contrib.sessions.backends.cache import SessionStore
 from libs.repunch import rputils
 from libs.repunch.rputils import delete_after_delay
 from apps.comet.models import CometSession, CometSessionIndex
-from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE
+from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE,\
+PRODUCTION_SERVER
 from parse import session as SESSION
 from parse.utils import parse
 from parse.apps.accounts.models import Account
@@ -133,7 +134,7 @@ def login(request, requestDict):
                         
                 # If value is None, the session reverts to using 
                 # the global session expiry policy.
-                if "stay_in" in requestDict:
+                if "stay_in" in requestDict and PRODUCTION_SERVER:
                     request.session.set_expiry(None)
                 # If value is 0, the user's session cookie will 
                 # expire when the user's Web browser is closed.

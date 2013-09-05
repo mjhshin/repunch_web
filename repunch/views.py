@@ -28,6 +28,7 @@ def manage_dev_login(request):
             password=request.POST['password']) is not None:
             # just insert an arbitrary object
             request.session[DEVELOPMENT_TOKEN] = 1
+            request.session.set_expiry(0)
             return redirect(reverse("public_home"))
         else:
             return render(request, 'manage/dev_login.djhtml',
