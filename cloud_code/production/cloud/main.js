@@ -1039,7 +1039,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
     Parse.Cloud.useMasterKey(); 
     
     userQuery.first().then(function(user) {
-        if (user.get("Store") == null and user.get("Patron") == null) {
+        if (user.get("Store") == null && user.get("Patron") == null) {
             return user.destroy();
         } else {
             user.set("Employee", null);
