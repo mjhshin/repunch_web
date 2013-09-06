@@ -4,7 +4,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Repunch Engineer | Login</title>
 	
-	<!-- include page specific css -->
 	<link href="{% static 'manage/css/global.1.2.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/login.1.0.css' %}" rel="stylesheet" />   
 	
@@ -16,33 +15,22 @@
     div#content-frame { width: 300px; }
     div#site-frame { width: 330px; }
     div#main-content { 
-        {% if error %}
-        min-height: 180px;
-	    padding-top: 25px; padding-bottom: 75px;
-        {% else %}
         min-height:0px;
         padding-top:0px; padding-bottom:0px;  
-        {% endif %}
         width:310px; height: 0px;
         margin-bottom:0px;margin-left:auto; margin-right:auto; 
     }
     div#header-left span { 
-        {% if not error %}
         opacity:0; 
-        {% endif %}
         position:relative; left:46px; 
-        font: bold italic 0.8em serif; 
+        font: bold italic 0.8em sans-serif; 
         color:#0965ad 
     }
     input { width: 286px; }
     input[type=submit]{ 
-        {% if error %}
-        width: 302px; color: white; 
-        {% else %}
         opacity: 0;
         position:relative; left: 151px; 
         width: 0px; color: #4c8ffb; 
-        {% endif %}
         margin-top:10px; 
         background-color: #4c8ffb; 
     }
@@ -53,15 +41,12 @@
         text-align:center; 
         margin-top:10px; 
     }
-    {% if not error %}
     form { opacity:0; }
-    {% endif %}
 	</style>
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script>
-    {% if not error %}
 	$(document).ready(function() {
 	    setTimeout(function() {
 	        $("#main-content").animate({"min-height": 180,
@@ -75,8 +60,22 @@
 	            });
 	        
 	    }, 300);
+	    
+	    $("input[type=submit]").click(function() {
+	        var data = $("form").serialize();
+	        $.post("{% url 'manage_dev_login' %}", data, function(res) {
+	            if (res.code == 0) {
+	                $("form div").text("Wrong username or password =P");
+	                $("#password").val("").focus();
+	            } else {
+	                window.location.replace("{% url 'public_home' %}");
+	            }
+	        });
+	        
+	        return false;
+	    });
+	    
 	});
-	{% endif %}
 	</script>
 	
 </head>
@@ -93,7 +92,7 @@
 		<div id="content-frame">
 			<div id="main-content">
 				
-				<form action="{% url 'manage_dev_login' %}" method="POST">
+				<form action="">
                     {% csrf_token %}
 
 	                <p><label for="username">Username:</label> 
@@ -104,7 +103,7 @@
 	
 	                <input type="submit" value="Sign in" />
 	                
-	                <div>{{ error }}</div>
+	                <div></div>
 	                
                 </form>
 				

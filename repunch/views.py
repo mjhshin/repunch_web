@@ -19,21 +19,22 @@ def manage_dev_login(request):
     """
     Used for the development site
     """
+    # just redirect user to home page if they already logged in
     # redirect user to home page if accessed from the production site
-    if PRODUCTION_SERVER:
+    if request.session.get(DEVELOPMENT_TOKEN) or PRODUCTION_SERVER:
         return redirect(reverse("public_home"))
         
-    if request.method == "POST":
+    if request.method == "POST" or request.is_ajax():
         if authenticate(username=request.POST['username'],
             password=request.POST['password']) is not None:
             # just insert an arbitrary object
             request.session[DEVELOPMENT_TOKEN] = 1
             request.session.set_expiry(0)
-            return redirect(reverse("public_home"))
+            return HttpResponse(json.dumps({"code":1}), 
+                content_type="application/json")
         else:
-            return render(request, 'manage/dev_login.djhtml',
-                {"error": "Wrong username or password =P",
-                "username": request.POST['username']})
+            return HttpResponse(json.dumps({"code":0}), 
+                content_type="application/json")
     else:
         return render(request, 'manage/dev_login.djhtml', {})
 
