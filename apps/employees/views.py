@@ -144,7 +144,7 @@ def delete(request, employee_id):
             deleted_employee = Employee(objectId=employee.objectId)
             payload["deletedEmployee"] = deleted_employee.jsonify()
             
-        comet_receive(store_id, payload)
+        comet_receive(store.objectId, payload)
         
         
     # Always save session first whenever calling a cloud code
@@ -240,7 +240,7 @@ def deny(request, employee_id):
             deleted_employee = Employee(objectId=employee.objectId)
             payload["deletedEmployee"] = deleted_employee.jsonify()
             
-        comet_receive(store_id, payload)
+        comet_receive(store.objectId, payload)
         
         
     # Always save session first whenever calling a cloud code
