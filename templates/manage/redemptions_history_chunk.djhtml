@@ -5,7 +5,7 @@
     <input type="hidden" value="{{redemp.reward_id}}" />
     <div class="td redemption_time-past">
     {% if redemp.updatedAt < today %}
-    {{ redemp.updatedAt|date:"F d" }}
+    {{ redemp.updatedAt|date:"N d" }}
     {% else %}
     {{ redemp.updatedAt|date:"h:i a" }}
     {% endif %}</div>

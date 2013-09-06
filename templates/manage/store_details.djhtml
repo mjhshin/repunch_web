@@ -129,7 +129,12 @@ $(document).ready(function() {
 		
 		<div class="white-box" id="limits-box">
 			<div class="limit-details">
+				{% if tmp != 2 %} {# 2 is heavyweight #}
 				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>
+				{% else %}
+				<div class="bar-graph" style="visibility:hidden;width:10px;"><div></div></div>
+				{% endif %}
+				
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count request.session %}</div>

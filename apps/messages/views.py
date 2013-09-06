@@ -130,14 +130,15 @@ def edit(request, message_id):
     data['mp_slider_min'] = 1
     data['mp_slider_max'] = mp
     
+    
+    # redirect if no patrons 
+    if not store.get("patronStores", count=1, limit=0):
+        return redirect(reverse("messages_index"))
+    
     if request.method == 'POST' or (request.method == "GET" and\
         request.GET.get("send_message") and "message_b4_upgrade" in\
         request.session):
         
-        # 404 if no patrons 
-        if not store.get("patronStores", count=1, limit=0):
-            raise Http404
-            
         if request.method == "GET":
             postDict = request.session['message_b4_upgrade'].copy()
             # cleanup temp vars in session

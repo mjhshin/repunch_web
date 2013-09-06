@@ -9,7 +9,7 @@
     <input type="hidden" value="{{redemp.reward_id}}" />
 	<div class="td redemption_time">
 	{% if redemp.createdAt < today %}
-	{{ redemp.createdAt|date:"F d" }}
+	{{ redemp.createdAt|date:"N d" }}
 	{% else %}
 	{{ redemp.createdAt|date:"h:i a" }}
 	{% endif %}</div>
