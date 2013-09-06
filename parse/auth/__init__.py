@@ -104,10 +104,6 @@ def login(request, requestDict):
             subscription = store.get("subscription")
         
             if store.get('active'):
-                # clear the session but do not assign a new sessionkey
-                request.session.clear()
-                request.session.delete()
-            
                 request.session[SESSION_KEY] = res.get('sessionToken')
                 
                 # load all cache data!
