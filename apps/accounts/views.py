@@ -179,7 +179,7 @@ def update(request):
                 amount = int(request.POST.get("place_order_amount"))
                 if amount > 0:
                     all_forms_valid = all_forms_valid and\
-                        subscription_form.is_valid()
+                        form.is_valid()
                 else:
                     all_forms_valid = False
                     data["place_order_amount_error"] =\
