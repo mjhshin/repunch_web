@@ -9,33 +9,74 @@
 	<link href="{% static 'manage/css/login.1.0.css' %}" rel="stylesheet" />   
 	
 	<style>
-	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
+	div#header { 
+	    margin-top: 20px; width:330px;
+	    margin-left:auto; margin-right:auto;
+	}
     div#content-frame { width: 300px; }
     div#site-frame { width: 330px; }
-    div#main-content { min-height:0px; height:0px; 
-        padding-top:0px; padding-bottom:0px; width:310px;
-        margin-bottom:0px;margin-left:auto; margin-right:auto; }
-    div#header-left span { opacity:0; position:relative; left:46px; font: bold italic 0.8em serif; color:#0965ad }
+    div#main-content { 
+        {% if error %}
+        min-height: 180px;
+	    padding-top: 25px; padding-bottom: 75px;
+        {% else %}
+        min-height:0px;
+        padding-top:0px; padding-bottom:0px;  
+        {% endif %}
+        width:310px; height: 0px;
+        margin-bottom:0px;margin-left:auto; margin-right:auto; 
+    }
+    div#header-left span { 
+        {% if not error %}
+        opacity:0; 
+        {% endif %}
+        position:relative; left:46px; 
+        font: bold italic 0.8em serif; 
+        color:#0965ad 
+    }
     input { width: 286px; }
-    input[type=submit]{ width: 302px; margin-top:10px; background-color: #4c8ffb; color: white; }
+    input[type=submit]{ 
+        {% if error %}
+        width: 302px; color: white; 
+        {% else %}
+        opacity: 0;
+        position:relative; left: 151px; 
+        width: 0px; color: #4c8ffb; 
+        {% endif %}
+        margin-top:10px; 
+        background-color: #4c8ffb; 
+    }
     input[type=submit]:hover{ background-color: #427edd; }
-    form div { width: 302px; color: red; font-size:0.8em; text-align:center; margin-top:10px; }
+    form div { 
+        width: 302px; color: red; 
+        font-size:0.8em; 
+        text-align:center; 
+        margin-top:10px; 
+    }
+    {% if not error %}
     form { opacity:0; }
+    {% endif %}
 	</style>
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script>
+    {% if not error %}
 	$(document).ready(function() {
 	    setTimeout(function() {
 	        $("#main-content").animate({"min-height": 180,
 	            "padding-top": 25, "padding-bottom":75}, 500, function() {
 	                $("form").animate({"opacity": 1}, 500);
-	                $("div#header-left span").animate({"opacity": 1}, 500);
+	                $("div#header-left span").animate({"opacity": 1}, 500,
+	                    function() {
+	                        $("input[type=submit]").animate({width: 302,
+	                            left:0, color: "#fff", opacity:1}, 700);
+	                    });
 	            });
 	        
 	    }, 300);
 	});
+	{% endif %}
 	</script>
 	
 </head>

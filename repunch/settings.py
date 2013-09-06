@@ -3,6 +3,9 @@ from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
     EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
+# Production server should always have DEBUG = False and 
+# PRODUCTION_SERVER = True
+
 # Set this to True to DISABLE Django user authentication
 PRODUCTION_SERVER = False
 DEVELOPMENT_TOKEN = "dev_token"
