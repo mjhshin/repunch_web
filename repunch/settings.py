@@ -18,9 +18,15 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
 else:
     FS_SITE_DIR = "/home/ubuntu/Repunch/repunch_web"
-    MAIN_TRANSPORT_PROTOCOL = "https"
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    if PRODUCTION_SERVER:
+        MAIN_TRANSPORT_PROTOCOL = "https"
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+    else:
+        MAIN_TRANSPORT_PROTOCOL = "http"
+        SESSION_COOKIE_SECURE = False
+        CSRF_COOKIE_SECURE = False
+        
 
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),
@@ -46,9 +52,15 @@ AUTH_USER_MODEL = 'accounts.Account'
 # configuration for SMTP
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'support@repunch.com'
-EMAIL_HOST_PASSWORD = 'REPunch7575'
 EMAIL_USE_TLS = True
+if PRODUCTION_SERVER:
+    EMAIL_HOST_USER = 'support@repunch.com'
+    EMAIL_HOST_PASSWORD = 'REPunch7575'
+else: # TODO replace
+    EMAIL_HOST_USER = 'support@repunch.com'
+    EMAIL_HOST_PASSWORD = 'REPunch7575'
+    
+    
 # for order_placed event
 if DEBUG:
     ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
@@ -59,13 +71,22 @@ else:
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
 else:
-    ABSOLUTE_HOST = 'www.repunch.com'
+    if PRODUCTION_SERVER:
+        ABSOLUTE_HOST = 'www.repunch.com'
+    else:
+        ABSOLUTE_HOST = 'dev.repunch.com'
 
 # PARSE 
 PARSE_VERSION = '1'
-PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
-PARSE_MASTER_KEY = 'K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB'
-REST_API_KEY = "LVlPD43KJK4oGsP5f8ItFCA7RD4fwahTKQYRudod"
+if PRODUCTION_SERVER:
+    PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
+    PARSE_MASTER_KEY = 'K78G9D3mBk3vmSRh90D7T2cv1v41JXrJg0vv2kUB'
+    REST_API_KEY = "LVlPD43KJK4oGsP5f8ItFCA7RD4fwahTKQYRudod"
+else:
+    PARSE_APPLICATION_ID = "r9QrVhpx3wguChA9X9oe2GFGZwTUtrYyHOHpNWxb"
+    PARSE_MASTER_KEY = 'XIiZlcZjzh547FJvWWLlZhrNojXM2PXqA0W9C321'
+    REST_API_KEY = "YXEVHl0zsSdDQi1okzekpOjet4nIvVMDlYr2JdfI"
+    
 PARSE_IMAGE_DIMENSIONS = (200, 200)
 SUPPORTED_IMAGE_FORMATS = ("png", "jpg", "jpeg")
 REST_CONNECTION_META = {
@@ -77,7 +98,7 @@ PARSE_BATCH_LIMIT = 50
 USER_CLASS = "Account"
 
 
-if DEBUG:
+if DEBUG or not PRODUCTION_SERVER:
     # PAYPAL SANDBOX credentials need to use LIVE for the real thing
     # endpoint = api.sandbox.paypal.com
     PAYPAL_CLIENT_ID = "AaRn0BC74DY7UloGyRv8DBt8VmfK2QpDuTqQF_LYVTpejKftwlUCueD3jM7R"
@@ -93,10 +114,11 @@ else:
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
-'repunch.com', 'www.repunch.com', '23.20.15.30']
-# note that the first ec2 host is repunch dev.
-# The second 1 is the real repunch.
+if PRODUCTION_SERVER:
+    ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
+    'repunch.com', 'www.repunch.com', '23.20.15.30']
+else:
+    ALLOWED_HOSTS = ['ec2-204-236-214-138.compute-1.amazonaws.com', 'localhost', 'dev.repunch.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -169,7 +191,10 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '0frrve^tq7+zj%f$#u46iquw)u(&d&kn1#=1cp7ca3fipwd)i2'
+if PRODUCTION_SERVER:
+    SECRET_KEY = '0frrve^tq7+zj%f$#u46iquw)u(&d&kn1#=1cp7ca3fipwd)i2'
+else:
+    SECRET_KEY = '0frrve^tq7+zj%f$#u46iquw)u(&d&kn1#=1cp7ca3fipwd)i2'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -235,12 +260,19 @@ if DEBUG:
     COMET_REQUEST_RECEIVE =\
         "http://localhost:8000/manage/comet/receive/"
 else:
-    COMET_REQUEST_RECEIVE = MAIN_TRANSPORT_PROTOCOL +\
-        '://www.repunch.com/manage/comet/receive/'
+    if PRODUCTION_SERVER:
+        COMET_REQUEST_RECEIVE = MAIN_TRANSPORT_PROTOCOL +\
+            '://www.repunch.com/manage/comet/receive/'
+    else:
+        COMET_REQUEST_RECEIVE = MAIN_TRANSPORT_PROTOCOL +\
+            '://dev.repunch.com/manage/comet/receive/'
 
 # Key used to verify the validity of post request to comet receive
 COMET_RECEIVE_KEY_NAME = "cometrkey"
-COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
+if PRODUCTION_SERVER:
+    COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
+else:
+    COMET_RECEIVE_KEY = "384ncocoacxpvgrwecwy"
 
 # force responding to requests and getting a new request from the
 # client every 4 minutes
