@@ -12,6 +12,7 @@ from parse.utils import make_aware_to_utc
 from parse.apps.employees import DENIED, APPROVED, PENDING
 from parse import session as SESSION
 from parse.comet import comet_receive
+from parse.utils import cloud_call
 from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts.models import Account
