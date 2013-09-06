@@ -133,7 +133,7 @@ function validate(which, next) {
 					        {% endif %}
 					    {% endif %}>
 						<div id="state_e">{{ store_form.state.errors }}</div>
-						<label for="state">State</label>
+						<label for="id_state">State</label>
 						{{ store_form.state }}
 					</div>
 					<div class="floated"
@@ -143,7 +143,7 @@ function validate(which, next) {
 					        {% endif %}
 					    {% endif %}>
 						<div id="zip_e">{{ store_form.zip.errors }}</div>
-						<label for="zip">Zip</label>
+						<label for="id_zip">Zip</label>
 						{{ store_form.zip }}
 					</div>
 					<div class="clear-both"></div>
@@ -259,7 +259,7 @@ function validate(which, next) {
 					<div class="clear-both"></div>
 					<div class="input-container" id="card_number_container">
 						<div id="cc_number_e">{{ subscription_form.cc_number.errors }}</div>
-						<label for="id_card_number" style="clear:left;">Card Number</label>
+						<label for="id_cc_number" style="clear:left;">Card Number</label>
 						{{ subscription_form.cc_number }}
 						<img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
 						<img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
@@ -273,7 +273,7 @@ function validate(which, next) {
 					    style="margin-top:28px;"
 					    {% endif %}>
 					<div id="cc_cvv_e">{{ subscription_form.cc_cvv.errors }}</div>
-					<label for="id_cvc">CVC</label>
+					<label for="id_cc_cvv">CVC</label>
 					{{ subscription_form.cc_cvv }}
 					</div>
 				
