@@ -495,6 +495,8 @@ class ParseObject(object):
                 if 'count' in res:
                     return res['count']
             else:
+                if 'count' in constraints:
+                    return 0
                 return None 
         # date object
         elif attr.startswith("date_"):
