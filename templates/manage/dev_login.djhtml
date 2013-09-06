@@ -12,16 +12,31 @@
 	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
     div#content-frame { width: 300px; }
     div#site-frame { width: 330px; }
-    div#main-content { min-height: 160px; height:180px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
-    div#header-left span { position:relative; left:46px; font: bold italic 0.8em serif; color:#0965ad }
-    input { width: 280px; }
-    input[type=submit]{ width: 296px; margin-top:10px; background-color: #4c8ffb; color: white; }
+    div#main-content { min-height:0px; height:0px; 
+        padding-top:0px; padding-bottom:0px; width:310px;
+        margin-bottom:0px;margin-left:auto; margin-right:auto; }
+    div#header-left span { opacity:0; position:relative; left:46px; font: bold italic 0.8em serif; color:#0965ad }
+    input { width: 286px; }
+    input[type=submit]{ width: 302px; margin-top:10px; background-color: #4c8ffb; color: white; }
     input[type=submit]:hover{ background-color: #427edd; }
-    form div { width: 296px; color: red; font-size:0.8em; text-align:center; margin-top:10px; }
+    form div { width: 302px; color: red; font-size:0.8em; text-align:center; margin-top:10px; }
+    form { opacity:0; }
 	</style>
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
+	<script>
+	$(document).ready(function() {
+	    setTimeout(function() {
+	        $("#main-content").animate({"min-height": 180,
+	            "padding-top": 25, "padding-bottom":75}, 500, function() {
+	                $("form").animate({"opacity": 1}, 500);
+	                $("div#header-left span").animate({"opacity": 1}, 500);
+	            });
+	        
+	    }, 300);
+	});
+	</script>
 	
 </head>
 <body>
