@@ -58,7 +58,7 @@ $(document).ready(function(){
 		
 		<h2>Send New Message</h2>
 		    
-		<label>Send to </label>
+		<label for="id_filter">Send to </label>
         <select id="filter" name="filter">
             {% for filter in filters %}
                 {% if filter.0 == 'all' %}
@@ -95,11 +95,11 @@ $(document).ready(function(){
         </span>
 	
 		<div id="subject_e">{{ form.subject.errors }}</div>
-		<label for="subject">Subject</label>
+		<label for="id_subject">Subject</label>
 		{{ form.subject }}
 		
 		<div id="body_e">{{ form.body.errors }}</div>
-		<label for="body">Body</label>
+		<label for="id_body">Body</label>
 		{{ form.body }}
 		
 		<div id="attach-offer-container">
