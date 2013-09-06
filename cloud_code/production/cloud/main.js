@@ -881,18 +881,18 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	}
 	
 	function executePush() {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("store_id", storeId);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+		iosInstallationQuery.equalTo("store_id", storeId);
+	    iosInstallationQuery.equalTo("deviceType", "ios");
+	    // TODO android push
 	    
 		Parse.Push.send({
-	        where: installationQuery,
+	        where: iosInstallationQuery,
 	        data: {
-	            alert: customerName + " wants to redeem a reward.",
+	            alert: customerName + " wants to redeem a reward",
 				redeem_id: redeemReward.id,
 	            badge: "Increment",
-	            name: customerName,
-	            num_punches: numPunches,
-	            title: rewardTitle,
+	            type: "request_redeem"
 	        }
 	    }, {
 	        success: function() {
@@ -999,6 +999,97 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	});
 	
 });
+
+
+////////////////////////////////////////////////////
+//
+//  Called when removing an approved employee and denying a pending employee.
+//
+//  Deletes the employee object and sends a push to the Installation with the given employee_id.
+//  This will also delete the Parse.User associated with the Employee 
+//  if it does not have a pointer to a Store and a Patron. Otherwise, 
+//  the Employee pointer will just be set to null.
+//
+//  Note that this does not need to post to server because this is only called server side!
+//  Meaning the notification is done within the server.
+// 
+//  Also not that removing the Employee's Parse.User from the Store's ACL is also done server side.
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("delete_employee", function(request, response) 
+{
+    var employeeId = request.params.employee_id;
+    
+    var Employee = Parse.Object.extend("Employee");
+    var employeeQuery = new Parse.Query(Employee);
+    var userQuery = new Parse.Query(Parse.User);
+    
+	var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+	androidInstallationQuery.equalTo("employee_id", employeeId);
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("employee_id", employeeId);
+	iosInstallationQuery.equalTo("deviceType", "ios");
+    
+    employeeQuery.equalTo("objectId", employeeId);
+    userQuery.matchesQuery("Employee", employeeQuery);
+    
+    // Need to use the master key since we are modifying a Parse.User object.
+    Parse.Cloud.useMasterKey(); 
+    
+    userQuery.first().then(function(user) {
+        if (user.get("Store") == null and user.get("Patron") == null) {
+            return user.destroy();
+        } else {
+            user.set("Employee", null);
+            return user.save(); 
+        }
+   
+    }, function(error) {
+        console.log("Failed to retrieve User. Employee has already been deleted.");
+        // Return the error so that the following promises will not be called.
+        return error;
+    
+    }).then(function(user) {
+        console.log("User successfully destroyed/saved.");
+        return employeeQuery.first();
+        
+    }).then(function(employee) {
+        return employee.destroy();
+    
+    }).then(function(employee) {
+        console.log("Employee successfully destroyed.");
+        
+        var promises = [];
+		promises.push( Parse.Push.send({
+	        where: androidInstallationQuery,
+	        data: {
+				action: "com.repunch.intent.EMPLOYEE_DELETE"
+	        }
+	    }) );
+		promises.push( Parse.Push.send({
+	        where: iosInstallationQuery,
+	        data: {
+				type: "employee_delete",
+	        }
+	    }) );
+		
+		return Parse.Promise.when(promises);
+        
+    }).then(function() {
+	    console.log("Android/iOS push successful");
+		response.success("success");
+		
+	}, function(error) {
+    	console.log("Android/iOS push failed");
+		response.error("error");
+		
+	});
+    
+    
+});
+
 
 ////////////////////////////////////////////////////
 //
@@ -1288,7 +1379,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 //  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
 //  Note that this does not need to post to server because this is only called server side!
-//  Meaning the notification is done withing the server.
+//  Meaning the notification is done within the server.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {

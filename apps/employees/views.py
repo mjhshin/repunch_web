@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.db.models import Sum
@@ -61,7 +62,8 @@ def edit(request, employee_id):
     store = SESSION.get_store(request.session)
             
     if not employee or not acc:
-        raise Http404
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee does not exist.'}))
 
     if request.method == "POST":
         post_acl = request.POST["ACL"]
@@ -119,44 +121,37 @@ def delete(request, employee_id):
             break
             
     if not employee:
-        raise Http404
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has already been removed.'}))
 
     employees_approved_list.pop(i_remove)   
     request.session['employees_approved_list'] =\
         employees_approved_list
-        
-    employee.delete()
-    # delete the account associated with the employee if the account
-    # does not have a pointer to a Store and/or a Patron
-    acc = Account.objects().get(Employee=employee.objectId)
-    if not acc.Store and not acc.Patron:
-        acc.delete()
-    else: # just set the Employee pointer to None
-        acc.Employee = None
-        acc.update()
     
+    # Always save session first whenever calling a cloud code
+    request.session.save()
+    
+    cloud_call("delete_employee", {"employee_id": employee.objectId})
+    
+    request.session.clear()
+    request.session.update(SessionStore(request.session.session_key))
+    
+    payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
+    
+    acc = Account.objects().get(Employee=employee.objectId)
     store = SESSION.get_store(request.session)
-    if acc.objectId in store.ACL:
-        del store.ACL[acc.objectId]
-                
-    store.update()
-    request.session['store'] = store
-    # notify other dashboards of this change
-    payload = {
-        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "updatedStore":store.jsonify()
-    }
-    comet_receive(store.objectId, payload)
-    ##########################
-
-    # notify other dashboards of this change
-    store_id = SESSION.get_store(request.session).objectId
-    deleted_employee = Employee(objectId=employee.objectId)
-    payload = {
-        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "deletedEmployee":deleted_employee.jsonify()
-    }
-    comet_receive(store_id, payload)
+    if acc: # employee may have been deleted
+        if acc.objectId in store.ACL:
+            del store.ACL[acc.objectId]
+            store.update()
+            payload["updatedStore"] = store.jsonify()
+            request.session['store'] = store
+        else:
+            # only need to pass in the objectId
+            deleted_employee = Employee(objectId=employee.objectId)
+            payload["deletedEmployee"] = deleted_employee.jsonify()
+            
+        comet_receive(store_id, payload)
     
 
     return redirect(reverse('employees_index')+ "?%s" %\
@@ -176,9 +171,9 @@ def approve(request, employee_id):
             i_remove = ind
             
     if not employee:
-        raise Http404
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has already been approved.'}))
     
-    # TODO do in cloud and send push!
     employee.set('status', APPROVED)
     employee.update()
             
@@ -209,7 +204,7 @@ def approve(request, employee_id):
 @login_required
 @admin_only(reverse_url="employees_index")
 def deny(request, employee_id):
-    """ this actually deletes the employee object! """
+    """ same as delete except this uses the pending list """
     # get from the employees_pending_list in session cache
     employees_pending_list = SESSION.get_employees_pending_list(\
         request.session)
@@ -220,32 +215,38 @@ def deny(request, employee_id):
             i_remove = ind
             
     if not employee:
-        raise Http404
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has already been denied.'}))
     
     # update session cache for employees_pending_list
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
         
-    # delete the employee!
-    employee.delete()  
-    # delete the account associated with the employee if the account
-    # does not have a pointer to a Store and/or a Patron
+    # Always save session first whenever calling a cloud code
+    request.session.save()
+    
+    cloud_call("delete_employee", {"employee_id": employee.objectId})
+    
+    request.session.clear()
+    request.session.update(SessionStore(request.session.session_key))
+    
+    payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
+    
     acc = Account.objects().get(Employee=employee.objectId)
-    if not acc.Store and not acc.Patron:
-        acc.delete()
-    else: # just set the Employee pointer to None
-        acc.Employee = None
-        acc.update()
-        
-    # notify other dashboards of this change
-    store_id = SESSION.get_store(request.session).objectId
-    deleted_employee = Employee(objectId=employee.objectId)
-    payload = {
-        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "deletedEmployee":deleted_employee.jsonify()
-    }
-    comet_receive(store_id, payload)
+    store = SESSION.get_store(request.session)
+    if acc: # employee may have been deleted
+        if acc.objectId in store.ACL:
+            del store.ACL[acc.objectId]
+            store.update()
+            payload["updatedStore"] = store.jsonify()
+            request.session['store'] = store
+        else:
+            # only need to pass in the objectId
+            deleted_employee = Employee(objectId=employee.objectId)
+            payload["deletedEmployee"] = deleted_employee.jsonify()
+            
+        comet_receive(store_id, payload)
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))

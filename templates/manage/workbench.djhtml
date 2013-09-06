@@ -49,7 +49,7 @@
     </div>
     
     <div class="section" style="margin-top:50px;"> {# SECTION #}
-		<h2 style="margin-bottom:10px;">Redemptions</h2>
+		<h2 style="margin-bottom:10px;">Redeem</h2>
 		<div class="tab-container">
 			<div class="tab active" id="tab-pending-redemptions">Pending {% if redcount > 0 %}({{ redcount }}){% endif %}</div>
 			<div class="tab" id="tab-history-redemptions">History</div>
