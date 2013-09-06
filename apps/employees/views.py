@@ -128,15 +128,7 @@ def delete(request, employee_id):
     employees_approved_list.pop(i_remove)   
     request.session['employees_approved_list'] =\
         employees_approved_list
-    
-    # Always save session first whenever calling a cloud code
-    request.session.save()
-    
-    cloud_call("delete_employee", {"employee_id": employee.objectId})
-    
-    request.session.clear()
-    request.session.update(SessionStore(request.session.session_key))
-    
+        
     payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
     
     acc = Account.objects().get(Employee=employee.objectId)
@@ -153,6 +145,15 @@ def delete(request, employee_id):
             payload["deletedEmployee"] = deleted_employee.jsonify()
             
         comet_receive(store_id, payload)
+        
+        
+    # Always save session first whenever calling a cloud code
+    request.session.save()
+    
+    cloud_call("delete_employee", {"employee_id": employee.objectId})
+    
+    request.session.clear()
+    request.session.update(SessionStore(request.session.session_key))
     
 
     return redirect(reverse('employees_index')+ "?%s" %\
@@ -223,14 +224,6 @@ def deny(request, employee_id):
     employees_pending_list.pop(i_remove)
     request.session['employees_pending_list'] =\
         employees_pending_list
-        
-    # Always save session first whenever calling a cloud code
-    request.session.save()
-    
-    cloud_call("delete_employee", {"employee_id": employee.objectId})
-    
-    request.session.clear()
-    request.session.update(SessionStore(request.session.session_key))
     
     payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
     
@@ -248,6 +241,15 @@ def deny(request, employee_id):
             payload["deletedEmployee"] = deleted_employee.jsonify()
             
         comet_receive(store_id, payload)
+        
+        
+    # Always save session first whenever calling a cloud code
+    request.session.save()
+    
+    cloud_call("delete_employee", {"employee_id": employee.objectId})
+    
+    request.session.clear()
+    request.session.update(SessionStore(request.session.session_key))
     
     return redirect(reverse('employees_index')+ "?show_pending&%s" %\
         urllib.urlencode({'success': 'Employee has been denied.'}))
