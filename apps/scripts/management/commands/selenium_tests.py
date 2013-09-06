@@ -46,7 +46,7 @@ class Command(BaseCommand):
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
-        #results.extend(test_employees())
+        results.extend(test_employees())
         #results.extend(test_employee_access()) # TODO FINISH
         
         ### SETTINGS

@@ -89,7 +89,7 @@ def test_employees():
         ("", Keys.RETURN)
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
-    sleep(5) 
+    sleep(7) 
     
     def register_employee(first_name, last_name, username=None, 
         password=None, email=None, retailer_pin=None):
@@ -111,53 +111,6 @@ def test_employees():
             "email": email,
             "retailer_pin": retailer_pin,
         })
-        
-    def approve():
-        """ 
-        Approves the first pending employee on the table.
-        Also returns the employee id.
-        """
-        test.find("#tab-pending-employees").click()
-        approveRow = test.find("#tab-body-pending-employees " +\
-            "div.tr")
-        approveId = approveRow.get_attribute("id")
-        approveRow.find_element_by_css_selector(\
-            "div.td.approve a.approve").click()
-        sleep(1)
-        test.switch_to_alert().accept()
-        sleep(2)
-        return approveId
-        
-    def deny(): 
-        """ 
-        Denies the first pending employee on the table.
-        Also returns the employee id.
-        """
-        test.find("#tab-pending-employees").click()
-        denyRow = test.find("#tab-body-pending-employees " +\
-            "div.tr")
-        denyId = denyRow.get_attribute("id")
-        denyRow.find_element_by_css_selector(\
-            "div.td.approve a.deny").click()
-        sleep(1)
-        test.switch_to_alert().accept()
-        sleep(3)
-        return denyId
-        
-    def remove():
-        """
-        Removes the first approved employee on the table.
-        Also returns the employee id.
-        """
-        test.find("#tab-approved-employees").click()
-        removeRow = test.find("#tab-body-approved-employees " +\
-            "div.tr")
-        removeId = removeRow.get_attribute("id")
-        removeRow.find_element_by_css_selector("div.td.remove a").click()
-        sleep(1)
-        test.switch_to_alert().accept()
-        sleep(3)
-        return removeId
         
     first_name, last_name, username, email =\
     "vandolf1", "estrellado", "xmanvman@xman.com", "xmanvman@xman.com"
@@ -188,7 +141,7 @@ def test_employees():
         sleep(COMET_PULL_RATE*2 + 1) # wait for dashboard to receive
         test.find("#tab-pending-employees").click()
         parts[4]['success'] = test.element_exists(\
-            "#tab-body-pending-employees ")
+            "#tab-body-pending-employees div.tr div.td.approve")
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
@@ -270,7 +223,14 @@ def test_employees():
         register_employee(first_name, last_name, username,
             email=email)
         sleep(COMET_PULL_RATE*2 + 1) # wait for dashboard to receive
-        approve()
+        test.find("#tab-pending-employees").click()
+        approveRow = test.find("#tab-body-pending-employees " +\
+            "div.tr")
+        approveId = approveRow.get_attribute("id")
+        approveRow.find_element_by_css_selector(\
+            "div.td.approve a.approve").click()
+        sleep(1)
+        test.switch_to_alert().accept()
         sleep(2)
         test.find("#tab-approved-employees").click()
         parts[14]['success'] = test.element_exists(\
