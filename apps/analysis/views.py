@@ -154,16 +154,22 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
             male_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
                 {"gender": "male"}, {'createdAt__lte':end_aware,
-                    'createdAt__gte':start_aware})['results']
+                    'createdAt__gte':start_aware})
             female_punches = relational_query(store.objectId, "Store",
                 "Punches", "Punch", "Patron", "Patron", 
                 {"gender": "female"}, {'createdAt__lte':end_aware,
-                    'createdAt__gte':start_aware})['results']
-            # aggregate the punches
-            for p in male_punches:
-                male += p.get('punches')
-            for p in female_punches:
-                female += p.get('punches')
+                    'createdAt__gte':start_aware})
+                    
+            if male_punches:
+                male_punches = male_punches['results']
+                # aggregate the punches
+                for p in male_punches:
+                    male += p.get('punches')
+            
+            if female_punches:
+                female_punches = female_punches['results']
+                for p in female_punches:
+                    female += p.get('punches')
 
             rows = [start.strftime("%m/%d/%Y")+\
                     ' - '+end.strftime("%m/%d/%Y"),
@@ -194,9 +200,10 @@ def breakdown_graph(request, data_type=None, filter=None, range=None):
                     {'date_of_birth__lte':end_dob_aware,
                      'date_of_birth__gte':start_dob_aware},
                     {'createdAt__lte':end_aware, 
-                     'createdAt__gte':start_aware})['results']
+                     'createdAt__gte':start_aware})
                 punch_count = 0
                 if punches: 
+                    punches = punches['results']
                     for punch in punches:
                         punch_count += punch['punches']
                 rows[idx] = punch_count

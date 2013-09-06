@@ -59,12 +59,19 @@ def pointer_query(dst_class, dst_class_where, dst_class_key,
         })
         if 'error' not in res:
             return res['count']
-        return None # shall not be 0
+        # May occur if the class or the relation column does not yet exist
+        return 0
         
-    return parse("GET", "classes" + "/" + dst_class, query={
+    res = parse("GET", "classes" + "/" + dst_class, query={
         "where":json.dumps(where), 
         "limit":limit, "order":order, "skip":skip,
     })
+    
+    if 'error' not in res:
+        return res
+        
+    # May occur if the class or the relation column does not yet exist
+    return None
 
 def relational_query(src_id, src_class, src_key, dst_class,
         dst_class_key, dst_class_key_class, dst_class_key_where,
@@ -123,12 +130,20 @@ def relational_query(src_id, src_class, src_key, dst_class,
         })
         if 'error' not in res:
             return res['count']
-        return None # shall not be 0
+        # May occur if the class or the relation column does not yet exist
+        return 0
         
-    return parse("GET", "classes" + "/" + dst_class, query={
+    res = parse("GET", "classes" + "/" + dst_class, query={
         "where":json.dumps(where), 
         "limit":limit, "order":order, "skip":skip,
     })
+    
+    
+    if 'error' not in res:
+        return res
+        
+    # May occur if the class or the relation column does not yet exist
+    return None
 
 
 

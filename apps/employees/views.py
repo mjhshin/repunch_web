@@ -178,6 +178,7 @@ def approve(request, employee_id):
     if not employee:
         raise Http404
     
+    # TODO do in cloud and send push!
     employee.set('status', APPROVED)
     employee.update()
             
