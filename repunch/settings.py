@@ -59,9 +59,9 @@ EMAIL_USE_TLS = True
 if PRODUCTION_SERVER:
     EMAIL_HOST_USER = 'support@repunch.com'
     EMAIL_HOST_PASSWORD = 'REPunch7575'
-else: # TODO replace
-    EMAIL_HOST_USER = 'support@repunch.com'
-    EMAIL_HOST_PASSWORD = 'REPunch7575'
+else:
+    EMAIL_HOST_USER = 'repunchdev@gmail.com'
+    EMAIL_HOST_PASSWORD = 'q3vnq985v7y34'
     
     
 # for order_placed event
