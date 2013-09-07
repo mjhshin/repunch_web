@@ -2,35 +2,6 @@
 /**
     Binds on click events to each componenet of each row in the tables.
 **/
-function rebindEmployees() {
-	$('.remove img').click(function(event){
-		
-		return confirm("Are you sure you want to remove this employee?");
-	});
-	
-	$('a.employee.approve').click(function(event){
-		
-		return confirm("Approve employee?");
-	});
-	
-	$('a.employee.deny').click(function(event){
-		
-		return confirm("Deny employee?");
-	});
-	
-	$("[name='employee-graph-cb']").click(function(){
-		updateChart();
-	});
-	
-	//tie date selectors to chart
-	$( "#graph-dates > input" ).datepicker({ autoSize: true, onSelect: function(dateText, inst){
-		updateChart();
-	} });
-}
-
-$(document).ready(function(){
-	rebindEmployees();
-});
 
 var chart = null;
 function updateChart()
@@ -103,3 +74,40 @@ function updateChart()
     });
 
 }
+
+
+
+function confirmRemove() {
+	return confirm("Are you sure you want to remove this employee?");
+};
+
+function confirmApprove() {
+	return confirm("Approve employee?");
+};
+
+function confirmDeny() {
+	return confirm("Deny employee?");
+};
+
+function rebindEmployees() {
+	$('.remove img').unbind("click", confirmRemove);
+	$('.remove img').bind("click", confirmRemove);
+	
+	$('a.employee.approve').unbind("click", confirmApprove);
+	$('a.employee.approve').bind("click", confirmApprove);
+	
+	$('a.employee.deny').unbind("click", confirmDeny);
+	$('a.employee.deny').bind("click", confirmDeny);
+	
+	$("[name='employee-graph-cb']").unbind("click", updateChart);
+	$("[name='employee-graph-cb']").bind("click", updateChart);
+	
+}
+
+$(document).ready(function(){
+	rebindEmployees();
+	//tie date selectors to chart
+	$( "#graph-dates > input" ).datepicker({ autoSize: true, onSelect: function(dateText, inst){
+		updateChart();
+	} });
+});
