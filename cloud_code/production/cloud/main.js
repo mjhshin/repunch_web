@@ -1005,24 +1005,33 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 //
 //  Called when removing an approved employee and denying a pending employee.
 //
+//  Params: 
+//      employee_id: Employee object's objectId
+//
 //  Deletes the employee object and sends a push to the Installation with the given employee_id.
 //  This will also delete the Parse.User associated with the Employee 
 //  if it does not have a pointer to a Store and a Patron. Otherwise, 
 //  the Employee pointer will just be set to null.
 //
+//  A push is made if the Employee status is "approved".
+//
 //  Note that this does not need to post to server because this is only called server side!
-//  Meaning the notification is done within the server.
-// 
-//  Also not that removing the Employee's Parse.User from the Store's ACL is also done server side.
+//  Meaning the notification is done within the server. 
+//  Also removing the Employee's Parse.User from the Store's ACL is also done server side.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("delete_employee", function(request, response) 
 {
     var employeeId = request.params.employee_id;
+    var action = request.params.action;
+    
+    var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
     
     var Employee = Parse.Object.extend("Employee");
     var employeeQuery = new Parse.Query(Employee);
     var userQuery = new Parse.Query(Parse.User);
+    
+    var employeeIsApproved;
     
 	var androidInstallationQuery = new Parse.Query(Parse.Installation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
@@ -1032,58 +1041,71 @@ Parse.Cloud.define("delete_employee", function(request, response)
 	iosInstallationQuery.equalTo("employee_id", employeeId);
 	iosInstallationQuery.equalTo("deviceType", "ios");
     
-    employeeQuery.equalTo("objectId", employeeId);
+    employeeQuery.equalTo("objectId", employeeId); 
     userQuery.matchesQuery("Employee", employeeQuery);
     
     // Need to use the master key since we are modifying a Parse.User object.
     Parse.Cloud.useMasterKey(); 
     
-    userQuery.first().then(function(user) {
+    employeeQuery.first().then(function(employee) 
+    {
+        // It will actually go here (not error) even if the employee does not exist!
+        // Note the difference between Parse.Query.get and .first/.find
+        // first() just returns find()[0], which may be null =)
+        if (employee == null) {
+            console.log("Failed to retrieve Employee.");
+            // Return a Parse error so that the following promises will not be called.
+            return Parse.Promise.error(EMPLOYEE_NOT_FOUND);
+        }
+        
+        employeeIsApproved = employee.get("status") == "approved"
+        return employee.destroy();
+   
+    }).then(function(employee) {
+        console.log("Employee successfully destroyed.");
+        return userQuery.first();
+        
+    }).then(function(user) {
         if (user.get("Store") == null && user.get("Patron") == null) {
             return user.destroy();
         } else {
             user.set("Employee", null);
             return user.save(); 
         }
-   
-    }, function(error) {
-        console.log("Failed to retrieve User. Employee has already been deleted.");
-        // Return the error so that the following promises will not be called.
-        return error;
     
     }).then(function(user) {
         console.log("User successfully destroyed/saved.");
-        return employeeQuery.first();
         
-    }).then(function(employee) {
-        return employee.destroy();
-    
-    }).then(function(employee) {
-        console.log("Employee successfully destroyed.");
-        
-        var promises = [];
-		promises.push( Parse.Push.send({
-	        where: androidInstallationQuery,
-	        data: {
-				action: "com.repunch.intent.EMPLOYEE_DELETE"
-	        }
-	    }) );
-		promises.push( Parse.Push.send({
-	        where: iosInstallationQuery,
-	        data: {
-				type: "employee_delete",
-	        }
-	    }) );
+        if (employeeIsApproved) {
+            var promises = [];
+		    promises.push( Parse.Push.send({
+	            where: androidInstallationQuery,
+	            data: {
+				    action: "com.repunch.intent.EMPLOYEE_DELETE"
+	            }
+	        }) );
+		    promises.push( Parse.Push.send({
+	            where: iosInstallationQuery,
+	            data: {
+				    type: "employee_delete",
+	            }
+	        }) );
 		
-		return Parse.Promise.when(promises);
+		    return Parse.Promise.when(promises);
+		}
         
     }).then(function() {
 	    console.log("Android/iOS push successful");
 		response.success("success");
 		
 	}, function(error) {
-    	console.log("Android/iOS push failed");
-		response.error("error");
+	    if (error == EMPLOYEE_NOT_FOUND) {
+            console.log("Employee has already been deleted.");
+        } else {
+    	    console.log("Android/iOS push failed");
+        }
+        
+		response.error(error);
 		
 	});
     
