@@ -176,6 +176,7 @@ def approve(request, employee_id):
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
+            break
             
     if not employee:
         return redirect(reverse('employees_index')+ "?%s" %\
@@ -220,6 +221,7 @@ def deny(request, employee_id):
         if m.objectId == employee_id:
             employee = m
             i_remove = ind
+            break
             
     if not employee:
         return redirect(reverse('employees_index')+ "?%s" %\
