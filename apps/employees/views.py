@@ -129,6 +129,11 @@ def delete(request, employee_id):
     request.session['employees_approved_list'] =\
         employees_approved_list
         
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc: # employee may have been deleted
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has already been deleted.'}))
+        
     # Always save session first whenever calling a cloud code
     request.session.save()
     
@@ -138,24 +143,22 @@ def delete(request, employee_id):
     request.session.update(SessionStore(request.session.session_key))
     
     if 'error' not in res:
-        acc = Account.objects().get(Employee=employee.objectId)
         store = SESSION.get_store(request.session)
         payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
-        if acc: # employee may have been deleted
-            if acc.objectId in store.ACL:
-                del store.ACL[acc.objectId]
-                store.update()
-                payload["updatedStore"] = store.jsonify()
-                request.session['store'] = store
-            else:
-                # only need to pass in the objectId
-                deleted_employee = Employee(objectId=employee.objectId)
-                payload["deletedEmployee"] = deleted_employee.jsonify()
-                
-            comet_receive(store.objectId, payload)
+        if acc.objectId in store.ACL:
+            del store.ACL[acc.objectId]
+            store.update()
+            payload["updatedStore"] = store.jsonify()
+            request.session['store'] = store
+            
+        # only need to pass in the objectId
+        deleted_employee = Employee(objectId=employee.objectId)
+        payload["deletedEmployee"] = deleted_employee.jsonify()
+            
+        comet_receive(store.objectId, payload)
 
-            return redirect(reverse('employees_index')+ "?%s" %\
-                urllib.urlencode({'success': 'Employee has been deleted.'}))
+        return redirect(reverse('employees_index')+ "?%s" %\
+            urllib.urlencode({'success': 'Employee has been deleted.'}))
                 
     return redirect(reverse('employees_index')+ "?%s" %\
         urllib.urlencode({'success': 'Employee has already been deleted.'}))
@@ -227,6 +230,12 @@ def deny(request, employee_id):
     request.session['employees_pending_list'] =\
         employees_pending_list
         
+        
+    acc = Account.objects().get(Employee=employee.objectId)
+    if not acc: # employee may have been deleted
+        return redirect(reverse('employees_index')+ "?show_pending&%s" %\
+            urllib.urlencode({'success': 'Employee has already been denied.'}))
+        
     # Always save session first whenever calling a cloud code
     request.session.save()
     
@@ -236,27 +245,25 @@ def deny(request, employee_id):
     request.session.update(SessionStore(request.session.session_key))
     
     if 'error' not in res:
-        acc = Account.objects().get(Employee=employee.objectId)
         payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
         store = SESSION.get_store(request.session)
-        if acc: # employee may have been deleted
-            if acc.objectId in store.ACL:
-                del store.ACL[acc.objectId]
-                store.update()
-                payload["updatedStore"] = store.jsonify()
-                request.session['store'] = store
-            else:
-                # only need to pass in the objectId
-                deleted_employee = Employee(objectId=employee.objectId)
-                payload["deletedEmployee"] = deleted_employee.jsonify()
+        if acc.objectId in store.ACL:
+            del store.ACL[acc.objectId]
+            store.update()
+            payload["updatedStore"] = store.jsonify()
+            request.session['store'] = store
+            
+        # only need to pass in the objectId
+        deleted_employee = Employee(objectId=employee.objectId)
+        payload["deletedEmployee"] = deleted_employee.jsonify()
+            
+        comet_receive(store.objectId, payload)
+    
+        return redirect(reverse('employees_index')+ "?show_pending&%s" %\
+            urllib.urlencode({'success': 'Employee has been denied.'}))
                 
-            comet_receive(store.objectId, payload)
-        
-            return redirect(reverse('employees_index')+ "?show_pending&%s" %\
-                urllib.urlencode({'success': 'Employee has been denied.'}))
-                
-    return redirect(reverse('employees_index')+ "?show_pending&%s" %\
-        urllib.urlencode({'success': 'Employee has already been denied.'}))
+    return redirect(reverse('employees_index')+ "?%s" %\
+        urllib.urlencode({'success': 'Employee has already been deleted.'}))
 
 @dev_login_required
 @login_required

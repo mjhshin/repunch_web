@@ -1029,9 +1029,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
     
     var Employee = Parse.Object.extend("Employee");
     var employeeQuery = new Parse.Query(Employee);
-    var userQuery = new Parse.Query(Parse.User);
-    
-    var employeeIsApproved;
+    var userQuery = new Parse.Query(Parse.User)
     
 	var androidInstallationQuery = new Parse.Query(Parse.Installation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
@@ -1047,36 +1045,39 @@ Parse.Cloud.define("delete_employee", function(request, response)
     // Need to use the master key since we are modifying a Parse.User object.
     Parse.Cloud.useMasterKey(); 
     
-    employeeQuery.first().then(function(employee) 
+    // Note that we must first retrive the user since deleting the employee
+    // will make the userQuery return nothing.
+    
+    userQuery.first().then(function(user) 
     {
         // It will actually go here (not error) even if the employee does not exist!
         // Note the difference between Parse.Query.get and .first/.find
         // first() just returns find()[0], which may be null =)
-        if (employee == null) {
-            console.log("Failed to retrieve Employee.");
+        if (user == null) {
+            console.log("Failed to retrieve User.");
             // Return a Parse error so that the following promises will not be called.
             return Parse.Promise.error(EMPLOYEE_NOT_FOUND);
         }
         
-        employeeIsApproved = employee.get("status") == "approved"
-        return employee.destroy();
-   
-    }).then(function(employee) {
-        console.log("Employee successfully destroyed.");
-        return userQuery.first();
-        
-    }).then(function(user) {
         if (user.get("Store") == null && user.get("Patron") == null) {
+            console.log("User's Store and Patron pointers are null. Destroying User.");
             return user.destroy();
         } else {
             user.set("Employee", null);
             return user.save(); 
         }
-    
+        
     }).then(function(user) {
         console.log("User successfully destroyed/saved.");
+        return employeeQuery.first();
         
-        if (employeeIsApproved) {
+    }).then(function(employee) {
+        return employee.destroy();
+    
+    }).then(function(employee) {
+        console.log("Employee successfully destroyed.");
+        
+        if (employee.get("status") == "approved") {
             var promises = [];
 		    promises.push( Parse.Push.send({
 	            where: androidInstallationQuery,
