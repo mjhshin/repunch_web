@@ -180,7 +180,7 @@ def approve(request, employee_id):
             
     if not employee:
         return redirect(reverse('employees_index')+ "?%s" %\
-            urllib.urlencode({'success': 'Employee has already been approved.'}))
+            urllib.urlencode({'success': 'Pending employee not found.'}))
     
     employee.set('status', APPROVED)
     employee.update()
@@ -225,7 +225,7 @@ def deny(request, employee_id):
             
     if not employee:
         return redirect(reverse('employees_index')+ "?%s" %\
-            urllib.urlencode({'success': 'Employee has already been denied.'}))
+            urllib.urlencode({'success': 'Pending employee not found.'}))
     
     # update session cache for employees_pending_list
     employees_pending_list.pop(i_remove)
