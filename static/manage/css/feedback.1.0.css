@@ -13,7 +13,7 @@
 
 a.breadcrumb {
 	display: block;
-	font-size: 11px;
+	font: normal 11px 'Cabin', sans-serif;
 	text-decoration: none;
 	margin-bottom: 20px;
 }
@@ -33,15 +33,13 @@ div.white-box div.sect.yellow {
 }
 div.white-box div.sect label {
 	float: left;
-	font-weight: normal;
 	margin: 0px;
 	display: block;
-	font-size: 12px;
+	font: normal 13px/24px 'Cabin', sans-serif;
 	margin-right: 5px;
 }
 div.white-box div.sect span {
-	font-weight: bold;
-	font-size: 12px;
+	font: bold 12px/24px 'Cabin', sans-serif;
 	display: block;
 	float: left;
 	margin-right: 10px;

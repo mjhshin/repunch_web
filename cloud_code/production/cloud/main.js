@@ -369,6 +369,8 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 		console.log("PatronStore/Store/Patron fetch success (in parallel).");
 		patronStore = patronStoreResult;
 		
+		// this shouldn't be necessary since deleting the patronStore
+		// will automatically remove it from all relations
 		store.relation("PatronStores").remove(patronStore);
 		patron.relation("PatronStores").remove(patronStore);
 		

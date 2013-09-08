@@ -122,7 +122,7 @@ $(document).ready(function() {
         {% with type=tmp|get_sub_type %}
 		<div class="section-title">
 			Current Subscription: 
-			<span style="font-weight:bold;">
+			<span class="bold">
 				{{ type.name }}
 			</span>
 		</div>

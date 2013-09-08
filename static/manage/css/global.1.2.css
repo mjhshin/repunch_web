@@ -9,9 +9,8 @@ body{
 
 h2{
 	margin:0;
-	color:#666;
-	font-size:24px;
-	font-weight:normal;
+	color:#0965ad;
+	font: normal 24px 'Cabin', sans-serif;
 }
 
 img{
@@ -22,8 +21,7 @@ p{ margin: 6px 0; }
 
 label{
 	display:block;
-	font-weight:bold;
-	font-size:14px;
+	font: bold 14px 'Cabin', sans-serif;
 	color:#666;
 	margin: 15px 0 10px;
 }
@@ -84,9 +82,10 @@ a.button{
 }
 
 a.button.blue{
-	background: #2359A1 url('../images/bkg_button-blue.png') repeat-x top left;
+	background: #0965ad url('../images/bkg_button-blue.png') repeat-x top left;
 	border:1px solid #163C61;
 	border-width:1px 1px 3px 1px;
+	font: bold 14px/38px 'Cabin', sans-serif;
 }
 
 a.button.gray{
@@ -96,7 +95,7 @@ a.button.gray{
 }
 
 a.red{
-	font-size:12px;
+	font: 14px 'Cabin', sans-serif;
 	color:#900;
 	text-decoration:none;
 }
@@ -161,14 +160,13 @@ img.avatar-big{
 }
 
 span#account-name{
-	font-size:12px;
-	font-weight:bold;
+	font: bold 14px 'Cabin', sans-serif;
 	margin:0 20px 0 4px;
 	color:#666;
 }
 
 a#link-logout{
-	font-size:12px;
+	font: normal 14px 'Cabin', sans-serif;
 	color:#666;
 }
 
@@ -197,6 +195,20 @@ div.nav-item a{
 	padding:0 15px;
 	display:block;
 	text-decoration:none;
+}
+
+div.nav-item a span{
+    color: #efefef;
+	font: normal 16px 'Cabin', sans-serif;
+}
+
+div.nav-item.active a span{
+    color: #fff;
+}
+
+div.nav-item a img{
+    margin-right:10px;
+    margin-left:2px;
 }
 
 div.nav-item a:hover{
@@ -229,10 +241,9 @@ div#main-content{
 div.notification div{
 	background-color: #FFFFCB;
 	border:1px solid #F9B64D;
-	font-weight:bold;
+	font: bold 14px 'Cabin', sans-serif;
 	padding: 15px;
 	color:#666;
-	font-size:14px;
 	margin-bottom:30px;
 }
 
@@ -251,7 +262,7 @@ div.section{
 div.section.first { margin-top: 0px; }
 
 div.section-title{
-	font-size:16px;
+	font: bold 16px 'Cabin', sans-serif;
 	color:#666;
 	margin-bottom:10px;
 }
@@ -312,6 +323,7 @@ div.white-box.table{
 }
 
 .th{
+	font: normal 14px/32px 'Cabin', sans-serif;
 	float:left;
 	padding-right:10px;
 	cursor:pointer;
@@ -361,12 +373,10 @@ div.white-box.table{
 .tab{
 	width:144px;
 	height: 30px;
-	line-height:30px;
+	font: bold 15px/30px 'Cabin', sans-serif;
 	text-align:center;
 	border-radius: 4px 4px 0 0;
 	background-color:white;
-	font-weight:bold;
-	font-size:15px;
 	float:left;
 	border:1px solid #CCC;
 	border-width:1px 1px 0;

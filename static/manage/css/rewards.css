@@ -51,6 +51,7 @@
 
 #header-reward_punches,
 #header-reward_summary {
+    position:relative; left:-8px;
     cursor: pointer;
 }
 

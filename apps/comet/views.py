@@ -303,6 +303,10 @@ def pull(request):
         except (IOError, socket.error) as e: # broken pipe/socket. 
             thread.exit() # exit silently
             
+            
+    ##################################################################
+    ##### ENTRY POINT
+    ######################################################
     # get the timestamp and uid
     t = parser.parse(request.GET["timestamp"])
     timestamp = str(t.hour).zfill(2) + ":" +\

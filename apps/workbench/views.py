@@ -244,18 +244,6 @@ def redeem(request):
                     redemptions_past.append(redemption)
                     session['redemptions_past'] =\
                         redemptions_past
-                    
-                    if DEBUG:
-                        # necessary when testing notifications server
-                        # to server when in debug mode since i_remove 
-                        store_id =\
-                            SESSION.get_store(session).objectId
-                        payload = {
-                            COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY, 
-                            "approvedRedemption":redemption.jsonify()
-                        }
-                        comet_receive(store_id, payload)
-                   
                       
                 # session changed only if i_remove was not 1
                 if i_remove != -1: 
@@ -284,14 +272,6 @@ def redeem(request):
                     del_red = redemptions_pending.pop(i_remove)
                     session['redemptions_pending'] =\
                         redemptions_pending
-                    if DEBUG:
-                        store_id =\
-                            SESSION.get_store(session).objectId
-                        payload = {
-                            COMET_RECEIVE_KEY_NAME:COMET_RECEIVE_KEY,
-                            "deletedRedemption":del_red.jsonify()
-                        }
-                        comet_receive(store_id, payload)
                
                 request.session.clear()
                 request.session.update(session)

@@ -254,8 +254,8 @@ def test_employees():
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
-    ##########  Clicking on the approved employee row " +\
-        "redirects user to employee edit page "
+    ##########  Clicking on the approved employee row 
+    ###         redirects user to employee edit page 
     try:
         test.find("#tab-approved-employees").click()
         test.find("#tab-body-approved-employees div#%s a" %\
@@ -308,8 +308,8 @@ def test_employees():
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-    ##########  Multiple employees (4) registering at once " +\
-        "shows up in dashboard"
+    ##########  Multiple employees (4) registering at once
+    ###         shows up in dashboard"
     try:
         for i in range(4):
             register_employee(first_name + str(i), last_name + str(i))

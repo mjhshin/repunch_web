@@ -20,6 +20,9 @@
 	<link href="{% static 'manage/css/global.1.2.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
+	    
+    <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' 
+        rel='stylesheet' type='text/css'>
 	
 	{% block styles %}{% endblock %}
 	
