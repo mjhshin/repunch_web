@@ -17,8 +17,10 @@ class SeleniumTest(object):
     not localhost because things that depend on the cloud code pushing
     notifications are not tested for localhost.
     """
-    SERVER_URL = "https://www.repunch.com"
-    #SERVER_URL = "http://localhost:8000"
+    
+    #SERVER_URL = "https://www.repunch.com"
+    #SERVER_URL = "http://dev.repunch.com"
+    SERVER_URL = "http://localhost:8000"
     
     IMPLICITLY_WAIT = 10
     

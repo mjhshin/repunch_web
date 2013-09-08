@@ -5,7 +5,7 @@
 
 {% block title %}{% if redcount > 0 %}({{ redcount }}){% endif %} Workbench{% endblock %}
 {% block styles %}	
-<link href="{% static "manage/css/workbench.css" %}" rel="stylesheet" />
+<link href="{% static "manage/css/workbench.1.0.css" %}" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
 {% endblock %}
 {% block javascript %}

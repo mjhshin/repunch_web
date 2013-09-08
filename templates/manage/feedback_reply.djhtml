@@ -4,7 +4,7 @@
 {# NOTE only accounts with full admin access may access this page!!! #}
 
 {% block title %}Feedback Reply{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.0.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.1.css" %}" />{% endblock %}
 {% block javascript %}
 <script>
 $(document).ready(function(){

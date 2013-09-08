@@ -2,7 +2,7 @@
 {% load static %}{% load parse_tags %}{% load text_tags %}{% load account_tags %}
 
 {% block title %}Rewards{% endblock %}
-{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/rewards.css" %}" />{% endblock %}
+{% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/rewards.1.0.css" %}" />{% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
 {% endblock %}
