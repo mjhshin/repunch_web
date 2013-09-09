@@ -74,13 +74,12 @@ a.button.orange{
 #header-content div {
 	width:960px;
 	margin:0 auto;	
-	overflow:hidden;
 }
 
 #header-logo {
 	float:left;
 	display:block;
-	margin:26px 0 19px 6px;
+	margin:20px 0 19px 0px;
 }
 
 #header-menu {
@@ -93,7 +92,7 @@ a.button.orange{
 	/** color:#696969; **/
 	display:inline-block;
 	letter-spacing:0.7px;
-	padding:34px 7px 0;
+	padding:30px 7px 0;
 	margin-right:24px;
 }
 
@@ -111,7 +110,7 @@ a.button.orange{
 	line-height:24px;
 	background:#0965ad;
 	text-decoration:none;
-	margin:31px 24px 0 35px;
+	margin:26px 0px 0 35px;
 	border:2px blue groove;
 	border-bottom-width:2px;
 }
