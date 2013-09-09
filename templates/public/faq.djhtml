@@ -164,14 +164,6 @@ jQuery(document).ready(function() {
 				</div>				
 				<div id="accordion-wrapper">
 					<div class="accordionButton">
-						<h3>How will retailers be charged for the service?</h3>
-					</div>
-					<div class="accordionContent">
-					<p>When first signing up for Repunch, you will be asked to input some basic credit card information that will be charged on a monthly billing cycle. Again, we will not charge you anything until you have a significant number of customers using Repunch at your business.</p>
-					</div>
-				</div>				
-				<div id="accordion-wrapper">
-					<div class="accordionButton">
 						<h3>Will retailers be offered support?</h3>
 					</div>
 					<div class="accordionContent">

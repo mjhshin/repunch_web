@@ -82,16 +82,25 @@ a.button{
 }
 
 a.button.blue{
-	background: #0965ad url('../images/bkg_button-blue.png') repeat-x top left;
+	background: #0965ad;
 	border:1px solid #163C61;
-	border-width:1px 1px 3px 1px;
+	border-width:1px 1px 2px 1px;
 	font: bold 14px/38px 'Cabin', sans-serif;
+}
+
+a.button.blue:hover {
+    background-image: -ms-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -moz-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -o-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3665FF), color-stop(1, #0965AD));
+    background-image: -webkit-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: linear-gradient(to bottom, #3665FF 0%, #0965AD 100%);
 }
 
 a.button.gray{
 	background: transparent url('../images/bkg_button-gray.png') repeat-x top left;
 	border:1px solid #666;
-	border-width:1px 1px 3px 1px;
+	border-width:1px 1px 2px 1px;
 }
 
 a.red{

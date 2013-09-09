@@ -16,6 +16,7 @@ a.button{
 	color:white;
 	height:38px;
 	padding:0 30px;
+	padding-right: 32px;
 	font-size:12px;
 	font-weight:bold;
 	line-height:38px;
@@ -130,7 +131,12 @@ a.button.orange{
 }
 
 #header-signin-btn:hover, #header-dashboard-btn:hover {
-    background: blue;
+    background-image: -ms-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -moz-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -o-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3665FF), color-stop(1, #0965AD));
+    background-image: -webkit-linear-gradient(top, #3665FF 0%, #0965AD 100%);
+    background-image: linear-gradient(to bottom, #3665FF 0%, #0965AD 100%);
 }
 
 
@@ -663,7 +669,7 @@ a.button.orange{
 	height:28px;
 	color:#646464;
 	padding-left:5px;
-	line-height:28px;
+	line-height:16px;
 	margin-bottom:23px;
 	border:1px #CFCFCF solid;
 	
@@ -680,7 +686,7 @@ a.button.orange{
 }
 
 #make-question-form .button.orange{
-	width:31px;
+	width:31px; 
 	margin:0 auto;
 	display:block;
 }
@@ -769,7 +775,7 @@ a.button.orange{
 	height:28px;
 	color:#646464;
 	padding-left:5px;
-	line-height:28px;
+	line-height:16px;
 	margin-bottom:23px;
 	border:1px #CFCFCF solid;
 	background:#f2f2f2;
@@ -910,7 +916,7 @@ float: right;
 }
 
 #signup-content-div {
-    width: 770px;
+    width: 780px;
     padding-left:0px;
     margin: 0 auto;
 	border-left:1px dashed #CDCDCD;
@@ -977,7 +983,7 @@ float: right;
 #signup-steps-box .step-box .step-des{
 	display:block;
 	padding:25px 17px 40px;
-	}
+}
 
 #signup-content .col1 h2{
 	color:#0965ad;
@@ -1225,6 +1231,7 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 	margin:0 13px;
 	font: normal 13px 'Cabin', sans-serif;
 	display:inline-block;
+	cursor: default;
 }
 
 /************************************ Accordion CSS */

@@ -7,7 +7,7 @@ import os
 # PRODUCTION_SERVER = True
 
 # Set this to True to DISABLE Django user authentication
-PRODUCTION_SERVER = False
+PRODUCTION_SERVER = True
 DEVELOPMENT_TOKEN = "dev_token"
 
 # SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!

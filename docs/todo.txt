@@ -5,6 +5,3 @@
     - parse.auth.__init__
     - apps.comet.views
     - apps.messages.views - edit()
-    
-    
-2. Research django gmail smtp limit
