@@ -4,7 +4,7 @@
 {% block title %}About Us{% endblock %}
 
 {% block styles %}
-<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
@@ -30,7 +30,7 @@
 			<aside class="col1">
 				<h3 class="content-header">Repunch is changing the nature of consumer loyalty.</h3>
 				<h4 class="content-header"> More broadly, we are altering the way businesses and their customers interact.<br/>We'll be on our way to achieving our goal when you know your Punch Code better than your birthday <br/>(or at least as well as your brother's birthday)!</h4>
-				<img id="team-photo" src="{% static "public/images/team-photo.png" %}" alt="">
+				<img id="team-photo" src="{% static "public/images/team-photo.1.0.png" %}" alt="">
 			</aside>
 			<aside class="col2">
 				

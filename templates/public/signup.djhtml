@@ -5,7 +5,7 @@
 
 {% block styles %}
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
-<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 <style>select { margin-top:2px; }</style>
 {% endblock %}
