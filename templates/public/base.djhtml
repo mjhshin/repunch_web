@@ -14,8 +14,8 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/global.1.8.g.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/login.1.1.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/global.1.9.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/login.1.2.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
 	
@@ -33,7 +33,7 @@
 		<div id="header-content">
 		    <div>
 		    
-			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white-blue-border.png" %}" alt="Repunch"></a>
+			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white.png" %}" alt="Repunch"></a>
 			{% if request.session.account %}
 			<a id="header-dashboard-btn"  href="{% url 'store_index' %}" style="cursor: pointer;">Dashboard</a>
 			{% else %}
