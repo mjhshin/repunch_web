@@ -17,10 +17,10 @@
 
 .ui-widget-header.ui-dialog-titlebar {
 	background: url("../images/bkg_header.png") repeat-x scroll left bottom white;
-	color: #555; 
+	color: #0965ad; 
     border-bottom: 1px solid #CCCCCC;
     height: 25px;
-	font: bold 16px/25px 'Cabin', sans-serif;
+	font: bold 18px/25px 'Cabin', sans-serif;
     padding: 0 15px;
 }
 
@@ -29,7 +29,7 @@
 #dialog-login-form label{
 	display:block;
 	font:bold 14px 'Cabin', sans-serif;
-	color:#666;
+	color:#0965ad;
 	margin: 15px 0 10px;
 }
 
