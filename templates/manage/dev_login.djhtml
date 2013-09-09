@@ -25,7 +25,7 @@
     }
     div#header-left span { 
         opacity:0; 
-        position:relative; left:46px; 
+        position:relative; left:50px; 
         font: bold italic 0.8em 'Cabin', sans-serif; 
         color:#0965ad 
     }

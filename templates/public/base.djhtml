@@ -31,7 +31,9 @@
 <body>
 	<header id="header-wrapper">
 		<div id="header-content">
-			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header.png" %}" alt="Repunch"></a>
+		    <div>
+		    
+			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white-blue-border.png" %}" alt="Repunch"></a>
 			{% if request.session.account %}
 			<a id="header-dashboard-btn"  href="{% url 'store_index' %}" style="cursor: pointer;">Dashboard</a>
 			{% else %}
@@ -43,6 +45,8 @@
 				<a class="menuitem {% if faq_nav %}active{% endif %}" href="{% url 'public_faq' %}">FAQ</a>
 				<a class="menuitem {% if about_nav %}active{% endif %}" href="{% url 'public_about' %}">About</a>
 			</nav>
+			
+			</div>
 		</div>
 	</header>
 	{% block pageblock %}{% endblock %}
