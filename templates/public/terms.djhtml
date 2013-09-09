@@ -5,7 +5,25 @@
 
 {% block styles %}
 <style>
-#about-content p {
+#page-content {
+    height:6250px;
+    background:white;
+	box-shadow:0px 0px 10px 0px #555;
+	-o-box-shadow:0px 0px 10px 0px #555;
+	-ms-box-shadow:0px 0px 10px 0px #555;
+	-moz-box-shadow:0px 0px 10px 0px #555;
+	-webkit-box-shadow:0px 0px 10px 0px #555;
+}
+
+#about-content div.col1 {
+    font-size:1.0em;
+    position:relative;left:150px;
+    width:600px;
+    border-left:1px solid gray;
+    margin-top:40px;
+}
+
+#about-content div.col1 p {
     font-size:1.0em;
 }
 
@@ -20,9 +38,9 @@ h3 {
     <div class="page-title-container">
     <h1 class="page-title">Terms &amp; Conditions</h1>
     </div>
-	<div id="page-content" style="height:6250px;">
+	<div id="page-content">
 		<div id="about-content">
-			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
+			<div class="col1" >
 			
 <h3>VENDOR AGREEMENT</h3><p>
 This Vendor Agreement is effective as of the date upon which your Repunch account is
