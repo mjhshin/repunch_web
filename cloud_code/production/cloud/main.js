@@ -1178,7 +1178,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		if(redeemReward.get("is_redeemed") == true) {
 			console.log("RedeemReward has already been validated");
-			response.success("validated");
+			response.success({ code:"validated", result: redeemReward });
 			
 		} else if(isOfferOrGift) {
 			console.log("RedeemReward's reward_id is null, this is an offer/gift");
@@ -1197,7 +1197,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			patronStore.save().then(function()
 			{
 			    console.log("PatronStore save success");
-				response.success("insufficient");
+			    
+			    redeemReward.destroy().then(function() {
+				    response.success({ code:"insufficient", result: redeemReward });
+			    });
 			}, function(error) {
 			    console.log("PatronStore save fail");
 			    response.error("error");
@@ -1236,7 +1239,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			
 	});
 	
-	function executePushReward()
+	function executePushReward(redeemReward)
 	{
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
@@ -1271,7 +1274,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success({ code:"success", result: redeemReward });
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");
@@ -1281,7 +1284,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    
 	}
 	
-	function executePushOfferGift()
+	function executePushOfferGift(redeemReward)
 	{
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
@@ -1313,7 +1316,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
-			response.success("success");
+			response.success({ code:"success", result: redeemReward });
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");
@@ -1352,12 +1355,12 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		});
 	}
 	
-	function updateMessageStatus()
+	function updateMessageStatus(redeemReward)
 	{
 		messageStatus.set("redeem_available", "no");	
 		messageStatus.save().then(function() {
 			console.log("MessageStatus save success.");
-			executePushOfferGift();
+			executePushOfferGift(redeemReward);
 					
 		}, function(error) {
 			console.log("MessageStatus save failed.");
@@ -1370,9 +1373,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	function postToServer(redeemReward)
 	{
 	    if(isOfferOrGift) {
-			updateMessageStatus();
+			updateMessageStatus(redeemReward);
 	    } else {
-	        executePushReward();
+	        executePushReward(redeemReward);
 	    }
 	    
 	    console.log("Posting to server");
