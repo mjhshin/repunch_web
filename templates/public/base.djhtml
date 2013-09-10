@@ -14,7 +14,7 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/global.1.9.d.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/global.1.9.e.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/login.1.2.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
