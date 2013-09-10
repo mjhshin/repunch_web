@@ -79,7 +79,7 @@ a.button.orange{
 #header-logo {
 	float:left;
 	display:block;
-	margin:20px 0 19px 0px;
+	margin:10px 0px 0px -6px;
 }
 
 #header-menu {
@@ -87,8 +87,8 @@ a.button.orange{
 }
 
 #header-menu a.menuitem {
-    color: white;
 	/** color:#696969; **/
+    color: white;
 	display:inline-block;
 	letter-spacing:0.7px;
 	padding:30px 7px 0;

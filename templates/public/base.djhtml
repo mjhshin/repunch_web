@@ -33,7 +33,7 @@
 		<div id="header-content">
 		    <div>
 		    
-			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white-orange-hint.png" %}" alt="Repunch"></a>
+			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white-orange-hint.1.0.png" %}" alt="Repunch"></a>
 			{% if request.session.account %}
 			<a id="header-dashboard-btn"  href="{% url 'store_index' %}" style="cursor: pointer;">Dashboard</a>
 			{% else %}
