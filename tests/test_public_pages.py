@@ -12,7 +12,6 @@ from time import sleep
 
 from libs.imap import Mail
 from tests import SeleniumTest
-from repunch.settings import PRODUCTION_SERVER
 
 from apps.public.forms import SUBJECT_PREFIX
 
@@ -137,18 +136,18 @@ def test_public_pages():
             test.is_current_url(reverse("public_thank_you"))
         
     ##########  FAQ email sent
-    sleep(4) # wait for the email to register in gmail
-    mail = Mail()
-    try:
-        if PRODUCTION_SERVER:
-             parts[6]['success'] = parts[5]['success']
-        else:
+    if SeleniumTest.CHECK_SENT_MAIL:
+        sleep(4) # wait for the email to register in gmail
+        mail = Mail()
+        try:
             parts[6]['success'] =\
                 mail.is_mail_sent(SUBJECT_PREFIX + "Test User X")
-    except Exception as e:
-        print e
-        parts[6]['test_message'] = str(e)
-            
+        except Exception as e:
+            print e
+            parts[6]['test_message'] = str(e)
+    else:
+        parts[6]['success'] = parts[5]['success']
+        
     ##########  FAQ email form all fields required
     test.open(reverse("public_faq"))
     sleep(1)
@@ -189,16 +188,16 @@ def test_public_pages():
             test.is_current_url(reverse("public_thank_you"))
          
     ##########  Contact Us email sent
-    sleep(4) # wait for the email to register in gmail
-    try:
-        if PRODUCTION_SERVER:
-            parts[9]['success'] = parts[8]['success']
-        else:
+    if SeleniumTest.CHECK_SENT_MAIL:
+        sleep(4) # wait for the email to register in gmail
+        try:
             parts[9]['success'] =\
                 mail.is_mail_sent(SUBJECT_PREFIX + "Test User Y")
-    except Exception as e:
-        print e
-        parts[9]['test_message'] = str(e)
+        except Exception as e:
+            print e
+            parts[9]['test_message'] = str(e)
+    else:
+        parts[9]['success'] = parts[8]['success']
             
     ##########  Contact Us email form all fields required
     test.open(reverse("public_contact")) # ACTION!

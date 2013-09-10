@@ -40,10 +40,11 @@
 			<a id="header-signin-btn" style="cursor: pointer;">Business Sign In</a>
 			{% endif %}
 			<nav id="header-menu">
-				<a class="menuitem {% if home_nav %}active{% endif %}" href="{% url 'public_home' %}">Home</a>
-				<a class="menuitem {% if learn_nav %}active{% endif %}" href="{% url 'public_learn' %}">Learn More for Businesses</a>
-				<a class="menuitem {% if faq_nav %}active{% endif %}" href="{% url 'public_faq' %}">FAQ</a>
-				<a class="menuitem {% if about_nav %}active{% endif %}" href="{% url 'public_about' %}">About</a>
+			    <!-- need to override font-weight style to fix mac bug -->
+				<a class="menuitem {% if home_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_home' %}">Home</a>
+				<a class="menuitem {% if learn_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_learn' %}">Learn More for Businesses</a>
+				<a class="menuitem {% if faq_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_faq' %}">FAQ</a>
+				<a class="menuitem {% if about_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_about' %}">About</a>
 			</nav>
 			
 			</div>
