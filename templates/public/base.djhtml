@@ -39,10 +39,10 @@
 			{% endif %}
 			<nav id="header-menu">
 			    <!-- need to override font-weight style to fix mac bug -->
-				<a class="menuitem {% if home_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_home' %}">Home</a>
-				<a class="menuitem {% if learn_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_learn' %}">Learn More for Businesses</a>
-				<a class="menuitem {% if faq_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_faq' %}">FAQ</a>
-				<a class="menuitem {% if about_nav %}active{% endif %}" style="font-weight:normal;" href="{% url 'public_about' %}">About</a>
+				<a class="menuitem {% if home_nav %}active{% endif %}" href="{% url 'public_home' %}"><span style="font-weight:normal;">Home</span></a>
+				<a class="menuitem {% if learn_nav %}active{% endif %}" href="{% url 'public_learn' %}"><span style="font-weight:normal;">Learn More for Businesses</span></a>
+				<a class="menuitem {% if faq_nav %}active{% endif %}" href="{% url 'public_faq' %}"><span style="font-weight:normal;">FAQ</span></a>
+				<a class="menuitem {% if about_nav %}active{% endif %}" href="{% url 'public_about' %}"><span style="font-weight:normal;">About</span></a>
 			</nav>
 			
 			</div>
