@@ -84,7 +84,6 @@ a.button.orange{
 
 #header-menu {
 	float:right;
-	font: normal 20px/18px 'Cabin', sans-serif;
 }
 
 #header-menu a.menuitem {
@@ -94,6 +93,7 @@ a.button.orange{
 	letter-spacing:0.7px;
 	padding:30px 7px 0;
 	margin-right:24px;
+	font: normal 20px/18px 'Cabin', sans-serif;
 }
 
 #header-menu a.menuitem:last-child {
@@ -572,6 +572,7 @@ a.button.orange{
 #ad-content a{
 	margin-left:25px;
 	font-size: 20px;
+	font-weight: normal;
 }
 
 
