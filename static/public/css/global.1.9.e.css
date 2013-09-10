@@ -91,9 +91,20 @@ a.button.orange{
     color: white;
 	display:inline-block;
 	letter-spacing:0.7px;
-	padding:30px 7px 0;
-	margin-right:24px;
+	padding:30px 0 0;
+	margin-right:34px;
 	font: normal 20px/18px 'Cabin', sans-serif;
+}
+
+#header-menu a.menuitem:hover {
+    text-decoration: none;
+    padding-bottom:1px;
+    border-bottom: 1px solid white;
+}
+
+#header-menu a.menuitem.active {
+    padding-bottom:1px;
+    border-bottom: 1px solid white;
 }
 
 #header-menu a.menuitem:last-child {
@@ -315,8 +326,8 @@ a.button.orange{
 
 #home-dowload-app h2{
 	padding:0;
-	font-size:16px;
-	margin:-10px 0 5px 0; 
+	font: normal 16px 'Cabin', sans-serif;
+	margin:-10px 0 15px 0; 
 }
 
 #home-dowload-app img{
@@ -1183,10 +1194,14 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 	color:#F5F5F5;
 	display:inline-block;
 	letter-spacing:0.7px;
-	padding:19px 7px 0;
+	padding:19px 14px 0;
 	margin-left:5px;
 	margin-right:15px;
 	font: normal 16px 'Cabin', sans-serif;
+}
+
+#footer-menu li.menuitem span{
+    margin-right: 10px;
 }
 
 #footer-menu li.menuitem a{
@@ -1202,7 +1217,7 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 #footer-menu li.menuitem:last-child{
 	margin-left:0px;
 	margin-right:20px;
-	font: italic 15px 'Cabin', sans-serif;
+	font: normal 15px 'Cabin', sans-serif;
 	text-shadow: 0px 0px 3px #000;
 }
 

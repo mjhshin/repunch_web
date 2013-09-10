@@ -25,7 +25,7 @@
 			<aside class="col1">
 				<h3 class="content-header">Repunch is changing the nature of consumer loyalty.</h3>
 				<h4 class="content-header"> More broadly, we are altering the way businesses and their customers interact.<br/>We'll be on our way to achieving our goal when you know your Punch Code better than your birthday <br/>(or at least as well as your brother's birthday)!</h4>
-				<img id="team-photo" src="{% static "public/images/team-photo.1.0.png" %}" alt="">
+				<img id="team-photo" src="{% static "public/images/team-photo.1.1.png" %}" alt="">
 			</aside>
 			<aside class="col2">
 				
@@ -67,7 +67,7 @@
 				{# VANDOLF #}
 				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Vandolf Estrellado</h4><p><span>Web Developer</span></p><div>Discovered web development in his senior year in College and immediately fell in love with it. Now works as Repunch's web developer.<br/><br/>In his spare time, Vandolf loves to work on developing his video games, drawing sprites, and learning new recipes to compliment his daily workout routine.</div></div>">
 					<div class="member-picture-border">
-						<div class="member-picture"><img src="{% static 'public/images/prof_vandolf.png' %}" /></div>
+						<div class="member-picture"><img src="{% static 'public/images/prof_vandolf.1.0.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Vandolf Estrellado</h2>
 					<div class="member-title">Web Developer</div>

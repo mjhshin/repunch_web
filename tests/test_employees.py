@@ -529,6 +529,11 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
+        
+    ### Update the store's ACL
+    store.ACL[employee_acc.objectId] = {"read": True}
+    store.update()
+        
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog  TODO
     try:

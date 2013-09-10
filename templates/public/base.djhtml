@@ -63,7 +63,7 @@
 				<li class="menuitem"><a href="{% url 'public_contact' %}">Contact Us</a></li>
 				<li class="menuitem"><a href="{% url 'public_jobs' %}">Jobs</a></li>
 				<li class="menuitem">
-					<span>follow us:</span>
+					<span>Follow us:</span>
 					<a href="https://www.facebook.com/Repunch" target="_blank"><img src="{% static "public/images/icon_facebook.png" %}" alt="Follow Us in Facebook"></a>
 					<a href="https://twitter.com/repunchapp" target="_blank"><img src="{% static "public/images/icon_twitter.png" %}" alt="Follow Us in twitter"></a>
 				</li>
