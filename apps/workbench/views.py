@@ -210,7 +210,12 @@ def redeem(request):
         if 'error' not in res:
             redemptions_pending =\
                     SESSION.get_redemptions_pending(session)
-            i_remove, result = -1, res.get("result").get("code")
+            i_remove = -1
+            if action == "approve":
+                result = res.get("result").get("code")
+            else:
+                result = res.get("result")
+                
             # remove from redemptions_pending
             for i, red in enumerate(redemptions_pending):
                 if red.objectId == redeemId:
