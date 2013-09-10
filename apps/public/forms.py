@@ -2,7 +2,7 @@ from django import forms
 from django.core.mail import send_mail
 
 from libs.repunch.validators import required
-from repunch.settings import ORDER_PLACED_EMAILS, DEBUG
+from repunch.settings import EMAIL_FROM, ORDER_PLACED_EMAILS, DEBUG
 
 SUBJECT_PREFIX = "Contact Form - "
     
@@ -22,5 +22,5 @@ class ContactForm(forms.Form):
                 self.cleaned_data['message'])
 
         send_mail(SUBJECT_PREFIX + self.cleaned_data['full_name'], 
-                full_message, self.cleaned_data['email'], 
+                full_message, EMAIL_FROM, 
                 ORDER_PLACED_EMAILS, fail_silently=not DEBUG)

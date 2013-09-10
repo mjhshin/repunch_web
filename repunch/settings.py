@@ -1,13 +1,10 @@
-# Django settings for repunch project.
-from django.conf.global_settings import EMAIL_HOST_USER, EMAIL_PORT,\
-    EMAIL_USE_TLS, EMAIL_HOST_PASSWORD
 import os
 
 # Production server should always have DEBUG = False and 
 # PRODUCTION_SERVER = True
 
 # Set this to True to DISABLE Django user authentication
-PRODUCTION_SERVER = True
+PRODUCTION_SERVER = False
 DEVELOPMENT_TOKEN = "dev_token"
 
 # SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
@@ -52,14 +49,18 @@ DATABASES = {
 # this 1 is for django
 AUTH_USER_MODEL = 'accounts.Account'
 
+# For parse notifications
+EMAIL_FROM = "support@repunch.com"
+
 # configuration for SMTP
-EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 if PRODUCTION_SERVER:
-    EMAIL_HOST_USER = 'support@repunch.com'
-    EMAIL_HOST_PASSWORD = 'REPunch7575'
+    EMAIL_HOST = 'smtp.sendgrid.com'
+    EMAIL_HOST_USER = 'repunch'
+    EMAIL_HOST_PASSWORD = 'repUNch7575'
 else:
+    EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_HOST_USER = 'repunchdev@gmail.com'
     EMAIL_HOST_PASSWORD = 'q3vnq985v7y34'
     
