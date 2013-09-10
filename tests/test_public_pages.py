@@ -219,7 +219,9 @@ def test_public_pages():
     sleep(2)
     
     # END TEST
-    mail.logout()
+    if SeleniumTest.CHECK_SENT_MAIL: 
+        mail.logout()
+    
     test.results.append(section)
     
     # END OF ALL TESTS

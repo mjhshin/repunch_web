@@ -141,22 +141,28 @@ def test_signup():
         
         ##########  Email about new user sent to staff
         sleep(5) # wait for the email to register in gmail
-        mail = Mail()
-        try:
-            parts[7]['success'] = mail.is_mail_sent(\
-                EMAIL_SIGNUP_SUBJECT_PREFIX + store.store_name)
-        except Exception as e:
-            print e
-            parts[7]['test_message'] = str(e)
+        if SeleniumTest.CHECK_SENT_MAIL:
+            mail = Mail()
+            try:
+                parts[7]['success'] = mail.is_mail_sent(\
+                    EMAIL_SIGNUP_SUBJECT_PREFIX + store.store_name)
+            except Exception as e:
+                print e
+                parts[7]['test_message'] = str(e)
+        else:
+            parts[7]['success'] = True
                 
         ##########  Welcome email sent to user
-        try:
-            parts[8]['success'] = mail.is_mail_sent(\
-                EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +
-                store.get_owner_fullname())
-        except Exception as e:
-            print e
-            parts[8]['test_message'] = str(e)
+        if SeleniumTest.CHECK_SENT_MAIL:
+            try:
+                parts[8]['success'] = mail.is_mail_sent(\
+                    EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +
+                    store.get_owner_fullname())
+            except Exception as e:
+                print e
+                parts[8]['test_message'] = str(e)
+        else:
+            parts[8]['success'] = True
         
         test.open(reverse("public_signup")) # ACTION!
         test.find("#id_email").send_keys(TEST_USER['email'])
@@ -172,7 +178,9 @@ def test_signup():
             print e
             parts[9]['test_message'] = str(e)
     
-        mail.logout()
+        if SeleniumTest.CHECK_SENT_MAIL:
+            mail.logout()
+            
         user.delete()
         store.delete()
         subscription.delete()
