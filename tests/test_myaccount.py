@@ -361,7 +361,7 @@ def test_edit_store_details():
         parts[18]['success'] = equal
     except Exception as e:
         print e
-        parts[18]'test_message'] = str(e)
+        parts[18]['test_message'] = str(e)
     
     ##########  Changes to hours are saved to Parse
     try:
@@ -379,7 +379,7 @@ def test_edit_store_details():
         parts[19]['success'] = equal
     except Exception as e:
         print e
-        parts[19]'test_message'] = str(e)
+        parts[19]['test_message'] = str(e)
     
     ##########  Changing the zip changes the store_timezone
     store.store_timezone = None
