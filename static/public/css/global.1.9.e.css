@@ -1277,11 +1277,3 @@ color:#999;
 /************************************ End Accordion CSS */
 
 
-
-
-/** To fix bug with macs **/
-#header-menu a.menuitem {
-    font-weight: normal;
-}
-
-

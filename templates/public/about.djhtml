@@ -3,11 +3,6 @@
 
 {% block title %}About Us{% endblock %}
 
-{% block styles %}
-<link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
-<link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
 {% block javascript %}
 	<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
 	<script>

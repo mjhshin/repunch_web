@@ -14,8 +14,13 @@
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/global.1.9.e.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/login.1.2.css' %}" rel="stylesheet" />
-	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
-	    rel="stylesheet" />
+	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
+	    
+    {# This really should only be imported at signup and about but for some reason if it is not imported here, the header menu items get bolded #}
+    {# This bug only applies to MAC OS #}
+    <link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
+    {# -------------- #}
 	
 	{% block styles %}{% endblock %}
 		
@@ -31,7 +36,7 @@
 		<div id="header-content">
 		    <div>
 		    
-			<a href="/"><img id="header-logo" src="{% static "public/images/logo_header-white-orange-hint.1.1.png" %}" alt="Repunch"></a>
+			<a href="{% url 'public_home' %}"><img id="header-logo" src="{% static "public/images/logo_header-white-orange-hint.1.1.png" %}" alt="Repunch"></a>
 			{% if request.session.account %}
 			<a id="header-dashboard-btn"  href="{% url 'store_index' %}" style="cursor: pointer;">Dashboard</a>
 			{% else %}
@@ -39,10 +44,10 @@
 			{% endif %}
 			<nav id="header-menu">
 			    <!-- need to override font-weight style to fix mac bug -->
-				<a class="menuitem {% if home_nav %}active{% endif %}" href="{% url 'public_home' %}"><span style="font-weight:normal;">Home</span></a>
-				<a class="menuitem {% if learn_nav %}active{% endif %}" href="{% url 'public_learn' %}"><span style="font-weight:normal;">Learn More for Businesses</span></a>
-				<a class="menuitem {% if faq_nav %}active{% endif %}" href="{% url 'public_faq' %}"><span style="font-weight:normal;">FAQ</span></a>
-				<a class="menuitem {% if about_nav %}active{% endif %}" href="{% url 'public_about' %}"><span style="font-weight:normal;">About</span></a>
+				<a class="menuitem {% if home_nav %}active{% endif %}" href="{% url 'public_home' %}">Home</a>
+				<a class="menuitem {% if learn_nav %}active{% endif %}" href="{% url 'public_learn' %}">Learn More for Businesses</a>
+				<a class="menuitem {% if faq_nav %}active{% endif %}" href="{% url 'public_faq' %}">FAQ</a>
+				<a class="menuitem {% if about_nav %}active{% endif %}" href="{% url 'public_about' %}">About</a>
 			</nav>
 			
 			</div>
