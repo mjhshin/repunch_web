@@ -160,6 +160,10 @@ a.button.orange{
     color: #F08C13;
 }
 
+.repunch-red {
+    color:#dd4b39;
+}
+
 .page-title{
     color:#0a71c1;
 	font: normal 2.3em/12px 'Cabin', sans-serif;
@@ -1054,7 +1058,7 @@ float: right;
 
 #signup-form select,
 #signup-form textarea,
-#signup-form input{
+#signup-form input, #associated-account-form input {
 	width:243px;
 	height:28px;
 	color:#646464;
@@ -1069,6 +1073,39 @@ float: right;
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;
 }
+
+#associated-account-form {
+    margin-top: 10px;
+}
+
+#associated-account-form input {
+    margin-top: 10px;
+    width: 354px;
+	margin-bottom:0px;
+	text-align: center;
+}
+
+#associated-account-form input[type=submit] {
+    margin-left: 4px;
+    font-weight:bold;
+}
+
+
+#associated-account-form input[type=submit].active {
+    background-color: #4c8ffb; color: white;
+    border:1px solid #3079ed;
+}
+
+#associated-account-form input[type=submit].active:hover{
+    background-color: #427edd;
+}
+
+#associated-account-message {
+    text-align: center;
+    margin-left: 2px; margin-top: 8px;
+    width: 100%;
+}
+
 
 #signup-form label#same_address_span{
 	color:#ababab;

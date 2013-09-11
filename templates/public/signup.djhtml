@@ -99,6 +99,11 @@ function validate(which, next) {
 	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
 		        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
 		        <input type="hidden" name="home-url" value="{% url 'public_home' %}" />
+		        
+		        {# used to flag signup view that there is an existing account already #}
+                <input type="hidden" name="aaf-nonce" value="" />
+                <input type="hidden" name="aaf-account_id" value="" />
+    
 		        {# uncomment below when credit card info is brought back on sign up #}
 		        {# also uncomment the parts in signup.js as well #}
 		        {# <input type="hidden" name="signup2" value="{% url 'public_signup2' %}" /> #}
@@ -236,6 +241,7 @@ function validate(which, next) {
                     <div id="cc_section" style="display:none;">
                     {% endif %}
                     
+                <input type="hidden" name="aaf-account_id" value="" />
 					<p id="cc_info">Credit Card Information</p>
 					<div class="floated"
 					    {% if not subscription_form.first_name2.errors and subscription_form.last_name2.errors %}
@@ -327,6 +333,7 @@ function validate(which, next) {
 						<div id="zip2_e">{{ subscription_form.zip2.errors }}</div>
 						<label for="id_zip2">Zip</label>
 						{{ subscription_form.zip2 }}
+                <input type="hidden" name="aaf-nonce" value="" />
 					</div>
 					<div class="clear-both"></div>
 					
@@ -383,5 +390,24 @@ function validate(which, next) {
     <img src="{% static 'public/images/icon_clock-orange.png' %}"
     alt="processing signup form..." id="signing-up-time"
     style="position:relative;top:-4px;left:-6px;"/>
+</div>
+{% endblock %}
+
+{% block hidden_stuff %}
+<div id="associated-account-div" style="display:none;">
+    <span>
+    The email you entered has an associated Repunch account.<br/>
+    Please enter the password associated with this email.<br/>
+    Note that this password will also be used as the password for
+    this business account.
+    </span>
+    <form id="associated-account-form" action="" method="POST">{% csrf_token %}
+        <input type="hidden" name="url" value="{% url "public_associated_account_confirm" %}" />
+        <input type="hidden" name="aaf-nonce" value="" />
+        <input type="hidden" name="aaf-account_id" value="" />
+        <input type="hidden" name="acc_username" value="" />
+        <input type="password" name="acc_password" value="" />
+        <input type="submit" value="Submit"/>
+    </form><div id="associated-account-message" class="repunch-red"></div> 
 </div>
 {% endblock %}

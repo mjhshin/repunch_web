@@ -13,6 +13,7 @@ from parse.notifications import send_email_signup,\
 send_email_receipt_ipod
 from apps import isdigit
 from apps.db_static.models import Category
+from apps.accounts.models import AssociatedAccountNonce
 from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
@@ -121,6 +122,35 @@ def password_reset(request):
         request_password_reset(request.POST['forgot-pass-email'])}), 
         content_type="application/json")
         
+@dev_login_required
+def associated_account_confirm(request):
+    """
+    A helper view for sign_up. Also handles requests from signup.js
+    """
+    if request.method == 'POST' or request.is_ajax():
+        # first check the AssociatedAccountNonce
+        acc_id = request.POST['aaf-account_id']
+        nonce_id = request.POST['aaf-nonce']
+        aa_nonce = AssociatedAccountNonce.objects.filter(\
+            id=nonce_id, account_id=acc_id)
+        if len(aa_nonce) > 0:
+            aa_nonce = aa_nonce[0]
+            # then attempt to login to parse
+            username = request.POST['acc_username']
+            password = request.POST['acc_password']
+            # note that email is the same as username
+            res = parse("GET", "login", query=\
+                        {"username":username,
+                         "password":password} )
+            if 'error' not in res:
+                aa_nonce.verified = True
+                aa_nonce.save()
+                return HttpResponse(json.dumps({"code": 0}), 
+                    content_type="application/json")
+                
+    return HttpResponse(json.dumps({"code": 1}), 
+        content_type="application/json")
+    
         
 @dev_login_required
 def sign_up(request):
@@ -131,11 +161,22 @@ def sign_up(request):
     data = {'sign_up_nav': True}
             
     if request.method == 'POST' or request.is_ajax():
+        from_associated_account = False
+        # check if this post is from the associated account dialog
+        # if it is then skip form validations
+        aaf_nonce_id = request.POST.get('aaf-nonce')
+        aaf_account_id = request.POST.get('aaf-account_id')
+        if len(aaf_nonce_id) > 0 and len(aaf_account_id) > 0:
+            aa_nonce = AssociatedAccountNonce.objects.filter(\
+                id=aaf_nonce_id, account_id=aaf_account_id)
+            if len(aa_nonce) > 0 and aa_nonce[0].verified:
+                aa_nonce[0].delete()
+                from_associated_account = True
+    
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
         account_form = AccountForm(request.POST)
         subscription_form = SubscriptionForm2(request.POST)
-        
         
         cats = request.POST.get("categories")
         category_names = None
@@ -146,8 +187,11 @@ def sign_up(request):
                 category_names.pop()
             data["category_names"] = category_names
         
-        all_forms_valid = store_form.is_valid() and\
-            account_form.is_valid()
+        if not from_associated_account:
+            all_forms_valid = store_form.is_valid() and\
+                account_form.is_valid()
+        else:
+            all_forms_valid = True
             
         ### Bad form of validation lol
         if request.POST.get("place_order"):
@@ -171,6 +215,19 @@ def sign_up(request):
         
         if all_forms_valid:
             postDict = request.POST.dict()
+            
+            # check if email already taken here to handle the case where 
+            # the user already has a patron account but also want to 
+            # sign up for a Store account
+            if hasattr(account_form, "associated_account"):
+                aa = account_form.associated_account
+                aan = AssociatedAccountNonce.objects.create(\
+                    account_id=aa.objectId)
+                return HttpResponse(json.dumps({"associated_account":\
+                    aa.objectId, "associated_account_nonce":aan.id,
+                    "email": aa.email, "code": 0}), 
+                    content_type="application/json")
+            #########################################################
 
             # create store
             tz = rputils.get_timezone(request.POST.get("zip"))
@@ -208,10 +265,15 @@ def sign_up(request):
             store.set('settings', settings)
 
             # create account
-            account = Account(**postDict)
-            # username = email
-            account.set("username", postDict['email'])
-            account.set_password(request.POST.get('password'))
+            if not from_associated_account:
+                account = Account(**postDict)
+                # username = email
+                account.set("username", postDict['email'])
+                account.set_password(request.POST.get('password'))
+            else:
+                account =\
+                    Account.objects().get(objectId=aaf_account_id)
+                
             account.set("store", store)
 
             # create an empty subscription
@@ -237,7 +299,10 @@ def sign_up(request):
             
             # create account
             account.Store = store.objectId
-            account.create()
+            if not from_associated_account:
+                account.create()
+            else:
+                account.update()
             
             # create the store ACL with the account having r/w access
             store.ACL = {
@@ -263,7 +328,11 @@ def sign_up(request):
                 subscription.delete()
                 settings.delete()
                 store.delete()
-                account.delete()
+                if not from_associated_account:
+                    account.delete()
+                else:
+                    account.Store = None
+                    account.update()
                     
                 data['store_form'] = store_form
                 data['account_form'] = account_form
@@ -318,14 +387,10 @@ def sign_up(request):
             user_login = login(request, postDict)
             if user_login != None:
                 data = {"code":-1}
-                # response effects - not login returns
-                # -1 - invalid request
-                # 0 - invalid form input
-                # 1 - bad login credentials
+                # response to signup.js - not login returns
+                # 0 - Associated account already exists
                 # 2 - subscription is not active
                 # 3 - success (login now)
-                # 4 - employee no access - never should be this though
-                # 5 - employee is not approved - never should be
                 if type(user_login) is int: # subscription not active
                     data['code'] = 2
                 else:

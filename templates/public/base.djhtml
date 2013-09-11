@@ -79,6 +79,7 @@
 	</div>
 	
 	{% block dialogs %}{% endblock %}
+	{% block hidden_stuff %}{% endblock %}
 	
 </body>
 </html>

@@ -31,12 +31,17 @@ class AccountForm(forms.Form):
         return p1
     
     def clean_email(self):
-        """ emails are unique """
+        # If an Account exist already with a Store object - then bad
         e = self.cleaned_data.get('email')
-        if e and Account.objects().count(email=e) > 0:
-            raise forms.ValidationError("Email is already being used.")
+        if e:
+            acc = Account.objects().get(email=e)
+            if acc and acc.Store:
+                raise forms.ValidationError(\
+                    "Email is already being used.")
+            elif acc: # save the object for later use
+                setattr(self, "associated_account", acc)
         return e
-    
+
     """
     def clean_username(self):
     # usernames are unique
