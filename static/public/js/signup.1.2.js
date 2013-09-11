@@ -86,7 +86,7 @@ $(document).ready(function(){
                         minWidth: 410, maxWidth: 410, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
-                            return;
+                            window.location.replace(url_home);
                         }
                     });
                     // adjust the width and height + title
@@ -142,7 +142,7 @@ $(document).ready(function(){
                                     dl_signup.dialog({
                                         beforeClose: function(event, ui) { return false; }, 
                                         title: "Signing Up",
-                                        minWidth: 330, maxWidth: 330, width: 330,
+                                        minWidth: 330, maxWidth: 330,
                                         minHeight: 120, maxHeight: 120,
                                     });
                                     // adjust the width and height + title
@@ -158,14 +158,39 @@ $(document).ready(function(){
                                         aaf_submit.removeClass("active");
                                         aaf_message.html("Wrong password");
                                     } else {
+                                        dl_signup.on( "dialogclose", function( event, ui ) {
+                                            window.location.replace(url_home);
+                                            } 
+                                        );
+                                        
+                                        // error message
                                         aaf_message.html("Wrong password. This was your 3rd attempt." +
                                             " You will have to start over for security purposes.");
                                         aaf_pass.hide();
-                                        aaf_submit.val("Okay");
+                                        aaf_submit.val("OK");
                                         aaf_submit.click(function() {
                                             window.location.replace(url_home);
                                             return false;
                                         });
+                                        
+                                        // forgot password link
+                                        var aaFPassForm = $("#aa-forgot-pass-form");
+                                        var aaFPassFormSpan = $("#aa-forgot-pass-form span");
+                                        var aaFPassFormLink = $("#aa-forgot-pass-form span a");
+                                        aaFPassFormLink.show();
+                                        aaFPassFormLink.click(function() {
+                                            aaFPassFormLink.unbind("click");
+                                            $("#aa-forgot-pass-form input[name=forgot-pass-email]").val(res.email);
+                                            $.post($("#aa-forgot-pass-form input[name=action]").val(), 
+                                                    $("#aa-forgot-pass-form").serialize(), function(aaFPRes){
+                                                if (aaFPRes.res){
+                                                    aaFPassFormSpan.html("<span style='color:green;'>Password Reset form sent.</span>");
+                                                } else { // should never go here
+                                                    aaFPassFormSpan.html("<span>Email not recognized.</span>");
+                                                }
+                                            });
+                                        });
+                                        
                                     }
                                     
                                     associatedAccountAttempts += 1;

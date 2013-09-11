@@ -1086,8 +1086,9 @@ float: right;
 }
 
 #associated-account-form input[type=submit] {
-    margin-left: 4px;
     font-weight:bold;
+    width: 120px;
+    margin-left: 120px;
 }
 
 
@@ -1106,6 +1107,17 @@ float: right;
     width: 100%;
 }
 
+#aa-forgot-pass-form {
+    width:100%;
+    text-align: center;
+    margin-top: 8px;
+}
+
+#aa-forgot-pass-form span a {
+    display:none;
+    color:#0965ad;
+    text-decoration: underline;
+}
 
 #signup-form label#same_address_span{
 	color:#ababab;

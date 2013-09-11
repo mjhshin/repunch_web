@@ -408,6 +408,15 @@ function validate(which, next) {
         <input type="hidden" name="acc_username" value="" />
         <input type="password" name="acc_password" value="" />
         <input type="submit" value="Submit"/>
-    </form><div id="associated-account-message" class="repunch-red"></div> 
+    </form>
+    <div id="associated-account-message" class="repunch-red"></div> 
+    
+    <form id="aa-forgot-pass-form" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{% url 'public_request_password_reset' %}"/>
+        <input type="hidden" name="forgot-pass-email"/>
+        <span><a>Forgot your password?</a></span>
+    </form>
+    
 </div>
 {% endblock %}
