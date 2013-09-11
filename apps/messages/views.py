@@ -225,11 +225,7 @@ def edit(request, message_id):
             # Note that the new message is saved in comet_receive
             # make sure we have the latest session to save!
             request.session.clear()
-            print "SESSION KEY: " + request.session.session_key
-            print request.session._session_cache
             request.session.update(SessionStore(request.session.session_key))
-            print "SESSION KEY: " + request.session.session_key
-            print request.session._session_cache
 
             return HttpResponseRedirect(message.get_absolute_url())
             

@@ -144,6 +144,12 @@ def punch(request):
             "punch_code":str(request.POST['punch_code']),
             "num_punches":nump,
         }
+        
+        # Check if the user is an employee
+        employee = request.session.get("employee")
+        if employee:
+            data['employee_id'] = employee.objectId
+        
         res = cloud_call("punch", data)
         if 'error' not in res:
             res['patron_name'] = res['result']

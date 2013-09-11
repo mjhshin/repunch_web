@@ -1,7 +1,3 @@
 ##############################################
-####################  TODO:
-1. DEBUG multiple tabs, signing out while sending message relogs user.
-    - parse.auth.decorators
-    - parse.auth.__init__
-    - apps.comet.views
-    - apps.messages.views - edit()
+####################  TODO: 
+1) 

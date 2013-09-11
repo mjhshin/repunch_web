@@ -67,14 +67,7 @@ def edit(request, employee_id):
             urllib.urlencode({'success': 'Employee does not exist.'}))
 
     if request.method == "POST":
-        post_acl = request.POST["ACL"]
-        if post_acl == ACCESS_ADMIN[0]:
-            store.ACL[acc.objectId] = {"read": True, "write": True}
-        elif post_acl == ACCESS_PUNCHREDEEM[0]:
-            store.ACL[acc.objectId] = {"read": True}
-        elif post_acl == ACCESS_NONE[0]:
-            if acc.objectId in store.ACL:
-                del store.ACL[acc.objectId]
+        store.set_access_level(request.POST["ACL"])
                 
         store.update()
         request.session['store'] = store
@@ -294,8 +287,7 @@ def punches(request, employee_id):
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
      
-    # TODO limit of 200 applies - remove paginator
-    # and use skip with limit!
+    # TODO limit of 200 applies - use self made paginator! =)
     ps = employee.get('punches', order=order_by, limit=200)
     if not ps:
         ps = []

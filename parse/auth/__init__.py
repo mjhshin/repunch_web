@@ -14,7 +14,7 @@ from apps.comet.models import CometSession, CometSessionIndex
 from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE,\
 PRODUCTION_SERVER
 from parse import session as SESSION
-from parse.utils import parse
+from parse.utils import parse, flush
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING
 
@@ -26,12 +26,7 @@ def hash_password(password):
 
 def logout(request, reverse_url):
     session_key = request.session.session_key
-    # flush immediately
-    request.session.flush()
-    print "Logged out"
-    print "SESSION KEY: " + session_key
-    print SessionStore(session_key)._get_session()
-    print "NEW SESSION KEY: " + request.session.session_key
+    flush(request.session)
     
     # first delete the CometSessionIndex
     try:
@@ -80,16 +75,15 @@ def login(request, requestDict):
         account = Account(**res)
         account.fetch_all()
         
-        # TODO in the future when an account may have a Store and
-        # Employee, we need to differentiate which 1 the user
-        # wants to login as. 
-        if account.Employee:
+        # If the Account has both a Store and Employee object,
+        # log the user in as the Store owner - not employee
+        if account.Store:
+            store = account.store
+            account_type = "store"
+        elif account.Employee:
             store = account.employee.get("store")
             employee = account.employee
             account_type = "employee"
-        elif account.Store:
-            store = account.store
-            account_type = "store"
         
         # if the User object has a store then we are good to go
         if store: 
@@ -116,6 +110,10 @@ def login(request, requestDict):
                 request.session['settings'] = settings
                 request.session['store'] = store
                 request.session['account'] = account
+                
+                if account_type == "employee":
+                    request.session['employee'] = employee
+                
                 SESSION.load_all(request.session)
                 
                 # moved to SESSION.load_all

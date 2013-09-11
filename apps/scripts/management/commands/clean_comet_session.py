@@ -23,6 +23,7 @@ from time import sleep
 
 from libs.dateutil.relativedelta import relativedelta
 from apps.comet.models import CometSession, CometSessionIndex
+from parse.utils import flush
 from repunch.settings import COMET_PULL_RATE
 
 LAST_UPDATED_THRESHOLD = 24 # in hours
@@ -44,7 +45,7 @@ class Command(BaseCommand):
         for cometi in  CometSessionIndex.objects.all():
             if cometi.last_updated < timedout_time or force:
                 session = SessionStore(cometi.session_key)
-                session.flush()
+                flush(session)
                 to_del.append(cometi)
                 # delete associated cometsessions 
                 for comet in CometSession.objects.filter(\
