@@ -67,7 +67,7 @@ def edit(request, employee_id):
             urllib.urlencode({'success': 'Employee does not exist.'}))
 
     if request.method == "POST":
-        store.set_access_level(request.POST["ACL"])
+        store.set_access_level(acc, request.POST["ACL"])
                 
         store.update()
         request.session['store'] = store

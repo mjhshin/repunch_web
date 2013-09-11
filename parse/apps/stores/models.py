@@ -128,13 +128,13 @@ class Store(ParseObject):
         else:
             return False
             
-        if access_level = ACCESS_ADMIN[index]:
+        if access_level == ACCESS_ADMIN[index]:
             self.ACL[account.objectId] = {"read": True, "write": True}
             return True
-        elif access_level = ACCESS_PUNCHREDEEM[index]:
+        elif access_level == ACCESS_PUNCHREDEEM[index]:
             self.ACL[account.objectId] = {"read": True}
             return True
-        elif access_level = ACCESS_NONE[index]:
+        elif access_level == ACCESS_NONE[index]:
             if account.objectId in self.ACL:
                 del self.ACL[account.objectId]
             return True
