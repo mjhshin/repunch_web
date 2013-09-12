@@ -91,10 +91,13 @@ class StoreForm(forms.Form):
             self.data['country']
             
     def clean_email(self):
-        """ emails are unique """
+        """ 
+        emails are unique - only clean email of self.email is not None
+        """
         e = self.cleaned_data.get('email')
-        if e and Account.objects().count(email=e) > 0:
-            # only raise if email is not its own!
+        
+        if self.email and e and Account.objects().count(email=e) > 0:
+            # only raise if email is not itself
             if self.email != e:
                 raise forms.ValidationError("Email is already " +\
                     "being used.")

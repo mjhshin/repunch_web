@@ -66,6 +66,10 @@ def account_is_admin(session):
     return SESSION.get_store(session).is_admin(session['account'])
     
 @register.assignment_tag
+def account_is_owner(session):
+    return SESSION.get_store(session).is_owner(session['account'])
+    
+@register.assignment_tag
 def employee_is_owner(session, employee_id):
     account = Account.objects().get(Employee=employee_id)
     return SESSION.get_store(session).is_owner(account)

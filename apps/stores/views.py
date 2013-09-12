@@ -101,7 +101,13 @@ def edit(request):
                             max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
-        form = StoreForm(account.email, request.POST)
+                                
+        # only clean email if user is the store owner!
+        if store.is_owner(account):
+            form = StoreForm(account.email, request.POST)
+        else:
+            form = StoreForm(None, request.POST)
+            
         if form.is_valid(): 
             # build the list of hours in proper format for saving 
             # to Parse. 
@@ -155,23 +161,27 @@ def edit(request):
                     
             store.update()
             
-            # Need to make sure that the account is the latest - 
-            # User in dashboard then signs up for a mobile account
-            # and then edits store details = bug!
-            account.fetch_all(clear_first=True, with_cache=False)
-            # update the account - email = username!
-            if account.username != request.POST['email']:
-                prev_username = account.username
-                
-                account.email = request.POST['email']
-                account.username = request.POST['email']
-                account.update()
-                
-                if account.Patron:
-                    # update the punch_code username field
-                    pc = PunchCode.objects().get(username=prev_username)
-                    pc.username = account.username
-                    pc.update()
+            # Only update the account if user is the store owner
+            if store.is_owner(account):
+                # Need to make sure that the account is the latest - 
+                # User in dashboard then signs up for a mobile account
+                # and then edits store details = bug!
+                account.fetch_all(clear_first=True, with_cache=False)
+                # update the account - email = username!
+                if account.username != request.POST['email']:
+                    prev_username = account.username
+                    
+                    account.email = request.POST['email']
+                    account.username = request.POST['email']
+                    account.update()
+                    
+                    if account.Patron:
+                        # update the punch_code username field
+                        pc = PunchCode.objects().get(\
+                            username=prev_username)
+                        if pc: # should never be none but ehh
+                            pc.username = account.username
+                            pc.update()
             
             # update the session cache
             try:
@@ -188,8 +198,11 @@ def edit(request):
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
-                "updatedAccount": account.jsonify()
             }
+            
+            if store.is_owner(account):
+                payload["updatedAccount"] = account.jsonify()
+            
             comet_receive(store.objectId, payload)
             
             return redirect(reverse('store_index')+ "?%s" %\
