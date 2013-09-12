@@ -381,21 +381,43 @@ class ParseObject(object):
         """
         return None
 
-    def fetch_all(self):
+    def fetch_all(self, clear_first=False, with_cache=True):
         """
         Gets all of this object's data from parse and update all
         of its value locally. This includes pulling each pointer for
-        caching. # TODO optimize using include
+        caching.
+        
+        If clear_first, sets all non-BUILTINS in __dict__ to None.
+            - note that cache attrs are also set to None
+        If with_cache, retrieves all the cache attributes.
         """
-        res = parse("GET", self.path() + "/" + self.objectId)
-        if res and "error" not in res:
-            self.update_locally(res, False)
+        if clear_first:
+            keys = self.__dict__.keys()
+            for key in keys:
+                if key not in ParseObject.BUILTINS:
+                    self.__dict__[key] = None
+                    
+        if with_cache:
+            cache_attrs = ""
             # fill up the Pointer cache attributes 
-            for key, value in self.__dict__.copy().iteritems():
+            for key in self.__dict__.iterkeys():
                 if key[0].isupper() and not key.endswith("_") and\
                     not key == "ACL":
-                    self.get(key[0].lower() + key[1:])
+                    cache_attrs = cache_attrs + key + ","
+            
+            if len(cache_attrs) > 0:
+                res = parse("GET", self.path() + "/" + self.objectId,
+                    query={ "include": cache_attrs })
+            else:
+                res = parse("GET", self.path() + "/" + self.objectId)
+        
+        else:
+            res = parse("GET", self.path() + "/" + self.objectId)
+            
+        if res and "error" not in res:
+            self.update_locally(res, False)
             return True
+            
         return False
 
     def increment(self, attr, amount):
@@ -545,7 +567,6 @@ class ParseObject(object):
     def set(self, attr, val):
         """ set this object's attr to val. This does not commit
         anything up to Parse. """
-        # TODO check attr and val validity
         setattr(self, attr, val)
         return True
 

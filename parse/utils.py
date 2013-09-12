@@ -109,11 +109,14 @@ def batch(method, parse_objects):
         else:
             path = '/' + PARSE_VERSION + '/' + po.path() + '/' +\
                 po.objectId
-        reqs.append({
+        d = {
             "method": method,
             "path": path,
-            "body": po._get_formatted_data()
-        })
+        }
+        if method != "DELETE":
+            d["body"] = po._get_formatted_data()
+        reqs.append(d)
+        
     payload = json.dumps({"requests": reqs})
     
     rcm = REST_CONNECTION_META.copy()

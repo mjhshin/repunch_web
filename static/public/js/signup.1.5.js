@@ -47,8 +47,9 @@ $(document).ready(function(){
             
         // open the dialog with the loading message
         dl_signup.dialog( "open" );
-        // make sure the time icon is hidden
+        // make sure the time icon is hidden and the loading is shown
         $("#signing-up-time").hide();
+        $("#signing-up").show();
         
         // make the ajax call
         var url = $("#signup-form input[name=action]").val();
@@ -130,7 +131,7 @@ $(document).ready(function(){
                         if (aaf_submit.hasClass("active")) {
                             var aaf_data = aaf.serialize();
                             $.post(aaf_url, aaf_data, function(aaf_res, aaf_status, aaf_xhr) {
-                                if (aaf_res.code == 0) { // success
+                                if (aaf_res.code == 0) { // SUCCESS
                                     // set the nonce and account_id and resubmit the signup form
                                     $("#signup-form input[name=aaf-nonce]").val(res.associated_account_nonce);
                                     $("#signup-form input[name=aaf-account_id]").val(res.associated_account);
@@ -149,7 +150,7 @@ $(document).ready(function(){
                                     dl_signup.dialog( "option", "height", 140 );
     
                                     $("#signup-form-submit").click();
-                                } else if (aaf_res.code == 1) { // invalid
+                                } else if (aaf_res.code == 1) { // INVALID
                                     if (associatedAccountAttempts < 2) {
                                         dl_signup.dialog({minHeight: 310, maxHeight: 310,});
                                         dl_signup.dialog( "option", "height", 310 );

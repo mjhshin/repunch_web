@@ -24,6 +24,7 @@ from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
+from parse.apps.patrons.models import PunchCode
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required, dev_login_required
@@ -154,10 +155,23 @@ def edit(request):
                     
             store.update()
             
+            # Need to make sure that the account is the latest - 
+            # User in dashboard then signs up for a mobile account
+            # and then edits store details = bug!
+            account.fetch_all(clear_first=True, with_cache=False)
             # update the account - email = username!
-            account.email = request.POST['email']
-            account.username = request.POST['email']
-            account.update()
+            if account.username != request.POST['email']:
+                prev_username = account.username
+                
+                account.email = request.POST['email']
+                account.username = request.POST['email']
+                account.update()
+                
+                if account.Patron:
+                    # update the punch_code username field
+                    pc = PunchCode.objects().get(username=prev_username)
+                    pc.username = account.username
+                    pc.update()
             
             # update the session cache
             try:
