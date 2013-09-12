@@ -151,8 +151,8 @@ $(document).ready(function(){
                                     $("#signup-form-submit").click();
                                 } else if (aaf_res.code == 1) { // invalid
                                     if (associatedAccountAttempts < 2) {
-                                        dl_signup.dialog({minHeight: 300, maxHeight: 300,});
-                                        dl_signup.dialog( "option", "height", 300 );
+                                        dl_signup.dialog({minHeight: 310, maxHeight: 310,});
+                                        dl_signup.dialog( "option", "height", 310 );
                                         
                                         aaf_pass.val('');
                                         aaf_pass.focus();
@@ -163,8 +163,8 @@ $(document).ready(function(){
                                             window.location.replace(url_home);
                                             } 
                                         );
-                                        dl_signup.dialog({minHeight: 310, maxHeight: 310,});
-                                        dl_signup.dialog( "option", "height", 310 );
+                                        dl_signup.dialog({minHeight: 320, maxHeight: 320,});
+                                        dl_signup.dialog( "option", "height", 320 );
                                         
                                         // error message
                                         aaf_message.html("Wrong password. This was your 3rd attempt." +
