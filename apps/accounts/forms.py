@@ -10,16 +10,15 @@ from parse.apps.accounts.models import Account
 
 class AccountForm(forms.Form):   
     """
-    username = forms.CharField(min_length=3, max_length=30,
-                widget=forms.TextInput(attrs={'pattern':".{3,30}"}),
-                validators=[required, alphanumeric_no_space])
+    Note that usernames can have leading, b/w, and trailing spaces
+    but must have at least 1 no spaces.
+    
+    Passwords, on the other hand, can be all spaces!
     """
     password = forms.CharField(min_length=6,
-            widget=forms.PasswordInput(attrs={'pattern':".{6,}"}),
-            validators=[required, alphanumeric_no_space])
+            widget=forms.PasswordInput(attrs={'pattern':".{6,}"}))
     confirm_password = forms.CharField(min_length=6,
-            widget=forms.PasswordInput(),
-            validators=[required, alphanumeric_no_space])
+            widget=forms.PasswordInput())
     email = forms.EmailField()
 
     def clean_password(self):
@@ -53,7 +52,7 @@ class AccountForm(forms.Form):
     """
             
 class LoginForm(forms.Form):
-    username = forms.CharField(validators=[required]) #, alphanumeric_no_space])
-    password = forms.CharField(widget=forms.PasswordInput(),
-        validators=[required, alphanumeric_no_space])
+    # currently the username = email
+    username = forms.CharField(validators=[required])
+    password = forms.CharField(widget=forms.PasswordInput())
 

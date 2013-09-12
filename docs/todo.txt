@@ -1,3 +1,5 @@
 ##############################################
 ####################  TODO: 
-1. write tests for only store owner can view/modify email field in edit store details
+1. spaces are now allowed for passwords - so fix broken tests for signup
+
+2. write tests for only store owner can view/modify email field in edit store details
