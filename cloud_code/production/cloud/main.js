@@ -74,6 +74,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		if(email != null) {
 			userResult.set("email", email);
+			userResult.set("username", email);
 		}
 		  
 		return userResult.save();
