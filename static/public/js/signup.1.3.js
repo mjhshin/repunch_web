@@ -30,8 +30,8 @@ $(document).ready(function(){
         beforeClose: function(event, ui) { return false; }, 
         title: "Signing Up",
         resizable: false,
-        minWidth: 330, maxWidth: 330, 
-        minHeight: 120, maxHeight: 120,
+        minWidth: 350, maxWidth: 350, 
+        minHeight: 140, maxHeight: 140,
     });
     
     // for associated account routine
@@ -82,8 +82,8 @@ $(document).ready(function(){
                 if (res.code == 0){ // Associated account already exists.
                     dl_signup.dialog({ 
                         title: "Associated Account Detected", 
-                        minHeight: 270, maxHeight: 270,
-                        minWidth: 410, maxWidth: 410, 
+                        minHeight: 280, maxHeight: 280,
+                        minWidth: 480, maxWidth: 480, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
                             window.location.replace(url_home);
@@ -91,14 +91,12 @@ $(document).ready(function(){
                     });
                     // adjust the width and height + title
                     dl_signup.dialog( "option", "title", "Associated Account Detected");
-                    dl_signup.dialog( "option", "width", 410 );
-                    dl_signup.dialog( "option", "height", 270 );
+                    dl_signup.dialog( "option", "width", 480 );
+                    dl_signup.dialog( "option", "height", 280 );
                     
                     
-                    messageContainer.css({ width: "370px"});
+                    messageContainer.css({ width: "420px"});
                     messageContainer.html($("#associated-account-div").clone().html());
-                    
-                    // remove the PLACEHOLDER from the id;
                     
                     var aaf = $("#dialog-signup-message #associated-account-form");
                     var aaf_nonce = $("#dialog-signup-message #associated-account-form input[name=aaf-nonce]");
@@ -142,17 +140,20 @@ $(document).ready(function(){
                                     dl_signup.dialog({
                                         beforeClose: function(event, ui) { return false; }, 
                                         title: "Signing Up",
-                                        minWidth: 330, maxWidth: 330,
-                                        minHeight: 120, maxHeight: 120,
+                                        minWidth: 350, maxWidth: 350,
+                                        minHeight: 140, maxHeight: 140,
                                     });
                                     // adjust the width and height + title
                                     dl_signup.dialog( "option", "title", "Signing Up");
-                                    dl_signup.dialog( "option", "width", 330 );
-                                    dl_signup.dialog( "option", "height", 120 );
+                                    dl_signup.dialog( "option", "width", 350 );
+                                    dl_signup.dialog( "option", "height", 140 );
     
                                     $("#signup-form-submit").click();
                                 } else if (aaf_res.code == 1) { // invalid
                                     if (associatedAccountAttempts < 2) {
+                                        dl_signup.dialog({minHeight: 300, maxHeight: 300,});
+                                        dl_signup.dialog( "option", "height", 300 );
+                                        
                                         aaf_pass.val('');
                                         aaf_pass.focus();
                                         aaf_submit.removeClass("active");
@@ -162,6 +163,8 @@ $(document).ready(function(){
                                             window.location.replace(url_home);
                                             } 
                                         );
+                                        dl_signup.dialog({minHeight: 310, maxHeight: 310,});
+                                        dl_signup.dialog( "option", "height", 310 );
                                         
                                         // error message
                                         aaf_message.html("Wrong password. This was your 3rd attempt." +
@@ -215,9 +218,9 @@ $(document).ready(function(){
                                     
                                     
                 } else if (res.code == 2){ // subscription not active. Tell them.
-                    $( "#dialog-signup" ).dialog({ 
+                    dl_signup.dialog({ 
                         title: "Sign Up Complete", 
-                        minHeight: 110, maxHeight: 110,
+                        minWidth: 360, maxWidth: 360, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
                             window.location.replace(url_home);
@@ -225,11 +228,11 @@ $(document).ready(function(){
                     });
                     // adjust the height + title
                     dl_signup.dialog( "option", "title", "Sign Up Complete");
-                    dl_signup.dialog( "option", "height", 110 );
+                    dl_signup.dialog( "option", "width", 360 );
                     
                     $("#signing-up-time").show();
                     messageContainer.css("width", "250px");
-                    messageContainer.html("<span style='color:#DF7401;position:relative;top:-4px;left:14px'>"+
+                    messageContainer.html("<span style='color:#DF7401;'>"+
                         "Your account is not yet active.<br/>We will get in touch with you soon.</span>");
                         
                 } else if (res.code == 3){ // active subscription. redirect to dashboard.

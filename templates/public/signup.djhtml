@@ -379,17 +379,14 @@ function validate(which, next) {
 {% endblock %}
 
 {% block dialogs %}
-<div id="dialog-signup" style="display:none;">
-    <img src="{% static 'manage/images/ajax-loader.gif' %}"
-    alt="processing signup form..." id="signing-up" 
-    style="position:relative;top:16px;margin-left:8px;margin-right:6px;display:inline-block;"/>
-    <div id="dialog-signup-message" 
-        style="display:inline-block;position:relative;top:14px;left:10px;width:220px;">
+<div id="dialog-signup">
+    <div id="dialog-signup-message" >
     Processing your information.<br/>Please wait.
     </div>
-    <img src="{% static 'public/images/icon_clock-orange.png' %}"
-    alt="processing signup form..." id="signing-up-time"
-    style="position:relative;top:-4px;left:-6px;"/>
+    <img src="{% static 'manage/images/ajax-loader.gif' %}"
+    alt="processing signup form..." id="signing-up" />
+    <img src="{% static 'public/images/icon_clock-orange-2.png' %}"
+    alt="processing signup form..." id="signing-up-time"/>
 </div>
 {% endblock %}
 

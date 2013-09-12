@@ -1074,8 +1074,29 @@ float: right;
 	-webkit-border-radius:5px;
 }
 
+#dialog-signup {
+    display:none;
+}
+
+#dialog-signup-message {
+    display:inline-block;
+    width:220px;
+    margin: 16px;
+}
+
+#signing-up {
+    margin-left:8px;margin-right:6px;
+    display:inline-block;
+}
+
+#signing-up-time {
+    width: 20px;height: 20px;
+    margin-bottom: 3px;
+}
+
 #associated-account-form {
     margin-top: 10px;
+	margin-left: 26px;
 }
 
 #associated-account-form input {
@@ -1104,7 +1125,7 @@ float: right;
 #associated-account-message {
     text-align: center;
     margin-left: 2px; margin-top: 8px;
-    width: 100%;
+    width: 100%; 
 }
 
 #aa-forgot-pass-form {
