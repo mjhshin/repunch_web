@@ -191,15 +191,16 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 			if(error.code == Parse.Error.USERNAME_TAKEN) {
 				console.log("User save failed - username already taken.");
-				response.error(error.code); // code: 141, error: 202
+				response.error(error.code); //  202
 			
 			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
+			    // TODO handle 
 			    console.log("User save failed - email already taken.");
-			    response.error(error.code); // code: 141, error: 203
+			    response.error(error.code); //  203
 				
 			} else if(error.code == Parse.Error.INVALID_EMAIL_ADDRESS) {
 			    console.log("User save failed - email is invalid.");
-			    response.error(error.code); // code: 141, error: 125
+			    response.error(error.code); // 125
 				
 			} else {
 				response.error("error");
@@ -208,6 +209,188 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			deleteEmployee();
 			
 		});
+	}
+	
+	function addEmployeeToStore() {
+		store.relation("Employees").add(employee);
+		
+		store.save().then(function(store) {
+			console.log("Store save success.");
+			response.success("success");
+			
+			Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + store.id,
+                headers: { "Content-Type": "application/json"},
+                body: { 
+                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    pendingEmployee: employee, 
+                }
+            });
+			
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+				
+		});
+	}
+	
+	function deleteEmployee() {
+		employee.destroy().then(function() {
+			console.log("Employee delete success.");
+			
+		}, function(error) {
+			console.log("Employee delete fail.");
+		});
+	}
+    
+});
+
+////////////////////////////////////////////////////
+//
+// This will replace the above register_employee.
+//
+//  Handles employee registration. A USERNAME_TAKEN_AVAILABLE or
+//  EMAIL_TAKEN_AVAILABLE error is returned if the Parse.User object 
+//  associated with the given email/username does not yet have an Employee pointer.
+// 
+//  If add_employee_to_user is set to true, then the Employee pointer
+//  of the Parse.User is set instead.
+//  
+//  IMPORTANT! You must first make sure that the user signing up is the
+//  actual Parse.User before calling this with add_employee_to_user = true.
+//  Do this by calling Parse.login manually for authentication.
+//  
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("register_employee_2", function(request, response) {
+	var retailerPin = request.params.retailer_pin;
+    var username = request.params.username;
+	var password = request.params.password;
+	var firstName = request.params.first_name;
+	var lastName = request.params.last_name;
+	var email = request.params.email;
+	
+	var Employee = Parse.Object.extend("Employee");
+	var Store = Parse.Object.extend("Store");
+	var Settings = Parse.Object.extend("Settings");
+	
+	var store, employee, user, settings;
+	
+	var settingsQuery = new Parse.Query(Settings);
+	settingsQuery.include("Store");
+	settingsQuery.equalTo("retailer_pin", retailerPin);
+	
+	
+    // Note that the master key is not necessary to create a Parse.User.
+    // However, it is necessary to modify an existing one.
+    Parse.Cloud.useMasterKey(); 
+	
+	settingsQuery.first().then(function(settingsResult) {
+		if(settingsResult == null) {
+			console.log("Settings fetch success, PIN invalid.");
+			response.error("RETAILER_PIN_INVALID");
+			
+		} else {
+			console.log("Settings fetch success, PIN valid.");
+			settings = settingsResult;
+			executeSignUp();
+		}		
+			
+	}, function(error) {
+		console.log("Settings fetch failed.");
+		response.error("error");
+		
+	});
+	
+	function executeSignUp() {
+		store = settings.get("Store");
+		
+		employee = new Employee();
+		employee.set("first_name", firstName);
+		employee.set("last_name", lastName);
+		employee.set("lifetime_punches", 0);
+		employee.set("status", "pending");
+		employee.set("Store", store);
+		
+		employee.save().then(function(employee) {
+			console.log("Employee save success.");
+
+			user = new Parse.User();
+			user.set("username", username);
+			user.set("password", password);
+			user.set("email", email);
+			user.set("Employee", employee);
+			
+			return user.save();
+			
+		}, function(error) {
+			console.log("Employee save failed.");
+			response.error("error");
+			return;
+				
+		}).then(function(user) {
+			console.log("User save success.");
+			addEmployeeToStore();		
+			
+		}, function(error) {
+			console.log("User save failed.");
+		
+			if(error.code == Parse.Error.USERNAME_TAKEN) {
+				console.log("User save failed - username already taken.");
+				associatedUserDetected("username");
+				
+			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
+			    console.log("User save failed - email already taken.");
+				associatedUserDetected("email");
+				
+			} else if(error.code == Parse.Error.INVALID_EMAIL_ADDRESS) {
+			    console.log("User save failed - email is invalid.");
+			    response.error("EMAIL_INVALID");
+			    deleteEmployee();
+				
+			} else {
+				response.error("error");
+			    deleteEmployee();
+			}
+			
+		});
+	}
+	
+	// email = username but differentiate anyways since 
+	// this is still taking email and username as separate params
+	function associatedUserDetected(which) {
+	    var userQuery = new Parse.Query(Parse.User);
+	    var error;
+	    if(which == "email") {
+	        userQuery.equalTo("email", email);
+	        error = "EMAIL_TAKEN";
+	    } else {
+	        userQuery.equalTo("username", username);
+	        error = "USERNAME_TAKEN";
+	    }
+	    
+	    userQuery.first().then(function(user) {
+	        if(user.get("Employee") == null) {
+	            if (request.params.add_employee_to_user) {
+	                user.set("Employee", employee);
+	                return user.save();
+	            } else {
+	                response.error(error + "_AVAILABLE");
+	            }
+	            
+	        } else {
+	            response.error(error);
+	        }
+			deleteEmployee();
+			
+	    }).then(function(user) {
+	        if(user != null) {
+	            addEmployeeToStore();
+	        }
+	        
+	    });
+	    
 	}
 	
 	function addEmployeeToStore() {
