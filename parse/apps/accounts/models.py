@@ -20,6 +20,8 @@ class Account(ParseObject):
 
     def __init__(self, **data):
         # note that we are using the email as the username also
+        # also note that emails in Parse are case sensitive! 
+        # so we must always lower email addresses
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')

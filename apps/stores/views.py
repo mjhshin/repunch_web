@@ -168,11 +168,12 @@ def edit(request):
                 # and then edits store details = bug!
                 account.fetch_all(clear_first=True, with_cache=False)
                 # update the account - email = username!
-                if account.username != request.POST['email']:
+                postEmail = request.POST['email'].lower()
+                if account.username != postEmail:
                     prev_username = account.username
                     
-                    account.email = request.POST['email']
-                    account.username = request.POST['email']
+                    account.email = postEmail
+                    account.username = postEmail
                     account.update()
                     
                     if account.Patron:

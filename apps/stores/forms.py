@@ -96,11 +96,13 @@ class StoreForm(forms.Form):
         """
         e = self.cleaned_data.get('email')
         
-        if self.email and e and Account.objects().count(email=e) > 0:
-            # only raise if email is not itself
-            if self.email != e:
-                raise forms.ValidationError("Email is already " +\
-                    "being used.")
+        if self.email and e:
+            e = e.lower()
+            if Account.objects().count(email=e) > 0:
+                # only raise if email is not itself
+                if self.email != e:
+                    raise forms.ValidationError("Email is already " +\
+                        "being used.")
         return e
                                     
     def clean_street(self):

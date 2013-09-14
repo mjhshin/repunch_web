@@ -268,7 +268,7 @@ def sign_up(request):
             if not from_associated_account:
                 account = Account(**postDict)
                 # username = email
-                account.set("username", postDict['email'])
+                account.set("username", postDict['email'].lower())
                 account.set_password(request.POST.get('password'))
             else:
                 account =\
