@@ -1,8 +1,8 @@
 
 .re-punch{
 	width:450px;
-	border:2px solid #4C4C4C;
-	background:#4C4C4C;
+	border:5px solid #0965ad;
+	background:#0965ad;
 	
 	border-radius:5px;
 	-o-border-radius:5px;
@@ -15,7 +15,7 @@
 	font-size:14px;
 	line-height:16px;
 	font-family:Arial, sans-serif;
-	background:transparent url("../images/bkg_content.png") repeat 0 0;
+	background: white;
 	
 	border-radius:5px;
 	-o-border-radius:5px;

@@ -1,6 +1,6 @@
 from django.db import models 
 from django.contrib.auth.models import AbstractUser, UserManager
-import datetime, paypalrestsdk
+import datetime, paypalrestsdk, random, string
 
 from libs.repunch import rpccutils
 from apps.stores.models import Store
@@ -44,8 +44,11 @@ class Account(AbstractUser):
 		return False
 	
 class AccountActivate(models.Model):
-	store_id = models.CharField(max_length=100)
-	is_used = models.BooleanField(default=False)
+	store_id = models.CharField(max_length=30)
+	
+class AssociatedAccountNonce(models.Model):
+	account_id = models.CharField(max_length=30)
+	verified = models.BooleanField(default=False)
 	
 class Settings(models.Model):
 	account = models.ForeignKey(Account)

@@ -15,6 +15,18 @@ BAD_FILE_CHR = re.compile('[\W_]+')
 
 import traceback
 
+def flush(session):
+    """
+    Flush does not call save after delete- which means that
+    changes are not made immediately!
+    flush calls: clear -> delete -> create
+    
+    This fixes that.
+    """
+    session.clear()
+    session.delete()
+    session.save()
+    session.create()
 
 def parse(method, path, data=None, query=None,
         timeout=None, content_type="application/json"):
@@ -97,11 +109,14 @@ def batch(method, parse_objects):
         else:
             path = '/' + PARSE_VERSION + '/' + po.path() + '/' +\
                 po.objectId
-        reqs.append({
+        d = {
             "method": method,
             "path": path,
-            "body": po._get_formatted_data()
-        })
+        }
+        if method != "DELETE":
+            d["body"] = po._get_formatted_data()
+        reqs.append(d)
+        
     payload = json.dumps({"requests": reqs})
     
     rcm = REST_CONNECTION_META.copy()

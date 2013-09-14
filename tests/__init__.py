@@ -18,9 +18,11 @@ class SeleniumTest(object):
     notifications are not tested for localhost.
     """
     
-    #SERVER_URL = "https://www.repunch.com"
+    SERVER_URL = "https://www.repunch.com"
+    CHECK_SENT_MAIL = False # Mail sent by sendgrid
+    
     #SERVER_URL = "http://dev.repunch.com"
-    SERVER_URL = "http://localhost:8000"
+    #SERVER_URL = "http://localhost:8000"
     
     IMPLICITLY_WAIT = 10
     

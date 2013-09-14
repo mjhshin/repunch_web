@@ -23,7 +23,7 @@ from django.template import Template, Context, loader
 from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
-EMAIL_HOST_USER, STATIC_URL, DEBUG,\
+EMAIL_FROM, STATIC_URL, DEBUG,\
 ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 
 # declare here for selenium tests use also
@@ -40,7 +40,7 @@ def get_notification_ctx():
         'ABSOLUTE_HOST':ABSOLUTE_HOST,
         'ICON_URL':STATIC_URL + "manage/images/email_icon.png", 
         'STORE_INDEX':reverse('store_index'),
-        'EMAIL_HOST_USER': EMAIL_HOST_USER,
+        'EMAIL_FROM': EMAIL_FROM,
         'MAIN_TRANSPORT_PROTOCOL': MAIN_TRANSPORT_PROTOCOL,
     }
 
@@ -87,7 +87,8 @@ def send_email_receipt_monthly_failed(account, store, subscription,
         body = template.render(Context(ctx)).__str__()
                 
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
             
         _send_emails([email], connection)
@@ -127,7 +128,8 @@ def send_email_receipt_monthly_success(account, store, subscription,
         timezone.deactivate()
                 
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -139,7 +141,8 @@ def send_email_receipt_monthly_success(account, store, subscription,
         body = template.render(Context(ctx)).__str__()
         timezone.deactivate()
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+                    strip_tags(body), EMAIL_FROM,
+                    ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -194,7 +197,8 @@ def send_email_receipt_monthly_batch(asiss, connection=None):
             timezone.deactivate()
                     
             email = mail.EmailMultiAlternatives(subject,
-                        strip_tags(body), to=[account.get('email')])
+                        strip_tags(body), EMAIL_FROM,
+                        [account.get('email')])
             email.attach_alternative(body, 'text/html')
             emails.append(email)
         # for ORDER_PLACED_EMAILS
@@ -209,7 +213,8 @@ def send_email_receipt_monthly_batch(asiss, connection=None):
         body = template.render(Context(ctx)).__str__()
         timezone.deactivate()
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+                    strip_tags(body), EMAIL_FROM,
+                    ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -245,7 +250,8 @@ def send_email_receipt_ipod(account, subscription, invoice,
                 
         emails = []
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -266,7 +272,8 @@ def send_email_receipt_ipod(account, subscription, invoice,
         body = template.render(Context(ctx)).__str__()
         timezone.deactivate()
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+                    strip_tags(body), EMAIL_FROM,
+                    ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -297,7 +304,8 @@ def send_email_signup(account, connection=None):
         emails = []
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -322,7 +330,8 @@ def send_email_signup(account, connection=None):
         timezone.deactivate()
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=ORDER_PLACED_EMAILS)
+                    strip_tags(body), EMAIL_FROM,
+                    ORDER_PLACED_EMAILS)
         email.attach_alternative(body, 'text/html')
         emails.append(email)
         
@@ -357,7 +366,8 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         body = template.render(Context(ctx)).__str__()
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         
         _send_emails([email], connection)
@@ -388,7 +398,8 @@ def send_email_passed_user_limit(account, store, package,
         body = template.render(Context(ctx)).__str__()
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         
         _send_emails([email], connection)
@@ -418,7 +429,8 @@ def send_email_account_upgrade(account, store, package,
         body = template.render(Context(ctx)).__str__()
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=[account.get('email')])
+                    strip_tags(body), EMAIL_FROM,
+                    [account.get('email')])
         email.attach_alternative(body, 'text/html')
         
         _send_emails([email], connection)
@@ -454,7 +466,8 @@ def send_email_selenium_test_results(tests, connection=None):
         timezone.deactivate()
         
         email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), to=(ADMINS[0][1], ))
+                    strip_tags(body), EMAIL_FROM,
+                    [ADMINS[0][1]])
         email.attach_alternative(body, 'text/html')
         
         _send_emails([email], connection)

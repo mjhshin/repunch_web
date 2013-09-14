@@ -34,11 +34,21 @@ SESSION_CACHE = [
     'messages_received_list', # PUSH
     'redemptions_pending', # PUSH
     'redemptions_past', # PUSH
+    
+    'employee', # if employee is logged in
+    
 ]
 
 def get_store(session):
+    # WARNING! If employee is logged in, therefore the employee is not
+    # the store owner and the account may have a null Store or 
+    # a Store different from what is expected!
     if "store" not in session:
-        store = session['account'].get('store')
+        if 'employee' in session:
+            store = session['employee'].get("store")
+        else:
+            store = session['account'].get('store')
+            
         session['store'] = store
         return store
     else:

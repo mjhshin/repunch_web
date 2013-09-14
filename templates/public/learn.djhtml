@@ -162,11 +162,11 @@ ul.orangy li div {
 			</div>
 		</section>
 	</div>
+	
+    <section id="ad-wrapper">
+        <div id="ad-content">Ready to start rewarding your customers? <a href="{% url 'public_signup' %}" class="button orange">Sign Up for Free</a></div>
+    </section>
+    
 </section>
 {% endblock %}
 
-{% block adblock %}
-<section id="ad-wrapper">
-	<div id="ad-content">Ready to start rewarding your customers? <a href="{% url 'public_signup' %}" class="button orange">Sign Up for Free</a></div>
-</section>
-{% endblock %}

@@ -36,22 +36,19 @@ def activate(request):
         act = AccountActivate.objects.filter(id=act_id,
                 store_id=store_id)
         if len(act) > 0:
-            act = act[0]
-            if not act.is_used: # exist and unused!
-                act.is_used = True
-                act.save()
-                store = Store.objects().get(objectId=store_id)
-                if store:
-                    store.active = True
-                    store.update()
-                    return HttpResponse(store.get(\
-                        "store_name").capitalize() +\
-                        " has been activated.")
-                else:
-                    return HttpResponse("Account/store not found.")    
-            else: # used
-                return HttpResponse("This form has already "+\
-                    "been used.")                
+            act[0].delete()
+            store = Store.objects().get(objectId=store_id)
+            if store:
+                store.active = True
+                store.update()
+                return HttpResponse(store.get(\
+                    "store_name").capitalize() +\
+                    " has been activated.")
+            else:
+                return HttpResponse("Account/store not found.")  
+        else:  
+            return HttpResponse("This form has already "+\
+                "been used.")                
     
     return HttpResponse("Bad request")
     

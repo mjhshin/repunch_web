@@ -1,10 +1,5 @@
 ##############################################
-####################  TODO:
-1. DEBUG multiple tabs, signing out while sending message relogs user.
-    - parse.auth.decorators
-    - parse.auth.__init__
-    - apps.comet.views
-    - apps.messages.views - edit()
-    
-    
-2. Research django gmail smtp limit
+####################  TODO: 
+1. spaces are now allowed for passwords - so fix broken tests for signup
+
+2. write tests for only store owner can view/modify email field in edit store details

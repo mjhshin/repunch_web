@@ -39,7 +39,7 @@
 			<h1>Customers</h1>
 			<p>Have fun while you earn rewards at your favorite local spots</p>
 			<div id="home-dowload-app">
-				<h2>download the free app</h2>
+				<h2>Download the free app</h2>
 				<a href="#">
 				<img src="{% static "public/images/badge_iphone.png" %}" alt="available on the appstore">
 				</a>

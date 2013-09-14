@@ -29,7 +29,7 @@ class Command(BaseCommand):
         
         ####### DASHBOARD #########################################
         #### MY ACCOUNT
-        #results.extend(test_edit_store_details()) # TODO added 2 more here
+        #results.extend(test_edit_store_details()) 
         #results.extend(test_edit_account())
         #results.extend(test_cancel_account())
         
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         
         ### EMPLOYEE
         #results.extend(test_employees())
-        #results.extend(test_employee_access()) # TODO FINISH
+        results.extend(test_employee_access()) # TODO FINISH
         
         ### SETTINGS
         #results.extend(test_settings())

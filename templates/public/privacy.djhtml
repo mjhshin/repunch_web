@@ -5,7 +5,25 @@
 
 {% block styles %}
 <style>
-#about-content p {
+#page-content {
+    height:2530px;
+    background:white;
+	box-shadow:0px 0px 10px 0px #555;
+	-o-box-shadow:0px 0px 10px 0px #555;
+	-ms-box-shadow:0px 0px 10px 0px #555;
+	-moz-box-shadow:0px 0px 10px 0px #555;
+	-webkit-box-shadow:0px 0px 10px 0px #555;
+}
+
+#about-content div.col1 {
+    font-size:1.0em;
+    position:relative;left:150px;
+    width:600px;
+    border-left:1px solid gray;
+    margin-top:40px;
+}
+
+#about-content div.col1 p {
     font-size:1.0em;
 }
 
@@ -20,9 +38,9 @@ h3 {
     <div class="page-title-container">
     <h1 class="page-title">Privacy Policy</h1>
     </div>
-	<div id="page-content" style="height:2530px;">
+	<div id="page-content">
 		<div id="about-content">
-			<div class="col1" style="position:relative;left:150px;width:600px;border-left:1px solid gray;margin-top:40px;">
+			<div class="col1">
 			
 <h3>Privacy Policy</h3><p>
 Your privacy is very important to us and we have developed this policy in order for you to understand how we collect, use, communicate and disclose information.  We may amend this policy at any time.  All amended terms automatically take effect 10 days after you are initially provided notice of such changes.  You agree that notice of changes to the policy is sufficient notice.  Your continued use of the Repunch Service following the posting of changes to this policy will mean that you accept those changes. 

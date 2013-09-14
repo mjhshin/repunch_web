@@ -115,6 +115,31 @@ class Store(ParseObject):
             elif acl.get("read"):
                 return ACCESS_PUNCHREDEEM
         return ACCESS_NONE
+        
+    def set_access_level(self, account, access_level):
+        """
+        Pass in the int or str/unicode representation 
+        of the access_level.
+        """
+        if type(access_level) in (str, unicode):
+            index = 0
+        elif type(access_level) in (int, float, long):
+            index = 1
+        else:
+            return False
+            
+        if access_level == ACCESS_ADMIN[index]:
+            self.ACL[account.objectId] = {"read": True, "write": True}
+            return True
+        elif access_level == ACCESS_PUNCHREDEEM[index]:
+            self.ACL[account.objectId] = {"read": True}
+            return True
+        elif access_level == ACCESS_NONE[index]:
+            if account.objectId in self.ACL:
+                del self.ACL[account.objectId]
+            return True
+        
+        return False
             
     def is_admin(self, account):
         """ Returns true if the account has full admin access """

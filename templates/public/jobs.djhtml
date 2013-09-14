@@ -21,7 +21,7 @@ div {
     <h1 class="page-title">Jobs</h1>
     </div>
 	<div id="page-content">
-		<div id="about-content">
+		<div id="about-content" style="min-height:500px;">
 			<aside class="col1">
 				<h2>Interested in joining the Repunch team?</h2>
 				<div>We are always looking for amazing engineers and marketing aficionados. Reach out to us at <a class="repunch-blue"  href="mailto:jobs@repunch.com">jobs@repunch.com</a>.</div>

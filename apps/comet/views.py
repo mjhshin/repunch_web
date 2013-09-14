@@ -11,6 +11,7 @@ import json, socket, thread
 
 from libs.dateutil.relativedelta import relativedelta
 from parse import session as SESSION
+from parse.utils import flush
 from parse.decorators import access_required
 from parse.auth.decorators import login_required, dev_login_required
 from apps.comet.models import CometSession, CometSessionIndex
@@ -285,15 +286,11 @@ def pull(request):
         # to the SessionStore(session_key) key!
         # need to check if we are still logged in
         session = SessionStore(request.session.session_key)
-        print "RETURNING COMET"
-        print "RETURNING COMET"
-        print "SESSION KEY: " + request.session.session_key
-        print session._get_session()
         if 'account' in session and SESSION_KEY in session:
             request.session.clear()
             request.session.update(session)
         else:
-            request.session.flush()
+            flush(request.session)
         
         ############################################################
         # Respond ###########################################
@@ -354,7 +351,7 @@ def pull(request):
                     request.session.clear()
                     request.session.update(session)
                 else:
-                    request.session.flush()
+                    flush(request.session)
                 return HttpResponse(json.dumps({"result":-1}), 
                             content_type="application/json")
             except (IOError, socket.error) as e: 
@@ -378,7 +375,6 @@ def pull(request):
                 # or forcefully by server =)
                 # now time to flag existing tabs.
                 request.session.clear()
-                print "KeyError at comet views"
                 try: 
                     return HttpResponse(json.dumps({"result": -3}), 
                                 content_type="application/json")
@@ -409,7 +405,7 @@ def pull(request):
         request.session.clear()
         request.session.update(session)
     else:
-        request.session.flush()
+        flush(request.session)
     
     # attempt to delete registered comet session if not yet deleted
     try:

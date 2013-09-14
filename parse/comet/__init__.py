@@ -290,7 +290,11 @@ def comet_receive(store_id, postDict):
         # ACCOUNT UPDATED ##############################
         updatedAccount = postDict.get("updatedAccount")
         if updatedAccount:
-            session['account'] = Account(**updatedAccount)
+            updatedAccountObject = Account(**updatedAccount)
+            # need to make sure that these are the same accounts!
+            if session['account'].objectId ==\
+                updatedAccountObject.objectId:
+                session['account'] = updatedAccountObject
                     
         #############################################################
         # SUBSCRIPTION UPDATED ##############################

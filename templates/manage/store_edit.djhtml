@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}
+{% load static %}{% load store_tags %}{% load util_tags %}{% load parse_tags %}{% load account_tags %}
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
@@ -19,7 +19,8 @@
 
 
 {% block content %}
-{% with store=request.session.store %}
+    {% with store=request.session.store %}
+	{% account_is_owner request.session as is_owner %}
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
     <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
@@ -150,7 +151,8 @@
             </script>
 		</div>
 		
-		<div class="input-container clearheight">
+		
+		<div class="input-container clearheight" {% if not is_owner %}style="display:none;"{% endif %}>
 			<div id="email_e">{{ form.email.errors }}</div>
 			<label for="id_email" id="label_email">Email</label>
 			{{ form.email }}

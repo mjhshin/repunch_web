@@ -144,6 +144,12 @@ def punch(request):
             "punch_code":str(request.POST['punch_code']),
             "num_punches":nump,
         }
+        
+        # Check if the user is an employee
+        employee = request.session.get("employee")
+        if employee:
+            data['employee_id'] = employee.objectId
+        
         res = cloud_call("punch", data)
         if 'error' not in res:
             res['patron_name'] = res['result']
@@ -210,7 +216,12 @@ def redeem(request):
         if 'error' not in res:
             redemptions_pending =\
                     SESSION.get_redemptions_pending(session)
-            i_remove, result = -1, res.get("result")
+            i_remove = -1
+            if action == "approve":
+                result = res.get("result").get("code")
+            else:
+                result = res.get("result")
+                
             # remove from redemptions_pending
             for i, red in enumerate(redemptions_pending):
                 if red.objectId == redeemId:
@@ -220,12 +231,11 @@ def redeem(request):
             # IMPORTANT! Since comet receive  immediately commits
             # changes to a session, i_remove will probably be -1
             
-           
             if action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
-                if result and result in\
-                    ("insufficient", "removed") and i_remove != -1:
+                if result and result == "insufficient" and\
+                    i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
                     # notify other dashboards of this change
                     store_id =\
@@ -235,8 +245,6 @@ def redeem(request):
                         "deletedRedemption":del_red.jsonify()
                     }
                     comet_receive(store_id, payload)
-                    # now delete the redemption
-                    del_red.delete()
                 elif i_remove != -1:
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True

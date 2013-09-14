@@ -37,7 +37,7 @@ $(document).ready(function(){
 					You currently have the highest level of subscription. 
 					Please contact us for further support.<br/>
 					<a class="button blue" style="margin-top: 10px;"
-					    href="{% url 'messages_index' %}" id="maxed_out">Okay</a>
+					    href="{% url 'messages_index' %}" id="maxed_out">OK</a>
 					<span style="clear: left; display: block;"></span>
 					{% else %}
 					This message cannot be sent because you have reached your maximum messages sent for this month. Click on the "Upgrade Account" button to upgrade your account to send more messages for this month.

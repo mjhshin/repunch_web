@@ -11,6 +11,8 @@ from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
 from repunch.settings import COMET_PULL_RATE
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
 
 TEST_USER = {
     "username": "clothing@vandolf.com",
@@ -529,6 +531,11 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
+        
+    ### Update the store's ACL
+    store.set_access_level(employee_acc, ACCESS_PUNCHREDEEM[0])
+    store.update()
+        
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog  TODO
     try:

@@ -182,7 +182,7 @@ paginate = function (pagUrl, which, getCallback) {
                     self.siblings().removeClass("active");
                     self.addClass("active");
                     // set the current active unit
-                    pagPage.val(self.text());
+                    pagPage.val(countTmp);
                 }
                 countTmp = countTmp + 1;
             });
@@ -192,7 +192,7 @@ paginate = function (pagUrl, which, getCallback) {
             self.siblings().removeClass("active");
             self.addClass("active");
             // set the current active unit
-            pagPage.val(self.text());
+            pagPage.val(pageNumStr);
         }
         
     });

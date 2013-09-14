@@ -4,7 +4,7 @@
 {% block title %}Account {% if update %}Update{% else %}Upgrade{% endif %}{% endblock %}
 {% block styles %}
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/account_update.1.0.css" %}" />
-<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
+<link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 {% endblock %}
 

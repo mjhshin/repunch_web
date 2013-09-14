@@ -24,6 +24,7 @@ from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
+from parse.apps.patrons.models import PunchCode
 from parse.apps.stores.models import Store
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required, dev_login_required
@@ -100,7 +101,13 @@ def edit(request):
                             max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
-        form = StoreForm(account.email, request.POST)
+                                
+        # only clean email if user is the store owner!
+        if store.is_owner(account):
+            form = StoreForm(account.email, request.POST)
+        else:
+            form = StoreForm(None, request.POST)
+            
         if form.is_valid(): 
             # build the list of hours in proper format for saving 
             # to Parse. 
@@ -154,10 +161,27 @@ def edit(request):
                     
             store.update()
             
-            # update the account - email = username!
-            account.email = request.POST['email']
-            account.username = request.POST['email']
-            account.update()
+            # Only update the account if user is the store owner
+            if store.is_owner(account):
+                # Need to make sure that the account is the latest - 
+                # User in dashboard then signs up for a mobile account
+                # and then edits store details = bug!
+                account.fetch_all(clear_first=True, with_cache=False)
+                # update the account - email = username!
+                if account.username != request.POST['email']:
+                    prev_username = account.username
+                    
+                    account.email = request.POST['email']
+                    account.username = request.POST['email']
+                    account.update()
+                    
+                    if account.Patron:
+                        # update the punch_code username field
+                        pc = PunchCode.objects().get(\
+                            username=prev_username)
+                        if pc: # should never be none but ehh
+                            pc.username = account.username
+                            pc.update()
             
             # update the session cache
             try:
@@ -174,8 +198,11 @@ def edit(request):
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
-                "updatedAccount": account.jsonify()
             }
+            
+            if store.is_owner(account):
+                payload["updatedAccount"] = account.jsonify()
+            
             comet_receive(store.objectId, payload)
             
             return redirect(reverse('store_index')+ "?%s" %\

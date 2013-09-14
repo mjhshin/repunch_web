@@ -5,8 +5,6 @@
 
 {% block styles %}
 <link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
-<link href="{% static "public/css/tooltipster-repunch.css" %}" rel="stylesheet" type="text/css">
-<link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 <style>select { margin-top:2px; }</style>
 {% endblock %}
 
@@ -14,7 +12,7 @@
 <script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
 <script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
 <script src="{% static 'public/js/place-order.1.0.js' %}"></script>
-<script src="{% static 'public/js/signup.1.2.js' %}"></script>
+<script src="{% static 'public/js/signup.1.5.b.js' %}"></script>
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
 $(document).ready(function(){
@@ -60,6 +58,8 @@ function validate(which, next) {
     </div>
 	<div id="page-content">
 		<div id="signup-content">
+		    <div id="signup-content-div">
+		    
 			<aside class="col1">
 				<h2>Please fill out the form below to get started.</h2>
 				<div id="signup-steps-box">
@@ -99,6 +99,11 @@ function validate(which, next) {
 	            <input type="hidden" name="action" value="{% url 'public_signup' %}" />
 		        <input type="hidden" name="redirect-url" value="{% url 'store_index' %}" />
 		        <input type="hidden" name="home-url" value="{% url 'public_home' %}" />
+		        
+		        {# used to flag signup view that there is an existing account already #}
+                <input type="hidden" name="aaf-nonce" value="" />
+                <input type="hidden" name="aaf-account_id" value="" />
+    
 		        {# uncomment below when credit card info is brought back on sign up #}
 		        {# also uncomment the parts in signup.js as well #}
 		        {# <input type="hidden" name="signup2" value="{% url 'public_signup2' %}" /> #}
@@ -236,6 +241,7 @@ function validate(which, next) {
                     <div id="cc_section" style="display:none;">
                     {% endif %}
                     
+                <input type="hidden" name="aaf-account_id" value="" />
 					<p id="cc_info">Credit Card Information</p>
 					<div class="floated"
 					    {% if not subscription_form.first_name2.errors and subscription_form.last_name2.errors %}
@@ -327,6 +333,7 @@ function validate(which, next) {
 						<div id="zip2_e">{{ subscription_form.zip2.errors }}</div>
 						<label for="id_zip2">Zip</label>
 						{{ subscription_form.zip2 }}
+                <input type="hidden" name="aaf-nonce" value="" />
 					</div>
 					<div class="clear-both"></div>
 					
@@ -364,22 +371,49 @@ function validate(which, next) {
 			</aside>
 			
 			<div class="clear-both"></div>
-		</div>
-	</div>
+			
+			</div> {# end signup-content-div #}
+		</div> {# end signup-content #}
+	</div> {# end page-content #}
 </section>
 {% endblock %}
 
 {% block dialogs %}
-<div id="dialog-signup" style="display:none;">
-    <img src="{% static 'manage/images/ajax-loader.gif' %}"
-    alt="processing signup form..." id="signing-up" 
-    style="position:relative;top:16px;margin-left:8px;margin-right:6px;display:inline-block;"/>
-    <div id="dialog-signup-message" 
-        style="display:inline-block;position:relative;top:14px;left:10px;width:220px;">
+<div id="dialog-signup">
+    <div id="dialog-signup-message" >
     Processing your information.<br/>Please wait.
     </div>
-    <img src="{% static 'public/images/icon_clock-orange.png' %}"
-    alt="processing signup form..." id="signing-up-time"
-    style="position:relative;top:-4px;left:-6px;"/>
+    <img src="{% static 'manage/images/ajax-loader.gif' %}"
+    alt="processing signup form..." id="signing-up" />
+    <img src="{% static 'public/images/icon_clock-orange-2.png' %}"
+    alt="processing signup form..." id="signing-up-time"/>
+</div>
+{% endblock %}
+
+{% block hidden_stuff %}
+<div id="associated-account-div" style="display:none;">
+    <span>
+    The email you entered has an associated Repunch account.<br/>
+    Please enter the password associated with this email.<br/>
+    Note that this password will also be used as the password for
+    this business account.
+    </span>
+    <form id="associated-account-form" action="" method="POST">{% csrf_token %}
+        <input type="hidden" name="url" value="{% url "public_associated_account_confirm" %}" />
+        <input type="hidden" name="aaf-nonce" value="" />
+        <input type="hidden" name="aaf-account_id" value="" />
+        <input type="hidden" name="acc_username" value="" />
+        <input type="password" name="acc_password" value="" />
+        <input type="submit" value="Submit"/>
+    </form>
+    <div id="associated-account-message" class="repunch-red"></div> 
+    
+    <form id="aa-forgot-pass-form" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{% url 'public_request_password_reset' %}"/>
+        <input type="hidden" name="forgot-pass-email"/>
+        <span><a>Forgot your password?</a></span>
+    </form>
+    
 </div>
 {% endblock %}

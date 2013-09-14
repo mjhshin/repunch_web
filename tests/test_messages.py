@@ -295,14 +295,18 @@ def test_messages():
         test.open(reverse("messages_index"))
         
     # open the mail connection
-    mail = Mail()
-    ##########  Email is sent notifying user the upgrade.
-    try:
-        parts[11]['success'] = mail.is_mail_sent(\
-            EMAIL_UPGRADE_SUBJECT)
-    except Exception as e:
-        print e
-        parts[11]['test_message'] = str(e)
+    if SeleniumTest.CHECK_SENT_MAIL:
+        mail = Mail()
+        ##########  Email is sent notifying user the upgrade.
+        try:
+            parts[11]['success'] = mail.is_mail_sent(\
+                EMAIL_UPGRADE_SUBJECT)
+        except Exception as e:
+            print e
+            parts[11]['test_message'] = str(e)
+    else:
+        parts[11]['success'] = parts[10]['success']
+        
     ##########  Message is in store's sentMessages relation. 
     message_in_relation(message_id, 12)
     ##########  Message is visible in page. 
@@ -364,12 +368,16 @@ def test_messages():
     finally: # must go back to messages index
         test.open(reverse("messages_index"))
     ##########  Email is sent notifying user the upgrade.
-    try:
-        parts[21]['success'] = mail.is_mail_sent(\
-            EMAIL_UPGRADE_SUBJECT)
-    except Exception as e:
-        print e
-        parts[21]['test_message'] = str(e)
+    if SeleniumTest.CHECK_SENT_MAIL:
+        try:
+            parts[21]['success'] = mail.is_mail_sent(\
+                EMAIL_UPGRADE_SUBJECT)
+        except Exception as e:
+            print e
+            parts[21]['test_message'] = str(e)
+    else:
+        parts[21]['success'] = parts[20]['success']
+            
     ##########  Message is in store's sentMessages relation. 
     message_in_relation(message_id, 22)
     ##########  Message is visible in page. 
@@ -583,7 +591,9 @@ def test_messages():
     
     
     # END OF ALL TESTS - cleanup
-    mail.logout()
+    if SeleniumTest.CHECK_SENT_MAIL:
+        mail.logout()
+        
     return test.tear_down() 
     
     
