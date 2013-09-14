@@ -261,7 +261,6 @@ Parse.Cloud.define("register_employee", function(request, response) {
 //  IMPORTANT! You must first make sure that the user signing up is the
 //  actual Parse.User before calling this with add_employee_to_user = true.
 //  Do this by calling Parse.login manually for authentication.
-//  
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_employee_2", function(request, response) {
@@ -271,6 +270,9 @@ Parse.Cloud.define("register_employee_2", function(request, response) {
 	var firstName = request.params.first_name;
 	var lastName = request.params.last_name;
 	var email = request.params.email;
+	
+	// optional - read the documentation above before using this.
+	var addEmployeeToUser = request.params.add_employee_to_user;
 	
 	var Employee = Parse.Object.extend("Employee");
 	var Store = Parse.Object.extend("Store");
@@ -373,7 +375,7 @@ Parse.Cloud.define("register_employee_2", function(request, response) {
 	    
 	    userQuery.first().then(function(user) {
 	        if(user.get("Employee") == null) {
-	            if (request.params.add_employee_to_user) {
+	            if (addEmployeeToUser != null && addEmployeeToUser) {
 	                user.set("Employee", employee);
 	                return user.save();
 	            } else {
