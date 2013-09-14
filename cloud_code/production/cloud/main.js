@@ -323,7 +323,7 @@ Parse.Cloud.define("register_employee_2", function(request, response) {
 			user.set("email", email);
 			user.set("Employee", employee);
 			
-			return user.save();
+			return user.signUp();
 			
 		}, function(error) {
 			console.log("Employee save failed.");
