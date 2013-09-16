@@ -97,7 +97,7 @@ class StoreForm(forms.Form):
         e = self.cleaned_data.get('email')
         
         if self.email and e:
-            e = e.lower()
+            e = e.strip().lower()
             if Account.objects().count(email=e) > 0:
                 # only raise if email is not itself
                 if self.email != e:

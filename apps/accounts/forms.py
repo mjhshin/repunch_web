@@ -33,7 +33,7 @@ class AccountForm(forms.Form):
         # If an Account exist already with a Store object - then bad
         e = self.cleaned_data.get('email')
         if e:
-            e = e.lower()
+            e = e.strip().lower()
             acc = Account.objects().get(email=e)
             if acc and acc.Store:
                 raise forms.ValidationError(\

@@ -168,7 +168,7 @@ def edit(request):
                 # and then edits store details = bug!
                 account.fetch_all(clear_first=True, with_cache=False)
                 # update the account - email = username!
-                postEmail = request.POST['email'].lower()
+                postEmail = request.POST['email'].strip().lower()
                 if account.username != postEmail:
                     prev_username = account.username
                     

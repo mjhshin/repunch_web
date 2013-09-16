@@ -262,6 +262,9 @@ Parse.Cloud.define("register_employee", function(request, response) {
 //  actual Parse.User before calling this with add_employee_to_user = true.
 //  Do this by calling Parse.login manually for authentication.
 //
+//  WARNING! Email address in Parse.User is case sensitive!
+//  This does not lower the email. Make sure to pass in email in all lower case.
+//
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_employee_2", function(request, response) {
 	var retailerPin = request.params.retailer_pin;
