@@ -364,7 +364,6 @@ Parse.Cloud.define("link_employee", function(request, response) {
 		}).then(function(user) {
 			console.log("User save & employee link success.");
 			addEmployeeToStore();
-		    response.success("success");
 		    
 		}, function(error) {
 		    deleteEmployee();
