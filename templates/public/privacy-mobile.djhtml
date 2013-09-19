@@ -5,6 +5,8 @@
 <head>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
+    
     <style>
     body {
         margin: 0;
@@ -31,6 +33,9 @@
     /* CONTENT (inside main) */
     div#content {
         background-color:#fff;border-top:10px solid #fff;
+    }
+    div#content h2, div#content h3 {
+        font-family: 'Cabin', sans-serif;
     }
     /* CLASSES */
     .compliment {
