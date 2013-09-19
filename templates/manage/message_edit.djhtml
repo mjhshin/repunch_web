@@ -22,6 +22,24 @@ $(document).ready(function(){
         $( "#num_patrons" ).val( ui.value );
       }
     });
+    
+    // remaining characters
+    function detectRemainingChars(object) {
+        var maxLength = new Number(object.attr("maxlength"));
+        var remainingContainer = $( "#" + object.attr("id").substring(3) + "_chars_remaining" );
+        remainingContainer.html(maxLength - object.val().length);
+    }
+    
+    $("#id_subject, #id_body").bind('input propertychange', function() {
+        detectRemainingChars($(this));
+    });
+    
+    // initial call
+    detectRemainingChars($("#id_subject"));
+    detectRemainingChars($("#id_body"));
+    
+    
+    
 });
 </script>
 {% endblock %}
@@ -95,11 +113,17 @@ $(document).ready(function(){
         </span>
 	
 		<div id="subject_e">{{ form.subject.errors }}</div>
-		<label for="id_subject">Subject</label>
+		<div style="margin-top:14px;">
+		    <label for="id_subject" style="display:inline;float:left">Subject</label>
+		    <label id="subject_chars_remaining" style="display:inline; float:right; margin-right:14px;color:#0965ad;"></label>
+		</div>
 		{{ form.subject }}
 		
 		<div id="body_e">{{ form.body.errors }}</div>
-		<label for="id_body">Body</label>
+		<div style="margin-top:14px;">
+		    <label for="id_body" style="display:inline;float:left">Body</label>
+		    <label id="body_chars_remaining" style="display:inline; float:right;margin-right:14px;color:#0965ad"></label>
+		</div>
 		{{ form.body }}
 		
 		<div id="attach-offer-container">

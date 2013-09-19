@@ -83,8 +83,9 @@ def edit(request, reward_id):
     if request.method == 'POST': 
         form = RewardForm(request.POST) 
         if form.is_valid():
+            # the description is stripped of newlines and tabs.
             reward = {'reward_name':form.data['reward_name'], 
-                "description":form.data['description'], 
+                "description":" ".join(form.data['description'].split()), 
                 "punches":int(form.data['punches']),
                 "redemption_count":0}
                 

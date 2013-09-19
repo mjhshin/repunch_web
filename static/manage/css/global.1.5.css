@@ -43,6 +43,7 @@ textarea{
 	font-size:14px;
 	color:#666;
 	padding:6px;
+	resize:vertical;
 }
 
 ul.errorlist { margin: 10px 0px 0px 0px; padding: 0px;  list-style: none; }
