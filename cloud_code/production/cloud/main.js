@@ -119,14 +119,9 @@ Parse.Cloud.define("register_patron", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
-// This will replace the above register_employee.
-//
 //  Handles employee registration. A USERNAME_TAKEN_AVAILABLE or
 //  EMAIL_TAKEN_AVAILABLE error is returned if the Parse.User object 
 //  associated with the given email/username does not yet have an Employee pointer.
-// 
-//  If add_employee_to_user is set to true, then the Employee pointer
-//  of the Parse.User is set instead.
 //
 //  WARNING! Email address in Parse.User is case sensitive!
 //  This does not lower the email. Make sure to pass in email in all lower case.
