@@ -74,6 +74,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		if(email != null) {
 			userResult.set("email", email);
+			userResult.set("username", email);
 		}
 		  
 		return userResult.save();
@@ -118,7 +119,12 @@ Parse.Cloud.define("register_patron", function(request, response) {
 
 ////////////////////////////////////////////////////
 //
+//  Handles employee registration. A USERNAME_TAKEN_AVAILABLE or
+//  EMAIL_TAKEN_AVAILABLE error is returned if the Parse.User object 
+//  associated with the given email/username does not yet have an Employee pointer.
 //
+//  WARNING! Email address in Parse.User is case sensitive!
+//  This does not lower the email. Make sure to pass in email in all lower case.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_employee", function(request, response) {
@@ -133,21 +139,20 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	var Store = Parse.Object.extend("Store");
 	var Settings = Parse.Object.extend("Settings");
 	
-	var store, employee, user, settings;
+	var employee, store;
 	
 	var settingsQuery = new Parse.Query(Settings);
 	settingsQuery.include("Store");
 	settingsQuery.equalTo("retailer_pin", retailerPin);
 	
-	settingsQuery.first().then(function(settingsResult) {
-		if(settingsResult == null) {
+	settingsQuery.first().then(function(settings) {
+		if(settings == null) {
 			console.log("Settings fetch success, PIN invalid.");
-			response.success("invalid_pin");
+			response.error("RETAILER_PIN_INVALID");
 			
 		} else {
 			console.log("Settings fetch success, PIN valid.");
-			settings = settingsResult;
-			executeSignUp();
+			executeSignUp(settings);
 		}		
 			
 	}, function(error) {
@@ -156,9 +161,9 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 	});
 	
-	function executeSignUp() {
-		store = settings.get("Store");
-		
+	function executeSignUp(settings) {
+	    store = settings.get("Store");
+	
 		employee = new Employee();
 		employee.set("first_name", firstName);
 		employee.set("last_name", lastName);
@@ -169,13 +174,13 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		employee.save().then(function(employee) {
 			console.log("Employee save success.");
 
-			user = new Parse.User();
+			var user = new Parse.User();
 			user.set("username", username);
 			user.set("password", password);
 			user.set("email", email);
 			user.set("Employee", employee);
 			
-			return user.save();
+			return user.signUp();
 			
 		}, function(error) {
 			console.log("Employee save failed.");
@@ -191,23 +196,48 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 			if(error.code == Parse.Error.USERNAME_TAKEN) {
 				console.log("User save failed - username already taken.");
-				response.error(error.code); // code: 141, error: 202
-			
+				associatedUserDetected("username");
+				
 			} else if(error.code == Parse.Error.EMAIL_TAKEN) {
 			    console.log("User save failed - email already taken.");
-			    response.error(error.code); // code: 141, error: 203
+				associatedUserDetected("email");
 				
 			} else if(error.code == Parse.Error.INVALID_EMAIL_ADDRESS) {
 			    console.log("User save failed - email is invalid.");
-			    response.error(error.code); // code: 141, error: 125
+			    response.error("EMAIL_INVALID");
+			    deleteEmployee();
 				
 			} else {
 				response.error("error");
+			    deleteEmployee();
 			}
 			
+		});
+	}
+	
+	// email = username but differentiate anyways since 
+	// this is still taking email and username as separate params
+	function associatedUserDetected(which) {
+	    var userQuery = new Parse.Query(Parse.User);
+	    var error;
+	    if(which == "email") {
+	        userQuery.equalTo("email", email);
+	        error = "EMAIL_TAKEN";
+	    } else {
+	        userQuery.equalTo("username", username);
+	        error = "USERNAME_TAKEN";
+	    }
+	    
+	    userQuery.first().then(function(user) {
+	        if(user.get("Employee") == null) {
+                response.error(error + "_AVAILABLE");
+	        } else {
+	            response.error(error);
+	        }
 			deleteEmployee();
 			
-		});
+	    });
+	    
 	}
 	
 	function addEmployeeToStore() {
@@ -243,6 +273,138 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		});
 	}
     
+});
+
+////////////////////////////////////////////////////
+//
+//  Creates an employee and sets it to the given Parse.User.
+//  EMPLOYEE_EXIST error if the given Parse.User already has an employee pointer.
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("link_employee", function(request, response) {  
+	var retailerPin = request.params.retailer_pin;
+    var username = request.params.username;
+	var firstName = request.params.first_name;
+	var lastName = request.params.last_name;
+	var email = request.params.email;
+	
+	var Employee = Parse.Object.extend("Employee");
+	var Store = Parse.Object.extend("Store");
+	var Settings = Parse.Object.extend("Settings");
+	
+	var employee, store;
+	
+	var userQuery = new Parse.Query(Parse.User);
+	var settingsQuery = new Parse.Query(Settings);
+	
+	// yes username = email but check both anyways
+	userQuery.equalTo("username", username);
+	userQuery.equalTo("email", email);
+	
+	settingsQuery.include("Store");
+	settingsQuery.equalTo("retailer_pin", retailerPin);
+	
+	
+    // Note that the master key is not necessary to create a Parse.User.
+    // However, it is necessary to modify an existing one.
+    Parse.Cloud.useMasterKey(); 
+	
+	settingsQuery.first().then(function(settings) {
+		if(settings == null) {
+			console.log("Settings fetch success, PIN invalid.");
+			response.error("RETAILER_PIN_INVALID");
+			
+		} else {
+			console.log("Settings fetch success, PIN valid.");
+			executeLink(settings);
+		}		
+			
+	}, function(error) {
+		console.log("Settings fetch failed.");
+		response.error("error");
+		
+	});
+	
+	function executeLink(settings) {
+		store = settings.get("Store");
+		
+		employee = new Employee();
+		employee.set("first_name", firstName);
+		employee.set("last_name", lastName);
+		employee.set("lifetime_punches", 0);
+		employee.set("status", "pending");
+		employee.set("Store", store);
+		
+		employee.save().then(function(employee) {
+			console.log("Employee save success.");
+			return userQuery.first();
+			
+		}, function(error) {
+			console.log("Employee save failed.");
+			return Parse.Promise.error("error");
+				
+		}).then(function(user) {
+		    if (user == null) {
+			    return Parse.Promise.error("USER_NOT_FOUND");
+			    
+		    } else {
+		        if (user.get("Employee") == null) {
+		            user.set("Employee", employee);
+		            return user.save();
+		        } else {
+			        return Parse.Promise.error("EMPLOYEE_EXIST");
+		        }
+		        
+		    }
+		
+		}, function(error) {
+			console.log("User query failed.");
+			return Parse.Promise.error("error");
+				
+		}).then(function(user) {
+			console.log("User save & employee link success.");
+			addEmployeeToStore();
+		    
+		}, function(error) {
+		    deleteEmployee();
+		    response.error(error);
+		});
+		
+	}
+	
+	function addEmployeeToStore() {
+		store.relation("Employees").add(employee);
+		
+		store.save().then(function(store) {
+			console.log("Store save success.");
+			response.success("success");
+			
+			Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "http://dev.repunch.com/manage/comet/receive/" + store.id,
+                headers: { "Content-Type": "application/json"},
+                body: { 
+                    "cometrkey": "384ncocoacxpvgrwecwy", 
+                    pendingEmployee: employee, 
+                }
+            });
+			
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+				
+		});
+	}
+	
+	function deleteEmployee() {
+		employee.destroy().then(function() {
+			console.log("Employee delete success.");
+			
+		}, function(error) {
+			console.log("Employee delete fail.");
+		});
+	}
+  
 });
 
 ////////////////////////////////////////////////////
@@ -369,6 +531,8 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 		console.log("PatronStore/Store/Patron fetch success (in parallel).");
 		patronStore = patronStoreResult;
 		
+		// this shouldn't be necessary since deleting the patronStore
+		// will automatically remove it from all relations
 		store.relation("PatronStores").remove(patronStore);
 		patron.relation("PatronStores").remove(patronStore);
 		
@@ -881,18 +1045,18 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	}
 	
 	function executePush() {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		installationQuery.equalTo("store_id", storeId);
+		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+		iosInstallationQuery.equalTo("store_id", storeId);
+	    iosInstallationQuery.equalTo("deviceType", "ios");
+	    // TODO android push
 	    
 		Parse.Push.send({
-	        where: installationQuery,
+	        where: iosInstallationQuery,
 	        data: {
-	            alert: customerName + " wants to redeem a reward.",
+	            alert: customerName + " wants to redeem a reward",
 				redeem_id: redeemReward.id,
 	            badge: "Increment",
-	            name: customerName,
-	            num_punches: numPunches,
-	            title: rewardTitle,
+	            type: "request_redeem"
 	        }
 	    }, {
 	        success: function() {
@@ -999,6 +1163,120 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	});
 	
 });
+
+
+////////////////////////////////////////////////////
+//
+//  Called when removing an approved employee and denying a pending employee.
+//
+//  Params: 
+//      employee_id: Employee object's objectId
+//
+//  Deletes the employee object and sends a push to the Installation with the given employee_id.
+//  This will also delete the Parse.User associated with the Employee 
+//  if it does not have a pointer to a Store and a Patron. Otherwise, 
+//  the Employee pointer will just be set to null.
+//
+//  A push is made if the Employee status is "approved".
+//
+//  Note that this does not need to post to server because this is only called server side!
+//  Meaning the notification is done within the server. 
+//  Also removing the Employee's Parse.User from the Store's ACL is also done server side.
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("delete_employee", function(request, response) 
+{
+    var employeeId = request.params.employee_id;
+    var action = request.params.action;
+    
+    var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
+    
+    var Employee = Parse.Object.extend("Employee");
+    var employeeQuery = new Parse.Query(Employee);
+    var userQuery = new Parse.Query(Parse.User)
+    
+	var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+	androidInstallationQuery.equalTo("employee_id", employeeId);
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("employee_id", employeeId);
+	iosInstallationQuery.equalTo("deviceType", "ios");
+    
+    employeeQuery.equalTo("objectId", employeeId); 
+    userQuery.matchesQuery("Employee", employeeQuery);
+    
+    // Need to use the master key since we are modifying a Parse.User object.
+    Parse.Cloud.useMasterKey(); 
+    
+    // Note that we must first retrive the user since deleting the employee
+    // will make the userQuery return nothing.
+    
+    userQuery.first().then(function(user) 
+    {
+        // It will actually go here (not error) even if the employee does not exist!
+        // Note the difference between Parse.Query.get and .first/.find
+        // first() just returns find()[0], which may be null =)
+        if (user == null) {
+            console.log("Failed to retrieve User.");
+            // Return a Parse error so that the following promises will not be called.
+            return Parse.Promise.error(EMPLOYEE_NOT_FOUND);
+        }
+        
+        if (user.get("Store") == null && user.get("Patron") == null) {
+            console.log("User's Store and Patron pointers are null. Destroying User.");
+            return user.destroy();
+        } else {
+            user.set("Employee", null);
+            return user.save(); 
+        }
+        
+    }).then(function(user) {
+        console.log("User successfully destroyed/saved.");
+        return employeeQuery.first();
+        
+    }).then(function(employee) {
+        return employee.destroy();
+    
+    }).then(function(employee) {
+        console.log("Employee successfully destroyed.");
+        
+        if (employee.get("status") == "approved") {
+            var promises = [];
+		    promises.push( Parse.Push.send({
+	            where: androidInstallationQuery,
+	            data: {
+				    action: "com.repunch.intent.EMPLOYEE_DELETE"
+	            }
+	        }) );
+		    promises.push( Parse.Push.send({
+	            where: iosInstallationQuery,
+	            data: {
+				    type: "employee_delete",
+	            }
+	        }) );
+		
+		    return Parse.Promise.when(promises);
+		}
+        
+    }).then(function() {
+	    console.log("Android/iOS push successful");
+		response.success("success");
+		
+	}, function(error) {
+	    if (error == EMPLOYEE_NOT_FOUND) {
+            console.log("Employee has already been deleted.");
+        } else {
+    	    console.log("Android/iOS push failed");
+        }
+        
+		response.error(error);
+		
+	});
+    
+    
+});
+
 
 ////////////////////////////////////////////////////
 //
@@ -1291,7 +1569,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 //  which is contained as a pointer in a newly created MessageStatus for each patron.
 //
 //  Note that this does not need to post to server because this is only called server side!
-//  Meaning the notification is done withing the server.
+//  Meaning the notification is done within the server.
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("retailer_message", function(request, response) {
