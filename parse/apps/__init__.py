@@ -14,7 +14,8 @@ def init_punch_codes():
     while len(punch_codes) > 0:
         reqs = []
         while len(reqs) < 50 and len(punch_codes) > 0:
-            pc = punch_codes.pop(random.randint(0, len(punch_codes)))
+            pc =\
+                punch_codes.pop(random.randint(0, len(punch_codes)-1))
             reqs.append({
                 "method": "POST",
                     "path": "/1/classes/PunchCode",
