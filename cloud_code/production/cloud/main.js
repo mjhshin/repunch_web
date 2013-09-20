@@ -25,7 +25,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCode) {
 		console.log("PunchCode fetch success.");
         punchCode.set("is_taken", true);
-        punchCode.set("email", email);
+        punchCode.set("username", email);
 		return punchCode.save();
 			
 	}, function(error) {
