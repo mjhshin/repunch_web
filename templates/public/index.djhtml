@@ -40,7 +40,7 @@
 			<p>Have fun while you earn rewards at your favorite local spots</p>
 			<div id="home-dowload-app">
 				<h2>Download the free app</h2>
-				<a href="#">
+				<a href="https://itunes.apple.com/us/app/repunch/id694942375">
 				<img src="{% static "public/images/badge_iphone.png" %}" alt="available on the appstore">
 				</a>
 				<a href="https://play.google.com/store/search?q=Repunch">
