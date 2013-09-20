@@ -17,13 +17,11 @@
 }
 
 .closable-box, .close-xtag {
-    margin-left:2px;
     padding:4px 10px; 
     border:1px groove #7294af;
-    font-size:1.2em;
-    font-weight:bold;
-    color:#3f3f3f;
-    background:#f79234; 
+	font: bold 1.0em 'Cabin', sans-serif;
+    color:white;
+    background:#F08C13; 
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     -khtml-border-radius: 4px;
@@ -32,11 +30,12 @@
 
 .closable-box {
     padding-right:42px;
+    margin-left:10px;
 }
 
 .close-xtag {
-    position:relative; left:-35px;
-    background:#0965ad; 
+    position:relative; left:-32px; 
+    border:1px transparent;
 }
 
 .close-xtag:hover {

@@ -4,7 +4,7 @@
 {% block title %}Sign-up{% endblock %}
 
 {% block styles %}
-<link href="{% static 'public/css/categories.css' %}" rel="stylesheet" />
+<link href="{% static 'public/css/categories.1.0.css' %}" rel="stylesheet" />
 <style>select { margin-top:2px; }</style>
 {% endblock %}
 
