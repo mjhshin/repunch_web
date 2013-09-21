@@ -1082,6 +1082,7 @@ float: right;
     display:inline-block;
     width:220px;
     margin: 16px;
+    text-align:center;
 }
 
 #signing-up {
@@ -1109,7 +1110,6 @@ float: right;
 #associated-account-form input[type=submit] {
     font-weight:bold;
     width: 120px;
-    margin-left: 120px;
 }
 
 
@@ -1124,7 +1124,7 @@ float: right;
 
 #associated-account-message {
     text-align: center;
-    margin-left: 2px; margin-top: 8px;
+    margin-top: 8px;
     width: 100%; 
 }
 
