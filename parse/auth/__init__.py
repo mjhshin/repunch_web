@@ -87,12 +87,12 @@ def login(request, requestDict):
         
         # if the User object has a store then we are good to go
         if store: 
-            if account_type == "employee" and\
-                employee.status == PENDING:
-                return 3
             # check if employee with no access level or still pending
-            elif not store.has_access(account):
-                return 2
+            if account_type == "employee":
+                if employee.status == PENDING:
+                    return 3
+                elif not store.has_access(account):
+                    return 2
             
             settings = store.get("settings")
             subscription = store.get("subscription")

@@ -107,7 +107,12 @@ class Store(ParseObject):
             ACCESS_ADMIN = {"read": True, "write": True}
             ACCESS_PUNCHREDEEM = {"read": True}
             ACCESS_NONE = /not in ACL/
+            
+        Always return ACCESS_ADMIN if account is owner.
         """
+        if self.is_owner(account):
+            return ACCESS_ADMIN
+        
         if account.objectId in self.ACL:
             acl = self.ACL[account.objectId]
             if acl.get("read") and acl.get("write"):

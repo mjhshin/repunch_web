@@ -138,7 +138,7 @@ def delete(request, employee_id):
     if 'error' not in res:
         store = SESSION.get_store(request.session)
         payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
-        if acc.objectId in store.ACL:
+        if acc.objectId in store.ACL and not store.is_owner(acc):
             del store.ACL[acc.objectId]
             store.update()
             payload["updatedStore"] = store.jsonify()
@@ -242,7 +242,8 @@ def deny(request, employee_id):
     if 'error' not in res:
         payload = { COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY }
         store = SESSION.get_store(request.session)
-        if acc.objectId in store.ACL:
+        # no need to check acl here but just in case
+        if acc.objectId in store.ACL and not store.is_owner(acc):
             del store.ACL[acc.objectId]
             store.update()
             payload["updatedStore"] = store.jsonify()
