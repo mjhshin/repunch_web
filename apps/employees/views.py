@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
@@ -22,7 +21,8 @@ from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
 ACCESS_NONE
 from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
 from libs.repunch import rputils
-from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+from repunch.settings import COMET_RECEIVE_KEY_NAME,\
+COMET_RECEIVE_KEY, PAGINATION_THRESHOLD
 
 @dev_login_required
 @login_required
@@ -279,31 +279,26 @@ def punches(request, employee_id):
     if not employee:
         raise Http404
     
+    # page starts at 1
+    page = int(request.GET.get('page'))
     order_by = request.POST.get('order_by')
-    
-    if order_by in (None, "date_punched"):
-        order_by = 'createdAt'
-        
     order_dir = request.POST.get('order_dir')
     if order_dir != None and order_dir.lower() == 'desc':
         order_by = '-'+order_by
-     
-    # TODO limit of 200 applies - use self made paginator! =)
-    ps = employee.get('punches', order=order_by, limit=200)
-    if not ps:
-        ps = []
-    paginator = Paginator(ps, 12)
+        
+    # limit is +1 to find out if has_next
+    limit = PAGINATION_THRESHOLD + 1
+    skip = (page-1) * PAGINATION_THRESHOLD
     
-    page = request.GET.get('page')
-    try:
-        punches = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        punches = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        punches = paginator.page(paginator.num_pages)
-    
+    employee.set("punches", None)
+    punches = employee.get('punches', order=order_by,
+        limit=limit, skip=skip)
+        
+    # make sure to pop the PAGINATION_THRESHOLD + 1 row if exist
+    if punches and len(punches) > PAGINATION_THRESHOLD:
+        punches.pop()
+        data['next_page_number'] = page + 1
+        
     data['punches'] = punches
     
     return render(request, 'manage/employee_punches.djhtml', data)

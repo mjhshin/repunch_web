@@ -858,14 +858,10 @@ Parse.Cloud.define("punch", function(request, response)
 				}
 				
 		}, function(error) {
-				console.log("Employee save failed.");
+				console.log("Employee fetch failed.");
 				response.error("error");	
 				
 		}).then(function(employee) {
-		        // IMPORTANT! Once response.success or error is called, the next promise will nto execute!
-				// response.success(patron.get("first_name") + " " + patron.get("last_name"));
-				
-				// below are for server notification
 		        if (employee != null) {
 				    console.log("Employee save was successful.");
 				    postBody.updatedEmployeePunch =  {
@@ -880,6 +876,10 @@ Parse.Cloud.define("punch", function(request, response)
                 } else {
                     return -1;
                 }
+				
+		}, function(error) {
+				console.log("Employee save failed.");
+				response.error("error");	
 				
 		}).then(function(patronStoreCount){
 		    if (isNewPatronStore) {

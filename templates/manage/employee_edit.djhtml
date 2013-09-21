@@ -5,14 +5,13 @@
 
 {% block title %}Edit Employee{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.0.css" %}" />
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.1.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/employee_edit.1.0.js" %}"></script>
 	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
 	<script type="text/javascript">
-		var _order_by = 'date_punched';
+		var _order_by = 'createdAt';
 		var _order_dir = 'desc';
 		var _page_url = '{% url 'employee_punches' employee_id %}';
 	</script>
@@ -69,14 +68,14 @@
 			<div class="section-title">Punch History</div>
 			<div class="white-box table" id="tab-body-punches">
 				<div class="table-header">
-					<div class="th sorted desc" id="header-date_punched">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+					<div class="th sorted desc" id="header-createdAt">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 					<div class="th not-sortable" id="header-time">Time</div>
 					<div class="th not-sortable" id="header-customer">Customer <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 					<div class="th" id="header-punches">Punches <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				</div>
 				<div id="table-body">
 					<div class="tr" id="load-row">
-						<div class="td date_punched"><a id="load-more" onclick="loadRow(1); return false;">Load more...</a></div>
+						<div class="td createdAt"><a id="load-more" onclick="loadRow(1); return false;">Load more...</a></div>
 						<div class="td time">&nbsp;</div>
 						<div class="td customer">&nbsp;</div>
 						<div class="td punches">&nbsp;</div>
