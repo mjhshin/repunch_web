@@ -78,6 +78,9 @@
 	font-weight:normal;
 }
 
+/* for recaptcha css fix */
+#recaptcha_area, #recaptcha_table { line-height: 0!important;}
+
 #forgot-pass-form-div input {
 	height:22px; width:200px;
 	border:1px solid #CCC;

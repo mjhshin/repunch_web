@@ -43,13 +43,6 @@ class Account(AbstractUser):
 		
 		return False
 	
-class AccountActivate(models.Model):
-	store_id = models.CharField(max_length=30)
-	
-class AssociatedAccountNonce(models.Model):
-	account_id = models.CharField(max_length=30)
-	verified = models.BooleanField(default=False)
-	
 class Settings(models.Model):
 	account = models.ForeignKey(Account)
 	retailer_id = models.CharField(max_length=255, default="")
@@ -173,3 +166,15 @@ class Invoice(models.Model):
 	trans_id = models.CharField(max_length=255,null=True,blank=True)
 	amount = models.FloatField(null=True,blank=True)
 	
+	
+	
+class AccountActivate(models.Model):
+	store_id = models.CharField(max_length=30)
+	
+class AssociatedAccountNonce(models.Model):
+	account_id = models.CharField(max_length=30)
+	verified = models.BooleanField(default=False)
+	
+class RecaptchaToken(models.Model):
+	username = models.CharField(max_length=70)
+	attempts = models.IntegerField(default=0)

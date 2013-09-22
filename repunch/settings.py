@@ -289,6 +289,8 @@ COMET_PULL_RATE = 4
 # repunch.com domain by vandolf@repunch.com
 RECAPTCHA_PUBLIC_KEY = "6LcRz-cSAAAAAIhbaQAFiiPvWqDrsDtIfd98cCWu"
 RECAPTCHA_PRIVATE_KEY = "6LcRz-cSAAAAAPOwkCDj0vHyIcGqqfm3hfOXgvTO"
+RECAPTCHA_ATTEMPTS = 3 # show recaptcha after 3 failed attempts
+RECAPTCHA_TOKEN = "recaptcha_token"
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"

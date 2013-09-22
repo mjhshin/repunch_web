@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate
 import json, thread
 
+from libs import recaptcha
 from parse import session as SESSION
 from parse.auth import login, logout
 from parse.auth.decorators import dev_login_required
@@ -60,8 +61,10 @@ def manage_login(request):
             c = login(request, request.POST.dict().copy())
             c_type = type(c)
             if c_type is int:
-                if c == 0:
+                if c == 0: # bad login credentials
                     data['code'] = 1 
+                    recaptcha.login_fail(request.session,
+                        request.POST['username'])
                 elif c == 1:
                     data['code'] = 2
                 elif c == 2:
@@ -70,6 +73,9 @@ def manage_login(request):
                     data['code'] = 5
             else:
                 data['code'] = 3
+                recaptcha.login_success(request.session,
+                    request.POST['username'])
+                        
                 # manually check the next parameter
                 next = request.GET.get("next")
                 if not next:

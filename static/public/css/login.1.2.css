@@ -81,6 +81,9 @@
 	font-weight:normal;
 }
 
+/* for recaptcha css fix */
+#recaptcha_area, #recaptcha_table { line-height: 0!important;}
+
 #forgot-pass-form a {
     color:#0040FF;
     cursor:pointer;

@@ -7,8 +7,10 @@ The original code has been modified.
 
 import urllib2, urllib
 
+from apps.accounts.models import RecaptchaToken
 from repunch.settings import RECAPTCHA_PUBLIC_KEY,\
-RECAPTCHA_PRIVATE_KEY, PRODUCTION_SERVER
+RECAPTCHA_PRIVATE_KEY, RECAPTCHA_ATTEMPTS, RECAPTCHA_TOKEN,\
+PRODUCTION_SERVER
 
 API_SSL_SERVER="https://www.google.com/recaptcha/api"
 API_SERVER="http://www.google.com/recaptcha/api"
@@ -22,20 +24,64 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+    
+def login_fail(session, username):
+    """ 
+    Call this if the user tried to login with the given username
+    and failed. 
+    
+    This will create a Recaptcha token if 1 does not yet exist for the
+    username or increment the attempts. Note that this will not 
+    increment attemps greater than RECAPTCHA_ATTEMPTS.
+    
+    A RECAPTCHA_TOKEN is also inserted in the user's session.
+    """
+    session[RECAPTCHA_TOKEN] = 1
+    token = RecaptchaToken.objects.filter(username=username)
+    if token.count() == 0:
+        token = RecaptchaToken.objects.create(username=username)
+    else:
+        token = token[0]
+
+    if token.attempts <= RECAPTCHA_ATTEMPTS:
+        token.attempts += 1
+        token.save()
+        
+def login_success(session, username):
+    """
+    Deletes the RECAPTCHA_TOKEN in the session if any and deletes
+    the RecaptchaToken in the database if exist.
+    """
+    if RECAPTCHA_TOKEN in session:
+        del session[RECAPTCHA_TOKEN]
+    token = RecaptchaToken.objects.filter(username=username)
+    if token.count > 0:
+        token[0].delete()
 
 class RecaptchaResponse(object):
     def __init__(self, is_valid, error_code=None):
         self.is_valid = is_valid
         self.error_code = error_code
 
-def displayhtml (public_key = RECAPTCHA_PUBLIC_KEY,
+def displayhtml (session, username = None, 
+                 public_key = RECAPTCHA_PUBLIC_KEY,
                  use_ssl = PRODUCTION_SERVER,
                  error = None):
     """Gets the HTML to display for reCAPTCHA
 
+    session -- user session object
+    username -- username input in the login form
     public_key -- The public api key
     use_ssl -- Should the request be sent over ssl?
     error -- An error message to display (from RecaptchaResponse.error_code)"""
+
+    # check if there is a recaptcha token for this request session
+    # or if the username provided has one in the database.
+    if not session.get(RECAPTCHA_TOKEN) and not\
+    	(username and RecaptchaToken.objects.filter(\
+    	username=username).count() > 0):
+    	return "";
+        
 
     error_param = ''
     if error:
@@ -47,9 +93,8 @@ def displayhtml (public_key = RECAPTCHA_PUBLIC_KEY,
         server = API_SERVER
 
     return """<script type="text/javascript" src="%(ApiServer)s/challenge?k=%(PublicKey)s%(ErrorParam)s"></script>
-
 <noscript>
-  <iframe src="%(ApiServer)s/noscript?k=%(PublicKey)s%(ErrorParam)s" height="300" width="500" frameborder="0"></iframe><br />
+  <iframe src="%(ApiServer)s/noscript?k=%(PublicKey)s%(ErrorParam)s" height="300" width="500" frameborder="0"></iframe>
   <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
   <input type='hidden' name='recaptcha_response_field' value='manual_challenge' />
 </noscript>

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %}{% load recaptcha_tags %}
 
 <form id="dialog-login-form" action="">
     {% csrf_token %}
@@ -13,6 +13,12 @@
 	<input type="password" name="password" id="login_password"></p>
 	
 	<div id="dialog-login-message"></div>
+	
+	{# RECAPTCHA #}
+	{% if request.session.recaptcha_token %}
+	<input type="hidden" name="recaptcha_repunch" value="1"/>
+	{% endif %}
+	{{ request.session|display_recaptcha|safe }}
 	
 	<input type="submit" value="Sign in" />
 	<div id="stay-signed-in">
@@ -34,6 +40,3 @@
     </div>
 </form>
 
-{% if recaptcha %}
-{{ recaptcha }}
-{% endif %}
