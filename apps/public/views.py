@@ -18,6 +18,7 @@ from apps.accounts.forms import AccountForm
 from parse.apps.stores import format_phone_number
 from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
 from libs.repunch import rputils
+from libs import recaptcha
 
 from repunch.settings import STATIC_URL
 from parse.auth import login
@@ -45,7 +46,8 @@ def index(request):
         request.session.get('subscription') is not None:
         return redirect(reverse('store_index'))
         
-    data = {'home_nav': True}
+    data = {'home_nav': True,
+        "recaptcha": recaptcha.displayhtml()}
     return render(request, 'public/index.djhtml', data)
 
 @dev_login_required

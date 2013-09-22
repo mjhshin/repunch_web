@@ -285,6 +285,11 @@ REQUEST_TIMEOUT = 240 # in seconds
 # check for new stuff in the cache every 4 seconds
 COMET_PULL_RATE = 4
 
+# RECAPTCHA - https://www.google.com/recaptcha/admin/site?siteid=317181713
+# repunch.com domain by vandolf@repunch.com
+RECAPTCHA_PUBLIC_KEY = "6LcRz-cSAAAAAIhbaQAFiiPvWqDrsDtIfd98cCWu"
+RECAPTCHA_PRIVATE_KEY = "6LcRz-cSAAAAAPOwkCDj0vHyIcGqqfm3hfOXgvTO"
+
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"
 # https://docs.djangoproject.com/en/dev/topics/http/sessions/

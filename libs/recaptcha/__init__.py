@@ -1,23 +1,35 @@
-import urllib2, urllib
 """
 Taken from http://recaptcha.googlecode.com/svn/trunk/recaptcha-plugins/python/recaptcha/client/captcha.py
 
 Pip wasn't installing it properly so just copy and pasted this source here.
-This is all it is anyways.
+The original code has been modified.
 """
 
+import urllib2, urllib
+
+from repunch.settings import RECAPTCHA_PUBLIC_KEY,\
+RECAPTCHA_PRIVATE_KEY, PRODUCTION_SERVER
 
 API_SSL_SERVER="https://www.google.com/recaptcha/api"
 API_SERVER="http://www.google.com/recaptcha/api"
 VERIFY_SERVER="www.google.com"
+
+def get_client_ip(request):
+    """ This is not part of the original code """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 class RecaptchaResponse(object):
     def __init__(self, is_valid, error_code=None):
         self.is_valid = is_valid
         self.error_code = error_code
 
-def displayhtml (public_key,
-                 use_ssl = False,
+def displayhtml (public_key = RECAPTCHA_PUBLIC_KEY,
+                 use_ssl = PRODUCTION_SERVER,
                  error = None):
     """Gets the HTML to display for reCAPTCHA
 
@@ -48,10 +60,9 @@ def displayhtml (public_key,
         }
 
 
-def submit (recaptcha_challenge_field,
+def submit (request, recaptcha_challenge_field,
             recaptcha_response_field,
-            private_key,
-            remoteip):
+            private_key = RECAPTCHA_PRIVATE_KEY):
     """
     Submits a reCAPTCHA request for verification. Returns RecaptchaResponse
     for the request
@@ -59,7 +70,8 @@ def submit (recaptcha_challenge_field,
     recaptcha_challenge_field -- The value of recaptcha_challenge_field from the form
     recaptcha_response_field -- The value of recaptcha_response_field from the form
     private_key -- your reCAPTCHA private key
-    remoteip -- the user's ip address
+    X remoteip -- the user's ip address - replaced by a request object
+    request -- the user's request
     """
 
     if not (recaptcha_response_field and recaptcha_challenge_field and
@@ -74,7 +86,7 @@ def submit (recaptcha_challenge_field,
 
     params = urllib.urlencode ({
             'privatekey': encode_if_necessary(private_key),
-            'remoteip' :  encode_if_necessary(remoteip),
+            'remoteip' :  encode_if_necessary(get_client_ip(request)),
             'challenge':  encode_if_necessary(recaptcha_challenge_field),
             'response' :  encode_if_necessary(recaptcha_response_field),
             })

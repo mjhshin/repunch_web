@@ -33,3 +33,7 @@
         <div id="forgot-pass-message"></div>
     </div>
 </form>
+
+{% if recaptcha %}
+{{ recaptcha }}
+{% endif %}
