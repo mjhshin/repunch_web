@@ -168,6 +168,9 @@ $(document).ready(function(){
         $("div#main-content").css({ "min-height": "360px", "height": "360px"});
         recaptchaResponse.val("").on("input propertychange", {submit:false}, validateInputs);
         
+        signInButton.attr("disabled", "disabled");
+        signInButton.removeClass("active").addClass("disabled");
+	            
         recaptchaDisplayed = true;
         $("#display_recaptcha").show();
     }
@@ -237,6 +240,8 @@ $(document).ready(function(){
                 }
                 messageContainer.html("<span name='incorrect'>Invalid ReCaptcha input.</span>");
                 $("#login_password").removeClass("input-text-error");
+                var pass = $("#login_password");
+                pass.addClass("input-text-error");
                 loading.hide();
                 recaptchaResponse.val("");
                 recaptchaResponse.focus();

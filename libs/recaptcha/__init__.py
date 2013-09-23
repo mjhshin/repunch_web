@@ -38,7 +38,7 @@ def login_fail(session, username):
     incremented.
     """
     token = RecaptchaToken.objects.filter(username=username)
-    if token.count() == 0:
+    if len(token) == 0:
         token = RecaptchaToken.objects.create(username=username)
     else:
         token = token[0]
@@ -62,7 +62,7 @@ def login_success(session, username):
     if RECAPTCHA_TOKEN in session:
         del session[RECAPTCHA_TOKEN]
     token = RecaptchaToken.objects.filter(username=username)
-    if token.count > 0:
+    if len(token) > 0:
         token[0].delete()
 
 class RecaptchaResponse(object):
