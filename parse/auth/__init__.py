@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import SESSION_KEY
 from django.contrib.sessions.backends.cache import SessionStore
 
+from libs import recaptcha
 from libs.repunch import rputils
 from libs.repunch.rputils import delete_after_delay
 from apps.comet.models import CometSession, CometSessionIndex
@@ -135,11 +136,18 @@ def login(request, requestDict):
                 # expire when the user's Web browser is closed.
                 else:
                     request.session.set_expiry(0)
+                    
+                recaptcha.login_success(request.session,
+                    request.POST['username'])
                 
                 return account
             else:
                 return 1
         else:
+            recaptcha.login_fail(request.session,
+                request.POST['username'])
             return 0
     else:
+        recaptcha.login_fail(request.session,
+            request.POST['username'])
         return 0

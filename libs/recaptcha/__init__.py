@@ -46,6 +46,8 @@ def login_fail(session, username):
     if token.attempts <= RECAPTCHA_ATTEMPTS:
         token.attempts += 1
         token.save()
+    else:
+        session[RECAPTCHA_TOKEN] = RECAPTCHA_ATTEMPTS
 
     if RECAPTCHA_TOKEN not in session:
         session[RECAPTCHA_TOKEN] = 1

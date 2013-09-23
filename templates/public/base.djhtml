@@ -13,7 +13,7 @@
 	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/global.2.0.css' %}" rel="stylesheet" />
-	<link href="{% static 'public/css/login.1.2.css' %}" rel="stylesheet" />
+	<link href="{% static 'public/css/login.2.0.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
 	    
     {# This really should only be imported at signup and about but for some reason if it is not imported here, the header menu items get bolded #}
@@ -27,7 +27,7 @@
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'public/js/dialog-login.1.8.js' %}" type="text/javascript"></script>
+    <script src="{% static 'public/js/dialog-login.2.0.js' %}" type="text/javascript"></script>
 	
 	{% block javascript %}{% endblock %}
 </head>

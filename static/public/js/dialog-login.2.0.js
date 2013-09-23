@@ -165,7 +165,7 @@ $(document).ready(function(){
         dl.dialog("option", "width", 380);
         // for dedicated login page
         $("div#main-content").css({ "min-height": "360px", "height": "360px"});
-        $("input[name=recaptcha_response_field]").val("");
+        $("input[name=recaptcha_response_field]").val("").on("input propertychange", {submit:false}, validateInputs);
         
         recaptchaDisplayed = true;
         $("#display_recaptcha").show();
