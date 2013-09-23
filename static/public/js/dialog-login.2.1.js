@@ -209,7 +209,7 @@ $(document).ready(function(){
                 finish(dim);
             } else if (res.code == 2){
                 messageContainer.html("<span>Your account is not active.</span>");
-                $("#login_password").removeClass("input-text-error");
+                password.removeClass("input-text-error");
                 loading.hide();
                 finish(324);
             } else if (res.code == 1){
@@ -217,20 +217,19 @@ $(document).ready(function(){
                     displayRecaptcha();
                 }
                 messageContainer.html("<span name='incorrect'>Incorrect email or password.</span>");
-                var pass = $("#login_password");
-                pass.addClass("input-text-error");
-                pass.val('');
-                pass.focus();
+                password.addClass("input-text-error");
+                password.val('');
+                password.focus();
                 loading.hide();
                 finish(324);
             } else if (res.code == 4){
                 messageContainer.html("<span name='incorrect'>You do not have permission to access the dashboard.</span>");
-                $("#login_password").removeClass("input-text-error");
+                password.removeClass("input-text-error");
                 loading.hide();
                 finish(344);
             } else if (res.code == 5){
                 messageContainer.html("<span name='incorrect'>You are not yet approved.</span>");
-                $("#login_password").removeClass("input-text-error");
+                password.removeClass("input-text-error");
                 loading.hide();
                 finish(324);
             } else if (res.code == 6){
@@ -239,9 +238,7 @@ $(document).ready(function(){
                     Recaptcha.reload();
                 }
                 messageContainer.html("<span name='incorrect'>Invalid ReCaptcha input.</span>");
-                $("#login_password").removeClass("input-text-error");
-                var pass = $("#login_password");
-                pass.addClass("input-text-error");
+                password.removeClass("input-text-error");
                 loading.hide();
                 recaptchaResponse.val("");
                 recaptchaResponse.focus();
@@ -250,16 +247,15 @@ $(document).ready(function(){
                 // same as 1 but may want to change later
                 //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
                 messageContainer.html("<span name='incorrect'>Incorrect email or password.</span>");
-                var pass = $("#login_password");
-                pass.addClass("input-text-error");
-                pass.val('');
+                password.addClass("input-text-error");
+                password.val('');
                 pass.focus();
-                loading.hide();
+                password.hide();
                 finish(324);
             }
         }).fail(function(){  // should not go here unless server error
             messageContainer.html("<span name='incorrect'>Error. Please try again.</span>");
-            $("#login_password").removeClass("input-text-error");
+            password.removeClass("input-text-error");
             loading.hide();
             finish(324);
         });
