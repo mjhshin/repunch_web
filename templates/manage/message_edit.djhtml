@@ -105,8 +105,8 @@ $(document).ready(function(){
             value="{{ mp_slider_value }}"
             {% endif %} />
         <div id="num_patron_inner">
-            <label id="num_patrons_label">Select the number of most loyal customers.</label>
             {% if mp_slider_max > 1 %}
+            <label id="num_patrons_label">Select the number of most loyal customers.</label>
                 <div id="num_patrons_slider" ></div>
             {% endif %}
         </div>
