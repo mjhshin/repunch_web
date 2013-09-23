@@ -173,6 +173,7 @@ $(document).ready(function(){
 	            
         recaptchaDisplayed = true;
         $("#display_recaptcha").show();
+        Recaptcha.reload();
     }
     
     function executeSignIn() {
@@ -235,7 +236,6 @@ $(document).ready(function(){
             } else if (res.code == 6){
                 if (res.display_recaptcha) {
                     displayRecaptcha();
-                    Recaptcha.reload();
                 }
                 messageContainer.html("<span name='incorrect'>Invalid ReCaptcha input.</span>");
                 password.removeClass("input-text-error");
