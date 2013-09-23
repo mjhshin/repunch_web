@@ -14,7 +14,8 @@ from parse.auth import login, logout
 from parse.auth.decorators import dev_login_required
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSessionIndex
-from repunch.settings import PRODUCTION_SERVER, DEVELOPMENT_TOKEN
+from repunch.settings import PRODUCTION_SERVER, DEVELOPMENT_TOKEN,\
+RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS
 
 def manage_dev_login(request):
     """
@@ -97,6 +98,11 @@ def manage_login(request):
             return redirect(reverse('store_index'))
         data['form'] = LoginForm()
         return render(request, 'manage/login.djhtml', data)
+        
+    if data['code'] == 1:
+        data['display_recaptcha'] =\
+            RECAPTCHA_TOKEN in request.session and request.session[\
+            RECAPTCHA_TOKEN] >= RECAPTCHA_ATTEMPTS
 
     return HttpResponse(json.dumps(data), 
         content_type="application/json")

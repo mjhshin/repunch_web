@@ -5,18 +5,34 @@
 $(document).ready(function(){
 
     var origTop;
+    var recaptchaDisplayed = $("#dialog-login-form input[name=recaptcha_repunch]").length > 0;
 
-    // prep the login dialog
-	$( "#dialog-login" ).dialog({ autoOpen: false, modal: true, 
-	    title: "Business Sign In",
-        position: { at: "top" },
-	    minWidth: 330, minHeight: 316,
-	    maxWidth: 330, maxHeight: 350,
-	    height: 310, width: 330,
+    var dl = $( "#dialog-login" );
+     // prep the login dialog
+	dl.dialog({ autoOpen: false, modal: true, 
+	    title: "Business Sign In", });
+        
+    if (recaptchaDisplayed) {
+        $("#display_recaptcha").show();
+        dl.dialog({minWidth: 380, minHeight: 440, maxWidth: 380, maxHeight: 440,});
+	    dl.dialog("option", "height", 440);
+	    dl.dialog("option", "width", 380);
+    } else {
+        dl.dialog({minWidth: 330, minHeight: 320, maxWidth: 330, maxHeight: 320,});
+	    dl.dialog("option", "height", 320);
+	    dl.dialog("option", "width", 330);
+    }
+    
+     // prep the login dialog
+	dl.dialog({ position: { at: "top" },
         open: function(event, ui) {
             var self = $(this);
             var container = $(window);
-            origTop = (container.height()/2.0)-(self.outerHeight()/1.3);
+            if (recaptchaDisplayed) {
+                origTop = (container.height()/2.0)-(self.outerHeight()/1.7);
+            } else {
+                origTop = (container.height()/2.0)-(self.outerHeight()/1.3);
+            }
             self.dialog("widget").animate({top: origTop, opacity:1.0}, {duration: 300});
         },
         beforeClose: function(event, ui) {
@@ -32,8 +48,6 @@ $(document).ready(function(){
 		return false;
 	});
 	
-	
-    var dl = $( "#dialog-login" );
     var fpdiv = $("#forgot-pass-form-div");
     var messageContainer = $("#dialog-login-message");
 	
@@ -46,8 +60,12 @@ $(document).ready(function(){
     signInButton.removeClass("active").addClass("disabled");
         
     function finish(dim){
+        if (recaptchaDisplayed) {
+            dim = dim + 150;
+        }
+    
         if (fpdiv.css("display") != "none"){
-            dl.dialog( "option", "height", dim + 50 );
+            dl.dialog( "option", "height", dim + 20 );
         } else {
             dl.dialog( "option", "height", dim );
         }
@@ -56,6 +74,14 @@ $(document).ready(function(){
     }
     
     function validateInputs(event) {
+        if (recaptchaDisplayed) {
+            if ($("input[name=recaptcha_response_field]").val().length == 0) {
+	            signInButton.attr("disabled", "disabled");
+	            signInButton.removeClass("active").addClass("disabled");
+                return false;
+            }
+        }
+        
         var submit = event.data.submit;
 	    var unLength = $.trim(username.val()).length;
 	    var pwLength = $.trim(password.val()).length;
@@ -94,7 +120,10 @@ $(document).ready(function(){
 	}
 	
 	// add the listeners to username and password fields
-	$("#login_username, #login_password").keyup({submit:false}, validateInputs);
+	$("#login_username, #login_password").on("input propertychange", {submit:false}, validateInputs);
+    if (recaptchaDisplayed) {
+        $("input[name=recaptcha_response_field]").on("input propertychange", {submit:false}, validateInputs);
+    }
 	
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
@@ -102,7 +131,11 @@ $(document).ready(function(){
             return;
         }
         // adjust the height
-        dl.dialog( "option", "height", 360 );
+        if (recaptchaDisplayed) {
+            dl.dialog( "option", "height", 480 );
+        } else {
+            dl.dialog( "option", "height", 360 );
+        }
         // need to make sure that dialog stays at the same position
         dl.dialog("widget").css({top: origTop});
         // show the input
@@ -124,6 +157,19 @@ $(document).ready(function(){
         });
         return false;
     });
+    
+    
+    function displayRecaptcha(){
+        dl.dialog({minWidth: 380, minHeight: 440, maxWidth: 380, maxHeight: 440,});
+        dl.dialog("option", "height", 440);
+        dl.dialog("option", "width", 380);
+        // for dedicated login page
+        $("div#main-content").css({ "min-height": "360px", "height": "360px"});
+        $("input[name=recaptcha_response_field]").val("");
+        
+        recaptchaDisplayed = true;
+        $("#display_recaptcha").show();
+    }
     
     function executeSignIn() {
         var loading = $("#logging-in");
@@ -163,7 +209,9 @@ $(document).ready(function(){
                 loading.hide();
                 finish(324);
             } else if (res.code == 1){
-                //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");
+                if (res.display_recaptcha) {
+                    displayRecaptcha();
+                }
                 messageContainer.html("<span name='incorrect'>Incorrect email or password.</span>");
                 var pass = $("#login_password");
                 pass.addClass("input-text-error");

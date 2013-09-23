@@ -177,4 +177,4 @@ class AssociatedAccountNonce(models.Model):
 	
 class RecaptchaToken(models.Model):
 	username = models.CharField(max_length=70)
-	attempts = models.IntegerField(default=0)
+	attempts = models.IntegerField(default=1)

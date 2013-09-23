@@ -12,7 +12,11 @@
 	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
     div#content-frame { width: 300px; }
     div#site-frame { width: 330px; }
-    div#main-content { min-height: 200px; height:250px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
+	{% if request.session.recaptcha_token %}
+    div#main-content { min-height: 360px; height:360px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
+	{% else %}
+    div#main-content { min-height: 250px; height:250px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
+	{% endif %}
 	</style>
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>

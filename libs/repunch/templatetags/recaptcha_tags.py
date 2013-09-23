@@ -5,6 +5,6 @@ from libs import recaptcha
 register = template.Library()
 
 @register.filter
-def display_recaptcha(session):
+def display_recaptcha(x):
     """ calls recaptcha displayhtml """
-    return recaptcha.displayhtml(session)
+    return recaptcha.displayhtml()

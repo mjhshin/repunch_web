@@ -34,9 +34,9 @@ def login_fail(session, username):
     username or increment the attempts. Note that this will not 
     increment attemps greater than RECAPTCHA_ATTEMPTS.
     
-    A RECAPTCHA_TOKEN is also inserted in the user's session.
+    A RECAPTCHA_TOKEN is also inserted in the user's session and
+    incremented.
     """
-    session[RECAPTCHA_TOKEN] = 1
     token = RecaptchaToken.objects.filter(username=username)
     if token.count() == 0:
         token = RecaptchaToken.objects.create(username=username)
@@ -46,6 +46,11 @@ def login_fail(session, username):
     if token.attempts <= RECAPTCHA_ATTEMPTS:
         token.attempts += 1
         token.save()
+
+    if RECAPTCHA_TOKEN not in session:
+        session[RECAPTCHA_TOKEN] = 1
+    elif session[RECAPTCHA_TOKEN] <= RECAPTCHA_ATTEMPTS:
+        session[RECAPTCHA_TOKEN] = session[RECAPTCHA_TOKEN] + 1
         
 def login_success(session, username):
     """
@@ -63,25 +68,14 @@ class RecaptchaResponse(object):
         self.is_valid = is_valid
         self.error_code = error_code
 
-def displayhtml (session, username = None, 
-                 public_key = RECAPTCHA_PUBLIC_KEY,
+def displayhtml (public_key = RECAPTCHA_PUBLIC_KEY,
                  use_ssl = PRODUCTION_SERVER,
                  error = None):
     """Gets the HTML to display for reCAPTCHA
 
-    session -- user session object
-    username -- username input in the login form
     public_key -- The public api key
     use_ssl -- Should the request be sent over ssl?
     error -- An error message to display (from RecaptchaResponse.error_code)"""
-
-    # check if there is a recaptcha token for this request session
-    # or if the username provided has one in the database.
-    if not session.get(RECAPTCHA_TOKEN) and not\
-    	(username and RecaptchaToken.objects.filter(\
-    	username=username).count() > 0):
-    	return "";
-        
 
     error_param = ''
     if error:
