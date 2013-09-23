@@ -298,7 +298,7 @@ class SubscriptionForm(forms.Form):
 class SettingsForm(forms.Form):
     punches_employee = forms.IntegerField(label=\
                         'Number of punches allowed by an employee'+\
-                        ' at one time', min_value=1)
+                        ' at one time', min_value=1, max_value=99)
     punches_facebook = forms.IntegerField(label=\
                         'Free Punch Allowance for Facebook',
-                                        min_value=0)
+                                        min_value=0, max_value=99)
