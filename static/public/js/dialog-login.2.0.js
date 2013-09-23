@@ -53,6 +53,7 @@ $(document).ready(function(){
 	
     var username = $("#login_username");
     var password = $("#login_password");
+    var recaptchaResponse = $("input[name=recaptcha_response_field]");
 	
 	// initialize the signin button
 	var signInButton = $("#dialog-login-form input[type=submit]");
@@ -75,7 +76,7 @@ $(document).ready(function(){
     
     function validateInputs(event) {
         if (recaptchaDisplayed) {
-            if ($("input[name=recaptcha_response_field]").val().length == 0) {
+            if (recaptchaResponse.val().length == 0) {
 	            signInButton.attr("disabled", "disabled");
 	            signInButton.removeClass("active").addClass("disabled");
                 return false;
@@ -122,7 +123,7 @@ $(document).ready(function(){
 	// add the listeners to username and password fields
 	$("#login_username, #login_password").on("input propertychange", {submit:false}, validateInputs);
     if (recaptchaDisplayed) {
-        $("input[name=recaptcha_response_field]").on("input propertychange", {submit:false}, validateInputs);
+        recaptchaResponse.on("input propertychange", {submit:false}, validateInputs);
     }
 	
     // PASSWORD RESET
@@ -165,7 +166,7 @@ $(document).ready(function(){
         dl.dialog("option", "width", 380);
         // for dedicated login page
         $("div#main-content").css({ "min-height": "360px", "height": "360px"});
-        $("input[name=recaptcha_response_field]").val("").on("input propertychange", {submit:false}, validateInputs);
+        recaptchaResponse.val("").on("input propertychange", {submit:false}, validateInputs);
         
         recaptchaDisplayed = true;
         $("#display_recaptcha").show();
@@ -229,6 +230,17 @@ $(document).ready(function(){
                 $("#login_password").removeClass("input-text-error");
                 loading.hide();
                 finish(324);
+            } else if (res.code == 6){
+                if (res.display_recaptcha) {
+                    displayRecaptcha();
+                    Recaptcha.reload();
+                }
+                messageContainer.html("<span name='incorrect'>Invalid ReCaptcha input.</span>");
+                $("#login_password").removeClass("input-text-error");
+                loading.hide();
+                recaptchaResponse.val("");
+                recaptchaResponse.focus();
+                finish(344);
             } else {
                 // same as 1 but may want to change later
                 //messageContainer.html("<span name='incorrect'>The username or password you entered is incorrect.</span>");

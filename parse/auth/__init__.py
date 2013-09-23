@@ -13,7 +13,7 @@ from libs.repunch import rputils
 from libs.repunch.rputils import delete_after_delay
 from apps.comet.models import CometSession, CometSessionIndex
 from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE,\
-PRODUCTION_SERVER
+PRODUCTION_SERVER, RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS
 from parse import session as SESSION
 from parse.utils import parse, flush
 from parse.apps.accounts.models import Account
@@ -61,11 +61,21 @@ def login(request, requestDict):
     and username and passwords are good. Otherwise, 0 if bad login 
     credentials (wrong pass or pointer to store does not exist) 
     and 1 if subscription is not active,
-    2 if employee but no access, 3 if employee is still pending.
+    2 if employee but no access, 3 if employee is still pending,
+    4 if RECAPTCHA_TOKEN in session and recaptcha response fails.
     """
     # first check if the request is already logged in 
     if request.session.get('account'):
         return request.session.get('account')
+        
+    # now check for recaptcha
+    if RECAPTCHA_TOKEN in request.session and\
+        request.session[RECAPTCHA_TOKEN] >= RECAPTCHA_ATTEMPTS:
+        is_valid = recaptcha.submit(request,
+            requestDict['recaptcha_challenge_field'],
+            requestDict['recaptcha_response_field']).is_valid
+        if not is_valid:
+            return 4
     
     # note that email is the same as username
     res = parse("GET", "login", query=\

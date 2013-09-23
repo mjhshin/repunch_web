@@ -53,6 +53,7 @@ def manage_login(request):
         3 - success
         4 - employee with no access
         5 - employee pending
+        6 - invalid recaptcha response
     """
     data = {"code":-1}
     if request.method == 'POST' or request.is_ajax():
@@ -69,6 +70,8 @@ def manage_login(request):
                     data['code'] = 4
                 elif c == 3:
                     data['code'] = 5
+                elif c == 4: # recaptcha response fail
+                    data['code'] = 6
             else:
                 data['code'] = 3
                         
@@ -94,7 +97,7 @@ def manage_login(request):
         data['form'] = LoginForm()
         return render(request, 'manage/login.djhtml', data)
         
-    if data['code'] == 1:
+    if data['code'] in (1, 6):
         data['display_recaptcha'] =\
             RECAPTCHA_TOKEN in request.session and request.session[\
             RECAPTCHA_TOKEN] >= RECAPTCHA_ATTEMPTS
