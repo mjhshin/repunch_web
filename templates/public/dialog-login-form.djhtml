@@ -15,11 +15,11 @@
 	<div id="dialog-login-message"></div>
 	
 	{# RECAPTCHA #}
-	{% if request.session.recaptcha_token %}
+	{% if request.session|display_recaptcha %}
 	<input type="hidden" name="recaptcha_repunch" value="1"/>
 	{% endif %}
 	<div id="display_recaptcha" style="display:none;margin-top:4px;">
-	{{ "x"|display_recaptcha|safe }}
+	{{ "x"|get_recaptcha|safe }}
 	</div>
 	
 	<input type="submit" value="Sign in" />
