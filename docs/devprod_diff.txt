@@ -10,6 +10,7 @@
     dev:    "cometrkey": "384ncocoacxpvgrwecwy",
     prod:   "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
     
-3. Django settings - the whole thing. Changes to settings must
-    be carefully transferred over.
+3. Django settings
+    dev:    PRODUCTION_SERVER = False
+    prod:   PRODUCTION_SERVER = True
    

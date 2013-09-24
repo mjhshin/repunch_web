@@ -249,10 +249,10 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			
 			Parse.Cloud.httpRequest({
                 method: "POST",
-                url: "https://www.repunch.com/manage/comet/receive/" + store.id,
+                url: "http://dev.repunch.com/manage/comet/receive/" + store.id,
                 headers: { "Content-Type": "application/json"},
                 body: { 
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    "cometrkey": "384ncocoacxpvgrwecwy", 
                     pendingEmployee: employee, 
                 }
             });
@@ -381,10 +381,10 @@ Parse.Cloud.define("link_employee", function(request, response) {
 			
 			Parse.Cloud.httpRequest({
                 method: "POST",
-                url: "https://www.repunch.com/manage/comet/receive/" + store.id,
+                url: "http://dev.repunch.com/manage/comet/receive/" + store.id,
                 headers: { "Content-Type": "application/json"},
                 body: { 
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    "cometrkey": "384ncocoacxpvgrwecwy", 
                     pendingEmployee: employee, 
                 }
             });
@@ -488,10 +488,10 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	}).then(function(patronStoreCount) {
         Parse.Cloud.httpRequest({
             method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
             headers: { "Content-Type": "application/json"},
             body: { 
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                "cometrkey": "384ncocoacxpvgrwecwy", 
                 patronStore_int: patronStoreCount,
             }
         });
@@ -890,10 +890,10 @@ Parse.Cloud.define("punch", function(request, response)
 		    // Let the server know if any changes occured
 		    if (isNewPatronStore || employeeId != null) {
 		        console.log("Posting to server");
-		        postBody.cometrkey = "f2cwxn35cxyoq8723c78wnvy";
+		        postBody.cometrkey = "384ncocoacxpvgrwecwy";
 		        Parse.Cloud.httpRequest({
                     method: "POST",
-                    url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                    url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
                     headers: { "Content-Type": "application/json"},
                     body: postBody, 
                 });
@@ -1027,10 +1027,10 @@ Parse.Cloud.define("request_redeem", function(request, response)
 		    console.log("Pushing to server");
 	        Parse.Cloud.httpRequest({
                 method: "POST",
-                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
                 headers: {"Content-Type": "application/json"},
                 body: { 
-                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    "cometrkey": "384ncocoacxpvgrwecwy", 
                     pendingRedemption: redeemReward, 
                 },
                 success: function(httpResponse) {
@@ -1150,10 +1150,10 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
             headers: { "Content-Type": "application/json"},
             body: {
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                "cometrkey": "384ncocoacxpvgrwecwy", 
                 deletedRedemption: redeemReward,
             },
         });
@@ -1542,7 +1542,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    
 	    console.log("Posting to server");
 	    var postBody = {
-            "cometrkey": "f2cwxn35cxyoq8723c78wnvy",
+            "cometrkey": "384ncocoacxpvgrwecwy",
 	        approvedRedemption: redeemReward,
 	    }
 	    if(updatedReward != null) {
@@ -1550,7 +1550,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    }
 	    Parse.Cloud.httpRequest({
             method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
             headers: { "Content-Type": "application/json"},
             body: postBody
         });
@@ -1818,10 +1818,10 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 	}).then(function() {
 	    Parse.Cloud.httpRequest({
             method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
             headers: { "Content-Type": "application/json"},
             body: {
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                "cometrkey": "384ncocoacxpvgrwecwy", 
                 newFeedback: message,
             }
         });
