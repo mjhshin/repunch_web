@@ -1,8 +1,4 @@
 ##############################################
 ####################  TODO: 
-0. Add validation on Punching - "Punch Code must have 5 characters"
-1. Captcha on login after 3rd failed attempt.
-   - create AccountCaptcha
-
 2. spaces are now allowed for passwords - so fix broken tests for signup
 3. write tests for only store owner can view/modify email field in edit store details

@@ -148,16 +148,16 @@ def login(request, requestDict):
                     request.session.set_expiry(0)
                     
                 recaptcha.login_success(request.session,
-                    request.POST['username'])
+                    requestDict['username'])
                 
                 return account
             else:
                 return 1
         else:
             recaptcha.login_fail(request.session,
-                request.POST['username'])
+                requestDict['username'])
             return 0
     else:
         recaptcha.login_fail(request.session,
-            request.POST['username'])
+            requestDict['username'])
         return 0

@@ -106,7 +106,9 @@ $(document).ready(function() {
 				</div>
 				<div id="description">
 					<span class="bold">Store Description</span>
-					<p>{{ store|get:'store_description' }}</p>
+					{% if store.store_description %}
+					<p>{{ store.store_description }}</p>
+					{% endif %}
 				</div>
 			</div>
 			<div class="clear">&nbsp;</div>

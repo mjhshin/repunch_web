@@ -239,7 +239,6 @@ def sign_up(request):
             # format the phone number
             store.phone_number =\
                 format_phone_number(request.POST['phone_number'])
-            store.set("store_description", "The " + store.store_name)
             store.set("hours", [])
             store.set("rewards", [])
             store.set("categories", [])
