@@ -1024,7 +1024,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 			return;
 					
 		}).then(function() {
-		    console.log("Pushing to server");
+		    console.log("Posting to server");
 	        Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "https://www.repunch.com/manage/comet/receive/" + storeId,
@@ -1034,7 +1034,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                     pendingRedemption: redeemReward, 
                 },
                 success: function(httpResponse) {
-                    console.log(httpResponse.text);
+                    console.log("Post success");
                 },
                 error: function(httpResponse) {
                     console.error("Request failed with response code " + httpResponse.status);
@@ -1122,45 +1122,72 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	redeemRewardQuery.include("PatronStore");
 	redeemRewardQuery.get(redeemId).then(function(redeemRewardResult)
 	{
-	    redeemReward = redeemRewardResult;
-	    messageStatus = redeemReward.get("MessageStatus");
-		
-	    if (messageStatus != null) { // offer/gift
-            messageStatus.set("redeem_available", 'no');
-            return messageStatus.save();
+	
+	    if (redeemRewardResult.get("is_redeemed")) {
+	        response.error("REDEEMREWARD_VALIDATED");
+	    } else {
+	        executeReject(redeemRewardResult);
         }
         
 	}, function(error) {
 		console.log("RedeemReward fetch failed.");
 		response.error("REDEEMREWARD_NOT_FOUND"); // rejected/deleted before
 		
-	}).then(function() {
-	    if (messageStatus == null) {
-	        var patronStore = redeemReward.get("PatronStore");
+	});
+	
+	function executeReject(redeemRewardResult) {
+	    handleMessageStatus(redeemRewardResult).then(function() {
+	        if (messageStatus == null) {
+	            var patronStore = redeemReward.get("PatronStore");
 			
-	        if (patronStore != null) {
-	            patronStore.set("pending_reward", false);
-	            return patronStore.save();
+	            if (patronStore != null) {
+	                patronStore.set("pending_reward", false);
+	                return patronStore.save();
+	            }
 	        }
-	    }
-	    
-	}).then(function() {
-	    return redeemReward.destroy();
-	    
-	}).then(function() {
-	    Parse.Cloud.httpRequest({
-            method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
-            headers: { "Content-Type": "application/json"},
-            body: {
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                deletedRedemption: redeemReward,
-            },
+	        
+        }, function(error) {
+            response.error(error);
+	
+        }).then(function() {
+            return redeemReward.destroy();
+            
+        }).then(function() {
+            Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                    deletedRedemption: redeemReward,
+                },
+            });
+            
+            response.success("success");
+            
         });
         
-        response.success("success");
+    }
+    
+    function handleMessageStatus(redeemRewardResult) {
+        var promise = new Parse.Promise();
+	
+        redeemReward = redeemRewardResult;
+        messageStatus = redeemReward.get("MessageStatus");
+	
+        if (messageStatus != null) { // offer/gift
+            messageStatus.set("redeem_available", 'no');
+            messageStatus.save().then(function() {
+                promise.resolve();
+            }, function(error) {
+                promise.resolve();
+            });
+        } else {
+            promise.resolve();
+        }
         
-	});
+        return promise;  
+    }
 	
 });
 

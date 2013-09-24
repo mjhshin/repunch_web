@@ -1024,7 +1024,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 			return;
 					
 		}).then(function() {
-		    console.log("Pushing to server");
+		    console.log("Posting to server");
 	        Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
@@ -1034,7 +1034,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                     pendingRedemption: redeemReward, 
                 },
                 success: function(httpResponse) {
-                    console.log(httpResponse.text);
+                    console.log("Post success");
                 },
                 error: function(httpResponse) {
                     console.error("Request failed with response code " + httpResponse.status);
