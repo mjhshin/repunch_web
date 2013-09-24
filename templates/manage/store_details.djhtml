@@ -104,12 +104,14 @@ $(document).ready(function() {
 						-->
 					</p>
 				</div>
+				
+				{% if store.store_description %}
 				<div id="description">
 					<span class="bold">Store Description</span>
-					{% if store.store_description %}
 					<p>{{ store.store_description }}</p>
-					{% endif %}
 				</div>
+				{% endif %}
+				
 			</div>
 			<div class="clear">&nbsp;</div>
 		</div>

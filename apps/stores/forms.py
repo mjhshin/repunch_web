@@ -77,9 +77,8 @@ class StoreForm(forms.Form):
         validators=[required])
     phone_number = forms.CharField(max_length=50)
     email = forms.EmailField()
-    store_description = forms.CharField(max_length=500, 
-        widget=forms.Textarea(attrs={"maxlength":500}),
-        validators=[required])
+    store_description = forms.CharField(required=False, 
+        max_length=500, widget=forms.Textarea(attrs={"maxlength":500}))
         
     def __init__(self, email, *args, **kwargs):
         super(StoreForm, self).__init__(*args, **kwargs)
