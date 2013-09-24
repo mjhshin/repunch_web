@@ -1,6 +1,11 @@
 /*
     Script for a punch event.
 */
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function punchit(url){
 
     // only proceed if not processing a punch
@@ -20,6 +25,14 @@ function punchit(url){
     if (!pc.val().length>0){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
             "<div><span>Please enter the customer's punch code.</span></div></div>");
+        cont = false;
+    } else if (!isNumber(pc.val())){
+        $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+            "<div><span>Punch Codes consist of only numbers.</span></div></div>");
+        cont = false;
+    } else if (pc.val().length != 5){
+        $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
+            "<div><span>Punch Codes are 5 characters long.</span></div></div>");
         cont = false;
     } else if (!pa.val().length>0){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+

@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	<link href="{% static 'manage/css/global.1.5.css' %}" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'manage/css/jquery/jquery.Jcrop.min.css' %}"
         type="text/css" />

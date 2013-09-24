@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/punch.1.2.js" %}"></script>
+	<script src="{% static "manage/js/punch.1.3.js" %}"></script>
 	<script src="{% static "manage/js/paginator.1.4.js" %}"></script>
 	<script src="{% static "manage/js/redemptions.js" %}"></script>
 	<script>
@@ -40,7 +40,7 @@
 		<h2 style="margin-bottom:10px;">Punch Customers</h2>
         <form action="" method="POST" id="punch-form" >
 	        {% csrf_token %}
-	        <input type="text" id="punch_code" placeholder="Punch Code"/>
+	        <input type="text" id="punch_code" placeholder="Punch Code" maxlength="5"/>
 	        <input type="number" id="punch_amount" placeholder="Amount" min="1" max="{{ settings.punches_employee }}"/>
 	        <a class="button blue" onclick="punchit('{% url 'workbench_punch' %}'); return false;"><span>Punch</span></a>
 	        <img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
