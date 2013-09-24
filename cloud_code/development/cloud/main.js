@@ -1136,7 +1136,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	});
 	
 	function executeReject(redeemRewardResult) {
-	    handleMessageStatus(handleMessageStatus).then(function() {
+	    handleMessageStatus(redeemRewardResult).then(function() {
 	        if (messageStatus == null) {
 	            var patronStore = redeemReward.get("PatronStore");
 			
