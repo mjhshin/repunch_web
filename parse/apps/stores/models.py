@@ -89,6 +89,11 @@ class Store(ParseObject):
         self.city = title(self.city)
         if self.state:
             self.state = self.state.upper()
+            
+        if self.store_description is not None and\
+            len(self.store_description.strip()) == 0:
+            self.store_description = None
+            
         
         data = self._get_formatted_data()
         res = parse("PUT", self.path() + "/" + self.objectId, data)
