@@ -45,7 +45,7 @@ def logout(request, reverse_url):
     delete_after_delay(cs, COMET_PULL_RATE + 3)
     return redirect(reverse(reverse_url))
 
-def login(request, requestDict):
+def login(request, requestDict, no_recaptcha=False):
     """ 
     This combines Django's authenticate and login functions.
     The request.POST must contain a username and password.
@@ -69,7 +69,7 @@ def login(request, requestDict):
         return request.session.get('account')
         
     # now check for recaptcha
-    if RECAPTCHA_TOKEN in request.session and\
+    if not no_recaptcha and RECAPTCHA_TOKEN in request.session and\
         request.session[RECAPTCHA_TOKEN] >= RECAPTCHA_ATTEMPTS:
         is_valid = recaptcha.submit(request,
             requestDict['recaptcha_challenge_field'],
@@ -83,6 +83,11 @@ def login(request, requestDict):
                  "password":requestDict.get('password')} )
                     
     if res and "error" not in res:
+        # correct login credentials - remove recaptcha token if exist
+        if not no_recaptcha:
+            recaptcha.login_success(request.session,
+                requestDict['username'])
+    
         account = Account(**res)
         account.fetch_all()
         
@@ -146,18 +151,17 @@ def login(request, requestDict):
                 # expire when the user's Web browser is closed.
                 else:
                     request.session.set_expiry(0)
-                    
-                recaptcha.login_success(request.session,
-                    requestDict['username'])
                 
                 return account
             else:
                 return 1
         else:
-            recaptcha.login_fail(request.session,
-                requestDict['username'])
+            if not no_recaptcha:
+                recaptcha.login_fail(request.session,
+                    requestDict['username'])
             return 0
     else:
-        recaptcha.login_fail(request.session,
-            requestDict['username'])
+        if not no_recaptcha:
+            recaptcha.login_fail(request.session,
+                requestDict['username'])
         return 0

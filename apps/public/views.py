@@ -386,7 +386,7 @@ def sign_up(request):
             send_email_signup(account)
 
             # auto login
-            user_login = login(request, postDict)
+            user_login = login(request, postDict, no_recaptcha=True)
             if user_login != None:
                 data = {"code":-1}
                 # response to signup.js - not login returns

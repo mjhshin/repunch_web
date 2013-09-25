@@ -292,6 +292,11 @@ def redeem(request):
                 request.session.update(session)
                 return HttpResponse(json.dumps({"result":5}), 
                             content_type="application/json")
+            elif res['error'] == "REDEEMREWARD_VALIDATED":
+                request.session.clear()
+                request.session.update(session)
+                return HttpResponse(json.dumps({"result":3}), 
+                            content_type="application/json")
                         
     # always make sure to get the latest session since the session 
     # will be saved on return!!!       
