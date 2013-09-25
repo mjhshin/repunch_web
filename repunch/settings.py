@@ -69,8 +69,11 @@ else:
 if DEBUG:
     ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
 else:
-    ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'matt@repunch.com',
-        'mike@repunch.com', 'andrew@repunch.com']
+    if PRODUCTION_SERVER:
+        ORDER_PLACED_EMAILS = ['matt@repunch.com', 'andrew@repunch.com']
+    else:
+        ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'mike@repunch.com']
+    
 # for template rendering
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
