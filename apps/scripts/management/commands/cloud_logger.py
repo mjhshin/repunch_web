@@ -1,4 +1,9 @@
 """
+IMPORTANT! 
+Make sure the parse command line tool is the most up-to-date (1.2+)
+or logging will crash if non-ascii characters are present in the logs.
+----------------------------------------------------------------------
+
 This will run parse log -f indefinitely looking for keywords listed
 in ERRORS.
 
@@ -21,7 +26,8 @@ Note that killing the process will result in an empty stdout.
     We do this until we have a subset of the logs from last_log_tag 
     to the TIP so that we do not miss 1 line of logging.
   
-  - If the last_log_tag is the tip, then we do nothing.
+  - If the last_log_tag is the tip, then we do nothing but set 
+    the last_log_tag encountered starting from the tip.
     
   - Once we have the subset of the logs we want, we then scan it for
     items in ERRORS. An email is sent containing the log from
@@ -56,13 +62,13 @@ Note that killing the process will result in an empty stdout.
    
 """
 
-import os, subprocess, shlex, re
+import os, sys, subprocess, shlex, re
 from time import sleep
+from datetime import datetime
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
-ERRORS = ["error"]
+ERRORS = ["success"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
 PARSE_CODE_DIR = "./cloud_code/development"
@@ -72,7 +78,12 @@ LOGJOB_INTERVAL = 10# in seconds
 
 TAG_RE = re.compile(r"(I|E)\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:\d{2,2}\.\d{3,3}Z]")
 
+# TODO debug this. it is still not working properly
+
 class LogJob(object):
+
+    START_N = 20
+    N_ADDER = 300
     
     def __init__(self, *args, **kwargs):
         # let's start the very first job with a relatively large n
@@ -81,8 +92,8 @@ class LogJob(object):
         self.n = 500
         
     def log_job(self):
-        sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD + str(n)),
-            stdout=subprocess.PIPE)
+        sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\
+            str(self.n)), stdout=subprocess.PIPE)
         subset = sp.stdout.read()
         
         # evaluate if first run
@@ -91,22 +102,55 @@ class LogJob(object):
                 if error in subset:
                     # TODO send_mail(subset)
                     print subset
+                    break
                     
             # set the last tag and time
             self.last_log_tag = TAG_RE.findall(subset)[-1]
-            self.last_log_time = timezone.now()
+            self.last_log_time = datetime.now()
             return
             
-        
-        
+        # check if the last_log_tag is in the subset
+        if self.last_log_tag in subset:
+            # now get the real subset starting form the last_log_tag
+            subset = re.search(r"%s.*" %\
+                (self.last_log_tag,), subset).group()
+            
+            # if the subset is nothing but the last_log_tag
+            if subset.count("\n") in  (0, 1):
+                self.last_log_time = datetime.now()
+                return
+            
+            # if it is not then we evaluate it
+            for error in ERRORS:
+                if error in subset:
+                    # TODO send_mail(subset)
+                    print subset
+                    break
+            
+            # set the last tag and time
+            self.last_log_tag = TAG_RE.findall(subset)[-1]
+            self.last_log_time = datetime.now()
+            return
+                    
+        # if it is not then lets increase n and try again
+        else:
+            self.n += LogJob.N_ADDER
+            self.log_job()
         
     def work(self):
         self.log_job()
-        # sleep if we finished early
-        work_time = (self.last_log_time - timezone.now()).seconds
+        # make sure that work_time is at least 1 second or else
+        # the difference will be 86399
+        sleep(1)
+        
+        work_time = (datetime.now() - self.last_log_time).seconds
         time_to_sleep = LOGJOB_INTERVAL - work_time
+        # sleep more if we finished early
         if time_to_sleep > 0:
             sleep(time_to_sleep)
+            
+        # start with a small n
+        self.n = LogJob.START_N
         self.work()
 
 
