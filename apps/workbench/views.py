@@ -212,6 +212,8 @@ def redeem(request):
         # of redemptions consecutively
         session = SessionStore(request.session.session_key)
             
+        data = {"result" : 0}
+            
         # success result removed means patronstore is null!
         if 'error' not in res:
             redemptions_pending =\
@@ -257,51 +259,47 @@ def redeem(request):
                 if i_remove != -1: 
                     session['redemptions_pending'] =\
                         redemptions_pending
-                        
+                
+                if result and result == "insufficient":
+                    data["result"] = 2
+                elif result and result == "validated":
+                    data["result"] = 3
+                elif result and result == "PATRONSTORE_REMOVED":
+                    data["result"] = 6
+                else:
+                    data["result"] = 1
+                    
                 # request.session will be saved after return
                 request.session.clear()
                 request.session.update(session)
-                
-                if result and result == "insufficient":
-                    return HttpResponse(json.dumps({"result":2}), 
-                                content_type="application/json")
-                elif result and result == "validated":
-                    return HttpResponse(json.dumps({"result":3}), 
-                                content_type="application/json")
-                elif result and result == "PATRONSTORE_REMOVED":
-                    return HttpResponse(json.dumps({"result":6}), 
-                                content_type="application/json")
-                else:
-                    return HttpResponse(json.dumps({"result":1}), 
-                                content_type="application/json")
+                return HttpResponse(json.dumps(data), 
+                            content_type="application/json")
                                 
             elif action == "deny":
                 if i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
                     session['redemptions_pending'] =\
                         redemptions_pending
+                        
+                data["result"] = 4
                
                 request.session.clear()
                 request.session.update(session)
-                return HttpResponse(json.dumps({"result":4}), 
+                return HttpResponse(json.dumps(data), 
                                 content_type="application/json")
                                 
         elif 'error' in res:
             if res['error'] == "REDEEMREWARD_NOT_FOUND":
-                request.session.clear()
-                request.session.update(session)
-                return HttpResponse(json.dumps({"result":5}), 
-                            content_type="application/json")
+                data["result"] = 5
             elif res['error'] == "REDEEMREWARD_VALIDATED":
-                request.session.clear()
-                request.session.update(session)
-                return HttpResponse(json.dumps({"result":3}), 
-                            content_type="application/json")
+                data["result"] = 3
+            elif res['error'] == "PATRONSTORE_REMOVED":
+                data["result"] = 6
                         
     # always make sure to get the latest session since the session 
     # will be saved on return!!!       
     request.session.clear()             
     request.session.update(SessionStore(request.session.session_key))
-    return HttpResponse(json.dumps({"result":0}), 
+    return HttpResponse(json.dumps(data), 
                     content_type="application/json")
                        

@@ -1116,7 +1116,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
-	var redeemReward, messageStatus;
+	var redeemReward, messageStatus, patronStore, rewardId;
 	
 	redeemRewardQuery.include("MessageStatus");
 	redeemRewardQuery.include("PatronStore");
@@ -1138,12 +1138,11 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	function executeReject(redeemRewardResult) {
 	    handleMessageStatus(redeemRewardResult).then(function() {
 	        if (messageStatus == null) {
-	            var patronStore = redeemReward.get("PatronStore");
 			
 	            if (patronStore != null) {
 	                patronStore.set("pending_reward", false);
 	                return patronStore.save();
-	            }
+	            } 
 	        }
 	        
         }, function(error) {
@@ -1163,7 +1162,12 @@ Parse.Cloud.define("reject_redeem", function(request, response)
                 },
             });
             
-            response.success("success");
+            // This is a deleted patronStore if it is not an offer/gift
+            // offer/gift do not have a patronStore and reward_id
+            if (patronStore == null && rewardId != null)
+                response.error("PATRONSTORE_REMOVED");
+            else
+                response.success("success");
             
         });
         
@@ -1173,7 +1177,9 @@ Parse.Cloud.define("reject_redeem", function(request, response)
         var promise = new Parse.Promise();
 	
         redeemReward = redeemRewardResult;
-        messageStatus = redeemReward.get("MessageStatus");
+        messageStatus = redeemRewardResult.get("MessageStatus");
+        patronStore = redeemRewardResult.get("PatronStore");
+        rewardId = redeemRewardResult.get("reward_id")
 	
         if (messageStatus != null) { // offer/gift
             messageStatus.set("redeem_available", 'no');
