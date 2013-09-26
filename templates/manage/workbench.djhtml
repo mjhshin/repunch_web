@@ -11,13 +11,13 @@
 {% block javascript %}
 	<script src="{% static "manage/js/punch.1.3.js" %}"></script>
 	<script src="{% static "manage/js/paginator.1.4.js" %}"></script>
-	<script src="{% static "manage/js/redemptions.js" %}"></script>
+	<script src="{% static "manage/js/redemptions.1.0.js" %}"></script>
 	<script>
 	
     $(document).ready(function(){
         $(".not-sortable").unbind("click");
         
-        // initial bind (in redemptions.js)
+        // initial bind - (this is in redemptions.js)
         rebindRedemptions();
         
         // activate the paginator!

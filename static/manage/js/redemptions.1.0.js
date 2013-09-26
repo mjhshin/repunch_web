@@ -13,6 +13,10 @@ function onRedeem(rowId, action){
     var customerName = $("#" + rowId + " div:nth-child(3)").text();
     var title = $("#" + rowId + " div:nth-child(4)").text();
     var numPunches = $("#" + rowId + " div:nth-child(5)").text();
+    
+    var font = "font: bold 'Cabin', sans-serif;"
+    var successRGB = "#CCFF99", errorRGB = "#FFFFCB";
+    
     $.ajax({
         url: urlRedeem,
         cache: false, // required to kill internet explorer 304 bug
@@ -26,33 +30,28 @@ function onRedeem(rowId, action){
             
             if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5 || res.result == 6){
                 if (res.result == 1){
-                    row.css("background", "#CCFF99");
-                    row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
+                    row.css("background", successRGB);
+                    row.html("Successfully <span style='color:blue;" + font + "'>APPROVED</span> redeem.");
                 } else if (res.result == 3){
-                    row.css("background", "#FFFFCB");
+                    row.css("background", errorRGB);
                     row.html("Reward already redeemed.");
                     alert("Invalid! Reward already redeemed.");
                 } else if (res.result == 4) {
-                    row.css("background", "#CCFF99");
-                    row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
+                    row.css("background", successRGB);
+                    row.html("Successfully <span style='color:red" + font + "'>DENIED</span> redeem.");
                 } else if (res.result == 5) {
-                    row.css("background", "#FFFFCB");
-                    // row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
-                    row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
+                    row.css("background", errorRGB);
+                    row.html("Successfully <span style='color:red" + font + "'>DENIED</span> redeem.");
                 } else if (res.result == 6) {
-                    row.css("background", "#FFFFCB");
-                    row.html("Patron no longer exist.");
-                    alert("Invalid! Patron no longer exist.");
+                    row.css("background", errorRGB);
+                    row.html(customerName + " deleted the store from their app.");
+                    alert("Invalid! Customer no longer exist.");
                 } else {
-                    row.css("background", "#FFFFCB");
+                    row.css("background", errorRGB);
                     row.html("Customer does not have enough punches!");
                     alert("Customer does not have enough punches!");
                 }
                 row.fadeOut(2000, function(){
-                    // no longer necessary to append to past redemptions since
-                    // clicking on redeem means that the redemption tab is active...
-                    
-                    // then remove
                     $(this).remove();
                                             
                     // update the counts
