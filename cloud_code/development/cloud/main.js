@@ -1381,7 +1381,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        });
 						
 		} else if(patronStore == null) {
-		    response.success("PATRONSTORE_REMOVED");
+		    redeemReward.destroy().then(function() {
+		        response.success({ code:"PATRONSTORE_REMOVED", result: null});
+		    });
 		
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
@@ -1393,6 +1395,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			    redeemReward.destroy().then(function() {
 				    response.success({ code:"insufficient", result: redeemReward });
 			    });
+			    
 			}, function(error) {
 			    console.log("PatronStore save fail");
 			    response.error("error");

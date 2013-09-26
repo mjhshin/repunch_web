@@ -234,8 +234,8 @@ def redeem(request):
             if action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
-                if result and result == "insufficient" and\
-                    i_remove != -1:
+                if result and result in ("insufficient",
+                    "PATRONSTORE_REMOVED") and i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
                     # notify other dashboards of this change
                     store_id =\
@@ -245,7 +245,7 @@ def redeem(request):
                         "deletedRedemption":del_red.jsonify()
                     }
                     comet_receive(store_id, payload)
-                elif i_remove != -1:
+                elif i_remove != -1: # success
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True
                     redemption.updatedAt = timezone.now()
