@@ -1233,8 +1233,10 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	// this (at the moment) is only involved in Push notifications.
 	var employeeId = request.params.employee_id;
 	
+	var Store = Parse.Object.extend("Store");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
+	var storeQuery = new Parse.Query(Store);
 	var redeemReward, messageStatus, patronStore, rewardId;
 	
 	redeemRewardQuery.include("MessageStatus");
