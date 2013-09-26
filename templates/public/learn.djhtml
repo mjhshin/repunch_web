@@ -57,8 +57,9 @@ ul.orangy li div {
 }
 
 .ul-points {
-    width:3%; height:3%;
+    width:14px; height:14px;
     margin-right:7px;
+    
 }
 
 </style>
@@ -74,8 +75,8 @@ ul.orangy li div {
 		<section id="learn-bottom">
 			<nav id="learn-bottom-menu" class="bottom-shadow">
 				<a href="#" id="tabRewards" class="active"><img src="{% static "public/images/icon_star-orange.png" %}" alt="" style="margin-bottom:4px;"> Rewards</a>
-				<a href="#" id="tabMessages"><img src="{% static "public/images/icon_mail-gray.png" %}" alt=""> Messages</a>
-				<a href="#" id="tabFeedback"><img src="{% static "public/images/icon_chat-bubble-gray.png" %}" alt=""> Feedback</a>
+				<a href="#" id="tabMessages"><img src="{% static "public/images/icon_mail-gray.1.0.png" %}" alt="" style="margin-bottom:2px;"> Messages</a>
+				<a href="#" id="tabFeedback"><img src="{% static "public/images/icon_chat-bubble-gray.png" %}" alt="" > Feedback</a>
 				<a href="#" id="tabAnalytics"><img src="{% static "public/images/icon_graph-gray.png" %}" alt="" style="margin-bottom:4px;"> Analytics</a>
 				<a href="#" id="tabSocial"><img src="{% static "public/images/icon_avatar-gray.png" %}" alt="" style="margin-bottom:4px;"> Social</a>
 				<a href="#" id="tabPlans-pricing"><img src="{% static "public/images/icon_tag-gray.png" %}" alt=""> Let's Get Going</a>
@@ -98,8 +99,8 @@ ul.orangy li div {
 					<aside class="col1">
 						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized Messages and Offers</h2><br />
 						<ul class="orangy">
-							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
-							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.png" %}" alt="" class="ul-points">TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.1.0.png" %}" alt="" class="ul-points" >NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.1.0.png" %}" alt="" class="ul-points" >TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
 						</ul>
 					</aside>
 					<aside class="col2">
@@ -145,19 +146,52 @@ ul.orangy li div {
 					</aside>
 				</div>
 				<div id="tabPlans-pricingBody" class="tab">
-					<aside class="col1" style="width:500px;">
+					<aside class="col1" style="width:100%;">
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
-							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">GET STARTED FOR FREE</span> <div>You only begin paying a modest monthly fee once you have a significant number of users getting punched at your store. As you enter into paid tiers, you gain access to special services like premium marketing campaigns.</div></li>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">EASY SETUP</span> <div>No hardware or POS integration required - you can be up and running in minutes!</div></li>
-							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">CHOOSE HOW TO PUNCH AND REDEEM</span> <div>Input a customer's Punch Code right into the dashboard from your internet-enabled POS, computer, or tablet.</div><br/><div>Or use our Retailer Mobile App. Your employees can download the app onto their devices and begin granting punches once you authorize them.</div><br/><div>If you would prefer to have Repunch-enabled devices, we can supply these to you at cost.</div></li>
+						
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points" >CHOOSE HOW TO PUNCH AND REDEEM</span> <div>Input a customer's Punch Code right into the dashboard from your internet-enabled POS, computer, or tablet.</div><br/><div>Or use our Retailer Mobile App. Your employees can download the app onto their devices and begin granting punches once you authorize them.</div><br/><div>If you would prefer to have Repunch-enabled devices, we can supply these to you at cost.</div></li>
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">PREVENT FRAUD</span> <div>We automatically let you know about any suspicious activity that may occur. Details include the name of the employee and the abnormal quantity or time of the punches.</div></li>
+						
+						    {# PLANS AND PRICING #}
+						    <li>
+						    
+						    <h2>Plans & Pricing</h2><br />
+						    {% for type in types %}
+                            <div class="bkg_price-plan-box">
+                                <h3>{{ type.name }} </h3>
+                                <p class="orange-text">
+                                {% if type.monthly_cost == 0 %}
+                                FREE
+                                {% else %}
+                                ${{ type.monthly_cost }}/mo
+                                {% endif %}
+                                </p>
+                                
+                                <span>
+                                {% if type.max_users == -1 %}
+                                    Unlimited Users
+                                {% else %}
+                                    Send up to {{ type.max_users }} user{{ type.max_users|pluralize }}
+                                {% endif %}<br>
+                                {{ type.max_messages }} message{{ type.max_messages|pluralize }}/month
+                                
+                                {% if type.max_users == -1 %}
+                                <br/>Premium marketing campaigns
+                                {% endif %}
+                                </span>
+                            </div>
+                            {% endfor %}
+						
+						    </li>
+						    {# END PLANS AND PRICING #}
 			    			
 						</ul>
                     </aside>		
-					<aside class="col2">
-						<img src="{% static "public/images/img_iphone-get_going.1.0.png" %}" alt="">
-					</aside>				
+                    
+					<aside class="col2" style="width:0px;">
+					</aside>	
+								
 				</div>						
 			</div>
 		</section>

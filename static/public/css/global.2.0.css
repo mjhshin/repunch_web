@@ -533,37 +533,34 @@ a.button.orange{
 	float:right;
 }
 
-#learn-plans {
-}
 
-#price-plan-boxes {
-	padding:0;	
-}
-
-#learn-plans .bkg_price-plan-box {
-	width: 195px;
+/* TODO STYLE THIS */
+.bkg_price-plan-box {
+	width: 300px;
 	height: 160px;
-	margin: 0 22px;
-	background: transparent url('../images/bkg_price-plan-box.png') no-repeat 0 0;
-	text-align: center;
+	margin: 0 20px;
+	margin-top: 20px;
 	float: left;
+	background: transparent url('../images/bkg_price-plan-box.png') no-repeat 0 0; 
+	text-align: center;
+	position:relative; left: 38px;
 }
 
-#learn-plans .bkg_price-plan-box h3 {
+.bkg_price-plan-box h3 {
 	border: 0px;
-	height: 40px;
-	color: #254f8B;
+	color: #0965ad;
+	font: 'Cabin', sans-serif;
 }
 
-#learn-plans .bkg_price-plan-box .orange-text{
+.bkg_price-plan-box .orange-text{
 	color:#FB6809;
-	font-weight:bold;
-	margin:15px 0 3px;
-	font-size:15px;
+	font: bold 14px 'Cabin', sans-serif;
+	margin-top: 40px;
+	margin-bottom:10px;
 }
 
-#learn-plans .bkg_price-plan-box span{
-	font-size:15px;
+.bkg_price-plan-box span{
+	font: bold 14px 'Cabin', sans-serif;
 }
 
 #ad-wrapper{

@@ -1166,7 +1166,6 @@ Parse.Cloud.define("request_redeem", function(request, response)
 		Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
-	            alert: customerName + " wants to redeem a reward",
 				redeem_id: redeemReward.id,
 	            badge: "Increment",
 	            type: "request_redeem",
