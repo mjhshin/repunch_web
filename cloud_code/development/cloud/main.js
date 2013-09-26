@@ -1034,7 +1034,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                     pendingRedemption: redeemReward, 
                 },
                 success: function(httpResponse) {
-                    console.log("Post success");
+                    console.log("Post success with " + httpResponse.text);
                 },
                 error: function(httpResponse) {
                     console.error("Request failed with response code " + httpResponse.status);

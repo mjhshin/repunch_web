@@ -460,10 +460,15 @@ def receive(request, store_id):
     
     Note: request.POST does not contain the data!
             Use request.body instead!
+            
+    Note 2: request.body comes in Latin-1 format (ISO-8859-1).
+        This must be converted to unicode which will then be encoded
+        to UTF-8 by django and the browser 
+        (<meta http-equiv="Content-Type" content="text/html; charset=utf-8">)         
     """
     if request.method == "POST" or request.is_ajax():
         try:
-            postDict = json.loads(request.body)
+            postDict = json.loads(unicode(request.body, "ISO-8859-1"))
         except Exception:
             return HttpResponse("error")
         
