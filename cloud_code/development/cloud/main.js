@@ -1056,7 +1056,8 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	            alert: customerName + " wants to redeem a reward",
 				redeem_id: redeemReward.id,
 	            badge: "Increment",
-	            type: "request_redeem"
+	            type: "request_redeem",
+				content-available: 1
 	        }
 	    }, {
 	        success: function() {
