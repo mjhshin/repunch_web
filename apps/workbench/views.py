@@ -268,7 +268,7 @@ def redeem(request):
                 elif result and result == "validated":
                     return HttpResponse(json.dumps({"result":3}), 
                                 content_type="application/json")
-                elif result and result == "removed":
+                elif result and result == "PATRONSTORE_REMOVED":
                     return HttpResponse(json.dumps({"result":6}), 
                                 content_type="application/json")
                 else:

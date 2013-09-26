@@ -1380,6 +1380,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			    response.error("error");
 	        });
 						
+		} else if(patronStore == null) {
+		    response.success("PATRONSTORE_REMOVED");
+		
 		} else if(patronStore.get("punch_count") < numPunches) {
 			console.log("PatronStore has insufficient punches.");
 			patronStore.set("pending_reward", false);
