@@ -22,7 +22,7 @@ Note that killing the process will result in an empty stdout.
   - In each "log_job" the output of "parse log -n n" is evaluated. 
     We start at n so we only evaluate a small portion of the logs.
 
-  - If the last_log_tag is not in this subset, then we multiply n. 
+  - If the last_log_tag is not in this subset, then we add to n. 
     We do this until we have a subset of the logs from last_log_tag 
     to the TIP so that we do not miss 1 line of logging.
   
