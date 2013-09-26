@@ -1,7 +1,6 @@
 """
 IMPORTANT! 
-Make sure the parse command line tool is the most up-to-date (1.2+)
-or logging will crash if non-ascii characters are present in the logs.
+Non-ascii characters will crash parse log tool! (Currently).
 ----------------------------------------------------------------------
 
 This will run parse log -f indefinitely looking for keywords listed
@@ -78,18 +77,16 @@ LOGJOB_INTERVAL = 10# in seconds
 
 TAG_RE = re.compile(r"(I|E)\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:\d{2,2}\.\d{3,3}Z]")
 
-# TODO debug this. it is still not working properly
-
 class LogJob(object):
 
     START_N = 20
-    N_ADDER = 300
+    N_ADDER = 50 # TODO make this bigger
     
     def __init__(self, *args, **kwargs):
         # let's start the very first job with a relatively large n
         self.last_log_tag = None
         self.last_log_time = None
-        self.n = 500
+        self.n = 100 # TODO make this bigger
         
     def log_job(self):
         sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\

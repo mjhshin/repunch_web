@@ -407,6 +407,119 @@ Parse.Cloud.define("link_employee", function(request, response) {
   
 });
 
+
+////////////////////////////////////////////////////
+//
+//  Called when removing an approved employee and denying a pending employee.
+//
+//  Params: 
+//      employee_id: Employee object's objectId
+//
+//  Deletes the employee object and sends a push to the Installation with the given employee_id.
+//  This will also delete the Parse.User associated with the Employee 
+//  if it does not have a pointer to a Store and a Patron. Otherwise, 
+//  the Employee pointer will just be set to null.
+//
+//  A push is made if the Employee status is "approved".
+//
+//  Note that this does not need to post to server because this is only called server side!
+//  Meaning the notification is done within the server. 
+//  Also removing the Employee's Parse.User from the Store's ACL is also done server side.
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("delete_employee", function(request, response) 
+{
+    var employeeId = request.params.employee_id;
+    var action = request.params.action;
+    
+    var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
+    
+    var Employee = Parse.Object.extend("Employee");
+    var employeeQuery = new Parse.Query(Employee);
+    var userQuery = new Parse.Query(Parse.User)
+    
+	var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+
+	androidInstallationQuery.equalTo("employee_id", employeeId);
+	androidInstallationQuery.equalTo("deviceType", "android");
+	iosInstallationQuery.equalTo("employee_id", employeeId);
+	iosInstallationQuery.equalTo("deviceType", "ios");
+    
+    employeeQuery.equalTo("objectId", employeeId); 
+    userQuery.matchesQuery("Employee", employeeQuery);
+    
+    // Need to use the master key since we are modifying a Parse.User object.
+    Parse.Cloud.useMasterKey(); 
+    
+    // Note that we must first retrive the user since deleting the employee
+    // will make the userQuery return nothing.
+    
+    userQuery.first().then(function(user) 
+    {
+        // It will actually go here (not error) even if the employee does not exist!
+        // Note the difference between Parse.Query.get and .first/.find
+        // first() just returns find()[0], which may be null =)
+        if (user == null) {
+            console.log("Failed to retrieve User.");
+            // Return a Parse error so that the following promises will not be called.
+            return Parse.Promise.error(EMPLOYEE_NOT_FOUND);
+        }
+        
+        if (user.get("Store") == null && user.get("Patron") == null) {
+            console.log("User's Store and Patron pointers are null. Destroying User.");
+            return user.destroy();
+        } else {
+            user.set("Employee", null);
+            return user.save(); 
+        }
+        
+    }).then(function(user) {
+        console.log("User successfully destroyed/saved.");
+        return employeeQuery.first();
+        
+    }).then(function(employee) {
+        return employee.destroy();
+    
+    }).then(function(employee) {
+        console.log("Employee successfully destroyed.");
+        
+        if (employee.get("status") == "approved") {
+            var promises = [];
+		    promises.push( Parse.Push.send({
+	            where: androidInstallationQuery,
+	            data: {
+				    action: "com.repunch.intent.EMPLOYEE_DELETE"
+	            }
+	        }) );
+		    promises.push( Parse.Push.send({
+	            where: iosInstallationQuery,
+	            data: {
+				    type: "employee_delete",
+	            }
+	        }) );
+		
+		    return Parse.Promise.when(promises);
+		}
+        
+    }).then(function() {
+	    console.log("Android/iOS push successful");
+		response.success("success");
+		
+	}, function(error) {
+	    if (error == EMPLOYEE_NOT_FOUND) {
+            console.log("Employee has already been deleted.");
+        } else {
+    	    console.log("Android/iOS push failed");
+        }
+        
+		response.error(error);
+		
+	});
+    
+    
+});
+
 ////////////////////////////////////////////////////
 //
 // 
@@ -1057,7 +1170,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 				redeem_id: redeemReward.id,
 	            badge: "Increment",
 	            type: "request_redeem",
-				content-available: 1
+				"content-available": 1
 	        }
 	    }, {
 	        success: function() {
@@ -1115,6 +1228,11 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	
+	// optional - if validated by an employee
+	// note that calls from the dashboard will not supply this value even if an employee is logged in
+	// this (at the moment) is only involved in Push notifications.
+	var employeeId = request.params.employee_id;
+	
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
 	var redeemReward, messageStatus, patronStore, rewardId;
@@ -1147,13 +1265,48 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	        }
 	        
         }, function(error) {
-            response.error(error);
+            console.log("Failed to handle MessageStatus.");
+            return Parse.Promise.error(error);
 	
         }).then(function() {
             return redeemReward.destroy();
             
+        }, function(error) {
+            console.log("Failed to fetch RedeemReward.");
+            return Parse.Promise.error(error);
+        
         }).then(function() {
-            Parse.Cloud.httpRequest({
+            return storeQuery.get(storeId);
+        
+        }, function(error) {
+            console.log("Failed to destory RedeemReward.");
+            return Parse.Promise.error(error);
+        
+        }).then(function(store)
+            {
+            var promises = [];
+            
+		    var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
+		    var storeEmployeeQuery = store.relation("Employees").query();
+		
+		    // If an employee validates the redeem, then that employee will not receive a push
+		    if (employeeId != null) {
+		        storeEmployeeQuery.notEqualTo("objectId", employeeId);
+		    }
+		
+		    iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
+		    iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
+		    
+		    promises.push( Parse.Push.send({
+	            where: iosEmployeeInstallationQuery,
+	            data: {
+				    type: "reject_redeem",
+				    "content-available": 1,
+	                redeem_id: redeemId,
+	            }
+	        }) );
+            
+            promises.push(Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
                 headers: { "Content-Type": "application/json"},
@@ -1161,15 +1314,24 @@ Parse.Cloud.define("reject_redeem", function(request, response)
                     "cometrkey": "384ncocoacxpvgrwecwy", 
                     deletedRedemption: redeemReward,
                 },
+            }));
+            
+            
+		    Parse.Promise.when(promises).then(function() {
+                // This is a deleted patronStore if it is not an offer/gift
+                // offer/gift do not have a patronStore and reward_id
+                if (patronStore == null && rewardId != null)
+                    response.error("PATRONSTORE_REMOVED");
+                else
+                    response.success("success");
+		    }, function(error) {
+                console.log("Failed to push and/or post to server.");
+                response.error(error);
             });
             
-            // This is a deleted patronStore if it is not an offer/gift
-            // offer/gift do not have a patronStore and reward_id
-            if (patronStore == null && rewardId != null)
-                response.error("PATRONSTORE_REMOVED");
-            else
-                response.success("success");
-            
+        }, function(error) {
+            console.log("Failed to get store with storeId " + storeId);
+            response.error(error);
         });
         
     }
@@ -1201,119 +1363,6 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 
 ////////////////////////////////////////////////////
 //
-//  Called when removing an approved employee and denying a pending employee.
-//
-//  Params: 
-//      employee_id: Employee object's objectId
-//
-//  Deletes the employee object and sends a push to the Installation with the given employee_id.
-//  This will also delete the Parse.User associated with the Employee 
-//  if it does not have a pointer to a Store and a Patron. Otherwise, 
-//  the Employee pointer will just be set to null.
-//
-//  A push is made if the Employee status is "approved".
-//
-//  Note that this does not need to post to server because this is only called server side!
-//  Meaning the notification is done within the server. 
-//  Also removing the Employee's Parse.User from the Store's ACL is also done server side.
-//
-////////////////////////////////////////////////////
-Parse.Cloud.define("delete_employee", function(request, response) 
-{
-    var employeeId = request.params.employee_id;
-    var action = request.params.action;
-    
-    var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
-    
-    var Employee = Parse.Object.extend("Employee");
-    var employeeQuery = new Parse.Query(Employee);
-    var userQuery = new Parse.Query(Parse.User)
-    
-	var androidInstallationQuery = new Parse.Query(Parse.Installation);
-	var iosInstallationQuery = new Parse.Query(Parse.Installation);
-
-	androidInstallationQuery.equalTo("employee_id", employeeId);
-	androidInstallationQuery.equalTo("deviceType", "android");
-	iosInstallationQuery.equalTo("employee_id", employeeId);
-	iosInstallationQuery.equalTo("deviceType", "ios");
-    
-    employeeQuery.equalTo("objectId", employeeId); 
-    userQuery.matchesQuery("Employee", employeeQuery);
-    
-    // Need to use the master key since we are modifying a Parse.User object.
-    Parse.Cloud.useMasterKey(); 
-    
-    // Note that we must first retrive the user since deleting the employee
-    // will make the userQuery return nothing.
-    
-    userQuery.first().then(function(user) 
-    {
-        // It will actually go here (not error) even if the employee does not exist!
-        // Note the difference between Parse.Query.get and .first/.find
-        // first() just returns find()[0], which may be null =)
-        if (user == null) {
-            console.log("Failed to retrieve User.");
-            // Return a Parse error so that the following promises will not be called.
-            return Parse.Promise.error(EMPLOYEE_NOT_FOUND);
-        }
-        
-        if (user.get("Store") == null && user.get("Patron") == null) {
-            console.log("User's Store and Patron pointers are null. Destroying User.");
-            return user.destroy();
-        } else {
-            user.set("Employee", null);
-            return user.save(); 
-        }
-        
-    }).then(function(user) {
-        console.log("User successfully destroyed/saved.");
-        return employeeQuery.first();
-        
-    }).then(function(employee) {
-        return employee.destroy();
-    
-    }).then(function(employee) {
-        console.log("Employee successfully destroyed.");
-        
-        if (employee.get("status") == "approved") {
-            var promises = [];
-		    promises.push( Parse.Push.send({
-	            where: androidInstallationQuery,
-	            data: {
-				    action: "com.repunch.intent.EMPLOYEE_DELETE"
-	            }
-	        }) );
-		    promises.push( Parse.Push.send({
-	            where: iosInstallationQuery,
-	            data: {
-				    type: "employee_delete",
-	            }
-	        }) );
-		
-		    return Parse.Promise.when(promises);
-		}
-        
-    }).then(function() {
-	    console.log("Android/iOS push successful");
-		response.success("success");
-		
-	}, function(error) {
-	    if (error == EMPLOYEE_NOT_FOUND) {
-            console.log("Employee has already been deleted.");
-        } else {
-    	    console.log("Android/iOS push failed");
-        }
-        
-		response.error(error);
-		
-	});
-    
-    
-});
-
-
-////////////////////////////////////////////////////
-//
 // 
 //
 ////////////////////////////////////////////////////
@@ -1322,6 +1371,11 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	var redeemId = request.params.redeem_id;
 	var storeId = request.params.store_id;
 	var rewardId = request.params.reward_id;
+	
+	// optional - if validated by an employee
+	// note that calls from the dashboard will not supply this value even if an employee is logged in
+	// this (at the moment) is only involved in Push notifications.
+	var employeeId = request.params.employee_id;
 	
 	var isOfferOrGift = (rewardId == null);
 	
@@ -1444,12 +1498,23 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	function executePushReward(redeemReward)
 	{
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
-		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
+		
+		var storeEmployeeQuery = store.relation("Employees").query();
 
-		androidInstallationQuery.equalTo("patron_id", patronId);
 		androidInstallationQuery.equalTo("deviceType", "android");
-		iosInstallationQuery.equalTo("patron_id", patronId);
-		iosInstallationQuery.equalTo("deviceType", "ios");
+		androidInstallationQuery.equalTo("patron_id", patronId);
+		iosPatronInstallationQuery.equalTo("deviceType", "ios");
+		iosPatronInstallationQuery.equalTo("patron_id", patronId);
+		
+		// If an employee validates the redeem, then that employee will not receive a push
+		if (employeeId != null) {
+		    storeEmployeeQuery.notEqualTo("objectId", employeeId);
+		}
+		
+		iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
+		iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
@@ -1464,7 +1529,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        }
 	    }) );
 		promises.push( Parse.Push.send({
-	        where: iosInstallationQuery,
+	        where: iosPatronInstallationQuery,
 	        data: {
 				type: "redeem",
 	            alert: "Redeemed '" + rewardTitle + "'",
@@ -1473,6 +1538,15 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }) );
+	    promises.push( Parse.Push.send({
+	        where: iosEmployeeInstallationQuery,
+	        data: {
+				type: "validate_redeem",
+				"content-available": 1,
+	            redeem_id: redeemId,
+	        }
+	    }) );
+	    
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
@@ -1489,12 +1563,23 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	function executePushOfferGift(redeemReward)
 	{
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
-		var iosInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
+		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
+		
+		var storeEmployeeQuery = store.relation("Employees").query();
 
 		androidInstallationQuery.equalTo("patron_id", patronId);
 		androidInstallationQuery.equalTo("deviceType", "android");
-		iosInstallationQuery.equalTo("patron_id", patronId);
-		iosInstallationQuery.equalTo("deviceType", "ios");
+		iosPatronInstallationQuery.equalTo("patron_id", patronId);
+		iosPatronInstallationQuery.equalTo("deviceType", "ios");
+		
+		// If an employee validates the redeem, then that employee will not receive a push
+		if (employeeId != null) {
+		    storeEmployeeQuery.notEqualTo("objectId", employeeId);
+		}
+		
+		iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
+		iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
@@ -1508,11 +1593,19 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        }
 	    }) );
 		promises.push( Parse.Push.send({
-	        where: iosInstallationQuery,
+	        where: iosPatronInstallationQuery,
 	        data: {
 				type: "redeem_offer_gift",
 	            alert: "Redeemed '" + rewardTitle + "'",
 	            message_status_id: messageStatus.id
+	        }
+	    }) );
+	    promises.push( Parse.Push.send({
+	        where: iosEmployeeInstallationQuery,
+	        data: {
+				type: "validate_redeem",
+				"content-available": 1,
+	            redeem_id: redeemId,
 	        }
 	    }) );
 		
