@@ -189,6 +189,9 @@ class Command(BaseCommand):
                 return
                 
             print "Running cloud_logger"
+            boss.is_running = True
+            boss.save()
+            
             # first cd to the cloud project
             os.chdir(PARSE_CODE_DIR)
             # now just just ignite the LogJob
