@@ -66,39 +66,50 @@ from time import sleep
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
+from django.core.mail import send_mail
 
-ERRORS = ["success"]
+from repunch.settings import DEBUG, EMAIL_FROM
+
+ERRORS = ["error"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
 PARSE_CODE_DIR = "./cloud_code/development"
 PARSE_LOG_CMD = "parse log -n "
 
-LOGJOB_INTERVAL = 10# in seconds
+LOGJOB_INTERVAL = 40 # in seconds
 
-TAG_RE = re.compile(r"(I|E)\d{4,4}-\d{2,2}-\d{2,2}T\d{2,2}:\d{2,2}:\d{2,2}\.\d{3,3}Z]")
+TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
 
 class LogJob(object):
 
-    START_N = 20
-    N_ADDER = 50 # TODO make this bigger
+    START_N = 50
+    N_ADDER = 100 # may want to make this bigger
     
     def __init__(self, *args, **kwargs):
         # let's start the very first job with a relatively large n
         self.last_log_tag = None
         self.last_log_time = None
-        self.n = 100 # TODO make this bigger
+        self.n = LogJob.START_N
+        self.first_run = True
+        
+        
+    def send(self, log):
+        if not self.first_run:
+            send_mail("Repunch Cloud Code Error", log, EMAIL_FROM, 
+                        EMAILS, fail_silently=not DEBUG)
+        else:
+            self.first_run = False
         
     def log_job(self):
         sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\
             str(self.n)), stdout=subprocess.PIPE)
-        subset = sp.stdout.read()
+        subset = str(sp.stdout.read())
         
         # evaluate if first run
         if not self.last_log_tag or not self.last_log_time:
             for error in ERRORS:
-                if error in subset:
-                    # TODO send_mail(subset)
-                    print subset
+                if re.search(error, subset):
+                    self.send(subset)
                     break
                     
             # set the last tag and time
@@ -107,21 +118,23 @@ class LogJob(object):
             return
             
         # check if the last_log_tag is in the subset
-        if self.last_log_tag in subset:
+        if re.search(self.last_log_tag, subset):
+            
             # now get the real subset starting form the last_log_tag
             subset = re.search(r"%s.*" %\
-                (self.last_log_tag,), subset).group()
+                (self.last_log_tag,), subset, re.DOTALL).group()
             
             # if the subset is nothing but the last_log_tag
-            if subset.count("\n") in  (0, 1):
+            # note that sometimes the last_log_tag is repeated
+            if subset.count("\n") -\
+                subset.count(self.last_log_tag) in  (0, 1):
                 self.last_log_time = datetime.now()
                 return
             
             # if it is not then we evaluate it
             for error in ERRORS:
-                if error in subset:
-                    # TODO send_mail(subset)
-                    print subset
+                if re.search(error, subset):
+                    self.send(subset)
                     break
             
             # set the last tag and time
@@ -156,8 +169,11 @@ class Command(BaseCommand):
         # first cd to the cloud project
         os.chdir(PARSE_CODE_DIR)
         # now just just ignite the LogJob
-        LogJob().work()
-        
+        try:
+            LogJob().work()
+        except Exception as e:
+            send_mail("Repunch Cloud Logger Stopped", str(e),
+                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
         
         
         
