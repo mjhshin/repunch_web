@@ -220,7 +220,7 @@ class Command(BaseCommand):
             boss.save()
             
             # now just just ignite the LogJob
-            LogJob().start(boss)
+            LogJob().work()
         
         elif "stop" in args:
             if count == 0:
