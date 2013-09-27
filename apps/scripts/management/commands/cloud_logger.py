@@ -49,7 +49,7 @@ Note that killing the process will result in an empty stdout.
     I2013-09-25T19:50:47.844Z] PatronStore save was successful.
     I2013-09-25T19:50:47.844Z] Patron... <---- (tip)
     
-    The following lob job will then send to EMAILS containing the below
+    The following log job will then send to EMAILS containing the below
     -------------------------------------------------------------
     I2013-09-25T19:50:27.149Z] Posting to server <---- (last_log_tag)
     I2013-09-25T19:50:47.285Z] v43: Ran cloud function punch for user uNUk7Jsiv9 with:
@@ -74,8 +74,8 @@ from django.core.mail import send_mail
 from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM
 
-ERRORS = ["error"]
-EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
+ERRORS = ["PATRON_NOT_FOUND"]
+EMAILS = ["vandolf@repunch.com"]#, "mike@repunch.com"]
 
 PARSE_CODE_DIR = "./cloud_code/production"
 PARSE_LOG_CMD = "parse log -n "
@@ -175,7 +175,7 @@ class LogJob(object):
 class Command(BaseCommand):
     def handle(self, *args, **options):
     
-        count = LobBoss.objects.count()
+        count = LogBoss.objects.count()
             
         if "start" in args:
             # run if not already running
@@ -209,7 +209,8 @@ class Command(BaseCommand):
                 boss.is_running = False
                 boss.save()
     
-        
+        else:
+            print "Args must be start or stop"
         
         
         
