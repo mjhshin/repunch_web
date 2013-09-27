@@ -72,12 +72,16 @@ from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 
 from apps.scripts.models import LogBoss
-from repunch.settings import DEBUG, EMAIL_FROM
+from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = ["error"]
-EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
+EMAILS = ["vandolf@repunch.com"]#, "mike@repunch.com"]
 
-PARSE_CODE_DIR = "./cloud_code/production"
+if DEBUG:
+    PARSE_CODE_DIR = "./cloud_code/production"
+else:
+    PARSE_CODE_DIR = FS_SITE_DIR + "/cloud_code/production"
+    
 PARSE_LOG_CMD = "parse log -n "
 
 LOGJOB_INTERVAL = 40 # in seconds
@@ -215,7 +219,7 @@ class Command(BaseCommand):
             # first cd to the cloud project
             os.chdir(PARSE_CODE_DIR)
             # now just just ignite the LogJob
-            LogJob().work()
+            LogJob().start(boss)
         
         elif "stop" in args:
             if count == 0:
