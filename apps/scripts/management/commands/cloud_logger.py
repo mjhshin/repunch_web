@@ -74,7 +74,7 @@ from django.core.mail import send_mail
 from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM
 
-ERRORS = ["PATRON_NOT_FOUND"]
+ERRORS = ["error"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
 PARSE_CODE_DIR = "./cloud_code/production"
@@ -87,7 +87,7 @@ TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\
 class LogJob(object):
 
     START_N = 50
-    N_ADDER = 100 # may want to make this bigger
+    N_ADDER = 200 # may want to make this bigger
     
     def __init__(self, *args, **kwargs):
         # let's start the very first job with a relatively large n
@@ -95,6 +95,11 @@ class LogJob(object):
         self.last_log_time = None
         self.n = LogJob.START_N
         self.first_run = True
+        
+    def on_stop(self):
+        send_mail("Repunch Cloud Logger Manually Stopped",
+            "cloud_logger has been manually terminated",
+            EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
         
         
     def send(self, log):
@@ -170,6 +175,8 @@ class LogJob(object):
         LogBoss.objects.update()
         if LogBoss.objects.all()[0].is_running:
             self.work()
+        else:
+            self.on_stop()
 
 
 class Command(BaseCommand):
@@ -189,6 +196,15 @@ class Command(BaseCommand):
                 return
                 
             print "Running cloud_logger"
+            
+            # send an email
+            specs = "cloud_logger running with ERRORS = " + str(ERRORS) +\
+                "\nEMAILS = " + str(EMAILS) +\
+                "\nLOGJOB_INTERVAL = " + str(LOGJOB_INTERVAL)
+            
+            send_mail("Repunch Cloud Logger Starting", specs,
+                    EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+            
             boss.is_running = True
             boss.save()
             
