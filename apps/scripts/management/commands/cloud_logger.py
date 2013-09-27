@@ -96,6 +96,14 @@ class LogJob(object):
         self.n = LogJob.START_N
         self.first_run = True
         
+        # send an email
+        specs = "cloud_logger running with ERRORS = " + str(ERRORS) +\
+            "\nEMAILS = " + str(EMAILS) +\
+            "\nLOGJOB_INTERVAL = " + str(LOGJOB_INTERVAL)
+        
+        send_mail("Repunch Cloud Logger Starting", specs,
+                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+        
     def on_stop(self):
         send_mail("Repunch Cloud Logger Manually Stopped",
             "cloud_logger has been manually terminated",
@@ -157,27 +165,32 @@ class LogJob(object):
             self.log_job()
         
     def work(self):
-        self.log_job()
-        # make sure that work_time is at least 1 second or else
-        # the difference will be 86399
-        sleep(1)
-        
-        work_time = (datetime.now() - self.last_log_time).seconds
-        time_to_sleep = LOGJOB_INTERVAL - work_time
-        # sleep more if we finished early
-        if time_to_sleep > 0:
-            sleep(time_to_sleep)
+        try:
+            self.log_job()
+            # make sure that work_time is at least 1 second or else
+            # the difference will be 86399
+            sleep(1)
             
-        # start with a small n
-        self.n = LogJob.START_N
-        
-        # check if we are still suppose to be running
-        LogBoss.objects.update()
-        if LogBoss.objects.all()[0].is_running:
-            self.work()
-        else:
-            self.on_stop()
-
+            work_time = (datetime.now() - self.last_log_time).seconds
+            time_to_sleep = LOGJOB_INTERVAL - work_time
+            # sleep more if we finished early
+            if time_to_sleep > 0:
+                sleep(time_to_sleep)
+                
+            # start with a small n
+            self.n = LogJob.START_N
+            
+            # check if we are still suppose to be running
+            LogBoss.objects.update()
+            if LogBoss.objects.all()[0].is_running:
+                self.work()
+            else:
+                self.on_stop()
+                
+        except Exception as e:
+            print "cloud_logger stopped"
+            send_mail("Repunch Cloud Logger Stopped", str(e),
+                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -196,28 +209,13 @@ class Command(BaseCommand):
                 return
                 
             print "Running cloud_logger"
-            
-            # send an email
-            specs = "cloud_logger running with ERRORS = " + str(ERRORS) +\
-                "\nEMAILS = " + str(EMAILS) +\
-                "\nLOGJOB_INTERVAL = " + str(LOGJOB_INTERVAL)
-            
-            send_mail("Repunch Cloud Logger Starting", specs,
-                    EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
-            
             boss.is_running = True
             boss.save()
             
             # first cd to the cloud project
             os.chdir(PARSE_CODE_DIR)
             # now just just ignite the LogJob
-            try:
-                LogJob().work()
-            except Exception as e:
-                print "cloud_logger stopped"
-                send_mail("Repunch Cloud Logger Stopped", str(e),
-                    EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
-        
+            LogJob().work()
         
         elif "stop" in args:
             if count == 0:
