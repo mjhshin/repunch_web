@@ -212,12 +212,13 @@ class Command(BaseCommand):
                 print "cloud_logger is already running"
                 return
                 
+            # first cd to the cloud project
+            os.chdir(PARSE_CODE_DIR)
+                
             print "Running cloud_logger"
             boss.is_running = True
             boss.save()
             
-            # first cd to the cloud project
-            os.chdir(PARSE_CODE_DIR)
             # now just just ignite the LogJob
             LogJob().start(boss)
         
@@ -225,10 +226,14 @@ class Command(BaseCommand):
             if count == 0:
                 print "cloud_logger was not running"
             elif count == 1:
-                print "stopping cloud_logger"
                 boss = LogBoss.objects.all()[0]
-                boss.is_running = False
-                boss.save()
+                
+                if boss.is_running:
+                    print "stopping cloud_logger"
+                    boss.is_running = False
+                    boss.save()
+                else:
+                    print "cloud_logger was not running"
     
         else:
             print "Args must be start or stop"
