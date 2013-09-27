@@ -1303,6 +1303,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	            data: {
 				    type: "reject_redeem",
 				    "content-available": 1,
+				    "badge": "decrement",
 	                redeem_id: redeemId,
 	            }
 	        }) );
@@ -1544,6 +1545,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        data: {
 				type: "validate_redeem",
 				"content-available": 1,
+				"badge": "decrement",
 	            redeem_id: redeemId,
 	        }
 	    }) );
@@ -1606,6 +1608,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        data: {
 				type: "validate_redeem",
 				"content-available": 1,
+				"badge": "decrement",
 	            redeem_id: redeemId,
 	        }
 	    }) );
