@@ -73,7 +73,7 @@ from repunch.settings import DEBUG, EMAIL_FROM
 ERRORS = ["error"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
-PARSE_CODE_DIR = "./cloud_code/development"
+PARSE_CODE_DIR = "./cloud_code/production"
 PARSE_LOG_CMD = "parse log -n "
 
 LOGJOB_INTERVAL = 40 # in seconds
