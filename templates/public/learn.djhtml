@@ -155,34 +155,26 @@ ul.orangy li div {
 						
 						    {# PLANS AND PRICING #}
 						    <li>
-						    
 						    <h2>Plans & Pricing</h2><br />
-						    {% for type in types %}
+                            
                             <div class="bkg_price-plan-box">
-                                <h3>{{ type.name }} </h3>
-                                <p class="orange-text">
-                                {% if type.monthly_cost == 0 %}
-                                FREE
-                                {% else %}
-                                ${{ type.monthly_cost }}/mo
-                                {% endif %}
-                                </p>
-                                
-                                <span>
-                                {% if type.max_users == -1 %}
-                                    Unlimited Users
-                                {% else %}
-                                    Send up to {{ type.max_users }} user{{ type.max_users|pluralize }}
-                                {% endif %}<br>
-                                {{ type.max_messages }} message{{ type.max_messages|pluralize }}/month
-                                
-                                {% if type.max_users == -1 %}
-                                <br/>Premium marketing campaigns
-                                {% endif %}
-                                </span>
+                                <h3>{{ sub_type.0.name }}</h3>
+                                <p class="orange-text">Less than 50 Users</p>
+                                <span>Send 2 messages/month<br/>and/or time sensitive offers to your customers' Repunch apps</span>
                             </div>
-                            {% endfor %}
-						
+                                
+                            <div class="bkg_price-plan-box">
+                                <h3>{{ sub_type.1.name }}</h3>
+                                <p class="orange-text">50-100 Users</p>
+                                <span>Send up to 4 messages/month</span>
+                            </div>
+                                
+                            <div class="bkg_price-plan-box">
+                                <h3>{{ sub_type.2.name }}</h3>
+                                <p class="orange-text">Unlimited Users</p>
+                                <span>Send up to 8 messages/month<br/>Premium marketing campaigns</span>
+                            </div>
+                                
 						    </li>
 						    {# END PLANS AND PRICING #}
 			    			

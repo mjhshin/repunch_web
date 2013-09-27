@@ -534,28 +534,28 @@ a.button.orange{
 }
 
 
-/* TODO STYLE THIS */
 .bkg_price-plan-box {
-	width: 300px;
-	height: 160px;
-	margin: 0 20px;
+	width: 240px;
+	height: 180px;
+	margin: 0px;
 	margin-top: 20px;
 	float: left;
-	background: transparent url('../images/bkg_price-plan-box.png') no-repeat 0 0; 
+	background: transparent url('../images/bkg_price-plan-box.1.1.png') no-repeat 0 0; 
+	background-color:yellow;
 	text-align: center;
-	position:relative; left: 38px;
+	position:relative; left:-8px;
 }
 
 .bkg_price-plan-box h3 {
 	border: 0px;
 	color: #0965ad;
-	font: 'Cabin', sans-serif;
+	font: bold 'Cabin', sans-serif;
 }
 
 .bkg_price-plan-box .orange-text{
 	color:#FB6809;
-	font: bold 14px 'Cabin', sans-serif;
-	margin-top: 40px;
+	font: bold 16px 'Cabin', sans-serif;
+	margin-top: 34px;
 	margin-bottom:10px;
 }
 
@@ -1006,30 +1006,6 @@ float: right;
     font-style:italic;
 	font-weight:normal;
     font-family:Georgia,serif;
-}
-
-#signup-content .bkg_price-plan-box{
-	width:195px;
-	height:160px;
-	margin:15px auto 0;
-	background:transparent url('../images/bkg_price-plan-box.png') no-repeat 0 0;
-}
-
-#signup-content .bkg_price-plan-box h3{
-	border:0px;
-	height:45px;
-	color:#254f8B;
-	line-height:45px;
-}
-
-#signup-content .bkg_price-plan-box .orange-text{
-	color:#FB6809;
-	font-weight:bold;
-	margin:28px 0 3px;
-}
-
-#signup-content .bkg_price-plan-box span{
-	font-size:15px;
 }
 
 #signup-form{}

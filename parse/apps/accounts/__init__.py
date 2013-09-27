@@ -1,7 +1,7 @@
 
-FREE = "FREE"
-MIDDLEWEIGHT = "MIDDLEWEIGHT"
-HEAVYWEIGHT = "HEAVYWEIGHT"
+FREE = "Free"
+MIDDLEWEIGHT = "Middleweight"
+HEAVYWEIGHT = "Heavyweight"
 
 UNLIMITED = -1
 ERROR = "Billing Error"

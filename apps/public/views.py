@@ -25,7 +25,7 @@ from parse.auth.decorators import dev_login_required
 from parse.utils import make_aware_to_utc, parse
 from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
-from parse.apps.accounts import sub_type, UNLIMITED
+from parse.apps.accounts import sub_type
 from parse.apps.stores import IPOD
 from parse.apps.stores.models import Store, Subscription,\
 Settings
@@ -50,17 +50,12 @@ def index(request):
 
 @dev_login_required
 def learn(request):
-    data = {'learn_nav': True}
-    
-    data['unlimited'] = UNLIMITED
-    types = [value for value in sub_type.itervalues()]
-    data['types'] = types
+    data = {'learn_nav': True, "sub_type": sub_type}
     return render(request, 'public/learn.djhtml', data)
 
 @dev_login_required
 def faq(request):
-    data = {'faq_nav': True}
-    data['form'] = ContactForm() # An unbound form
+    data = {'faq_nav': True, 'form':ContactForm()}
     return render(request, 'public/faq.djhtml', data)
 
 @dev_login_required
