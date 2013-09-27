@@ -497,7 +497,7 @@ a.button.orange{
 #learn-bottom-tabs-contents .tab {
 	width:840px;
 	display:none;
-	min-height:680px;
+	min-height:720px;
 	padding-top:45px;  
 	overflow:hidden;
 	margin:0 auto;	
@@ -535,27 +535,37 @@ a.button.orange{
 
 
 .bkg_price-plan-box {
-	width: 240px;
-	height: 180px;
-	margin: 0px;
+	width: 240px; height: 220px;
+	margin: 0px; 
 	float: left;
-	background: transparent url('../images/bkg_price-plan-box.1.1.png') no-repeat 0 0; 
-	background-color:yellow;
+	background: transparent url('../images/bkg_price-plan-box.1.2.png') no-repeat 0 0; 
 	text-align: center;
 	position:relative; left:-8px;
+	
+	box-shadow:0px 5px 5px 0px #999;
+	-o-box-shadow:0px 5px 5px 0px #999;
+	-ms-box-shadow:0px 5px 5px 0px #999;
+	-moz-box-shadow:0px 5px 5px 0px #999;
+	-webkit-box-shadow:0px 5px 5px 0px #999;
 }
 
 .bkg_price-plan-box h3 {
 	border: 0px;
-	color: #0965ad;
-	font: bold serif;
+	color: white;
+	font: bold 19px/12px 'Cabin', sans-serif;
 }
 
-.bkg_price-plan-box .orange-text{
+.bkg_price-plan-box .orange-text, .bkg_price-plan-box .blue-text {
 	color:#0965ad;
-	font: bold 16px 'Cabin', sans-serif;
-	margin-top: 34px;
+	font: bold 17px 'Cabin', sans-serif;
 	margin-bottom:10px;
+	margin-top: 0px;
+}
+
+.bkg_price-plan-box .orange-text {
+	font-size: 22px;
+	margin-top: 34px;
+	color:#F08C13;
 }
 
 .bkg_price-plan-box span{

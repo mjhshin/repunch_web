@@ -37,7 +37,7 @@
 				{# MATTHEW #}
 				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Matthew Tervooren</h4><p><span>Co-Founder & CEO</span></p><div>In the rare instances when Matt's mind wanders away from all things Repunch, he is probably:<ul><li>Exploring the inexhaustible variety of NYC</li><li>Rooting for University of Michigan sports</li><li>Playing tennis or golf</li><li>Reading Hemingway or watching Tarantino</li><li>Surfing or playing wiffle ball on the beach</li><li>Following every movement of the Dutch national soccer team</li></ul></div></div>">
 					<div class="member-picture-border">
-						<div class="member-picture"><img src="{% static 'public/images/prof_matthew.png' %}" /></div>
+						<div class="member-picture"><img src="{% static 'public/images/prof_matthew.1.0.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Matthew Tervooren</h2>
 					<div class="member-title">Co-Founder & CEO</div>
@@ -57,7 +57,7 @@
 				{# ANDREW #}
 				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Andrew Tervooren</h4><p><span>VP of Marketing & Business Development</span></p><div>After graduating from Rutgers University, where Andrew was Captain of the Men's Tennis Team, he worked in the Literary Department of the entertainment company, William Morris Endeavor.<br/><br/>He enjoys sports and travel. The next hobbies he would like to pick up: Cooking and Photography. Andrew leads Repunch's marketing efforts.</div></div>">
 					<div class="member-picture-border">
-						<div class="member-picture"><img src="{% static 'public/images/prof_andrew.png' %}" /></div>
+						<div class="member-picture"><img src="{% static 'public/images/prof_andrew.1.0.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Andrew Tervooren</h2>
 					<div class="member-title">VP of Marketing & Business Development</div>
