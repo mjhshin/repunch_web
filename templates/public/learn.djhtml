@@ -153,10 +153,12 @@ ul.orangy li div {
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points" >CHOOSE HOW TO PUNCH AND REDEEM</span> <div>Input a customer's Punch Code right into the dashboard from your internet-enabled POS, computer, or tablet.</div><br/><div>Or use our Retailer Mobile App. Your employees can download the app onto their devices and begin granting punches once you authorize them.</div><br/><div>If you would prefer to have Repunch-enabled devices, we can supply these to you at cost.</div></li>
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">PREVENT FRAUD</span> <div>We automatically let you know about any suspicious activity that may occur. Details include the name of the employee and the abnormal quantity or time of the punches.</div></li>
 						
-						    {# PLANS AND PRICING #}
+						</ul>
+						
+					    {# PLANS AND PRICING #}
+					    <h2>Plans & Pricing</h2>
+					    <ul class="orangy">
 						    <li>
-						    <h2>Plans & Pricing</h2><br />
-
                             <div class="bkg_price-plan-box">
                                 <h3>{{ sub_type.0.name }}</h3>
                                 <p class="orange-text">Fewer than 50 Users</p>

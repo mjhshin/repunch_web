@@ -1,11 +1,26 @@
 """
+#######################################
 IMPORTANT! 
 ------------------------
 1) Must have the parse tool installed!
    - curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash
 2) Non-ascii characters will crash parse log tool! (Currently).
+3) Unfortunately, I can't get this to run using cron via django management commands.
+   So, just run "python manage.py cloud_logger start &; disown" in order to close
+   the terminal it is running on without killing it.
+4) Do not just kill this process! Use python manage.py cloud_logger stop.
 ----------------------------------------------------------------------
 
+#########################
+NOTE
+----------------------
+1) apps.scripts.models.LogBoss' sole purpose is to ensure that only 1 LogJob process
+   is running at once.
+----------------------------
+
+########################
+Description
+-----------------------------------
 This will run parse log -f indefinitely looking for keywords listed
 in ERRORS.
 
@@ -13,6 +28,7 @@ If an item is detected, then a chunk of lines of output is emailed to
 EMAILS.
 ---------------------------------------------------------------------
 
+################################
 Implementation:
 ---------------------------------------------
 Since the stdout of subprocess.Popen is blocked until the
@@ -75,7 +91,7 @@ from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = ["error"]
-EMAILS = ["vandolf@repunch.com"]#, "mike@repunch.com"]
+EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
 if DEBUG:
     PARSE_CODE_DIR = "./cloud_code/production"
