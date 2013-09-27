@@ -100,7 +100,7 @@ ul.orangy li div {
 						<h2><!--<img src="{% static "public/images/icon_mail-orange.png" %}" alt="">-->Send Personalized Messages and Offers</h2><br />
 						<ul class="orangy">
 							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.1.0.png" %}" alt="" class="ul-points" >NO EMAIL BLASTS</span> <div>Send messages directly to your customers' phones about things they are really interested in.<br/><br/><span class="italic georgia">Live music this weekend? New pumpkin roast? Closed for the holidays? Just want to say thanks? No problem! Send messages to your actual customers.</span></div></li>
-							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.1.0.png" %}" alt="" class="ul-points" >TIME SENSITIVE OFFERS</span> <div>Send time sensitive offers directly to your customers.<br/><br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
+							<li><span class="bold blue"><img src="{% static "public/images/icon_mail-orange.1.0.png" %}" alt="" class="ul-points" >TIME-SENSITIVE OFFERS</span> <div>Send time-sensitive offers directly to your customers.<br/><br/><span class="italic georgia">Half off appetizers before 6pm today? Extra scoop of ice cream all day? Draw customers in at certain times with specific products.</span></div></li>
 						</ul>
 					</aside>
 					<aside class="col2">
@@ -156,11 +156,11 @@ ul.orangy li div {
 						    {# PLANS AND PRICING #}
 						    <li>
 						    <h2>Plans & Pricing</h2><br />
-                            
+
                             <div class="bkg_price-plan-box">
                                 <h3>{{ sub_type.0.name }}</h3>
-                                <p class="orange-text">Less than 50 Users</p>
-                                <span>Send 2 messages/month<br/>and/or time sensitive offers to your customers' Repunch apps</span>
+                                <p class="orange-text">Fewer than 50 Users</p>
+                                <span>Send up to 2 messages or<br/>time-sensitive offers to your customers' Repunch app every month</span>
                             </div>
                                 
                             <div class="bkg_price-plan-box">
@@ -172,7 +172,7 @@ ul.orangy li div {
                             <div class="bkg_price-plan-box">
                                 <h3>{{ sub_type.2.name }}</h3>
                                 <p class="orange-text">Unlimited Users</p>
-                                <span>Send up to 8 messages/month<br/>Premium marketing campaigns</span>
+                                <span>Send up to 8 messages/month<br/><span style="line-height:30px;">Premium marketing campaigns</span></span>
                             </div>
                                 
 						    </li>

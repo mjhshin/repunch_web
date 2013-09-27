@@ -1,6 +1,9 @@
 """
 IMPORTANT! 
-Non-ascii characters will crash parse log tool! (Currently).
+------------------------
+1) Must have the parse tool installed!
+   - curl -s https://www.parse.com/downloads/cloud_code/installer.sh | sudo /bin/bash
+2) Non-ascii characters will crash parse log tool! (Currently).
 ----------------------------------------------------------------------
 
 This will run parse log -f indefinitely looking for keywords listed
@@ -68,6 +71,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 
+from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM
 
 ERRORS = ["error"]
@@ -161,19 +165,50 @@ class LogJob(object):
             
         # start with a small n
         self.n = LogJob.START_N
-        self.work()
+        
+        # check if we are still suppose to be running
+        LogBoss.objects.update()
+        if LogBoss.objects.all()[0].is_running:
+            self.work()
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # first cd to the cloud project
-        os.chdir(PARSE_CODE_DIR)
-        # now just just ignite the LogJob
-        try:
-            LogJob().work()
-        except Exception as e:
-            send_mail("Repunch Cloud Logger Stopped", str(e),
-                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+    
+        count = LobBoss.objects.count()
+            
+        if "start" in args:
+            # run if not already running
+            if count == 0:
+                boss = LogBoss.objects.create(is_running=False)
+            elif count == 1:
+                boss = LogBoss.objects.all()[0]
+                
+            if boss.is_running:
+                print "cloud_logger is already running"
+                return
+                
+            print "Running cloud_logger"
+            # first cd to the cloud project
+            os.chdir(PARSE_CODE_DIR)
+            # now just just ignite the LogJob
+            try:
+                LogJob().work()
+            except Exception as e:
+                print "cloud_logger stopped"
+                send_mail("Repunch Cloud Logger Stopped", str(e),
+                    EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+        
+        
+        elif "stop" in args:
+            if count == 0:
+                print "cloud_logger was not running"
+            elif count == 1:
+                print "stopping cloud_logger"
+                boss = LogBoss.objects.all()[0]
+                boss.is_running = False
+                boss.save()
+    
         
         
         

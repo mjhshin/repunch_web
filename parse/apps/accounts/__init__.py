@@ -13,12 +13,12 @@ free_type = {"name":FREE,
 
 # MIDDLE
 middle_type = {"name":MIDDLEWEIGHT, 
-                "monthly_cost":39, "max_users":99,
+                "monthly_cost":39, "max_users":100,
                 "max_messages":4, "level":1}
 
 # HEAVY
 heavy_type = {"name":HEAVYWEIGHT, 
-                "monthly_cost":69, "max_users":UNLIMITED,
+                "monthly_cost":75, "max_users":UNLIMITED,
                 "max_messages":8, "level":2}
 
 sub_type = {
