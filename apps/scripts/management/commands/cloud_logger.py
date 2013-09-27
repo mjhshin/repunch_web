@@ -75,7 +75,7 @@ from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM
 
 ERRORS = ["PATRON_NOT_FOUND"]
-EMAILS = ["vandolf@repunch.com"]#, "mike@repunch.com"]
+EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 
 PARSE_CODE_DIR = "./cloud_code/production"
 PARSE_LOG_CMD = "parse log -n "
