@@ -186,26 +186,26 @@ class LogJob(object):
         
     def work(self):
         try:
-            self.log_job()
-            # make sure that work_time is at least 1 second or else
-            # the difference will be 86399
-            sleep(1)
-            
-            work_time = (datetime.now() - self.last_log_time).seconds
-            time_to_sleep = LOGJOB_INTERVAL - work_time
-            # sleep more if we finished early
-            if time_to_sleep > 0:
-                sleep(time_to_sleep)
+            while True: # yes we are running forever
+                self.log_job()
+                # make sure that work_time is at least 1 second or else
+                # the difference will be 86399
+                sleep(1)
                 
-            # start with a small n
-            self.n = LogJob.START_N
-            
-            # check if we are still suppose to be running
-            LogBoss.objects.update()
-            if LogBoss.objects.all()[0].is_running:
-                self.work()
-            else:
-                self.on_stop()
+                work_time = (datetime.now() - self.last_log_time).seconds
+                time_to_sleep = LOGJOB_INTERVAL - work_time
+                # sleep more if we finished early
+                if time_to_sleep > 0:
+                    sleep(time_to_sleep)
+                    
+                # start with a small n
+                self.n = LogJob.START_N
+                
+                # check if we are still suppose to be running
+                LogBoss.objects.update()
+                if not LogBoss.objects.all()[0].is_running:
+                    self.on_stop()
+                    break
                 
         except Exception as e:
             print "cloud_logger stopped"
