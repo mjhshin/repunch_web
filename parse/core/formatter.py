@@ -127,7 +127,10 @@ def query(constraints, where_only=False):
                 where[key] = format_date(value)
             # GeoPoint
             elif key == "coordinates":
-                where[key] = format_geopoint(value[0], value[1])
+                if value is not None:
+                    where[key] = format_geopoint(value[0], value[1])
+                else:
+                    where[key] = None
             # Pointer __type
             elif key[0].isupper() and not key.endswith('_'): 
                 where[key] = format_pointer(key, value)

@@ -25,6 +25,8 @@ class Account(ParseObject):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
+        self.authData = data.get('authData')
+        self.emailVerified = data.get("emailVerified")
 
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')
@@ -37,8 +39,10 @@ class Account(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "username", "password", "email",
-            ["Store", "Patron", "Employee"] )
+        # note that password is not included because it is always
+        # treated as if it were null
+        return (cls, "username", ("email", {"authData": None}),
+            ["Store", "Patron", "Employee"])
     
     def update(self, save_password=False):
         # get the formated data to be put in the request

@@ -48,15 +48,20 @@ class Command(BaseCommand):
         # Loop through all of the models in MODELS
         for model in MODELS:
             fields_required = model.fields_required()
-            model_class = fields_required.pop(0)
+            
+            model_class = fields_required[0]
+            fields_required = fields_required[1:]
             
             if len(fields_required) == 0:
                 continue
                 
             for field in fields_required:
                 self.process_field(model_class, field)
+                
+        # TODO send email template
+        print self.abnormalities
     
-    def resolve_field(self, model_class, field):
+    def process_field(self, model_class, field):
         """
         Calls the proper handler for the given field.
         """
@@ -75,7 +80,12 @@ class Command(BaseCommand):
         Adds to abnormalities model instances that have a null value
         for the given field.
         """
-        pass    
+        field_abs = model_class.objects().filter(**{field:None})
+        print field, model_class.__name__
+        if len(field_abs) > 0:
+            print field_abs[0].objectId
+            self.abnormalities[model_class.__name__][field] =\
+                tuple(field_abs)
         
     def process_tuple(self, model_class, field):
         """
