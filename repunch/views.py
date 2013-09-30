@@ -25,7 +25,7 @@ def manage_dev_login(request):
     if request.session.get(DEVELOPMENT_TOKEN) or PRODUCTION_SERVER:
         return redirect(reverse("public_home"))
         
-    if request.method == "POST" or request.is_ajax():
+    if request.method == "POST":
         if authenticate(username=request.POST['username'],
             password=request.POST['password']) is not None:
             # just insert an arbitrary object

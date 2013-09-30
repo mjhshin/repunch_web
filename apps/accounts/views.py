@@ -63,6 +63,12 @@ def deactivate(request):
     store = request.session['store']
     store.active = False
     store.update()
+    # notify other dashboards of this changes
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "updatedStore":store.jsonify(),
+    }
+    comet_receive(store.objectId, payload)
     return redirect(reverse('manage_logout'))
 
 @dev_login_required

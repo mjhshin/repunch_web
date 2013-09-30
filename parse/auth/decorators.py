@@ -102,7 +102,8 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     
     
 #####################################
-def dev_passes_test(test_func, login_url, redirect_field_name):
+def dev_passes_test(test_func, login_url, redirect_field_name,
+    http_response, content_type):
     """
     Used for preventing non-repunch engineers from accessing all pages
     """
@@ -111,6 +112,12 @@ def dev_passes_test(test_func, login_url, redirect_field_name):
         def _wrapped_view(request, *args, **kwargs):
             if test_func(request):
                 return view_func(request, *args, **kwargs)
+                
+            if request.is_ajax() and http_response and\
+                content_type == "application/json":
+                return HttpResponse(json.dumps(http_response),
+                    content_type=content_type)    
+            
             path = request.build_absolute_uri()
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url.
@@ -129,7 +136,8 @@ def dev_passes_test(test_func, login_url, redirect_field_name):
     return decorator
 
 
-def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=LOGIN_URL_DEV):
+def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=LOGIN_URL_DEV,
+    http_response=None, content_type="application/json"):
     """
     Used for preventing non-repunch engineers from accessing all pages
     """
@@ -138,12 +146,16 @@ def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, l
             lambda req: True,
             login_url=login_url,
             redirect_field_name=redirect_field_name,
+            http_response=http_response,
+            content_type=content_type,
         )
     else:
         actual_decorator = dev_passes_test(
             lambda req: req.session.get(DEVELOPMENT_TOKEN),
             login_url=login_url,
             redirect_field_name=redirect_field_name,
+            http_response=http_response,
+            content_type=content_type,
         )
     
     if function:

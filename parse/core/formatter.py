@@ -15,7 +15,7 @@ NOT_WHERE_CONSTRAINTS = [
 ]
 
 WHERE_OPTIONS = [
-    "lt", "lte", "gt", "gte", "in", "nin",
+    "lt", "lte", "gt", "gte", "ne", "in", "nin",
 ]
 
 def format_date(dateObj):

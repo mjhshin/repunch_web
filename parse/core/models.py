@@ -253,14 +253,16 @@ class ParseObject(object):
         The first item in this tuple must be the __class__.
         
         Fields that are required together are in a tuple. These fields
-        are either all null (or satisfies all conditions if there
-        are dict objects present) or all not null.
+        are either all null or all not null.
+        If a dict is inside a tuple then all fields in the tuple must
+        not be null and the dict must be True.
         
         Fields that are in a list must have at least 1 member that is
         not null.
         
-        Fields that are in a dictionary must have the value specified.
-        dicts can also be used as conditions that must be True.
+        No nesting is allowed (no lists/tuples within lists/tuples)
+        or dicts within dicts. However, dicts may be within
+        tuples (no dicts within lists).
         """
         raise NotImplementedError("Must implement this for " +\
             "validate_models management command.")
