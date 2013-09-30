@@ -25,6 +25,8 @@ MODELS = (Account, Employee, Message, MessageStatus, Punch,
     RedeemReward, Store, Settings, Subscription, Invoice,
     Patron, PatronStore, PunchCode, FacebookPost)
     
+# All models that uses this delimiter must match this value!
+NOT_NULL = "!None"
     
 class Command(BaseCommand):
     """
@@ -77,7 +79,6 @@ class Command(BaseCommand):
             
     def add_to_abnormalities(self, model_class, field, field_abs):
         if len(field_abs) > 0:
-            print field_abs
             self.abnormalities[model_class.__name__][field] =\
                 tuple(field_abs)
             
@@ -86,9 +87,8 @@ class Command(BaseCommand):
         Adds to abnormalities model instances that have a null value
         for the given field.
         """
-        #self.add_to_abnormalities(model_class, field,
-        #   model_class.objects().filter(**{field:None}))
-        pass
+        self.add_to_abnormalities(model_class, field,
+            model_class.objects().filter(**{field:None}))
         
     def process_tuple(self, model_class, fields):
         """
@@ -109,22 +109,43 @@ class Command(BaseCommand):
         if len(dicts) == 0:
             for i, s in enumerate(strs):
                 # all current str is null except for the current 1
+                # note that this method may not produce correct
+                # results if len(strs) > 2
                 filter_params = {y:None for x,y in\
                     enumerate(strs) if i != x}
                 filter_params.update({s + "__ne":None})
-                print filter_params
-                self.add_to_abnormalities(model_class, s,
+                
+                # yes the key is strs
+                self.add_to_abnormalities(model_class, tuple(strs),
                     model_class.objects().filter(**filter_params))
                 
-        else:
-            pass
+        else: # all strs are required here
+            filter_params = {s:None for s in strs}
+            
+            # set the key for the abnormalities dict
+            key = strs[:]
+            
+            for dic in dicts:
+                for k, v in dic.iteritems():
+                    if v == NOT_NULL:
+                        filter_params.update({k+"__ne":None})
+                    else:
+                        filter_params.update({k:v})
+                    key.append(k)
+
+            self.add_to_abnormalities(model_class, tuple(key),
+                model_class.objects().filter(**filter_params))
         
     def process_list(self, model_class, fields):
         """
         Adds to abnormalities model instances that have a null value
         for all fields in the given list.
+        
+        This will not process anything other than strings.
         """
-        pass
+        self.add_to_abnormalities(model_class, tuple(fields),
+            model_class.objects().filter(**{f:None for f in fields}))
+        
         
     def process_dict(self, model_class, field):
         """
@@ -133,7 +154,8 @@ class Command(BaseCommand):
         
         Nested dicts will not be processed.
         """
-        pass    
+        # not used atm
+        raise NotImplementedError
         
        
             

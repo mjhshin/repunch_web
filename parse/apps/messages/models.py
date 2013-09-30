@@ -44,8 +44,7 @@ class Message(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "body", "message_type", "sender_name",
-            "store_id", ("subject", {"message_type": "feedback"}),
-            ("gift_title", "gift_description"),
+            "store_id", ("gift_title", "gift_description"),
             ("offer_title", "date_offer_expiration") )
 
     def get_absolute_url(self):

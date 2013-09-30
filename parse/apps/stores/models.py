@@ -335,9 +335,9 @@ class Subscription(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "subscriptionType", "date_last_billed",
-            ("cc_number", "date_cc_expiration", "pp_cc_id",
-            "date_pp_valid"), "Store")
+        #("cc_number", "date_cc_expiration", "pp_cc_id",
+        #    "date_pp_valid")
+        return (cls, "subscriptionType", "date_last_billed", "Store")
     
     def get_class(self, className):
         if className == "Invoice":

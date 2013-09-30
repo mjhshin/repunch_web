@@ -54,7 +54,7 @@ class ParseObjectManager(object):
         Returns the first result returned by filter if any.
         """
         res = self.filter(**constraints)
-        if res:
+        if len(res) > 0:
             return res[0]
 
     def filter(self, **constraints):
@@ -64,8 +64,6 @@ class ParseObjectManager(object):
         See WHERE_OPTIONS for all currently supported options.
         Double underscores allow for usage of WHERE_OPTIONS like 
         gte (greater than or equal to). 
-
-        TODO Also allows queries spanning multiple classes.
         """
         res = parse("GET", self.path, query=query(constraints))
                   
@@ -75,7 +73,7 @@ class ParseObjectManager(object):
                 objs.append(self.cls(**data))     
             return objs
         
-        return None 
+        return [] 
 
 class ParseObject(object):
     """ Provides a Parse version of the Django models 
@@ -258,7 +256,11 @@ class ParseObject(object):
         not be null and the dict must be True.
         
         Fields that are in a list must have at least 1 member that is
-        not null.
+        not null. Only strings are allowed.
+        
+        Fields that are in a dict must have the given value for the
+        given key. Values that are not None are delimited by a 
+        string !None.
         
         No nesting is allowed (no lists/tuples within lists/tuples)
         or dicts within dicts. However, dicts may be within
@@ -482,7 +484,7 @@ class ParseObject(object):
                 'count' in constraints):
                 return self.__dict__.get(attr)
                 
-        # Pointer cache this only supports include!
+        # Pointer cache 
         if attr[0].islower() and\
             self.__dict__.get(attr[0].upper() + attr[1:]):
             # if pointer meta exist then use it

@@ -42,6 +42,8 @@ class Account(ParseObject):
         """
         # note that password is not included because it is always
         # treated as if it were null
+        
+        # email cannot be null if authData is null
         return (cls, "username", ("email", {"authData": None}),
             ["Store", "Patron", "Employee"])
     
