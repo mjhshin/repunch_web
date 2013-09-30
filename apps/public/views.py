@@ -212,8 +212,8 @@ def sign_up(request):
             postDict = request.POST.dict()
             
             # check if email already taken here to handle the case where 
-            # the user already has a patron account but also want to 
-            # sign up for a Store account
+            # the user already has a patron/employee account 
+            # but also want to sign up for a Store account
             if hasattr(account_form, "associated_account"):
                 aa = account_form.associated_account
                 aan = AssociatedAccountNonce.objects.create(\
@@ -273,8 +273,15 @@ def sign_up(request):
                 
             account.set("store", store)
 
-            # create an empty subscription
-            subscription = Subscription(**postDict) 
+            # create subscription
+            if request.POST.get("place_order"):
+                subscription = Subscription(first_name=postDict.get("first_name2"),
+                    last_name=postDict.get("last_name2"), cc_number=postDict.get("cc_number"),
+                    date_cc_expiration=postDict.get("date_cc_expiration"),
+                    address=postDict.get("address"), city=postDict.get("city2"),
+                    state=postDict.get("state2"), zip=postDict.get("zip2"), country=postDict.get("country2"))
+            else:
+                subscription = Subscription() 
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
             subscription.Store = store.objectId 

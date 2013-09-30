@@ -16,6 +16,9 @@ class Account(ParseObject):
     IMPORTANT!
     The Parse table of this class is the Parse.User table in the DB!
     So don't go looking for an Account class in the Data Browser!
+    
+    Also, emailVerified and authData should not be touched!
+    emailVerified is a reserved word and authData must not be None.
     """
 
     def __init__(self, **data):
@@ -25,8 +28,6 @@ class Account(ParseObject):
         self.username = data.get('username')
         self.password = data.get('password')
         self.email = data.get('email')
-        self.authData = data.get('authData')
-        self.emailVerified = data.get("emailVerified")
 
         self.Store = data.get('Store')
         self.Patron = data.get('Patron')

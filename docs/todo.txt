@@ -1,7 +1,5 @@
 ##############################################
 ####################  TODO: 
-0. Run syncd db on production server for LogBoss
-
 1. Fix all broken tests.
 2. spaces are now allowed for passwords - so fix broken tests for signup
 3. write tests for only store owner can view/modify email field in edit store details
