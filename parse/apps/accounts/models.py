@@ -32,6 +32,13 @@ class Account(ParseObject):
 
         super(Account, self).__init__(False, **data)
         
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "username", "password", "email",
+            ["Store", "Patron", "Employee"] )
     
     def update(self, save_password=False):
         # get the formated data to be put in the request

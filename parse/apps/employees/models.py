@@ -22,6 +22,14 @@ class Employee(ParseObject):
         self.Store = data.get("Store")
 
         super(Employee, self).__init__(False, **data)
+
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "first_name", "last_name", "status",
+            "lifetime_punches", "Store")
         
     def get_fullname(self):
         return self.first_name.capitalize()+\

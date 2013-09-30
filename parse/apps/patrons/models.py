@@ -24,6 +24,14 @@ class Patron(ParseObject):
 
         super(Patron, self).__init__(False, **data)
         
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "first_name", "last_name", "gender",
+            "date_of_birth", "punch_code")
+        
     def get_fullname(self):
         return self.first_name.capitalize()+\
                 " " + self.last_name.capitalize()
@@ -45,6 +53,14 @@ class PunchCode(ParseObject):
         self.username = data.get("username")
         
         super(PunchCode, self).__init__(False, **data)
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "punch_code", "is_taken",
+            ("username", {"is_taken": True}))
 
 class PatronStore(ParseObject):
     """ New class not in Django """
@@ -59,6 +75,14 @@ class PatronStore(ParseObject):
         self.FacebookPost = data.get("FacebookPost")
         
         super(PatronStore, self).__init__(False, **data)
+    
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "punch_count", "all_time_punches",
+            "pending_reward", "Patron", "Store")
 
     def get_class(self, className):
         if className == "Patron":
@@ -77,6 +101,13 @@ class FacebookPost(ParseObject):
         self.reward = data.get("reward")
 
         super(FacebookPost, self).__init__(False, **data)
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "reward", "Patron")
 
     def get_class(self, className):
         if className == "Patron":

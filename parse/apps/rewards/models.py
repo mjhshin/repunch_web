@@ -16,6 +16,13 @@ class Punch(ParseObject):
         
         super(Punch, self).__init__(False, **data)
 
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "punches", "Patron")
+        
     def get_class(self, className):
         if className == "Patron":
             return getattr(import_module('parse.apps.patrons.models'), className)
@@ -32,35 +39,19 @@ class RedeemReward(ParseObject):
         self.PatronStore = data.get('PatronStore')
         
         super(RedeemReward, self).__init__(False, **data)
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "title", "customer_name", "is_redeemed",
+            "num_punches", ("PatronStore", "reward_id"),
+            ("MessageStatus", {"num_punches":0}))
 
     def get_class(self, className):
         if className == "PatronStore":
             return getattr(import_module('parse.apps.patrons.models'), className)
         elif className == "MessageStatus":
             return getattr(import_module('parse.apps.messages.models'), className)
-
-"""
-class Reward(ParseObject):
-    # Equivalence class of apps.rewards.models.Reward 
-    def __init__(self, **data):
-        self.reward_name = data.get("reward_name")
-        self.description = data.get("description")
-        self.punches = data.get("punches")
-        self.redemption_count = data.get("redemption_count")
-
-        super(Reward, self).__init__(False, **data)
-
-    def get_absolute_url(self):
-	    return reverse('reward_edit', args=[self.objectId])
-
-        
-class Redemption(ParseObject):
-    # Equivalence class of apps.rewards.models.Redemption
-    def __init__(self, **data):
-        self.punches = data.get("punches")
-        self.patron_name = data.get("patron_name")
-        
-        super(Redemption, self).__init__(False, **data)
-
-"""
 

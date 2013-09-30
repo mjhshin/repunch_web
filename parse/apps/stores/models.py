@@ -79,6 +79,17 @@ class Store(ParseObject):
         self.RedeemRewards_ = "RedeemReward"
         
         super(Store, self).__init__(False, **data)
+    
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "active", "owner_id", "store_name", "street",
+            "city", "state", "zip", "country", "first_name",
+            "last_name", "phone_number", "store_timezone",
+            "coordinates", "punches_facebook", "hours", "rewards",
+            "categories", "Subscription", "Settings")
      
     def update(self):
         """
@@ -252,6 +263,15 @@ class Invoice(ParseObject):
         
         super(Invoice, self).__init__(False, **data)
         
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "type", "state", "payment_id", "sale_id",
+            "total")
+        
     def as_ul(self):
         """
         Returns this invoice object as an html ul.
@@ -310,6 +330,14 @@ class Subscription(ParseObject):
 
         super(Subscription, self).__init__(False, **data)
   
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "subscriptionType", "date_last_billed",
+            ("cc_number", "date_cc_expiration", "pp_cc_id",
+            "date_pp_valid"), "Store")
     
     def get_class(self, className):
         if className == "Invoice":
@@ -430,6 +458,13 @@ class Settings(ParseObject):
         self.Store = data.get('Store')
 
         super(Settings, self).__init__(False, **data)
+    
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "punches_employee", "retailer_pin", "Store")
     
     @staticmethod
     def generate_id(size=6, chars=string.ascii_uppercase + string.digits):

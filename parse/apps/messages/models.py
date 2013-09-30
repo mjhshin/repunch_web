@@ -21,9 +21,9 @@ class Message(ParseObject):
         self.is_read = data.get("is_read", False)
         # store name or patron fullname
         self.sender_name = data.get("sender_name")
-        # empty if message sent by patron
+        # empty if message sent by patron??? required atm
         self.store_id = data.get("store_id")
-        # empty if message sent by store NEW
+        # empty if message sent by store
         self.patron_id = data.get('patron_id')
         # number of patrons that received this message
         self.receiver_count = data.get("receiver_count")
@@ -37,6 +37,15 @@ class Message(ParseObject):
         self._reply = "Message"
 
         super(Message, self).__init__(False, **data)
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "subject", "body", "message_type", "sender_name",
+            "store_id", ("gift_title", "gift_description"),
+            ("offer_title", "date_offer_expiration") )
 
     def get_absolute_url(self):
 		return reverse('message_details', args=[self.objectId])
@@ -59,6 +68,13 @@ class MessageStatus(ParseObject):
         self.Message  = data.get("Message")
         
         super(MessageStatus, self).__init__(False, **data)
+        
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "is_read", "redeem_available", "Message")
 
     def get_class(self, className):
         if className == "Message":
