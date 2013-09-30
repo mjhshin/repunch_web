@@ -245,6 +245,12 @@ class ParseObject(object):
         if not hasattr(cls, "_manager"):
             setattr(cls, "_manager", ParseObjectManager(cls))
         return cls._manager
+    @classmethod  
+    def fields_required(cls):
+        """
+        Return a list of instance variables that cannot be null.
+        """
+        print dir(cls)
 
     def __init__(self, create=True, **data):
         """
