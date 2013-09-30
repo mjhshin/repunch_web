@@ -255,15 +255,13 @@ class ParseObject(object):
         Fields that are required together are in a tuple. These fields
         are either all null or all not null.
         
-        Tuples with a dictionary inside do not follow the above rule.
-        
         Fields that are in a list must have at least 1 member that is
         not null.
         
         Fields that are in a dictionary must have the value specified.
         """
         raise NotImplementedError("Must implement this for " +\
-            "validate_models script.")
+            "validate_models management command.")
 
     def __init__(self, create=True, **data):
         """

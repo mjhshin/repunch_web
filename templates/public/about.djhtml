@@ -65,12 +65,12 @@
 				{# END ANDREW #}
 				
 				{# VANDOLF #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Vandolf Estrellado</h4><p><span>Web Developer</span></p><div>Discovered web development in his senior year in College and immediately fell in love with it. Now works as Repunch's web developer.<br/><br/>In his spare time, Vandolf loves to work on developing his video games, drawing sprites, and learning new recipes to compliment his daily workout routine.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Vandolf Estrellado</h4><p><span>Web Developer</span></p><div>On rare occasions that Vandolf is found with spare time, he is working on developing his video games, drawing 2D sprites, and learning new recipes to compliment his daily workout routine.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_vandolf.1.0.png' %}" /></div>
 					</div>
 					<h2 class="member-name">Vandolf Estrellado</h2>
-					<div class="member-title">Web Developer</div>
+					<div class="member-title">Web & Android Developer</div>
 				</div>
 				{# END VANDOLF #}
 				
