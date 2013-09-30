@@ -906,6 +906,7 @@ Parse.Cloud.define("punch", function(request, response)
             where: iosInstallationQuery, 
 			data: {
 				type: "punch",
+				"content-available": 1,
 				alert: "Received " + numPunches + " " + punchString + " from " + storeName,
 				store_id: storeId,
 				patron_store_id: patronStore.id,
@@ -1535,6 +1536,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        data: {
 				type: "redeem",
 	            alert: "Redeemed '" + rewardTitle + "'",
+	            "content-available": 1,
 	            store_id: storeId,
 				reward_title: rewardTitle,
 				total_punches: patronStore.get("punch_count")
@@ -1599,6 +1601,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        where: iosPatronInstallationQuery,
 	        data: {
 				type: "redeem_offer_gift",
+				"content-available": 1,
 	            alert: "Redeemed '" + rewardTitle + "'",
 	            message_status_id: messageStatus.id
 	        }
@@ -1859,11 +1862,12 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
+            	type: "message",
+            	"content-available": 1,
+            	badge: "Increment",
             	alert: storeName + " sent you a message",
                 store_id: storeId,
-                message_id: messageId,
-                type: "message",
-				badge: "Increment"
+                message_id: messageId
             }
 		}) );
 		
@@ -2104,10 +2108,11 @@ Parse.Cloud.define("send_gift", function(request, response) {
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
-                alert: senderName + " sent you a gift",
-                message_status_id: messageStatus.id,
                 type: "gift",
-				badge: "Increment"
+                "content-available": 1,
+				badge: "Increment",
+				alert: senderName + " sent you a gift",
+                message_status_id: messageStatus.id
 			}
         }) );
 		
@@ -2234,7 +2239,8 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
                 alert: senderName + " replied to your gift",
                 message_status_id: messageStatus.id,
                 type: "gift_reply",
-				badge: "Increment"
+				badge: "Increment",
+				"content-available": 1
 			}
         }) );
 		
