@@ -71,7 +71,7 @@
 	{% endif %}
 	
     {# action specified via script below #}
-	<form method="post" id="update-form">{% csrf_token %}
+	<form method="POST" id="update-form">{% csrf_token %}
 	<div class="section first">
 		<h2>Credit Card Information</h2>
 		

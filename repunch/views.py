@@ -56,7 +56,7 @@ def manage_login(request):
         6 - invalid recaptcha response
     """
     data = {"code":-1}
-    if request.method == 'POST' or request.is_ajax():
+    if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid(): 
             c = login(request, request.POST.dict().copy())

@@ -25,7 +25,7 @@
     {# REQUIRED FOR AVATAR UPLOAD JS #}
     <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
 	
-	<form action="{% url 'store_edit' %}" method="post" id="account-edit-form">{% csrf_token %}
+	<form action="{% url 'store_edit' %}" method="POST" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
 		<div class="notification {% if success %}success{% endif %} hide">
 			<div>{{ error }}{{ success }}</div>

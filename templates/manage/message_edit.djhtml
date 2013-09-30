@@ -46,7 +46,7 @@ $(document).ready(function(){
 
 
 {% block content %}
-	<form action="{% url 'message_edit' message_id %}" method="post" id="message-form">{% csrf_token %}
+	<form action="{% url 'message_edit' message_id %}" method="POST" id="message-form">{% csrf_token %}
 		{% if limit_reached %}
 			<div class="notification">
 				<div>

@@ -298,7 +298,7 @@ def avatar(request):
 content_type="text/html")
 def get_avatar(request):
     """ returns the store's avatar url """
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET":
         store = SESSION.get_store(request.session)
         return HttpResponse(store.get("store_avatar_url"))
         

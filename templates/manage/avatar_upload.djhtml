@@ -52,7 +52,7 @@
 
 </head>
 <body style="background-image: none; background-color: transparent;">
-	<form action="{{ url }}" method="post" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
+	<form action="{{ url }}" method="POST" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}
 		</div>

@@ -95,7 +95,7 @@ def categories(request):
     """ takes in ajax requests and returns a list of choices for
     autocompletion in json format """
     # term is the key in request.GET
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET":
         categories = Category.objects.filter(name__istartswith=\
                         request.GET['term'].strip())[:8]
                         
@@ -122,7 +122,7 @@ def associated_account_confirm(request):
     """
     A helper view for sign_up. Also handles requests from signup.js
     """
-    if request.method == 'POST' or request.is_ajax():
+    if request.method == 'POST':
         # first check the AssociatedAccountNonce
         acc_id = request.POST['aaf-account_id']
         nonce_id = request.POST['aaf-nonce']
@@ -155,7 +155,7 @@ def sign_up(request):
     # renders the signup page on GET and returns a json object on POST.
     data = {'sign_up_nav': True}
             
-    if request.method == 'POST' or request.is_ajax():
+    if request.method == 'POST':
         from_associated_account = False
         # check if this post is from the associated account dialog
         # if it is then skip form validations

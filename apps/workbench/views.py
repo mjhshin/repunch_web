@@ -60,7 +60,7 @@ def get_page(request):
     """
     Returns a generated html to plug in the tables.
     """
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET":
         type = request.GET.get("type")
         page = int(request.GET.get("page")) - 1
         if type == "pending-redemptions":
@@ -125,7 +125,7 @@ def get_page(request):
 @login_required
 @access_required(http_response={"error":"permission_denied"})
 def punch(request):
-    if request.method == "POST" or request.is_ajax():
+    if request.method == "POST":
         try:
             nump = int(request.POST['num_punches'])
         except ValueError:
@@ -184,7 +184,7 @@ def redeem(request):
     4 if successfully deleted/denied, 5 has been deleted elsewhere,
     6 PatronStore has been removed.
     """
-    if request.method == "GET" or request.is_ajax():        
+    if request.method == "GET":        
         # approve or deny
         action = request.GET.get("action")
         redeemId = request.GET.get('redeemRewardId')

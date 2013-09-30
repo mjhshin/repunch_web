@@ -32,7 +32,7 @@ def get_page(request):
     Returns the corresponding chunk of rows in html to plug into
     the sent/feedback table.
     """
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET":
         type = request.GET.get("type")
         page = int(request.GET.get("page")) - 1
         if type == "sent":

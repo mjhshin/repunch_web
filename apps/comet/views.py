@@ -429,7 +429,7 @@ def terminate(request):
     Flags the looping thread in the pull view to exit.
     This simply deletes the CometSession bound to this instance.
     """
-    if request.method == "GET" or request.is_ajax():
+    if request.method == "GET":
         t = parser.parse(request.GET["timestamp"])
         timestamp = str(t.hour).zfill(2) + ":" +\
             str(t.minute).zfill(2) + ":" + str(t.second).zfill(2)
@@ -466,7 +466,7 @@ def receive(request, store_id):
         to UTF-8 by django and the browser 
         (<meta http-equiv="Content-Type" content="text/html; charset=utf-8">)         
     """
-    if request.method == "POST" or request.is_ajax():
+    if request.method == "POST":
         try:
             postDict = json.loads(unicode(request.body, "ISO-8859-1"))
         except Exception:
