@@ -112,13 +112,6 @@ def test_edit_store_details():
         {'test_name': "Changes to zip are saved to Parse"},
         {'test_name': "Changes to phone number are visible"},
         {'test_name': "Changes to phone number are saved to Parse"},
-        {'test_name': "Changes to email are visible"},
-        {'test_name': "Changes to email are saved to Parse"},
-        
-        {'test_name': "Changing the email also changes the " +\
-            "username (Parse)"},
-        {'test_name': "Changing the email also changes the " +\
-            "username (Dashboard)"},
         
         {'test_name': "Changes to hours are visible"},
         {'test_name': "Changes to hours are saved to Parse"},
@@ -138,7 +131,6 @@ def test_edit_store_details():
         {'test_name': "State is required"},
         {'test_name': "Zip is required"},
         {'test_name': "Phone number is required"},
-        {'test_name': "Email is required"},
         {'test_name': "Description is required"},
         {'test_name': "Cancel button redirects user back to store " +\
             "details page and no changes are saved to Parse"},
@@ -219,10 +211,6 @@ def test_edit_store_details():
     ph1.send_keys(TEST_STORE_INFO['Ph1'])
     ph2.send_keys(TEST_STORE_INFO['Ph2'])
     ph3.send_keys(TEST_STORE_INFO['Ph3'])
-    # email
-    email = test.find("#id_email")
-    email.clear()
-    email.send_keys(TEST_USER_INFO['email'])
     # store_description
     store_description = test.find("#id_store_description")
     store_description.clear()
@@ -271,7 +259,6 @@ def test_edit_store_details():
     city = l2[0]
     state, zip = l2[1].split(" ")
     phone_number = address[2]
-    email = address[3]
 
     ##########  Changes to store name are visible 
     parts[2]['success'] = str(test.find("#address span").text) ==\
@@ -321,30 +308,6 @@ def test_edit_store_details():
     parts[13]['success'] = store.get("phone_number") ==\
         TEST_STORE_INFO['phone_number']
     
-    ##########  Changes to email are visible
-    parts[14]['success'] = email == TEST_USER_INFO['email']
-    
-    ##########  Changes to email are saved to Parse
-    account.email = None
-    parts[15]['success'] = account.get("email") ==\
-        TEST_USER_INFO['email']
-        
-    ##########  Changing the email also changes the username (Parse)
-    try:
-        account.username = None
-        parts[16]['success'] = account.get("username") ==\
-            account.get("email")
-    except Exception as e:
-        print e
-        parts[16]['test_message'] = str(e)
-    ##########  Changing the email also changes the username (Dashboard)
-    try:
-        parts[17]['success'] = test.find("#account-name").text ==\
-            account.username
-    except Exception as e:
-        print e
-        parts[17]['test_message'] = str(e)
-    
     ##########  Changes to hours are visible
     try:
         hours = test.find("#hours").text.split("\n")[1:]
@@ -358,10 +321,10 @@ def test_edit_store_details():
             if not success:
                 equal = False
                 break
-        parts[18]['success'] = equal
+        parts[14]['success'] = equal
     except Exception as e:
         print e
-        parts[18]['test_message'] = str(e)
+        parts[14]['test_message'] = str(e)
     
     ##########  Changes to hours are saved to Parse
     try:
@@ -376,37 +339,28 @@ def test_edit_store_details():
             if not success:
                 equal = False
                 break
-        parts[19]['success'] = equal
+        parts[15]['success'] = equal
     except Exception as e:
         print e
-        parts[19]['test_message'] = str(e)
+        parts[15]['test_message'] = str(e)
     
     ##########  Changing the zip changes the store_timezone
     store.store_timezone = None
-    parts[20]['success'] = store.get("store_timezone") ==\
+    parts[16]['success'] = store.get("store_timezone") ==\
         TEST_STORE_INFO['store_timezone']
     
     ##########  Changing the zip changes the neighborhood 
     store.neighborhood = None
-    parts[21]['success'] = store.get("neighborhood") ==\
+    parts[17]['success'] = store.get("neighborhood") ==\
         TEST_STORE_INFO['neighborhood']
     
     ##########  Changing the zip changes the coordinates 
     store.coordinates = None
-    parts[22]['success'] =\
+    parts[18]['success'] =\
         int(math.floor(store.get("coordinates")[0])) ==\
         int(math.floor(TEST_STORE_INFO['coordinates'][0])) and\
         int(math.floor(store.get("coordinates")[1])) ==\
         int(math.floor(TEST_STORE_INFO['coordinates'][1]))
-        
-    ## revert the email address back
-    click_store_edit()
-    sleep(3)
-    test.find("#id_email").clear()
-    test.find("#id_email").send_keys(TEST_USER['email'])
-    # save!
-    test.find("#save-button").click()
-    sleep(6)
     
     ##########  Entering invalid address shows error
     try:
@@ -431,7 +385,7 @@ def test_edit_store_details():
         # save!
         test.find("#save-button").click()
         sleep(3)
-        parts[23]['success'] = str(test.find(".errorlist").text) ==\
+        parts[19]['success'] = str(test.find(".errorlist").text) ==\
             "Enter a valid adress, city, state, and/or zip."
             
         test.find("//div[@id='edit-store-options']/a[2]",
@@ -439,7 +393,7 @@ def test_edit_store_details():
         sleep(2)
     except Exception as e:
         print e
-        parts[23]['test_message'] = str(e)
+        parts[19]['test_message'] = str(e)
     
     ##########  Entering invalid hours with same open time
     ########    as close time shows error
@@ -454,12 +408,12 @@ def test_edit_store_details():
         # save!
         test.find("#save-button").click()
         sleep(3)
-        parts[24]['success'] = str(test.find(\
+        parts[20]['success'] = str(test.find(\
             ".notification div").text) == "Invalid hours. Open " +\
                 "time must be greater than close time."
     except Exception as e:
         print e
-        parts[24]['test_message'] = str(e)
+        parts[20]['test_message'] = str(e)
     
     
     ##########  Entering invalid hours with later open time
@@ -473,12 +427,12 @@ def test_edit_store_details():
         # save!
         test.find("#save-button").click()
         sleep(3)
-        parts[25]['success'] = str(test.find(\
+        parts[21]['success'] = str(test.find(\
             ".notification div").text) == "Invalid hours. Open " +\
                 "time must be greater than close time."
     except Exception as e:
         print e
-        parts[25]['test_message'] = str(e)
+        parts[21]['test_message'] = str(e)
     
     ##########  Having no hours is allowed
     try:
@@ -493,13 +447,13 @@ def test_edit_store_details():
         test.find("#save-button").click()
         sleep(6)
         store.hours = None
-        parts[26]['success'] =\
+        parts[22]['success'] =\
             str(test.find("#hours").text.split("\n")[1]) ==\
             'Closed Sunday - Saturday' and\
             len(store.get("hours")) == 0
     except Exception as e:
         print e
-        parts[26]['test_message'] = str(e)
+        parts[22]['test_message'] = str(e)
     
     ##########  There can be no more than 7 hours rows 
     try:
@@ -508,18 +462,18 @@ def test_edit_store_details():
         test.action_chain(1, ["#hours-0-add" for i in range(10)])
         sleep(1)
         # 8 because of the hidden clone row
-        parts[27]['success'] =\
+        parts[23]['success'] =\
             len(test.find(".days", multiple=True)) == 8
     except Exception as e:
         print e
-        parts[27]['test_message'] = str(e)
+        parts[23]['test_message'] = str(e)
     
     ## fields required
     selectors = [
         "#id_store_name", "#id_street", "#id_city",
         "#id_state", "#id_zip",
         "#Ph1", "#Ph2", "#Ph3",
-        "#id_email", "#id_store_description",
+        "#id_store_description",
     ]
     test.action_chain(0, selectors, action="clear") # ACTION!
     for i in range(len(selectors)):
@@ -535,11 +489,10 @@ def test_edit_store_details():
     ##########  State is required 
     ##########  Zip is required 
     ##########  Phone number is required 
-    ##########  Email is required 
     ##########  Description is required 
     e_list = ["store_name", "street", "city", "state", "zip",
-                "phone_number", "email", "store_description"]
-    for i in range(28, 36):
+                "phone_number", "store_description"]
+    for i in range(24, 31):
         selector = "#%s_e ul li" % (e_list.pop(0),)
         parts[i]['success'] = str(test.find(selector).text) ==\
             "This field is required."
@@ -549,11 +502,11 @@ def test_edit_store_details():
         test.find("//div[@id='edit-store-options']/a[2]",
             type="xpath").click()
         sleep(2)
-        parts[36]['success'] =\
+        parts[31]['success'] =\
             test.is_current_url(reverse('store_index'))
     except Exception as e:
         print e
-        parts[36]['test_message'] = str(e)
+        parts[31]['test_message'] = str(e)
     
     ##########  Clicking Add/Change Photo brings up the
     ########    image upload dialog/frame
@@ -566,22 +519,22 @@ def test_edit_store_details():
         test.driver.switch_to_frame(\
             test.find("iframe", type='tag_name'))
         
-        parts[37]['success'] =\
+        parts[32]['success'] =\
             test.find("#edit-avatar-options").is_displayed()
     except Exception as e:
         print e
-        parts[37]['test_message'] = str(e)
+        parts[32]['test_message'] = str(e)
     
     ##########  Clicking cancel on upload removes the dialog /frame
     try:
         test.find("//div[@id='edit-avatar-options']/a[2]",
             type="xpath").click()
         sleep(1)
-        parts[38]['success'] =\
+        parts[33]['success'] =\
             test.element_exists("#edit-store-options")
     except Exception as e:
         print e
-        parts[38]['test_message'] = str(e)
+        parts[33]['test_message'] = str(e)
         
     ##########  Clicking upload when no file is selected shows alert
     try:
@@ -593,33 +546,33 @@ def test_edit_store_details():
         test.find("#upload-btn").click()
         sleep(1)
         alert = test.switch_to_alert()
-        parts[39]['success'] = str(alert.text) ==\
+        parts[34]['success'] = str(alert.text) ==\
             "Please select an image to upload."
         alert.accept()
     except Exception as e:
         print e
-        parts[39]['test_message'] = str(e)
+        parts[34]['test_message'] = str(e)
     
     ##########  Uploading images works
     try:
         test.find("#id_image").send_keys(IMAGE_UPLOAD)
         test.find("#upload-btn").click()
         sleep(3)
-        parts[40]['success'] = test.find("#crop-btn").is_displayed()
+        parts[35]['success'] = test.find("#crop-btn").is_displayed()
     except Exception as e:
         print e
-        parts[40]['test_message'] = str(e)
+        parts[35]['test_message'] = str(e)
     
     ##########  Clicking cancel on crop removes the dialog
     try:
         test.find("//div[@id='edit-avatar-options']/a[2]",
             type="xpath").click()
         sleep(1)
-        parts[41]['success'] =\
+        parts[36]['success'] =\
             test.element_exists("#edit-store-options")
     except Exception as e:
         print e
-        parts[41]['test_message'] = str(e)
+        parts[36]['test_message'] = str(e)
         
     ##########  Cropping images works
     try:
@@ -632,10 +585,10 @@ def test_edit_store_details():
         test.find("#upload-btn").click()
         sleep(3)
         test.find("#crop-btn").click()
-        parts[42]['success'] = True
+        parts[37]['success'] = True
     except Exception as e:
         print e
-        parts[42]['test_message'] = str(e)
+        parts[37]['test_message'] = str(e)
     
     sleep(5)
     old_avatar_url = store.store_avatar_url
@@ -644,15 +597,15 @@ def test_edit_store_details():
     new_avatar_url = store.get("store_avatar_url")
     
     ##########  New store avatar is saved to Parse
-    parts[43]['success'] = old_avatar_url != new_avatar_url
+    parts[38]['success'] = old_avatar_url != new_avatar_url
     
     ##########  Old store avatar is deleted from Parse files
     resp = requests.get(old_avatar_url)
-    parts[44]['success'] = not resp.ok and resp.status_code == 403
+    parts[39]['success'] = not resp.ok and resp.status_code == 403
     
     ##########  The store avatar thumbnail and image in
     ##########  store details/edit match the one saved in Parse
-    parts[45]['success'] = new_avatar_url ==\
+    parts[40]['success'] = new_avatar_url ==\
         test.find("#store_avatar").get_attribute("src") and\
         new_avatar_url ==\
         test.find("#avatar-thumbnail").get_attribute("src")

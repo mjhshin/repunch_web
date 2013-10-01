@@ -68,7 +68,7 @@
 				<div class="nav-item {% if account_nav %}active{% endif %}">
 					<a href="{% url 'store_index' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_myaccount.png" %}" alt="" />
-						<span class="nav-item-title">My Account</span>
+						<span class="nav-item-title">My Store</span>
 						{% if alert_users != 0 or alert_billing %}
 						<div class="nav-item-badge">!</div>
 						{% endif %}

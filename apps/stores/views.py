@@ -46,7 +46,6 @@ def index(request):
 @login_required
 @admin_only(reverse_url="store_index")
 def edit(request):
-    account = request.session['account']
     store = SESSION.get_store(request.session)
     
     data = {'account_nav': True}
@@ -88,7 +87,6 @@ def edit(request):
             formset[i].initial = d
                 
         # update the session cache
-        request.session['account'] = account
         request.session['store'] = store
            
         data['form'] = form
@@ -101,12 +99,7 @@ def edit(request):
                             max_num=7, extra=0)
         formset = HoursFormSet(request.POST, prefix='hours',
                                 instance=dstore_inst) 
-                                
-        # only clean email if user is the store owner!
-        if store.is_owner(account):
-            form = StoreForm(account.email, request.POST)
-        else:
-            form = StoreForm(None, request.POST)
+        form = StoreForm(request.POST)
             
         if form.is_valid(): 
             # build the list of hours in proper format for saving 
@@ -161,6 +154,7 @@ def edit(request):
                     
             store.update()
             
+            """ TODO move to dedicated account settings page
             # Only update the account if user is the store owner
             if store.is_owner(account):
                 # Need to make sure that the account is the latest - 
@@ -183,6 +177,7 @@ def edit(request):
                         if pc: # should never be none but ehh
                             pc.username = account.username
                             pc.update()
+            """
             
             # update the session cache
             try:
@@ -192,7 +187,6 @@ def edit(request):
                 request.session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
                 
-            request.session['account'] = account
             request.session['store'] = store
             
             # notify other dashboards of this change
@@ -200,10 +194,6 @@ def edit(request):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
             }
-            
-            if store.is_owner(account):
-                payload["updatedAccount"] = account.jsonify()
-            
             comet_receive(store.objectId, payload)
             
             return redirect(reverse('store_index')+ "?%s" %\
@@ -213,8 +203,6 @@ def edit(request):
     else:
         form = StoreForm(None)
         form.initial = store.__dict__.copy()
-        # the email is in the account
-        form.initial['email'] = account.email
         # make sure that the phone number is unformatted
         form.initial['phone_number'] =\
             form.initial['phone_number'].replace("(",

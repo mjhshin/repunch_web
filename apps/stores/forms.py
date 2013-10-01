@@ -76,23 +76,20 @@ class StoreForm(forms.Form):
     country = forms.CharField(max_length=50,
         validators=[required])
     phone_number = forms.CharField(max_length=50)
-    email = forms.EmailField()
     store_description = forms.CharField(required=False, 
         max_length=500, widget=forms.Textarea(attrs={"maxlength":500}))
         
+    """
+    email = forms.EmailField()
+    
+    
     def __init__(self, email, *args, **kwargs):
         super(StoreForm, self).__init__(*args, **kwargs)
         self.email = email
-                                    
-    def get_full_address(self):
-        return self.data['street'] + ", " + self.data['city']  + ", " +\
-            self.data['state'] + ", " + self.data['zip']  + ", " +\
-            self.data['country']
-            
+                               
+                
     def clean_email(self):
-        """ 
-        emails are unique - only clean email of self.email is not None
-        """
+        #emails are unique - only clean email of self.email is not None
         e = self.cleaned_data.get('email')
         
         if self.email and e:
@@ -103,6 +100,12 @@ class StoreForm(forms.Form):
                     raise forms.ValidationError("Email is already " +\
                         "being used.")
         return e
+    """
+             
+    def get_full_address(self):
+        return self.data['street'] + ", " + self.data['city']  + ", " +\
+            self.data['state'] + ", " + self.data['zip']  + ", " +\
+            self.data['country']
                                     
     def clean_street(self):
         # WARNING! get_map_data is unreliable due to google api 
