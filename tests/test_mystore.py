@@ -689,7 +689,7 @@ def test_edit_account():
             type="xpath").click()
         sleep(3)
         parts[1]['success'] =\
-            test.is_current_url(reverse("account_update"))
+            test.is_current_url(reverse("subscription_update"))
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)

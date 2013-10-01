@@ -42,25 +42,27 @@
 
 	<div id="site-frame">
 		<div id="header">
-			<div id="header-left">
+		
+			<a id="header-left" href="{% url 'store_index' %}">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
-			</div>
+			</a>
 			
-			<div id="header-right" >
-				<div id="account-info">
-					<a href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
-					{% if request.session.has_store_avatar %}
-						{% if request.session.store|get:'store_avatar'  %}
-							<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
-						{% endif %}
-					{% endif %}
-						<span id="account-name">{{ request.session.account|get:'username' }}</span>
-					</a>
-				</div>
-				<div id="logout">
-					<a href="{% url 'manage_logout' %}" id="link-logout">Sign Out</a>
-				</div>
-			</div>
+			<a id="header-right" href="{% url 'store_index' %}">
+					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
+					    {% if request.session.has_store_avatar and request.session.store|get:'store_avatar' %}
+						<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
+					    {% endif %}
+					</span>
+				    <span id="account-name">
+				        {% if request.session.employee %}
+				        {{ request.session.employee.get_fullname }}
+				        {% else %}
+				        {{ request.session.store.get_owner_fullname }}
+				        {% endif %}
+				    </span>
+				    <img src="{% static 'manage/images/arrow-down.png' %}" alt="options" style="vertical-align:middle;" />
+			</a>
+			
 		</div>
 		<div id="content-frame">
 			<div id="nav">
@@ -105,7 +107,7 @@
 					</a>
 				</div>
 				<div class="nav-item {% if settings_nav %}active{% endif %}">
-					<a href="{% url 'account_settings' %}">
+					<a href="{% url 'store_settings' %}">
 						<img class="nav-item-icon" src="{% static "manage/images/icon_settings.png" %}" alt="" />
 						<span class="nav-item-title">Settings</span>
 					</a>

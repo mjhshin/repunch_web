@@ -248,7 +248,7 @@ def edit(request, message_id):
             # flag the upgrade view
             request.session["from_limit_reached"] = True
             # redirect to upgrade account 
-            return HttpResponseRedirect(reverse("account_update") +\
+            return HttpResponseRedirect(reverse("subscription_update") +\
                 "?do_upgrade=1")
             
         if message_id in (0, '0'):

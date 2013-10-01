@@ -58,10 +58,10 @@ def test_settings():
     test.results.append(section)
     
     ##########  User needs to be logged in to access page
-    test.open(reverse("account_settings")) # ACTION!
+    test.open(reverse("store_settings")) # ACTION!
     sleep(1)
     parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=" + reverse("account_settings"))
+        'manage_login') + "?next=" + reverse("store_settings"))
         
     # login
     selectors = (
@@ -223,7 +223,7 @@ def test_settings():
             type="xpath").click()
         sleep(1)
         parts[13]['success'] =\
-            test.is_current_url(reverse("account_settings"))
+            test.is_current_url(reverse("store_settings"))
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)

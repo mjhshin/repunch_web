@@ -151,13 +151,6 @@
             </script>
 		</div>
 		
-		
-		<div class="input-container clearheight" {% if not is_owner %}style="display:none;"{% endif %}>
-			<div id="email_e">{{ form.email.errors }}</div>
-			<label for="id_email" id="label_email">Email</label>
-			{{ form.email }}
-		</div>
-		
 		<div class="input-container clearheight">
 			<div id="store_description_e">{{ form.store_description.errors }}</div>
 			<label for="id_store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>

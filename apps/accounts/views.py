@@ -12,14 +12,14 @@ from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps import isdigit
-from apps.stores.forms import SettingsForm, SubscriptionForm
+from apps.stores.forms import SubscriptionForm
 from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import IPOD, MONTHLY
-from parse.apps.stores.models import Settings, Store, Subscription
+from parse.apps.stores.models import Store, Subscription
 from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
 send_email_receipt_ipod, send_email_account_upgrade,\
@@ -73,90 +73,8 @@ def deactivate(request):
 
 @dev_login_required
 @login_required
-@admin_only(except_method="GET")
-def settings(request):
-    data = {'settings_nav': True}
-    store = SESSION.get_store(request.session)
-    settings = SESSION.get_settings(request.session)
-    if request.method == 'POST':
-        form = SettingsForm(request.POST)
-        if form.is_valid(): 
-            # expect numbers so cast to int
-            dct = request.POST.dict().copy()
-            dct['punches_employee'] = int(dct['punches_employee'])
-            settings.update_locally(dct, False)
-            settings.update()
-            # Shin chose to move punches_facebook to Store...
-            store.set("punches_facebook", 
-                        int(request.POST["punches_facebook"]))
-            store.Settings = settings.objectId
-            store.settings = settings
-            store.update()
-            
-            # notify other dashboards of this changes
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings":settings.jsonify(),
-                "updatedPunchesFacebook_int":\
-                    store.punches_facebook,
-            }
-            comet_receive(store.objectId, payload)
-
-            data['success'] = "Settings have been saved."
-        else:
-            data['error'] = 'Error saving settings.';
-    else:
-        form = SettingsForm()
-        form.initial = settings.__dict__.copy()
-        # shin chose to move punches_facebook to Store...
-        form.initial['punches_facebook'] =\
-            store.get('punches_facebook')
-    
-    # update the session cache
-    request.session['store'] = store
-    request.session['settings'] = settings
-    
-    data['form'] = form
-    data['settings'] = settings
-    return render(request, 'manage/settings.djhtml', data)
-
-@dev_login_required
-@login_required
-@admin_only(http_response={"error": "Permission denied"})
-def refresh(request):
-    if request.session.get('account') and\
-            request.session.get(SESSION_KEY):
-        data = {'success': False}
-        settings = SESSION.get_settings(request.session)
-        
-        if settings == None:
-            raise Http404
-        else:
-            settings.set('retailer_pin', Settings.generate_id())
-            settings.update()
-            
-            # update the session cache
-            request.session['settings'] = settings
-            
-            # notify other dashboards of these changes
-            store = SESSION.get_store(request.session)
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedSettings":settings.jsonify()
-            }
-            comet_receive(store.objectId, payload)
-            
-            data['success'] = True
-            data['retailer_pin'] = settings.retailer_pin
-        
-        return HttpResponse(json.dumps(data), content_type="application/json")
-    else:
-        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
-
-@dev_login_required
-@login_required
 @admin_only(reverse_url="store_index")
-def update(request):
+def update_subscription(request):
     """
     This view is also used for explicit upgrades.
     """
@@ -232,7 +150,7 @@ def update(request):
                     "have sufficient funds, then try again.")
                 data['form'] = form
                 return render(request, 
-                        'manage/account_update.djhtml', data)
+                        'manage/subscription_update.djhtml', data)
                     
             res = True
             # only store_cc if it is a digit (new)
@@ -344,4 +262,4 @@ def update(request):
     request.session['subscription'] = subscription
     
     data['form'] = form
-    return render(request, 'manage/account_update.djhtml', data)
+    return render(request, 'manage/subscription_update.djhtml', data)

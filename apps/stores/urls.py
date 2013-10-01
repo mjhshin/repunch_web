@@ -9,5 +9,8 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^get-avatar$', 'get_avatar', name='store_get_avatar'),
     url(r'^crop-avatar$', 'crop_avatar', name='store_crop_avatar'),
     
+    url(r'^settings$', 'settings', name='store_settings'),
+    url(r'^settings/refresh$', 'refresh', 
+                                name='refresh_retailer_pin'),  
 )
 

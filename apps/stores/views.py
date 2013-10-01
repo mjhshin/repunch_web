@@ -13,7 +13,7 @@ import json, urllib, urllib2, os, pytz
 
 from apps.stores.models import Store as dStore, Hours as dHours,\
 StoreAvatarTmp
-from apps.stores.forms import StoreForm, StoreAvatarForm
+from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
@@ -25,7 +25,7 @@ from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
 from parse.apps.patrons.models import PunchCode
-from parse.apps.stores.models import Store
+from parse.apps.stores.models import Store, Settings
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required, dev_login_required
 
@@ -370,7 +370,89 @@ def crop_avatar(request):
     
     raise Http404
     
+
+@dev_login_required
+@login_required
+@admin_only(except_method="GET")
+def settings(request):
+    data = {'settings_nav': True}
+    store = SESSION.get_store(request.session)
+    settings = SESSION.get_settings(request.session)
+    if request.method == 'POST':
+        form = SettingsForm(request.POST)
+        if form.is_valid(): 
+            # expect numbers so cast to int
+            dct = request.POST.dict().copy()
+            dct['punches_employee'] = int(dct['punches_employee'])
+            settings.update_locally(dct, False)
+            settings.update()
+            # Shin chose to move punches_facebook to Store...
+            store.set("punches_facebook", 
+                        int(request.POST["punches_facebook"]))
+            store.Settings = settings.objectId
+            store.settings = settings
+            store.update()
+            
+            # notify other dashboards of this changes
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSettings":settings.jsonify(),
+                "updatedPunchesFacebook_int":\
+                    store.punches_facebook,
+            }
+            comet_receive(store.objectId, payload)
+
+            data['success'] = "Settings have been saved."
+        else:
+            data['error'] = 'Error saving settings.';
+    else:
+        form = SettingsForm()
+        form.initial = settings.__dict__.copy()
+        # shin chose to move punches_facebook to Store...
+        form.initial['punches_facebook'] =\
+            store.get('punches_facebook')
     
+    # update the session cache
+    request.session['store'] = store
+    request.session['settings'] = settings
+    
+    data['form'] = form
+    data['settings'] = settings
+    return render(request, 'manage/settings.djhtml', data)
+
+@dev_login_required
+@login_required
+@admin_only(http_response={"error": "Permission denied"})
+def refresh(request):
+    if request.session.get('account') and\
+            request.session.get(SESSION_KEY):
+        data = {'success': False}
+        settings = SESSION.get_settings(request.session)
+        
+        if settings == None:
+            raise Http404
+        else:
+            settings.set('retailer_pin', Settings.generate_id())
+            settings.update()
+            
+            # update the session cache
+            request.session['settings'] = settings
+            
+            # notify other dashboards of these changes
+            store = SESSION.get_store(request.session)
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedSettings":settings.jsonify()
+            }
+            comet_receive(store.objectId, payload)
+            
+            data['success'] = True
+            data['retailer_pin'] = settings.retailer_pin
+        
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'success': False}), content_type="application/json")
+
     
     
     

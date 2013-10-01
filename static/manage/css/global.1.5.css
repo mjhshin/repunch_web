@@ -137,7 +137,7 @@ div#header a{
 	text-decoration:none;
 }
 
-div#header-left{
+a#header-left{
 	float:left;
 }
 
@@ -145,18 +145,14 @@ img#logo-header{
 	vertical-align:middle;
 }
 
-div#header-right{
+a#header-right{
 	float:right;
-}
-
-div#header-right div{
-	float:left;
 }
 
 img.avatar-small{
 	vertical-align:middle;
-	border-radius: 4px;
-	width:25px;
+	border-radius: 5px;
+	width:35px; height: 35px;
 }
 
 img.avatar-medium{
@@ -170,9 +166,10 @@ img.avatar-big{
 }
 
 span#account-name{
-	font: bold 14px 'Cabin', sans-serif;
-	margin:0 20px 0 4px;
-	color:#666;
+	font: bold 15px/32px 'Cabin', sans-serif;
+	margin:0 2px 0 4px;
+	color:#888; /* 666 */
+	vertical-align:middle;
 }
 
 a#link-logout{

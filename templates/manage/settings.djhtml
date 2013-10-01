@@ -10,7 +10,7 @@
 
 {% block content %}
 	{% account_is_admin request.session as is_admin %}
-	<form action="{% url 'account_settings' %}" method="POST" id="settings-form">{% csrf_token %}
+	<form action="{% url 'store_settings' %}" method="POST" id="settings-form">{% csrf_token %}
 		{% if error or success %}
 		<div class="notification {% if success %}success{% endif %} hide">
 			<div>{{ error }}{{ success }}</div>
@@ -51,7 +51,7 @@
 		<div id="settings-options" class="form-options">
 			<a id="settings-form-submit"
 			    class="button blue">Save Settings</a>
-			<a href="{% url 'account_settings' %}" class="red">Cancel changes</a>
+			<a href="{% url 'store_settings' %}" class="red">Cancel changes</a>
 			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
 		            alt="processing punch request..." 
 		            id="settings-saving" 

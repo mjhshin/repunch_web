@@ -10,18 +10,6 @@
 {% account_is_admin request.session as is_admin %}
 {% if is_admin %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
-<script>
-$(document).ready(function() {
-    $("#deactivate_account").click(function() {
-        choice = confirm("Are you sure you want to deactivate your account?");
-        if (choice == true) {
-            return true;
-        }
-        
-        return false;
-    });
-});
-</script>
 {% endif %}
 {% endblock %}
 
@@ -40,13 +28,13 @@ $(document).ready(function() {
 	    <div>
 	    {% if alert_users == 2  %}
 	        <span style="color:red">ALERT!</span> You have passed your maximum number users.<br/><br/>
-		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
+		    Please <a href="{% url 'subscription_update' %}" >update your subscription</a> for continued service.
 	    {% else %}
 		    You are reaching your maximum number of users.<br/>
 		    {% if request.session.subscription.pp_cc_id %}
 		    Your account will automatically be upgraded once you've passed your limit.<br/><br/>
 		    {% else %}
-		    Please <a href="{% url 'account_update' %}" >update your account information</a> for continued service.
+		    Please <a href="{% url 'subscription_update' %}" >update your subscription</a> for continued service.
 		    {% endif %}
 	    {% endif %}
 		</div>
@@ -59,7 +47,7 @@ $(document).ready(function() {
         <span style="color:red">ALERT!</span> We have failed to charge you for your monthly membership.<br/>
         The credit card information you provided may be incorrect or<br/> 
         the credit card may not have enough funds.<br/><br/>
-	    Please make a payment by <a href="{% url 'account_update' %}" >updating your account information</a> for continued service.
+	    Please make a payment by <a href="{% url 'subscription_update' %}" >updating your subscription</a> for continued service.
 		</div>
 	</div>
     {% endif %}
@@ -91,8 +79,7 @@ $(document).ready(function() {
 					<p>
 						{{ store|get:'street' }}<br />
 						{{ store|get:'city' }}, {{ store|get:'state' }} {{ store|get:'zip' }}<br />
-						{{ store|get:'phone_number' }}<br />
-						{{ request.session.account|get:'email' }}
+						{{ store|get:'phone_number' }}
 					</p>
 				</div>
 				<div id="hours">
@@ -159,10 +146,11 @@ $(document).ready(function() {
 		{% endwith %}
 		<div id="account-options" class="form-options">
 		    {% if is_admin %}
-			<a href="{% url 'account_update' %}" class="button blue">
-				Update Account
+			<a href="{% url 'subscription_update' %}" class="button blue">
+				Update Subscription
 			</a>
-			<a href="{% url 'account_deactivate' %}" class="red" id="deactivate_account">Cancel My Account</a>
+			<a href="{% url 'account_deactivate' %}" class="red" id="deactivate_account" 
+			    onclick="return confirm('Are you sure you want to deactivate {{ request.session.store.store_name }}?');">Deactivate My Store</a>
 			{% endif %}
 		</div>
 	</div>

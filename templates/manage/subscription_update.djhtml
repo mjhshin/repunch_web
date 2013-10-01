@@ -3,7 +3,7 @@
 
 {% block title %}Account {% if update %}Update{% else %}Upgrade{% endif %}{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/account_update.1.0.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/subscription_update.1.0.css" %}" />
 <link href="{% static "public/css/tooltipster-repunch.1.0.css" %}" rel="stylesheet" type="text/css">
 <link href="{% static "public/css/tooltipster.css" %}" rel="stylesheet" type="text/css">
 {% endblock %}
@@ -18,10 +18,10 @@
             var uForm = $('#update-form');
             {% if update %}
             uForm.attr("action",
-                "{% url 'account_update' %}");
+                "{% url 'subscription_update' %}");
             {% elif upgrade %}
             uForm.attr("action",
-                "{% url 'account_update' %}" + "?do_upgrade=1");
+                "{% url 'subscription_update' %}" + "?do_upgrade=1");
             {% endif %}
             // only proceed if not processing a form
             if (pf.css("display") == "none"){
