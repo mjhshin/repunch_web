@@ -12,7 +12,7 @@ Hey {{ store.get_owner_fullname }},
 {% if package.status == 'upgraded' %}
 
 <p>
-We have upgraded your account from {{ package.sub_type }} to {{ package.new_sub_type }}.
+We have upgraded your subscription from {{ package.sub_type }} to {{ package.new_sub_type }}.
 </p>
 
 <p>
@@ -25,18 +25,18 @@ We have upgraded your account from {{ package.sub_type }} to {{ package.new_sub_
 {% elif package.status == 'disabled' %}
 
 <p>
-Your account has been disabled.<br/>
-Please contact us at <a href="mailto:{{EMAIL_FROM}}">{{EMAIL_FROM}}</a> to enable your account.
+Your store, {{ store.store_name }}, has been disabled.<br/>
+Please contact us at <a href="mailto:{{EMAIL_FROM}}">{{EMAIL_FROM}}</a> to enable your store.
 </p>
 
 {% else %}
 <p>
-Please upgrade your account or your account will be disabled on {{ package.disable_date }}
+Please upgrade your subscription or your subscription will be disabled on {{ package.disable_date }}
 </p>
 
 <p>
-You may upgrade your account by logging into your <a href="http://{{ABSOLUTE_HOST}}{{STORE_INDEX}}">dashboard</a> and
-updating your account.
+You may upgrade your subscription by logging into your <a href="http://{{ABSOLUTE_HOST}}{{STORE_INDEX}}">dashboard</a> and
+updating your subscription.
 </p>
 
 <p>

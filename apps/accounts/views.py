@@ -7,7 +7,6 @@ from django.contrib.auth import SESSION_KEY
 from datetime import datetime
 import json, urllib
 
-from apps.accounts.models import AccountActivate
 from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
@@ -24,52 +23,6 @@ from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
 send_email_receipt_ipod, send_email_account_upgrade,\
 send_email_receipt_monthly_success
-
-@csrf_exempt
-def activate(request):
-    """
-    Handles account activation from email form sent at user sign up.
-    """
-    if request.method == "POST":
-        store_id = request.POST['store_id']
-        act_id = request.POST['act_id']
-        act = AccountActivate.objects.filter(id=act_id,
-                store_id=store_id)
-        if len(act) > 0:
-            act[0].delete()
-            store = Store.objects().get(objectId=store_id)
-            if store:
-                store.active = True
-                store.update()
-                return HttpResponse(store.get(\
-                    "store_name").capitalize() +\
-                    " has been activated.")
-            else:
-                return HttpResponse("Account/store not found.")  
-        else:  
-            return HttpResponse("This form has already "+\
-                "been used.")                
-    
-    return HttpResponse("Bad request")
-    
-@dev_login_required
-@login_required
-@admin_only(reverse_url="store_index")
-def deactivate(request):
-    """
-    This does not delete anything! It merely sets the store's active
-    field to false and logs the user out.
-    """
-    store = request.session['store']
-    store.active = False
-    store.update()
-    # notify other dashboards of this changes
-    payload = {
-        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "updatedStore":store.jsonify(),
-    }
-    comet_receive(store.objectId, payload)
-    return redirect(reverse('manage_logout'))
 
 @dev_login_required
 @login_required
@@ -238,11 +191,11 @@ def update_subscription(request):
             if do_upgrade:
                 return redirect(reverse('store_index')+ "?%s" %\
                         urllib.urlencode({'success':\
-                            'Your account has been upgraded.'}))
+                            'Your subscription has been upgraded.'}))
             else:
                 return redirect(reverse('store_index')+ "?%s" %\
                             urllib.urlencode({'success':\
-                                'Your account has been updated.'}))
+                                'Your subscription has been updated.'}))
     else:
         form = SubscriptionForm()
         form.initial = subscription.__dict__.copy()

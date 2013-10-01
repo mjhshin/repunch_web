@@ -41,13 +41,13 @@
 	
 	{% if from_limit_reached %}
     <div class="notification">
-		<div>Your message will be sent after you succesfully upgrade your account.</div>
+		<div>Your message will be sent after you succesfully upgrade your subscription.</div>
 	</div>
 	{% endif %}
 	
 	{% if alert_users == 2 %}
     <div class="notification">
-		<div>You have passed your user limit.<br/> Your account will be upgraded once you update your account with a valid credit card.</div>
+		<div>You have passed your user limit.<br/> Your subscription will be upgraded once you update your subscription with a valid credit card.</div>
 	</div>
 	{% endif %}
 	

@@ -13,6 +13,7 @@ import json, urllib, urllib2, os, pytz
 
 from apps.stores.models import Store as dStore, Hours as dHours,\
 StoreAvatarTmp
+from apps.accounts.models import AccountActivate
 from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
@@ -453,7 +454,51 @@ def refresh(request):
     else:
         return HttpResponse(json.dumps({'success': False}), content_type="application/json")
 
+@csrf_exempt
+def activate(request):
+    """
+    Handles account activation from email form sent at user sign up.
+    """
+    if request.method == "POST":
+        store_id = request.POST['store_id']
+        act_id = request.POST['act_id']
+        act = AccountActivate.objects.filter(id=act_id,
+                store_id=store_id)
+        if len(act) > 0:
+            act[0].delete()
+            store = Store.objects().get(objectId=store_id)
+            if store:
+                store.active = True
+                store.update()
+                return HttpResponse(store.get(\
+                    "store_name").capitalize() +\
+                    " has been activated.")
+            else:
+                return HttpResponse("Account/store not found.")  
+        else:  
+            return HttpResponse("This form has already "+\
+                "been used.")                
     
+    return HttpResponse("Bad request")
+    
+@dev_login_required
+@login_required
+@admin_only(reverse_url="store_index")
+def deactivate(request):
+    """
+    This does not delete anything! It merely sets the store's active
+    field to false and logs the user out.
+    """
+    store = request.session['store']
+    store.active = False
+    store.update()
+    # notify other dashboards of this changes
+    payload = {
+        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+        "updatedStore":store.jsonify(),
+    }
+    comet_receive(store.objectId, payload)
+    return redirect(reverse('manage_logout'))
     
     
         

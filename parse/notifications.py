@@ -29,7 +29,7 @@ ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
 # declare here for selenium tests use also
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX = "Welcome to Repunch "
-EMAIL_UPGRADE_SUBJECT = "Repunch Inc. Your account has been upgraded."
+EMAIL_UPGRADE_SUBJECT = "Repunch Inc. Your subscription has been upgraded."
 EMAIL_MONTHLY_SUBJECT = "Repunch Inc. monthly service charge."
 
 def get_notification_ctx():
@@ -292,7 +292,7 @@ def send_email_signup(account, connection=None):
     def _wrapper():
         # for new account
         with open(FS_SITE_DIR +\
-            "/templates/manage/notification.html", 'r') as f:
+            "/templates/manage/notification-newuser.html", 'r') as f:
             template = Template(f.read())
             
         store = account.get("store")
@@ -311,7 +311,7 @@ def send_email_signup(account, connection=None):
         
         # for ORDER_PLACED_EMAILS
         with open(FS_SITE_DIR +\
-            "/templates/manage/notification-newuser.html", 'r') as f:
+            "/templates/manage/notification-newuser-admin.html", 'r') as f:
             template = Template(f.read())
         
         subject = EMAIL_SIGNUP_SUBJECT_PREFIX +\
@@ -419,7 +419,7 @@ def send_email_account_upgrade(account, store, package,
         timezone.activate(pytz.timezone(store.store_timezone))
         
         with open(FS_SITE_DIR +\
-            "/templates/manage/notification-account-upgraded.html",
+            "/templates/manage/notification-subscription-upgraded.html",
                 'r') as f:
             template = Template(f.read())
             

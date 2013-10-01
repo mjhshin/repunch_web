@@ -209,7 +209,7 @@ $(document).ready(function(){
                 }
                 finish(dim);
             } else if (res.code == 2){
-                messageContainer.html("<span>Your account is not active.</span>");
+                messageContainer.html("<span>Your store is not active.</span>");
                 password.removeClass("input-text-error");
                 loading.hide();
                 finish(324);

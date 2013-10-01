@@ -16,15 +16,15 @@ We have failed to charge you for your membership from {{ subscription.date_last_
 The credit card information you provided was either incorrect or it does not have enough funds.
 {% if not account_disabled %}
 Please update your credit card information by logging into your 
-<a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{STORE_INDEX}}">dashboard</a> and updating your account.
+<a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{STORE_INDEX}}">dashboard</a> and updating your subscription.
 {% endif %}
 </p>
 
 <p>
 {% if account_disabled %}
-Your account has been disabled. Please contact us if you want to re-activate your account.
+Your store, {{ store.store_name }}, has been deactivated. Please contact us if you want to re-activate your store.
 {% else %}
-Your account will be disabled on {{ date_disable|date:"F d, Y" }} if you fail to pay your monthly membership.
+Your store, {{ store.store_name }}, will be deactivated on {{ date_disable|date:"F d, Y" }} if you fail to pay your monthly membership.
 {% endif %}
 </p>
 
