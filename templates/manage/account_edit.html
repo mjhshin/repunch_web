@@ -34,7 +34,7 @@
 			</a>
 			
 			<div id="header-right">
-			    <a href="{% url 'store_index' %}">
+			    <a href="{% url 'account_edit' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
 					    {% if request.session.has_store_avatar and request.session.store|get:'store_avatar' %}
 						<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
@@ -69,7 +69,7 @@
 		    </div>
 		    
 		    <div class="form-options">
-			    <a class="button blue" >Submit</a>
+			    <a class="button blue" >Save</a>
 			    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="email-saving"/>
 			</div>
 	    </form>
@@ -94,7 +94,7 @@
 		    </div>
 		    
 		    <div class="form-options">
-			    <a class="button blue" >Submit</a>
+			    <a class="button blue" >Save</a>
 			    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="password-saving"/>
 			</div>
 		</form>

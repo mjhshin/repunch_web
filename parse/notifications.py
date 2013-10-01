@@ -316,13 +316,13 @@ def send_email_signup(account, connection=None):
         
         subject = EMAIL_SIGNUP_SUBJECT_PREFIX +\
             account.get("store").get("store_name")
-        AccountActivate = getattr(import_module('apps.accounts.models'),
-                                    "AccountActivate")
+        StoreActivate = getattr(import_module('apps.stores.models'),
+                                    "StoreActivate")
         ctx = get_notification_ctx()
         ctx.update({
             'account': account,
             'store': account.get("store"),
-            'activate': AccountActivate.objects.create(\
+            'activate': StoreActivate.objects.create(\
             				store_id=store.objectId),
         })
         timezone.activate(pytz.timezone(TIME_ZONE))

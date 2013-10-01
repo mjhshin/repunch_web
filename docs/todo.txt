@@ -1,5 +1,11 @@
 ##############################################
 ####################  TODO: 
+* ASAP *
+   - Fix alignment of account-name in header-right
+   - update manage/css/global version name
+   - Delete AccountActivate table and run syncdb (servers)
+   
+
 1. Fix all broken tests.
    - login (dev server)
    - logout

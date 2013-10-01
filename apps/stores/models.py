@@ -3,6 +3,10 @@ from django.db import models
 from libs.repunch import rpforms
 from repunch.settings import TIME_ZONE, MEDIA_ROOT
 
+	
+class StoreActivate(models.Model):
+	store_id = models.CharField(max_length=30)
+
 class StoreAvatarTmp(models.Model):
     """ 
     This is used in the image upload sequence. The file needs to be 

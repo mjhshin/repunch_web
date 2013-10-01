@@ -13,7 +13,7 @@ import json, urllib, urllib2, os, pytz
 
 from apps.stores.models import Store as dStore, Hours as dHours,\
 StoreAvatarTmp
-from apps.accounts.models import AccountActivate
+from apps.stores.models import StoreActivate
 from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
@@ -462,7 +462,7 @@ def activate(request):
     if request.method == "POST":
         store_id = request.POST['store_id']
         act_id = request.POST['act_id']
-        act = AccountActivate.objects.filter(id=act_id,
+        act = StoreActivate.objects.filter(id=act_id,
                 store_id=store_id)
         if len(act) > 0:
             act[0].delete()

@@ -31,7 +31,7 @@
             return false;
         });
     });
-    </script>
+</script>
 {% endblock %}
 
 {% block content %}

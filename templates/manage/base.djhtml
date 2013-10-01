@@ -49,10 +49,12 @@
 			</a>
 			
 			<div id="header-right">
-			    <a href="{% url 'store_index' %}">
+			    <a href="{% url 'account_edit' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
 					    {% if request.session.has_store_avatar and request.session.store|get:'store_avatar' %}
 						<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
+						{% else %}
+						<img class="avatar-small" style="visibility:hidden" />
 					    {% endif %}
 					</span>
 				    <span id="account-name">
@@ -62,7 +64,7 @@
 				        {{ request.session.store.get_owner_fullname }}
 				        {% endif %}
 				    </span>
-				    <img src="{% static 'manage/images/arrow-down.png' %}" alt="options" style="vertical-align:middle;" />
+			        <img src="{% static 'manage/images/arrow-down.png' %}" alt="options" style="vertical-align:middle;" />
 		        </a>
 				    
                 <ul>

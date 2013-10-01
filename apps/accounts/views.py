@@ -30,7 +30,6 @@ send_email_receipt_monthly_success
 @login_required
 @access_required
 def edit(request):
-    
     return render(request, 'manage/account_edit.html', {"email_form":\
         EmailForm(), "password_form": PasswordForm()})
      
