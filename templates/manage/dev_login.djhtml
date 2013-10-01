@@ -12,11 +12,10 @@
 	
 	<style>
 	div#header { 
-	    margin-top: 20px; width:330px;
+	    margin-top: 20px;
 	    margin-left:auto; margin-right:auto;
 	}
-    div#content-frame { width: 300px; }
-    div#site-frame { width: 330px; }
+    div#site-frame { width: 360px; }
     div#main-content { 
         min-height:0px;
         padding-top:0px; padding-bottom:0px;  

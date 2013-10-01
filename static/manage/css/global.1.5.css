@@ -128,7 +128,7 @@ div#site-frame{
 div#header{
 	height:70px;
 	line-height:70px;
-	padding:0 15px;
+	padding-left:15px;
 	border-bottom:1px solid #CCC;
 	
     background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
@@ -151,17 +151,56 @@ img#logo-header{
 	vertical-align:middle;
 }
 
-a#header-right {
+div#header-right {
 	float:right;
+	padding: 0 15px;
+	width: 180px;
 }
 
-a#header-right:hover {
-    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
-    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
+div#header-right > a {
+    height: 100%;
+	color:#888;
+    display: inline-block;
+}
+
+div#header-right:hover > a {
+	color:#666;
+}
+
+div#header-right:hover {
+    background-image: -ms-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -moz-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -o-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #E1E1E1), color-stop(1, #EEEEEE));
+    background-image: -webkit-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: linear-gradient(to top, #E1E1E1 0%, #EEEEEE 100%);
+}
+
+div#header-right > ul {
+    list-style: none;
+    border: 1px solid #CCC; border-top: none;
+	background:white;
+    width: 194px; 
+    position:absolute; 
+    margin-top: 0px; padding: 0px;
+    display:none;
+}
+
+div#header-right:hover > ul {
+    display: block;
+}
+
+div#header-right > ul > a > li {
+    width: 100%;
+    margin:0px; padding: 0px;
+	font: normal 16px/44px 'Cabin', sans-serif;
+    text-align: center;
+    color:#666;
+}
+
+div#header-right > ul > a > li:hover {
+    color:#0965ad;
+    background: #f1f1f1;
 }
 
 img.avatar-small{
@@ -183,13 +222,7 @@ img.avatar-big{
 span#account-name{
 	font: bold 15px/32px 'Cabin', sans-serif;
 	margin:0 2px 0 4px;
-	color:#888; /* 666 */
 	vertical-align:middle;
-}
-
-a#link-logout{
-	font: normal 14px 'Cabin', sans-serif;
-	color:#666;
 }
 
 div#content-frame{

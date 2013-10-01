@@ -40,6 +40,7 @@
 <input id="comet_url" type="hidden" value="{% url 'comet_pull' %}" />
 <input id="comet_url_terminate" type="hidden" value="{% url 'comet_terminate' %}" />
 
+
 	<div id="site-frame">
 		<div id="header">
 		
@@ -47,7 +48,8 @@
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</a>
 			
-			<a id="header-right" href="{% url 'store_index' %}">
+			<div id="header-right">
+			    <a href="{% url 'store_index' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
 					    {% if request.session.has_store_avatar and request.session.store|get:'store_avatar' %}
 						<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
@@ -61,7 +63,14 @@
 				        {% endif %}
 				    </span>
 				    <img src="{% static 'manage/images/arrow-down.png' %}" alt="options" style="vertical-align:middle;" />
-			</a>
+		        </a>
+				    
+                <ul>
+                    <a href="#"><li>Settings</li></a>
+                    <a href="{% url 'manage_logout' %}"><li>Logout</li></a>
+                </ul>
+			</div>
+			
 			
 		</div>
 		<div id="content-frame">

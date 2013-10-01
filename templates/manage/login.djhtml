@@ -9,9 +9,8 @@
 	<link href="{% static 'manage/css/login.2.1.css' %}" rel="stylesheet" />   
 	
 	<style>
-	div#header { margin-top: 20px; width:330px;margin-left:auto; margin-right:auto;}
-    div#content-frame { width: 300px; }
-    div#site-frame { width: 330px; }
+	div#header { margin-top: 20px; margin-left:auto; margin-right:auto;}
+    div#site-frame { width: 360px; }
 	{% if request.session.recaptcha_token %}
     div#main-content { min-height: 360px; height:360px;width:310px;margin-bottom:0px;margin-left:auto; margin-right:auto; }
 	{% else %}
