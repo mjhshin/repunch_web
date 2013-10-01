@@ -13,7 +13,7 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^settings/refresh$', 'refresh', 
                                 name='refresh_retailer_pin'),  
                                 
-    url(r'^qoc48mxyz/deactivate', 'deactivate', name='store_deactivate'),
-    url(r'^qoc48mxyz/activate', 'activate', name='store_activate'),
+    url(r'^qoc48mxyz/deactivate$', 'deactivate', name='store_deactivate'),
+    url(r'^qoc48mxyz/activate$', 'activate', name='store_activate'),
 )
 

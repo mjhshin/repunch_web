@@ -7,11 +7,6 @@
 	width:260px;
 }
 
-#employee-saving {
-    display:none;
-    position:relative; top:5px;left:4px;
-}
-
 #delete-button {
     float:right;
     position:relative; top:34px; right:6px;

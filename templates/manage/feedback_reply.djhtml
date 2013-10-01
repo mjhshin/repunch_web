@@ -67,10 +67,7 @@ $(document).ready(function(){
 		<div id="message-detail-options" class="form-options">
 			<a id="reply-form-submit" class="button blue">Reply</a>
 			<a href="{% url 'feedback_details' feedback.objectId %}" class="red">Cancel</a>
-			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
-		            alt="processing punch request..." 
-		            id="reply-sending" 
-		            style="display:none;position:relative;top:5px;left:4px;"/>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="reply-sending" />
 		</div>
 	</form>
 	<div class="divider"></div>

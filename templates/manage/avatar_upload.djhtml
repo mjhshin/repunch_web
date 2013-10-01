@@ -60,9 +60,7 @@
 		<div id="edit-avatar-options" class="form-options" style="margin-top:16px;">
 			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
 			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
-		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
-		            id="img-upload-loading" 
-		            style="display:none;position:relative;top:5px;left:4px;"/>
+		    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="img-upload-loading" />
 		</div>
 	</form>
 </body>

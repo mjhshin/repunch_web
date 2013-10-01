@@ -1,0 +1,33 @@
+/**
+    Overrides a lot of stuff from global.css so import this below that.
+*/
+
+h2 {
+    margin-left: 255px;
+}
+
+input {
+    width: 380px;
+}
+
+form#password-form {
+    margin-top: 40px;
+}
+
+div#content-frame {
+    padding-top: 30px;
+	background: white url('../images/bkg_content.png') repeat top left;
+}
+
+div#main-content {
+    width: 400px;
+	padding: 25px 25px 50px;
+    margin: 0px 255px 100px;
+    background: white;
+}
+
+.form-options img {
+    position:relative;top:5px;left:16px;
+}
+
+

@@ -162,7 +162,7 @@ class StoreAvatarForm(forms.Form):
                 session_key, avatar=rename())
         return av.avatar
 
-class SubscriptionForm2(forms.Form):
+class SubscriptionSignUpForm(forms.Form):
     """ 
     2s are appended at each attr name because of name conflicts at
     signup with StoreSignUpForm. 
@@ -188,7 +188,7 @@ class SubscriptionForm2(forms.Form):
     cc_cvv = forms.CharField(validators=[required, numeric])
     
     def clean(self, *args, **kwargs):
-        super(SubscriptionForm2, self).clean()
+        super(SubscriptionSignUpForm, self).clean()
         cleaned_data = self.cleaned_data
         
         # if cc_number doesn't exists, it is because we already 

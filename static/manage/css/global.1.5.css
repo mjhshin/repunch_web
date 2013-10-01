@@ -120,7 +120,7 @@ div.clear{
 }
 
 div#site-frame{
-	width:960px;
+	width:960px; 
 	margin:0 auto;
 	box-shadow: 0 0 5px 3px #BBB;
 }
@@ -191,10 +191,11 @@ div#header-right:hover > ul {
 }
 
 div#header-right > ul > a > li {
-    width: 100%;
+    width: 164px; /* this + padding must = width of header-right ul */
     margin:0px; padding: 0px;
 	font: normal 16px/44px 'Cabin', sans-serif;
-    text-align: center;
+	padding-left: 30px;
+    text-align: left;
     color:#666;
 }
 
@@ -333,6 +334,10 @@ div.form-options{
 	margin-top:20px;
 	float:left;
 	clear:both;
+}
+
+div.form-options img{
+    display:none;position:relative;top:5px;left:16px;
 }
 
 div.form-options a.red{

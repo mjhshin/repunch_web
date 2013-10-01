@@ -59,10 +59,7 @@
 			{% else %}
 				<a id="delete-link" href="{% url 'reward_delete' reward_id %}" class="red">Delete Reward</a>
 			{% endif %}
-			<img src="{% static 'manage/images/ajax-loader.gif' %}" 
-		            alt="processing punch request..." 
-		            id="reward-saving" 
-		            style="display:none;position:relative;top:5px;left:4px;"/>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="reward-saving" />
 		</div>
 		
 	</form>

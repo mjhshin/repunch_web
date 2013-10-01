@@ -14,9 +14,9 @@ send_email_receipt_ipod
 from apps import isdigit
 from apps.db_static.models import Category
 from apps.accounts.models import AssociatedAccountNonce
-from apps.accounts.forms import AccountForm
+from apps.accounts.forms import AccountSignUpForm
 from parse.apps.stores import format_phone_number
-from apps.stores.forms import StoreSignUpForm, SubscriptionForm2
+from apps.stores.forms import StoreSignUpForm, SubscriptionSignUpForm
 from libs.repunch import rputils
 
 from repunch.settings import STATIC_URL
@@ -170,8 +170,8 @@ def sign_up(request):
     
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
-        account_form = AccountForm(request.POST)
-        subscription_form = SubscriptionForm2(request.POST)
+        account_form = AccountSignUpForm(request.POST)
+        subscription_form = SubscriptionSignUpForm(request.POST)
         
         cats = request.POST.get("categories")
         category_names = None
@@ -206,7 +206,7 @@ def sign_up(request):
                     "Amount must be a number greater than 0."
                 
         else:
-            subscription_form = SubscriptionForm2()
+            subscription_form = SubscriptionSignUpForm()
         
         if all_forms_valid:
             postDict = request.POST.dict()
@@ -406,8 +406,8 @@ def sign_up(request):
            
     else:
         store_form = StoreSignUpForm()
-        account_form = AccountForm()
-        subscription_form = SubscriptionForm2()
+        account_form = AccountSignUpForm()
+        subscription_form = SubscriptionSignUpForm()
         
     data['store_form'] = store_form
     data['account_form'] = account_form

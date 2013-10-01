@@ -66,7 +66,7 @@
 		        </a>
 				    
                 <ul>
-                    <a href="#"><li>Settings</li></a>
+                    <a href="{% url 'account_edit' %}"><li>Account Settings</li></a>
                     <a href="{% url 'manage_logout' %}"><li>Logout</li></a>
                 </ul>
 			</div>

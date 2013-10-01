@@ -11,6 +11,7 @@ from libs.dateutil.relativedelta import relativedelta
 from repunch.settings import PHONE_COST_UNIT_COST,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps import isdigit
+from apps.accounts.forms import EmailForm, PasswordForm
 from apps.stores.forms import SubscriptionForm
 from parse import session as SESSION
 from parse.comet import comet_receive
@@ -23,6 +24,34 @@ from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
 send_email_receipt_ipod, send_email_account_upgrade,\
 send_email_receipt_monthly_success
+
+
+@dev_login_required
+@login_required
+@access_required
+def edit(request):
+    
+    return render(request, 'manage/account_edit.html', {"email_form":\
+        EmailForm(), "password_form": PasswordForm()})
+     
+@dev_login_required
+@login_required
+@access_required
+def change_email(request):
+    if request.method == "POST":
+        pass # TODO
+    
+    
+    return redirect(reverse("account_edit"))
+        
+@dev_login_required
+@login_required
+@access_required
+def change_password(request):
+    if request.method == "POST":
+        pass # TODO
+        
+    return redirect(reverse("account_edit"))
 
 @dev_login_required
 @login_required

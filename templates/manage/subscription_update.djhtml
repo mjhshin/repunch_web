@@ -199,8 +199,7 @@
 		<a class="button blue" id="update-form-submit">Upgrade{% if alert_billing %} & Pay{% endif %}</a>
 		<a href="{% url 'messages_index' %}" class="red">Back</a>
 		{% endif %}
-		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing form..."
-			        id="processing-form" style="display:none;"/>
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" id="processing-form" />
 	</div>
 	
 	</form>

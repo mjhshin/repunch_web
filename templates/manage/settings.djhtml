@@ -42,8 +42,7 @@
 		<div id="retailer_pin">{{ settings|get:'retailer_pin'  }}</div> 
 		{% if is_admin %}
 		<a href="{% url 'refresh_retailer_pin' %}" id="link_refresh_retailer_pin"><img src="{% static "manage/images/btn_orange-refresh-code.png" %}" id="refresh_retailer_pin" /></a>
-		<img src="{% static 'manage/images/ajax-loader.gif' %}" alt="processing punch request..."
-			        id="retailer-pin-loading" style="display:none;position:relative;top:-10px;"/>
+		<img src="{% static 'manage/images/ajax-loader.gif' %}" id="retailer-pin-loading" style="display:none;position:relative;top:-10px;"/>
         {% endif %}
 		{% endif %}
 		
