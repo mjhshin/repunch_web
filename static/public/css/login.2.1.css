@@ -1,37 +1,46 @@
 
-/** login dialog styles for dedicated login page **/
-
-#dialog-login form {
-    padding:10px;
-    padding-top:2px;
-}
-
-
+/** login dialog styles **/
 .input-text-error {
     outline: none;
     border-color: #dd4b39;
     box-shadow: 0 0 10px #dd4b39;
 }
 
+#dialog-login {
+	background: url("../images/bkg_content.png") repeat scroll left top white;
+}
+
+#dialog-login form {
+    padding:10px;
+    padding-top:2px;
+}
+
 .ui-widget-header.ui-dialog-titlebar {
-	background: url("../images/bkg_header.png") repeat-x scroll left bottom white;
+	color: #0965ad; 
     border-bottom: 1px solid #CCCCCC;
     height: 25px;
-    line-height: 25px;
+	font: bold 18px/25px 'Cabin', sans-serif;
     padding: 0 15px;
+    
+    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
+    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
 }
 
 #dialog-login-form p{ margin: 0px 0px 10px 0px; }
 
 #dialog-login-form label{
 	display:block;
-	font: bold 14px 'Cabin', sans-serif;
+	font:bold 14px 'Cabin', sans-serif;
 	color:#696969;
 	margin: 15px 0 10px;
 }
 
-#dialog-login-form input{
-	height:28px; width:284px;
+#dialog-login-form input {
+	height:28px; width:268px;
 	border:1px solid #CCC;
 	border-radius: 4px;
 	padding: 0 6px;
@@ -73,7 +82,7 @@
 #stay-signed-in label{
     position:relative; top:-2px;
     color:gray;
-    font-size:0.8em;
+    font-size:1em;
 	display:inline;
 	font-weight:normal;
 }
@@ -81,29 +90,24 @@
 /* for recaptcha css fix */
 #recaptcha_area, #recaptcha_table { line-height: 0!important;}
 
+#forgot-pass-form a {
+    color:#0040FF;
+    cursor:pointer;
+    text-decoration:none;
+}
+
+#forgot-pass-form-div {
+    margin-top:6px; 
+}
+
 #forgot-pass-form-div input {
-	height:22px; width:200px;
+	height:22px; width:180px;
 	border:1px solid #CCC;
 	border-radius: 4px;
 	padding: 0 6px;
 	font-size:14px;
 	color:#666;
     margin-right:2px;
-}
-
-#forgot-pass-form a {
-    color:#0040FF;
-    cursor:pointer;
-    font-size:0.9em;
-    text-decoration:none;
-}
-
-#forgot-pass-form a:hover {
-    text-decoration:underline;
-}
-
-#forgot-pass-form-div {
-    margin-top:12px;
 }
 
 #forgot-pass-form-div input[type=submit] {
@@ -114,22 +118,20 @@
     background-color: #ccc;
 }
 
+#forgot-pass-form a:hover {
+    text-decoration:underline;
+}
+
 #logging-in {
     display:none;
     position:relative;top:20px;left:40px;
-}
-
-#forgot-pass-form {
-    margin-top:28px;
 }
 
 #dialog-login-message span, #forgot-pass-form a span{
     color:#dd4b39;
 }
 
-#dialog-login-message {
-    font-size:0.9em;
+#forgot-pass-form {
+    margin-top:16px;
 }
-
-
 

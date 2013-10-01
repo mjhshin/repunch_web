@@ -126,11 +126,17 @@ div#site-frame{
 }
 
 div#header{
-	background: white url('../images/bkg_header.png') repeat-x top left;
 	height:70px;
 	line-height:70px;
 	padding:0 15px;
 	border-bottom:1px solid #CCC;
+	
+    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
+    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
 }
 
 div#header a{
@@ -145,8 +151,17 @@ img#logo-header{
 	vertical-align:middle;
 }
 
-a#header-right{
+a#header-right {
 	float:right;
+}
+
+a#header-right:hover {
+    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
+    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
 }
 
 img.avatar-small{
