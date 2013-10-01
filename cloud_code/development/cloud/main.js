@@ -5,13 +5,12 @@
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_patron", function(request, response) {
     var userObjectId = request.params.user_id;
-	var username = request.params.username;
+	var email = request.params.email;
 	var birthday = request.params.birthday;
 	var gender = request.params.gender;
 	var firstName = request.params.first_name;
 	var lastName = request.params.last_name;
 	var facebookId = request.params.facebook_id;
-	var email = request.params.email;
 	
 	var Patron = Parse.Object.extend("Patron");
 	var PunchCode = Parse.Object.extend("PunchCode");
