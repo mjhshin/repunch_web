@@ -37,28 +37,17 @@ class PasswordForm(forms.Form):
 class EmailForm(forms.Form):
     email = forms.EmailField()
             
-    """
-    email = forms.EmailField()
-    
-    
-    def __init__(self, email, *args, **kwargs):
-        super(StoreForm, self).__init__(*args, **kwargs)
-        self.email = email
-                               
+    def __init__(self, account, *args, **kwargs):
+        super(EmailForm, self).__init__(*args, **kwargs)
+        self.account = account
                 
     def clean_email(self):
-        #emails are unique - only clean email of self.email is not None
-        e = self.cleaned_data.get('email')
-        
-        if self.email and e:
-            e = e.strip().lower()
-            if Account.objects().count(email=e) > 0:
-                # only raise if email is not itself
-                if self.email != e:
-                    raise forms.ValidationError("Email is already " +\
-                        "being used.")
-        return e
-    """
+        email = self.cleaned_data.get('email').strip().lower()
+        if Account.objects().count(email=email) > 0:
+            if self.account.email != email:
+                raise forms.ValidationError("Email is already " +\
+                    "being used.")
+        return email
         
 class AccountSignUpForm(forms.Form):   
     """

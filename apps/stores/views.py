@@ -25,7 +25,6 @@ from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
-from parse.apps.patrons.models import PunchCode
 from parse.apps.stores.models import Store, Settings
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required, dev_login_required
@@ -154,31 +153,6 @@ def edit(request):
                     map_data.get("neighborhood")))
                     
             store.update()
-            
-            """ TODO move to dedicated account settings page
-            # Only update the account if user is the store owner
-            if store.is_owner(account):
-                # Need to make sure that the account is the latest - 
-                # User in dashboard then signs up for a mobile account
-                # and then edits store details = bug!
-                account.fetch_all(clear_first=True, with_cache=False)
-                # update the account - email = username!
-                postEmail = request.POST['email'].strip().lower()
-                if account.username != postEmail:
-                    prev_username = account.username
-                    
-                    account.email = postEmail
-                    account.username = postEmail
-                    account.update()
-                    
-                    if account.Patron:
-                        # update the punch_code username field
-                        pc = PunchCode.objects().get(\
-                            username=prev_username)
-                        if pc: # should never be none but ehh
-                            pc.username = account.username
-                            pc.update()
-            """
             
             # update the session cache
             try:

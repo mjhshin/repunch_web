@@ -20,6 +20,7 @@ from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import IPOD, MONTHLY
 from parse.apps.stores.models import Store, Subscription
+from parse.apps.patrons.models import PunchCode
 from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
 send_email_receipt_ipod, send_email_account_upgrade,\
@@ -31,24 +32,54 @@ send_email_receipt_monthly_success
 @access_required
 def edit(request):
     account = request.session['account']
+    store = SESSION.get_store(request.session)
     email_form, pass_form, data = None, None, {}
 
     if request.method == "POST":
         action, success = request.POST['action'], None
         if action == "email":
-            pass        
+            email_form = EmailForm(account, request.POST)
+            if email_form.is_valid():
+                success = "Successfully updated email."
+                
+                # Need to make sure that the account is the latest - 
+                # User in dashboard then signs up for a mobile account
+                # and then edits store details = bug!
+                account.fetch_all(clear_first=True, with_cache=False)
+                # update the account - email = username!
+                postEmail = email_form.cleaned_data['email']
+                if account.email != postEmail:
+                    prev_username = account.username
+                    account.email = postEmail
+                    account.username = postEmail
+                    account.update()
+                    if account.Patron:
+                        # update the punch_code username field
+                        pc = PunchCode.objects().get(\
+                            username=prev_username)
+                        if pc: # should never be none but ehh
+                            pc.username = account.username
+                            pc.update()
+                    
         elif action == "password":
             pass_form = PasswordForm(account, request.POST)
             if pass_form.is_valid():
+                success = "Successfully updated password."
                 account.set_password(pass_form.cleaned_data['new'])
                 account.update(save_password=True)
-                success = "Successfully updated password."
                 
         if success:
             data['success'] = success
+            # notify other dashboards of these changes
+            payload={
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedAccount":account.jsonify()
+            }
+            comet_receive(store.objectId, payload)
+            request.session["account"] = account
            
     if not email_form:
-        email_form = EmailForm()
+        email_form = EmailForm(None)
         email_form.initial = request.session['account'].__dict__.copy()
     if not pass_form:
         pass_form = PasswordForm(None)
