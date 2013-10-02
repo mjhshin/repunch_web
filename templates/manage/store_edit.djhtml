@@ -10,7 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.0.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
 	<script type="text/javascript">
 		var _hours_preview_url = '{% url 'store_hours' %}';

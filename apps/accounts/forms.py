@@ -32,6 +32,29 @@ class PasswordForm(forms.Form):
 
 class EmailForm(forms.Form):
     email = forms.EmailField()
+            
+    """
+    email = forms.EmailField()
+    
+    
+    def __init__(self, email, *args, **kwargs):
+        super(StoreForm, self).__init__(*args, **kwargs)
+        self.email = email
+                               
+                
+    def clean_email(self):
+        #emails are unique - only clean email of self.email is not None
+        e = self.cleaned_data.get('email')
+        
+        if self.email and e:
+            e = e.strip().lower()
+            if Account.objects().count(email=e) > 0:
+                # only raise if email is not itself
+                if self.email != e:
+                    raise forms.ValidationError("Email is already " +\
+                        "being used.")
+        return e
+    """
         
 class AccountSignUpForm(forms.Form):   
     """
@@ -66,16 +89,6 @@ class AccountSignUpForm(forms.Form):
             elif acc: # save the object for later use
                 setattr(self, "associated_account", acc)
         return e
-
-    """
-    def clean_username(self):
-    # usernames are unique
-        u = self.cleaned_data.get('username')
-        if u and Account.objects().count(username=u) > 0:
-            raise forms.ValidationError("Username is already being"+\
-                                        " used.")
-        return u
-    """
             
 class LoginForm(forms.Form):
     # currently the username = email

@@ -1,7 +1,6 @@
 ##############################################
 ####################  TODO: 
 * ASAP *
-   - Fix alignment of account-name in header-right
    - update manage/css/global version name
    - Delete AccountActivate table and run syncdb (servers)
    

@@ -78,29 +78,6 @@ class StoreForm(forms.Form):
     phone_number = forms.CharField(max_length=50)
     store_description = forms.CharField(required=False, 
         max_length=500, widget=forms.Textarea(attrs={"maxlength":500}))
-        
-    """
-    email = forms.EmailField()
-    
-    
-    def __init__(self, email, *args, **kwargs):
-        super(StoreForm, self).__init__(*args, **kwargs)
-        self.email = email
-                               
-                
-    def clean_email(self):
-        #emails are unique - only clean email of self.email is not None
-        e = self.cleaned_data.get('email')
-        
-        if self.email and e:
-            e = e.strip().lower()
-            if Account.objects().count(email=e) > 0:
-                # only raise if email is not itself
-                if self.email != e:
-                    raise forms.ValidationError("Email is already " +\
-                        "being used.")
-        return e
-    """
              
     def get_full_address(self):
         return self.data['street'] + ", " + self.data['city']  + ", " +\
