@@ -1,7 +1,6 @@
 ##############################################
 ####################  TODO: 
 * ASAP *
-   - update manage/css/global version name
    - Delete AccountActivate table and run syncdb (servers)
    
 

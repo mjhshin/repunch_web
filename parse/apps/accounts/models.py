@@ -57,6 +57,11 @@ class Account(ParseObject):
             del data['password']
             
         res = parse("PUT", self.path() + "/" + self.objectId, data)
+        
+        # always set the password to None to prevent passing it around in comet receive
+        if self.__dict__.get("password") is not None:
+            self.password = None
+        
         if res and "error" not in res:
             self.update_locally(res, False)
             return True
@@ -72,8 +77,7 @@ class Account(ParseObject):
             return getattr(import_module('parse.apps.stores.models'), className)
 
     def set_password(self, new_pass):
-        """ sets the password to a hashed new_pass """
-        # self.password = hash_password(new_pass)
+        """ may want to do some extra stuff here in the future """
         self.password = new_pass
     
     def is_free(self):

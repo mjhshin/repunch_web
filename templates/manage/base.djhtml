@@ -14,15 +14,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Repunch | {% block title %}{% endblock %}</title>
 	<link rel="shortcut icon" href="{% static 'public/images/favicon.png' %}" />
-	    
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	
-	<!-- include page specific css -->
 	<link href="{% static 'manage/css/global.2.0.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}"
 	    rel="stylesheet" />
-	    
-	
 	{% block styles %}{% endblock %}
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
@@ -76,6 +72,8 @@
 			
 		</div>
 		<div id="content-frame">
+		    {% block content_frame %}
+		
 			<div id="nav">
 				
 				<div class="nav-item {% if account_nav %}active{% endif %}">
@@ -136,7 +134,9 @@
 				</div>
 				
 			</div>
-			<div id="main-content">{% block content %}{% endblock %}</div><!-- close main-content -->
+			<div id="main-content">{% block content %}{% endblock %}</div>
+			
+			{% endblock %}
 			<div class="clear">&nbsp;</div>
 		</div><!-- close content-frame -->
 	</div><!-- close site-frame -->

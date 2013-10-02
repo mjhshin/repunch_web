@@ -30,27 +30,14 @@ send_email_receipt_monthly_success
 @login_required
 @access_required
 def edit(request):
+    if request.method == "POST":
+        pass
+    else:
+        email_form = EmailForm()
+        email_form.initial = request.session['account'].__dict__.copy()
+    
     return render(request, 'manage/account_edit.html', {"email_form":\
-        EmailForm(), "password_form": PasswordForm()})
-     
-@dev_login_required
-@login_required
-@access_required
-def change_email(request):
-    if request.method == "POST":
-        pass # TODO
-    
-    
-    return redirect(reverse("account_edit"))
-        
-@dev_login_required
-@login_required
-@access_required
-def change_password(request):
-    if request.method == "POST":
-        pass # TODO
-        
-    return redirect(reverse("account_edit"))
+        email_form, "password_form": PasswordForm()})
 
 @dev_login_required
 @login_required
