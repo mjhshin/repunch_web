@@ -92,6 +92,7 @@ from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = ["error"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
+EMAILS_BOOT = ["vandolf@repunch.com",]
 
 if DEBUG:
     PARSE_CODE_DIR = "./cloud_code/production"
@@ -124,12 +125,12 @@ class LogJob(object):
             "\nLOGJOB_INTERVAL = " + str(LOGJOB_INTERVAL)
         
         send_mail("Repunch Cloud Logger Starting", specs,
-                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+                EMAIL_FROM, EMAILS_BOOT, fail_silently=not DEBUG)
         
     def on_stop(self):
         send_mail("Repunch Cloud Logger Manually Stopped",
             "cloud_logger has been manually terminated",
-            EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+            EMAIL_FROM, EMAILS_BOOT, fail_silently=not DEBUG)
         
         
     def send(self, log):
@@ -223,7 +224,7 @@ class LogJob(object):
         except Exception as e:
             print "cloud_logger stopped"
             send_mail("Repunch Cloud Logger Stopped", str(e),
-                EMAIL_FROM, EMAILS, fail_silently=not DEBUG)
+                EMAIL_FROM, EMAILS_BOOT, fail_silently=not DEBUG)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
