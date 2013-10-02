@@ -253,14 +253,12 @@ class ParseObject(object):
         Fields that are required together are in a tuple. These fields
         are either all null or all not null.
         If a dict is inside a tuple then all fields in the tuple must
-        not be null and the dict must be True.
+        not be null and the dict must be True. Keys of the dict may
+        have double underscores delimiting Parse query options
+        like ne (not equal).
         
         Fields that are in a list must have at least 1 member that is
         not null. Only strings are allowed.
-        
-        Fields that are in a dict must have the given value for the
-        given key. Values that are not None are delimited by a 
-        string !None.
         
         No nesting is allowed (no lists/tuples within lists/tuples)
         or dicts within dicts. However, dicts may be within

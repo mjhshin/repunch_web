@@ -25,9 +25,6 @@ MODELS = (Account, Employee, Message, MessageStatus, Punch,
     RedeemReward, Store, Settings, Subscription, Invoice,
     Patron, PatronStore, PunchCode, FacebookPost)
     
-# All models that uses this delimiter must match this value!
-NOT_NULL = "!None"
-    
 class Command(BaseCommand):
     """
     Keeps track of abnormalities to be emailed to EMAILS.
@@ -74,8 +71,6 @@ class Command(BaseCommand):
             self.process_tuple(model_class, field)
         elif field_type is list:
             self.process_list(model_class, field)
-        elif field_type is dict:
-            self.process_dict(model_class, field)
             
     def add_to_abnormalities(self, model_class, field, field_abs):
         if len(field_abs) > 0:
@@ -126,11 +121,8 @@ class Command(BaseCommand):
             key = strs[:]
             
             for dic in dicts:
-                for k, v in dic.iteritems():
-                    if v == NOT_NULL:
-                        filter_params.update({k+"__ne":None})
-                    else:
-                        filter_params.update({k:v})
+                filter_params.update(dic)
+                for k in dic.iterkeys():
                     key.append(k)
 
             self.add_to_abnormalities(model_class, tuple(key),
@@ -145,17 +137,6 @@ class Command(BaseCommand):
         """
         self.add_to_abnormalities(model_class, tuple(fields),
             model_class.objects().filter(**{f:None for f in fields}))
-        
-        
-    def process_dict(self, model_class, field):
-        """
-        Adds to abnormalities model instances that do not have the
-        given value for the given field.
-        
-        Nested dicts will not be processed.
-        """
-        # not used atm
-        raise NotImplementedError
         
        
             
