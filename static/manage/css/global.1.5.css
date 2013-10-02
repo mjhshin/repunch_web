@@ -153,9 +153,10 @@ img#logo-header{
 
 div#header-right {
 	float:right;
-	padding: 0 15px;
-	width: 180px;
-	background:red;
+	/* This is required so that children with absolute positioning
+	   can use left, right, top, and bottom properties relative to the
+	   parent and not the window itself! */
+	position:relative; 
 }
 
 div#header-right > a {
@@ -163,6 +164,7 @@ div#header-right > a {
 	color:#888;
     display: inline-block;
     float:right;
+	padding: 0 15px;
 }
 
 div#header-right:hover > a {
@@ -180,12 +182,13 @@ div#header-right:hover {
 
 div#header-right > ul {
     list-style: none;
-    border: 1px solid #CCC; border-top: none;
+    border: 1px solid #CCC; border-top: none; border-right: none;
 	background:white;
     width: 194px; 
     position:absolute; 
-    margin-top: 0px; padding: 0px;
+    margin-top: 70px; padding: 0px;
     display:none;
+    right:0px;
 }
 
 div#header-right:hover > ul {
@@ -226,7 +229,6 @@ span#account-name{
 	font: bold 15px/32px 'Cabin', sans-serif;
 	margin:0 2px 0 4px;
 	vertical-align:middle;
-	background: green;
 }
 
 div#content-frame{
