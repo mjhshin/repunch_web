@@ -100,7 +100,9 @@ else:
     
 PARSE_LOG_CMD = "parse log -n "
 
-LOGJOB_INTERVAL = 40 # in seconds
+ # in seconds
+LOGJOB_INTERVAL = 40
+PARSE_TIMEOUT = 15 
 
 TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
 
@@ -140,7 +142,18 @@ class LogJob(object):
     def log_job(self):
         sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\
             str(self.n)), stdout=subprocess.PIPE)
+        start_time = datetime.now()
         subset = str(sp.stdout.read())
+        end_time = datetime.now()
+        
+        # make sure that work_time is at least 1 second or else
+        # the difference might be 86399
+        sleep(1)
+        
+        # Parse servers may be having technical difficulties so
+        # consider a PARSE_TIMEOUT
+        if (end_time - start_time).seconds > PARSE_TIMEOUT:
+            return
         
         # evaluate if first run
         if not self.last_log_tag or not self.last_log_time:
@@ -189,7 +202,7 @@ class LogJob(object):
             while True: # yes we are running forever
                 self.log_job()
                 # make sure that work_time is at least 1 second or else
-                # the difference will be 86399
+                # the difference might be 86399
                 sleep(1)
                 
                 work_time = (datetime.now() - self.last_log_time).seconds
