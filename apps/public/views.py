@@ -22,7 +22,7 @@ from libs.repunch import rputils
 from repunch.settings import STATIC_URL
 from parse.auth import login
 from parse.auth.decorators import dev_login_required
-from parse.utils import make_aware_to_utc, parse
+from parse.utils import make_aware_to_utc, parse, account_login
 from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type
@@ -134,9 +134,7 @@ def associated_account_confirm(request):
             username = request.POST['acc_username']
             password = request.POST['acc_password']
             # note that email is the same as username
-            res = parse("GET", "login", query=\
-                        {"username":username,
-                         "password":password} )
+            res = account_login(username, password)
             if 'error' not in res:
                 aa_nonce.verified = True
                 aa_nonce.save()

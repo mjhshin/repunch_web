@@ -7,27 +7,31 @@ from libs.repunch import rpforms, rpccutils, rputils
 from libs.repunch.validators import required, alphanumeric_no_space
 
 from parse.apps.accounts.models import Account
+from parse.utils import account_login
 
 class PasswordForm(forms.Form):
-    current = forms.CharField(\
-        widget=forms.PasswordInput(attrs={'pattern':".{6,}"}))
+    current = forms.CharField(widget=forms.PasswordInput())
     new = forms.CharField(min_length=6,
             widget=forms.PasswordInput(attrs={'pattern':".{6,}"}))
-    confirm_new = forms.CharField(min_length=6,
-            widget=forms.PasswordInput())
-    
+    confirm_new = forms.CharField(widget=forms.PasswordInput())
+        
+    def __init__(self, account, *args, **kwargs):
+        super(PasswordForm, self).__init__(*args, **kwargs)
+        self.account = account
+        
     def clean_current(self):
         """ check if the current password is corrent by logging in """
         current = self.cleaned_data.get('current')
-        # TODO
+        if 'error' in account_login(self.account.username, current):
+            raise forms.ValidationError("Incorrect password.")
         return current
         
     def clean_new(self):
         """ make sure that password is same as confirm_password """
         p1 = self.cleaned_data.get('new')
-        p2 = self.data.get('confirm')
+        p2 = self.data.get('confirm_new')
         if p1 and p2 and p1 != p2:
-            raise forms.ValidationError("Passwords don't match")
+            raise forms.ValidationError("Passwords don't match.")
         return p1
 
 class EmailForm(forms.Form):

@@ -1,5 +1,7 @@
 /**
     Overrides a lot of stuff from global.css so import this below that.
+    
+    Total width is 500px
 */
 
 h2 {
@@ -26,4 +28,7 @@ div#main-content {
     background: white;
 }
 
-
+div.notification {
+    width: 450px;
+    margin: 0 auto;
+}

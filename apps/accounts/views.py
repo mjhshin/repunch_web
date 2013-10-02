@@ -30,14 +30,33 @@ send_email_receipt_monthly_success
 @login_required
 @access_required
 def edit(request):
+    account = request.session['account']
+    email_form, pass_form, data = None, None, {}
+
     if request.method == "POST":
-        pass
-    else:
+        action, success = request.POST['action'], None
+        if action == "email":
+            pass        
+        elif action == "password":
+            pass_form = PasswordForm(account, request.POST)
+            if pass_form.is_valid():
+                account.set_password(pass_form.cleaned_data['new'])
+                account.update(save_password=True)
+                success = "Successfully updated password."
+                
+        if success:
+            data['success'] = success
+           
+    if not email_form:
         email_form = EmailForm()
         email_form.initial = request.session['account'].__dict__.copy()
+    if not pass_form:
+        pass_form = PasswordForm(None)
+        
+    data["email_form"] = email_form
+    data["password_form"] = pass_form
     
-    return render(request, 'manage/account_edit.html', {"email_form":\
-        email_form, "password_form": PasswordForm()})
+    return render(request, 'manage/account_edit.html', data)
 
 @dev_login_required
 @login_required

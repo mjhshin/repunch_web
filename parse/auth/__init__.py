@@ -15,15 +15,10 @@ from apps.comet.models import CometSession, CometSessionIndex
 from repunch.settings import PAGINATION_THRESHOLD, COMET_PULL_RATE,\
 PRODUCTION_SERVER, RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS
 from parse import session as SESSION
-from parse.utils import parse, flush
+from parse.utils import account_login, flush
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING
 
-def hash_password(password):
-    """ returns the hash of the raw password """
-    # NOT USED ATM
-    return hashlib.sha1(password).hexdigest()
-    
 
 def logout(request, reverse_url):
     session_key = request.session.session_key
@@ -78,9 +73,8 @@ def login(request, requestDict, no_recaptcha=False):
             return 4
     
     # note that email is the same as username
-    res = parse("GET", "login", query=\
-                {"username":requestDict.get('username'),
-                 "password":requestDict.get('password')} )
+    res = account_login(requestDict.get('username'),
+        requestDict.get('password'))
                     
     if res and "error" not in res:
         # correct login credentials - remove recaptcha token if exist

@@ -1,14 +1,52 @@
 {% extends "manage/base.djhtml" %}{% load static %}{% load parse_tags %}
 
+{% block title %}
+Account Settings
+{% endblock %}
+
 {% block styles %}
 <link href="/static/manage/css/account_edit.1.0.css" rel="stylesheet" />
 {% endblock %}
 
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    $('#email-form div.form-options a').click(function(){
+        if ($("#email-saving").css("display") == "none" && $("#password-saving").css("display") == "none"){
+            $("#email-saving").show();
+            $('#email-form').submit(); 
+        }
+        
+        return false;
+    });
+    
+    $('#password-form div.form-options a').click(function(){
+        if ($("#email-saving").css("display") == "none" && $("#password-saving").css("display") == "none"){
+            $("#password-saving").show();
+            $('#password-form').submit(); 
+        }
+        
+        return false;
+    });
+        
+});
+</script>
+{% endblock %}
+
 {% block content_frame %}
+
+{% if error or success %}
+<div class="notification {% if success %}success{% endif %} hide">
+	<div>{{ error }}{{ success }}</div>
+</div>
+{% endif %}
+	
 <h2>Account Settings</h2><br/>
 <div id="main-content" class="white-box">
 
-<form id="email-form" method="POST" action="">{% csrf_token %}
+<form id="email-form" method="POST" action="{% url 'account_edit' %}">{% csrf_token %}
+    <input type="hidden" name="action" value="email" />
+    
     <div class="input-container clearheight" id="email_ic">
 	    {{ email_form.email.errors }}
 	    <label for="id_email">Email</label>
@@ -23,7 +61,9 @@
 
 <div class="clear">&nbsp;</div>
 
-<form id="password-form" method="POST" action="">{% csrf_token %}
+<form id="password-form" method="POST" action="{% url 'account_edit' %}">{% csrf_token %}
+    <input type="hidden" name="action" value="password" />
+    
     <div class="input-container  clearheight" id="password_current_ic">
 	    {{ password_form.current.errors }}
 	    <label for="id_current">Current Password</label>

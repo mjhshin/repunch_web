@@ -128,6 +128,10 @@ def batch(method, parse_objects):
         payload, rcm)
      
     return json.loads(conn.getresponse().read())
+    
+def account_login(username, password):
+    return parse("GET", "login", query=\
+                {"username":username, "password":password} )
 
 def rescale(image_path, img_format, crop_coords=None,
         dst_width=PID[0], dst_height=PID[1]):

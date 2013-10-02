@@ -56,6 +56,21 @@ div.notification div ul.errorlist li {
 	top: 0px; 
 }
 
+div.notification div{
+	background-color: #FFFFCB;
+	border:1px solid #F9B64D;
+	font: bold 14px 'Cabin', sans-serif;
+	padding: 15px;
+	color:#666;
+	margin-bottom:30px;
+}
+
+div.notification.success div {
+	color: #666666;
+	background-color: #DEFFCB;
+	border:1px solid #669900;
+}
+
 .bold{ font-weight:bold; }
 
 .input-container{ 
@@ -297,21 +312,6 @@ div#main-content{
 	padding: 25px 25px 75px;
 	float:left;
 	width:670px;
-}
-
-div.notification div{
-	background-color: #FFFFCB;
-	border:1px solid #F9B64D;
-	font: bold 14px 'Cabin', sans-serif;
-	padding: 15px;
-	color:#666;
-	margin-bottom:30px;
-}
-
-div.notification.success div {
-	color: #666666;
-	background-color: #DEFFCB;
-	border:1px solid #669900;
 }
 
 div.section{
