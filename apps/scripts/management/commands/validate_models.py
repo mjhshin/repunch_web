@@ -12,6 +12,7 @@ See ParseObject.fields_required for full documentation.
 
 from django.core.management.base import BaseCommand
 
+from parse.notifications import send_email_validate_models
 from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.messages.models import Message, MessageStatus
@@ -57,8 +58,8 @@ class Command(BaseCommand):
             for field in fields_required:
                 self.process_field(model_class, field)
                 
-        # TODO send email template
-        print self.abnormalities
+        # send the results
+        send_email_validate_models(self.abnormalities, EMAILS)
     
     def process_field(self, model_class, field):
         """

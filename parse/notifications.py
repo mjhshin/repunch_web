@@ -23,8 +23,8 @@ from django.template import Template, Context, loader
 from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
-EMAIL_FROM, STATIC_URL, DEBUG,\
-ORDER_PLACED_EMAILS, TIME_ZONE, ADMINS, MAIN_TRANSPORT_PROTOCOL
+EMAIL_FROM, STATIC_URL, DEBUG, TIME_ZONE, ADMINS,\
+ORDER_PLACED_EMAILS, MAIN_TRANSPORT_PROTOCOL
 
 # declare here for selenium tests use also
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
@@ -450,6 +450,8 @@ def send_email_selenium_test_results(tests, connection=None):
                             'test_message':'...'}, ... ],
             ...
         ]
+        
+    Email is sent only to repunch.settings.ADMINS[0][1]
     """
     def _wrapper():
         with open(FS_SITE_DIR +\
@@ -476,6 +478,61 @@ def send_email_selenium_test_results(tests, connection=None):
         _wrapper()
     else:
         Thread(target=_wrapper).start()
+    
+    
+def send_email_validate_models(abnormalities, emails, connection=None):
+    """
+    Used by validate models management command.
+    The format of abnormalities is as follows
+        { 
+            cls.__name__ : {
+                cls.fields_required[1] : (cls.instance, ...)
+            }, ...
+        } 
+    """
+    def _wrapper():
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-validate-models.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+        subject = "Repunch Inc. Abnormal Parse Rows."
+        ctx = get_notification_ctx()
+        ctx.update({'date':date, 'abnormalities':abnormalities})
+        timezone.activate(pytz.timezone(TIME_ZONE))
+        body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), EMAIL_FROM, emails)
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
+   
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

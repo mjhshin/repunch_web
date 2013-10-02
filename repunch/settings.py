@@ -27,12 +27,12 @@ else:
         SESSION_COOKIE_SECURE = False
         CSRF_COOKIE_SECURE = False
         
-
+# Django email related settings
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),
 )
-
 MANAGERS = ADMINS
+#-----------
 
 DATABASES = {
     'default': {
