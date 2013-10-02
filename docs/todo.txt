@@ -1,7 +1,9 @@
 ##############################################
 ####################  TODO: 
 * ASAP *
-   - Delete AccountActivate table and run syncdb (servers)
+   0. Re-test everything from associated account signup
+   1. Delete AccountActivate table and run syncdb (production)
+   2. Then finish notification-validate-models.html
    
 
 1. Fix all broken tests.
