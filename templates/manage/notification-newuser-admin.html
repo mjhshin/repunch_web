@@ -34,7 +34,7 @@ A new business has signed up!
 		value="{{ activate.store_id }}" />
 	<input type="hidden" name="act_id" 
 		value="{{ activate.id }}" />
-	Click the button below to activate this user's account.<br/>
+	Click the button below to activate {{ store|get:"store_name" }}.<br/>
 	This can only be used once.<br/>
 	<input type="submit" value="Activate" />
 </form><br/>
