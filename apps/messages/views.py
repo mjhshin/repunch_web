@@ -150,15 +150,26 @@ def edit(request, message_id):
         form = MessageForm(postDict) 
         subType = SESSION.get_subscription(\
                     request.session).get('subscriptionType')
-                    
-        # refresh the message count - make sure we get the one in the cloud
-        if 'message_count' in request.session:
-            del request.session['message_count']
-        message_count = SESSION.get_message_count(request.session)
-                                
-        limit_reached = message_count >= sub_type[subType]['max_messages']
         
-        if form.is_valid() and not limit_reached:
+        if form.is_valid():
+            
+            # refresh the message count - make sure we get the one in the cloud
+            if 'message_count' in request.session:
+                del request.session['message_count']
+            message_count = SESSION.get_message_count(request.session)
+                                    
+            limit_reached = message_count >= sub_type[subType]['max_messages']
+            
+            if limit_reached:
+                if subType != 2:
+                    data['limit_reached'] = limit_reached
+                    # save the dict to the session
+                    request.session['message_b4_upgrade'] =\
+                        request.POST.dict().copy()
+                elif subType == 2:
+                    data['limit_reached'] = limit_reached
+                    data['maxed_out'] = True
+            
             # create the message
             message = Message(sender_name=\
                     store.get('store_name'), store_id=store.objectId)
@@ -185,8 +196,6 @@ def edit(request, message_id):
             # add to the store's relation
             store.add_relation("SentMessages_", [message.objectId]) 
             success_message = "Message has been sent."
-                
-            # message_count updated in comet_receive!
 
             params = {
                 "store_id":store.objectId,
@@ -205,7 +214,8 @@ def edit(request, message_id):
                 params.update({"num_patrons":\
                     postDict['num_patrons']})
                     
-            # update store session cache
+            # update store and message_count in session cache
+            request.session['message_count'] = message_count
             request.session['store'] = store
             # save session- cloud_call may take a while!
             request.session.save()
@@ -229,14 +239,6 @@ def edit(request, message_id):
 
             return HttpResponseRedirect(message.get_absolute_url())
             
-        elif limit_reached and subType != 2:
-            data['limit_reached'] = limit_reached
-            # save the dict to the session
-            request.session['message_b4_upgrade'] =\
-                request.POST.dict().copy()
-        elif limit_reached and subType == 2:
-            data['limit_reached'] = limit_reached
-            data['maxed_out'] = True
         elif 'num_patrons' in form.errors:
             data['error'] = "Number of customers must be a "+\
                                 "whole number and greater than 0."
