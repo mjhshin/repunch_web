@@ -169,75 +169,76 @@ def edit(request, message_id):
                 elif subType == 2:
                     data['limit_reached'] = limit_reached
                     data['maxed_out'] = True
-            
-            # create the message
-            message = Message(sender_name=\
-                    store.get('store_name'), store_id=store.objectId)
-            message.update_locally(postDict, False)
-            
-            # check if attach offer is selected
-            if 'attach_offer' in postDict:
-                d = parser.parse(postDict['date_offer_expiration'])
-                d = make_aware_to_utc(d, 
-                    SESSION.get_store_timezone(request.session))
-                message.set('date_offer_expiration', d)
-                message.set('message_type', OFFER)
-                message.set("offer_redeemed", False)
+                    
             else:
-                # pop the offer
-                message.set('offer_title', None)
-                message.set('date_offer_expiration', None)
-                # already defaults to None but whatever.
-                message.set("offer_redeemed", None)
-                message.set('message_type', BASIC)
+                # create the message
+                message = Message(sender_name=\
+                        store.get('store_name'), store_id=store.objectId)
+                message.update_locally(postDict, False)
                 
-            message.create()
-            data['message'] = message
-            # add to the store's relation
-            store.add_relation("SentMessages_", [message.objectId]) 
-            success_message = "Message has been sent."
-
-            params = {
-                "store_id":store.objectId,
-                "store_name":store.get('store_name'),
-                "subject":message.get('subject'),
-                "message_id":message.objectId,
-                "filter":message.filter,
-            }
-
-            if message.filter == "idle":
-                idle_days = postDict['idle_latency']
-                d = timezone.now() + relativedelta(days=\
-                    -1*int(idle_days))
-                params.update({"idle_date":d.isoformat()})
-            elif message.filter == "most_loyal":
-                params.update({"num_patrons":\
-                    postDict['num_patrons']})
+                # check if attach offer is selected
+                if 'attach_offer' in postDict:
+                    d = parser.parse(postDict['date_offer_expiration'])
+                    d = make_aware_to_utc(d, 
+                        SESSION.get_store_timezone(request.session))
+                    message.set('date_offer_expiration', d)
+                    message.set('message_type', OFFER)
+                    message.set("offer_redeemed", False)
+                else:
+                    # pop the offer
+                    message.set('offer_title', None)
+                    message.set('date_offer_expiration', None)
+                    # already defaults to None but whatever.
+                    message.set("offer_redeemed", None)
+                    message.set('message_type', BASIC)
                     
-            # update store and message_count in session cache
-            request.session['message_count'] = message_count
-            request.session['store'] = store
-            # save session- cloud_call may take a while!
-            request.session.save()
+                message.create()
+                data['message'] = message
+                # add to the store's relation
+                store.add_relation("SentMessages_", [message.objectId]) 
+                success_message = "Message has been sent."
 
-            # push notification
-            res = cloud_call("retailer_message", params)
-            if "error" not in res and res.get("result"):
-                message.set("receiver_count",
-                    res.get("result").get("receiver_count"))
-                    
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "newMessage":message.jsonify()
-            }
-            comet_receive(store.objectId, payload)
-            
-            # Note that the new message is saved in comet_receive
-            # make sure we have the latest session to save!
-            request.session.clear()
-            request.session.update(SessionStore(request.session.session_key))
+                params = {
+                    "store_id":store.objectId,
+                    "store_name":store.get('store_name'),
+                    "subject":message.get('subject'),
+                    "message_id":message.objectId,
+                    "filter":message.filter,
+                }
 
-            return HttpResponseRedirect(message.get_absolute_url())
+                if message.filter == "idle":
+                    idle_days = postDict['idle_latency']
+                    d = timezone.now() + relativedelta(days=\
+                        -1*int(idle_days))
+                    params.update({"idle_date":d.isoformat()})
+                elif message.filter == "most_loyal":
+                    params.update({"num_patrons":\
+                        postDict['num_patrons']})
+                        
+                # update store and message_count in session cache
+                request.session['message_count'] = message_count
+                request.session['store'] = store
+                # save session- cloud_call may take a while!
+                request.session.save()
+
+                # push notification
+                res = cloud_call("retailer_message", params)
+                if "error" not in res and res.get("result"):
+                    message.set("receiver_count",
+                        res.get("result").get("receiver_count"))
+                        
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "newMessage":message.jsonify()
+                }
+                comet_receive(store.objectId, payload)
+                
+                # Note that the new message is saved in comet_receive
+                # make sure we have the latest session to save!
+                request.session.clear()
+                request.session.update(SessionStore(request.session.session_key))
+
+                return HttpResponseRedirect(message.get_absolute_url())
             
         elif 'num_patrons' in form.errors:
             data['error'] = "Number of customers must be a "+\
