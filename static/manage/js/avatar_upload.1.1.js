@@ -41,6 +41,7 @@ function avatarCropComplete() {
         success: function(result) {
 	        $("#store_avatar").attr("src", result);
             $("#avatar-thumbnail").attr("src", result);
+            $("#avatar-thumbnail").css("visibility", "visible");
         },
     });
     
