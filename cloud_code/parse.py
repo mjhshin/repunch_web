@@ -5,6 +5,7 @@ Wrapper around the parse command line tool for synchronization
 between production and development cloud codes.
 
 All edits to the production and development cloud codes are ignored!
+Edit the master cloud code instead.
 """
 
 import os, subprocess, shlex, argparse

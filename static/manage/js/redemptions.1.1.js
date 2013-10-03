@@ -24,7 +24,7 @@ function onRedeem(rowId, action){
             // now hide the spinner
             loading.hide();
             
-            if (res.result == 1 || res.result == 2 || res.result == 3 || res.result == 4 || res.result == 5 || res.result == 6){
+            if (res.result > 0){
                 if (res.result == 1){
                     row.css("background", "#CCFF99");
                     row.html("Successfully <span style='color:blue'>APPROVED</span> redemption.");
@@ -37,16 +37,19 @@ function onRedeem(rowId, action){
                     row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
                 } else if (res.result == 5) {
                     row.css("background", "#FFFFCB");
-                    // row.html("Redemption has been <span style='color:red'>DENIED</span> elsewhere.");
                     row.html("Successfully <span style='color:red'>DENIED</span> redemption.");
                 } else if (res.result == 6) {
                     row.css("background", "#FFFFCB");
                     row.html("Customer deleted the store from their app.");
                     alert("Invalid! Customer deleted the store from their app.");
-                } else {
+                } else if (res.result == 7){
+                    row.css("background", "#FFFFCB");
+                    row.html("Redemption has been rejected.");
+                    alert("Invalid! Redemption has been rejected.");
+                } else { // res.result == 2
                     row.css("background", "#FFFFCB");
                     row.html("Customer does not have enough punches!");
-                    alert("Customer does not have enough punches!");
+                    alert("Invalid! Customer does not have enough punches!");
                 }
                 row.fadeOut(2000, function(){
                     // no longer necessary to append to past redemptions since
@@ -99,7 +102,7 @@ function onRedeem(rowId, action){
                     
                 });
             } else {
-                alert("Redemption failed");
+                alert("Redeem failed");
             }
         },
         error: function(res){

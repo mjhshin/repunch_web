@@ -180,9 +180,10 @@ def punch(request):
 @access_required(http_response={"error":"permission_denied"})
 def redeem(request):
     """ returns json object. result is 0 if fail, 1 if success,
-    2 if insufficient, 3 if already validated, 
-    4 if successfully deleted/denied, 5 has been deleted elsewhere,
-    6 PatronStore has been removed.
+    2 if insufficient punches, 3 if already validated, 
+    4 if successfully deleted/denied, 5 has been deleted elsewhere and
+    action is deny, 6 PatronStore has been removed,
+    7 deleted elsewhere and action is approve.
     """
     if request.method == "GET":        
         # approve or deny
@@ -290,7 +291,10 @@ def redeem(request):
                                 
         elif 'error' in res:
             if res['error'] == "REDEEMREWARD_NOT_FOUND":
-                data["result"] = 5
+                if action == "approve":
+                    data["result"] = 7
+                elif action == "deny":
+                    data["result"] = 5
             elif res['error'] == "REDEEMREWARD_VALIDATED":
                 data["result"] = 3
             elif res['error'] == "PATRONSTORE_REMOVED":
