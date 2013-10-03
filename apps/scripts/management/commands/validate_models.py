@@ -20,7 +20,7 @@ from parse.apps.rewards.models import Punch, RedeemReward
 from parse.apps.stores.models import Store, Settings, Subscription, Invoice
 from parse.apps.patrons.models import Patron, PatronStore, PunchCode, FacebookPost
 
-EMAILS = ("vandolf@repunch.com",)# "mike@repunch.com")
+EMAILS = ("vandolf@repunch.com", "mike@repunch.com")
 
 MODELS = (Account, Employee, Message, MessageStatus, Punch,
     RedeemReward, Store, Settings, Subscription, Invoice,
@@ -32,7 +32,7 @@ class Command(BaseCommand):
     The format is as follows
         { 
             cls.__name__ : {
-                cls.fields_required[1] : (cls.instance, ...)
+                cls.fields_required[1] : (cls.instance, ...), ...
             }, ...
         } 
     """

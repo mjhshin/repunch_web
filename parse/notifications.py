@@ -486,7 +486,7 @@ def send_email_validate_models(abnormalities, emails, connection=None):
     The format of abnormalities is as follows
         { 
             cls.__name__ : {
-                cls.fields_required[1] : (cls.instance, ...)
+                cls.fields_required[1] : (cls.instance, ...), ...
             }, ...
         } 
     """

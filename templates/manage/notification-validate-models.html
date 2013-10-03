@@ -3,13 +3,13 @@
 {% comment %}
 { 
     cls.__name__ : {
-        cls.fields_required[1] : (cls.instance, ...)
+        cls.fields_required[1] : (cls.instance, ...), ...
     }, ...
 } 
 {% endcomment %}
 
 {% block title %}
-Selenium test results.
+Parse Class Validation Results.
 {% endblock %}
 
 {% block title_compliment %}
@@ -20,35 +20,27 @@ Selenium test results.
 
 {% block content %}
 
-{# TESTS #}
-{% for test in tests %}
+{# CHUNK #}
+{% for class_name, fields in abnormalities.iteritems %}
 
 {# TABLE TOP #}
-<div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
-{{ test.section_name }}
+<div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:24px;">
+{{ class_name }}
 </div>
 
 {# END TABLE TOP #}
 <table cellpadding="0" cellspacing="0" 
     style="width:100%;background-color:#eee;display:none;">
     
-{% for part in test.parts %}
-    
+{% for key, values in fields.iteritems %}
 <tr>
 
     {# MINI RESULT BOX #}
-	<td style="width:32px;background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
+	<td style="width:220px;background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
 		<div style="border:1px solid #555;">
-		    <div style="background-color:#555;text-transform:uppercase;color:#fff;font-weight:bold;text-align:center;font-size:9px;line-height:14px;padding:0 4px;">
-                {{ forloop.counter0 }}</div>
-			<div style="background-color:#fff;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
-			    {% if part.success %}
-			    <span style="color:green;">
-			    SUCCESS
-			    {% else %}
+			<div style="background-color:#fff;font-size:12px;font-weight:normal;text-align:center;padding:1px 4px 0 4px;">
 			    <span style="color:red;">
-			    FAIL
-                {% endif %}
+			    {{ key }}
                 </span>
             </div>
 		</div>
@@ -59,22 +51,10 @@ Selenium test results.
 	<td style="vertical-align:top;padding:8px;border-top:1px solid #fff;line-height:120%;">
 		<table cellpadding="0" cellspacing="0" style="width:100%;">
 			<tr>
-				<td style="background-color:#eee;vertical-align:top;padding-right:20px;">
-
-                    {# TEST NAME #}
-                    <div style="padding:0px;">
-                        {{ part.test_name }}     
-					</div>
-                    {# END TEST NAME #}
-                    
-                    {# TEST MESSAGE #}
-                    {% if part.test_message %}
-                    <div style="padding:8px;background:#fdfdd7;">
-                        {{ part.test_message }}     
-					</div>
-					{% endif %}
-                    {# END TEST MESSAGE #}
-
+				<td style="background-color:#fdfdd7;vertical-align:top;padding-right:20px;">
+                    {% for val in values %}
+                    {{ val.objectId }},&nbsp;
+                    {% endfor %}
 				</td>
 
             </tr>
@@ -83,11 +63,25 @@ Selenium test results.
     {# END INNER TABLE #}
     
 </tr>
+{% empty %}
+<tr>
+    {# MINI RESULT BOX #}
+	<td style="background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
+		<div style="border:2px solid #555;">
+			<div style="background-color:green;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
+			    <span style="color:white;">
+			    CLEAN
+                </span>
+            </div>
+		</div>
+    </td>
+    {# END MINI RESULT BOX #}
+</tr>
 {% endfor %}
 
 </table><br/>
 
 {% endfor %}
-{# END TESTS #}
+{# END CHUNK #}
 
 {% endblock %}
