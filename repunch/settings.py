@@ -1,15 +1,16 @@
 import os
 
-# Production server should always have DEBUG = False and 
-# PRODUCTION_SERVER = True
+# Production server should always have
+# PRODUCTION_SERVER = True and DEBUG = False
 
 # Set this to True to DISABLE Django user authentication
 PRODUCTION_SERVER = False
-DEVELOPMENT_TOKEN = "dev_token"
 
 # SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+DEVELOPMENT_TOKEN = "dev_token"
 
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
