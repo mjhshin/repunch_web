@@ -73,8 +73,9 @@ def login(request, requestDict, no_recaptcha=False):
             return 4
     
     # note that email is the same as username
-    res = account_login(requestDict.get('username'),
-        requestDict.get('password'))
+    # email needs to be stripped and lowered
+    res = account_login(requestDict['username'].strip().lower(),
+        requestDict['password'])
                     
     if res and "error" not in res:
         # correct login credentials - remove recaptcha token if exist
