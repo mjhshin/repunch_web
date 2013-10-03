@@ -34,9 +34,9 @@ function punchit(url){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
             "<div><span>Punch Codes are 5 characters long.</span></div></div>");
         cont = false;
-    } else if (!pa.val().length>0){
+    } else if (!isNumber(pa.val()) || pa.val().length==0){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
-            "<div><span>Please enter the amount of punches to give.</span></div></div>");
+            "<div><span>Please enter the number of punches to give.</span></div></div>");
         cont = false;
     } else if (!(new Number(pa.val())>0)){
         $("#punch-form").append("<div id='punch-notification' class='notification hide'>"+
