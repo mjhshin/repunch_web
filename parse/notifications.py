@@ -238,7 +238,7 @@ def send_email_receipt_ipod(account, subscription, invoice,
         store = account.get("store")
         timezone.activate(pytz.timezone(store.store_timezone))
         # for account
-        subject = "Repunch Inc. transaction invoice."
+        subject = "Repunch Inc. Transaction Invoice."
         ctx = get_notification_ctx()
         ctx.update({
                 'store': store,

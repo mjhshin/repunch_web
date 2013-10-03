@@ -21,7 +21,7 @@ This is an invoice for your recent purchase of {{ amount }} iPod Touch{% if amou
 {% endif %}
 
 <p style="">
-<span style="color:#545454;font-weight:bold;">Merchandise:</span> iPod Touch{% if amount > 1 %}s{% endif %}<br/>
+<span style="color:#545454;font-weight:bold;">Merchandise:</span> iPod Touch<br/>
 <span style="color:#545454;font-weight:bold;">Quantity:</span> {{ amount }}<br/>
 <span style="color:#545454;font-weight:bold;">Total (USD):</span> ${{ invoice.total }}<br/><br/>
 
@@ -31,7 +31,7 @@ This is an invoice for your recent purchase of {{ amount }} iPod Touch{% if amou
 {% endif %}
 </p>
 {% if not for_customer %}
-<strong>ACCOUNT INFO</strong>
+<span style="color:#545454;font-weight:bold;">ACCOUNT INFO</span>
 <ul>
     <li><span style="color:#545454;font-weight:bold;">Business name:</span>
     {{ store|get:"store_name" }}
@@ -60,7 +60,7 @@ This is an invoice for your recent purchase of {{ amount }} iPod Touch{% if amou
     {% endfor %}
     </li>
 </ul>
-<strong>PAYPAL INVOICE</strong>
+<span style="color:#545454;font-weight:bold;">PAYPAL INVOICE</span>
 {{ invoice.as_ul|safe }}
 <br/>
 {% endif %}

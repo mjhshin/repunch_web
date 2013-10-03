@@ -13,7 +13,7 @@ You have been charged ${{ invoice.total }} for your membership with Repunch.
 {% if for_admin %}
 <p><span style="color:#545454;font-weight:bold;">Billing period:</span> {{ date_30_ago|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}</p>
 
-<strong>ACCOUNT INFO</strong>
+<span style="color:#545454;font-weight:bold;">ACCOUNT INFO</span>
 <ul>
     <li><span style="color:#545454;font-weight:bold;">Business name:</span>
     {{ store.store_name }}
@@ -42,7 +42,7 @@ You have been charged ${{ invoice.total }} for your membership with Repunch.
     {% endfor %}
     </li>
 </ul>
-<strong>PAYPAL INVOICE</strong>
+<span style="color:#545454;font-weight:bold;">PAYPAL INVOICE</span>
 {{ invoice.as_ul|safe }}
 <br/>
 

@@ -87,6 +87,7 @@ def login(request, requestDict, no_recaptcha=False):
         
         # If the Account has both a Store and Employee object,
         # log the user in as the Store owner - not employee
+        store = None
         if account.Store:
             store = account.store
             account_type = "store"
