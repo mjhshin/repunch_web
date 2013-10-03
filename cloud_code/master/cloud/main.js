@@ -277,7 +277,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 ////////////////////////////////////////////////////
 //
 //  Creates an employee and sets it to the given Parse.User.
-//  EMPLOYEE_EXIST error if the given Parse.User already has an employee pointer.
+//  EMPLOYEE_EXIST error if the given Parse.User already has an employee pointer
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("link_employee", function(request, response) {  
