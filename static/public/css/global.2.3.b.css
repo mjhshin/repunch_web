@@ -1080,7 +1080,6 @@ float: right;
 #associated-account-form {
     margin-top: 10px;
     margin-left : auto; margin-right : auto;
-	background:yellow;
 }
 
 #associated-account-form input {
@@ -1093,7 +1092,6 @@ float: right;
 #associated-account-form input[type=submit] {
     font-weight:bold;
     width: 120px;
-    background: green;
     margin-left : auto; margin-right : auto;
 }
 
