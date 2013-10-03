@@ -526,6 +526,12 @@ $(document).ready(function(){
                     // remove the rows
                     for (var i=0; i< redemps.length; i++){
                         var row = $("#" + redemps[i].objectId);
+                        
+                        // don't touch rows that are already fading out.
+                        if (row.is(":animated")) {
+                            continue;
+                        }
+                        
                         // row.css("background", "#FFFFCB");
                         row.css("background", "#CCFF99");
                         if (type == "approved") {
