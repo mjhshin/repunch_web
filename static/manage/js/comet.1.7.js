@@ -528,7 +528,7 @@ $(document).ready(function(){
                         var row = $("#" + redemps[i].objectId);
                         
                         // don't touch rows that are already fading out.
-                        if (row.is(":animated")) {
+                        if ($("#" + redemps[i].objectId + " .redemption_title").length == 0) {
                             continue;
                         }
                         
