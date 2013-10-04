@@ -1228,9 +1228,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	var storeId = request.params.store_id;
 	
 	// optional - if validated by an employee
-	// note that calls from the dashboard will not supply this value even if an employee is logged in
-	// this (at the moment) is only involved in Push notifications.
-	var employeeId = request.params.employee_id;
+	var installationId = request.params.installation_id;
 	
 	var Store = Parse.Object.extend("Store");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -1288,15 +1286,12 @@ Parse.Cloud.define("reject_redeem", function(request, response)
             var promises = [];
             
 		    var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
-		    var storeEmployeeQuery = store.relation("Employees").query();
-		
-		    // If an employee validates the redeem, then that employee will not receive a push
-		    if (employeeId != null) {
-		        storeEmployeeQuery.notEqualTo("objectId", employeeId);
-		    }
-		
+		    
 		    iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
-		    iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
+		    iosEmployeeInstallationQuery.equalTo("store_id", storeId);
+		    if (installationId != null) {
+		        iosEmployeeInstallationQuery.notEqualTo("objectId", installationId);
+		    }
 		    
 		    promises.push( Parse.Push.send({
 	            where: iosEmployeeInstallationQuery,
@@ -1375,9 +1370,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	var rewardId = request.params.reward_id;
 	
 	// optional - if validated by an employee
-	// note that calls from the dashboard will not supply this value even if an employee is logged in
-	// this (at the moment) is only involved in Push notifications.
-	var employeeId = request.params.employee_id;
+	var installationId = request.params.installation_id;
 	
 	var isOfferOrGift = (rewardId == null);
 	
@@ -1502,21 +1495,17 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
-		
-		var storeEmployeeQuery = store.relation("Employees").query();
 
 		androidInstallationQuery.equalTo("deviceType", "android");
 		androidInstallationQuery.equalTo("patron_id", patronId);
 		iosPatronInstallationQuery.equalTo("deviceType", "ios");
 		iosPatronInstallationQuery.equalTo("patron_id", patronId);
 		
-		// If an employee validates the redeem, then that employee will not receive a push
-		if (employeeId != null) {
-		    storeEmployeeQuery.notEqualTo("objectId", employeeId);
-		}
-		
 		iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
-		iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
+		iosEmployeeInstallationQuery.equalTo("store_id", storeId);
+		if (installationId != null) {
+		    iosEmployeeInstallationQuery.notEqualTo("objectId", installationId);
+		}
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
@@ -1570,20 +1559,16 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
 		
-		var storeEmployeeQuery = store.relation("Employees").query();
-
 		androidInstallationQuery.equalTo("patron_id", patronId);
 		androidInstallationQuery.equalTo("deviceType", "android");
 		iosPatronInstallationQuery.equalTo("patron_id", patronId);
 		iosPatronInstallationQuery.equalTo("deviceType", "ios");
 		
-		// If an employee validates the redeem, then that employee will not receive a push
-		if (employeeId != null) {
-		    storeEmployeeQuery.notEqualTo("objectId", employeeId);
-		}
-		
 		iosEmployeeInstallationQuery.equalTo("deviceType", "ios");
-		iosEmployeeInstallationQuery.matchesKeyInQuery("employee_id", "objectId", storeEmployeeQuery);
+		iosEmployeeInstallationQuery.equalTo("store_id", storeId);
+		if (installationId != null) {
+		    iosEmployeeInstallationQuery.notEqualTo("objectId", installationId);
+		}
 		
 		var promises = [];
 		promises.push( Parse.Push.send({
