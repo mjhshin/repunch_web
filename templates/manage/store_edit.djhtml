@@ -38,7 +38,7 @@
 	            <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% else %}
 	            <a href="{% url 'store_avatar' %}" id="upload-avatar">
-	            <img src="{% static "manage/images/store_avatar_placeholder.1.0.png" %}"" alt="" id="store_avatar"
+	            <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" id="store_avatar"
 	                class="avatar-big" width="200px" height="200px"/>
 	            </a>
             {% endif %}
