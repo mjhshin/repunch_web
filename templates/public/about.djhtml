@@ -24,7 +24,7 @@
 		<div id="about-content">
 			<aside class="col1">
 				<h3 class="content-header">Repunch is changing the nature of consumer loyalty.</h3>
-				<h4 class="content-header"> More broadly, we are altering the way businesses and their customers interact.<br/>We'll be on our way to achieving our goal when you know your Punch Code better than your birthday <br/>(or at least as well as your brother's birthday)!</h4>
+				<h4 class="content-header">More broadly, we are altering the way businesses and their customers interact. Repunch users are rewarded for their loyal patronage and retailers better understand who these consumers actually are. Repunch ensures that useful communication flows easily between stores and their customers as people stay in tune with their local establishments like never before. Join us and start punching today!</h4>
 				<img id="team-photo" src="{% static "public/images/team-photo.1.1.png" %}" alt="">
 			</aside>
 			<aside class="col2">
