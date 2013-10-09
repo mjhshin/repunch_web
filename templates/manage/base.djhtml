@@ -13,7 +13,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Repunch | {% block title %}{% endblock %}</title>
-	<link rel="shortcut icon" href="{% static 'public/images/favicon.2.0.png' %}" />
+	<link rel="shortcut icon" href="{% static 'public/images/favicon.2.1.png' %}" />
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	
 	<link href="{% static 'manage/css/global.2.0.css' %}" rel="stylesheet" />
