@@ -2,7 +2,6 @@
 Contains functions used for comet connections.
 """
 from django.contrib.auth import SESSION_KEY
-from django.utils import timezone
 from django.contrib.sessions.backends.cache import SessionStore
 import pytz
 
@@ -227,7 +226,7 @@ def comet_receive(store_id, postDict):
                 if redem.objectId == redemp.objectId:
                     r = redemptions_pending.pop(i)
                     r.is_redeemed = True
-                    r.updatedAt = timezone.now()
+                    r.updatedAt = redemp.updatedAt
                     redemptions_past.insert(0, r)
                     break
             # if not then check if it is in the history already

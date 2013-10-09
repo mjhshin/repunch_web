@@ -11,6 +11,7 @@ import json
 from libs.dateutil.relativedelta import relativedelta
 from parse.utils import cloud_call
 from parse.comet import comet_receive
+from parse.apps.rewards.models import RedeemReward
 from parse.decorators import access_required
 from parse.auth.decorators import login_required, dev_login_required
 from parse import session as SESSION
@@ -222,6 +223,8 @@ def redeem(request):
             i_remove = -1
             if action == "approve":
                 result = res.get("result").get("code")
+                result_red =\
+                    RedeemReward(**res.get("result").get("result"))
             else:
                 result = res.get("result")
                 
@@ -240,6 +243,7 @@ def redeem(request):
                 if result and result in ("insufficient",
                     "PATRONSTORE_REMOVED") and i_remove != -1:
                     del_red = redemptions_pending.pop(i_remove)
+                    del_red.updatedAt = result_red.updatedAt 
                     # notify other dashboards of this change
                     store_id =\
                         SESSION.get_store(session).objectId
@@ -251,7 +255,7 @@ def redeem(request):
                 elif i_remove != -1: # success
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True
-                    redemption.updatedAt = timezone.now()
+                    redemption.updatedAt = result_red.updatedAt 
                     redemptions_past.append(redemption)
                     session['redemptions_past'] =\
                         redemptions_past
