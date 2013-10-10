@@ -1439,6 +1439,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		} else if(patronStore == null) {
 		    redeemReward.destroy().then(function() {
 		        response.success({ code:"PATRONSTORE_REMOVED", result: null});
+		        postToServerDeleted(redeemReward);
 		    });
 		
 		} else if(patronStore.get("punch_count") < numPunches) {
@@ -1449,6 +1450,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			    console.log("PatronStore save success");
 			    
 			    redeemReward.destroy().then(function() {
+			        postToServerDeleted(redeemReward);
 				    response.success({ code:"insufficient", result: redeemReward });
 			    });
 			    
@@ -1677,6 +1679,16 @@ Parse.Cloud.define("validate_redeem", function(request, response)
             url: "<<COMET_RECEIVE_URL>>" + storeId,
             headers: { "Content-Type": "application/json"},
             body: postBody
+        });
+	}
+	
+	function postToServerDeleted(redeemReward)
+	{
+	    Parse.Cloud.httpRequest({
+            method: "POST",
+            url: "<<COMET_RECEIVE_URL>>" + storeId,
+            headers: { "Content-Type": "application/json"},
+            body: { deletedRedemption: redeemReward }
         });
 	}
 	
