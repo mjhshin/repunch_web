@@ -1688,7 +1688,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
             method: "POST",
             url: "<<COMET_RECEIVE_URL>>" + storeId,
             headers: { "Content-Type": "application/json"},
-            body: { deletedRedemption: redeemReward }
+            body: { 
+                "cometrkey": "<<COMET_RECEIVE_KEY>>",
+                deletedRedemption: redeemReward
+            }
         });
 	}
 	

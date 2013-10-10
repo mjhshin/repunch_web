@@ -1688,7 +1688,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
             method: "POST",
             url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
             headers: { "Content-Type": "application/json"},
-            body: { deletedRedemption: redeemReward }
+            body: { 
+                "cometrkey": "384ncocoacxpvgrwecwy",
+                deletedRedemption: redeemReward
+            }
         });
 	}
 	
