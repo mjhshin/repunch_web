@@ -20,9 +20,7 @@ import sys
 # if running multiple sites in the same mod_wsgi process. To fix this, use
 # mod_wsgi daemon mode with each site in its own daemon process, or use
 # os.environ["DJANGO_SETTINGS_MODULE"] = "repunch.settings"
-sys.path.append('/home/ubuntu/Repunch')
 sys.path.append('/home/ubuntu/Repunch/repunch_web')
-sys.path.append('/home/ubuntu/Repunch/repunch_web/repunch')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "repunch.settings")
 
 # This application object is used by any WSGI server configured to use this
