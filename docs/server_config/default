@@ -1,7 +1,8 @@
 <VirtualHost *:80>
         ServerAdmin ubuntu@ec2-23-20-15-30.compute-1.amazonaws.com
         ServerName ec2-23-20-15-30.compute-1.amazonaws.com
-        DocumentRoot /home/ubuntu/Repunch/repunch_web/
+        # Django overrides the DocumentRoot so this is actually unused
+        DocumentRoot /var/www/repunch
 
         Alias  /static/  /home/ubuntu/Repunch/repunch_web/static/
         <Directory /home/ubuntu/Repunch/repunch_web/static>
