@@ -480,7 +480,8 @@ def send_email_selenium_test_results(tests, connection=None):
         Thread(target=_wrapper).start()
     
     
-def send_email_validate_models(abnormalities, emails, connection=None):
+def send_email_validate_models(status, abnormalities, emails,
+    connection=None):
     """
     Used by validate models management command.
     The format of abnormalities is as follows
@@ -497,7 +498,10 @@ def send_email_validate_models(abnormalities, emails, connection=None):
             template = Template(f.read())
             
         date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
-        subject = "Repunch Inc. Abnormal Parse Rows."
+        if status:
+            subject = "Repunch Inc. Abnormal Parse Rows. PASS"
+        else:
+            subject = "Repunch Inc. Abnormal Parse Rows. FAIL"
         ctx = get_notification_ctx()
         ctx.update({'date':date, 'abnormalities':abnormalities})
         timezone.activate(pytz.timezone(TIME_ZONE))

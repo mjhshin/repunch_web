@@ -43,6 +43,7 @@ class Command(BaseCommand):
         """
         super(Command, self).__init__(*args, **kwargs)
         self.abnormalities = { m.__name__:{} for m in MODELS }
+        self.status = True # True if no abnormalitites
 
     def handle(self, *args, **options):
         # Loop through all of the models in MODELS
@@ -59,7 +60,7 @@ class Command(BaseCommand):
                 self.process_field(model_class, field)
                 
         # send the results
-        send_email_validate_models(self.abnormalities, EMAILS)
+        send_email_validate_models(self.status, self.abnormalities, EMAILS)
     
     def process_field(self, model_class, field):
         """
@@ -75,6 +76,7 @@ class Command(BaseCommand):
             
     def add_to_abnormalities(self, model_class, field, field_abs):
         if len(field_abs) > 0:
+            self.status = False
             self.abnormalities[model_class.__name__][field] =\
                 tuple(field_abs)
             
