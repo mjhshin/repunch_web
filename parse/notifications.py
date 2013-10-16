@@ -499,9 +499,9 @@ def send_email_validate_models(status, abnormalities, emails,
             
         date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
         if status:
-            subject = "Repunch Inc. Abnormal Parse Rows. PASS"
+            subject = "[PASS] Repunch Inc. Abnormal Parse Rows."
         else:
-            subject = "Repunch Inc. Abnormal Parse Rows. FAIL"
+            subject = "[FAIL] Repunch Inc. Abnormal Parse Rows."
         ctx = get_notification_ctx()
         ctx.update({'date':date, 'abnormalities':abnormalities})
         timezone.activate(pytz.timezone(TIME_ZONE))
