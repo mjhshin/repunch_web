@@ -22,7 +22,7 @@
 		</div>
 		{% endif %}
 	
-		<h2>{{ is_new|yesno:"Add New,Edit" }} Reward</h2>
+		<h2>{{ is_new|yesno:"Create New,Edit" }} Reward</h2>
 		
 		<div class="input-container" id="reward_name_ic">
 			{{ form.reward_name.errors }}

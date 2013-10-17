@@ -2,8 +2,9 @@
 ####################  TODO: 
 
 * ASAP *
+    - Write Register Employee page
     - Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
-        + fix redemptions.js
+        * in redemptions.js
    
 
 1. Fix all broken tests.
@@ -12,4 +13,3 @@
    - everything else
 
 2. spaces are now allowed for passwords - so fix broken tests for signup
-3. write tests for only store owner can view/modify email field in edit store details

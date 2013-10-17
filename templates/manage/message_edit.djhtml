@@ -74,7 +74,7 @@ $(document).ready(function(){
 			{% endif %}
 		{% endif %}
 		
-		<h2>Send New Message</h2>
+		<h2>Create New Message</h2>
 		    
 		<label for="id_filter">Send to </label>
         <select id="filter" name="filter">
