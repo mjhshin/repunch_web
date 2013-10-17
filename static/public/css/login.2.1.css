@@ -1,11 +1,5 @@
 
 /** login dialog styles **/
-.input-text-error {
-    outline: none;
-    border-color: #dd4b39;
-    box-shadow: 0 0 10px #dd4b39;
-}
-
 #dialog-login {
 	background: url("../images/bkg_content.png") repeat scroll left top white;
 }
@@ -13,21 +7,6 @@
 #dialog-login form {
     padding:10px;
     padding-top:2px;
-}
-
-.ui-widget-header.ui-dialog-titlebar {
-	color: #0965ad; 
-    border-bottom: 1px solid #CCCCCC;
-    height: 25px;
-	font: bold 18px/25px 'Cabin', sans-serif;
-    padding: 0 15px;
-    
-    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
-    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
-    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
 }
 
 #dialog-login-form p{ margin: 0px 0px 10px 0px; }

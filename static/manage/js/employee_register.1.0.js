@@ -14,12 +14,9 @@ $(document).ready(function(){
     var associatedAccountAttempts = 0;
     var messageContainer = $("#dialog-signup-message");
     
-    $("#signup-form-submit").click(function(){
+    $("#register-employee-submit").click(function(){
         // make sure that this has default message
         messageContainer.html("Processing your information.<br/>Please wait.");
-        // update the phone number's value
-        $("#id_phone_number").val(new String($("#Ph1").val()) + 
-            new String($("#Ph2").val()) + new String($("#Ph3").val()));
             
         // open the dialog with the loading message
         dl_signup.dialog( "open" );
@@ -28,22 +25,10 @@ $(document).ready(function(){
         $("#signing-up").show();
         
         // make the ajax call
-        var url = $("#signup-form input[name=action]").val();
-        var url_redirect = $("#signup-form input[name=redirect-url]").val();
-        var url_home = $("#signup-form input[name=home-url]").val();
-        
-        // need to enable again to serialize
-        $("#id_address").attr("disabled", false);
-        $("#id_city2").attr("disabled", false);
-        $("#id_state2").attr("disabled", false);
-        $("#id_zip2").attr("disabled", false);
-        // format the cats first
-        var cats = '';
-        $(".closable-box").each(function(){
-            cats = cats + $(this).text() + '|';
-        });
-        $( "#categories" ).val(cats);
-        var data = $("#signup-form").serialize();
+        var url = $("#employee-register-form input[name=action]").val();
+        var url_redirect = $("#employee-register-form input[name=redirect-url]").val();
+        var url_home = $("#employee-register-form input[name=home-url]").val();
+        var data = $("#employee-register-form").serialize();
         
         function executeSignUp(res, status, xhr) {
             $("#signing-up").hide();
@@ -109,14 +94,14 @@ $(document).ready(function(){
                             $.post(aaf_url, aaf_data, function(aaf_res, aaf_status, aaf_xhr) {
                                 if (aaf_res.code == 0) { // SUCCESS
                                     // set the nonce and account_id and resubmit the signup form
-                                    $("#signup-form input[name=aaf-nonce]").val(res.associated_account_nonce);
-                                    $("#signup-form input[name=aaf-account_id]").val(res.associated_account);
+                                    $("#employee-register-form input[name=aaf-nonce]").val(res.associated_account_nonce);
+                                    $("#employee-register-form input[name=aaf-account_id]").val(res.associated_account);
                                     
                                     // prepare the dialog
                                     messageContainer.css({ width: "220px"});
                                     dl_signup.dialog({
                                         beforeClose: function(event, ui) { return false; }, 
-                                        title: "Signing Up",
+                                        title: "Registering",
                                         minWidth: 350, maxWidth: 350,
                                         minHeight: 140, maxHeight: 140,
                                     });
@@ -125,7 +110,7 @@ $(document).ready(function(){
                                     dl_signup.dialog( "option", "width", 350 );
                                     dl_signup.dialog( "option", "height", 140 );
     
-                                    $("#signup-form-submit").click();
+                                    $("#register-employee-submit").click();
                                 } else if (aaf_res.code == 1) { // INVALID
                                     if (associatedAccountAttempts < 2) {
                                         dl_signup.dialog({minHeight: 310, maxHeight: 310,});
@@ -138,8 +123,7 @@ $(document).ready(function(){
                                     } else {
                                         dl_signup.on( "dialogclose", function( event, ui ) {
                                             window.location.replace(url_home);
-                                            } 
-                                        );
+                                        });
                                         dl_signup.dialog({minHeight: 320, maxHeight: 320,});
                                         dl_signup.dialog( "option", "height", 320 );
                                         
@@ -194,9 +178,9 @@ $(document).ready(function(){
                     aaf_submit.click(submitAAF);
                                     
                                     
-                } else if (res.code == 2){ // subscription not active. Tell them.
+                } else if (res.code == 2){ // Success
                     dl_signup.dialog({ 
-                        title: "Sign Up Complete", 
+                        title: "Register Complete", 
                         minWidth: 360, maxWidth: 360, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
@@ -204,13 +188,13 @@ $(document).ready(function(){
                         }
                     });
                     // adjust the height + title
-                    dl_signup.dialog( "option", "title", "Sign Up Complete");
+                    dl_signup.dialog( "option", "title", "Register Complete");
                     dl_signup.dialog( "option", "width", 360 );
                     
-                    $("#signing-up-time").show();
+                    // $("#signing-up-time").show();
                     messageContainer.css("width", "250px");
                     messageContainer.html("<span style='color:#DF7401;'>"+
-                        "Your store is not yet active.<br/>We will get in touch with you soon.</span>");
+                        "You are now an employee.<br/>Congratulations.</span>");
                         
                 } else if (res.code == 3){ // active subscription. redirect to dashboard.
                     messageContainer.html("<span style='color:green;'>Success! Welcome to Repunch.</span>");
@@ -221,7 +205,7 @@ $(document).ready(function(){
             
         };
         
-        // signup!
+        // register!
         $.post(url, data, executeSignUp).fail(function(){  // should not go here unless server error
             messageContainer.html("<span>Server Error</span>");
         });

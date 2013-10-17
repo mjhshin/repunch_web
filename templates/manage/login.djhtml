@@ -6,7 +6,8 @@
 	
 	<!-- include page specific css -->
 	<link href="{% static 'manage/css/global.2.0.css' %}" rel="stylesheet" />
-	<link href="{% static 'manage/css/login.2.1.css' %}" rel="stylesheet" />   
+	<link href="{% static 'manage/css/login.2.1.css' %}" rel="stylesheet" />  
+	<link href="{% static 'public/css/jquery-ui-repunch.css' %}" rel="stylesheet" /> 
 	
 	<style>
 	div#header { margin-top: 20px; margin-left:auto; margin-right:auto;}

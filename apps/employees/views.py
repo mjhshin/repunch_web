@@ -385,6 +385,8 @@ def register(request):
     This automatically sets this employee to approved.
     """
     data = {'employees_nav': True}
+    from time import sleep
+    sleep(5)
     if request.method == "POST":
         from_associated_account = False
         # check if this post is from the associated account dialog
@@ -399,7 +401,7 @@ def register(request):
                 from_associated_account = True
         
         account_form = AccountSignUpForm(request.POST)
-        employee_form = AccountSignUpForm(request.POST)
+        employee_form = EmployeeForm(request.POST)
         
         if not from_associated_account:
             all_forms_valid = account_form.is_valid() and\

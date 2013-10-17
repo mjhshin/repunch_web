@@ -6,6 +6,8 @@
 {% block title %}Register New Employee{% endblock %}
 
 {% block styles %}
+<link href="{% static 'public/css/dialog-signup.1.0.css' %}" rel="stylesheet" />
+<link href="{% static 'public/css/jquery-ui-repunch.css' %}" rel="stylesheet" />
 <style>
 h2 { margin-bottom: 16px; }
 .form-options { position: relative; top: 16px; }
@@ -15,31 +17,19 @@ h2 { margin-bottom: 16px; }
 {% endblock %}
 
 {% block javascript %}
-<link href="{% static 'public/css/dialog-signup.1.0.css' %}" rel="stylesheet" />
-<script>
-$(document).ready(function(){
-	$('#register-employee-submit').click(function(){
-        if ($("#employee-registering").css("display") != "none"){
-            return false;
-        }
-        $("#employee-registering").show();
-
-        $('#employee-register-form').submit(); 
-        return false;
-    }); 
-});
-</script>
+<script src="{% static 'manage/js/employee_register.1.0.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
-	
-	<form action="{% url 'employee_register' %}" method="POST" id="employee-register-form">
-	    {% csrf_token %}
-		{% if error or success %}
-		<div class="notification {% if success %}success{% endif %} hide">
-			<div>{{ error }}{{ success }}</div>
-		</div>
-		{% endif %}
+	<form method="POST" id="employee-register-form">{% csrf_token %}
+	    
+        <input type="hidden" name="action" value="{% url 'employee_register' %}" />
+        <input type="hidden" name="redirect-url" value="{% url 'employees_index' %}" />
+        <input type="hidden" name="home-url" value="{% url 'employees_index' %}" />
+        
+        {# used to flag signup view that there is an existing account already #}
+        <input type="hidden" name="aaf-nonce" value="" />
+        <input type="hidden" name="aaf-account_id" value="" />
 	
 		<h2>Register New Employee</h2>
 		
@@ -94,13 +84,12 @@ $(document).ready(function(){
 		    {% endif %}>
 			{{ employee_form.last_name.errors }}
 			<label for="id_last_name">Last Name</label>
-			{{ employee_formr.last_name }}
+			{{ employee_form.last_name }}
 		</div>
 		
 		<div id="register-employee-options" class="form-options">
 			<a class="button blue" id="register-employee-submit">Register Employee</a>
 			<a href="{% url 'employees_index' %}" class="red">Cancel</a>
-			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="employee-registering" />
 		</div>
 		
 	</form>

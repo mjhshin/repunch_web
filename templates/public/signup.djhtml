@@ -193,9 +193,6 @@ function validate(which, next) {
 				    <label for="id_confirm_password">Confirm Password</label>
 				    {{ account_form.confirm_password }}					
 				    <div class="clear-both"></div>		            
-	                
-			        {# currently only supports countries in the US #}
-				    <input type="hidden" name="country" id="id_country" value="US" />
 				
 				    <div style="clear: left;"></div>
 		            {% if place_order_amount_error %}
