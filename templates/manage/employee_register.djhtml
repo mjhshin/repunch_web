@@ -13,7 +13,9 @@ h2 { margin-bottom: 16px; }
 .col2 { margin-left: 20px; }
 </style>
 {% endblock %}
+
 {% block javascript %}
+<link href="{% static 'public/css/dialog-signup.1.0.css' %}" rel="stylesheet" />
 <script>
 $(document).ready(function(){
 	$('#register-employee-submit').click(function(){

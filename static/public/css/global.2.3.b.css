@@ -1040,7 +1040,7 @@ float: right;
 
 #signup-form select,
 #signup-form textarea,
-#signup-form input, #associated-account-form input {
+#signup-form input {
 	width:243px;
 	height:28px;
 	color:#646464;
@@ -1054,73 +1054,6 @@ float: right;
 	-ms-border-radius:5px;
 	-moz-border-radius:5px;
 	-webkit-border-radius:5px;
-}
-
-#dialog-signup {
-    display:none;
-}
-
-#dialog-signup-message {
-    display:inline-block;
-    width:220px;
-    margin: 16px;
-    text-align:center;
-}
-
-#signing-up {
-    margin-left:8px;margin-right:6px;
-    display:inline-block;
-}
-
-#signing-up-time {
-    width: 20px;height: 20px;
-    margin-bottom: 3px;
-}
-
-#associated-account-form {
-    margin-top: 10px;
-    margin-left : auto; margin-right : auto;
-}
-
-#associated-account-form input {
-    margin-top: 10px;
-    width: 354px;
-	margin-bottom:0px;
-	text-align: center;
-}
-
-#associated-account-form input[type=submit] {
-    font-weight:bold;
-    width: 120px;
-    margin-left : auto; margin-right : auto;
-}
-
-
-#associated-account-form input[type=submit].active {
-    background-color: #4c8ffb; color: white;
-    border:1px solid #3079ed;
-}
-
-#associated-account-form input[type=submit].active:hover{
-    background-color: #427edd;
-}
-
-#associated-account-message {
-    text-align: center;
-    margin-top: 8px;
-    width: 100%; 
-}
-
-#aa-forgot-pass-form {
-    width:100%;
-    text-align: center;
-    margin-top: 8px;
-}
-
-#aa-forgot-pass-form span a {
-    display:none;
-    color:#0965ad;
-    text-decoration: underline;
 }
 
 #signup-form label#same_address_span{
