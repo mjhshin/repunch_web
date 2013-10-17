@@ -12,7 +12,6 @@ ACCESS_NONE
 ACL_CHOICES = (
     (ACCESS_ADMIN[0], "Full Admin Access"),
     (ACCESS_PUNCHREDEEM[0], "Allow Punch/Redeem"),
-    (ACCESS_NONE[0], "No Access"), 
 )
 
 class EmployeeForm(forms.Form):
