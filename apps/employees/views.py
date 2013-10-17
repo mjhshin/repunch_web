@@ -386,11 +386,53 @@ def register(request):
     """
     data = {'employees_nav': True}
     if request.method == "POST":
-        pass
+        from_associated_account = False
+        # check if this post is from the associated account dialog
+        # if it is then skip form validations
+        aaf_nonce_id = request.POST.get('aaf-nonce')
+        aaf_account_id = request.POST.get('aaf-account_id')
+        if len(aaf_nonce_id) > 0 and len(aaf_account_id) > 0:
+            aa_nonce = AssociatedAccountNonce.objects.filter(\
+                id=aaf_nonce_id, account_id=aaf_account_id)
+            if len(aa_nonce) > 0 and aa_nonce[0].verified:
+                aa_nonce[0].delete()
+                from_associated_account = True
+        
+        account_form = AccountSignUpForm(request.POST)
+        employee_form = AccountSignUpForm(request.POST)
+        
+        if not from_associated_account:
+            all_forms_valid = account_form.is_valid() and\
+                employee_form.is_valid()
+        else:
+            all_forms_valid = True
+            
+        if all_forms_valid:
+            postDict = request.POST.dict()
+            # check if email already taken here to handle the case where 
+            # the user already has a patron/employee account 
+            # but also want to sign up for a Store account
+            if hasattr(account_form, "associated_account"):
+                aa = account_form.associated_account
+                aan = AssociatedAccountNonce.objects.create(\
+                    account_id=aa.objectId)
+                return HttpResponse(json.dumps({"associated_account":\
+                    aa.objectId, "associated_account_nonce":aan.id,
+                    "email": aa.email, "code": 0}), 
+                    content_type="application/json")
+                  
+                  
+            
+        return HttpResponse(json.dumps(data), 
+                    content_type="application/json") 
+                
     else:
-        data["employee_form"] = EmployeeForm(initial={"acl":\
+        employee_form = EmployeeForm(initial={"acl":\
             ACCESS_PUNCHREDEEM[0]})
-        data["account_form"] = AccountSignUpForm()
+        account_form = AccountSignUpForm()
+        
+    data["employee_form"] = employee_form
+    data["account_form"] = account_form
         
     return render(request, 'manage/employee_register.djhtml', data)    
     

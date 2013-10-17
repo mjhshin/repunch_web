@@ -143,5 +143,8 @@
 	<div id="footer">
 		<img src="{% static "manage/images/logo_footer.png" %}" alt="Repunch" id="logo-footer" />
 	</div>
+	
+	{% block dialogs %}{% endblock %}
+	
 </body>
 </html>
