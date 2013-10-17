@@ -7,7 +7,6 @@
 
 {% block styles %}
 <link href="{% static 'public/css/dialog-signup.1.0.css' %}" rel="stylesheet" />
-<link href="{% static 'public/css/jquery-ui-repunch.css' %}" rel="stylesheet" />
 <style>
 h2 { margin-bottom: 16px; }
 .form-options { position: relative; top: 16px; }
@@ -101,7 +100,8 @@ h2 { margin-bottom: 16px; }
     <div id="dialog-signup-message" >
     Processing your information.<br/>Please wait.
     </div>
-    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="signing-up" />
+    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="signing-up" 
+        style="position:relative; right: 0px;" />
     <img src="{% static 'public/images/icon_clock-orange-2.png' %}" id="signing-up-time"/>
 </div>
 

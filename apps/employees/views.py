@@ -385,9 +385,9 @@ def register(request):
     This automatically sets this employee to approved.
     """
     data = {'employees_nav': True}
-    from time import sleep
-    sleep(5)
     if request.method == "POST":
+        from time import sleep
+        sleep(3)
         from_associated_account = False
         # check if this post is from the associated account dialog
         # if it is then skip form validations

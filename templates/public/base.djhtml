@@ -10,7 +10,6 @@
 	    
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	
-	<!-- include page specific css -->
 	<link href="{% static 'public/css/normalize.min.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/global.2.3.b.css' %}" rel="stylesheet" />
 	<link href="{% static 'public/css/login.2.1.css' %}" rel="stylesheet" />
