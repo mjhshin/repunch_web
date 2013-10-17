@@ -45,7 +45,7 @@ $(document).ready(function(){
                     dl_signup.dialog({ 
                         title: "Associated Account Detected", 
                         minHeight: 280, maxHeight: 280,
-                        minWidth: 480, maxWidth: 480, 
+                        minWidth: 490, maxWidth: 490, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
                             window.location.replace(url_home);
@@ -53,7 +53,7 @@ $(document).ready(function(){
                     });
                     // adjust the width and height + title
                     dl_signup.dialog( "option", "title", "Associated Account Detected");
-                    dl_signup.dialog( "option", "width", 480 );
+                    dl_signup.dialog( "option", "width", 490 );
                     dl_signup.dialog( "option", "height", 280 );
                     
                     
@@ -148,7 +148,7 @@ $(document).ready(function(){
                                             $.post($("#aa-forgot-pass-form input[name=action]").val(), 
                                                     $("#aa-forgot-pass-form").serialize(), function(aaFPRes){
                                                 if (aaFPRes.res){
-                                                    aaFPassFormSpan.html("<span style='color:green;'>Password Reset form sent.</span>");
+                                                    aaFPassFormSpan.html("<span style='font: 14px \"Cabin\", sans-serif; color:green;'>Password Reset form sent.</span>");
                                                 } else { // should never go here
                                                     aaFPassFormSpan.html("<span>Email not recognized.</span>");
                                                 }
@@ -196,11 +196,7 @@ $(document).ready(function(){
                     messageContainer.html("<span style='color:#DF7401;'>"+
                         "You are now an employee.<br/>Congratulations.</span>");
                         
-                } else if (res.code == 3){ // active subscription. redirect to dashboard.
-                    messageContainer.html("<span style='color:green;'>Success! Welcome to Repunch.</span>");
-                    window.location.replace(url_redirect);
-                    
-                }
+                } 
             }
             
         };

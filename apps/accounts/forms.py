@@ -82,6 +82,20 @@ class AccountSignUpForm(forms.Form):
             elif acc: # save the object for later use
                 setattr(self, "associated_account", acc)
         return e
+
+class EmployeeAccountSignUpForm(AccountSignUpForm):   
+    def clean_email(self):
+        e = self.cleaned_data.get('email')
+        if e:
+            e = e.strip().lower()
+            acc = Account.objects().get(email=e)
+            if acc and acc.Employee:
+                raise forms.ValidationError(\
+                    "Email is already being used.")
+            elif acc: # save the object for later use
+                setattr(self, "associated_account", acc)
+        return e        
+
             
 class LoginForm(forms.Form):
     # currently the username = email

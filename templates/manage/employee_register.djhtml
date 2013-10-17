@@ -34,7 +34,7 @@ h2 { margin-bottom: 16px; }
 		
 		<div class="input-container" id="email_ic"
 		    {% if not account_form.email.errors and employee_form.acl.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ account_form.email.errors }}
 			<label for="id_email">Email</label>
@@ -42,7 +42,7 @@ h2 { margin-bottom: 16px; }
 		</div>
 		<div class="input-container col2" id="acl_ic"
 		    {% if not employee_form.acl.errors and account_form.email.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ employee_form.acl.errors }}
 			<label for="id_acl">Access Level</label>
@@ -52,7 +52,7 @@ h2 { margin-bottom: 16px; }
 		<div style="clear: left;"></div>
 		<div class="input-container" id="password_ic"
 		    {% if not account_form.password.errors and account_form.confirm_password.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ account_form.password.errors }}
 			<label for="id_password">Password</label>
@@ -60,7 +60,7 @@ h2 { margin-bottom: 16px; }
 		</div>
 		<div class="input-container col2" id="confirm_password_ic"
 		    {% if not account_form.confirm_password.errors and account_form.password.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ account_form.confirm_password.errors }}
 			<label for="id_email">Confirm Password</label>
@@ -70,7 +70,7 @@ h2 { margin-bottom: 16px; }
 		<div style="clear: left;"></div>
 		<div class="input-container" id="first_name_ic"
 		    {% if not employee_form.first_name.errors and employee_form.last_name.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ employee_form.first_name.errors }}
 			<label for="id_first_name">First Name</label>
@@ -79,7 +79,7 @@ h2 { margin-bottom: 16px; }
 		
 		<div class="input-container col2" id="last_name_ic"
 		    {% if not employee_form.last_name.errors and employee_form.first_name.errors %}
-		    style="margin-top:24px;"
+		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ employee_form.last_name.errors }}
 			<label for="id_last_name">Last Name</label>
@@ -96,12 +96,12 @@ h2 { margin-bottom: 16px; }
 {% endblock %}
 
 {% block dialogs %}
-<div id="dialog-signup">
+<div id="dialog-signup" style="position: relative;">
     <div id="dialog-signup-message" >
     Processing your information.<br/>Please wait.
     </div>
     <img src="{% static 'manage/images/ajax-loader.gif' %}" id="signing-up" 
-        style="position:relative; right: 0px;" />
+        style="position:absolute; right: 50px; top: 22px;" />
     <img src="{% static 'public/images/icon_clock-orange-2.png' %}" id="signing-up-time"/>
 </div>
 
@@ -109,8 +109,8 @@ h2 { margin-bottom: 16px; }
     <span>
     The email you entered has an associated Repunch account.<br/>
     Please enter the password associated with this email.<br/>
-    Note that this password will also be used as the password for
-    this employee account.
+    Note that this password will also be used as the password<br/>
+    for this employee account.
     </span>
     <form id="associated-account-form" action="" method="POST">{% csrf_token %}
         <input type="hidden" name="url" value="{% url "public_associated_account_confirm" %}" />
@@ -120,7 +120,7 @@ h2 { margin-bottom: 16px; }
         <input type="password" name="acc_password" value="" />
         <input type="submit" value="Submit"/>
     </form>
-    <div id="associated-account-message" class="repunch-red"></div> 
+    <div id="associated-account-message"></div> 
     
     <form id="aa-forgot-pass-form" action="" method="POST">
         {% csrf_token %}

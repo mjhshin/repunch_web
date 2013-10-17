@@ -188,7 +188,7 @@ $(document).ready(function(){
                                             $.post($("#aa-forgot-pass-form input[name=action]").val(), 
                                                     $("#aa-forgot-pass-form").serialize(), function(aaFPRes){
                                                 if (aaFPRes.res){
-                                                    aaFPassFormSpan.html("<span style='color:green;'>Password Reset form sent.</span>");
+                                                    aaFPassFormSpan.html("<span style='font: 14px \"Cabin\", sans-serif; color:green;'>Password Reset form sent.</span>");
                                                 } else { // should never go here
                                                     aaFPassFormSpan.html("<span>Email not recognized.</span>");
                                                 }

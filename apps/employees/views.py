@@ -20,7 +20,7 @@ from parse.apps.rewards.models import Punch
 from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
 ACCESS_NONE
 from apps.employees.forms import EmployeeForm
-from apps.accounts.forms import AccountSignUpForm
+from apps.accounts.forms import EmployeeAccountSignUpForm
 from apps.accounts.models import AssociatedAccountNonce
 from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME,\
@@ -386,8 +386,6 @@ def register(request):
     """
     data = {'employees_nav': True}
     if request.method == "POST":
-        from time import sleep
-        sleep(3)
         from_associated_account = False
         # check if this post is from the associated account dialog
         # if it is then skip form validations
@@ -400,7 +398,7 @@ def register(request):
                 aa_nonce[0].delete()
                 from_associated_account = True
         
-        account_form = AccountSignUpForm(request.POST)
+        account_form = EmployeeAccountSignUpForm(request.POST)
         employee_form = EmployeeForm(request.POST)
         
         if not from_associated_account:
@@ -431,7 +429,7 @@ def register(request):
     else:
         employee_form = EmployeeForm(initial={"acl":\
             ACCESS_PUNCHREDEEM[0]})
-        account_form = AccountSignUpForm()
+        account_form = EmployeeAccountSignUpForm()
         
     data["employee_form"] = employee_form
     data["account_form"] = account_form

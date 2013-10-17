@@ -385,8 +385,8 @@ function validate(which, next) {
     <span>
     The email you entered has an associated Repunch account.<br/>
     Please enter the password associated with this email.<br/>
-    Note that this password will also be used as the password for
-    this business account.
+    Note that this password will also be used as the password <br/>
+    for this business account.
     </span>
     <form id="associated-account-form" action="" method="POST">{% csrf_token %}
         <input type="hidden" name="url" value="{% url "public_associated_account_confirm" %}" />
