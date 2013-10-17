@@ -421,10 +421,10 @@ def register(request):
                     "email": aa.email, "code": 0}), 
                     content_type="application/json")
                   
-                  
+            # TODO
             
-        return HttpResponse(json.dumps(data), 
-                    content_type="application/json") 
+            return HttpResponse(json.dumps({}), 
+                        content_type="application/json") 
                 
     else:
         employee_form = EmployeeForm(initial={"acl":\

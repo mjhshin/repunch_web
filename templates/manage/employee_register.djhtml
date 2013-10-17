@@ -104,3 +104,39 @@ $(document).ready(function(){
 	</form>
 
 {% endblock %}
+
+{% block dialogs %}
+<div id="dialog-signup">
+    <div id="dialog-signup-message" >
+    Processing your information.<br/>Please wait.
+    </div>
+    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="signing-up" />
+    <img src="{% static 'public/images/icon_clock-orange-2.png' %}" id="signing-up-time"/>
+</div>
+
+<div id="associated-account-div" style="display:none;">
+    <span>
+    The email you entered has an associated Repunch account.<br/>
+    Please enter the password associated with this email.<br/>
+    Note that this password will also be used as the password for
+    this employee account.
+    </span>
+    <form id="associated-account-form" action="" method="POST">{% csrf_token %}
+        <input type="hidden" name="url" value="{% url "public_associated_account_confirm" %}" />
+        <input type="hidden" name="aaf-nonce" value="" />
+        <input type="hidden" name="aaf-account_id" value="" />
+        <input type="hidden" name="acc_username" value="" />
+        <input type="password" name="acc_password" value="" />
+        <input type="submit" value="Submit"/>
+    </form>
+    <div id="associated-account-message" class="repunch-red"></div> 
+    
+    <form id="aa-forgot-pass-form" action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{% url 'public_request_password_reset' %}"/>
+        <input type="hidden" name="forgot-pass-email"/>
+        <span><a>Forgot your password?</a></span>
+    </form>
+    
+</div>
+{% endblock %}
