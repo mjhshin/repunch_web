@@ -14,7 +14,19 @@ h2 { margin-bottom: 16px; }
 </style>
 {% endblock %}
 {% block javascript %}
+<script>
+$(document).ready(function(){
+	$('#register-employee-submit').click(function(){
+        if ($("#employee-registering").css("display") != "none"){
+            return false;
+        }
+        $("#employee-registering").show();
 
+        $('#employee-register-form').submit(); 
+        return false;
+    }); 
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -29,45 +41,64 @@ h2 { margin-bottom: 16px; }
 	
 		<h2>Register New Employee</h2>
 		
-		<div class="input-container" id="email_ic">
+		<div class="input-container" id="email_ic"
+		    {% if not account_form.email.errors and employee_form.acl.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ account_form.email.errors }}
 			<label for="id_email">Email</label>
 			{{ account_form.email }}
 		</div>
-		<div class="input-container col2" id="acl_ic">
+		<div class="input-container col2" id="acl_ic"
+		    {% if not employee_form.acl.errors and account_form.email.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ employee_form.acl.errors }}
 			<label for="id_acl">Access Level</label>
 			{{ employee_form.acl }}
 		</div>
 		
 		<div style="clear: left;"></div>
-		<div class="input-container" id="password_ic">
+		<div class="input-container" id="password_ic"
+		    {% if not account_form.password.errors and account_form.confirm_password.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ account_form.password.errors }}
 			<label for="id_password">Password</label>
 			{{ account_form.password }}
 		</div>
-		<div class="input-container col2" id="confirm_password_ic">
+		<div class="input-container col2" id="confirm_password_ic"
+		    {% if not account_form.confirm_password.errors and account_form.password.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ account_form.confirm_password.errors }}
 			<label for="id_email">Confirm Password</label>
 			{{ account_form.confirm_password }}
 		</div>
 		
 		<div style="clear: left;"></div>
-		<div class="input-container" id="first_name_ic">
+		<div class="input-container" id="first_name_ic"
+		    {% if not employee_form.first_name.errors and employee_form.last_name.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ employee_form.first_name.errors }}
 			<label for="id_first_name">First Name</label>
 			{{ employee_form.first_name }}
 		</div>
-		<div class="input-container col2" id="last_name_ic">
+		
+		<div class="input-container col2" id="last_name_ic"
+		    {% if not employee_form.last_name.errors and employee_form.first_name.errors %}
+		    style="margin-top:24px;"
+		    {% endif %}>
 			{{ employee_form.last_name.errors }}
 			<label for="id_last_name">Last Name</label>
-			{{ employee_form.last_name }}
+			{{ employee_formr.last_name }}
 		</div>
 		
 		<div id="register-employee-options" class="form-options">
-			<a class="button blue">Register Employee</a>
+			<a class="button blue" id="register-employee-submit">Register Employee</a>
 			<a href="{% url 'employees_index' %}" class="red">Cancel</a>
-			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="reward-saving" />
+			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="employee-registering" />
 		</div>
 		
 	</form>
