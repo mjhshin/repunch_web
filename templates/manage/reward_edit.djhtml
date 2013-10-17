@@ -3,7 +3,7 @@
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
-{% block title %}{{ is_new|yesno:"Add New,Edit" }} Reward{% endblock %}
+{% block title %}{{ is_new|yesno:"Create New,Edit" }} Reward{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/reward_edit.1.0.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />

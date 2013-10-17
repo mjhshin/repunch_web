@@ -19,7 +19,9 @@ from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import Punch
 from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
 ACCESS_NONE
-from apps.employees.forms import EmployeeForm, EmployeeAvatarForm
+from apps.employees.forms import EmployeeForm
+from apps.accounts.forms import AccountSignUpForm
+from apps.accounts.models import AssociatedAccountNonce
 from libs.repunch import rputils
 from repunch.settings import COMET_RECEIVE_KEY_NAME,\
 COMET_RECEIVE_KEY, PAGINATION_THRESHOLD
@@ -372,6 +374,54 @@ def graph(request):
         rows.append({'c': c})
 
     return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
+    
+    
+@dev_login_required
+@login_required
+@admin_only(reverse_url="employees_index")
+def register(request):
+    """ 
+    Adds a new employee to the currently logged in Store.
+    This automatically sets this employee to approved.
+    """
+    data = {'employees_nav': True}
+    if request.method == "POST":
+        pass
+    else:
+        data["employee_form"] = EmployeeForm(initial={"acl":\
+            ACCESS_PUNCHREDEEM[0]})
+        data["account_form"] = AccountSignUpForm()
+        
+    return render(request, 'manage/employee_register.djhtml', data)    
+    
+@dev_login_required
+@login_required
+@admin_only(reverse_url="employees_index")
+def associated_account_confirm(request):
+    """
+    A helper view for sign_up. Also handles requests from signup.js
+    """
+    if request.method == 'POST':
+        # first check the AssociatedAccountNonce
+        acc_id = request.POST['aaf-account_id']
+        nonce_id = request.POST['aaf-nonce']
+        aa_nonce = AssociatedAccountNonce.objects.filter(\
+            id=nonce_id, account_id=acc_id)
+        if len(aa_nonce) > 0:
+            aa_nonce = aa_nonce[0]
+            # then attempt to login to parse
+            username = request.POST['acc_username']
+            password = request.POST['acc_password']
+            # note that email is the same as username
+            res = account_login(username, password)
+            if 'error' not in res:
+                aa_nonce.verified = True
+                aa_nonce.save()
+                return HttpResponse(json.dumps({"code": 0}), 
+                    content_type="application/json")
+                
+    return HttpResponse(json.dumps({"code": 1}), 
+        content_type="application/json")
 
 @dev_login_required
 @login_required

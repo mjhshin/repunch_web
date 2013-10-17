@@ -32,6 +32,10 @@
 	</div>
 	{% endif %}
 	
+    {% if is_admin %}
+	<a href="{% url 'employee_register' %}" class="button blue" id="register_employee">+ Register New Employee</a>
+	{% endif %}
+	
 	<div class="section">
 		
 		<div class="tab-container">

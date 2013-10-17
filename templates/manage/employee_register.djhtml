@@ -1,0 +1,75 @@
+{% extends "manage/base.djhtml" %}
+{% load static %}{% load parse_tags %}
+
+{# NOTE only accounts with full admin access may access this page!!! #}
+
+{% block title %}Register New Employee{% endblock %}
+
+{% block styles %}
+<style>
+h2 { margin-bottom: 16px; }
+.form-options { position: relative; top: 16px; }
+.input-container { margin-top: 10px; }
+.col2 { margin-left: 20px; }
+</style>
+{% endblock %}
+{% block javascript %}
+
+{% endblock %}
+
+{% block content %}
+	
+	<form action="{% url 'employee_register' %}" method="POST" id="employee-register-form">
+	    {% csrf_token %}
+		{% if error or success %}
+		<div class="notification {% if success %}success{% endif %} hide">
+			<div>{{ error }}{{ success }}</div>
+		</div>
+		{% endif %}
+	
+		<h2>Register New Employee</h2>
+		
+		<div class="input-container" id="email_ic">
+			{{ account_form.email.errors }}
+			<label for="id_email">Email</label>
+			{{ account_form.email }}
+		</div>
+		<div class="input-container col2" id="acl_ic">
+			{{ employee_form.acl.errors }}
+			<label for="id_acl">Access Level</label>
+			{{ employee_form.acl }}
+		</div>
+		
+		<div style="clear: left;"></div>
+		<div class="input-container" id="password_ic">
+			{{ account_form.password.errors }}
+			<label for="id_password">Password</label>
+			{{ account_form.password }}
+		</div>
+		<div class="input-container col2" id="confirm_password_ic">
+			{{ account_form.confirm_password.errors }}
+			<label for="id_email">Confirm Password</label>
+			{{ account_form.confirm_password }}
+		</div>
+		
+		<div style="clear: left;"></div>
+		<div class="input-container" id="first_name_ic">
+			{{ employee_form.first_name.errors }}
+			<label for="id_first_name">First Name</label>
+			{{ employee_form.first_name }}
+		</div>
+		<div class="input-container col2" id="last_name_ic">
+			{{ employee_form.last_name.errors }}
+			<label for="id_last_name">Last Name</label>
+			{{ employee_form.last_name }}
+		</div>
+		
+		<div id="register-employee-options" class="form-options">
+			<a class="button blue">Register Employee</a>
+			<a href="{% url 'employees_index' %}" class="red">Cancel</a>
+			<img src="{% static 'manage/images/ajax-loader.gif' %}"  id="reward-saving" />
+		</div>
+		
+	</form>
+
+{% endblock %}

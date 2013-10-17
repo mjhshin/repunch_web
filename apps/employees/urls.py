@@ -9,4 +9,7 @@ urlpatterns = patterns('apps.employees.views',
     url(r'^(?P<employee_id>.+)/deny', 'deny', name='employee_deny'),
     url(r'^(?P<employee_id>.+)/avatar$', 'avatar', name='employee_avatar'),
     url(r'^(?P<employee_id>.+)/punches$', 'punches', name='employee_punches'),
+    
+    url(r'^register$', 'register', name='employee_register'),
+    url(r'^associated-account-confirm$', 'associated_account_confirm', name='employee_associated_account_confirm'),
 )

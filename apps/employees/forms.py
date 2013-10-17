@@ -5,14 +5,22 @@ from repunch import settings
 import os
 
 from libs.repunch.validators import required
+from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
+ACCESS_NONE
+
+# format the choices 
+ACL_CHOICES = (
+    (ACCESS_ADMIN[0], "Full Admin Access"),
+    (ACCESS_PUNCHREDEEM[0], "Allow Punch/Redeem"),
+    (ACCESS_NONE[0], "No Access"), 
+)
 
 class EmployeeForm(forms.Form):
-    first_name = forms.CharField(max_length=255, 
+    first_name = forms.CharField(max_length=50, 
         validators=[required])
-    last_name = forms.CharField(max_length=255,
+    last_name = forms.CharField(max_length=50,
         validators=[required])
-    email = forms.CharField(max_length=255,
-        validators=[required])
+    acl = forms.ChoiceField(choices=ACL_CHOICES)
         
 class EmployeeAvatarForm(forms.Form):
     employee_avatar = forms.FileField()

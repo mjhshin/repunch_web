@@ -167,6 +167,7 @@ class Invoice(models.Model):
 	amount = models.FloatField(null=True,blank=True)
 	
 class AssociatedAccountNonce(models.Model):
+	""" Used for both Employee and Store registration (warning) """
 	account_id = models.CharField(max_length=30)
 	verified = models.BooleanField(default=False)
 	
