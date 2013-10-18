@@ -134,7 +134,11 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	var lastName = request.params.last_name;
 	var email = request.params.email;
 	
-	// optional - default is pending if not given
+	// optional parameters
+	// punch_redeem, admin
+	var access_level = request.params.access_level;
+	
+	// status or approved
 	var status = request.params.status;
 	if(status == null) {
 	    status = "pending";
@@ -194,7 +198,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 				
 		}).then(function(user) {
 			console.log("User save success.");
-			addEmployeeToStore();		
+			addEmployeeToStore(user);		
 			
 		}, function(error) {
 			console.log("User save failed.");
@@ -245,8 +249,18 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	    
 	}
 	
-	function addEmployeeToStore() {
+	function addEmployeeToStore(employeeUser) {
 		store.relation("Employees").add(employee);
+		
+		// set the acl if given
+		var acl = new Parse.ACL();
+		if(access_level == "admin") {
+		    acl.setReadAccess(employeeUser, true);
+		    acl.setWriteAccess(employeeUser, true);
+		} else if(access_level == "punch_redeem") {
+		    acl.setReadAccess(employeeUser, true);
+		} 
+		store.setACL(acl);
 		
 		store.save().then(function(store) {
 			console.log("Store save success.");
@@ -297,7 +311,11 @@ Parse.Cloud.define("link_employee", function(request, response) {
 	var lastName = request.params.last_name;
 	var email = request.params.email;
 	
-	// optional - default is pending if not given
+	// optional parameters
+	// punch_redeem, admin
+	var access_level = request.params.access_level;
+	
+	// status or approved
 	var status = request.params.status;
 	if(status == null) {
 	    status = "pending";
@@ -378,7 +396,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 				
 		}).then(function(user) {
 			console.log("User save & employee link success.");
-			addEmployeeToStore();
+			addEmployeeToStore(user);
 		    
 		}, function(error) {
 		    deleteEmployee();
@@ -387,8 +405,18 @@ Parse.Cloud.define("link_employee", function(request, response) {
 		
 	}
 	
-	function addEmployeeToStore() {
+	function addEmployeeToStore(employeeUser) {
 		store.relation("Employees").add(employee);
+		
+		// set the acl if given
+		var acl = new Parse.ACL();
+		if(access_level == "admin") {
+		    acl.setReadAccess(employeeUser, true);
+		    acl.setWriteAccess(employeeUser, true);
+		} else if(access_level == "punch_redeem") {
+		    acl.setReadAccess(employeeUser, true);
+		} 
+		store.setACL(acl);
 		
 		store.save().then(function(store) {
 			console.log("Store save success.");
