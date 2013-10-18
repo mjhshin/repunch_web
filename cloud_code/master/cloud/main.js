@@ -264,7 +264,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		
 		store.save().then(function(store) {
 			console.log("Store save success.");
-			response.success("success");
+			response.success(employee);
 			
 			var postBody = { "cometrkey": "<<COMET_RECEIVE_KEY>>" };
 			if(status == "pending") {
@@ -420,7 +420,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 		
 		store.save().then(function(store) {
 			console.log("Store save success.");
-			response.success("success");
+			response.success(employee);
 			
 			var postBody = { "cometrkey": "<<COMET_RECEIVE_KEY>>" };
 			if(status == "pending") {
