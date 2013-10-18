@@ -83,18 +83,13 @@ class AccountSignUpForm(forms.Form):
                 setattr(self, "associated_account", acc)
         return e
 
-class EmployeeAccountSignUpForm(AccountSignUpForm):   
+class EmployeeAccountSignUpForm(AccountSignUpForm):
+    """
+    Unlike int AccountSignUpForm, we are doing the registration in
+    the cloud.    
+    """
     def clean_email(self):
-        e = self.cleaned_data.get('email')
-        if e:
-            e = e.strip().lower()
-            acc = Account.objects().get(email=e)
-            if acc and acc.Employee:
-                raise forms.ValidationError(\
-                    "Email is already being used.")
-            elif acc: # save the object for later use
-                setattr(self, "associated_account", acc)
-        return e        
+        return self.cleaned_data.get('email')
 
             
 class LoginForm(forms.Form):

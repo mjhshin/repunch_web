@@ -260,6 +260,7 @@ def sign_up(request):
             if not from_associated_account:
                 account = Account(**postDict)
                 # username = email
+                # we should be doing this in the form but ehh
                 account.set("username", 
                     postDict['email'].strip().lower())
                 account.set("email", 

@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.db.models import Sum
 from django.utils import timezone
+from django.forms.util import ErrorList
 from datetime import datetime
 import urllib, json
 
@@ -385,6 +386,9 @@ def register(request):
     This automatically sets this employee to approved.
     """
     data = {'employees_nav': True}
+    
+    store = SESSION.get_store(request.session)
+    
     if request.method == "POST":
         from_associated_account = False
         # check if this post is from the associated account dialog
@@ -409,10 +413,33 @@ def register(request):
             
         if all_forms_valid:
             postDict = request.POST.dict()
+            
+            # make the cloud call
+            params = {
+                "retailer_pin": store.get("retailer_pin"),
+                "username": postDict['email'].strip().lower(),
+                "first_name": postDict['first_name'].capitalize(),
+                "last_name": postDict['last_name'].capitalize(),
+                "email": postDict['email'].strip().lower(),
+                "status": APPROVED,
+            }
+            
+            if from_associated_account:
+                res = cloud_call("link_employee", params)
+            else:
+                params["password"] = postDict['password']
+                res = cloud_call("register_employee", params)
+                
+            # don't forget to retrieve the latest session
+            request.session.clear()
+            request.session.update(SessionStore(request.session.session_key))
+            
+            
             # check if email already taken here to handle the case where 
             # the user already has a patron/employee account 
             # but also want to sign up for a Store account
-            if hasattr(account_form, "associated_account"):
+            if "error" in res and res['error'] in ("EMAIL_TAKEN_AVAILABLE",
+                "USERNAME_TAKEN_AVAILABLE"):
                 aa = account_form.associated_account
                 aan = AssociatedAccountNonce.objects.create(\
                     account_id=aa.objectId)
@@ -420,12 +447,17 @@ def register(request):
                     aa.objectId, "associated_account_nonce":aan.id,
                     "email": aa.email, "code": 0}), 
                     content_type="application/json")
-                  
-            # TODO
-            
-            return HttpResponse(json.dumps({}), 
+            else if "error" in res and res['error'] in ("EMAIL_TAKEN",
+                "USERNAME_TAKEN"):
+                employee_form._errors.setdefault("email",
+                    ErrorList()).append(u"Email is already being used.")
+            else if "error" not in res:
+                return HttpResponse(json.dumps({"code": 2}), 
+                        content_type="application/json")
+            else:
+                return HttpResponse(json.dumps({"code": 3}), 
                         content_type="application/json") 
-                
+                    
     else:
         employee_form = EmployeeForm(initial={"acl":\
             ACCESS_PUNCHREDEEM[0]})
