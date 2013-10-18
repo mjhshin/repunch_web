@@ -447,11 +447,11 @@ def register(request):
                     aa.objectId, "associated_account_nonce":aan.id,
                     "email": aa.email, "code": 0}), 
                     content_type="application/json")
-            else if "error" in res and res['error'] in ("EMAIL_TAKEN",
+            elif "error" in res and res['error'] in ("EMAIL_TAKEN",
                 "USERNAME_TAKEN"):
                 employee_form._errors.setdefault("email",
                     ErrorList()).append(u"Email is already being used.")
-            else if "error" not in res:
+            elif "error" not in res:
                 return HttpResponse(json.dumps({"code": 2}), 
                         content_type="application/json")
             else:
