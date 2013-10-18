@@ -387,6 +387,7 @@ def register(request):
     """
     data = {'employees_nav': True}
     
+    settings = SESSION.get_settings(request.session)
     store = SESSION.get_store(request.session)
     
     if request.method == "POST":
@@ -415,13 +416,23 @@ def register(request):
             postDict = request.POST.dict()
             
             # make the cloud call
+            # see cloud param for possible access level values
+            acl = postDict['acl']
+            if acl == ACCESS_ADMIN[0]:
+                access_level = "admin"
+            elif acl == ACCESS_PUNCHREDEEM[0]:
+                access_level = "punch_redeem"
+            else:
+                access_level = None
+            
             params = {
-                "retailer_pin": store.get("retailer_pin"),
+                "retailer_pin": settings.get("retailer_pin"),
                 "username": postDict['email'].strip().lower(),
                 "first_name": postDict['first_name'].capitalize(),
                 "last_name": postDict['last_name'].capitalize(),
                 "email": postDict['email'].strip().lower(),
                 "status": APPROVED,
+                "access_level": access_level,
             }
             
             if from_associated_account:
@@ -433,7 +444,6 @@ def register(request):
             # don't forget to retrieve the latest session
             request.session.clear()
             request.session.update(SessionStore(request.session.session_key))
-            
             
             # check if email already taken here to handle the case where 
             # the user already has a patron/employee account 
@@ -449,7 +459,7 @@ def register(request):
                     content_type="application/json")
             elif "error" in res and res['error'] in ("EMAIL_TAKEN",
                 "USERNAME_TAKEN"):
-                employee_form._errors.setdefault("email",
+                account_form._errors.setdefault("email",
                     ErrorList()).append(u"Email is already being used.")
             elif "error" not in res:
                 return HttpResponse(json.dumps({"code": 2}), 

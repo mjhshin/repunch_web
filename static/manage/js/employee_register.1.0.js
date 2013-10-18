@@ -181,14 +181,12 @@ $(document).ready(function(){
                 } else { // success || error
                     var title, message;
                     
-                    if (res.code == 2) [
+                    if (res.code == 2) {
                         title = "Register Complete";
-                        message = "<span style='color:#DF7401;'>"+
-                        "You are now a registered employee.<br/>Congratulations.</span>";
+                        message = "<span style='color:#DF7401;'>You are now a registered employee.<br/>Congratulations.</span>";
                     } else {
                         title = "Register Failed";
-                        message = "<span style='color:#900;'>"+
-                        "Something went wrong.<br/>Please try again.</span>";
+                        message = "<span style='color:#900;'>Something went wrong.<br/>Please try again.</span>";
                     }
                 
                     dl_signup.dialog({ 
