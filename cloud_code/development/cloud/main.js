@@ -134,6 +134,12 @@ Parse.Cloud.define("register_employee", function(request, response) {
 	var lastName = request.params.last_name;
 	var email = request.params.email;
 	
+	// optional - default is pending if not given
+	var status = request.params.status;
+	if(status == null) {
+	    status = "pending";
+	}
+	
 	var Employee = Parse.Object.extend("Employee");
 	var Store = Parse.Object.extend("Store");
 	var Settings = Parse.Object.extend("Settings");
@@ -167,7 +173,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		employee.set("first_name", firstName);
 		employee.set("last_name", lastName);
 		employee.set("lifetime_punches", 0);
-		employee.set("status", "pending");
+		employee.set("status", status);
 		employee.set("Store", store);
 		
 		employee.save().then(function(employee) {
@@ -246,14 +252,18 @@ Parse.Cloud.define("register_employee", function(request, response) {
 			console.log("Store save success.");
 			response.success("success");
 			
+			var postBody = { "cometrkey": "384ncocoacxpvgrwecwy" };
+			if(status == "pending") {
+                postBody.pendingEmployee = employee;
+			} else {
+                postBody.newEmployee = employee;
+			}
+			
 			Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/manage/comet/receive/" + store.id,
                 headers: { "Content-Type": "application/json"},
-                body: { 
-                    "cometrkey": "384ncocoacxpvgrwecwy", 
-                    pendingEmployee: employee, 
-                }
+                body: postBody
             });
 			
 		}, function(error) {
@@ -286,6 +296,12 @@ Parse.Cloud.define("link_employee", function(request, response) {
 	var firstName = request.params.first_name;
 	var lastName = request.params.last_name;
 	var email = request.params.email;
+	
+	// optional - default is pending if not given
+	var status = request.params.status;
+	if(status == null) {
+	    status = "pending";
+	}
 	
 	var Employee = Parse.Object.extend("Employee");
 	var Store = Parse.Object.extend("Store");
@@ -331,7 +347,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 		employee.set("first_name", firstName);
 		employee.set("last_name", lastName);
 		employee.set("lifetime_punches", 0);
-		employee.set("status", "pending");
+		employee.set("status", status);
 		employee.set("Store", store);
 		
 		employee.save().then(function(employee) {
@@ -378,14 +394,18 @@ Parse.Cloud.define("link_employee", function(request, response) {
 			console.log("Store save success.");
 			response.success("success");
 			
+			var postBody = { "cometrkey": "384ncocoacxpvgrwecwy" };
+			if(status == "pending") {
+                postBody.pendingEmployee = employee;
+			} else {
+                postBody.newEmployee = employee;
+			}
+			
 			Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/manage/comet/receive/" + store.id,
                 headers: { "Content-Type": "application/json"},
-                body: { 
-                    "cometrkey": "384ncocoacxpvgrwecwy", 
-                    pendingEmployee: employee, 
-                }
+                body: postBody
             });
 			
 		}, function(error) {
