@@ -450,7 +450,7 @@ def register(request):
             # but also want to sign up for a Store account
             if "error" in res and res['error'] in ("EMAIL_TAKEN_AVAILABLE",
                 "USERNAME_TAKEN_AVAILABLE"):
-                aa = account_form.associated_account
+                aa = Account.objects().get(email=postDict['email'].strip().lower())
                 aan = AssociatedAccountNonce.objects.create(\
                     account_id=aa.objectId)
                 return HttpResponse(json.dumps({"associated_account":\
@@ -478,7 +478,7 @@ def register(request):
                 # the cloud post
                 store = SESSION.get_store(request.session)
                 store.set_access_level(Account.objects().get(\
-                    Employee=new_employee.objectId), acl)
+                    email=postDict['email'].strip().lower()), acl)
                 request.session['store'] = store
                 
                 # notify other dashboards of this change
