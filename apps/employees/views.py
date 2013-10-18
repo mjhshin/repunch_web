@@ -463,9 +463,12 @@ def register(request):
                     ErrorList()).append(u"Email is already being used.")
             elif "error" not in res:
                 # add the employee to the approved list
-                new_employee = Employee(**res["result"])
                 employees_approved_list =\
                     SESSION.get_employees_approved_list(request.session)
+                employees_approved_ids =\
+                    [ emp.objectId for emp in employees_approved_list ]
+                    
+                new_employee = Employee(**res["result"])
                 if new_employee.objectId not in employees_approved_ids:
                     employees_approved_list.insert(0, new_employee)
                     request.session['employees_approved_list'] =\
