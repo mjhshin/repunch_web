@@ -106,7 +106,7 @@ $(document).ready(function(){
                                         minHeight: 140, maxHeight: 140,
                                     });
                                     // adjust the width and height + title
-                                    dl_signup.dialog( "option", "title", "Signing Up");
+                                    dl_signup.dialog( "option", "title", "Registering");
                                     dl_signup.dialog( "option", "width", 350 );
                                     dl_signup.dialog( "option", "height", 140 );
     
