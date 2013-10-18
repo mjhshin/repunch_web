@@ -64,7 +64,7 @@ def edit(request, employee_id):
             
     acc = Account.objects().get(Employee=employee.objectId)
     store = SESSION.get_store(request.session)
-            
+    
     if not employee or not acc:
         return redirect(reverse('employees_index')+ "?%s" %\
             urllib.urlencode({'success': 'Employee does not exist.'}))
@@ -479,7 +479,6 @@ def register(request):
                     store = SESSION.get_store(request.session)
                     store.set_access_level(Account.objects().get(\
                         Employee=new_employee.objectId), acl)
-                    request.session['store'] = store
                     
                     # notify other dashboards of this change
                     payload = {
@@ -487,6 +486,8 @@ def register(request):
                         "updatedStore":store.jsonify()
                     }
                     comet_receive(store.objectId, payload)
+                    
+                    request.session['store'] = store
                         
                 return HttpResponse(json.dumps({"code": 2}), 
                         content_type="application/json")
