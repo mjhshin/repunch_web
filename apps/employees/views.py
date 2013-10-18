@@ -474,20 +474,19 @@ def register(request):
                     request.session['employees_approved_list'] =\
                         employees_approved_list
                     
-                    # update our local store's acl - don't wait for 
-                    # the cloud post
-                    store = SESSION.get_store(request.session)
-                    store.set_access_level(Account.objects().get(\
-                        Employee=new_employee.objectId), acl)
-                    
-                    # notify other dashboards of this change
-                    payload = {
-                        COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                        "updatedStore":store.jsonify()
-                    }
-                    comet_receive(store.objectId, payload)
-                    
-                    request.session['store'] = store
+                # update our local store's acl - don't wait for 
+                # the cloud post
+                store = SESSION.get_store(request.session)
+                store.set_access_level(Account.objects().get(\
+                    Employee=new_employee.objectId), acl)
+                request.session['store'] = store
+                
+                # notify other dashboards of this change
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedStore":store.jsonify()
+                }
+                comet_receive(store.objectId, payload)
                         
                 return HttpResponse(json.dumps({"code": 2}), 
                         content_type="application/json")
