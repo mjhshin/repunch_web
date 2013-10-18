@@ -37,6 +37,7 @@ def comet_receive(store_id, postDict):
         newFeedback 
         deletedFeedback 
         pendingEmployee
+        newEmployee
         approvedEmployee 
         deletedEmployee 
         updatedEmployeePunch
@@ -161,6 +162,18 @@ def comet_receive(store_id, postDict):
                 employees_pending_list
             session['employees_approved_list'] =\
                 employees_approved_list
+                
+        #############################################################
+        # EMPLOYEES NEW (straight to approved) #################
+        newEmployee = postDict.get("newEmployee")
+        if newEmployee:
+            employees_approved_ids =\
+                [ emp.objectId for emp in employees_approved_list ]
+            emp = Employee(**newEmployee)
+            if emp.objectId not in employees_approved_ids:
+                employees_approved_list.insert(0, emp)
+                session['employees_approved_list'] =\
+                    employees_approved_list
             
         #############################################################
         # EMPLOYEES DELETED/DENIED/REJECTED (pending/approved to pop)!

@@ -178,9 +178,21 @@ $(document).ready(function(){
                     aaf_submit.click(submitAAF);
                                     
                                     
-                } else if (res.code == 2){ // Success
+                } else { // success || error
+                    var title, message;
+                    
+                    if (res.code == 2) [
+                        title = "Register Complete";
+                        message = "<span style='color:#DF7401;'>"+
+                        "You are now a registered employee.<br/>Congratulations.</span>";
+                    } else {
+                        title = "Register Failed";
+                        message = "<span style='color:#900;'>"+
+                        "Something went wrong.<br/>Please try again.</span>";
+                    }
+                
                     dl_signup.dialog({ 
-                        title: "Register Complete", 
+                        title: title, 
                         minWidth: 360, maxWidth: 360, 
                         beforeClose: function(event, ui) { return true; }, 
                         close: function(){
@@ -188,15 +200,13 @@ $(document).ready(function(){
                         }
                     });
                     // adjust the height + title
-                    dl_signup.dialog( "option", "title", "Register Complete");
+                    dl_signup.dialog( "option", "title", title);
                     dl_signup.dialog( "option", "width", 360 );
                     
                     // $("#signing-up-time").show();
                     messageContainer.css("width", "250px");
-                    messageContainer.html("<span style='color:#DF7401;'>"+
-                        "You are now an employee.<br/>Congratulations.</span>");
-                        
-                } 
+                    messageContainer.html(message);
+                }
             }
             
         };

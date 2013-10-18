@@ -2,7 +2,6 @@
 ####################  TODO: 
 
 * ASAP *
-    - Write Register Employee page
     - Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
         * in redemptions.js
    
