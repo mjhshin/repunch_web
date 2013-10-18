@@ -253,7 +253,7 @@ Parse.Cloud.define("register_employee", function(request, response) {
 		store.relation("Employees").add(employee);
 		
 		// set the acl if given
-		var acl = new Parse.ACL();
+		var acl = store.getACL();
 		if(access_level == "admin") {
 		    acl.setReadAccess(employeeUser, true);
 		    acl.setWriteAccess(employeeUser, true);
@@ -409,7 +409,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 		store.relation("Employees").add(employee);
 		
 		// set the acl if given
-		var acl = new Parse.ACL();
+		var acl = store.getACL();
 		if(access_level == "admin") {
 		    acl.setReadAccess(employeeUser, true);
 		    acl.setWriteAccess(employeeUser, true);
