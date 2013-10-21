@@ -2,6 +2,14 @@
 GCM HTTP Sender.
 """
 
+import requests, json
+
+from repunch.settings import GCM_RECEIVE_KEY, GCM_RECEIVE_KEY_NAME,\
+GCM_API_KEY
+
+NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids', 'action',
+    "delay_while_idle")
+
 def gcm_send(postBody):
     """
     postBody format/example:
@@ -19,5 +27,27 @@ def gcm_send(postBody):
             optionalData4: [1,2,3],
             optionalData5: {1:1, 2:2},
         }
+        
+    See http://developer.android.com/google/gcm/server.html#params
+    for more GCM parameters.
     """
-    pass
+    if str(postBody[GCM_RECEIVE_KEY_NAME]) != GCM_RECEIVE_KEY:
+        return False
+    
+    auth = ("key", GCM_API_KEY)
+    headers = {
+        'content-type': 'application/json',
+    }
+    payload = {
+        "delay_while_idle": True,
+        "registration_ids": postBody['registration_ids'],
+        "data": { k:v for k,v in postBody.iteritems()
+            if k not in NON_DATA_PARAMS },
+    }
+    
+    res = requests.post(url, data=json.dumps(payload),
+        headers=headers, auth=auth)
+    
+    # TODO process response
+    print res
+    return True

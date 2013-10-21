@@ -939,7 +939,11 @@ Parse.Cloud.define("punch", function(request, response)
 	function gcmPost(){
 	    var promise = new Parse.Promise();
 	    
-		// TODO replace action
+		// TODO replace action and delete below
+	    var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	    androidInstallationQuery.equalTo('deviceType', 'android');
+	    androidInstallationQuery.select("gcm_regid");
+	    /////////////////////////////////////
 	    androidInstallationQuery.find().then(function(installations) {
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
