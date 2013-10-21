@@ -839,6 +839,7 @@ Parse.Cloud.define("punch", function(request, response)
 	
 	androidInstallationQuery.equalTo("punch_code", punchCode);
 	androidInstallationQuery.equalTo('deviceType', 'android');
+	androidInstallationQuery.select("gcm_regid");
 	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 				   
@@ -935,26 +936,46 @@ Parse.Cloud.define("punch", function(request, response)
 		});
 	}
 	
+	function gcmPost(){
+	    var promise = new Parse.Promise();
+	    
+		// TODO replace action
+	    androidInstallationQuery.find().then(function(installations) {
+	        var registration_ids = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            registration_ids.push(installations[i].get("gcm_regid"));
+	        }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "<<GCM_RECEIVE_URL>>",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "<<GCM_RECEIVE_KEY>>",
+                    registration_ids: registration_ids,
+				    action: "com.repunch.retailer.PUNCH"
+				    name: storeName,
+				    id: storeId,
+				    punches: numPunches,
+				    total_punches: patronStore.get("punch_count"),
+                }, 
+            });
+            
+            promise.resolve();
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	    
+	    return promise;
+	}
+	
 	function executePush(patronStore)
 	{
 		var punchString = (numPunches == 1) ? "punch" : "punches";
 		var promises = [];
 		
-		// TODO replace action
-		promises.push( Parse.Cloud.httpRequest({
-            method: "POST",
-            url: "<<GCM_RECEIVE_URL>>",
-            headers: { "Content-Type": "application/json"},
-            body: {
-                gcmrkey: "<<GCM_RECEIVE_KEY>>",
-				name: storeName,
-				id: storeId,
-				punches: numPunches,
-				total_punches: patronStore.get("punch_count"),
-				action: "com.repunch.retailer.PUNCH"
-            }, 
-        }) );
-		
+		promises.push( gcmPost() );
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
 			data: {
