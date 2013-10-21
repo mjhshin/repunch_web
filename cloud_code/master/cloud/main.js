@@ -953,7 +953,7 @@ Parse.Cloud.define("punch", function(request, response)
                 body: {
                     gcmrkey: "<<GCM_RECEIVE_KEY>>",
                     registration_ids: registration_ids,
-				    action: "com.repunch.retailer.PUNCH"
+				    action: "com.repunch.retailer.PUNCH",
 				    name: storeName,
 				    id: storeId,
 				    punches: numPunches,
