@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^manage/$', views.manage_login, name='manage_login'),
     url(r'^manage/logout$', views.manage_logout, name='manage_logout'),
     
+    url(r'^gcm/', include('apps.gcm.urls')),
+    
     # Parse Stuff
     url(r'^manage/password-reset$', 
             views.manage_parse_password_reset, 

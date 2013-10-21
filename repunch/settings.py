@@ -325,6 +325,7 @@ INSTALLED_APPS = (
     'apps.workbench',
     'apps.comet',
     'apps.scripts',
+    'apps.gcm',
     'libs.repunch',
 
     'django_extensions',
