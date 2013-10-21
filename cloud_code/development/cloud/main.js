@@ -939,16 +939,22 @@ Parse.Cloud.define("punch", function(request, response)
 	{
 		var punchString = (numPunches == 1) ? "punch" : "punches";
 		var promises = [];
-		promises.push( Parse.Push.send({
-            where: androidInstallationQuery, 
-			data: {
+		
+		// TODO replace action
+		promises.push( Parse.Cloud.httpRequest({
+            method: "POST",
+            url: "http://dev.repunch.com/gcm/receive/",
+            headers: { "Content-Type": "application/json"},
+            body: {
+                gcmrkey: "p9wn84m8450yot4ureh",
 				name: storeName,
 				id: storeId,
 				punches: numPunches,
 				total_punches: patronStore.get("punch_count"),
-				action: "com.repunch.intent.PUNCH"
-			}
+				action: "com.repunch.retailer.PUNCH"
+            }, 
         }) );
+		
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
 			data: {

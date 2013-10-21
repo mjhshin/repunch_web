@@ -946,6 +946,7 @@ Parse.Cloud.define("punch", function(request, response)
             url: "<<GCM_RECEIVE_URL>>",
             headers: { "Content-Type": "application/json"},
             body: {
+                gcmrkey: "<<GCM_RECEIVE_KEY>>",
 				name: storeName,
 				id: storeId,
 				punches: numPunches,
