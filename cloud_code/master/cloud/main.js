@@ -936,7 +936,7 @@ Parse.Cloud.define("punch", function(request, response)
 		});
 	}
 	
-	function gcmPost(){
+	function gcmPost(patronStore){
 	    var promise = new Parse.Promise();
 	    
 		// TODO replace action and delete below
@@ -978,7 +978,7 @@ Parse.Cloud.define("punch", function(request, response)
 		var punchString = (numPunches == 1) ? "punch" : "punches";
 		var promises = [];
 		
-		promises.push( gcmPost() );
+		promises.push( gcmPost(patronStore) );
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
 			data: {
