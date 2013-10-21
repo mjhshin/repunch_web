@@ -8,6 +8,7 @@ from repunch.settings import GCM_RECEIVE_KEY, GCM_RECEIVE_KEY_NAME,\
 GCM_API_KEY
 
 NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids', 'action')
+GCM_URL = "https://android.googleapis.com/gcm/send"
 
 def gcm_send(postBody):
     """
@@ -33,9 +34,10 @@ def gcm_send(postBody):
     if str(postBody[GCM_RECEIVE_KEY_NAME]) != GCM_RECEIVE_KEY:
         return False
     
-    auth = ("key", GCM_API_KEY)
     headers = {
+        'UserAgent': "GCM-Server",
         'content-type': 'application/json',
+        'Authorization': 'key=%s' % (GCM_API_KEY,),
     }
     payload = {
         "registration_ids": postBody['registration_ids'],
@@ -43,8 +45,9 @@ def gcm_send(postBody):
             if k not in NON_DATA_PARAMS },
     }
     
-    res = requests.post(url, data=json.dumps(payload),
-        headers=headers, auth=auth)
+    res = requests.post(GCM_URL, data=json.dumps(payload),
+        headers=headers)
     
     # TODO process response
-    return True
+    print res.reason
+    return res.ok
