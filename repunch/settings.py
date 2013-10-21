@@ -281,6 +281,13 @@ if PRODUCTION_SERVER:
     COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
 else:
     COMET_RECEIVE_KEY = "384ncocoacxpvgrwecwy"
+    
+# Key used to verify the validity of post request to gcm receive
+GCM_RECEIVE_KEY_NAME = "gcmrkey"
+if PRODUCTION_SERVER:
+    GCM_RECEIVE_KEY = "sikxuuq348o75c7seoryt"
+else:
+    GCM_RECEIVE_KEY = "p9wn84m8450yot4ureh"
 
 # force responding to requests and getting a new request from the
 # client every 4 minutes
