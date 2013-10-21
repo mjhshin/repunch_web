@@ -939,13 +939,11 @@ Parse.Cloud.define("punch", function(request, response)
 	function gcmPost(patronStore){
 	    var promise = new Parse.Promise();
 	    
-		// TODO replace action and delete below
-	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
-	    androidInstallationQuery.select("registration_id");
-	    /////////////////////////////////////
+		// TODO replace action 
 	    androidInstallationQuery.find().then(function(installations) {
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
+	            console.log("Pushing registration_id " + installations[i].get("registration_id"));
 	            registration_ids.push(installations[i].get("registration_id"));
 	        }
 	    
