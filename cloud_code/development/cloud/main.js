@@ -823,11 +823,12 @@ Parse.Cloud.define("punch", function(request, response)
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var Store = Parse.Object.extend("Store");
 	var Employee = Parse.Object.extend("Employee");
+	var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
    
 	var patronQuery = new Parse.Query(Patron);
 	var patronStoreQuery = new Parse.Query(PatronStore);
 	var storeQuery = new Parse.Query(Store);
-	var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
    
 	patronQuery.equalTo("punch_code", punchCode);
@@ -838,8 +839,7 @@ Parse.Cloud.define("punch", function(request, response)
 	patronStoreQuery.include("Store");
 	
 	androidInstallationQuery.equalTo("punch_code", punchCode);
-	androidInstallationQuery.equalTo('deviceType', 'android');
-	androidInstallationQuery.select("gcm_regid");
+	androidInstallationQuery.select("registration_id");
 	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 				   
@@ -940,14 +940,13 @@ Parse.Cloud.define("punch", function(request, response)
 	    var promise = new Parse.Promise();
 	    
 		// TODO replace action and delete below
-	    var androidInstallationQuery = new Parse.Query(Parse.Installation);
-	    androidInstallationQuery.equalTo('deviceType', 'android');
-	    androidInstallationQuery.select("gcm_regid");
+	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+	    androidInstallationQuery.select("registration_id");
 	    /////////////////////////////////////
 	    androidInstallationQuery.find().then(function(installations) {
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
-	            registration_ids.push(installations[i].get("gcm_regid"));
+	            registration_ids.push(installations[i].get("registration_id"));
 	        }
 	    
 	        Parse.Cloud.httpRequest({

@@ -7,8 +7,7 @@ import requests, json
 from repunch.settings import GCM_RECEIVE_KEY, GCM_RECEIVE_KEY_NAME,\
 GCM_API_KEY
 
-NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids', 'action',
-    "delay_while_idle")
+NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids', 'action')
 
 def gcm_send(postBody):
     """
@@ -39,7 +38,6 @@ def gcm_send(postBody):
         'content-type': 'application/json',
     }
     payload = {
-        "delay_while_idle": True,
         "registration_ids": postBody['registration_ids'],
         "data": { k:v for k,v in postBody.iteritems()
             if k not in NON_DATA_PARAMS },
@@ -49,5 +47,4 @@ def gcm_send(postBody):
         headers=headers, auth=auth)
     
     # TODO process response
-    print res
     return True
