@@ -5,6 +5,7 @@ GCM HTTP Server.
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 from libs.gcm import gcm_send
 
