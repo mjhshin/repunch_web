@@ -951,7 +951,7 @@ Parse.Cloud.define("punch", function(request, response)
 	    
 	        Parse.Cloud.httpRequest({
                 method: "POST",
-                url: "http://dev.repunch.com/gcm/receive/",
+                url: "http://dev.repunch.com/gcm/receive",
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",

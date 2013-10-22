@@ -12,12 +12,12 @@ import os, subprocess, shlex, argparse
 
 DEVELOPMENT_COMET_RECEIVE_URL = "http://dev.repunch.com/manage/comet/receive/"
 DEVELOPMENT_COMET_RECEIVE_KEY = "384ncocoacxpvgrwecwy"
-DEVELOPMENT_GCM_RECEIVE_URL = "http://dev.repunch.com/gcm/receive/"
+DEVELOPMENT_GCM_RECEIVE_URL = "http://dev.repunch.com/gcm/receive"
 DEVELOPMENT_GCM_RECEIVE_KEY = "p9wn84m8450yot4ureh"
 
 PRODUCTION_COMET_RECEIVE_URL = "https://www.repunch.com/manage/comet/receive/"
 PRODUCTION_COMET_RECEIVE_KEY = "f2cwxn35cxyoq8723c78wnvy"
-PRODUCTION_GCM_RECEIVE_URL = "https://www.repunch.com/gcm/receive/"
+PRODUCTION_GCM_RECEIVE_URL = "https://www.repunch.com/gcm/receive"
 PRODUCTION_GCM_RECEIVE_KEY = "sikxuuq348o75c7seoryt"
 
 COMET_RECEIVE_URL_DELIMETER = "<<COMET_RECEIVE_URL>>"
