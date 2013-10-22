@@ -7,7 +7,7 @@ import requests, json
 from repunch.settings import GCM_RECEIVE_KEY, GCM_RECEIVE_KEY_NAME,\
 GCM_API_KEY
 
-NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids', 'action')
+NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'registration_ids')
 GCM_URL = "https://android.googleapis.com/gcm/send"
 
 def gcm_send(postBody):
