@@ -73,7 +73,7 @@
     {# action specified via script below #}
 	<form method="POST" id="update-form">{% csrf_token %}
 	<div class="section first">
-		<h2>Credit Card Information</h2>
+		<h2>Billing Information</h2>
 		
 		<div class="input-container" id="first_name_ic"
 		    {% if not form.first_name.errors and form.last_name.errors %}
