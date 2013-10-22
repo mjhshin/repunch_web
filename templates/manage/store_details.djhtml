@@ -44,10 +44,9 @@
     {% if alert_billing %}
 	<div class="notification">
 	    <div>
-        <span style="color:red">ALERT!</span> We have failed to charge you for your monthly membership.<br/>
-        The credit card information you provided may be incorrect or<br/> 
-        the credit card may not have enough funds.<br/><br/>
-	    Please make a payment by <a href="{% url 'subscription_update' %}" >updating your subscription</a> for continued service.
+        <span style="color:red">ALERT!</span> We were unable to charge you for your monthly membership.<br/>
+        The billing information we have is invalid.<br/><br/>
+	    Please <a href="{% url 'subscription_update' %}" >update your subscription</a> for continued service.
 		</div>
 	</div>
     {% endif %}
