@@ -939,7 +939,6 @@ Parse.Cloud.define("punch", function(request, response)
 	function gcmPost(patronStore){
 	    var promise = new Parse.Promise();
 	    
-		// TODO replace action 
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" installations for punch_code "+punchCode);
 	    
@@ -956,7 +955,7 @@ Parse.Cloud.define("punch", function(request, response)
                 body: {
                     gcmrkey: "<<GCM_RECEIVE_KEY>>",
                     registration_ids: registration_ids,
-			        action: "com.repunch.retailer.PUNCH",
+			        action: "com.repunch.consumer.PUNCH",
 			        name: storeName,
 			        id: storeId,
 			        punches: numPunches,
