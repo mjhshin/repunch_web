@@ -48,6 +48,8 @@ def gcm_send(postBody):
     res = requests.post(GCM_URL, data=json.dumps(payload),
         headers=headers)
     
-    # TODO process response
-    print res.reason
+    # TODO handle response
+    print res.json()
+    
+    
     return res.ok
