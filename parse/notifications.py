@@ -29,8 +29,8 @@ ORDER_PLACED_EMAILS, MAIN_TRANSPORT_PROTOCOL
 # declare here for selenium tests use also
 EMAIL_SIGNUP_SUBJECT_PREFIX = "New business: "
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX = "Welcome to Repunch "
-EMAIL_UPGRADE_SUBJECT = "Repunch Inc. Your subscription has been upgraded."
-EMAIL_MONTHLY_SUBJECT = "Repunch Inc. monthly service charge."
+EMAIL_UPGRADE_SUBJECT = "Your Repunch subscription has been upgraded."
+EMAIL_MONTHLY_SUBJECT = "Repunch Monthly Account Statement"
 
 def get_notification_ctx():
     """
@@ -391,8 +391,7 @@ def send_email_passed_user_limit(account, store, package,
                 'r') as f:
             template = Template(f.read())
             
-        subject = "Repunch Inc. Alert. Your store, " +\
-            store.get("store_name") + " has passed the user limit."
+        subject = "Your Repunch store has passed the user limit"
         ctx = get_notification_ctx()
         ctx.update({'store':store, 'package':package})
         body = template.render(Context(ctx)).__str__()

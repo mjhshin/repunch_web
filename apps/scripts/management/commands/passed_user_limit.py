@@ -312,7 +312,7 @@ class Command(BaseCommand):
                         "sub_type": sub_type[1]["name"],
                         "new_sub_type": sub_type[2]["name"],
                         "new_sub_type_cost": sub_type[2]["monthly_cost"],
-                        "new_max_patronStore_count": "UNLIMITED",
+                        "new_max_patronStore_count": "Unlimited",
                         "patronStore_count": sub.store.get(\
                             "patronStores", limit=0, count=1),
                     }

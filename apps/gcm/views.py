@@ -3,8 +3,11 @@ Processes POST requests from Cloud Code and sends corresponding
 GCM HTTP Server.
 """ 
 
+from django.views.decorators.csrf import csrf_exempt
+
 from libs.gcm import gcm_send
 
+@csrf_exempt
 def receive(request):
     if request.method == "POST":
         try:

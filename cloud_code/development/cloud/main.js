@@ -956,12 +956,19 @@ Parse.Cloud.define("punch", function(request, response)
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
                     registration_ids: registration_ids,
-				    action: "com.repunch.retailer.PUNCH",
-				    name: storeName,
-				    id: storeId,
-				    punches: numPunches,
-				    total_punches: patronStore.get("punch_count"),
+			        action: "com.repunch.retailer.PUNCH",
+			        name: storeName,
+			        id: storeId,
+			        punches: numPunches,
+			        total_punches: patronStore.get("punch_count"),
                 }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
             });
             
             promise.resolve();

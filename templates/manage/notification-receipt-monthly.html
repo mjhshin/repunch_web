@@ -2,9 +2,9 @@
 
 {% block title %}
 {% if for_admin %}
-{{ store.get_owner_fullname }} has paid his monthly subscription fee.
+{{ store.get_owner_fullname }} has paid his monthly subscription fee
 {% else %}
-You have been charged ${{ invoice.total }} for your membership with Repunch.
+Your monthly payment has been received
 {% endif %}
 {% endblock %}
 
