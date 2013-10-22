@@ -944,7 +944,6 @@ Parse.Cloud.define("punch", function(request, response)
 	    
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
-	            console.log("Pushing registration_id " + installations[i].get("registration_id"));
 	            registration_ids.push(installations[i].get("registration_id"));
 	        }
 	    
@@ -971,6 +970,7 @@ Parse.Cloud.define("punch", function(request, response)
             });
             
             promise.resolve();
+            
 	    }, function(error) {
 	        console.log("error");
 	    });
@@ -1455,6 +1455,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 	// optional - if validated by an employee
 	var installationId = request.params.installation_id;
+	var androidInstallationId = request.params.android_installation_id;
 	
 	var isOfferOrGift = (rewardId == null);
 	
@@ -1576,14 +1577,60 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 			
 	});
 	
+	function gcmEmployeePost() {
+	    var promise = new Parse.Promise();
+	    
+	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+	    androidInstallationQuery.equalTo("store_id", storeId);
+	    androidInstallationQuery.select("registration_id");
+		if (androidInstallationId != null) {
+		    androidInstallationQuery.notEqualTo("objectId", androidInstallationId);
+		}
+	    
+	    androidInstallationQuery.find().then(function(installations) {
+	        console.log("Found "+installations.length+" employee installations for store "+storeId);
+	    
+	        var registration_ids = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            registration_ids.push(installations[i].get("registration_id"));
+	        }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "http://dev.repunch.com/gcm/receive",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "p9wn84m8450yot4ureh",
+                    registration_ids: registration_ids,
+			        action: "com.repunch.retailer.VALIDATE_REDEEM",
+			        id: storeId,
+                }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	
+	    return promise;
+	}
+	
 	function executePushReward(redeemReward)
 	{
-		var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	    
 		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
 
-		androidInstallationQuery.equalTo("deviceType", "android");
-		androidInstallationQuery.equalTo("patron_id", patronId);
 		iosPatronInstallationQuery.equalTo("deviceType", "ios");
 		iosPatronInstallationQuery.equalTo("patron_id", patronId);
 		
@@ -1594,17 +1641,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		}
 		
 		var promises = [];
-		promises.push( Parse.Push.send({
-	        where: androidInstallationQuery,
-	        data: {
-	            title: rewardTitle,
-	            id: storeId, 
-	            store: store.get("store_name"), 
-	            punches: numPunches,
-				total_punches: patronStore.get("punch_count"),
-				action: "com.repunch.intent.REDEEM_REWARD"
-	        }
-	    }) );
+		// Consumer push
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
 	        data: {
@@ -1616,6 +1653,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }) );
+	    
+	    // Employee push
+	    promises.push(gcmEmployeePost());
+	    
 	    promises.push( Parse.Push.send({
 	        where: iosEmployeeInstallationQuery,
 	        data: {
@@ -1641,12 +1682,9 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 	function executePushOfferGift(redeemReward)
 	{
-		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
 		
-		androidInstallationQuery.equalTo("patron_id", patronId);
-		androidInstallationQuery.equalTo("deviceType", "android");
 		iosPatronInstallationQuery.equalTo("patron_id", patronId);
 		iosPatronInstallationQuery.equalTo("deviceType", "ios");
 		
@@ -1657,6 +1695,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		}
 		
 		var promises = [];
+		// Consumer push
 		promises.push( Parse.Push.send({
 	        where: androidInstallationQuery,
 	        data: {
@@ -1667,6 +1706,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
 	        }
 	    }) );
+	    
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
 	        data: {
@@ -1676,6 +1716,10 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	            message_status_id: messageStatus.id
 	        }
 	    }) );
+
+	    // Employee push
+	    promises.push(gcmEmployeePost());
+	    	    
 	    promises.push( Parse.Push.send({
 	        where: iosEmployeeInstallationQuery,
 	        data: {
