@@ -1246,13 +1246,66 @@ Parse.Cloud.define("request_redeem", function(request, response)
 		});
 	}
 	
+	function gcmPost(){
+	    var promise = new Parse.Promise();
+	    
+	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+	    androidInstallationQuery.equalTo("store_id", storeId);
+	    androidInstallationQuery.select("registration_id");
+	    
+	    androidInstallationQuery.find().then(function(installations) {
+	        console.log("Found "+installations.length+" employee installations for store_id "+storeId);
+
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var registration_ids = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            registration_ids.push(installations[i].get("registration_id"));
+	        }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "http://dev.repunch.com/gcm/receive",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "p9wn84m8450yot4ureh",
+                    registration_ids: registration_ids,
+			        action: "com.repunch.retailer.INTENT_REQUEST_REDEEM",
+			        redeem_id: redeemReward.id
+                }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	    
+	    return promise;
+	}
+	
 	function executePush() {
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
 		iosInstallationQuery.equalTo("store_id", storeId);
 	    iosInstallationQuery.equalTo("deviceType", "ios");
-	    // TODO android push
 	    
-		Parse.Push.send({
+	    var promises = [];
+	    
+	    promises.push( gcmPost() );
+	    
+		promises.push( Parse.Push.send({
 	        where: iosInstallationQuery,
 	        data: {
 				redeem_id: redeemReward.id,
@@ -1260,18 +1313,17 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	            type: "request_redeem",
 				"content-available": 1
 	        }
-	    }, {
-	        success: function() {
-				console.log("Push success.");
-	            response.success("success");
-				return;
-	        },
-	        error: function(error) {
-				console.log("Push failed.");
-	            response.error("error");
-				return;
-	        }
-	    });
+	    }));
+	    
+	   Parse.Promise.when(promises).then(function() {
+		    console.log("Android/iOS push successful");
+			
+		}, function(error) {
+        	console.log("Android/iOS push failed");
+			response.error("error");
+			
+		});
+	    
 	}
 	
 	function updateMessageStatus() {
@@ -1318,6 +1370,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	
 	// optional - if validated by an employee
 	var installationId = request.params.installation_id;
+	var androidInstallationId = request.params.android_installation_id;
 	
 	var Store = Parse.Object.extend("Store");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -1382,6 +1435,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 		        iosEmployeeInstallationQuery.notEqualTo("objectId", installationId);
 		    }
 		    
+		    // Push to iOS employees
 		    promises.push( Parse.Push.send({
 	            where: iosEmployeeInstallationQuery,
 	            data: {
@@ -1391,7 +1445,11 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	                redeem_id: redeemId,
 	            }
 	        }) );
+	        
+	        // Post to Android GCM
+	        promises.push( gcmEmployeePost() );
             
+            // Post to Dashboard
             promises.push(Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/manage/comet/receive/" + storeId,
@@ -1421,6 +1479,59 @@ Parse.Cloud.define("reject_redeem", function(request, response)
         });
         
     }
+    
+    function gcmEmployeePost() {
+	    var promise = new Parse.Promise();
+	    
+	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+	    androidInstallationQuery.equalTo("store_id", storeId);
+	    androidInstallationQuery.select("registration_id");
+		if (androidInstallationId != null) {
+		    androidInstallationQuery.notEqualTo("objectId", androidInstallationId);
+		}
+	    
+	    androidInstallationQuery.find().then(function(installations) {
+	        console.log("Found "+installations.length+" employee installations for store "+storeId);
+	        
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var registration_ids = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            registration_ids.push(installations[i].get("registration_id"));
+	        }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "http://dev.repunch.com/gcm/receive",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "p9wn84m8450yot4ureh",
+                    registration_ids: registration_ids,
+			        action: "com.repunch.retailer.INTENT_REJECT_REDEEM",
+			        redeem_id: redeemId,
+                }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	
+	    return promise;
+	}
     
     function handleMessageStatus(redeemRewardResult) {
         var promise = new Parse.Promise();
@@ -1595,6 +1706,11 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" employee installations for store "+storeId);
+	        
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
 	    
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {

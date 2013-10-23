@@ -1313,7 +1313,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	            type: "request_redeem",
 				"content-available": 1
 	        }
-	    });
+	    }));
 	    
 	   Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
