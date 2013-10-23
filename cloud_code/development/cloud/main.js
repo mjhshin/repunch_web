@@ -1317,6 +1317,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	    
 	   Parse.Promise.when(promises).then(function() {
 		    console.log("Android/iOS push successful");
+			response.success("success");
 			
 		}, function(error) {
         	console.log("Android/iOS push failed");
