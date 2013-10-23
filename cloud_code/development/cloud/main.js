@@ -1604,7 +1604,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
                     gcmrkey: "p9wn84m8450yot4ureh",
                     registration_ids: registration_ids,
 			        action: "com.repunch.retailer.INTENT_VALIDATE_REDEEM",
-			        id: storeId,
+			        redeem_id: redeemId,
                 }, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);

@@ -942,6 +942,11 @@ Parse.Cloud.define("punch", function(request, response)
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" installations for punch_code "+punchCode);
 	    
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
 	            registration_ids.push(installations[i].get("registration_id"));
@@ -1604,7 +1609,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
                     gcmrkey: "<<GCM_RECEIVE_KEY>>",
                     registration_ids: registration_ids,
 			        action: "com.repunch.retailer.INTENT_VALIDATE_REDEEM",
-			        id: storeId,
+			        redeem_id: redeemId,
                 }, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);
