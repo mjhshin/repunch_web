@@ -71,7 +71,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		user = userResult;
 		userResult.set("Patron", patron);
 		
-		if(email != null) {
+		if(email != null && facebookId == null) {
 			userResult.set("email", email);
 			userResult.set("username", email);
 		}
@@ -95,7 +95,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 			console.log("User save failed because this email is already taken.");
 			response.error(error.message);
 			deleteAccount();
-			
+
 		} else {
 			response.error("error");
 		}	
@@ -113,7 +113,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		    console.log("Patron and User delete fail (in parallel).");
         });
 	}
-	
+
 });
 
 ////////////////////////////////////////////////////
