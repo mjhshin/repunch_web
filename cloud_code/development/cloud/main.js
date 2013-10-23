@@ -942,6 +942,11 @@ Parse.Cloud.define("punch", function(request, response)
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" installations for punch_code "+punchCode);
 	    
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
 	        var registration_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
 	            registration_ids.push(installations[i].get("registration_id"));
