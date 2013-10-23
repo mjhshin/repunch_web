@@ -1603,7 +1603,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
                     registration_ids: registration_ids,
-			        action: "com.repunch.retailer.VALIDATE_REDEEM",
+			        action: "com.repunch.retailer.INTENT_VALIDATE_REDEEM",
 			        id: storeId,
                 }, 
                 success: function(httpResponse) {
@@ -1696,6 +1696,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		var promises = [];
 		// Consumer push
+		/*
 		promises.push( Parse.Push.send({
 	        where: androidInstallationQuery,
 	        data: {
@@ -1706,6 +1707,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
 	        }
 	    }) );
+	    */
 	    
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
