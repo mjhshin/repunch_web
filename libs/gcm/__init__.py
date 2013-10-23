@@ -17,8 +17,9 @@ def gcm_send(postBody):
         {
             # Required content
             gcmrkey: "<<GCM_RECEIVE_KEY>>",
-            registration_ids: ["kh7x7towm4t", "uytxgygx", ...],
-	        action: "com.repunch.retailer.PUNCH"
+            registration_ids: ["kh7x7towm4t...", "uytxgygx....", ...],
+            employee_ids or patron_ids: ["SGDgsas", ...],
+	        action: "com.repunch.retailer.PUNCH",
         
             # optional content (must be less than 4kb)
             optionalData1: False,
@@ -47,6 +48,9 @@ def gcm_send(postBody):
     
     res = requests.post(GCM_URL, data=json.dumps(payload),
         headers=headers)
+    
+    # TODO make sure the employee_ids | patron_ids do not end up
+    # exceeding the 4kb limit of a GCM push
     
     # TODO handle response
     print res.json()
