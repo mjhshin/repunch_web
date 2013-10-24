@@ -1727,6 +1727,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        var registration_ids = new Array();
 	        var employee_ids = new Array();
 	        for(var i=0; i<installations.length; i++) {
+	            console.log("Pushing installation "+installations[i].id);
 	            registration_ids.push(installations[i].get("registration_id"));
 	            employee_ids.push(installations[i].get("employee_id"));
 	        }
