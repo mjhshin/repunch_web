@@ -1712,6 +1712,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    androidInstallationQuery.equalTo("store_id", storeId);
 	    androidInstallationQuery.select("registration_id", "employee_id");
 		if (androidInstallationId != null) {
+		    console.log("Excluding Android Installation "+androidInstallationId);
 		    androidInstallationQuery.notEqualTo("objectId", androidInstallationId);
 		}
 	    
