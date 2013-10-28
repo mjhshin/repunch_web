@@ -64,7 +64,7 @@ def gcm_send(postBody):
     # chunk messages to make sure the employee_ids | patron_ids
     # do not end up exceeding the 4kb limit of a GCM push
     while len(receivers) > 0:
-        registration_ids, extra_ids = {}, [], []
+        registration_ids, extra_ids = [], []
         rec = receivers[:RECEIVER_BATCH_SIZE]
         receivers = rec
         for r in rec:
