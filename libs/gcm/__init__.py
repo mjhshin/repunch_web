@@ -66,7 +66,7 @@ def gcm_send(postBody):
     while len(receivers) > 0:
         registration_ids, extra_ids = [], []
         rec = receivers[:RECEIVER_BATCH_SIZE]
-        receivers = rec
+        receivers = receivers[len(rec):]
         for r in rec:
             registration_ids.append(r["registration_id"])
             extra_ids.append(r[which_id])
