@@ -67,6 +67,17 @@ def gcm_send(postBody):
         registration_ids, extra_ids = [], []
         rec = receivers[:RECEIVER_BATCH_SIZE]
         receivers = receivers[len(rec):]
+        
+        """
+        A test that this will never result in an infinite loop.
+        receivers = [1,2,3,4,5,6,7,8,9,10]
+        batch_count = 3
+        while len(receivers) > 0:
+            rec = receivers[:batch_count]
+            print rec
+            receivers = receivers[len(rec):]
+        """
+        
         for r in rec:
             registration_ids.append(r["registration_id"])
             extra_ids.append(r[which_id])
@@ -80,7 +91,7 @@ def gcm_send(postBody):
         }), headers=headers)
         
         # TODO handle response
-        print res.json()
+        # print res.json()
     
     
     return True
