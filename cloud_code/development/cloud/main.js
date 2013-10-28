@@ -947,12 +947,13 @@ Parse.Cloud.define("punch", function(request, response)
 	            return;
 	        }
 	    
-	        
-	        var registration_ids = new Array();
-	        var patron_ids = new Array();
+	        var repunchReceivers = new Array();
 	        for(var i=0; i<installations.length; i++) {
-	            registration_ids.push(installations[i].get("registration_id"));
-	            patron_ids.push(installations[i].get("patron_id"));
+	            console.log("Pushing installation "+installations[i].id);
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                patron_id: installations[i].get("patron_id"),
+	            });
 	        }
 	    
 	        Parse.Cloud.httpRequest({
@@ -961,8 +962,7 @@ Parse.Cloud.define("punch", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
-                    registration_ids: registration_ids,
-                    patron_ids: patron_ids,
+                    repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.consumer.PUNCH",
 			        name: storeName,
 			        id: storeId,
@@ -1266,11 +1266,13 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	            return;
 	        }
 	    
-	        var registration_ids = new Array();
-	        var employee_ids = new Array();
+	        var repunchReceivers = new Array();
 	        for(var i=0; i<installations.length; i++) {
-	            registration_ids.push(installations[i].get("registration_id"));
-	            employee_ids.push(installations[i].get("employee_id"));
+	            console.log("Pushing installation "+installations[i].id);
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                employee_id: installations[i].get("employee_id"),
+	            });
 	        }
 	    
 	        Parse.Cloud.httpRequest({
@@ -1279,8 +1281,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
-                    registration_ids: registration_ids,
-                    employee_ids: employee_ids,
+                    repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_REQUEST_REDEEM",
 			        redeem_id: redeemReward.id
                 }, 
@@ -1506,12 +1507,14 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	            promise.resolve();
 	            return;
 	        }
-	    
-	        var registration_ids = new Array();
-	        var employee_ids = new Array();
+	        
+	        var repunchReceivers = new Array();
 	        for(var i=0; i<installations.length; i++) {
-	            registration_ids.push(installations[i].get("registration_id"));
-	            employee_ids.push(installations[i].get("employee_id"));
+	            console.log("Pushing installation "+installations[i].id);
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                employee_id: installations[i].get("employee_id"),
+	            });
 	        }
 	    
 	        Parse.Cloud.httpRequest({
@@ -1520,8 +1523,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
-                    registration_ids: registration_ids,
-                    employee_ids: employee_ids,
+                    repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_REJECT_REDEEM",
 			        redeem_id: redeemId,
                 }, 
@@ -1724,12 +1726,13 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	            return;
 	        }
 	    
-	        var registration_ids = new Array();
-	        var employee_ids = new Array();
+	        var repunchReceivers = new Array();
 	        for(var i=0; i<installations.length; i++) {
 	            console.log("Pushing installation "+installations[i].id);
-	            registration_ids.push(installations[i].get("registration_id"));
-	            employee_ids.push(installations[i].get("employee_id"));
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                employee_id: installations[i].get("employee_id"),
+	            });
 	        }
 	    
 	        Parse.Cloud.httpRequest({
@@ -1738,8 +1741,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
-                    registration_ids: registration_ids,
-                    employee_ids: employee_ids, 
+                    repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_VALIDATE_REDEEM",
 			        redeem_id: redeemId,
                 }, 
