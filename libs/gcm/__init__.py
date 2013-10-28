@@ -69,7 +69,7 @@ def gcm_send(postBody):
         receivers = rec
         for r in rec:
             registration_ids.append(r["registration_id"])
-            extra_ids.append(r[which_id])
+            extra_ids.append(r[which_ids])
             
         batch_data = data.copy()
         batch_data.update({which_ids: extra_ids})
