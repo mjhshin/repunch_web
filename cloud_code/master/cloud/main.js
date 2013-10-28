@@ -481,17 +481,18 @@ Parse.Cloud.define("delete_employee", function(request, response)
     
     var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
     
+    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
     var Employee = Parse.Object.extend("Employee");
     var employeeQuery = new Parse.Query(Employee);
-    var userQuery = new Parse.Query(Parse.User)
+    var userQuery = new Parse.Query(Parse.User);
     
-	var androidInstallationQuery = new Parse.Query(Parse.Installation);
+	var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
 
-	androidInstallationQuery.equalTo("employee_id", employeeId);
-	androidInstallationQuery.equalTo("deviceType", "android");
 	iosInstallationQuery.equalTo("employee_id", employeeId);
 	iosInstallationQuery.equalTo("deviceType", "ios");
+	androidInstallationQuery.equalTo("employee_id", employeeId);
+    androidInstallationQuery.select("registration_id");
     
     employeeQuery.equalTo("objectId", employeeId); 
     userQuery.matchesQuery("Employee", employeeQuery);
@@ -499,7 +500,49 @@ Parse.Cloud.define("delete_employee", function(request, response)
     // Need to use the master key since we are modifying a Parse.User object.
     Parse.Cloud.useMasterKey(); 
     
-    // Note that we must first retrive the user since deleting the employee
+    function gcmPost() {
+	    var promise = new Parse.Promise();
+    
+        androidInstallationQuery.first().then(function(installation) {
+	        if(installation == null) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var repunchReceivers = new Array();
+            repunchReceivers.push({
+                registration_id: installation.get("registration_id"),
+                employee_id: employeeId,
+            });
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "<<GCM_RECEIVE_URL>>",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "<<GCM_RECEIVE_KEY>>",
+                    repunch_receivers: repunchReceivers, 
+			        action: "com.repunch.retailer.EMPLOYEE_DELETE",
+                }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+    
+        return promise;
+    }
+    
+    // Note that we must first retrieve the user since deleting the employee
     // will make the userQuery return nothing.
     
     userQuery.first().then(function(user) 
@@ -533,12 +576,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
         
         if (employee.get("status") == "approved") {
             var promises = [];
-		    promises.push( Parse.Push.send({
-	            where: androidInstallationQuery,
-	            data: {
-				    action: "com.repunch.intent.EMPLOYEE_DELETE"
-	            }
-	        }) );
+		    promises.push( gcmPost() );
 		    promises.push( Parse.Push.send({
 	            where: iosInstallationQuery,
 	            data: {
