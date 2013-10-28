@@ -57,9 +57,9 @@ def gcm_send(postBody):
     
     # its either all employee or patron
     if "employee_id" in receivers[0].keys():
-        which_ids = "employee_ids"
+        which_id = "employee_id"
     else:
-        which_ids = "patron_ids"
+        which_id = "patron_id"
         
     # chunk messages to make sure the employee_ids | patron_ids
     # do not end up exceeding the 4kb limit of a GCM push
@@ -69,10 +69,10 @@ def gcm_send(postBody):
         receivers = rec
         for r in rec:
             registration_ids.append(r["registration_id"])
-            extra_ids.append(r[which_ids])
+            extra_ids.append(r[which_id])
             
         batch_data = data.copy()
-        batch_data.update({which_ids: extra_ids})
+        batch_data.update({which_id+"s": extra_ids})
     
         res = requests.post(GCM_URL, data=json.dumps({
             "registration_ids": registration_ids,
