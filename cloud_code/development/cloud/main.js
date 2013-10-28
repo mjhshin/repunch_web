@@ -2043,6 +2043,15 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var iosInstallationQuery = new Parse.Query(Parse.Installation);
 	androidInstallationQuery.equalTo("deviceType", "android");
 	iosInstallationQuery.equalTo("deviceType", "ios");
+	
+	function setMessage(messageResult) {
+	    message = messageResult;
+        if (message.get("message_type") == "offer") {
+            redeem_available = "yes";
+        } else {
+            redeem_available = "no";
+        }
+	}
 
     storeQuery.get(storeId).then(function(storeResult) {
         patronStoreQuery = storeResult.relation("PatronStores").query();
@@ -2054,18 +2063,26 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		console.log("Store query failed.");
 		response.error("error");
     }).then(function(messageResult) {
-        message = messageResult;
-        if (message.get("message_type") == "offer") {
-            redeem_available = "yes";
-        } else {
-            redeem_available = "no";
-        }
+        setMessage(messageResult);
+        continueWithMessage();
             
     }, function(error) {
-        console.log("Message query failed");
-        response.error("error");
+        console.log("Message query failed. Retrying...");
+        // retry to get the message
+        messageQuery.get(messageId).then(function(messageResult) {
+            setMessage(messageResult);
+            continueWithMessage();
+        
+        }, function(error) {
+            console.log("Message query failed.");
+            response.error("error");
+            
+        });
                 
-    }).then(function() {
+    });
+    
+    
+    function continueWithMessage() {
         if (filter === "one"){
             patronQuery.get(request.params.patron_id).then(function(patron) {
                 patronStoreQuery.equalTo("Patron", patron);
@@ -2103,7 +2120,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             
         }
         
-    });
+    }
     
     function createMessageStatus(patron) { 
         var promise = new Parse.Promise();
