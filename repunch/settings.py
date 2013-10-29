@@ -282,14 +282,13 @@ if PRODUCTION_SERVER:
 else:
     COMET_RECEIVE_KEY = "384ncocoacxpvgrwecwy"
     
-# Google API key (used by GCM)
-GCM_API_KEY = "AIzaSyAwqSVwGB5IoJPcc8EQf8FQme1qfCmnVMU" 
-    
 # Key used to verify the validity of post request to gcm receive
 GCM_RECEIVE_KEY_NAME = "gcmrkey"
 if PRODUCTION_SERVER:
+    GCM_API_KEY = "AIzaSyD6_h9ChUg_3IRrSV3Qggdioxudq2BLny8" 
     GCM_RECEIVE_KEY = "sikxuuq348o75c7seoryt"
 else:
+    GCM_API_KEY = "AIzaSyAwqSVwGB5IoJPcc8EQf8FQme1qfCmnVMU" 
     GCM_RECEIVE_KEY = "p9wn84m8450yot4ureh"
 
 # force responding to requests and getting a new request from the
