@@ -125,6 +125,9 @@ $(document).ready(function(){
     if (recaptchaDisplayed) {
         recaptchaResponse.on("input propertychange", {submit:false}, validateInputs);
     }
+    
+    // initial validation just incase browser prepopulates inputs
+    validateInputs();
 	
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
