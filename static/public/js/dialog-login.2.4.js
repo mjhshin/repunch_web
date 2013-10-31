@@ -127,7 +127,11 @@ $(document).ready(function(){
     }
     
     // initial validation just incase browser prepopulates inputs
-    validateInputs();
+    validateInputs({
+        data: {
+            submit: false,
+        }
+    });
 	
     // PASSWORD RESET
     $("#forgot-pass-form a").click(function(){
