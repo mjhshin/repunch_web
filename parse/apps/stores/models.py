@@ -95,15 +95,17 @@ class Store(ParseObject):
         """
         Capitalize certain strings before saving to parse.
         """
-        self.store_name = title(self.store_name)       
-        self.street = title(self.street)
-        self.city = title(self.city)
+        self.store_name = title(self.store_name).strip()      
+        self.street = title(self.street).strip()
+        self.city = title(self.city).strip()
         if self.state:
-            self.state = self.state.upper()
+            self.state = self.state.upper().strip()
+        if self.zip:
+            self.zip = self.zip.strip()
             
         if self.store_description is not None and\
             len(self.store_description.strip()) == 0:
-            self.store_description = None
+            self.store_description = self.store_description.strip()
             
         
         data = self._get_formatted_data()
