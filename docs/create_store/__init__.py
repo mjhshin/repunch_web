@@ -12,6 +12,7 @@ Random NY store generator!
 4) Image urls taken from google images
 """ 
 
+from django.utils import timezone
 from random import randint
 import requests
 
@@ -111,7 +112,8 @@ class RandomStoreGenerator(object):
             
             # create the subscription
             subscription =\
-                Subscription.objects().create(Store=store.objectId)
+                Subscription.objects().create(Store=store.objectId,
+                    date_last_billed=timezone.now())
             
             # create the user
             email = first_name+str(randint(0, 99))+USER_EMAIL_POSTFIX
