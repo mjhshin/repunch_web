@@ -52,11 +52,14 @@ RANGE_LONG = -73783150 + 74014635
 class RandomStoreGenerator(object):
 
     def __init__(self):
-        with open(DIR+"addresses.txt", "r") as addr,\
-            open(DIR+"owner_names.txt", "r") as own:
-            self.owners = own.read().split("\n")
-            self.addrs = addr.read().split("\n")
-            # TODO neighborhoods
+        with open(DIR+"addresses.txt", "r") as addrs,\
+            open(DIR+"neighborhoods.txt", "r") as neighborhoods,
+            open(DIR+"store_names.txt", "r") as stores,
+            open(DIR+"owner_names.txt", "r") as owners:
+            self.owners = owners.read().split("\n")
+            self.addrs = addrs.read().split("\n")
+            self.stores = stores.read().split("\n")
+            self.neighborhoods = neighborhoods.read().split("\n")
             # TODO image urls            
         
     def create_random_stores(self, amount):
@@ -64,22 +67,28 @@ class RandomStoreGenerator(object):
             street, city, state, zip, country, phone_number =\
                 self.addrs[i].split(", ")
             first_name, last_name = self.owners[i].split(" ")
-            # TODO coordinates
-            # TODO store_avatar
-            # TODO neighborhood
+            neighborhood = self.neighborhoods[i]
+            store_name = self.stores[i]
             store_i = STORE.copy()
             store_i.update({
+                "store_name": store_name,
                 "street": street,
                 "city": city,
                 "state": state,
                 "zip": zip,
+                "neighborhood": neighborhood,
                 "country": country,
                 "phone_number", phone_number
                 "first_name": first_name,
                 "last_name": last_name,
+                "coordinates": self.get_random_coordinates(),
+                
             })
             store = Store(**store_i)   
-            store.create()     
+            store.create()    
+            
+            
+            # TODO store_avatar 
             
     def get_random_coordinates(self):
         """
@@ -91,8 +100,7 @@ class RandomStoreGenerator(object):
         latitude = latitude.insert(2, ".")
         longitude = longitude.insert(3, ".")
         return [latitude, longitude]    
-            
-        
+
 if __name__ == "__main__":
     generator = RandomStoreGenerator()
     generator.create_random_stores(5)
