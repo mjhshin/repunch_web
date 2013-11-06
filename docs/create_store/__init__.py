@@ -13,7 +13,9 @@ Random NY store generator!
 """ 
 
 from random import randint
+import requests
 
+from parse.utils import create_png
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store, Settings, Subscription
 from repunch.settings import TIME_ZONE
@@ -32,7 +34,11 @@ STORE = {
         {"day":5,"open_time":"0900","close_time":"1700"},
         {"day":6,"open_time":"0900","close_time":"1700"},
     ],
+    "ACL": {"*": {"read": True,"write": True}},
 }
+
+USER_EMAIL_POSTFIX = "@repunch.com"
+USER_PASSWORD = "repunch7575"
 
 # Rectangular area around NY 
 # format: (bottom_left, top_left, top_right, bottom_right)
@@ -49,27 +55,39 @@ BASE_LONG = -74014635
 RANGE_LAT = 40836582 - 40617579
 RANGE_LONG = -73783150 + 74014635
 
+TMP_IMG_PATH = DIR+"tmp.png"
+
 class RandomStoreGenerator(object):
 
     def __init__(self):
         with open(DIR+"addresses.txt", "r") as addrs,\
-            open(DIR+"neighborhoods.txt", "r") as neighborhoods,
-            open(DIR+"store_names.txt", "r") as stores,
+            open(DIR+"neighborhoods.txt", "r") as neighborhoods,\
+            open(DIR+"store_names.txt", "r") as stores,\
+            open(DIR+"image_urls.txt", "r") as images,\
             open(DIR+"owner_names.txt", "r") as owners:
             self.owners = owners.read().split("\n")
             self.addrs = addrs.read().split("\n")
             self.stores = stores.read().split("\n")
             self.neighborhoods = neighborhoods.read().split("\n")
-            # TODO image urls            
+            self.images = images.read().split("\n")
         
     def create_random_stores(self, amount):
         for i in range(amount):
+            print "Creating store %s" % (str(i),) 
+            # create the store
             street, city, state, zip, country, phone_number =\
                 self.addrs[i].split(", ")
             first_name, last_name = self.owners[i].split(" ")
             neighborhood = self.neighborhoods[i]
             store_name = self.stores[i]
             store_i = STORE.copy()
+            
+            self.get_store_avatar(i)
+            avatar = create_png(TMP_IMG_PATH)
+            while "error" in avatar:
+                print "Retrying create_png"
+                avatar = create_png(TMP_IMG_PATH)
+            
             store_i.update({
                 "store_name": store_name,
                 "street": street,
@@ -78,17 +96,50 @@ class RandomStoreGenerator(object):
                 "zip": zip,
                 "neighborhood": neighborhood,
                 "country": country,
-                "phone_number", phone_number
+                "phone_number": phone_number,
                 "first_name": first_name,
                 "last_name": last_name,
                 "coordinates": self.get_random_coordinates(),
-                
+                "store_avatar": avatar.get("name"),
             })
+            
             store = Store(**store_i)   
             store.create()    
             
+            # create the settings
+            settings = Settings.objects().create(Store=store.objectId)
             
-            # TODO store_avatar 
+            # create the subscription
+            subscription =\
+                Subscription.objects().create(Store=store.objectId)
+            
+            # create the user
+            email = first_name+str(randint(0, 99))+USER_EMAIL_POSTFIX
+            email = email.lower()
+            acc = Account.objects().create(\
+                username=email, email=email,
+                password=USER_PASSWORD, Store=store.objectId)
+            if not acc.objectId:
+                raise Exception("Account creation failed.")
+                
+            # link the store
+            store.Settings = settings.objectId
+            store.Subscription = subscription.objectId
+            store.owner_id = acc.objectId
+            store.update()
+            
+    def get_store_avatar(self, i):
+        """
+        Read the image to tmp.png.
+        Thanks to 
+            http://stackoverflow.com/questions/13137817/
+            how-to-download-image-using-requests
+        """
+        r = requests.get(self.images[i], stream=True)
+        if r.status_code == 200:
+            with open(TMP_IMG_PATH, 'wb') as fid:
+                for chunk in r.iter_content():
+                    fid.write(chunk)
             
     def get_random_coordinates(self):
         """
@@ -97,10 +148,12 @@ class RandomStoreGenerator(object):
         latitude = list(str(BASE_LAT + randint(0, RANGE_LAT)))
         longitude = list(str(BASE_LONG + randint(0, RANGE_LONG)))
         # add the decimal
-        latitude = latitude.insert(2, ".")
-        longitude = longitude.insert(3, ".")
+        latitude.insert(2, ".")
+        longitude.insert(3, ".")
+        latitude = float("".join(latitude))
+        longitude = float("".join(longitude))
         return [latitude, longitude]    
 
 if __name__ == "__main__":
     generator = RandomStoreGenerator()
-    generator.create_random_stores(5)
+    generator.create_random_stores(1)
