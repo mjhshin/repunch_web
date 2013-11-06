@@ -58,14 +58,14 @@ class Store(ParseObject):
 
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
-        self.hours = data.get("hours")
+        self.hours = data.get("hours", [])
         # [{"reward_name":"Free bottle of wine", "description":
         # "Must be under $25 in value",
         # "punches":10,"redemption_count":0, reward_id:0},]
-        self.rewards = data.get("rewards")
+        self.rewards = data.get("rewards", [])
         # [{"alias":"bakery","name":"Bakeries"},
         # {"alias":"coffee","name":"Coffee & Tea"}]
-        self.categories = data.get('categories')
+        self.categories = data.get('categories', [])
 
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
