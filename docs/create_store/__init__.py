@@ -156,4 +156,4 @@ class RandomStoreGenerator(object):
 
 if __name__ == "__main__":
     generator = RandomStoreGenerator()
-    generator.create_random_stores(1)
+    generator.create_random_stores(200)
