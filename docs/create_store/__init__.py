@@ -85,9 +85,11 @@ class RandomStoreGenerator(object):
         """
         Just pick a random lat/long in between the maximum lat/long
         """
-        latitude = str(BASE_LAT + randint(0, RANGE_LAT))
-        longitude = str(BASE_LONG + randint(0, RANGE_LONG))
+        latitude = list(str(BASE_LAT + randint(0, RANGE_LAT)))
+        longitude = list(str(BASE_LONG + randint(0, RANGE_LONG)))
         # add the decimal
+        latitude = latitude.insert(2, ".")
+        longitude = longitude.insert(3, ".")
         return [latitude, longitude]    
             
         
