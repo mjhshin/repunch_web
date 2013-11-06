@@ -102,7 +102,7 @@ def time_selector(fieldid, timestamp):
     # noon
     if thour == 12:
         rv.extend(('<option ', ('selected' if  tmin == 0  else ''),' value="12:00:00">12:00 PM</option>',
-                       '<option ', ('selected' if  tmin == 0  else ''),' value="12:30:00">12:30 PM</option>'))
+                       '<option ', ('selected' if  tmin == 30  else ''),' value="12:30:00">12:30 PM</option>'))
     else:
         rv.extend(('<option value="12:00:00">12:00 PM</option>',
                    '<option value="12:30:00">12:30 PM</option>'))
