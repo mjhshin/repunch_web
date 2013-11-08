@@ -116,11 +116,6 @@ def edit(request):
                                 "-close"].replace(":", 
                                                 "").zfill(6)[:4]
                     for day in days:
-                        if int(open_time)>=int(close_time):
-                            data["error"] = "Invalid hours. Open "+\
-                                "time must be "+\
-                                "greater than close time."
-                            return common(form)
                         hours.append({
                             "day":int(day), 
                             "open_time":open_time,
