@@ -95,16 +95,18 @@ class Command(BaseCommand):
                             last_billed <= day8_end):
                             send_email_receipt_monthly_failed(account, store,
                                 subscription)
-                        # disable account on 14th day
-                        elif last_billed >= day14_start and\
-                            last_billed <= day14_end:
+                                
+                        else: # make sure that the store is deactivated 
                             store.active = False
                             store.update()
                             update_store = True
-                            send_email_receipt_monthly_failed(account, store,
-                                subscription, account_disabled=True)
-                        else:
-                            send_user_email = False
+                            if last_billed >= day14_start and\
+                                last_billed <= day14_end:
+                                # send final notification
+                                send_email_receipt_monthly_failed(account,
+                                    store, subscription, account_disabled=True)
+                            else:
+                                send_user_email = False
                         
                     # do not send email after account deactivation
                     if send_user_email:
