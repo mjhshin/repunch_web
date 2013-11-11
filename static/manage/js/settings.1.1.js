@@ -1,13 +1,18 @@
 $(document).ready(function(){
 
+    var loader = $("#settings-saving");
     $("#settings-form-submit").click(function(){
-        if ($("#settings-saving").css("display") != "none"){
-	        return false;
+        if (!loader.is(":visible")){
+	        loader.show();
+            $('#settings-form').submit();
 	    }
-	    $("#settings-saving").show();
-    
-        $('#settings-form').submit();
+	    
         return false;
+    });
+    
+    // prevent cancel
+    $(".form-options a.red").click(function() {
+        return !loader.is(":visible");
     });
 
 	$('#link_refresh_retailer_pin').click(function(){

@@ -9,7 +9,7 @@
 {% endblock %}
 {% block javascript %}
 <script src="{% static "manage/js/jquery/jquery-ui-timepicker-addon.js" %}"></script>
-<script src="{% static "manage/js/message_edit.js" %}"></script>
+<script src="{% static "manage/js/message_edit.1.0.js" %}"></script>
 {# INIT THE SLIDER #}
 <script>
 $(document).ready(function(){
@@ -143,7 +143,7 @@ $(document).ready(function(){
 		
 		<div id="message-detail-options" class="form-options">
             <a id="send-now" class="button blue">Send Now</a>
-			<a href="{% url 'messages_index' %}" id="delete-button" class="red">Cancel</a>
+			<a href="{% url 'messages_index' %}" class="red">Cancel</a>
 			<img src="{% static 'manage/images/ajax-loader.gif' %}" id="message-sending" />
 		</div>
 	</form>

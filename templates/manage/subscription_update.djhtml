@@ -24,11 +24,16 @@
                 "{% url 'subscription_update' %}" + "?do_upgrade=1");
             {% endif %}
             // only proceed if not processing a form
-            if (pf.css("display") == "none"){
+            if (!pf.is(":visible")){
                 pf.show();
                 uForm.submit();
             }
             return false;
+        });
+        
+        // prevent cancel
+        $(".form-options a.red").click(function() {
+            return !pf.is(":visible");
         });
     });
 </script>

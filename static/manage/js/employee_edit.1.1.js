@@ -1,19 +1,24 @@
 $(document).ready(function(){
-
+    var loader = $("#employee-saving");
 	$('#save-button').click(function(){
-        if ($("#employee-saving").css("display") != "none") {
-            return false;
+        if (!loader.is(":visible")) {
+            loader.show();
+            $('#employee-form').submit(); 
         }
-        $("#employee-saving").show();
-
-        $('#employee-form').submit(); 
+        
         return false;
     }); 
 
-	// move to onclick to stopPropagation works?
+    // prevent cancel
+    $(".form-options a.red").click(function() {
+        return !loader.is(":visible");
+    });
+    
 	$('a#delete-button').click(function(event){
-		
-		return confirm("Are you sure you want to delete this employee?");
+		if (!loader.is(":visible")) {
+		    return confirm("Are you sure you want to delete this employee?");
+		} 
+		return false;
 	});
 	
 	$('#load-more').click();

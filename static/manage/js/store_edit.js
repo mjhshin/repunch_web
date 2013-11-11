@@ -103,16 +103,14 @@ $(document).ready(function(){
     // clicks on submit
     var loader = $("#store-save-loading");
     $("#save-button").click(function() {
-        if (loader.is(":visible")) {
-            return;
+        if (!loader.is(":visible")) {
+            loader.show();
+            submitForm();
         }
-        
-        loader.show();
-        submitForm();
     });
     
     // clicks on cancel
-    $("#edit-store-options a.red").click(function() {
+    $(".form-options a.red").click(function() {
         return !loader.is(":visible");
     });
     

@@ -8,14 +8,19 @@
 {% block javascript %}
 <script>
 $(document).ready(function(){
+    var loader = $("#reply-sending");
     $("#reply-form-submit").click(function(){
-        if ($("#reply-sending").css("display") != "none"){
-	            return false;
-	        }   
-        $("#reply-sending").show();
+        if (!loader.is(":visible")){
+            loader.show();
+            $('#message-form').submit(); 
+        }   
         
-        $('#message-form').submit(); 
         return false;
+    });
+    
+    // clicks on cancel
+    $(".form-options a.red").click(function() {
+        return !loader.is(":visible");
     });
     
     // remaining characters

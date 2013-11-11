@@ -35,6 +35,7 @@ def hours(session):
     build the list of hours in proper format to render in template
     """
     # TODO
+    return ""
     return HoursInterpreter(hours=hours).readable()  
 
 @register.simple_tag

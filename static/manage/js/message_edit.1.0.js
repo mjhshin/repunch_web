@@ -1,17 +1,18 @@
 $(document).ready(function(){
+    var loader = $("#message-sending");
 	$('#send-now').click(function(){
-	    if ($("#message-sending").css("display") != "none"){
-	        return false;
+	    if (!loader.is(":visible")){
+	        $("#message-sending").show();
+		    $('#message-form').submit();
 	    }
-	    $("#message-sending").show();
 	    
-		$('#message-form').submit();
 		return false;
 	});
 	
-	$('#delete-button').click(function(){
-		return confirm("Are you sure you want to delete this message?");
-	});
+    // prevent cancel
+    $(".form-options a.red").click(function() {
+        return !loader.is(":visible");
+    });
 	
 	$('#id_attach_offer').change(function(){
 		if(this.checked)

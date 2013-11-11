@@ -10,7 +10,7 @@
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
-	<script src="{% static "manage/js/reward_edit.js" %}"></script>
+	<script src="{% static "manage/js/reward_edit.1.0.js" %}"></script>
 {% endblock %}
 
 {% block content %}

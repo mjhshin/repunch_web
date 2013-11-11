@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.2.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script src="{% static "manage/js/employee_edit.1.0.js" %}"></script>
+	<script src="{% static "manage/js/employee_edit.1.1.js" %}"></script>
 	<script type="text/javascript" src="{% static 'manage/js/django_ajax.js' %}" ></script>
 	<script type="text/javascript">
 		var _order_by = 'createdAt';
@@ -86,7 +86,7 @@
 		
 		<div class="form-options">
 			<a class="button blue" id="save-button">Save Changes</a>
-			<a href="{% url 'store_index' %}" class="red">Cancel</a>
+			<a href="{% url 'employees_index' %}" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}"  id="employee-saving" />
 		</div>
 		
