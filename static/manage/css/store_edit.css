@@ -56,6 +56,7 @@ ul.hours-form {
 	list-style: none; 
 	margin: 0px 0px 5px 0px; 
 	padding: 0px;
+	background: red;
 	clear: left;
 }
 ul.hours-form li { 
@@ -94,27 +95,27 @@ ul.hours-form li.days div.active {
 	color: #666; 
 }
 ul.hours-form li.time { 
-	width: 135px; 
+	width: 160px;
+	background: green; 
 }
 ul.hours-form li.time select {
 	margin-left: 5px;
 }
-ul.hours-form li.time.close {
-	width: 120px;
-}
 ul.hours-form li.buttons { 
-	width: 80px; 
+	background: blue; 
 }
 ul.hours-form li.buttons div {
 	width: 30px;
 	height: 30px;
 	margin-right: 5px;
-	background: transparent url('../images/hours_add.png') no-repeat center center;
 	float: left;
 	cursor: pointer;
 }
 ul.hours-form li.buttons div.remove {
 	background-image: url('../images/hours_remove.png');
+}
+ul.hours-form li.buttons div.allday {
+	background: transparent url('../images/hours_24.png') no-repeat center center;
 }
 
 

@@ -5,15 +5,12 @@
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
-	{{ block.super }}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
-	<script type="text/javascript">
-		var _hours_preview_url = '{% url 'store_hours' %}';
 	</script>
 {% endblock %}
 
@@ -157,75 +154,23 @@
 			{{ form.store_description }}
 		</div>
 		
-		{{ hours_formset.management_form }}
-		{{ hours_formset.non_form_errors }}
-		
 		<div class="input-container clearheight" style="width: 650px;">
 			<label>Hours</label>
-			{% for hform in hours_formset %}
-				<ul class="hours-form django-form" id="{{ hform.prefix }}-row">
-					{{ hform.id }}
-					<input type="hidden" name="{{ hform.store.html_name }}" id="{{ hform.store.auto_id }}" value="{{ store.id }}" />
-					<input type="hidden" name="{{ hform.list_order.html_name }}" id="{{ hform.list_order.auto_id }}" value="{{ hform.list_order.value }}" />
-					<input type="hidden" name="{{ hform.DELETE.html_name }}" id="{{ hform.DELETE.auto_id }}" value="" />
-					<li class="days" id="{{ hform.days.html_name }}">
-						<div {% if '1' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_0">S</div>
-						<div {% if '2' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_1">M</div>
-						<div {% if '3' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_2">T</div>
-						<div {% if '4' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_3">W</div>
-						<div {% if '5' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_4">T</div>
-						<div {% if '6' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_5">F</div>
-						<div {% if '7' in hform.days.value %}class="active"{% endif %} id="{{ hform.prefix }}-days_6">S</div>
-					</li>
-					<li class="time"><span>from</span>{% time_selector hform.open.html_name hform.open.value %}</li>
-					<li class="time close"><span>to</span>{% time_selector hform.close.html_name hform.close.value %}</li>
-					<li class="buttons">
-						<div class="add" id="{{ hform.prefix }}-add"></div>
-						<div class="remove" id="{{ hform.prefix }}-remove"></div>
-					</li>
-				</ul>
-			{% empty %}
-				<ul class="hours-form" id="hours-0-row">
-					<input type="hidden" name="hours-0-id" id="hours-0-id" value="">
-					<input type="hidden" name="hours-0-store" id="hours-0-store" value="{{ store.id }}" />
-					<input id="hours-0-list_order" type="hidden" value="0" name="hours-0-list_order" />
-					<input id="hours-0-DELETE" type="hidden" value="" name="hours-0-DELETE" />
-					<li class="days">
-						<div id="hours-0-days_0">S</div>
-						<div id="hours-0-days_1">M</div>
-						<div id="hours-0-days_2">T</div>
-						<div id="hours-0-days_3">W</div>
-						<div id="hours-0-days_4">T</div>
-						<div id="hours-0-days_5">F</div>
-						<div id="hours-0-days_6">S</div>
-					</li>
-					<li class="time"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
-					<li class="time close"><span>to</span>{% time_selector 'hours-0-close' None %}</li>
-					<li class="buttons">
-						<div class="add" id="hours-0-add"></div>
-					</li>
-				</ul>
-			{% endfor %}
-			
-			<ul class="hours-form" id="clone-row" style="display: none;">
-				<input type="hidden" name="clone-id" id="clone-id" value="">
-				<input type="hidden" name="clone-store" id="clone-store" value="{{ store.id }}" />
-				<input id="clone-list_order" type="hidden" value="0" name="clone-list_order" />
-				<input id="clone-DELETE" type="hidden" value="" name="clone-DELETE" />
+			<ul class="hours-form" id="hours-0-row">
 				<li class="days">
-					<div id="clone-days_0">S</div>
-					<div id="clone-days_1">M</div>
-					<div id="clone-days_2">T</div>
-					<div id="clone-days_3">W</div>
-					<div id="clone-days_4">T</div>
-					<div id="clone-days_5">F</div>
-					<div id="clone-days_6">S</div>
+					<div id="hours-0-day_0">S</div>
+					<div id="hours-0-day_1">M</div>
+					<div id="hours-0-day_2">T</div>
+					<div id="hours-0-day_3">W</div>
+					<div id="hours-0-day_4">T</div>
+					<div id="hours-0-day_5">F</div>
+					<div id="hours-0-day_6">S</div>
 				</li>
-				<li class="time"><span>from</span>{% time_selector 'clone-open' None %}</li>
-				<li class="time close"><span>to</span>{% time_selector 'clone-close' None %}</li>
+				<li class="time"><span>from</span>{% time_selector 'open' None %}</li>
+				<li class="time close"><span>to</span>{% time_selector 'close' None %}</li>
 				<li class="buttons">
-					<div class="add" id="clone-add"></div>
-					<div class="remove" id="clone-remove"></div>
+					<div class="allday"></div>
+					<div class="remove"></div>
 				</li>
 			</ul>
 			<div style="clear: left"></div>

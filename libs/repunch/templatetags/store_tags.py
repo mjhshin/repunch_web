@@ -34,86 +34,91 @@ def hours(session):
     """ 
     build the list of hours in proper format to render in template
     """
-    hours_map, hours = {}, []
-    store = SESSION.get_store(session)
-    hrs = store.get("hours")
-    if hrs:
-        for hour in hrs:
-            key = (hour['close_time'], hour['open_time'])
-            if key in hours_map:
-                hours_map[key].append(hour['day'])
-            else:
-                hours_map[key] = [hour['day']]
-        hrsmap_vk, days_list = {}, []
-        for k, v in hours_map.iteritems():
-            v.sort()
-            v_tup = tuple(v)
-            hrsmap_vk[v_tup] = k
-            days_list.append(v_tup)
-        # now sort the days list by first element
-        days_list.sort(key=lambda k: k[0])
-        for i, days in enumerate(days_list):
-            hours.append(Hours(days=[str(d) for d in days],
-                    open=datetime.datetime.strptime(\
-                         hrsmap_vk[days][1], "%H%M"),
-                    close=datetime.datetime.strptime(\
-                        hrsmap_vk[days][0], "%H%M"),
-                    list_order=i+1))
-                    
-    # update the session cache
-    session['store'] = store
-            
+    # TODO
     return HoursInterpreter(hours=hours).readable()  
 
 @register.simple_tag
-def time_selector(fieldid, timestamp):
+def time_selector(name, timestamp):
+    """
+    Returns a select block with options from 6am to 5.30 am in 30 min
+    increments. 
     
-    thour = 10
-    tmin = 0
-        
-    if timestamp != None:
-        if isinstance(timestamp, datetime.time):
-            thour = timestamp.hour
-            tmin = timestamp.minute
+    Time is represented as XXyy where XX is the hours from 00 to 23
+    and yy is the minutes, which is either 00 or 30.
+    
+    The generated select has the following format:
+    
+    <select name=name>
+        <option value="0600">6:00 AM</option>
+        <option value="0630">6:30 AM</option>
+        ...
+        <option value="1200">12 PM (Noon)</option>
+        ...
+        <option value="0000">12 AM (Midnight)</option>
+        ...
+        <option value="0530">5:30 AM</option>
+    </select>
+    
+    The optional parameter timestamp determines which option is selected.
+    """
+    def option_text(value):
+        """
+        Returns the text of the option given the value.
+        e.g. option_text("0630") returns 6:30 AM.
+        """
+        if value == "0000":
+            return "12 AM (Midnight)"
+        elif value == "1200":
+            return "12 PM (Noon)"
         else:
-            thour, tmin, _ = timestamp.split(':')
-            thour = int(thour)
-            tmin = int(tmin)
+            hour = int(value[0:2])
+            if hour >= 12:
+                if hour > 12:
+                    hour -= 12
+                ampm = "PM"
+            else:
+                if hour == 0:
+                    hour = 12
+                ampm = "AM"
+                
+            return "%s:%s %s" % (str(hour), value[2:], ampm)
+                
     
-    rv = ['<select id="id_',fieldid,'" name="',fieldid,'">']
+    select = "<select name='%s'>%s</select>"
+    options = []
     
-    # midnight
-    if thour == 0:
-        rv.extend(('<option ', ('selected' if  tmin == 0 else ''),' value="0:00:00">12:00 AM</option>',
-                       '<option ', ('selected' if  tmin == 30 else ''),' value="0:30:00">12:30 AM</option>'))
-    else:
-        rv.extend(('<option value="0:00:00">12:00 AM</option>',
-                   '<option value="0:30:00">12:30 AM</option>'))
+    option = "<option value='%s'>%s</option>"
+    option_selected = "<option value='%s' selected>%s</option>"
     
-    # morning
-    for hour in range(1, 12):
-        if hour == thour:
-            rv.extend(('<option ', ('selected' if  tmin == 0  else ''),' value="',str(hour),':00:00">',str(hour),':00 AM</option>',
-                       '<option ', ('selected' if  tmin == 30   else ''),' value="',str(hour),':30:00">',str(hour),':30 AM</option>'))
-        else:
-            rv.extend(('<option value="',str(hour),':00:00">',str(hour),':00 AM</option>',
-                       '<option value="',str(hour),':30:00">',str(hour),':30 AM</option>'))
+    # generate the options
+    start_hour = 6
+    for i in range(24): # 24 hours
+        # TODO determine if selected
+        opt = option
+        hour = str((i+start_hour)%24).zfill(2)
         
-    # noon
-    if thour == 12:
-        rv.extend(('<option ', ('selected' if  tmin == 0  else ''),' value="12:00:00">12:00 PM</option>',
-                       '<option ', ('selected' if  tmin == 30  else ''),' value="12:30:00">12:30 PM</option>'))
-    else:
-        rv.extend(('<option value="12:00:00">12:00 PM</option>',
-                   '<option value="12:30:00">12:30 PM</option>'))
-        
-    for hour in range(1, 12):
-        if (hour + 12) == thour:
-            rv.extend(('<option ', ('selected' if  tmin == 0 else ''),' value="',str(hour+12),':00:00">',str(hour),':00 PM</option>',
-                       '<option ', ('selected' if  tmin == 30 else ''),' value="',str(hour+12),':30:00">',str(hour),':30 PM</option>'))
-        else:
-            rv.extend(('<option value="',str(hour+12),':00:00">',str(hour),':00 PM</option>',
-                       '<option value="',str(hour+12),':30:00">',str(hour),':30 PM</option>'))
-
-    rv.append('</select>')
-    return ''.join(rv)
+        options.append(opt % (hour+"00", option_text(hour+"00")))
+        options.append(opt % (hour+"30", option_text(hour+"30")))
+    
+    return select % (name, "".join(options))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
