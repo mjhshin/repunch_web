@@ -5,8 +5,7 @@
 /**
     Returns the hours in the example format.
     {
-        "hours-1-day_1-open": "0600",
-        "hours-1-day_1-close": "1730",
+        hours-1-day_1: "0600,1730" } 
         ...
     }
     
@@ -22,9 +21,7 @@ function getHoursData() {
     
         // add all the active days
         self.find(".days .active").each(function() {
-            var self = $(this);
-            data[self.attr("id")+"-open"] = openTime.val();
-            data[self.attr("id")+"-close"] = closeTime.val();
+            data[$(this).attr("id")] = openTime.val()+","+ closeTime.val();
         });
     });
     

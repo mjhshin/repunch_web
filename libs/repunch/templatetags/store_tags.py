@@ -1,7 +1,7 @@
 from django import template
 import datetime
 
-from libs.repunch.rphours_util import HoursInterpreter
+from libs.repunch.rphours_util import HoursInterpreter, readable_hours
 
 from apps.stores.models import Hours
 from parse.apps.messages import FEEDBACK
@@ -62,28 +62,6 @@ def time_selector(name, timestamp):
     
     The optional parameter timestamp determines which option is selected.
     """
-    def option_text(value):
-        """
-        Returns the text of the option given the value.
-        e.g. option_text("0630") returns 6:30 AM.
-        """
-        if value == "0000":
-            return "12 AM (Midnight)"
-        elif value == "1200":
-            return "12 PM (Noon)"
-        else:
-            hour = int(value[0:2])
-            if hour >= 12:
-                if hour > 12:
-                    hour -= 12
-                ampm = "PM"
-            else:
-                if hour == 0:
-                    hour = 12
-                ampm = "AM"
-                
-            return "%s:%s %s" % (str(hour), value[2:], ampm)
-                
     
     select = "<select name='%s'>%s</select>"
     options = []
@@ -98,8 +76,8 @@ def time_selector(name, timestamp):
         opt = option
         hour = str((i+start_hour)%24).zfill(2)
         
-        options.append(opt % (hour+"00", option_text(hour+"00")))
-        options.append(opt % (hour+"30", option_text(hour+"30")))
+        options.append(opt % (hour+"00", readable_hours(hour+"00")))
+        options.append(opt % (hour+"30", readable_hours(hour+"30")))
     
     return select % (name, "".join(options))
     
