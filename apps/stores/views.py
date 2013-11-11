@@ -6,14 +6,11 @@ from django.contrib.sessions.backends.cache import SessionStore
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.http.request import QueryDict
-from django.forms.models import inlineformset_factory
 from datetime import datetime
 from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
-from apps.stores.models import Store as dStore, Hours as dHours,\
-StoreAvatarTmp
-from apps.stores.models import StoreActivate
+from apps.stores.models import StoreAvatarTmp, StoreActivate
 from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
@@ -47,88 +44,23 @@ def index(request):
 @admin_only(reverse_url="store_index")
 def edit(request):
     store = SESSION.get_store(request.session)
-    
     data = {'account_nav': True}
-    # fake a store to construct HoursFormset - probably not necessary
-    dstore_inst = dStore()
     
     def common(form):
-        hours_map = {}
-        # group up the days that are in the same row
-        if store.get("hours"):
-            for hour in store.get("hours"):
-                key = (hour['close_time'], hour['open_time'])
-                if key in hours_map:
-                    hours_map[key].append(hour['day'])
-                else:
-                    hours_map[key] = [hour['day']]
-                
-        # create the formset
-        HoursFormSet = inlineformset_factory(dStore, dHours,
-                            max_num=7, extra=len(hours_map))
-        formset = HoursFormSet(prefix='hours', instance=dstore_inst)
-        hrsmap_vk, days_list = {}, []
-        for k, v in hours_map.iteritems():
-            v.sort()
-            v_tup = tuple(v)
-            hrsmap_vk[v_tup] = k
-            days_list.append(v_tup)
-        # now sort the days list by first element
-        days_list.sort(key=lambda k: k[0])
-        
-        # set forms in formset initial data
-        for i, days in enumerate(days_list):
-            d = {'days':[unicode(d) for d in days],
-                    'open':unicode(hrsmap_vk[days][1][:2] +\
-                            ':' + hrsmap_vk[days][1][2:4] + ':00'),
-                    'close':unicode( hrsmap_vk[days][0][:2] +\
-                            ':' +  hrsmap_vk[days][0][2:4] + ':00'),
-                    'list_order':unicode(i+1) }
-            formset[i].initial = d
-                
+        # TODO
         # update the session cache
         request.session['store'] = store
-           
         data['form'] = form
-        data['hours_formset'] = formset
 
         return render(request, 'manage/store_edit.djhtml', data)
             
     if request.method == 'POST': 
-        HoursFormSet = inlineformset_factory(dStore, dHours,
-                            max_num=7, extra=0)
-        formset = HoursFormSet(request.POST, prefix='hours',
-                                instance=dstore_inst) 
         form = StoreForm(request.POST)
             
         if form.is_valid(): 
-            # build the list of hours in proper format for saving 
-            # to Parse. 
-            hours, ind, key = [], 0, "hours-0-days"
-            while ind < 7:
-                days = request.POST.getlist(key)
-                if days and not request.POST.get('hours-' +\
-                        str(ind) + '-DELETE'):
-                    # format time from 10:00:00 to 1000
-                    open_time = request.POST["hours-" + str(ind) +\
-                                "-open"].replace(":", "").zfill(6)[:4]
-                    close_time = request.POST["hours-" + str(ind) +\
-                                "-close"].replace(":", 
-                                                "").zfill(6)[:4]
-                    for day in days:
-                        hours.append({
-                            "day":int(day), 
-                            "open_time":open_time,
-                            "close_time":close_time,
-                        })
-                ind += 1
-                key = "hours-" + str(ind) + "-days"
-            # sort the list
-            hours.sort(key=lambda k: k['day'])
-            
             store = Store(**store.__dict__)
             store.update_locally(request.POST.dict(), False)
-            store.set("hours", hours)
+            # store.set("hours", hours)
             
             # set the timezone
             if store.get('zip'):
@@ -187,17 +119,8 @@ def edit(request):
 @login_required
 @access_required(http_response="Access denied", content_type="text/plain")
 def hours_preview(request):
-    HoursFormSet = inlineformset_factory(dStore, dHours, extra=0)
-    
-    hours = []
-    formset = HoursFormSet(request.GET, prefix='hours', 
-                            instance=dStore())
-    if formset.is_valid():
-        for form in formset:
-            if(not 'DELETE' in form.changed_data):
-                hours.append(form.instance)
-    
-    return HttpResponse(HoursInterpreter(hours).readable(), 
+    print request.POST
+    return HttpResponse(HoursInterpreter(request.POST).readable(), 
                         content_type="text/html")
     
     

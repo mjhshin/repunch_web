@@ -1,3 +1,7 @@
+"""
+Hours interpreter re-written.
+"""
+
 from parse.apps.stores import models
 
 import types
