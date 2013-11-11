@@ -2,13 +2,39 @@
     Store edit js re-written.
 */
 
-function hoursPreview(){
-    return;
-    // TODO format the data
+/**
+    Returns the hours in the example format.
+    {
+        "hours-1-day_1-open": "0600",
+        "hours-1-day_1-close": "1730",
+        ...
+    }
+    
+    The above example states that Sunday has an opening time of 6 am and closing time of 5.30 pm.
+*/
+function getHoursData() {
+    var data = {};
+    
+    $(".hours-form ul").each(function() {
+        var self = $(this);
+        var openTime = self.find(".time.open select");
+        var closeTime = self.find(".time.close select");
+    
+        // add all the active days
+        self.find(".days .active").each(function() {
+            var self = $(this);
+            data[self.attr("id")+"-open"] = openTime.val();
+            data[self.attr("id")+"-close"] = closeTime.val();
+        });
+    });
+    
+    return data;
+}
 
+function hoursPreview(){
     $.ajax({
         url: $("#hours_preview_url").val(),
-        data: data,
+        data: getHoursData(),
         type: "POST",
         cache: false, // required to kill internet explorer 304 bug
         success: function(res) {
@@ -18,6 +44,22 @@ function hoursPreview(){
     });
 
 }
+
+/**
+    rowId is -x- in hours-x-row
+*/
+function bindOptionsClick(rowId) {
+    if (rowId == null) {
+        rowId = "";
+    } else {
+        rowId = "#hours"+rowId+"row";
+    }
+    $(".hours-form ul"+rowId+" li.time select").change(function() {
+        // hours changed so update the preview
+        hoursPreview();
+    });
+}
+
 
 /**
     rowId is -x- in hours-x-row
@@ -57,7 +99,7 @@ function bindRemoveRow(rowId){
             $(this).closest("ul").remove();
             
         } else { // just deactivate all days
-            $(this).closest("ul").children(".days").children().removeClass("active");
+            $(this).closest("ul").find(".days div").removeClass("active");
         }
         
         // hours may have changed so update the preview
@@ -81,11 +123,30 @@ function addHoursRow() {
     // bind events
     bindDaysClick(copyId);
     bindRemoveRow(copyId);
+    bindOptionsClick(copyId);
 }
 
 function submitForm(){
-    // TODO
+    var loader = $("#store-save-loading");
+    if (loader.is(":visible")) { return; }
+    loader.show();
+                    
+    var form = $("#account-edit-form");
+    var data = form.serialize();
+    data["hours"] = getHoursData();
+    $.ajax({
+        url: form.attr("action"),
+        data: data,
+        type: "POST",
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(res) {
+            loader.hide();
+            // TODO handle response
+        },
+        
+    });
 }
+
 
 $(document).ready(function(){
 
@@ -100,15 +161,15 @@ $(document).ready(function(){
         addHoursRow();
     });
     
+    // clicks on options
+    bindOptionsClick();
+    
     // clicks on submit
-    var loader = $("#store-save-loading");
     $("#save-button").click(function() {
-        if (!loader.is(":visible")) {
-            loader.show();
-            submitForm();
-        }
+        submitForm();
     });
     
+    var loader = $("#store-save-loading");
     // clicks on cancel
     $(".form-options a.red").click(function() {
         return !loader.is(":visible");

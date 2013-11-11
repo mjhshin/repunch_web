@@ -113,7 +113,7 @@ div.hours-form ul li.buttons div.remove {
 
 div.hours-form div.add {
 	width: 254px; height: 24px;
-	margin-top: 10px; 
+	margin: 10px 0 20px; 
 	font-size: 14px; 
 	border: 1px solid #669900;
 	font: bold 16px/26px 'Cabin', sans-serif;

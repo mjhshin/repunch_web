@@ -5,12 +5,12 @@
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.1.0.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
 {% endblock %}
 
 
@@ -155,19 +155,22 @@
 			{{ form.store_description }}
 		</div>
 		
-		<div class="hours-form input-container clearheight" style="width: 650px;">
+	</form>
+	
+	{# Must process the elements below manually. #}
+	    <div class="hours-form input-container clearheight" style="width: 650px;">
 			<label>Hours</label>
-			<ul id="hours-0-row">
+			<ul id="hours-1-row">
 				<li class="days">
-					<div id="hours-0-day_0">S</div>
-					<div id="hours-0-day_1">M</div>
-					<div id="hours-0-day_2">T</div>
-					<div id="hours-0-day_3">W</div>
-					<div id="hours-0-day_4">T</div>
-					<div id="hours-0-day_5">F</div>
-					<div id="hours-0-day_6">S</div>
+					<div id="hours-1-day_1">S</div>
+					<div id="hours-1-day_2">M</div>
+					<div id="hours-1-day_3">T</div>
+					<div id="hours-1-day_4">W</div>
+					<div id="hours-1-day_5">T</div>
+					<div id="hours-1-day_6">F</div>
+					<div id="hours-1-day_7">S</div>
 				</li>
-				<li class="time"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
+				<li class="time open"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
 				<li class="time close"><span>to</span>{% time_selector 'hours-0-close' None %}</li>
 				<li class="buttons">
 					<div class="remove"></div>
@@ -192,6 +195,5 @@
 		            id="store-save-loading" 
 		            style="display:none;position:relative;top:5px;left:4px;"/>
 		</div>
-	</form>
 {% endwith %}
 {% endblock %}
