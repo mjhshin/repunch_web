@@ -51,15 +51,14 @@ div#notification { }
 
 
 /* hours form style */
-ul.hours-form { 
+div.hours-form ul { 
 	height: 30px; 
 	list-style: none; 
 	margin: 0px 0px 5px 0px; 
 	padding: 0px;
-	background: red;
 	clear: left;
 }
-ul.hours-form li { 
+div.hours-form ul li { 
 	float: left; 
 	display: block; 
 	height: 30px; 
@@ -67,14 +66,12 @@ ul.hours-form li {
 	margin: 0px;
 	padding: 0px;
 }
-ul.hours-form li span {
+div.hours-form ul li span {
 	font-size: 14px;
 	color: #999;
 }
-ul.hours-form li.days { 
-	width: 260px; 
-}
-ul.hours-form li.days div { 
+div.hours-form ul li.days div,
+div.hours-form div.add { 
 	background-color: #FFF; 
 	width: 30px; 
 	height: 30px; 
@@ -89,33 +86,45 @@ ul.hours-form li.days div {
 	float: left;
 	cursor: pointer;
 }
-ul.hours-form li.days div.active { 
+div.hours-form ul li.days{ 
+	width: 260px; 
+}
+div.hours-form ul li.days div.active { 
 	background-color: #FFFFCC; 
 	border-color: #F9B64B; 
 	color: #666; 
 }
-ul.hours-form li.time { 
+div.hours-form ul li.time { 
 	width: 160px;
-	background: green; 
 }
-ul.hours-form li.time select {
+div.hours-form ul li.time select {
 	margin-left: 5px;
 }
-ul.hours-form li.buttons { 
-	background: blue; 
-}
-ul.hours-form li.buttons div {
+div.hours-form ul li.buttons div {
 	width: 30px;
 	height: 30px;
 	margin-right: 5px;
 	float: left;
 	cursor: pointer;
 }
-ul.hours-form li.buttons div.remove {
+div.hours-form ul li.buttons div.remove {
 	background-image: url('../images/hours_remove.png');
 }
-ul.hours-form li.buttons div.allday {
-	background: transparent url('../images/hours_24.png') no-repeat center center;
+
+div.hours-form div.add {
+	width: 254px; height: 24px;
+	margin-top: 10px; 
+	font-size: 14px; 
+	border: 1px solid #669900;
+	font: bold 16px/26px 'Cabin', sans-serif;
+	color: white;
+
+    background-image: -ms-linear-gradient(top, #B2E179 0%, #92C657 100%);
+    background-image: -moz-linear-gradient(top, #B2E179 0%, #92C657 100%);
+    background-image: -o-linear-gradient(top, #B2E179 0%, #92C657 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #B2E179), color-stop(1, #92C657));
+    background-image: -webkit-linear-gradient(top, #B2E179 0%, #92C657 100%);
+    background-image: linear-gradient(to bottom, #B2E179 0%, #92C657 100%);
 }
 
 

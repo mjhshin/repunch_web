@@ -11,7 +11,6 @@
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_edit.js' %}" ></script>
-	</script>
 {% endblock %}
 
 
@@ -21,6 +20,8 @@
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
     <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
+    {# REQUIRED FOR STORE EDIT JS #}
+    <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 	
 	<form action="{% url 'store_edit' %}" method="POST" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
@@ -154,9 +155,9 @@
 			{{ form.store_description }}
 		</div>
 		
-		<div class="input-container clearheight" style="width: 650px;">
+		<div class="hours-form input-container clearheight" style="width: 650px;">
 			<label>Hours</label>
-			<ul class="hours-form" id="hours-0-row">
+			<ul id="hours-0-row">
 				<li class="days">
 					<div id="hours-0-day_0">S</div>
 					<div id="hours-0-day_1">M</div>
@@ -166,14 +167,14 @@
 					<div id="hours-0-day_5">F</div>
 					<div id="hours-0-day_6">S</div>
 				</li>
-				<li class="time"><span>from</span>{% time_selector 'open' None %}</li>
-				<li class="time close"><span>to</span>{% time_selector 'close' None %}</li>
+				<li class="time"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
+				<li class="time close"><span>to</span>{% time_selector 'hours-0-close' None %}</li>
 				<li class="buttons">
-					<div class="allday"></div>
 					<div class="remove"></div>
 				</li>
 			</ul>
-			<div style="clear: left"></div>
+			
+			<div class="add" style="clear: left">Add Hours</div>
 		</div>		
 		
 		<div class="input-container clearheight">
