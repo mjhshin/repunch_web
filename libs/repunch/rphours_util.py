@@ -100,8 +100,11 @@ class HoursInterpreter:
                 hours_map[v] = []
             hours_map[v].append(int(k.split("_")[-1]))
         
+        # TODO FIX BUGS
+        
         # now process each set of open and close time
         for k, v in hours_map.iteritems():
+            open_time, close_time = k.split(",")
             # days start from 1 to 7 and is circular so we must group
             # adjacent elements together first
             groups, solos = [], []
@@ -111,8 +114,6 @@ class HoursInterpreter:
                     solos.extend(group)
                 else:
                     groups.append(group)
-            
-            print groups, solos 
               
             line = ""
             # make readable process solo days
@@ -141,8 +142,10 @@ class HoursInterpreter:
                     start = end
                     end = tmp
                         
-                line += WEEKDAY[start]+"  -  "+WEEKDAY[end]
-            
+                line += WEEKDAYS[start]+"  -  "+WEEKDAYS[end]
+                
+            line += "  "+readable_hours_range(open_time, close_time)
+                
             readable.append(line) 
             
             # make the closed days (if any) readable
