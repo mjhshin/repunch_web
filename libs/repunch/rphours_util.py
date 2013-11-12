@@ -5,6 +5,8 @@ Hours interpreter re-written.
 from apps.stores.models import DAYS, SHORT_DAYS
 from parse.apps.stores import models
 
+SPACE = "&nbsp;" * 2
+
 def readable_hours(value):
     """
     Returns the text of the option given the value.
@@ -35,7 +37,7 @@ def readable_days_list(days, return_type=str, names=DAYS, postfix=""):
     d = [ names[i-1][1]+postfix for i in days ]
     
     if return_type is str:
-        return " and ".join(d)
+        return SPACE+"and"+SPACE.join(d)
     elif return_type is list:
         return d
     
@@ -119,14 +121,26 @@ class HoursInterpreter:
             }
         ]
         """
+        # first merge same (open, close) together
+        order, hours_map = self._format_javascript_input()
         formatted = []
         
-        for k, v in self.hours.iteritems():
-            formatted.append({
-                "day": int(k.split("_")[-1]),
-                "open_time": v.split(",")[0],
-                "close_time": v.split(",")[1],
-            })
+        # sort the order
+        order_list = [ i for i in order.keys() ]
+        order_list.sort()
+        """
+        hours_map = {
+            ("0600", "1330"): [1,2],
+        }
+        """
+        for i in order_list:
+            key, days = order[i], hours_map[order[i]]
+            for day in days:
+                formatted.append({
+                    "day": day,
+                    "open_time": key[0],
+                    "close_time": key[1],
+                })
         
         return formatted
         
@@ -183,7 +197,7 @@ class HoursInterpreter:
                     end = tmp 
                 
                 # add the groups to the line if any     
-                line.append(names[start-1][1]+"  -  "+names[end-1][1])
+                line.append(names[start-1][1]+SPACE+"-"+SPACE+names[end-1][1])
                 
             # add the solo days to the line if any
             line.extend(readable_days_list(solos, list, names, postfix))
@@ -193,11 +207,11 @@ class HoursInterpreter:
             if total > 2: # commas + and
                 for l in line:
                     if line.index(l) == total - 1: # last element
-                        processed_line.append(" and ")
+                        processed_line.append(SPACE+"and"+SPACE)
                         processed_line.append(l)
                     else:
                         processed_line.append(l)
-                        processed_line.append(", ")
+                        processed_line.append(","+SPACE)
                      
             elif total == 2: # and
                 processed_line.append(line[0])
@@ -209,8 +223,11 @@ class HoursInterpreter:
             # add the close and open time to the line if these days are open
             if open:
                 open_time, close_time = k
-                processed_line.append("  "+\
+                processed_line.append(SPACE*2+\
                     readable_hours_range(open_time, close_time))
+                # if open is the same as close it is 24 hours
+                if open_time == close_time:
+                    processed_line.append(SPACE+"(24 hours)")
               
             # add to the readable
             readable.append("".join(processed_line)+"<br/>")
@@ -409,7 +426,7 @@ class HoursInterpreter:
         # just pass in a dummy for order
         closed_days = self._get_javascript_closed_days()
         if len(closed_days) > 0:
-            readable.append("Closed ")
+            readable.append("Closed"+SPACE)
             readable.extend(self._to_readable({1:"x"},
                 {"x": closed_days}, False))
         

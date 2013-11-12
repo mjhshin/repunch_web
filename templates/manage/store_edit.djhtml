@@ -150,105 +150,105 @@
 	</form>
 	
 	{# Must process the elements below manually. #}
-	    <div class="hours-form input-container clearheight">
-			<label>Hours</label>
-			
-			{# Didn't want to waste time reformatting everything to use tables #}
-			<span style="width:256px;">Days</span>
-			<span style="width:140px;">Open</span>
-			<span style="width:140px;">Close</span>
-			<span style="width:50px;">24 hrs</span>
-			<span style="width:76px;">Remove</span>
-			
-			
-			{% if hours_data|length == 0 %}
-			<ul id="hours-1-row">
-				<li class="days">
-					<div id="hours-1-day_1">S</div>
-					<div id="hours-1-day_2">M</div>
-					<div id="hours-1-day_3">T</div>
-					<div id="hours-1-day_4">W</div>
-					<div id="hours-1-day_5">T</div>
-					<div id="hours-1-day_6">F</div>
-					<div id="hours-1-day_7">S</div>
-				</li>
-				<li class="time open">{% time_selector 'hours-1-open' None %}</li>
-				<li class="time close">{% time_selector 'hours-1-close' None %}</li>
-				<li class="buttons">
-				    {% allday_checkbox allday None %} 
-					<div class="remove"></div>
-				</li>
-			</ul>
-			{% else %}
-			
-			{% with order=hours_data.0 %}
-			{% with hours=hours_data.1 %}
-			{% hours_order_list order as order_list %}
-			
-			{% for i in order_list %}
-			
-			{% hours_key order i as time %}
-			{% hours_days hours time as days %}
-			
-			{% comment %}
-			    order is
-			    {
-                    1: ("0600", "1330"),
-                }
-			    and where time is ("0600", "1330") and days is [1, 2] in
-			    {
-                    ("0600", "1330"): [1,2],
-                }
-			{% endcomment %}
-			
-			{% hours_names forloop.counter "" as prefix %}
-			{% hours_names forloop.counter "row" as row %}
-			{% hours_names forloop.counter "open" as open %}
-			{% hours_names forloop.counter "close" as close %}
-			{% hours_names forloop.counter "allday" as allday %}
-			
-			<ul id="{{ row }}">
-				<li class="days">
-					<div {% if 1 in days %}class="active"{% endif %} id="{{ prefix }}day_1">S</div>
-					<div {% if 2 in days %}class="active"{% endif %} id="{{ prefix }}day_2">M</div>
-					<div {% if 3 in days %}class="active"{% endif %} id="{{ prefix }}day_3">T</div>
-					<div {% if 4 in days %}class="active"{% endif %} id="{{ prefix }}day_4">W</div>
-					<div {% if 5 in days %}class="active"{% endif %} id="{{ prefix }}day_5">T</div>
-					<div {% if 6 in days %}class="active"{% endif %} id="{{ prefix }}day_6">F</div>
-					<div {% if 7 in days %}class="active"{% endif %} id="{{ prefix }}day_7">S</div>
-				</li>
-				<li class="time open">{% time_selector open time.0 %}</li>
-				<li class="time close">{% time_selector close time.1  %}</li>
-				<li class="buttons">
-				    {% allday_checkbox allday time %} 
-					<div class="remove"></div>
-				</li>
-			</ul>
-			
-			{% endfor %}
-			
-			{% endwith %}
-			{% endwith %}
-			
-			{% endif %}
-			
-			<div class="add" style="clear: left">Add Hours</div>
-		</div>		
+    <div class="hours-form input-container clearheight">
+		<label>Hours</label>
 		
-		<div class="input-container clearheight">
-			<label>What customers see:</label>
-			<div id="store-hours-preview">
-				
-			</div>
+		{# Didn't want to waste time reformatting everything to use tables #}
+		<span style="width:256px;">Days</span>
+		<span style="width:140px;">Open</span>
+		<span style="width:140px;">Close</span>
+		<span style="width:50px;">24 hrs</span>
+		<span style="width:76px;">Remove</span>
+		
+		
+		{% if hours_data|length == 0 %}
+		<ul id="hours-1-row">
+			<li class="days">
+				<div id="hours-1-day_1">S</div>
+				<div id="hours-1-day_2">M</div>
+				<div id="hours-1-day_3">T</div>
+				<div id="hours-1-day_4">W</div>
+				<div id="hours-1-day_5">T</div>
+				<div id="hours-1-day_6">F</div>
+				<div id="hours-1-day_7">S</div>
+			</li>
+			<li class="time open">{% time_selector 'hours-1-open' None %}</li>
+			<li class="time close">{% time_selector 'hours-1-close' None %}</li>
+			<li class="buttons">
+			    {% allday_checkbox allday None %} 
+				<div class="remove"></div>
+			</li>
+		</ul>
+		{% else %}
+		
+		{% with order=hours_data.0 %}
+		{% with hours=hours_data.1 %}
+		{% hours_order_list order as order_list %}
+		
+		{% for i in order_list %}
+		
+		{% hours_key order i as time %}
+		{% hours_days hours time as days %}
+		
+		{% comment %}
+		    order is
+		    {
+                1: ("0600", "1330"),
+            }
+		    and where time is ("0600", "1330") and days is [1, 2] in
+		    {
+                ("0600", "1330"): [1,2],
+            }
+		{% endcomment %}
+		
+		{% hours_names forloop.counter "" as prefix %}
+		{% hours_names forloop.counter "row" as row %}
+		{% hours_names forloop.counter "open" as open %}
+		{% hours_names forloop.counter "close" as close %}
+		{% hours_names forloop.counter "allday" as allday %}
+		
+		<ul id="{{ row }}">
+			<li class="days">
+				<div {% if 1 in days %}class="active"{% endif %} id="{{ prefix }}day_1">S</div>
+				<div {% if 2 in days %}class="active"{% endif %} id="{{ prefix }}day_2">M</div>
+				<div {% if 3 in days %}class="active"{% endif %} id="{{ prefix }}day_3">T</div>
+				<div {% if 4 in days %}class="active"{% endif %} id="{{ prefix }}day_4">W</div>
+				<div {% if 5 in days %}class="active"{% endif %} id="{{ prefix }}day_5">T</div>
+				<div {% if 6 in days %}class="active"{% endif %} id="{{ prefix }}day_6">F</div>
+				<div {% if 7 in days %}class="active"{% endif %} id="{{ prefix }}day_7">S</div>
+			</li>
+			<li class="time open">{% time_selector open time.0 %}</li>
+			<li class="time close">{% time_selector close time.1  %}</li>
+			<li class="buttons">
+			    {% allday_checkbox allday time %} 
+				<div class="remove"></div>
+			</li>
+		</ul>
+		
+		{% endfor %}
+		
+		{% endwith %}
+		{% endwith %}
+		
+		{% endif %}
+		
+		<div class="add" style="clear: left">Add Hours</div>
+	</div>		
+		
+	<div class="input-container clearheight">
+		<label>What customers see:</label>
+		<div id="store-hours-preview">
+			
 		</div>
-				
-		<div id="edit-store-options" class="form-options">
-			<a class="button blue" id="save-button">Save Changes</a>
-			<a href="{% url 'store_index' %}" class="red">Cancel</a>
-		    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
-		            alt="processing punch request..." 
-		            id="store-save-loading" 
-		            style="display:none;position:relative;top:5px;left:4px;"/>
-		</div>
+	</div>
+			
+	<div id="edit-store-options" class="form-options">
+		<a class="button blue" id="save-button">Save Changes</a>
+		<a href="{% url 'store_index' %}" class="red">Cancel</a>
+	    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
+	            alt="processing punch request..." 
+	            id="store-save-loading" 
+	            style="display:none;position:relative;top:5px;left:4px;"/>
+	</div>
 {% endwith %}
 {% endblock %}
