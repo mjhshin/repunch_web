@@ -172,5 +172,7 @@ $(document).ready(function(){
         return !loader.is(":visible");
     });
     
+    // initial preview
+    hoursPreview();
 
 });

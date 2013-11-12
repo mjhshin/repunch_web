@@ -160,7 +160,7 @@ class HoursInterpreter:
             # add to the readable
             readable.append("".join(processed_line)+"<br/>")
             
-            return readable
+        return readable
             
     def _format_parse_input(self):
         """

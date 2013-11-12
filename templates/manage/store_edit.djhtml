@@ -160,6 +160,7 @@
 	{# Must process the elements below manually. #}
 	    <div class="hours-form input-container clearheight" style="width: 650px;">
 			<label>Hours</label>
+			{% if hours_data|length == 0 %}
 			<ul id="hours-1-row">
 				<li class="days">
 					<div id="hours-1-day_1">S</div>
@@ -170,12 +171,55 @@
 					<div id="hours-1-day_6">F</div>
 					<div id="hours-1-day_7">S</div>
 				</li>
-				<li class="time open"><span>from</span>{% time_selector 'hours-0-open' None %}</li>
-				<li class="time close"><span>to</span>{% time_selector 'hours-0-close' None %}</li>
+				<li class="time open"><span>from</span>{% time_selector 'hours-1-open' None %}</li>
+				<li class="time close"><span>to</span>{% time_selector 'hours-1-close' None %}</li>
 				<li class="buttons">
 					<div class="remove"></div>
 				</li>
 			</ul>
+			{% else %}
+			
+			{% with order=hours_data.0 %}
+			{% with hours=hours_data.1 %}
+			
+			{% for time in order %}
+			{% hours_days hours time as days %}
+			
+			{% comment %}
+			{
+                ("0600", "1330"): [1,2],
+            }
+            time is ("0600", "1330") and days is [1, 2]
+			{% endcomment %}
+			
+			{% hours_names forloop.counter "" as prefix %}
+			{% hours_names forloop.counter "row" as row %}
+			{% hours_names forloop.counter "open" as open %}
+			{% hours_names forloop.counter "close" as close %}
+			
+			<ul id="{{ row }}">
+				<li class="days">
+					<div {% if 1 in days %}class="active"{% endif %} id="{{ prefix }}day_1">S</div>
+					<div {% if 2 in days %}class="active"{% endif %} id="{{ prefix }}day_2">M</div>
+					<div {% if 3 in days %}class="active"{% endif %} id="{{ prefix }}day_3">T</div>
+					<div {% if 4 in days %}class="active"{% endif %} id="{{ prefix }}day_4">W</div>
+					<div {% if 5 in days %}class="active"{% endif %} id="{{ prefix }}day_5">T</div>
+					<div {% if 6 in days %}class="active"{% endif %} id="{{ prefix }}day_6">F</div>
+					<div {% if 7 in days %}class="active"{% endif %} id="{{ prefix }}day_7">S</div>
+				</li>
+				<li class="time open"><span>from</span>{% time_selector open time.0 %}</li>
+				<li class="time close"><span>to</span>{% time_selector close time.1  %}</li>
+				<li class="buttons">
+					<div class="remove"></div>
+				</li>
+			</ul>
+			
+			{% endfor %}
+			
+			{% endwith %}
+			{% endwith %}
+			
+			{% endif %}
 			
 			<div class="add" style="clear: left">Add Hours</div>
 		</div>		

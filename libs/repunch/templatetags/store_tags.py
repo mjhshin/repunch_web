@@ -33,9 +33,17 @@ def redemptions_pending(session):
 def hours(session):
     return HoursInterpreter(\
         session["store"].hours).from_parse_to_readable() 
+        
+@register.assignment_tag
+def hours_names(day, postfix):
+    return "hours-%s-%s" % (str(day), postfix)
+    
+@register.assignment_tag
+def hours_days(hours, key):
+    return hours[key]
 
 @register.simple_tag
-def time_selector(name, timestamp):
+def time_selector(name, selected_value):
     """
     Returns a select block with options from 6am to 5.30 am in 30 min
     increments. 
@@ -56,7 +64,7 @@ def time_selector(name, timestamp):
         <option value="0530">5:30 AM</option>
     </select>
     
-    The optional parameter timestamp determines which option is selected.
+    The selected_value, if not None, determines which option is selected.
     """
     
     select = "<select name='%s'>%s</select>"
@@ -68,11 +76,18 @@ def time_selector(name, timestamp):
     # generate the options
     start_hour = 6
     for i in range(24): # 24 hours
-        # TODO determine if selected
-        opt = option
         hour = str((i+start_hour)%24).zfill(2)
         
+        if selected_value and selected_value == hour+"00":
+            opt = option_selected
+        else:
+            opt = option
         options.append(opt % (hour+"00", readable_hours(hour+"00")))
+        
+        if selected_value and selected_value == hour+"30":
+            opt = option_selected
+        else:
+            opt = option
         options.append(opt % (hour+"30", readable_hours(hour+"30")))
     
     return select % (name, "".join(options))

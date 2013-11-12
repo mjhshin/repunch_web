@@ -51,6 +51,8 @@ def edit(request):
         # update the session cache
         request.session['store'] = store
         data['form'] = form
+        data['hours_data'] = HoursInterpreter(\
+            store.hours)._format_parse_input()
 
         return render(request, 'manage/store_edit.djhtml', data)
             
