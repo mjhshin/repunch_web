@@ -121,7 +121,7 @@ class HoursInterpreter:
         """
         formatted = []
         
-        for k, v in hours.iteritems():
+        for k, v in self.hours.iteritems():
             formatted.append({
                 "day": int(k.split("_")[-1]),
                 "open_time": v.split(",")[0],

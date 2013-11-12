@@ -46,19 +46,6 @@ def edit(request):
     store = SESSION.get_store(request.session)
     data = {'account_nav': True}
     
-    def prep_form():
-        form = StoreForm(None)
-        form.initial = store.__dict__.copy()
-        # make sure that the phone number is unformatted
-        form.initial['phone_number'] =\
-            form.initial['phone_number'].replace("(",
-                "").replace(")","").replace(" ", "").replace("-","")
-                
-        data['hours_data'] = HoursInterpreter(\
-            store.hours)._format_parse_input()
-            
-        return form
-    
     def common(form):
         # update the session cache
         request.session['store'] = store
@@ -126,15 +113,22 @@ def edit(request):
             }), content_type="application/json")
             
         else:
-            form = prep_form()
             data['hours_data'] = hours._format_javascript_input()
             return HttpResponse(json.dumps({
                 "result": "error",
-                "html": common(form).content
+                "html": common(form).content,
             }), content_type="application/json")
                 
     else:
-        form = prep_form()
+        form = StoreForm(None)
+        form.initial = store.__dict__.copy()
+        # make sure that the phone number is unformatted
+        form.initial['phone_number'] =\
+            form.initial['phone_number'].replace("(",
+                "").replace(")","").replace(" ", "").replace("-","")
+                
+        data['hours_data'] = HoursInterpreter(\
+            store.hours)._format_parse_input()
          
     return common(form)
 

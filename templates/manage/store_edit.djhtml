@@ -123,15 +123,7 @@
 	            }
 	            $("#Ph1").val(p_num.substring(0,3));
 	            $("#Ph2").val(p_num.substring(3,6));
-	            $("#Ph3").val(p_num.substring(6,10));
-	            
-	            // note that the submit is involved in store_edit.js
-                $("#account-edit-form").submit(function(){
-                    // update the phone number's value
-                    $("#id_phone_number").val(new String($("#Ph1").val()) + 
-                        new String($("#Ph2").val()) + new String($("#Ph3").val()));
-                });
-	            
+	            $("#Ph3").val(p_num.substring(6,10));        
 			});
 			
 			// stolen from http://www.codingforums.com/showthread.php?t=202208
