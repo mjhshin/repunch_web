@@ -47,7 +47,7 @@ def get_adj_days(day, days):
     The day is popped from the days immediately even if it does not
     have any adjacent days.
     
-    Slick recurseion is used here. =)
+    Slick recursion is used here. =)
     """
     group = [days.pop(days.index(day))]
             
@@ -78,16 +78,14 @@ def get_adj_days(day, days):
 class HoursInterpreter:
     def __init__(self, hours):
         self.hours = hours
-        self.html = []
         
-    def _to_readable(self, order, hours_map):
-        html = self.html
+    def _to_readable(self, order, hours_map, open=True):
+        readable = []
         
         # keep the order of the hours and
         # process each set of open and close time
         for k in order:
             v = hours_map[k]
-            open_time, close_time = k.split(",")
             # days start from 1 to 7 and is circular so we must group
             # adjacent elements together first
             groups, solos = [], []
@@ -153,17 +151,21 @@ class HoursInterpreter:
             else: # just 1 element
                 processed_line = line
             
-            # add the close and open time to the line
-            processed_line.append("  "+\
-                readable_hours_range(open_time, close_time))
+            # add the close and open time to the line if these days are open
+            if open:
+                open_time, close_time = k.split(",")
+                processed_line.append("  "+\
+                    readable_hours_range(open_time, close_time))
               
             # add to the readable
-            html.append("".join(processed_line)+"<br/>") 
+            readable.append("".join(processed_line)+"<br/>")
+            
+            return readable
             
     def _format_input(self):
         """
         create a map with the open and close time as the keys.
-        Returns the order and hours_map
+        Returns the order and hours_map.
         """
         order, hours_map = [], {}
         for k, v in self.hours.iteritems():
@@ -174,6 +176,23 @@ class HoursInterpreter:
             if v not in hours_map[v]:
                 hours_map[v].append(int(k.split("_")[-1]))
         return order, hours_map
+        
+        
+    def _get_closed_days(self):
+        """
+        Returns the closed days as a list of integers from 1-7.
+        """
+        closed_days = range(1, 8)
+        
+        for k in self.hours.iterkeys():
+            day = int(k.split("_")[-1])
+            if day in closed_days:
+                closed_days.remove(day)
+            
+            if len(closed_days) == 0:
+                break
+        
+        return closed_days
         
         
     def readable(self):        
@@ -192,11 +211,16 @@ class HoursInterpreter:
         Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
         Closed Sundays and Saturdays
         """
-        order, hours_map = self._format_input()
-        self._to_readable(order, hours_map)
-            
-        # make the closed days readable (if any) 
-        # TODO
+        # get the open days readable
+        readable = self._to_readable(*self._format_input())
         
-        return "".join(self.html)
+        # get the closed days readable
+        # just pass in a dummy for order
+        closed_days = self._get_closed_days()
+        if len(closed_days) > 0:
+            readable.append("Closed ")
+            readable.extend(self._to_readable(["x"],
+                {"x": closed_days}, False))
+        
+        return "".join(readable)
     
