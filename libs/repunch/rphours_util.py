@@ -2,18 +2,8 @@
 Hours interpreter re-written.
 """
 
+from apps.stores.models import DAYS, SHORT_DAYS
 from parse.apps.stores import models
-
-# no ambiguity here lol
-WEEKDAYS = {
-    1: 'Sunday',
-    2: 'Monday',
-    3: 'Tuesday',
-    4: 'Wednesday',
-    5: 'Thursday',
-    6: 'Friday',
-    7: 'Saturday',
-}
 
 def readable_hours(value):
     """
@@ -40,11 +30,11 @@ def readable_hours(value):
 def readable_hours_range(open_time, close_time):
     return readable_hours(open_time)+"  -  "+readable_hours(close_time)
     
-def readable_days_list(days):
+def readable_days_list(days, names=DAYS):
     days.sort()
-    return " and ".join([ WEEKDAYS[i] for i in days ])   
+    return " and ".join([ names[i-1][1] for i in days ])   
     
-def get_adj_days(day, days, group=[]):
+def get_adj_days(day, days):
     """
     Returns the adjacent days relative to day and groups them up in a
     list. The adjacent days are popped from days.
@@ -54,7 +44,7 @@ def get_adj_days(day, days, group=[]):
     
     Slick recurseion is used here. =)
     """
-    group.append(days.pop(days.index(day)))
+    group = [days.pop(days.index(day))]
             
     def left_adj(d):
         left = d-1
@@ -64,7 +54,6 @@ def get_adj_days(day, days, group=[]):
             group.append(days.pop(days.index(left)))
             left_adj(left)
             
-        
     def right_adj(d):
         right = d+1
         if right == 8:
@@ -98,9 +87,10 @@ class HoursInterpreter:
             # v is hours-x-day_y
             if v not in hours_map:
                 hours_map[v] = []
-            hours_map[v].append(int(k.split("_")[-1]))
+            if v not in hours_map[v]:
+                hours_map[v].append(int(k.split("_")[-1]))
         
-        # TODO FIX BUGS
+        print hours_map
         
         # now process each set of open and close time
         for k, v in hours_map.iteritems():
@@ -114,15 +104,25 @@ class HoursInterpreter:
                     solos.extend(group)
                 else:
                     groups.append(group)
+                    
+            print groups, solos
+                    
+            # use short days if there is more than 1 group or 2 solos
+            names = DAYS
+            if len(solos) > 2 or len(groups) > 1 or len(solos) +\
+                len(groups) > 2:
+                names = SHORT_DAYS
               
             line = ""
             # make readable process solo days
-            line += readable_days_list(solos)
+            line += readable_days_list(solos, names)
+            if len(line) > 1:
+                line += " and "
+            
             # make readable grouped days
             while len(groups) > 0:
                 group = groups.pop(0)
                 start, end = min(group), max(group)
-                line += " and "
                 
                 # case that there is a gap in b/w the min and max
                 if set(group) != set(range(start, end+1)): # e.g 1,2,5,6,7
@@ -138,11 +138,11 @@ class HoursInterpreter:
                         start+=1
                         
                     # swap 
-                    tmp = start
-                    start = end
-                    end = tmp
+                    tmp = start - 1
+                    start = end - 1
+                    end = tmp 
                         
-                line += WEEKDAYS[start]+"  -  "+WEEKDAYS[end]
+                line += names[start][1]+"  -  "+names[end][1]
                 
             line += "  "+readable_hours_range(open_time, close_time)
                 
@@ -150,6 +150,7 @@ class HoursInterpreter:
             
             # make the closed days (if any) readable
             
+        print readable
         
         return "".join(readable)
     
