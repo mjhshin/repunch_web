@@ -78,33 +78,10 @@ def get_adj_days(day, days):
 class HoursInterpreter:
     def __init__(self, hours):
         self.hours = hours
+        self.html = []
         
-    def readable(self):        
-        """
-        Hours input must be of the format:
-        {
-            hours-1-day_1: "0600,1330",
-            hours-1-day_2: "0600,1330",
-            hours-2-day_4: "1530,2330",
-            hours-2-day_6: "1530,2330",
-            ...
-        }
-        
-        The return value would then be:
-        Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
-        Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
-        Closed Sundays and Saturdays
-        """
-        readable, hours_map, order = [], {}, []
-        print self.hours
-        # first create a map with the open and close time as the keys
-        for k, v in self.hours.iteritems():
-            # v is hours-x-day_y
-            if v not in hours_map:
-                order.append(v)
-                hours_map[v] = []
-            if v not in hours_map[v]:
-                hours_map[v].append(int(k.split("_")[-1]))
+    def _to_readable(self, order, hours_map):
+        html = self.html
         
         # keep the order of the hours and
         # process each set of open and close time
@@ -123,15 +100,11 @@ class HoursInterpreter:
                     
             # use short days if there is more than 1 group or 2 solos
             # pluralize the Days for solos if full day name
-            names, postfix = DAYS, "s"
+            names, postfix, line = DAYS, "s", []
             if len(solos) > 2 or len(groups) > 1 or len(solos) +\
                 len(groups) > 2:
                 names = SHORT_DAYS
                 postfix = ""
-              
-            line = []
-            # add the solo days to the line if any
-            line.extend(readable_days_list(solos, list, names, postfix))
             
             # make readable grouped days
             while len(groups) > 0:
@@ -159,6 +132,9 @@ class HoursInterpreter:
                 # add the groups to the line if any     
                 line.append(names[start-1][1]+"  -  "+names[end-1][1])
                 
+            # add the solo days to the line if any
+            line.extend(readable_days_list(solos, list, names, postfix))
+                
             # time to add separators
             total, processed_line = len(line), []
             if total > 2: # commas + and
@@ -182,10 +158,45 @@ class HoursInterpreter:
                 readable_hours_range(open_time, close_time))
               
             # add to the readable
-            readable.append("".join(processed_line)+"<br/>") 
+            html.append("".join(processed_line)+"<br/>") 
             
-            # make the closed days (if any) readable
-            # TODO
+    def _format_input(self):
+        """
+        create a map with the open and close time as the keys.
+        Returns the order and hours_map
+        """
+        order, hours_map = [], {}
+        for k, v in self.hours.iteritems():
+            # v is hours-x-day_y
+            if v not in hours_map:
+                order.append(v)
+                hours_map[v] = []
+            if v not in hours_map[v]:
+                hours_map[v].append(int(k.split("_")[-1]))
+        return order, hours_map
         
-        return "".join(readable)
+        
+    def readable(self):        
+        """
+        Hours input must be of the format:
+        {
+            hours-1-day_1: "0600,1330",
+            hours-1-day_2: "0600,1330",
+            hours-2-day_4: "1530,2330",
+            hours-2-day_6: "1530,2330",
+            ...
+        }
+        
+        The return value would then be:
+        Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
+        Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
+        Closed Sundays and Saturdays
+        """
+        order, hours_map = self._format_input()
+        self._to_readable(order, hours_map)
+            
+        # make the closed days readable (if any) 
+        # TODO
+        
+        return "".join(self.html)
     
