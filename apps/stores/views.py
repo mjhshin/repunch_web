@@ -120,9 +120,9 @@ def edit(request):
 @access_required(http_response="Access denied", content_type="text/plain")
 @csrf_exempt
 def hours_preview(request):
-    return HttpResponse(HoursInterpreter(request.POST).readable(),
+    return HttpResponse(HoursInterpreter(\
+        request.POST).from_javascript_to_readable(),
         content_type="text/html")
-    
     
 @login_required
 @dev_login_required

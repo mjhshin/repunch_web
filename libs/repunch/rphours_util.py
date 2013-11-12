@@ -153,7 +153,7 @@ class HoursInterpreter:
             
             # add the close and open time to the line if these days are open
             if open:
-                open_time, close_time = k.split(",")
+                open_time, close_time = k
                 processed_line.append("  "+\
                     readable_hours_range(open_time, close_time))
               
@@ -162,25 +162,119 @@ class HoursInterpreter:
             
             return readable
             
-    def _format_input(self):
+    def _format_parse_input(self):
         """
-        create a map with the open and close time as the keys.
-        Returns the order and hours_map.
+        Returns the order and hours_map used for _to_readable.
+        
+        Example input:
+        [
+            {
+                day:1,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            {
+                day:2,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            ...
+        ]
+        
+        Output would then be:
+        {
+            ("0600", "1330"): [1,2],
+        }
+        """
+        order, hours_map = [], {}
+        for hour in self.hours:
+            key = (hour["open_time"], hour["close_time"])
+            day = hour["day"]
+            if key not in hours_map:
+                order.append(key)
+                hours_map[key] = []
+            if day not in hours_map[key]:
+                hours_map[key].append(day)
+        return order, hours_map
+        
+            
+    def _format_javascript_input(self):
+        """
+        Returns the order and hours_map used for _to_readable.
+        
+        Example input:
+        {
+            hours-1-day_1: "0600,1330",
+            hours-1-day_2: "0600,1330",
+            hours-2-day_4: "1530,2330",
+            hours-2-day_6: "1530,2330",
+            ...
+        }
+        
+        Output would then be:
+        {
+            ("0600", "1330"): [1,2],
+            ("1530", "2330"): [4,6],
+        }
         """
         order, hours_map = [], {}
         for k, v in self.hours.iteritems():
-            # v is hours-x-day_y
-            if v not in hours_map:
-                order.append(v)
-                hours_map[v] = []
-            if v not in hours_map[v]:
-                hours_map[v].append(int(k.split("_")[-1]))
+            key = tuple(v.split(","))
+            day = int(k.split("_")[-1])
+            if key not in hours_map:
+                order.append(key)
+                hours_map[key] = []
+            if day not in hours_map[key]:
+                hours_map[key].append(day)
         return order, hours_map
         
         
-    def _get_closed_days(self):
+    def _get_parse_closed_days(self):
         """
         Returns the closed days as a list of integers from 1-7.
+        
+        Example input:
+        [
+            {
+                day:1,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            {
+                day:2,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            ...
+        ]
+        Output would then be:
+        [ 3, 4, 5, 6, 7 ]
+        """
+        closed_days = range(1, 8)
+        
+        for hours in self.hours:
+            if hours["day"] in closed_days:
+                closed_days.remove(hours["day"])
+                
+            if len(closed_days) == 0:
+                break
+        
+        return closed_days
+        
+    def _get_javascript_closed_days(self):
+        """
+        Returns the closed days as a list of integers from 1-7.
+        
+        Example input:
+        {
+            hours-1-day_1: "0600,1330",
+            hours-1-day_2: "0600,1330",
+            hours-2-day_4: "1530,2330",
+            hours-2-day_6: "1530,2330",
+            ...
+        }
+        Output would then be:
+        [ 3, 5, 7 ]
         """
         closed_days = range(1, 8)
         
@@ -194,8 +288,42 @@ class HoursInterpreter:
         
         return closed_days
         
+    def from_parse_to_readable(self):        
+        """
+        Hours input must be of the format:
+        [
+            {
+                day:1,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            {
+                day:2,
+                open_time: "0600",
+                close_time: "1330",
+            }, 
+            ...
+        ]
         
-    def readable(self):        
+        The return value would then be:
+        Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
+        Closed Tuesday - Saturday
+        """
+        # get the open days readable
+        readable = self._to_readable(*self._format_parse_input())
+        
+        # get the closed days readable
+        # just pass in a dummy for order
+        closed_days = self._get_parse_closed_days()
+        if len(closed_days) > 0:
+            readable.append("Closed ")
+            readable.extend(self._to_readable(["x"],
+                {"x": closed_days}, False))
+        
+        return "".join(readable)
+    
+        
+    def from_javascript_to_readable(self):        
         """
         Hours input must be of the format:
         {
@@ -209,14 +337,14 @@ class HoursInterpreter:
         The return value would then be:
         Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
         Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
-        Closed Sundays and Saturdays
+        Closed Tues, Thurs, and Sat
         """
         # get the open days readable
-        readable = self._to_readable(*self._format_input())
+        readable = self._to_readable(*self._format_javascript_input())
         
         # get the closed days readable
         # just pass in a dummy for order
-        closed_days = self._get_closed_days()
+        closed_days = self._get_javascript_closed_days()
         if len(closed_days) > 0:
             readable.append("Closed ")
             readable.extend(self._to_readable(["x"],

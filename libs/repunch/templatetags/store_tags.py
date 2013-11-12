@@ -31,12 +31,8 @@ def redemptions_pending(session):
 
 @register.simple_tag
 def hours(session):
-    """ 
-    build the list of hours in proper format to render in template
-    """
-    # TODO
-    return ""
-    return HoursInterpreter(hours=hours).readable()  
+    return HoursInterpreter(\
+        session["store"].hours).from_parse_to_readable() 
 
 @register.simple_tag
 def time_selector(name, timestamp):
