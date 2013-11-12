@@ -95,19 +95,21 @@ class HoursInterpreter:
         Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
         Closed Sundays and Saturdays
         """
-        readable, hours_map = [], {}
+        readable, hours_map, order = [], {}, []
+        print self.hours
         # first create a map with the open and close time as the keys
         for k, v in self.hours.iteritems():
             # v is hours-x-day_y
             if v not in hours_map:
+                order.append(v)
                 hours_map[v] = []
             if v not in hours_map[v]:
                 hours_map[v].append(int(k.split("_")[-1]))
         
-        print hours_map
-        
-        # now process each set of open and close time
-        for k, v in hours_map.iteritems():
+        # keep the order of the hours and
+        # process each set of open and close time
+        for k in order:
+            v = hours_map[k]
             open_time, close_time = k.split(",")
             # days start from 1 to 7 and is circular so we must group
             # adjacent elements together first
@@ -118,8 +120,6 @@ class HoursInterpreter:
                     solos.extend(group)
                 else:
                     groups.append(group)
-                    
-            print groups, solos
                     
             # use short days if there is more than 1 group or 2 solos
             # pluralize the Days for solos if full day name
@@ -163,10 +163,11 @@ class HoursInterpreter:
             total, processed_line = len(line), []
             if total > 2: # commas + and
                 for l in line:
-                    processed_line.append(l)
-                    if line.index(l) == total - 1:
+                    if line.index(l) == total - 1: # last element
                         processed_line.append(" and ")
+                        processed_line.append(l)
                     else:
+                        processed_line.append(l)
                         processed_line.append(", ")
                      
             elif total == 2: # and
@@ -185,8 +186,6 @@ class HoursInterpreter:
             
             # make the closed days (if any) readable
             # TODO
-            
-        print readable
         
         return "".join(readable)
     
