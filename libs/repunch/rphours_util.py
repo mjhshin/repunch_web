@@ -30,9 +30,14 @@ def readable_hours(value):
 def readable_hours_range(open_time, close_time):
     return readable_hours(open_time)+"  -  "+readable_hours(close_time)
     
-def readable_days_list(days, names=DAYS):
+def readable_days_list(days, return_type=str, names=DAYS, postfix=""):
     days.sort()
-    return " and ".join([ names[i-1][1] for i in days ])   
+    d = [ names[i-1][1]+postfix for i in days ]
+    
+    if return_type is str:
+        return " and ".join(d)
+    elif return_type is list:
+        return d
     
 def get_adj_days(day, days):
     """
@@ -76,7 +81,16 @@ class HoursInterpreter:
         
     def readable(self):        
         """
-        Example return value:
+        Hours input must be of the format:
+        {
+            hours-1-day_1: "0600,1330",
+            hours-1-day_2: "0600,1330",
+            hours-2-day_4: "1530,2330",
+            hours-2-day_6: "1530,2330",
+            ...
+        }
+        
+        The return value would then be:
         Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
         Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
         Closed Sundays and Saturdays
@@ -108,16 +122,16 @@ class HoursInterpreter:
             print groups, solos
                     
             # use short days if there is more than 1 group or 2 solos
-            names = DAYS
+            # pluralize the Days for solos if full day name
+            names, postfix = DAYS, "s"
             if len(solos) > 2 or len(groups) > 1 or len(solos) +\
                 len(groups) > 2:
                 names = SHORT_DAYS
+                postfix = ""
               
-            line = ""
-            # make readable process solo days
-            line += readable_days_list(solos, names)
-            if len(line) > 1:
-                line += " and "
+            line = []
+            # add the solo days to the line if any
+            line.extend(readable_days_list(solos, list, names, postfix))
             
             # make readable grouped days
             while len(groups) > 0:
@@ -138,17 +152,39 @@ class HoursInterpreter:
                         start+=1
                         
                     # swap 
-                    tmp = start - 1
-                    start = end - 1
+                    tmp = start
+                    start = end
                     end = tmp 
-                        
-                line += names[start][1]+"  -  "+names[end][1]
                 
-            line += "  "+readable_hours_range(open_time, close_time)
+                # add the groups to the line if any     
+                line.append(names[start-1][1]+"  -  "+names[end-1][1])
                 
-            readable.append(line) 
+            # time to add separators
+            total, processed_line = len(line), []
+            if total > 2: # commas + and
+                for l in line:
+                    processed_line.append(l)
+                    if line.index(l) == total - 1:
+                        processed_line.append(" and ")
+                    else:
+                        processed_line.append(", ")
+                     
+            elif total == 2: # and
+                processed_line.append(line[0])
+                processed_line.append(" and ")
+                processed_line.append(line[1])
+            else: # just 1 element
+                processed_line = line
+            
+            # add the close and open time to the line
+            processed_line.append("  "+\
+                readable_hours_range(open_time, close_time))
+              
+            # add to the readable
+            readable.append("".join(processed_line)+"<br/>") 
             
             # make the closed days (if any) readable
+            # TODO
             
         print readable
         

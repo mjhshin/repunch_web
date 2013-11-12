@@ -5,7 +5,7 @@
 /**
     Returns the hours in the example format.
     {
-        hours-1-day_1: "0600,1730" } 
+        hours-1-day_1: "0600,1730",
         ...
     }
     
