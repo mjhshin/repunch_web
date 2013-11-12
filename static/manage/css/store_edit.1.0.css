@@ -51,6 +51,10 @@ div#notification { }
 
 
 /* hours form style */
+.hours-form {
+    width: 690px; 
+}
+
 div.hours-form ul { 
 	height: 30px; 
 	list-style: none; 
@@ -66,9 +70,12 @@ div.hours-form ul li {
 	margin: 0px;
 	padding: 0px;
 }
-div.hours-form ul li span {
-	font-size: 14px;
-	color: #999;
+div.hours-form span {
+    display: inline-block;
+    text-align: center;
+	font: bold 14px/26px 'Cabin', sans-serif;
+	color: #666;
+	height: 26px;
 }
 div.hours-form ul li.days div,
 div.hours-form div.add { 
@@ -95,20 +102,27 @@ div.hours-form ul li.days div.active {
 	color: #666; 
 }
 div.hours-form ul li.time { 
-	width: 160px;
+    margin-left: 10px; 
+    width: 130px; 
 }
-div.hours-form ul li.time select {
-	margin-left: 5px;
+div.hours-form ul li.buttons {
+	margin-left: 20px;
 }
 div.hours-form ul li.buttons div {
-	width: 30px;
-	height: 30px;
-	margin-right: 5px;
-	float: left;
+    position: relative; top: 3px;
+    float: left;
+	width: 24px;
+	height: 24px;
 	cursor: pointer;
 }
+div.hours-form ul li.buttons input[type="checkbox"] {
+    position: relative; top: 4px;
+    float: left;
+    width: 20px; height: 20px;
+}
 div.hours-form ul li.buttons div.remove {
-	background-image: url('../images/hours_remove.png');
+	margin-left: 42px;
+	background-image: url('../images/hours_remove.1.0.png');
 }
 
 div.hours-form div.add {

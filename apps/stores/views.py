@@ -66,8 +66,11 @@ def edit(request):
                 store.set("hours", hours.from_javascript_to_parse())
             else:
                 data['hours_data'] = hours._format_javascript_input()
-                # TODO
-                return common(form)
+                data['hours_error'] = "Invalid hours"
+                return HttpResponse(json.dumps({
+                    "result": "error",
+                    "html": common(form).content,
+                }), content_type="application/json")
             
             # set the timezone
             if store.get('zip'):

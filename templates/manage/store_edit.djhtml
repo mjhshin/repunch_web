@@ -150,8 +150,17 @@
 	</form>
 	
 	{# Must process the elements below manually. #}
-	    <div class="hours-form input-container clearheight" style="width: 650px;">
+	    <div class="hours-form input-container clearheight">
 			<label>Hours</label>
+			
+			{# Didn't want to waste time reformatting everything to use tables #}
+			<span style="width:256px;">Days</span>
+			<span style="width:140px;">Open</span>
+			<span style="width:140px;">Close</span>
+			<span style="width:50px;">24 hrs</span>
+			<span style="width:76px;">Remove</span>
+			
+			
 			{% if hours_data|length == 0 %}
 			<ul id="hours-1-row">
 				<li class="days">
@@ -163,9 +172,10 @@
 					<div id="hours-1-day_6">F</div>
 					<div id="hours-1-day_7">S</div>
 				</li>
-				<li class="time open"><span>from</span>{% time_selector 'hours-1-open' None %}</li>
-				<li class="time close"><span>to</span>{% time_selector 'hours-1-close' None %}</li>
+				<li class="time open">{% time_selector 'hours-1-open' None %}</li>
+				<li class="time close">{% time_selector 'hours-1-close' None %}</li>
 				<li class="buttons">
+				    {% allday_checkbox allday None %} 
 					<div class="remove"></div>
 				</li>
 			</ul>
@@ -195,6 +205,7 @@
 			{% hours_names forloop.counter "row" as row %}
 			{% hours_names forloop.counter "open" as open %}
 			{% hours_names forloop.counter "close" as close %}
+			{% hours_names forloop.counter "allday" as allday %}
 			
 			<ul id="{{ row }}">
 				<li class="days">
@@ -206,9 +217,10 @@
 					<div {% if 6 in days %}class="active"{% endif %} id="{{ prefix }}day_6">F</div>
 					<div {% if 7 in days %}class="active"{% endif %} id="{{ prefix }}day_7">S</div>
 				</li>
-				<li class="time open"><span>from</span>{% time_selector open time.0 %}</li>
-				<li class="time close"><span>to</span>{% time_selector close time.1  %}</li>
+				<li class="time open">{% time_selector open time.0 %}</li>
+				<li class="time close">{% time_selector close time.1  %}</li>
 				<li class="buttons">
+				    {% allday_checkbox allday time %} 
 					<div class="remove"></div>
 				</li>
 			</ul>
