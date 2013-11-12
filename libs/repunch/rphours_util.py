@@ -76,15 +76,70 @@ def get_adj_days(day, days):
     return group
             
 class HoursInterpreter:
+    """
+    Transforms store_edit.js inputs and Parse formatted hours to readable
+    and also provides hours validation.
+    """
+
     def __init__(self, hours):
         self.hours = hours
+        
+    def is_valid(self):
+        """
+        Returns True if the following conditions are met:
+            1. hours must not overlap
+            2. if open time is greater than close time, then close time
+               must be earlier than or equal to 5.30 am.
+               
+        Close time and open time being equal is valid.
+        """
+        return True
+        
+    def from_javascript_to_parse(self):
+        """
+        Transforms javascript input to Parse hours format.
+        Example input:
+        {
+            hours-1-day_1: "0600,1330",
+            hours-2-day_6: "1530,2330",
+            ...
+        }
+        
+        Output would then be:
+        [
+            {
+                day: 1,
+                open_time: "0600",
+                close_time: "1330"
+            },
+            {
+                day: 6,
+                open_time: "1530",
+                close_time: "2330"
+            }
+        ]
+        """
+        formatted = []
+        
+        for k, v in hours.iteritems():
+            formatted.append({
+                "day": int(k.split("_")[-1]),
+                "open_time": v.split(",")[0],
+                "close_time": v.split(",")[1],
+            })
+        
+        return formatted
         
     def _to_readable(self, order, hours_map, open=True):
         readable = []
         
-        # keep the order of the hours and
-        # process each set of open and close time
-        for k in order:
+        # sort the order
+        order_list = [ i for i in order.keys() ] 
+        order_list.sort()
+        
+        # keep the order of the hours and process each set of open and close time
+        for i in order_list:
+            k = order[i]
             v = hours_map[k]
             # days start from 1 to 7 and is circular so we must group
             # adjacent elements together first
@@ -182,16 +237,19 @@ class HoursInterpreter:
         ]
         
         Output would then be:
-        {
+        hours_map = {
             ("0600", "1330"): [1,2],
         }
+        order = {
+            1: ("0600", "1330"),
+        }
         """
-        order, hours_map = [], {}
-        for hour in self.hours:
+        order, hours_map = {}, {}
+        for i, hour in enumerate(self.hours):
             key = (hour["open_time"], hour["close_time"])
             day = hour["day"]
             if key not in hours_map:
-                order.append(key)
+                order.update({ i: key })
                 hours_map[key] = []
             if day not in hours_map[key]:
                 hours_map[key].append(day)
@@ -212,17 +270,22 @@ class HoursInterpreter:
         }
         
         Output would then be:
-        {
+        hours_map = {
             ("0600", "1330"): [1,2],
             ("1530", "2330"): [4,6],
         }
+        
+        order = {
+            1: ("0600", "1330"),
+            2: ("0600", "1330")
+        }
         """
-        order, hours_map = [], {}
+        order, hours_map = {}, {}
         for k, v in self.hours.iteritems():
             key = tuple(v.split(","))
             day = int(k.split("_")[-1])
             if key not in hours_map:
-                order.append(key)
+                order.update({ int(k.split("-")[1]): key })
                 hours_map[key] = []
             if day not in hours_map[key]:
                 hours_map[key].append(day)
@@ -317,7 +380,7 @@ class HoursInterpreter:
         closed_days = self._get_parse_closed_days()
         if len(closed_days) > 0:
             readable.append("Closed ")
-            readable.extend(self._to_readable(["x"],
+            readable.extend(self._to_readable({1:"x"},
                 {"x": closed_days}, False))
         
         return "".join(readable)
@@ -347,7 +410,7 @@ class HoursInterpreter:
         closed_days = self._get_javascript_closed_days()
         if len(closed_days) > 0:
             readable.append("Closed ")
-            readable.extend(self._to_readable(["x"],
+            readable.extend(self._to_readable({1:"x"},
                 {"x": closed_days}, False))
         
         return "".join(readable)

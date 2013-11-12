@@ -181,15 +181,22 @@
 			
 			{% with order=hours_data.0 %}
 			{% with hours=hours_data.1 %}
+			{% hours_order_list order as order_list %}
 			
-			{% for time in order %}
+			{% for i in order_list %}
+			
+			{% hours_key order i as time %}
 			{% hours_days hours time as days %}
 			
 			{% comment %}
-			{
-                ("0600", "1330"): [1,2],
-            }
-            time is ("0600", "1330") and days is [1, 2]
+			    order is
+			    {
+                    1: ("0600", "1330"),
+                }
+			    and where time is ("0600", "1330") and days is [1, 2] in
+			    {
+                    ("0600", "1330"): [1,2],
+                }
 			{% endcomment %}
 			
 			{% hours_names forloop.counter "" as prefix %}

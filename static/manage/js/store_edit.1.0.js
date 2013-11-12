@@ -129,16 +129,29 @@ function submitForm(){
     loader.show();
                     
     var form = $("#account-edit-form");
-    var data = form.serialize();
-    data["hours"] = getHoursData();
+    var data = form.serializeArray();
+    data.push({
+        name: "hours",
+        value: JSON.stringify(getHoursData()),
+    });
+    
     $.ajax({
         url: form.attr("action"),
-        data: data,
+        data: $.param(data),
         type: "POST",
         cache: false, // required to kill internet explorer 304 bug
         success: function(res) {
             loader.hide();
-            // TODO handle response
+            
+            if (res.result == "success") {
+                window.location.replace(res.url);
+            
+            } else if (res.result == "error" ) {
+                var newDoc = document.open("text/html", "replace");
+                newDoc.write(res.html);
+                newDoc.close();
+            }
+
         },
         
     });

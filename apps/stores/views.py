@@ -46,23 +46,41 @@ def edit(request):
     store = SESSION.get_store(request.session)
     data = {'account_nav': True}
     
+    def prep_form():
+        form = StoreForm(None)
+        form.initial = store.__dict__.copy()
+        # make sure that the phone number is unformatted
+        form.initial['phone_number'] =\
+            form.initial['phone_number'].replace("(",
+                "").replace(")","").replace(" ", "").replace("-","")
+                
+        data['hours_data'] = HoursInterpreter(\
+            store.hours)._format_parse_input()
+            
+        return form
+    
     def common(form):
-        # TODO
         # update the session cache
         request.session['store'] = store
         data['form'] = form
-        data['hours_data'] = HoursInterpreter(\
-            store.hours)._format_parse_input()
-
         return render(request, 'manage/store_edit.djhtml', data)
             
     if request.method == 'POST': 
         form = StoreForm(request.POST)
-            
+        postDict = request.POST.dict()
+        hours = HoursInterpreter(json.loads(postDict["hours"]))
+
         if form.is_valid(): 
             store = Store(**store.__dict__)
-            store.update_locally(request.POST.dict(), False)
-            # store.set("hours", hours)
+            store.update_locally(postDict, False)
+            
+            # validate and format the hours
+            if hours.is_valid():
+                store.set("hours", hours.from_javascript_to_parse())
+            else:
+                data['hours_data'] = hours._format_javascript_input()
+                # TODO
+                return common(form)
             
             # set the timezone
             if store.get('zip'):
@@ -100,17 +118,23 @@ def edit(request):
             }
             comet_receive(store.objectId, payload)
             
-            return redirect(reverse('store_index')+ "?%s" %\
-                        urllib.urlencode({'success':\
-                            'Store details has been updated.'}))
+            return HttpResponse(json.dumps({
+                "result": "success",
+                "url": reverse('store_index')+ "?%s" %\
+                    urllib.urlencode({'success':\
+                            'Store details has been updated.'})
+            }), content_type="application/json")
+            
+        else:
+            form = prep_form()
+            data['hours_data'] = hours._format_javascript_input()
+            return HttpResponse(json.dumps({
+                "result": "error",
+                "html": common(form).content
+            }), content_type="application/json")
                 
     else:
-        form = StoreForm(None)
-        form.initial = store.__dict__.copy()
-        # make sure that the phone number is unformatted
-        form.initial['phone_number'] =\
-            form.initial['phone_number'].replace("(",
-                "").replace(")","").replace(" ", "").replace("-","")
+        form = prep_form()
          
     return common(form)
 

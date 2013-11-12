@@ -40,7 +40,26 @@ def hours_names(day, postfix):
     
 @register.assignment_tag
 def hours_days(hours, key):
+    """
+    Dictionary lookup.
+    """
     return hours[key]
+    
+@register.assignment_tag
+def hours_key(order, i):
+    """
+    Dictionary lookup.
+    """
+    return order[i]
+    
+@register.assignment_tag
+def hours_order_list(order):
+    """
+    Return and ordered list from the order dict.
+    """
+    order_list = [ k for k in order.keys() ]
+    order_list.sort()
+    return order_list
 
 @register.simple_tag
 def time_selector(name, selected_value):
