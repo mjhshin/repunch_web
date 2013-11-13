@@ -95,7 +95,7 @@ class HoursInterpreter:
                
         Close time and open time being equal is valid.
         """
-        return True
+        return False
         
     def from_javascript_to_parse(self):
         """

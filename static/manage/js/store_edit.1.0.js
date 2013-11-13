@@ -41,6 +41,10 @@ function getHoursData() {
     return data;
 }
 
+/**
+    This not only shows a textual preview but also handles hours validation response
+    from the server - enabling and disabling the submit button.
+*/
 function hoursPreview(){
     $.ajax({
         url: $("#hours_preview_url").val(),
@@ -50,10 +54,12 @@ function hoursPreview(){
         success: function(res) {
             if (res.result == "success") {
                 $("#store-hours-preview").html(res.html);
+                $("#save-button").removeClass("gray").addClass("blue");
                 
             } else {
                 $("#hours_e > ul.errorlist > li").text(res.html);
-            
+                $("#save-button").removeClass("blue").addClass("gray");
+                
             }
         
         },
@@ -209,7 +215,11 @@ function addHoursRow() {
     bindAllDay(copyId);
 }
 
-function submitForm(){
+function submitForm(submitButton){
+    if (submitButton.hasClass("gray")) {
+        return;
+    }
+
     var loader = $("#store-save-loading");
     if (loader.is(":visible")) { return; }
     loader.show();
@@ -270,7 +280,7 @@ $(document).ready(function(){
     
     // clicks on submit
     $("#save-button").click(function() {
-        submitForm();
+        submitForm($(this));
     });
     
     var loader = $("#store-save-loading");
