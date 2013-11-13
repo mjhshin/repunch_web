@@ -76,6 +76,26 @@ def get_adj_days(day, days):
     # sort before returning
     group.sort()
     return group
+    
+def get_lexicographical_time(time):
+    """
+    The day "starts" from 0600 and ends at 0530.
+    This returns an integer representing the given time 
+    lexicographically from 0600 to 0530.
+    0600 = 0
+    0630 = 1
+    ...
+    0500 = 46
+    0530 = 47
+    """
+    hour, minute = int(time[:2]), int(time[2:])
+    # normal time starts from 0000 = 0 to 2330 = 47
+    # 0600 would be 12 normal time so we just need to shift everything by 12
+    index = (hour*2) + (minute/30) - 12
+    if index < 0: # these are times 0530 and below
+        index += 48
+    
+    return index
             
 class HoursInterpreter:
     """
@@ -111,24 +131,77 @@ class HoursInterpreter:
         # 
         # order = {
         #     1: ("0600", "1330", "0"),
-        #     2: ("1530", "1530", "1"), # valid since thrid bit is "1"
+        #     2: ("1530", "1530", "1"), # valid since third bit is "1"
         # }
-        order_list = [ i for i in order.keys() ]
+        order_list, days_map = [ i for i in order.keys() ], {}
         order_list.sort() # order doesn't really matter but whatever
+        
+        def hours_overlap(time, days):
+            """
+            Check if this hours has a conflict with an hours in
+            the days_map. This does not handle open time being the
+            same as close time.
+            
+            days_map = {
+                1: [("0600", "1330", "0"), ...],
+                2: [("0600", "1330", "0"), ...],
+                4: [("1530", "1530", "1"), ...],
+                6: [("1530", "1530", "1"), ...],
+            }
+            """
+            open_time, close_time = time[:2]
+            open_time = get_lexicographical_time(open_time)
+            close_time = get_lexicographical_time(close_time)
+            
+            for day in days:
+                if day not in days_map:
+                    days_map[day] = []
+                    
+                # check hours the day after if the open = close
+                # close time has to be <= tomorrow's opening
+                if open_time == close_time:
+                    hours_tomorrow = days_map[day]
+                    for hours in hours_tomorrow:
+                        open, close = hours[:2]
+                        open = get_lexicographical_time(open)
+                        if close_time > open:
+                            return True
+                    continue
+                
+                # check hours on the same day
+                hours_today = days_map[day]
+                for hours in hours_today:
+                    open, close = hours[:2]
+                    open = get_lexicographical_time(open)
+                    close = get_lexicographical_time(close)
+                    if not ((open_time < open and close_time <= open) or\
+                        (open_time >= close and close_time > close)):
+                        return True
+            
+                # all valid - add the hours to the days map
+                days_map[day].append(time)
+                
+            return False
+        
         for i in order_list:
-            k, v = order[i], hours_map[order[i]]
-            open_time, close_time, all_day = k
-            # lets check for condition 2
+            time, days = order[i], hours_map[order[i]]
+            open_time, close_time, all_day = time
+            open_time = get_lexicographical_time(open_time)
+            close_time = get_lexicographical_time(close_time)
+            
+            # condition 2
             # The comparison uses lexicographical ordering *1*
-            if open_time > close_time and close_time > "0530":
-                return False
+            if open_time > close_time:
+                return "The opening time cannot be later than the "+\
+                    "closing time."
             # condition 3
             if open_time == close_time and all_day == "0":
-                return False
+                return "The opening time cannot be the same as the "+\
+                    "close time."
             
             # Here comes the hard part - condition 1
-            # TODO
-        
+            if hours_overlap(time, days):
+                return "The store hours cannot overlap."
         
         return True
         
@@ -186,7 +259,8 @@ class HoursInterpreter:
         order_list = [ i for i in order.keys() ] 
         order_list.sort()
         
-        # keep the order of the hours and process each set of open and close time
+        # keep the order of the hours and process each set of open
+        # and close time
         for i in order_list:
             k = order[i]
             v = hours_map[k]
@@ -214,13 +288,14 @@ class HoursInterpreter:
                 start, end = min(group), max(group)
                 
                 # case that there is a gap in b/w the min and max
-                if set(group) != set(range(start, end+1)): # e.g 1,2,5,6,7
-                    # find the left most day from the max before the gap
+                # e.g 1,2,5,6,7
+                if set(group) != set(range(start, end+1)): 
+                    # find the left most day from the max before gap
                     while True:
                         if end - 1 not in group:
                             break;
                         end-=1
-                    # find the right most day from the min before the gap
+                    # find the right most day from the min before gap
                     while True:
                         if start + 1 not in group:
                             break;
@@ -255,7 +330,8 @@ class HoursInterpreter:
             else: # just 1 element
                 processed_line = line
             
-            # add the close and open time to the line if these days are open
+            # add the close and open time to the line
+            # if these days are open
             if open:
                 open_time, close_time = k
                 processed_line.append(SPACE*2+\

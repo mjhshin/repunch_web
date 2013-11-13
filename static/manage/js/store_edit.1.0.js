@@ -54,6 +54,7 @@ function hoursPreview(){
         success: function(res) {
             if (res.result == "success") {
                 $("#store-hours-preview").html(res.html);
+                $("#hours_e > ul.errorlist > li").text("");
                 $("#save-button").removeClass("gray").addClass("blue");
                 
             } else {

@@ -62,11 +62,12 @@ def edit(request):
             store.update_locally(postDict, False)
             
             # validate and format the hours
-            if hours.is_valid():
+            hours_validation = hours.is_valid()
+            if type(hours_validation) is bool:
                 store.set("hours", hours.from_javascript_to_parse())
             else:
                 data['hours_data'] = hours._format_javascript_input()
-                data['hours_error'] = "Invalid hours"
+                data['hours_error'] = hours_validation
                 return HttpResponse(json.dumps({
                     "result": "error",
                     "html": common(form).content,
@@ -147,12 +148,13 @@ def hours_preview(request):
         return "Bad request"
 
     hours = HoursInterpreter(request.POST)
-    if hours.is_valid():
+    hours_validation = hours.is_valid()
+    if type(hours_validation) is bool:
         result = "success"
         html = HoursInterpreter(request.POST).from_javascript_to_readable()
     else:
         result = "error"
-        html = "Invalid hours"
+        html = hours_validation
     
     return HttpResponse(json.dumps({
         "result": result,
