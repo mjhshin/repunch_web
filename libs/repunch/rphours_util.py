@@ -273,7 +273,7 @@ class HoursInterpreter:
         return order, hours_map
         
             
-    def _format_javascript_input(self):
+    def _format_javascript_input(self, allDayBit=False):
         """
         Returns the order and hours_map used for _to_readable.
         
@@ -296,10 +296,18 @@ class HoursInterpreter:
             1: ("0600", "1330"),
             2: ("0600", "1330")
         }
+        
+        If allDayBit is True then the key would b a 3-tuple.
+        From ("0600", "1330") to ("0600", "1330", "0|1").
+        If allDayBit is True the output of this should not be used
+        for _to_readable. Only use it for validation.
         """
         order, hours_map = {}, {}
         for k, v in self.hours.iteritems():
-            key = tuple(v.split(","))
+            if allDayBit:
+                key = tuple(v.split(","))
+            else:
+                key = tuple(v.split(",")[:2])
             day = int(k.split("_")[-1])
             if key not in hours_map:
                 order.update({ int(k.split("-")[1]): key })

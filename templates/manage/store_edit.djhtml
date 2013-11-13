@@ -151,6 +151,8 @@
 	
 	{# Must process the elements below manually. #}
     <div class="hours-form input-container clearheight">
+    
+        <div id="hours_e"><ul class="errorlist"><li>{{ hours_error }}</li></ul></div>
 		<label>Hours</label>
 		
 		{# Didn't want to waste time reformatting everything to use tables #}
@@ -162,7 +164,7 @@
 		
 		
 		{% if hours_data|length == 0 %}
-		<ul id="hours-1-row">
+		<ul id="hours-1-row" class="hours-row">
 			<li class="days">
 				<div id="hours-1-day_1">S</div>
 				<div id="hours-1-day_2">M</div>
@@ -207,7 +209,7 @@
 		{% hours_names forloop.counter "close" as close %}
 		{% hours_names forloop.counter "allday" as allday %}
 		
-		<ul id="{{ row }}">
+		<ul id="{{ row }}" class="hours-row">
 			<li class="days">
 				<div {% if 1 in days %}class="active"{% endif %} id="{{ prefix }}day_1">S</div>
 				<div {% if 2 in days %}class="active"{% endif %} id="{{ prefix }}day_2">M</div>

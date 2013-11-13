@@ -143,9 +143,21 @@ def edit(request):
 @access_required(http_response="Access denied", content_type="text/plain")
 @csrf_exempt
 def hours_preview(request):
-    return HttpResponse(HoursInterpreter(\
-        request.POST).from_javascript_to_readable(),
-        content_type="text/html")
+    if request.method != "POST":
+        return "Bad request"
+
+    hours = HoursInterpreter(request.POST)
+    if hours.is_valid():
+        result = "success"
+        html = HoursInterpreter(request.POST).from_javascript_to_readable()
+    else:
+        result = "error"
+        html = "Invalid hours"
+    
+    return HttpResponse(json.dumps({
+        "result": result,
+        "html": html,
+    }), content_type="application/json")
     
 @login_required
 @dev_login_required

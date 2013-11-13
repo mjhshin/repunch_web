@@ -1,7 +1,6 @@
 /**
     Store edit js re-written.
     
-    // TODO validate hours ad they are clicking and don't show in preview if invalid
 */
 
 var allDayText = "24 hours";
@@ -10,27 +9,32 @@ var defaultCloseTime = "1700";
 /**
     Returns the hours in the example format.
     {
-        hours-1-day_1: "0600,1730",
+        hours-1-day_1: "0600,1730,0",
         ...
     }
     
     The above example states that Sunday has an opening time of 6 am and closing time of 5.30 pm.
+    
+    The third bit represents the state of the 24 hour checkbox. 0 for unchecked, 1 for checked.
+    This is used for validation - to differentiate b/w checking the checkbox for 24 hours 
+    and manually entering the same open and close time.
 */
 function getHoursData() {
     var data = {};
     
-    $(".hours-form ul").each(function() {
+    $(".hours-form ul.hours-row").each(function() {
         var self = $(this);
         var openTime = self.find(".time.open select").val();
         var closeTime = self.find(".time.close select").val();
+        var is24Hours = self.find(".buttons input[type='checkbox']").first()[0].checked;
         // closeTime is the same as openTime if the allday checkbox is checked.
-        if (self.find(".buttons input[type='checkbox']").first()[0].checked) {
+        if (is24Hours) {
             closeTime = openTime;
         }
     
         // add all the active days
         self.find(".days .active").each(function() {
-            data[$(this).attr("id")] = openTime+","+closeTime;
+            data[$(this).attr("id")] = openTime+","+closeTime+","+(is24Hours?"1":"0");
         });
     });
     
@@ -44,7 +48,14 @@ function hoursPreview(){
         type: "POST",
         cache: false, // required to kill internet explorer 304 bug
         success: function(res) {
-            $("#store-hours-preview").html(res);
+            if (res.result == "success") {
+                $("#store-hours-preview").html(res.html);
+                
+            } else {
+                $("#hours_e > ul.errorlist > li").text(res.html);
+            
+            }
+        
         },
         
     });
@@ -56,7 +67,7 @@ function hoursPreview(){
 */
 function bindOptionsClick(rowId) {
     if (rowId == null) {
-        rowId = "";
+        rowId = ".hours-row";
     } else {
         rowId = "#hours"+rowId+"row";
     }
@@ -72,7 +83,7 @@ function bindOptionsClick(rowId) {
 */
 function bindDaysClick(rowId) {
     if (rowId == null) {
-        rowId = "";
+        rowId = ".hours-row";
     } else {
         rowId = "#hours"+rowId+"row";
     }
@@ -94,18 +105,18 @@ function bindDaysClick(rowId) {
 */
 function bindRemoveRow(rowId){
     if (rowId == null) {
-        rowId = "";
+        rowId = ".hours-row";
     } else {
         rowId = "#hours"+rowId+"row";
     }
     
     $(".hours-form ul"+rowId+" .buttons .remove").click(function() {
         // do not remove the last row
-        if ($(".hours-form > ul").length > 1) {
-            $(this).closest("ul").remove();
+        if ($(".hours-form > ul.hours-row").length > 1) {
+            $(this).closest("ul.hours-row").remove();
             
         } else { // just deactivate all days
-            $(this).closest("ul").find(".days div").removeClass("active");
+            $(this).closest("ul.hours-row").find(".days div").removeClass("active");
         }
         
         // hours may have changed so update the preview
@@ -153,7 +164,7 @@ function getReadableDay(value){
 */
 function bindAllDay(rowId){
     if (rowId == null) {
-        rowId = "";
+        rowId = ".hours-row";
     } else {
         rowId = "#hours"+rowId+"row";
     }
@@ -161,7 +172,7 @@ function bindAllDay(rowId){
     $(".hours-form ul"+rowId+" .buttons input[type='checkbox']").click(function() {
         // disable the close time for this row
         var self = $(this);
-        var closeSelect = self.closest("ul").find("li.time.close > select").first();
+        var closeSelect = self.closest("ul.hours-row").find("li.time.close > select").first();
         closeSelect.attr("disabled", self[0].checked);
         
         var selectedOption = closeSelect.find("option:selected").first();     
@@ -181,13 +192,13 @@ function bindAllDay(rowId){
 }
 
 function addHoursRow() {
-    var lastHours = $(".hours-form ul:last");
+    var lastHours = $(".hours-form ul.hours-row:last");
     var orig = $("#hours-clone");
     var copyId = "-"+String(Number(lastHours.attr("id").substring(6,7)) + 1)+"-";
     // replace the -0- in hours-0-row with copyId
     // also remove all active classes on days
     lastHours.after( 
-        "<ul id='hours"+copyId+"row'>"+
+        "<ul id='hours"+copyId+"row' class='hours-row'>"+
         orig.html().replace(new RegExp("-x-", 'g'), copyId).replace(/active|checked/g, "")+
         "</ul>"
     );
@@ -270,8 +281,8 @@ $(document).ready(function(){
     
     // if close time and open time are equal, set the close time to 5pm, disable it, 
     // and changed the option text to 24 hours
-    $(".hours-form ul .buttons input[type='checkbox']:checked").each(function() {
-        var closeSelect = $(this).closest("ul").find("li.time.close > select").first();
+    $(".hours-form ul.hours-row .buttons input[type='checkbox']:checked").each(function() {
+        var closeSelect = $(this).closest("ul.hours-row").find("li.time.close > select").first();
         closeSelect.val(defaultCloseTime);
         closeSelect.attr("disabled", true);
         
