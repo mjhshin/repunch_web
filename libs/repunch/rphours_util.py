@@ -222,7 +222,7 @@ class HoursInterpreter:
             # condition 3
             if open_time == close_time and all_day == "0":
                 return "The opening time cannot be the same as the "+\
-                    "close time."
+                    "closing time."
             
             # Here comes the hard part - condition 1
             if hours_overlap(time, days):
@@ -350,7 +350,7 @@ class HoursInterpreter:
                      
             elif total == 2: # and
                 processed_line.append(line[0])
-                processed_line.append(" and ")
+                processed_line.append("and"+SPACE)
                 processed_line.append(line[1])
             else: # just 1 element
                 processed_line = line
