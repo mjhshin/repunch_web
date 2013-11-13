@@ -7,7 +7,7 @@
     <link href='http://fonts.googleapis.com/css?family=Cabin:400,600,700' 
         rel='stylesheet' type='text/css'>
 	
-	<link href="{% static 'manage/css/global.2.0.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.2.1.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/login.2.1.css' %}" rel="stylesheet" />   
 	
 	<style>

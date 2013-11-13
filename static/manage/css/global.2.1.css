@@ -95,13 +95,13 @@ a.button{
 	font-weight:bold;
 	padding:0 30px;
 	cursor: pointer;
+	font: bold 14px/38px 'Cabin', sans-serif;
 }
 
 a.button.blue{
 	background: #0965ad;
 	border:1px solid #163C61;
 	border-width:1px 1px 2px 1px;
-	font: bold 14px/38px 'Cabin', sans-serif;
 }
 
 a.button.blue:hover {
@@ -350,10 +350,6 @@ div.form-options a.red{
 	margin:14px 10px 0;
 	display:block;
 	float:left;
-}
-
-div.form-options .button.gray{
-	margin: 0 0 0 10px;
 }
 
 div#photo-edit{

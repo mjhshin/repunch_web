@@ -92,10 +92,45 @@ class HoursInterpreter:
             1. hours must not overlap
             2. if open time is greater than close time, then close time
                must be earlier than or equal to 5.30 am.
+            3. allDayBit (from _format_javascript_input) must be 1 if
+                open time is equal to close time. Otherwise, the user 
+                manually entered the same open and close time w/o
+                checking the 24 hours / allDay checkbox.
                
         Close time and open time being equal is valid.
+        This is only used to validate javascript input - not Parse hours,
+        which will always be valid.
         """
-        return False
+        order, hours_map = self._format_javascript_input(True)
+        # At this point we have something like the below.
+        # 
+        # hours_map = {
+        #     ("0600", "1330"): [1,2],
+        #     ("1530", "1530"): [4,6],
+        # }
+        # 
+        # order = {
+        #     1: ("0600", "1330", "0"),
+        #     2: ("1530", "1530", "1"), # valid since thrid bit is "1"
+        # }
+        order_list = [ i for i in order.keys() ]
+        order_list.sort() # order doesn't really matter but whatever
+        for i in order_list:
+            k, v = order[i], hours_map[order[i]]
+            open_time, close_time, all_day = k
+            # lets check for condition 2
+            # The comparison uses lexicographical ordering *1*
+            if open_time > close_time and close_time > "0530":
+                return False
+            # condition 3
+            if open_time == close_time and all_day == "0":
+                return False
+            
+            # Here comes the hard part - condition 1
+            # TODO
+        
+        
+        return True
         
     def from_javascript_to_parse(self):
         """
@@ -294,7 +329,7 @@ class HoursInterpreter:
         
         order = {
             1: ("0600", "1330"),
-            2: ("0600", "1330")
+            2: ("1530", "2330")
         }
         
         If allDayBit is True then the key would b a 3-tuple.
@@ -439,4 +474,7 @@ class HoursInterpreter:
                 {"x": closed_days}, False))
         
         return "".join(readable)
-    
+  
+  
+### FOOTNOTES
+# *1* http://docs.python.org/2/tutorial/datastructures.html#comparing-sequences-and-other-types  

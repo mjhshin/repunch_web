@@ -16,7 +16,7 @@
 	<link rel="shortcut icon" href="{% static 'public/images/favicon.2.1.png' %}" />
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	
-	<link href="{% static 'manage/css/global.2.0.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.2.1.css' %}" rel="stylesheet" />
     <link href="{% static 'public/css/jquery-ui-repunch.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
 	{% block styles %}{% endblock %}
