@@ -94,7 +94,7 @@ div.hours-form div.add {
 	cursor: pointer;
 }
 div.hours-form ul li.days{ 
-	width: 260px; 
+	width: 260px; height: 32px;
 }
 div.hours-form ul li.days div.active { 
 	background-color: #FFFFCC; 
@@ -103,22 +103,24 @@ div.hours-form ul li.days div.active {
 }
 div.hours-form ul li.time { 
     margin-left: 10px; 
-    width: 130px; 
+    width: 130px; height: 32px;
+}
+div.hours-form ul li.time select { 
+    vertical-align: middle;
 }
 div.hours-form ul li.buttons {
-	margin-left: 20px;
+	margin-left: 20px; height: 32px;
 }
 div.hours-form ul li.buttons div {
-    position: relative; top: 3px;
+    position: relative; top: 4px;
     float: left;
 	width: 24px;
 	height: 24px;
 	cursor: pointer;
 }
 div.hours-form ul li.buttons input[type="checkbox"] {
-    position: relative; top: 4px;
     float: left;
-    width: 20px; height: 20px;
+    vertical-align: middle;
 }
 div.hours-form ul li.buttons div.remove {
 	margin-left: 42px;
@@ -141,7 +143,9 @@ div.hours-form div.add {
     background-image: linear-gradient(to bottom, #B2E179 0%, #92C657 100%);
 }
 
-
+#hours_e {
+    position: relative; top: 9px;
+}
 #store-hours-preview{
 	color: #666;
 	font-size: 12px;

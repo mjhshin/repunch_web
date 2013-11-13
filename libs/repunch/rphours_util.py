@@ -5,7 +5,7 @@ Hours interpreter re-written.
 from apps.stores.models import DAYS, SHORT_DAYS
 from parse.apps.stores import models
 
-SPACE = "&nbsp;" * 2
+SPACE = "&nbsp;"
 
 def readable_hours(value):
     """
@@ -342,7 +342,7 @@ class HoursInterpreter:
             if total > 2: # commas + and
                 for l in line:
                     if line.index(l) == total - 1: # last element
-                        processed_line.append(SPACE+"and"+SPACE)
+                        processed_line.append("and"+SPACE)
                         processed_line.append(l)
                     else:
                         processed_line.append(l)
@@ -350,7 +350,7 @@ class HoursInterpreter:
                      
             elif total == 2: # and
                 processed_line.append(line[0])
-                processed_line.append("and"+SPACE)
+                processed_line.append(SPACE+"and"+SPACE)
                 processed_line.append(line[1])
             else: # just 1 element
                 processed_line = line
@@ -359,11 +359,11 @@ class HoursInterpreter:
             # if these days are open
             if open:
                 open_time, close_time = k
-                processed_line.append(SPACE*2+\
+                processed_line.append(SPACE*4+\
                     readable_hours_range(open_time, close_time))
                 # if open is the same as close it is 24 hours
                 if open_time == close_time:
-                    processed_line.append(SPACE+"(24 hours)")
+                    processed_line.append(SPACE+"(Open 24 hours)")
               
             # add to the readable
             readable.append("".join(processed_line)+"<br/>")
