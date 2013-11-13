@@ -4,6 +4,9 @@
     // TODO validate hours ad they are clicking and don't show in preview if invalid
 */
 
+var allDayText = "24 hours";
+var defaultCloseTime = "1700";
+
 /**
     Returns the hours in the example format.
     {
@@ -113,6 +116,39 @@ function bindRemoveRow(rowId){
 }
 
 /**
+    Same code as rphours_util.py
+    
+    Returns the text of the option given the value.
+    e.g. option_text("0630") returns 6:30 AM.
+*/
+function getReadableDay(value){
+    if (value == "0000") {
+        return "12 AM (Midnight)";
+        
+    } else if (value == "1200") {
+        return "12 PM (Noon)";
+        
+    } else {
+        var hour = Number(value.substring(0, 2));
+        var ampm = "";
+        if (hour >= 12) {
+            if (hour > 12) {
+                hour -= 12;
+            }
+            ampm = "PM";
+        } else {
+            if (hour == 0) {
+                hour = 12;
+            }
+            ampm = "AM";
+        }
+            
+        return String(hour)+":"+value.substring(2,4)+" "+ampm;
+    }
+    
+}
+
+/**
     rowId is -x- in hours-x-row
 */
 function bindAllDay(rowId){
@@ -128,10 +164,14 @@ function bindAllDay(rowId){
         var closeSelect = self.closest("ul").find("li.time.close > select").first();
         closeSelect.attr("disabled", self[0].checked);
         
-        // unchecking sets the close time to 5 apm
-        if (!self[0].checked) {
-            closeSelect.val("1700");
-        } 
+        var selectedOption = closeSelect.find("option:selected").first();     
+        if (self[0].checked) {
+            // set selected option text to 24 hours
+            selectedOption.text(allDayText);
+        } else {
+            // unchecking reverts the option text
+            selectedOption.text(getReadableDay(selectedOption.val()));
+        }
         
         // hours may have changed so update the preview
         hoursPreview();
@@ -141,14 +181,14 @@ function bindAllDay(rowId){
 }
 
 function addHoursRow() {
-    var orig = $(".hours-form ul:last");
-    var origId = orig.attr("id").substring(5, 8);
-    var copyId = "-"+String(Number(origId.substring(1,2)) + 1)+"-";
+    var lastHours = $(".hours-form ul:last");
+    var orig = $("#hours-clone");
+    var copyId = "-"+String(Number(lastHours.attr("id").substring(6,7)) + 1)+"-";
     // replace the -0- in hours-0-row with copyId
     // also remove all active classes on days
-    orig.after( 
+    lastHours.after( 
         "<ul id='hours"+copyId+"row'>"+
-        orig.html().replace(new RegExp(origId, 'g'), copyId).replace(/active|checked/g, "")+
+        orig.html().replace(new RegExp("-x-", 'g'), copyId).replace(/active|checked/g, "")+
         "</ul>"
     );
     // bind events
@@ -228,15 +268,15 @@ $(document).ready(function(){
         return !loader.is(":visible");
     });
     
-    // make sure that if close time and open time are equal, the 
-    // the selected close time is 5pm and disabled
+    // if close time and open time are equal, set the close time to 5pm, disable it, 
+    // and changed the option text to 24 hours
     $(".hours-form ul .buttons input[type='checkbox']:checked").each(function() {
-        // disable the close time for this row
-        var self = $(this);
-        var closeSelect = self.closest("ul").find("li.time.close > select").first();
-        closeSelect.attr("disabled", self[0].checked);
-        closeSelect.val("1700");
+        var closeSelect = $(this).closest("ul").find("li.time.close > select").first();
+        closeSelect.val(defaultCloseTime);
+        closeSelect.attr("disabled", true);
         
+        var selectedOption = closeSelect.find("option:selected").first();     
+        selectedOption.text(allDayText);
     });
     
     // initial preview

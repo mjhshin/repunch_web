@@ -172,8 +172,8 @@
 				<div id="hours-1-day_6">F</div>
 				<div id="hours-1-day_7">S</div>
 			</li>
-			<li class="time open">{% time_selector 'hours-1-open' None %}</li>
-			<li class="time close">{% time_selector 'hours-1-close' None %}</li>
+			<li class="time open">{% time_selector 'hours-1-open' '0900' %}</li>
+			<li class="time close">{% time_selector 'hours-1-close' '1700' %}</li>
 			<li class="buttons">
 			    {% allday_checkbox allday None %} 
 				<div class="remove"></div>
@@ -234,6 +234,25 @@
 		
 		<div class="add" style="clear: left">Add Hours</div>
 	</div>		
+	
+	{# for cloning #}
+	<ul id="hours-clone" style="display:none;">
+		<li class="days">
+			<div id="hours-x-day_1">S</div>
+			<div id="hours-x-day_2">M</div>
+			<div id="hours-x-day_3">T</div>
+			<div id="hours-x-day_4">W</div>
+			<div id="hours-x-day_5">T</div>
+			<div id="hours-x-day_6">F</div>
+			<div id="hours-x-day_7">S</div>
+		</li>
+		<li class="time open">{% time_selector 'hours-x-open' '0900' %}</li>
+		<li class="time close">{% time_selector 'hours-x-close' '1700' %}</li>
+		<li class="buttons">
+		    {% allday_checkbox allday None %} 
+			<div class="remove"></div>
+		</li>
+	</ul>
 		
 	<div class="input-container clearheight">
 		<label>What customers see:</label>
