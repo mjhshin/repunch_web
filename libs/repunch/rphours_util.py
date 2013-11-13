@@ -158,15 +158,29 @@ class HoursInterpreter:
                     days_map[day] = []
                     
                 # check hours the day after if the open = close
-                # close time has to be <= tomorrow's opening
+                # close_time has to be <= tomorrow's opening
                 if open_time == close_time:
-                    hours_tomorrow = days_map[day]
+                    next_day = day + 1
+                    if next_day == 8:
+                        next_day = 1
+                    hours_tomorrow = days_map.get(next_day, [])
                     for hours in hours_tomorrow:
-                        open, close = hours[:2]
-                        open = get_lexicographical_time(open)
+                        open = get_lexicographical_time(hours[0])
                         if close_time > open:
                             return True
-                    continue
+                            
+                # check hours the day before
+                prev_day = day - 1
+                if prev_day == 0:
+                    prev_day = 1
+                hours_yesterday = days_map.get(prev_day, [])
+                for hours in hours_yesterday:
+                    open, close = hours[:2]
+                    open = get_lexicographical_time(open)
+                    close = get_lexicographical_time(close)
+                    # overlap may only occur if yesterday is 24 hours
+                    if open == close and open_time < close:
+                        return True
                 
                 # check hours on the same day
                 hours_today = days_map[day]
@@ -174,9 +188,20 @@ class HoursInterpreter:
                     open, close = hours[:2]
                     open = get_lexicographical_time(open)
                     close = get_lexicographical_time(close)
-                    if not ((open_time < open and close_time <= open) or\
-                        (open_time >= close and close_time > close)):
-                        return True
+                    if open == close:
+                        if close_time == open_time or close_time > open:
+                            # close_time has to be <= todays's opening
+                            return True
+                    else:
+                        if close_time == open_time and open_time < close:
+                            return True
+                            
+                        elif close_time != open_time:
+                            if not ((open_time < open and\
+                                close_time <= open) or\
+                                (open_time >= close and\
+                                close_time > close)):
+                                return True
             
                 # all valid - add the hours to the days map
                 days_map[day].append(time)
