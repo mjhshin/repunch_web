@@ -102,7 +102,7 @@ div.hours-form ul li.days div.active {
 	color: #666; 
 }
 div.hours-form ul li.time { 
-    margin-left: 10px; 
+    margin-left: 10px;
     width: 130px; height: 32px;
 }
 div.hours-form ul li.time select { 
@@ -120,7 +120,7 @@ div.hours-form ul li.buttons div {
 }
 div.hours-form ul li.buttons input[type="checkbox"] {
     float: left;
-    vertical-align: middle;
+    position: relative; top: 0;
 }
 div.hours-form ul li.buttons div.remove {
 	margin-left: 42px;

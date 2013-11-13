@@ -301,11 +301,10 @@ class HoursInterpreter:
                     
             # use short days if there is more than 1 group or 2 solos
             # pluralize the Days for solos if full day name
-            names, postfix, line = DAYS, "s", []
+            names, line = DAYS, []
             if len(solos) > 2 or len(groups) > 1 or len(solos) +\
                 len(groups) > 2:
                 names = SHORT_DAYS
-                postfix = ""
             
             # make readable grouped days
             while len(groups) > 0:
@@ -335,7 +334,7 @@ class HoursInterpreter:
                 line.append(names[start-1][1]+SPACE+"-"+SPACE+names[end-1][1])
                 
             # add the solo days to the line if any
-            line.extend(readable_days_list(solos, list, names, postfix))
+            line.extend(readable_days_list(solos, list, names))
                 
             # time to add separators
             total, processed_line = len(line), []
