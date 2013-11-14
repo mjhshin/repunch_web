@@ -163,7 +163,7 @@
 		<span style="width:76px;">Remove</span>
 		
 		
-		{% if hours_data|length == 0 %}
+		{% if hours_data.1|length == 0 %}
 		<ul id="hours-1-row" class="hours-row">
 			<li class="days">
 				<div id="hours-1-day_1">S</div>
