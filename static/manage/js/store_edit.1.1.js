@@ -211,7 +211,6 @@ function addHoursRow() {
         orig.html().replace(new RegExp("-x-", 'g'), copyId).replace(/active|checked/g, "")+
         "</ul>"
     );
-    alert(copyId);
     bindDaysClick(copyId);
     bindRemoveRow(copyId);
     bindOptionsClick(copyId);
