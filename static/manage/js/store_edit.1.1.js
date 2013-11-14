@@ -201,7 +201,9 @@ function bindAllDay(rowId){
 function addHoursRow() {
     var lastHours = $(".hours-form ul.hours-row:last");
     var orig = $("#hours-clone");
-    var copyId = "-"+String(Number(lastHours.attr("id").substring(6,7)) + 1)+"-";
+    var origId = lastHours.attr("id");
+    origId = origId.substring(origId.indexOf("-")+1, origId.lastIndexOf("-"));
+    var copyId = "-"+String(Number(origId) + 1)+"-";
     // replace the -0- in hours-0-row with copyId
     // also remove all active classes on days
     lastHours.after( 
@@ -209,7 +211,7 @@ function addHoursRow() {
         orig.html().replace(new RegExp("-x-", 'g'), copyId).replace(/active|checked/g, "")+
         "</ul>"
     );
-    // bind events
+    alert(copyId);
     bindDaysClick(copyId);
     bindRemoveRow(copyId);
     bindOptionsClick(copyId);
