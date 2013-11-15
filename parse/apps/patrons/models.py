@@ -49,8 +49,8 @@ class PunchCode(ParseObject):
         # string from 00000 to 99999
         self.punch_code = data.get("punch_code")
         self.is_taken = data.get("is_taken", False)
-        # string of _User's username
-        self.username = data.get("username")
+        # string of _User's objectId
+        self.user_id = data.get("user_id")
         
         super(PunchCode, self).__init__(False, **data)
         
@@ -60,7 +60,7 @@ class PunchCode(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "punch_code", "is_taken",
-            ("username", {"is_taken": True}))
+            ("user_id", {"is_taken": True}))
 
 class PatronStore(ParseObject):
     """ New class not in Django """

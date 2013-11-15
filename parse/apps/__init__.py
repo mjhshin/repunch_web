@@ -22,7 +22,7 @@ def init_punch_codes():
                     "body": {
                          "punch_code": pc,
                          "is_taken": False,
-                         "username": None,
+                         "user_id": None,
                     }
             })
             

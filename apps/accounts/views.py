@@ -20,7 +20,6 @@ from parse.auth.decorators import login_required, dev_login_required
 from parse.apps.accounts import sub_type, UNLIMITED
 from parse.apps.stores import IPOD, MONTHLY
 from parse.apps.stores.models import Store, Subscription
-from parse.apps.patrons.models import PunchCode
 from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
 send_email_receipt_ipod, send_email_account_upgrade,\
@@ -49,17 +48,9 @@ def edit(request):
                 # update the account - email = username!
                 postEmail = email_form.cleaned_data['email']
                 if account.email != postEmail:
-                    prev_username = account.username
                     account.email = postEmail
                     account.username = postEmail
                     account.update()
-                    if account.Patron:
-                        # update the punch_code username field
-                        pc = PunchCode.objects().get(\
-                            username=prev_username)
-                        if pc: # should never be none but ehh
-                            pc.username = account.username
-                            pc.update()
                     
         elif action == "password":
             pass_form = PasswordForm(account, request.POST)
