@@ -112,16 +112,18 @@ class HoursInterpreter:
             1. hours must not overlap
             2. if open time is greater than close time, then close time
                must be earlier than or equal to 5.30 am.
-            3. allDayBit (from _format_javascript_input) must be 1 if
-                open time is equal to close time. Otherwise, the user 
-                manually entered the same open and close time w/o
-                checking the 24 hours / allDay checkbox.
-               
-        Close time and open time being equal is valid.
+            3. if open 24/7, which is represented by day 0.
+            4. Close time and open time cannot be the same.
+            
         This is only used to validate javascript input - not Parse hours,
         which will always be valid.
         """
-        order, hours_map = self._format_javascript_input(True)
+        order, hours_map = self._format_javascript_input()
+        
+        # 24/7
+        if order is None and hours_map is None:
+            return True
+        
         # At this point we have something like the below.
         # 
         # hours_map = {
@@ -130,8 +132,8 @@ class HoursInterpreter:
         # }
         # 
         # order = {
-        #     1: ("0600", "1330", "0"),
-        #     2: ("1530", "1530", "1"), # valid since third bit is "1"
+        #     1: ("0600", "1330"),
+        #     2: ("1530", "1530"), # valid since third bit is "1"
         # }
         order_list, days_map = [ i for i in order.keys() ], {}
         order_list.sort() # order doesn't really matter but whatever
@@ -143,44 +145,19 @@ class HoursInterpreter:
             same as close time.
             
             days_map = {
-                1: [("0600", "1330", "0"), ...],
-                2: [("0600", "1330", "0"), ...],
-                4: [("1530", "1530", "1"), ...],
-                6: [("1530", "1530", "1"), ...],
+                1: [("0600", "1330"), ...],
+                2: [("0600", "1330"), ...],
+                4: [("1530", "1530"), ...],
+                6: [("1530", "1530"), ...],
             }
             """
-            open_time, close_time = time[:2]
+            open_time, close_time = time
             open_time = get_lexicographical_time(open_time)
             close_time = get_lexicographical_time(close_time)
             
             for day in days:
                 if day not in days_map:
                     days_map[day] = []
-                    
-                # check hours the day after if the open = close
-                # close_time has to be <= tomorrow's opening
-                if open_time == close_time:
-                    next_day = day + 1
-                    if next_day == 8:
-                        next_day = 1
-                    hours_tomorrow = days_map.get(next_day, [])
-                    for hours in hours_tomorrow:
-                        open = get_lexicographical_time(hours[0])
-                        if close_time > open:
-                            return True
-                            
-                # check hours the day before
-                prev_day = day - 1
-                if prev_day == 0:
-                    prev_day = 1
-                hours_yesterday = days_map.get(prev_day, [])
-                for hours in hours_yesterday:
-                    open, close = hours[:2]
-                    open = get_lexicographical_time(open)
-                    close = get_lexicographical_time(close)
-                    # overlap may only occur if yesterday is 24 hours
-                    if open == close and open_time < close:
-                        return True
                 
                 # check hours on the same day
                 hours_today = days_map[day]
@@ -210,7 +187,7 @@ class HoursInterpreter:
         
         for i in order_list:
             time, days = order[i], hours_map[order[i]]
-            open_time, close_time, all_day = time
+            open_time, close_time = time
             open_time = get_lexicographical_time(open_time)
             close_time = get_lexicographical_time(close_time)
             
@@ -220,7 +197,7 @@ class HoursInterpreter:
                 return "The opening time cannot be later than the "+\
                     "closing time."
             # condition 3
-            if open_time == close_time and all_day == "0":
+            if open_time == close_time:
                 return "The opening time cannot be the same as the "+\
                     "closing time."
             
@@ -235,8 +212,8 @@ class HoursInterpreter:
         Transforms javascript input to Parse hours format.
         Example input:
         {
-            hours-1-day_1: "0600,1330",
-            hours-2-day_6: "1530,2330",
+            hours-0-day_1: "0600,1330",
+            hours-1-day_6: "1530,2330",
             ...
         }
         
@@ -253,19 +230,30 @@ class HoursInterpreter:
                 close_time: "2330"
             }
         ]
+        
+        If 24/7 (hours-0-day_0: "xxxx,xxxx"), returns
+        [
+            {
+                day: 0,
+            },
+        ]
         """
         # first merge same (open, close) together
         order, hours_map = self._format_javascript_input()
+
+        if order is None and hours_map is None:
+            return [{ "day": 0}]
+        
         formatted = []
         
         # sort the order
         order_list = [ i for i in order.keys() ]
         order_list.sort()
-        """
-        hours_map = {
-            ("0600", "1330"): [1,2],
-        }
-        """
+        
+        # hours_map = {
+        #     ("0600", "1330"): [1,2],
+        # }
+
         for i in order_list:
             key, days = order[i], hours_map[order[i]]
             for day in days:
@@ -278,6 +266,9 @@ class HoursInterpreter:
         return formatted
         
     def _to_readable(self, order, hours_map, open=True):
+        """
+        Does not handle 24/7.
+        """
         readable = []
         
         # sort the order
@@ -393,10 +384,16 @@ class HoursInterpreter:
             ("0600", "1330"): [1,2],
         }
         order = {
-            1: ("0600", "1330"),
+            0: ("0600", "1330"),
         }
+        
+        returns None, None if 24/7 ([{day: 0}])
         """
-        order, hours_map = {}, {}
+        # check if 24/7 now
+        if len(self.hours) == 1 and self.hours[0]["day"] == 0:
+            return None, None
+            
+        order, hours_map = {}, {}       
         for i, hour in enumerate(self.hours):
             key = (hour["open_time"], hour["close_time"])
             day = hour["day"]
@@ -408,16 +405,16 @@ class HoursInterpreter:
         return order, hours_map
         
             
-    def _format_javascript_input(self, allDayBit=False):
+    def _format_javascript_input(self):
         """
         Returns the order and hours_map used for _to_readable.
         
         Example input:
         {
-            hours-1-day_1: "0600,1330",
-            hours-1-day_2: "0600,1330",
-            hours-2-day_4: "1530,2330",
-            hours-2-day_6: "1530,2330",
+            hours-0-day_1: "0600,1330",
+            hours-0-day_2: "0600,1330",
+            hours-1-day_4: "1530,2330",
+            hours-1-day_6: "1530,2330",
             ...
         }
         
@@ -428,21 +425,19 @@ class HoursInterpreter:
         }
         
         order = {
-            1: ("0600", "1330"),
-            2: ("1530", "2330")
+            0: ("0600", "1330"),
+            1: ("1530", "2330")
         }
         
-        If allDayBit is True then the key would b a 3-tuple.
-        From ("0600", "1330") to ("0600", "1330", "0|1").
-        If allDayBit is True the output of this should not be used
-        for _to_readable. Only use it for validation.
+        returns None, None if 24/7 (hours-0-day_0: "xxxx,xxxx")
         """
+        # 24/7
+        if "hours-0-day_0" in self.hours.keys():
+            return None, None
+            
         order, hours_map = {}, {}
         for k, v in self.hours.iteritems():
-            if allDayBit:
-                key = tuple(v.split(","))
-            else:
-                key = tuple(v.split(",")[:2])
+            key = tuple(v.split(",")[:2])
             day = int(k.split("_")[-1])
             if key not in hours_map:
                 order.update({ int(k.split("-")[1]): key })
@@ -490,10 +485,10 @@ class HoursInterpreter:
         
         Example input:
         {
-            hours-1-day_1: "0600,1330",
-            hours-1-day_2: "0600,1330",
-            hours-2-day_4: "1530,2330",
-            hours-2-day_6: "1530,2330",
+            hours-0-day_1: "0600,1330",
+            hours-0-day_2: "0600,1330",
+            hours-1-day_4: "1530,2330",
+            hours-1-day_6: "1530,2330",
             ...
         }
         Output would then be:
@@ -531,9 +526,22 @@ class HoursInterpreter:
         The return value would then be:
         Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
         Closed Tuesday - Saturday
+        
+        24/7 is represented as:
+        [
+            {
+                day:0,
+            }, 
+        ]
         """
+        order, hours_map = self._format_parse_input()
+        
+        # 24/7
+        if order is None and hours_map is None:
+            return "Open 24/7"
+        
         # get the open days readable
-        readable = self._to_readable(*self._format_parse_input())
+        readable = self._to_readable(order, hours_map)
         
         # get the closed days readable
         # just pass in a dummy for order
@@ -550,10 +558,10 @@ class HoursInterpreter:
         """
         Hours input must be of the format:
         {
-            hours-1-day_1: "0600,1330",
-            hours-1-day_2: "0600,1330",
-            hours-2-day_4: "1530,2330",
-            hours-2-day_6: "1530,2330",
+            hours-0-day_1: "0600,1330",
+            hours-0-day_2: "0600,1330",
+            hours-1-day_4: "1530,2330",
+            hours-1-day_6: "1530,2330",
             ...
         }
         
@@ -561,9 +569,20 @@ class HoursInterpreter:
         Sundays and Monday - Friday  6:00 AM - 1:30 PM<br/>
         Wednesdays and Fridays  3:30 PM  - 11:30 PM<br/>
         Closed Tues, Thurs, and Sat
+        
+        24/7 is represented as:
+        {
+            hours-0-day_0: "xxxx,xxxx",
+        }, 
         """
+        order, hours_map = self._format_javascript_input()
+        
+        # 24/7
+        if order is None and hours_map is None:
+            return "Open 24/7"
+        
         # get the open days readable
-        readable = self._to_readable(*self._format_javascript_input())
+        readable = self._to_readable(order, hours_map)
         
         # get the closed days readable
         # just pass in a dummy for order

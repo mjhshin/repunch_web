@@ -52,7 +52,7 @@ div#notification { }
 
 /* hours form style */
 .hours-form {
-    width: 690px; 
+    width: 640px; 
 }
 
 div.hours-form ul { 
@@ -109,7 +109,7 @@ div.hours-form ul li.time select {
     vertical-align: middle;
 }
 div.hours-form ul li.buttons {
-	margin-left: 20px; height: 32px;
+	margin-left: 34px; height: 32px;
 }
 div.hours-form ul li.buttons div {
     position: relative; top: 4px;
@@ -118,12 +118,7 @@ div.hours-form ul li.buttons div {
 	height: 24px;
 	cursor: pointer;
 }
-div.hours-form ul li.buttons input[type="checkbox"] {
-    float: left;
-    position: relative; top: 0;
-}
 div.hours-form ul li.buttons div.remove {
-	margin-left: 42px;
 	background-image: url('../images/hours_remove.1.0.png');
 }
 
@@ -143,9 +138,33 @@ div.hours-form div.add {
     background-image: linear-gradient(to bottom, #B2E179 0%, #92C657 100%);
 }
 
+#hours-top {
+    width: 616px; 
+    position: relative;
+}
+#hours-top label {
+    display:inline-block;
+}
+#hours-top input[type="checkbox"] {
+    display:inline-block;
+    vertical-align:middle;
+}
+#open-24-7-label,
+#hours-top input[type="checkbox"] {
+    position: absolute;
+    right: 0px;
+}
+#hours-top input[type="checkbox"] {
+    top: 7px;
+}
+#open-24-7-label {
+    right: 24px;
+}
+
 #hours_e {
     position: relative; top: 9px;
 }
+
 #store-hours-preview{
 	color: #666;
 	font-size: 12px;

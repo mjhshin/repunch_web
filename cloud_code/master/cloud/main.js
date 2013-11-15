@@ -1091,7 +1091,7 @@ Parse.Cloud.define("punch", function(request, response)
 				}
 						
 		}, function(error) {
-				console.log("Employee fetch failed.");
+				console.log("Store save failed.");
 				response.error("error");	
 				
 		}).then(function(employee) {
@@ -1103,7 +1103,8 @@ Parse.Cloud.define("punch", function(request, response)
 				}
 				
 		}, function(error) {
-				console.log("Employee save failed.");
+				console.log("Employee fetch failed.");
+				// undo changes above
 				response.error("error");	
 				
 		}).then(function(employee) {

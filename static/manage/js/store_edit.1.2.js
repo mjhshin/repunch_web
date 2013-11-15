@@ -3,39 +3,41 @@
     
 */
 
-var allDayText = "24 hours";
 var defaultCloseTime = "1700";
 
 /**
     Returns the hours in the example format.
     {
-        hours-1-day_1: "0600,1730,0",
+        hours-1-day_1: "0600,1730",
         ...
     }
     
     The above example states that Sunday has an opening time of 6 am and closing time of 5.30 pm.
     
-    The third bit represents the state of the 24 hour checkbox. 0 for unchecked, 1 for checked.
-    This is used for validation - to differentiate b/w checking the checkbox for 24 hours 
-    and manually entering the same open and close time.
+    If the 24/7 checkbox is checked, then this will return the below.
+    {
+        hours-0-day_0: "xxxx,xxxx",
+    }
+    
 */
 function getHoursData() {
     var data = {};
+    
+    // check if 24/7
+    if ($("#hours-top input[type='checkbox']").first()[0].checked){
+        return { "hours-0-day_0": "xxxx,xxxx", };
+    }
     
     $(".hours-form ul.hours-row").each(function() {
         var self = $(this);
         var openTime = self.find(".time.open select").val();
         var closeTime = self.find(".time.close select").val();
-        var is24Hours = self.find(".buttons input[type='checkbox']").first()[0].checked;
-        // closeTime is the same as openTime if the allday checkbox is checked.
-        if (is24Hours) {
-            closeTime = openTime;
-        }
     
         // add all the active days
         self.find(".days .active").each(function() {
-            data[$(this).attr("id")] = openTime+","+closeTime+","+(is24Hours?"1":"0");
+            data[$(this).attr("id")] = openTime+","+closeTime;
         });
+        
     });
     
     return data;
@@ -167,35 +169,17 @@ function getReadableDay(value){
 }
 
 /**
-    rowId is -x- in hours-x-row
+    Hide all the hours-rows, including the add hours button, if checked.
+    Show all rows if not.
 */
-function bindAllDay(rowId){
-    if (rowId == null) {
-        rowId = ".hours-row";
+function checkOpenAllWeek(self){
+    if (self[0].checked) {
+        $("#slide-container").slideUp();
     } else {
-        rowId = "#hours"+rowId+"row";
+        $("#slide-container").slideDown();
     }
     
-    $(".hours-form ul"+rowId+" .buttons input[type='checkbox']").click(function() {
-        // disable the close time for this row
-        var self = $(this);
-        var closeSelect = self.closest("ul.hours-row").find("li.time.close > select").first();
-        closeSelect.attr("disabled", self[0].checked);
-        
-        var selectedOption = closeSelect.find("option:selected").first();     
-        if (self[0].checked) {
-            // set selected option text to 24 hours
-            selectedOption.text(allDayText);
-        } else {
-            // unchecking reverts the option text
-            selectedOption.text(getReadableDay(selectedOption.val()));
-        }
-        
-        // hours may have changed so update the preview
-        hoursPreview();
-        
-    });
-    
+    hoursPreview();
 }
 
 function addHoursRow() {
@@ -214,7 +198,6 @@ function addHoursRow() {
     bindDaysClick(copyId);
     bindRemoveRow(copyId);
     bindOptionsClick(copyId);
-    bindAllDay(copyId);
 }
 
 function submitForm(submitButton){
@@ -269,12 +252,14 @@ $(document).ready(function(){
     // clicks on remove hours
     bindRemoveRow();
     
-    // clicks on allday checkbox
-    bindAllDay();
-    
     // clicks on add hours
     $(".hours-form .add").click(function() {
         addHoursRow();
+    });
+    
+    // clicks on 24/7 checkbox
+    $("#hours-top input[type='checkbox']").change(function() {
+        checkOpenAllWeek($(this));
     });
     
     // clicks on options
@@ -291,16 +276,8 @@ $(document).ready(function(){
         return !loader.is(":visible");
     });
     
-    // if close time and open time are equal, set the close time to 5pm, disable it, 
-    // and changed the option text to 24 hours
-    $(".hours-form ul.hours-row .buttons input[type='checkbox']:checked").each(function() {
-        var closeSelect = $(this).closest("ul.hours-row").find("li.time.close > select").first();
-        closeSelect.val(defaultCloseTime);
-        closeSelect.attr("disabled", true);
-        
-        var selectedOption = closeSelect.find("option:selected").first();     
-        selectedOption.text(allDayText);
-    });
+    // initial check if 24/7
+    checkOpenAllWeek($("#hours-top input[type='checkbox']"));
     
     // initial preview
     hoursPreview();

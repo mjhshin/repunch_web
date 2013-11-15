@@ -61,21 +61,6 @@ def hours_order_list(order):
     order_list.sort()
     return order_list
     
-@register.simple_tag
-def allday_checkbox(name, time):
-    """
-    Returns a checkbox input with the given name. If time is provided
-    and the open and close time are the same then it is checked.
-    
-    The generated input has the format:
-    <input name="name" type="checkbox" value="1" checked/>
-    """
-    if time and time[0] == time[1]:
-        checkbox = "<input name='%s' type='checkbox' value='1' checked/>"
-    else:
-        checkbox = "<input name='%s' type='checkbox' value='1'/>"
-    return checkbox % (name,)    
-    
 
 @register.simple_tag
 def time_selector(name, selected_value):
