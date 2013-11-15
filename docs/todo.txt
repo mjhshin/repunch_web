@@ -1,14 +1,8 @@
 ##############################################
 ####################  TODO: 
 
-* ASAP *
-    - Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
-        * in redemptions.js
+1. Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
+    - in redemptions.js
    
-
-1. Fix all broken tests.
-   - login (dev server)
-   - logout
-   - everything else
-
-2. spaces are now allowed for passwords - so fix broken tests for signup
+2. Fix all broken tests.
+    - spaces are now allowed for passwords - so fix broken tests for signup

@@ -16,9 +16,8 @@ from random import randint
 def request_redeem():
     """
     """
-    print _request_redeem("2wqNnnrmkq", "FPbRCOoQTi", "XgGKiDHOQ1",
-        "Sandwhich and Soup", 0, 2, 
-        "Michael Shin", None)
+    print _request_redeem("zef0o3YjIm", "o72LmDy0YK", "kfWmOOlIWD",
+        "Test Redeem#"+str(randint(0,9999)), 1, 1, "Vandolf Estrellado", None)
 
 def _request_redeem(patron_id, store_id, patron_store_id, title,
     reward_id, num_punches, name, message_status_id):
