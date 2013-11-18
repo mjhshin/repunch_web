@@ -625,6 +625,9 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	
 	var storeQuery = new Parse.Query(Store);
 	var patronQuery = new Parse.Query(Patron);
+	var patronStoreQuery = new Parse.Query(PatronStore);
+
+	var patron;
 	
 	store.id = storeId;
 	patron.id = patronId;
@@ -634,70 +637,90 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	patronStore.set("pending_reward", false);
 	patronStore.set("Store", store);
 	patronStore.set("Patron", patron);
-	
-	patronStore.save().then(function(patronStore) {
-		console.log("PatronStore save success.");
-		return patronQuery.get(patronId);
-		
-	}, function(error) {
-		console.log("PatronStore save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(patron) {
+
+	storeQuery.equalTo("objectId", storeId);
+
+	patronQuery.get(patronId).then(function(patronResult) {
 		console.log("Patron fetch success.");
-		patron.relation("PatronStores").add(patronStore);
-		return patron.save();
+		patron = patronResult;
+		var punchCode = patronResult.get("punch_code");
+		patronStore.set("punch_code", punchCode);
+		patronStoreQuery.equalTo("punch_code", punchCode);
+		patronStoreQuery.matchesQuery("Store", storeQuery);
+		return patronStoreQuery.first();
+
+	}, function(error) {
+		console.log("Patron fetch failed: " + error.message);
+		response.error("error");
+		
+	}).then(function(patronStoreResult) {
+		if(patronStoreResult == null) {
+			console.log("PatronStore not found. Creating new one.");
+			addPatronStore();
+		}
+		else {
+			console.log("PatronStore containing this Punch Code already exists");
+			response.success(patronStoreResult);
+		}
 		
 	}, function(error) {
-		console.log("Patron fetch failed.");
+		console.log("PatronStore query failed: " + error.message);
 		response.error("error");
-		return;
 		
-	}).then(function(patron) {
-		console.log("Patron save success.");
-		return storeQuery.get(storeId);
-		
-	}, function(error) {
-		console.log("Patron save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(store) {
-		console.log("Store fetch success.");
-		store.relation("PatronStores").add(patronStore);
-		return store.save();
-		
-	}, function(error) {
-		console.log("Store fetch failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(store) {
-		console.log("Store save success.");
-		// calling response.success here will prevent the following promises from executing!
-		// response.success(patronStore);
-	    return store.relation("PatronStores").query().count();
-		
-	}, function(error) {
-		console.log("Store save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(patronStoreCount) {
-        Parse.Cloud.httpRequest({
-            method: "POST",
-            url: "<<COMET_RECEIVE_URL>>" + storeId,
-            headers: { "Content-Type": "application/json"},
-            body: { 
-                "cometrkey": "<<COMET_RECEIVE_KEY>>", 
-                patronStore_int: patronStoreCount,
-            }
-        });
-        
-        response.success(patronStore);
-        
 	});
+
+	function addPatronStore()
+	{
+		patronStore.save().then(function(patronStore) {
+			console.log("PatronStore save success.");
+			patron.relation("PatronStores").add(patronStore);
+			return patron.save();
+		
+		}, function(error) {
+			console.log("PatronStore save failed.");
+			response.error("error");
+		
+		}).then(function(patron) {
+			console.log("Patron save success.");
+			return storeQuery.get(storeId);
+		
+		}, function(error) {
+			console.log("Patron save failed.");
+			response.error("error");
+		
+		}).then(function(store) {
+			console.log("Store fetch success.");
+			store.relation("PatronStores").add(patronStore);
+			return store.save();
+		
+		}, function(error) {
+			console.log("Store fetch failed.");
+			response.error("error");
+		
+		}).then(function(store) {
+			console.log("Store save success.");
+			// calling response.success here will prevent the following promises from executing!
+			// response.success(patronStore);
+	    	return store.relation("PatronStores").query().count();
+		
+		}, function(error) {
+			console.log("Store save failed.");
+			response.error("error");
+		
+		}).then(function(patronStoreCount) {
+        	Parse.Cloud.httpRequest({
+            	method: "POST",
+            	url: "<<COMET_RECEIVE_URL>>" + storeId,
+            	headers: { "Content-Type": "application/json"},
+            	body: { 
+                	"cometrkey": "<<COMET_RECEIVE_KEY>>", 
+                	patronStore_int: patronStoreCount,
+            	}
+        	});
+        
+        	response.success(patronStore);
+		});
+	}
 	
 });
 
@@ -872,7 +895,7 @@ Parse.Cloud.define("punch", function(request, response)
    
 	patronQuery.equalTo("punch_code", punchCode);
 	storeQuery.equalTo("objectId", storeId);
-	patronStoreQuery.matchesQuery("Patron", patronQuery);
+	patronStoreQuery.equalTo("punch_code", punchCode);
 	patronStoreQuery.matchesQuery("Store", storeQuery);
 	patronStoreQuery.include("Patron");
 	patronStoreQuery.include("Store");
@@ -919,6 +942,7 @@ Parse.Cloud.define("punch", function(request, response)
 				patronStore.set("all_time_punches", numPunches);
 				patronStore.set("pending_reward", false);
 				patronStore.set("Patron", patronResult);
+				patronStore.set("punch_code", punchCode);
 				
 				storeQuery.first().then(function(storeResult) {
 					console.log("Store query success");
