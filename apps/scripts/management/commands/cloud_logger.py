@@ -102,8 +102,8 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 10
-LOGJOB_FAIL = 90
+LOGJOB_INTERVAL = 45
+LOGJOB_FAIL = 60
 PARSE_TIMEOUT = 20 
 
 TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
@@ -117,6 +117,7 @@ class LogJob(object):
     def __init__(self, *args, **kwargs):
         # let's start the very first job with a relatively large n
         self.last_log_tag = None
+        self.last_log_tag_sent = None
         self.last_log_time = None
         self.n = LogJob.START_N
         self.first_run = True
@@ -137,6 +138,12 @@ class LogJob(object):
         
     def send(self, log):
         if not self.first_run:
+            last_log_tag = TAG_RE.findall(log)[-1]
+            # send only if it is not the same log
+            if self.last_log_tag_sent == last_log_tag:
+                return
+            
+            self.last_log_tag_sent = last_log_tag
             send_mail("Cloud Code Error", log, EMAIL_FROM, 
                         EMAILS, fail_silently=not DEBUG)
         else:
