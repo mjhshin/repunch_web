@@ -950,7 +950,7 @@ def test_cancel_account():
             "to false on Parse"},
     ]
     section = {
-        "section_name": "Cancel account link functional?",
+        "section_name": "Deactivate store link functional?",
         "parts": parts,
     }
     test.results.append(section)

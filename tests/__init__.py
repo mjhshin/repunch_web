@@ -85,7 +85,6 @@ class SeleniumTest(object):
         sleep(final_sleep) 
     
     def logout(self):
-        """ Clicks the logout button on the dashboard """
         self.open(reverse("manage_logout"))
         sleep(2)
    

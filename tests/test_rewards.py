@@ -10,8 +10,8 @@ from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing@vandolf.com",
-    "password": "123456",
+    "username": "violette87@repunch.com",
+    "password": "repunch7575",
 }
 
 def test_rewards():
@@ -388,7 +388,8 @@ def test_rewards():
     ###         count option resets the redemption count to 0
     try:
         # logout
-        test.find("#link-logout").click()
+        test.logout()
+        test.dev_login()
         sleep(1)
         # modify store the rewards redemption count
         store.rewards = None
