@@ -82,11 +82,11 @@ Note that killing the process will result in an empty stdout.
 
 import os, sys, subprocess, shlex, re
 from time import sleep
-from datetime import datetime
-
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.core.mail import send_mail
 
+from libs.dateutil.relativedelta import relativedelta
 from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
@@ -102,10 +102,12 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 40
-PARSE_TIMEOUT = 15 
+LOGJOB_INTERVAL = 15
+LOGJOB_FAIL = 30
+PARSE_TIMEOUT = 20 
 
 TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
+TAG_TIME_RE = re.compile(r"T(\d{2,2}\:\d{2,2}\:\d{2,2})\.")
 
 class LogJob(object):
 
@@ -124,18 +126,18 @@ class LogJob(object):
             "\nEMAILS = " + str(EMAILS) +\
             "\nLOGJOB_INTERVAL = " + str(LOGJOB_INTERVAL)
         
-        send_mail("Repunch Cloud Logger Starting", specs,
+        send_mail("Cloud Logger Starting", specs,
                 EMAIL_FROM, EMAILS_BOOT, fail_silently=not DEBUG)
         
     def on_stop(self):
-        send_mail("Repunch Cloud Logger Manually Stopped",
+        send_mail("Cloud Logger Manually Stopped",
             "cloud_logger has been manually terminated",
             EMAIL_FROM, EMAILS_BOOT, fail_silently=not DEBUG)
         
         
     def send(self, log):
         if not self.first_run:
-            send_mail("Repunch Cloud Code Error", log, EMAIL_FROM, 
+            send_mail("Cloud Code Error", log, EMAIL_FROM, 
                         EMAILS, fail_silently=not DEBUG)
         else:
             self.first_run = False
@@ -143,9 +145,9 @@ class LogJob(object):
     def log_job(self):
         sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\
             str(self.n)), stdout=subprocess.PIPE)
-        start_time = datetime.now()
+        start_time = timezone.now()
         subset = str(sp.stdout.read())
-        end_time = datetime.now()
+        end_time = timezone.now()
         
         # make sure that work_time is at least 1 second or else
         # the difference might be 86399
@@ -165,12 +167,12 @@ class LogJob(object):
                     
             # set the last tag and time
             self.last_log_tag = TAG_RE.findall(subset)[-1]
-            self.last_log_time = datetime.now()
+            self.last_log_time = timezone.now()
+            self.n = LogJob.START_N
             return
             
         # check if the last_log_tag is in the subset
         if re.search(self.last_log_tag, subset):
-            
             # now get the real subset starting form the last_log_tag
             subset = re.search(r"%s.*" %\
                 (self.last_log_tag,), subset, re.DOTALL).group()
@@ -179,7 +181,8 @@ class LogJob(object):
             # note that sometimes the last_log_tag is repeated
             if subset.count("\n") -\
                 subset.count(self.last_log_tag) in  (0, 1):
-                self.last_log_time = datetime.now()
+                self.last_log_time = timezone.now()
+                self.n = LogJob.START_N
                 return
             
             # if it is not then we evaluate it
@@ -190,11 +193,30 @@ class LogJob(object):
             
             # set the last tag and time
             self.last_log_tag = TAG_RE.findall(subset)[-1]
-            self.last_log_time = datetime.now()
+            self.last_log_time = timezone.now()
+            self.n = LogJob.START_N
             return
                     
         # if it is not then lets increase n and try again
         else:
+            # we may encounter an infinite loop if a UnicodeDecodeError
+            # occurs so we check the datetime of the last tag in the
+            # in the current subset and start fresh if LOGJOB_FAIL
+            # has passed
+            last_log_tag = TAG_RE.findall(subset)[-1]
+            # get 16:23:32 from "I2013-11-18T16:23:32.026Z]"
+            last_log_time = TAG_TIME_RE.search(last_log_tag).group(1)
+            hour, minute, second = last_log_time.split(":")
+            last_log_time = timezone.now().replace(hour=int(hour),
+                minute=int(minute), second=int(second))
+            
+            if timezone.now() > last_log_time +\
+                relativedelta(seconds=LOGJOB_FAIL):
+                self.last_log_tag = None
+                self.last_log_time = None
+                self.n = LogJob.START_N
+                return
+            
             self.n += LogJob.N_ADDER
             self.log_job()
         
@@ -206,7 +228,7 @@ class LogJob(object):
                 # the difference might be 86399
                 sleep(1)
                 
-                work_time = (datetime.now() - self.last_log_time).seconds
+                work_time = (timezone.now() - self.last_log_time).seconds
                 time_to_sleep = LOGJOB_INTERVAL - work_time
                 # sleep more if we finished early
                 if time_to_sleep > 0:
