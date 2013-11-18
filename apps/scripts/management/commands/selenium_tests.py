@@ -9,7 +9,7 @@ from tests.test_public_pages import test_public_pages
 from tests.test_signup import test_signup
 from tests.test_login_logout import test_login_dialog, test_login_page
 from tests.test_mystore import test_edit_store_details,\
-test_edit_account, test_cancel_account
+test_update_subscription, test_cancel_account
 from tests.test_rewards import test_rewards
 from tests.test_analysis import test_trends, test_breakdown,\
 test_reward_redemptions
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         ####### DASHBOARD #########################################
         #### MY ACCOUNT
         results.extend(test_edit_store_details()) 
-        #results.extend(test_edit_account())
+        #results.extend(test_update_subscription())
         #results.extend(test_cancel_account())
         
         ### REWARDS

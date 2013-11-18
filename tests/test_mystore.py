@@ -443,6 +443,8 @@ def test_edit_store_details():
         
     ##########  24/7 Hours is functional
     try:
+        click_store_edit()
+        sleep(3)
         test.find("#open-24-7-label").click()
         sleep(2)
         parts[23]['success'] = test.find(\
@@ -612,7 +614,7 @@ def test_edit_store_details():
     return test.tear_down()
     
     
-def test_edit_account():
+def test_update_subscription():
     # TODO test place_order
     account =  Account.objects().get(username=TEST_USER['username'],
         include="Store.Subscription")
