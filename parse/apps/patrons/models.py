@@ -82,7 +82,7 @@ class PatronStore(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "punch_count", "all_time_punches",
+        return (cls, "punch_code", "punch_count", "all_time_punches",
             "pending_reward", "Patron", "Store")
 
     def get_class(self, className):
