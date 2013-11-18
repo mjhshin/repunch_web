@@ -102,8 +102,8 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 45
-LOGJOB_FAIL = 30
+LOGJOB_INTERVAL = 10
+LOGJOB_FAIL = 90
 PARSE_TIMEOUT = 20 
 
 TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
@@ -111,7 +111,7 @@ TAG_TIME_RE = re.compile(r"T(\d{2,2}\:\d{2,2}\:\d{2,2})\.")
 
 class LogJob(object):
 
-    START_N = 50
+    START_N = 20
     N_ADDER = 200 # may want to make this bigger
     
     def __init__(self, *args, **kwargs):
@@ -141,6 +141,29 @@ class LogJob(object):
                         EMAILS, fail_silently=not DEBUG)
         else:
             self.first_run = False
+            
+    def has_unicodedecodeerror(self, subset):
+        """
+        we may encounter an infinite loop if a UnicodeDecodeError
+        occurs so we check the datetime of the last tag in the
+        in the current subset and start fresh if LOGJOB_FAIL has passed
+        """
+        last_log_tag = TAG_RE.findall(subset)[-1]
+        # get 16:23:32 from "I2013-11-18T16:23:32.026Z]"
+        last_log_time = TAG_TIME_RE.search(last_log_tag).group(1)
+        hour, minute, second = last_log_time.split(":")
+        last_log_time = timezone.now().replace(hour=int(hour),
+            minute=int(minute), second=int(second)) +\
+            relativedelta(seconds=LOGJOB_FAIL)
+
+        if timezone.now() > last_log_time:
+            print timezone.now() , last_log_time
+            self.last_log_tag = None
+            self.last_log_time = timezone.now()
+            self.n = LogJob.START_N
+            return True
+            
+        return False
         
     def log_job(self):
         sp = subprocess.Popen(shlex.split(PARSE_LOG_CMD +\
@@ -199,22 +222,7 @@ class LogJob(object):
                     
         # if it is not then lets increase n and try again
         else:
-            # we may encounter an infinite loop if a UnicodeDecodeError
-            # occurs so we check the datetime of the last tag in the
-            # in the current subset and start fresh if LOGJOB_FAIL
-            # has passed
-            last_log_tag = TAG_RE.findall(subset)[-1]
-            # get 16:23:32 from "I2013-11-18T16:23:32.026Z]"
-            last_log_time = TAG_TIME_RE.search(last_log_tag).group(1)
-            hour, minute, second = last_log_time.split(":")
-            last_log_time = timezone.now().replace(hour=int(hour),
-                minute=int(minute), second=int(second))
-            
-            if timezone.now() > last_log_time +\
-                relativedelta(seconds=LOGJOB_FAIL):
-                self.last_log_tag = None
-                self.last_log_time = None
-                self.n = LogJob.START_N
+            if self.has_unicodedecodeerror(subset):
                 return
             
             self.n += LogJob.N_ADDER

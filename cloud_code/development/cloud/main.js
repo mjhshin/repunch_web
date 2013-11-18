@@ -976,7 +976,7 @@ Parse.Cloud.define("punch", function(request, response)
 	
 	function gcmPost(patronStore){
 	    var promise = new Parse.Promise();
-	    
+
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" installations for punch_code "+punchCode);
 	    
