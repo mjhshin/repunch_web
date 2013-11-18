@@ -69,6 +69,7 @@ class PatronStore(ParseObject):
         self.all_time_punches = data.get('all_time_punches', 0)
         # this is for rewards only! not offers!
         self.pending_reward = data.get("pending_reward", False)
+        self.punch_code = data.get("punch_code")
         
         self.Patron = data.get("Patron")
         self.Store = data.get("Store")

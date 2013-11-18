@@ -25,11 +25,11 @@ class Command(BaseCommand):
         #results.extend(test_public_pages())
         #results.extend(test_signup())
         #results.extend(test_login_dialog())
-        results.extend(test_login_page())
+        #results.extend(test_login_page())
         
         ####### DASHBOARD #########################################
         #### MY ACCOUNT
-        #results.extend(test_edit_store_details()) 
+        results.extend(test_edit_store_details()) 
         #results.extend(test_edit_account())
         #results.extend(test_cancel_account())
         
