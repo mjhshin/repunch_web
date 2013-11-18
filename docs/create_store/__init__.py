@@ -128,6 +128,7 @@ class RandomStoreGenerator(object):
             store.Settings = settings.objectId
             store.Subscription = subscription.objectId
             store.owner_id = acc.objectId
+            store.ACL[acc.objectId] = {"read": True,"write": True}
             store.update()
             
     def get_store_avatar(self, i):

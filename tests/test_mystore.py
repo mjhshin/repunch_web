@@ -993,16 +993,19 @@ def test_cancel_account():
         print e
         parts[2]['test_message'] = str(e)
         
-    ## cancel the account
+    ##########  Clicking OK logs the user out
     try:
         test.find("#deactivate_account").click()
         sleep(1)
         alert = test.switch_to_alert()
         alert.accept()
         sleep(4)
-        parts[3]['success'] =\
-            test.is_current_url(reverse("public_home"))
-    ##########  Clicking OK logs the user out
+        if SeleniumTest.DEV_LOGIN:
+            parts[3]["success"] =\
+                test.is_current_url(reverse("manage_dev_login")+"?next=/")
+        else:
+            parts[3]["success"] =\
+                test.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
