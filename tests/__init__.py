@@ -18,11 +18,13 @@ class SeleniumTest(object):
     notifications are not tested for localhost.
     """
     
-    SERVER_URL = "https://www.repunch.com"
+    # SERVER_URL = "https://www.repunch.com"
     CHECK_SENT_MAIL = False # Mail sent by sendgrid
     
     #SERVER_URL = "http://dev.repunch.com"
-    #SERVER_URL = "http://localhost:8000"
+    SERVER_URL = "http://localhost:8000"
+    
+    DEV_LOGIN = True
     
     IMPLICITLY_WAIT = 10
     
@@ -39,6 +41,12 @@ class SeleniumTest(object):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
         self.results = []
+        
+        if SeleniumTest.DEV_LOGIN:
+            self.open("")
+            self.find("#username").send_keys("admin")
+            self.find("#password").send_keys("vandolfisthebestandshinsucks")
+            self.find("input[type='submit']").click()
         
     def tear_down(self):
         """
