@@ -319,14 +319,17 @@ def test_edit_store_details():
     try:
         store.hours, equal = None, True
         for hour in store.get("hours"):
+            z = False
             for x in TEST_STORE_INFO['hours']:
                 if hour["day"] == x["day"] and hour["open_time"] ==\
                     x["open_time"] and hour["close_time"] ==\
                     x["close_time"]:
-                    continue
-            equal = False
-            break
-            
+                    z = True
+                    break
+            if not z:
+                equal = False
+                break
+
         parts[15]['success'] = equal
     except Exception as e:
         print e
@@ -423,7 +426,8 @@ def test_edit_store_details():
     try:
         for i in range(4):
             test.find("//ul[@id='hours-{0}-row']".format(str(i))+\
-            "/li[@class='buttons']/div[@class='remove']").click()
+                "/li[@class='buttons']/div[@class='remove']",
+                type="xpath").click()
             
         # save!
         test.find("#save-button").click()

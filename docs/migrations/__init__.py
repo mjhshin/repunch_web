@@ -16,7 +16,7 @@ def rename_punchcode_username_to_userid():
         pc.update()
         print "Updated PunchCode " + acc.patron.punch_code
 
-def add_punch_code_to_patronstore():
+def add_punch_code_to_patronstore(delete_if_nullpatron=True):
     """
     Added punch_code column to PatronStore class.
     WARNING! Assumes this assumes that # PatronStores < 1000.
@@ -28,5 +28,6 @@ def add_punch_code_to_patronstore():
             ps.update()
             print "Updated PatronStore " + ps.objectId
         else:
-            ps.delete()
+            if delete_if_nullpatron:
+                ps.delete()
             print "PatronStore %s has a null patron" % (ps.objectId,)
