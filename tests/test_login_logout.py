@@ -12,8 +12,8 @@ from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing@vandolf.com",
-    "password": "123456",
+    "username": "violette87@repunch.com",
+    "password": "repunch7575",
 }
 
 def test_login_dialog():
@@ -40,7 +40,8 @@ def test_login_dialog():
     }
     test.results.append(section)
     
-    test.open(reverse("public_home")) # ACTION!
+    if not SeleniumTest.DEV_LOGIN:
+        test.open(reverse("public_home")) # ACTION!
 
     ##########  Login dialog showing up
     try:
@@ -93,6 +94,7 @@ def test_login_dialog():
     
     ##########  Having the stay signed in option
     ##########  sets the sessionid's cookie expiry to a number
+    ## This is not tested if DEV_LOGIN
     selectors = (
         ("#login_username", TEST_USER['username']),
         ("#login_password", TEST_USER['password']),
@@ -105,23 +107,32 @@ def test_login_dialog():
         test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
         parts[4]["success"] = test.driver.get_cookie(\
-            "sessionid")['expiry'] != None
+            "sessionid")['expiry'] != None or SeleniumTest.DEV_LOGIN
+            
+        if SeleniumTest.DEV_LOGIN:
+            parts[4]['test_message'] = "Test skipped since dev site "+\
+                "always have expiry as None."
+            
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
     
     ##########  Logout works
     try:
-        test.find("#link-logout").click() # ACTION!
-        sleep(2)
-        parts[5]["success"] =\
-            test.is_current_url(reverse("public_home"))
+        test.logout() # ACTION!
+        if SeleniumTest.DEV_LOGIN:
+            parts[5]["success"] =\
+                test.is_current_url(reverse("manage_dev_login")+"?next=/")
+        else:
+            parts[5]["success"] =\
+                test.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
     
     ##########  Forgot password form functional
     try:
+        test.dev_login()
         test.find("#header-signin-btn").click() # ACTION!
         test.find("//form[@id='forgot-pass-form']/a",
             type="xpath").click() # ACTION!
@@ -221,24 +232,34 @@ def test_login_page():
         test.find("#stay_in").click() # ACTION!
         test.action_chain(0, selectors, "send_keys") # ACTION!
         sleep(7)
+        
         parts[3]["success"] = test.driver.get_cookie(\
-            "sessionid")['expiry'] != None
+            "sessionid")['expiry'] != None or SeleniumTest.DEV_LOGIN
+            
+        if SeleniumTest.DEV_LOGIN:
+            parts[3]['test_message'] = "Test skipped since dev site "+\
+                "always have expiry as None."
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
     
     ##########  Logout works
     try:
-        test.find("#link-logout").click() # ACTION!
+        test.logout() # ACTION!
         sleep(2)
-        parts[4]["success"] =\
-            test.is_current_url(reverse("public_home"))
+        if SeleniumTest.DEV_LOGIN:
+            parts[4]["success"] =\
+                test.is_current_url(reverse("manage_dev_login")+"?next=/")
+        else:
+            parts[4]["success"] =\
+                test.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
     
     ##########  Forgot password form functional
     try:
+        test.dev_login()
         test.open(reverse("manage_login"))
         sleep(1)
         test.find("//form[@id='forgot-pass-form']/a",

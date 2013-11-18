@@ -19,13 +19,11 @@ class SeleniumTest(object):
     """
     
     # SERVER_URL = "https://www.repunch.com"
-    CHECK_SENT_MAIL = False # Mail sent by sendgrid
-    
     #SERVER_URL = "http://dev.repunch.com"
     SERVER_URL = "http://localhost:8000"
     
     DEV_LOGIN = True
-    
+    CHECK_SENT_MAIL = False # Mail sent by sendgrid
     IMPLICITLY_WAIT = 10
     
     def __init__(self):
@@ -41,12 +39,18 @@ class SeleniumTest(object):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
         self.results = []
-        
+        self.dev_login()
+            
+    def dev_login(self):
         if SeleniumTest.DEV_LOGIN:
-            self.open("")
+            if not self.is_current_url(reverse("manage_dev_login")+"?next=/"):
+                self.open()
+                sleep(1)
+                
             self.find("#username").send_keys("admin")
             self.find("#password").send_keys("vandolfisthebestandshinsucks")
             self.find("input[type='submit']").click()
+            sleep(2)
         
     def tear_down(self):
         """
@@ -82,7 +86,7 @@ class SeleniumTest(object):
     
     def logout(self):
         """ Clicks the logout button on the dashboard """
-        self.find("#link-logout").click()
+        self.open(reverse("manage_logout"))
         sleep(2)
    
     def is_current_url(self, url):
@@ -104,8 +108,10 @@ class SeleniumTest(object):
         self.driver.quit()
         sleep(2)
         self.driver = webdriver.Firefox()
-        self.open()
-        sleep(1)
+        if not SeleniumTest.DEV_LOGIN:
+            self.open()    
+            sleep(1)
+        self.dev_login()    
         if save_session_cookie and cookie:
             self.driver.add_cookie(cookie)
             
