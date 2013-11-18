@@ -17,7 +17,7 @@ from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX,\
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX
 
 TEST_USER = {
-    "email": "vanman00@kayk.com",
+    "email": "vanman00@repunch.com",
 }
 
 def test_signup():
@@ -47,7 +47,6 @@ def test_signup():
         {'test_name': "Password confirmation is required"},
         {'test_name': "ToS check is required"},
         {'test_name': "Invalid address is detected (no coordinates)"},
-        {'test_name': "password must not contain whitespace"},
         {'test_name': "password must be at least 6 characters"},
         {'test_name': "password and corfirmation must be the same"},
         
@@ -202,8 +201,8 @@ def test_signup():
             ("#Ph2", "   "),
             ("#Ph3", "    "),
             ("#id_email", "   "),
-            ("#id_password", "         "),
-            ("#id_confirm_password", "         "),
+            ("#id_password", ""),
+            ("#id_confirm_password", ""),
         )
         test.action_chain(0, selectors, action="send_keys") # ACTION!
         # submit
@@ -286,21 +285,17 @@ def test_signup():
         parts[18]['test_message'] = str(e)
     ##########  Password is required 
     try:
-        e1, e2 = test.find("#password_e ul li", multiple=True)
+        err = test.find("#password_e ul li")
         parts[19]['success'] =\
-            str(e1.text) == "This field is required." and\
-            str(e2.text) == "Must contain only alpha-numeric" +\
-                " characters without spaces."
+            str(err.text) == "This field is required."
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
     ##########  Password confirmation is required
     try:
-        e1, e2 = test.find("#password2_e ul li", multiple=True)
+        err = test.find("#password2_e ul li")
         parts[20]['success'] =\
-            str(e1.text) == "This field is required." and\
-            str(e2.text) == "Must contain only alpha-numeric" +\
-                " characters without spaces."
+            str(err.text) == "This field is required."
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
@@ -340,23 +335,6 @@ def test_signup():
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-   
-    ## no whitespace
-    try:
-        # password
-        pass2 = test.find("#id_password")
-        pass2.clear()
-        pass2.send_keys("123 567")
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
-        sleep(2)
-        ##########  password must not contain whitespace
-        parts[23]['success'] =\
-            str(test.find("#password_e ul li").text) == "Must " +\
-            "contain only alpha-numeric characters without spaces."
-    except Exception as e:
-        print e
-        parts[23]['test_message'] = str(e)
     
     ##########  password must be at least 6 characters
     try:
@@ -371,7 +349,7 @@ def test_signup():
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
-        parts[24]['success'] =\
+        parts[23]['success'] =\
             str(test.find("#password_e ul li").text) ==\
             "Ensure this value has at least 6 characters " +\
             "(it has 5)." and str(test.find(\
@@ -379,7 +357,7 @@ def test_signup():
             "value has at least 6 characters (it has 5)."
     except Exception as e:
         print e
-        parts[24]['test_message'] = str(e)
+        parts[23]['test_message'] = str(e)
  
     ##########  password and corfirmation must be the same
     try:
@@ -394,12 +372,12 @@ def test_signup():
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
-        parts[25]['success'] =\
+        parts[24]['success'] =\
             str(test.find("#password_e ul li").text) ==\
             "Passwords don't match"
     except Exception as e:
         print e
-        parts[25]['test_message'] = str(e)
+        parts[24]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup
