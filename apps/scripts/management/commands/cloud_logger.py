@@ -102,7 +102,7 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 15
+LOGJOB_INTERVAL = 45
 LOGJOB_FAIL = 30
 PARSE_TIMEOUT = 20 
 
