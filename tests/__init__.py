@@ -119,9 +119,7 @@ class SeleniumTest(object):
         """
         Returns the active alert if one is present. Otherwise None.
         """
-        print "SWITCHING TO ALERT"
         alert = self.driver.switch_to_alert()
-        print "DONE"
         try:
             # switch_to_alert is actually lazy - it returns a
             # web element even if an alert is not present

@@ -31,10 +31,10 @@ class Command(BaseCommand):
         #### MY ACCOUNT
         #results.extend(test_edit_store_details()) 
         #results.extend(test_update_subscription())
-        results.extend(test_cancel_account())
+        #results.extend(test_cancel_account())
         
         ### REWARDS
-        #results.extend(test_rewards())
+        results.extend(test_rewards())
         
         ### ANALYSIS
         #results.extend(test_trends()) todo

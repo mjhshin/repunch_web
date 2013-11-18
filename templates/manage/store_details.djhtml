@@ -10,6 +10,13 @@
 {% account_is_admin request.session as is_admin %}
 {% if is_admin %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
+<script>
+$(document).ready(function() {
+    $("#deactivate_account").click(function() {
+        return confirm("Are you sure you want to deactivate {{ request.session.store.store_name }}?");
+    });
+});
+</script>
 {% endif %}
 {% endblock %}
 
@@ -148,8 +155,7 @@
 			<a href="{% url 'subscription_update' %}" class="button blue">
 				Update Subscription
 			</a>
-			<a href="{% url 'store_deactivate' %}" class="red" id="deactivate_account" 
-			    onclick="return confirm('Are you sure you want to deactivate {{ request.session.store.store_name }}?');">Deactivate My Store</a>
+			<a href="{% url 'store_deactivate' %}" class="red" id="deactivate_account">Deactivate My Store</a>
 			{% endif %}
 		</div>
 	</div>
