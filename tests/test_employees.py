@@ -10,8 +10,7 @@ from urllib import urlencode
 import re
 
 from tests import SeleniumTest
-from parse.test import register_employee, register_rand_employee,
-approve_employee
+from parse.test import register_employee, register_rand_employee
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
@@ -791,10 +790,10 @@ def test_employee_access():
     ###         redirects user to messages index
     try:
         test.open(reverse("feedback_reply", args=(feedback_id,)))
-        sleep(2)
+        sleep(3)
         parts[24]['success'] = test.is_current_url(reverse(\
             "messages_index")+ "?" + urlencode({'error':\
-            "Permission denied", "tab_feedback": "1"}))
+            "Permission denied"}) + "&tab_feedback=1")
         
     except Exception as e:
         print e
@@ -803,7 +802,7 @@ def test_employee_access():
     ##########  No delete message button
     try:
         test.open(reverse("feedback_details", args=(feedback_id,)))
-        sleep(2)
+        sleep(3)
         test.set_to_implicit_wait(False)
         try:
             test.find("#delete-button")
@@ -823,7 +822,7 @@ def test_employee_access():
         sleep(2)
         parts[26]['success'] = test.is_current_url(reverse(\
             "messages_index")+ "?" + urlencode({'error':\
-            "Permission denied", "tab_feedback": "1"}))
+            "Permission denied"}) + "&tab_feedback=1")
             
     except Exception as e:
         print e
@@ -967,7 +966,7 @@ def test_employee_access():
         test.open(reverse("employee_deny", args=(employee_id,)))
         sleep(3)
         parts[36]['success'] = test.is_current_url(reverse(\
-            "employees_index")+ urlencode({'error':\
+            "employees_index") + "?" + urlencode({'error':\
             "Permission denied"}))
             
     except Exception as e:
@@ -994,7 +993,7 @@ def test_employee_access():
         test.open(reverse("employee_approve", args=(employee_id,)))
         sleep(3)
         parts[38]['success'] = test.is_current_url(reverse(\
-            "employees_index")+ urlencode({'error':\
+            "employees_index") + "?" + urlencode({'error':\
             "Permission denied"}))
             
     except Exception as e:
