@@ -516,18 +516,15 @@ def test_employee_access():
         
     ### Update the store's ACL
     store.ACL = {"*": {"read": True, "write": True}}
-    print store.ACL
     store.set_access_level(employee_acc, ACCESS_PUNCHREDEEM[0])
     store.update()
-    print store.ACL
     
     test.new_driver(False)
         
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog
     try:
-        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
-            final_sleep=1)
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'])
         parts[4]['success'] = test.is_current_url(reverse("store_index"))
         test.logout()
     except Exception as e:
@@ -538,7 +535,7 @@ def test_employee_access():
     try:
         test.dev_login()
         test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
-            reverse("employees_index"), final_sleep=1)
+            reverse("employees_index"))
         parts[5]['success'] = test.is_current_url(reverse("employees_index"))
         sleep(4)
     except Exception as e:
