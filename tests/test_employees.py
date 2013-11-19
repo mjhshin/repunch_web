@@ -10,7 +10,8 @@ from urllib import urlencode
 import re
 
 from tests import SeleniumTest
-from parse.test import register_employee, register_rand_employee
+from parse.test import register_employee, register_rand_employee,\
+request_redeem_pt
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
@@ -28,6 +29,7 @@ def test_employees():
     Tests for employee approve, deny, remove, details. etc.
     """
     # TODO test employee graph
+    # TODO test employee punches history
     
     # delete the employees and associated User objects in the relation
     account = Account.objects().get(username=TEST_USER['username'],
@@ -961,6 +963,7 @@ def test_employee_access():
     ##########  Requesting deny employee through url 
     ###         redirects user to employees index
     try:
+        test.find("#tab-pending-employees").click()
         row = test.find("#tab-body-pending-employees div.tr")
         employee_id = row.get_attribute("id")
         test.open(reverse("employee_deny", args=(employee_id,)))
@@ -975,6 +978,7 @@ def test_employee_access():
         
     ##########  No approve button in pending employees
     try:
+        test.find("#tab-pending-employees").click()
         sleep(1)
         test.set_to_implicit_wait(False)
         try:
@@ -986,6 +990,8 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[37]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
         
     ##########  Requesting approve employee through url 
     ###         redirects user to employees index 
@@ -1000,71 +1006,124 @@ def test_employee_access():
         print e
         parts[38]['test_message'] = str(e)
     
-    ##########  Settings accessible  TODO
+    ##########  Settings accessible
     try:
-        pass
+        test.open(reverse("store_settings"))
+        sleep(3)
+        parts[39]['success'] = test.is_current_url(reverse(\
+            "store_settings"))
+            
     except Exception as e:
         print e
         parts[39]['test_message'] = str(e)
-    ##########  No refresh button for retailer pin  TODO
+        
+    ##########  No refresh button for retailer pin
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#link_refresh_retailer_pin")
+        except NoSuchElementException:
+            parts[40]['success'] = True
+        
     except Exception as e:
         print e
         parts[40]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting refresh through url returns 
-    ###         a json object with error Permission denied  TODO
+    ###         a json object with error Permission denied
     try:
-        pass
+        test.open(reverse("refresh_retailer_pin"))
+        sleep(3)
+        parts[41]['success'] = "Permission denied" in\
+            test.driver.page_source
     except Exception as e:
         print e
         parts[41]['test_message'] = str(e)
-    ##########  Punches employee is readonly  TODO
+        
+    ##########  Punches employee is readonly
     try:
-        pass
+        parts[42]['success'] =\
+            test.find("#id_punches_employee").get_attribute(\
+                "readonly") == "true"
     except Exception as e:
         print e
         parts[42]['test_message'] = str(e)
-    ##########  Punches facebook is readonly  TODO
+        
+    ##########  Punches facebook is readonly
     try:
-        pass
+        parts[43]['success'] =\
+            test.find("#id_punches_facebook").get_attribute(\
+                "readonly") == "true"
     except Exception as e:
         print e
         parts[43]['test_message'] = str(e)
-    ##########  No save button  TODO
+        
+    ##########  No save button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#settings-form-submit")
+        except NoSuchElementException:
+            parts[44]['success'] = True
+        
     except Exception as e:
         print e
         parts[44]['test_message'] = str(e)
-    ##########  No cancel changes button  TODO
+    finally:
+        test.set_to_implicit_wait(True)
+        
+    ##########  No cancel changes button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#settings-options a.red")
+        except NoSuchElementException:
+            parts[45]['success'] = True
+            
     except Exception as e:
         print e
         parts[45]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
         
-    ##########  Workbench accessible  TODO
+    ##########  Workbench accessible
     try:
-        pass
+        test.open(reverse("workbench_index"))
+        sleep(3)
+        parts[46]['success'] = test.is_current_url(\
+            reverse("workbench_index"))
     except Exception as e:
         print e
         parts[46]['test_message'] = str(e)
-    ##########  Employee can punch  TODO
+        
+    ##########  Employee can punch
     try:
-        pass
+        test.find("#punch_code").send_keys("00010")
+        test.find("#punch_amount").send_keys("1")
+        test.find("#punch-form a.button.blue").click()
+        sleep(2)
+        parts[47]['success'] =\
+            test.find(".notification.hide") is not None
     except Exception as e:
         print e
         parts[47]['test_message'] = str(e)
-    ##########  Employee can reject redeem  TODO
+        
+    ##########  Employee can reject redeem 
     try:
-        pass
+        request_redeem_pt("eiZa6Mzu7f")
+        sleep(COMET_PULL_RATE+4)
+        # TODO
     except Exception as e:
         print e
         parts[48]['test_message'] = str(e)
-    ##########  Employee can validate redeem  TODO
+        
+    ##########  Employee can validate redeem
     try:
-        pass
+        request_redeem_pt("eiZa6Mzu7f")
+        sleep(COMET_PULL_RATE+4)
+        # TODO
     except Exception as e:
         print e
         parts[49]['test_message'] = str(e)
