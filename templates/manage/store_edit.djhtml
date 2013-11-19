@@ -10,7 +10,7 @@
 {% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/store_edit.1.2.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/store_edit.1.3.js' %}" ></script>
 {% endblock %}
 
 {% block content %}

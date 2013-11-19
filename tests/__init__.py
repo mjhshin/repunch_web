@@ -19,8 +19,8 @@ class SeleniumTest(object):
     """
     
     # SERVER_URL = "https://www.repunch.com"
-    SERVER_URL = "http://dev.repunch.com"
-    #SERVER_URL = "http://localhost:8000"
+    #SERVER_URL = "http://dev.repunch.com"
+    SERVER_URL = "http://localhost:8000"
     
     DEV_LOGIN = True
     CHECK_SENT_MAIL = False # Mail sent by sendgrid

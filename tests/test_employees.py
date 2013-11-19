@@ -513,6 +513,7 @@ def test_employee_access():
     ##########  Employee with ACCESS_NONE cannot login 
     ###         using the login dialog 
     try:
+        test.dev_login()
         test.login(TEST_EMPLOYEE['username'],
             TEST_EMPLOYEE['password'], final_sleep=1)
         parts[2]['success'] =\
@@ -538,16 +539,22 @@ def test_employee_access():
     store.update()
         
     ##########  Employee with ACCESS_PUNCHREDEEM can 
-    ###         login to the dashboard through the login dialog  TODO
+    ###         login to the dashboard through the login dialog
     try:
-        pass
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            final_sleep=1)
+        parts[4]['success'] = test.is_current_url(reverse("store_index"))
+        test.logout()
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
     ##########  Employee with ACCESS_PUNCHREDEEM can 
-    ###         login to the dashboard through the dedicated dialog pg  TODO
+    ###         login to the dashboard through the dedicated dialog page
     try:
-        pass
+        test.dev_login()
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            reverse("employees_index"), final_sleep=1)
+        parts[5]['success'] = test.is_current_url(reverse("employees_index"))
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
