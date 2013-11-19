@@ -103,6 +103,15 @@ def request_redeem_offers(patron_store_id):
             "message_status_id": ms.objectId,
         })
     
-    
-    
-    
+def register_employee(first_name, last_name, username, 
+    email, password, retailer_pin):
+    return cloud_call("register_employee", {
+        "first_name": first_name,
+        "last_name": last_name,
+        "username": username,
+        "password": password,
+        "email": email,
+        "retailer_pin": retailer_pin,
+    }) 
+
+

@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
+from parse.test import register_employee
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
@@ -354,27 +355,6 @@ def test_employee_access():
             Account.objects().get(Employee=emp.objectId).delete()
             emp.delete()
     store.set("employees", None) 
-    
-    def register_employee(first_name, last_name, username=None, 
-        password=None, email=None, retailer_pin=None):
-        
-        if username is None: 
-            username = first_name
-        if password is None: 
-            password = first_name
-        if email is None: 
-            email = first_name + "@" + last_name + ".com"
-        if retailer_pin is None: 
-            retailer_pin = settings.retailer_pin
-            
-        return cloud_call("register_employee", {
-            "first_name": first_name,
-            "last_name": last_name,
-            "username": username,
-            "password": password,
-            "email": email,
-            "retailer_pin": retailer_pin,
-        }) 
         
     test = SeleniumTest()
     parts = [
@@ -461,10 +441,10 @@ def test_employee_access():
     
     try:
         # register the test employee
-        register_employee("employee", "empy", username=TEST_EMPLOYEE[\
-            'username'], email=TEST_EMPLOYEE[\
-            'username'], password=TEST_EMPLOYEE['password'])
-        sleep(1)
+        register_employee("employee", "ex", TEST_EMPLOYEE['username'],
+            TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            settings.retailer_pin)
+        sleep(2)
         employee_acc = Account.objects().get(username=TEST_EMPLOYEE[\
             'username'], include="Employee")
         employee = employee_acc.employee
@@ -535,8 +515,13 @@ def test_employee_access():
         parts[3]['test_message'] = str(e)
         
     ### Update the store's ACL
+    store.ACL = {"*": {"read": True, "write": True}}
+    print store.ACL
     store.set_access_level(employee_acc, ACCESS_PUNCHREDEEM[0])
     store.update()
+    print store.ACL
+    
+    test.new_driver(False)
         
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog
@@ -555,6 +540,7 @@ def test_employee_access():
         test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
             reverse("employees_index"), final_sleep=1)
         parts[5]['success'] = test.is_current_url(reverse("employees_index"))
+        sleep(4)
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
