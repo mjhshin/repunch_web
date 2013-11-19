@@ -406,6 +406,9 @@ def test_employee_access():
         {"test_name" : "Analysis accessible"},
         
         {"test_name" : "Employees accessible"},
+        {"test_name" : "No register new employee button"},
+        {"test_name" : "Requesting new employee registration"+\
+            "redirects user to employees_index"},
         {"test_name" : "Approved employees are not clickable"},
         {"test_name" : "Requesting edit employee through url " +\
             "redirects user to employees index"},
@@ -504,6 +507,7 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
+        
     ##########  Employee with ACCESS_NONE cannot login 
     ###         using the dedicated login page 
     try:
@@ -526,18 +530,20 @@ def test_employee_access():
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the login dialog
     try:
-        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'])
+        test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+            final_sleep=6)
         parts[4]['success'] = test.is_current_url(reverse("store_index"))
         test.logout()
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
+        
     ##########  Employee with ACCESS_PUNCHREDEEM can 
     ###         login to the dashboard through the dedicated dialog page
     try:
         test.dev_login()
         test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
-            reverse("employees_index"))
+            reverse("employees_index"), final_sleep=6)
         parts[5]['success'] = test.is_current_url(reverse("employees_index"))
         sleep(4)
     except Exception as e:
@@ -552,6 +558,7 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
+        
     ##########  No edit store detail button
     try:
         test.open(reverse("store_index"))
@@ -578,6 +585,7 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
+        
     ##########  No update subscription button 
     try:
         test.set_to_implicit_wait(False)
@@ -603,6 +611,7 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
+        
     ##########  No deactivate my store button 
     try:
         test.set_to_implicit_wait(False)
@@ -619,7 +628,7 @@ def test_employee_access():
     ##########  Requesting store deactivation through url 
     ###         redirects user to store index
     try:
-        test.open("store_deactivate")
+        test.open(reverse("store_deactivate"))
         sleep(2)
         parts[12]['success'] = test.is_current_url(reverse(\
             "store_index")+ "?" + urlencode({'error':\
@@ -628,42 +637,71 @@ def test_employee_access():
         print e
         parts[12]['test_message'] = str(e)
         
-    ##########  Rewards accessible  TODO
+    ##########  Rewards accessible
     try:
-        pass
+        test.open(reverse("rewards_index"))
+        sleep(2)
+        parts[13]['success'] = test.is_current_url(reverse("rewards_index"))
     except Exception as e:
         print e
         parts[13]['test_message'] = str(e)
-    ##########  No create new reward button  TODO
+        
+    ##########  No create new reward button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#add_reward")
+        except NoSuchElementException:
+            parts[14]['success'] = True
+        
     except Exception as e:
         print e
         parts[14]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting create new reward through url 
-    ###         redirects user to rewards index  TODO
+    ###         redirects user to rewards index
     try:
-        pass
+        test.open(reverse("reward_edit", args=(-1,)))
+        sleep(2)
+        parts[15]['success'] = test.is_current_url(reverse(\
+            "rewards_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
     except Exception as e:
         print e
         parts[15]['test_message'] = str(e)
-    ##########  Rewards are not clickable  TODO
+        
+    ##########  Rewards are not clickable
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("div.tr.reward a")
+        except NoSuchElementException:
+            parts[16]['success'] = True
+            
     except Exception as e:
         print e
         parts[16]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting edit reward through url 
-    ###         redirects user to rewards index  TODO
+    ###         redirects user to rewards index
     try:
-        pass
+        test.open(reverse("reward_edit", args=\
+            (int(test.find("div.tr.reward").get_attribute("id")),)))
+        sleep(3)
+        parts[17]['success'] = test.is_current_url(reverse(\
+            "rewards_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
     except Exception as e:
         print e
         parts[17]['test_message'] = str(e)
         
     ##########  Messages accessible  TODO
     try:
-        pass
+        
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
@@ -732,127 +770,143 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[28]['test_message'] = str(e)
-    ##########  Approved employees are not clickable  TODO
+        
+    
+    ##########  No register new employee button  TODO
     try:
         pass
     except Exception as e:
         print e
         parts[29]['test_message'] = str(e)
+    ##########  Requesting new employee registration
+    ###         redirects user to employees_index TODO
+    try:
+        pass
+    except Exception as e:
+        print e
+        parts[30]['test_message'] = str(e)
+        
+    ##########  Approved employees are not clickable  TODO
+    try:
+        pass
+    except Exception as e:
+        print e
+        parts[31]['test_message'] = str(e)
     ##########  Requesting edit employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[30]['test_message'] = str(e)
+        parts[32]['test_message'] = str(e)
     ##########  No remove button in approved employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[31]['test_message'] = str(e)
+        parts[33]['test_message'] = str(e)
     ##########  Requesting remove employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[32]['test_message'] = str(e)
+        parts[34]['test_message'] = str(e)
     ##########  No deny button in pending employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[33]['test_message'] = str(e)
+        parts[35]['test_message'] = str(e)
     ##########  Requesting deny employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[34]['test_message'] = str(e)
+        parts[36]['test_message'] = str(e)
     ##########  No approve button in pending employees  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[35]['test_message'] = str(e)
+        parts[37]['test_message'] = str(e)
     ##########  Requesting approve employee through url 
     ###         redirects user to employees index  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[36]['test_message'] = str(e)
+        parts[38]['test_message'] = str(e)
     
     ##########  Settings accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[37]['test_message'] = str(e)
+        parts[39]['test_message'] = str(e)
     ##########  No refresh button for retailer pin  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[38]['test_message'] = str(e)
+        parts[40]['test_message'] = str(e)
     ##########  Requesting refresh through url returns 
     ###         a json object with error Permission denied  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[39]['test_message'] = str(e)
+        parts[41]['test_message'] = str(e)
     ##########  Punches employee is readonly  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[40]['test_message'] = str(e)
+        parts[42]['test_message'] = str(e)
     ##########  Punches facebook is readonly  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[41]['test_message'] = str(e)
+        parts[43]['test_message'] = str(e)
     ##########  No save button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[42]['test_message'] = str(e)
+        parts[44]['test_message'] = str(e)
     ##########  No cancel changes button  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[43]['test_message'] = str(e)
+        parts[45]['test_message'] = str(e)
         
     ##########  Workbench accessible  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[44]['test_message'] = str(e)
+        parts[46]['test_message'] = str(e)
     ##########  Employee can punch  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[45]['test_message'] = str(e)
+        parts[47]['test_message'] = str(e)
     ##########  Employee can reject redeem  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[46]['test_message'] = str(e)
+        parts[48]['test_message'] = str(e)
     ##########  Employee can validate redeem  TODO
     try:
         pass
     except Exception as e:
         print e
-        parts[47]['test_message'] = str(e)
+        parts[49]['test_message'] = str(e)
 
 
     # END OF ALL TESTS - cleanup
