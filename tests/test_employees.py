@@ -444,7 +444,7 @@ def test_employee_access():
         register_employee("employee", "ex", TEST_EMPLOYEE['username'],
             TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
             settings.retailer_pin)
-        sleep(2)
+        sleep(3)
         employee_acc = Account.objects().get(username=TEST_EMPLOYEE[\
             'username'], include="Employee")
         employee = employee_acc.employee
@@ -454,7 +454,7 @@ def test_employee_access():
     ##########  Pending employee has no access 
     try:
         test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
-            reverse("employees_index"), final_sleep=1)
+            reverse("employees_index"))
         parts[0]['success'] =\
             test.find("#dialog-login-message").text ==\
             "You are not yet approved."
@@ -495,7 +495,7 @@ def test_employee_access():
     try:
         test.dev_login()
         test.login(TEST_EMPLOYEE['username'],
-            TEST_EMPLOYEE['password'], final_sleep=1)
+            TEST_EMPLOYEE['password'])
         parts[2]['success'] =\
             test.find("#dialog-login-message").text ==\
             "You do not have permission to access the dashboard."
@@ -506,7 +506,7 @@ def test_employee_access():
     ###         using the dedicated login page 
     try:
         test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
-            reverse("employees_index"), final_sleep=1)
+            reverse("employees_index"))
         parts[3]['success'] =\
             test.find("#dialog-login-message").text ==\
             "You do not have permission to access the dashboard."
