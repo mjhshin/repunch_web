@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from urllib import urlencode
+import re
 
 from tests import SeleniumTest
 from parse.test import register_employee
@@ -336,6 +337,8 @@ TEST_EMPLOYEE = {
     "username": "employee@vandolf.com",
     "password": "123456",
 }
+
+MESSAGE_DETAIL_RE = re.compile(r"messages/(.*)/details")
     
 def test_employee_access():
     """
@@ -699,60 +702,128 @@ def test_employee_access():
         print e
         parts[17]['test_message'] = str(e)
         
-    ##########  Messages accessible  TODO
+    ##########  Messages accessible
     try:
-        
+        test.open(reverse("messages_index"))
+        sleep(3)
+        parts[18]['success'] = test.is_current_url(reverse(\
+            "messages_index"))
     except Exception as e:
         print e
         parts[18]['test_message'] = str(e)
-    ##########  No create new message button  TODO
+        
+    ##########  No create new message button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#create_message")
+        except NoSuchElementException:
+            parts[19]['success'] = True
+        
     except Exception as e:
         print e
         parts[19]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting create new message through url 
-    ###         redirects user to messages index  TODO
+    ###         redirects user to messages index
     try:
-        pass
+        test.open(reverse("message_edit", args=("0",)))
+        sleep(3)
+        parts[20]['success'] = test.is_current_url(reverse(\
+            "messages_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
+            
     except Exception as e:
         print e
         parts[20]['test_message'] = str(e)
-    ##########  Sent messages are viewable  TODO
+        
+    ##########  Sent messages are viewable 
     try:
-        pass
+        row = test.find("#tab-body-sent div.tr a")
+        # get id from /manage/messages/H1llFritVJ/details
+        message_id = MESSAGE_DETAIL_RE.search(\
+            row.get_attribute("href")).group(1)
+        row.click()
+        sleep(3)
+        parts[21]['success'] = test.is_current_url(reverse(\
+            "message_details", args=(message_id,)))
+        
     except Exception as e:
         print e
         parts[21]['test_message'] = str(e)
-    ##########  Feedbacks are viewable  TODO
+        
+    ##########  Feedbacks are viewable
     try:
-        pass
+        test.open(reverse("messages_index"))
+        sleep(2)
+        test.find("#tab-feedback").click()
+        sleep(1)
+        row = test.find("#tab-body-feedback div.tr a")
+        # get id from /manage/messages/feedback/H1llFritVJ
+        feedback_id = row.get_attribute("href").split("/")[-1]
+        row.click()
+        sleep(3)
+        parts[22]['success'] = test.is_current_url(reverse(\
+            "feedback_details", args=(feedback_id,)))
+            
     except Exception as e:
         print e
         parts[22]['test_message'] = str(e)
-    ##########  No reply button  TODO
+        
+    ##########  No reply button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#reply-button")
+        except NoSuchElementException:
+            parts[23]['success'] = True
+        
     except Exception as e:
         print e
         parts[23]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting reply through url 
-    ###         redirects user to messages index  TODO
+    ###         redirects user to messages index
     try:
-        pass
+        test.open(reverse("feedback_reply", args=(feedback_id,)))
+        sleep(2)
+        parts[24]['success'] = test.is_current_url(reverse(\
+            "messages_index")+ "?" + urlencode({'error':\
+            "Permission denied", "tab_feedback": "1"}))
+        
     except Exception as e:
         print e
         parts[24]['test_message'] = str(e)
-    ##########  No delete message button  TODO
+        
+    ##########  No delete message button
     try:
-        pass
+        test.open(reverse("feedback_details", args=(feedback_id,)))
+        sleep(2)
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#delete-button")
+        except NoSuchElementException:
+            parts[25]['success'] = True
+        
     except Exception as e:
         print e
         parts[25]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting delete message through url 
-    ###         redirects user to messages index  TODO 
+    ###         redirects user to messages index 
     try:
-        pass
+        test.open(reverse("feedback_delete", args=(feedback_id,)))
+        sleep(2)
+        parts[26]['success'] = test.is_current_url(reverse(\
+            "messages_index")+ "?" + urlencode({'error':\
+            "Permission denied", "tab_feedback": "1"}))
+            
     except Exception as e:
         print e
         parts[26]['test_message'] = str(e)
