@@ -28,7 +28,7 @@ class Command(BaseCommand):
         #results.extend(test_login_page())
         
         ####### DASHBOARD #########################################
-        #### MY ACCOUNT
+        #### MY STORE
         #results.extend(test_edit_store_details()) 
         #results.extend(test_update_subscription())
         #results.extend(test_cancel_account())
@@ -37,9 +37,9 @@ class Command(BaseCommand):
         #results.extend(test_rewards())
         
         ### ANALYSIS
-        #results.extend(test_trends()) todo
-        #results.extend(test_breakdown()) todo
-        #results.extend(test_reward_redemptions()) todo 
+        #results.extend(test_trends()) todo?
+        #results.extend(test_breakdown()) todo?
+        #results.extend(test_reward_redemptions()) todo? 
         
         ### MESSAGES
         #results.extend(test_messages())
@@ -57,5 +57,8 @@ class Command(BaseCommand):
         #results.extend(test_punch()) TODO 
         #results.extend(test_redemptions()) TODO 
         
+        ### ACCOUNT SETTINGS
+        #results.extend(test_account_settings()) TODO 
+
         
         send_email_selenium_test_results(results)

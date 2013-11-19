@@ -6,6 +6,7 @@ for a physical device.
 from parse.utils import cloud_call
 from parse.apps.messages.models import Message
 from parse.apps.patrons.models import PatronStore
+from parse.apps.stores.models import Store
 
 from libs.dateutil.relativedelta import relativedelta
 
@@ -114,4 +115,11 @@ def register_employee(first_name, last_name, username,
         "retailer_pin": retailer_pin,
     }) 
 
-
+def register_rand_employee(store_id):
+    name = "Employee" + str(randint(0,9999))
+    username = name+"@repunch.com"
+    store = Store.objects().get(objectId=store_id, include="Settings")
+    
+    return register_employee(name, name, username, 
+        username, "repunch7575", store.settings.retailer_pin)
+        

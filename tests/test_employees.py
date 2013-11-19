@@ -10,7 +10,8 @@ from urllib import urlencode
 import re
 
 from tests import SeleniumTest
-from parse.test import register_employee
+from parse.test import register_employee, register_rand_employee,
+approve_employee
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
@@ -828,84 +829,174 @@ def test_employee_access():
         print e
         parts[26]['test_message'] = str(e)
     
-    ##########  Analysis accessible  TODO
+    ##########  Analysis accessible
     try:
-        pass
+        test.open(reverse("analysis_index"))
+        sleep(4)
+        parts[27]['success'] = test.is_current_url(reverse(\
+            "analysis_index"))
+            
     except Exception as e:
         print e
         parts[27]['test_message'] = str(e)
     
-    ##########  Employees accessible  TODO
+    ##########  Employees accessible
     try:
-        pass
+        test.open(reverse("employees_index"))
+        sleep(4)
+        parts[28]['success'] = test.is_current_url(reverse(\
+            "employees_index"))
+            
     except Exception as e:
         print e
         parts[28]['test_message'] = str(e)
-        
     
-    ##########  No register new employee button  TODO
+    ##########  No register new employee button
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#register_employee")
+        except NoSuchElementException:
+            parts[29]['success'] = True
+        
     except Exception as e:
         print e
         parts[29]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting new employee registration
-    ###         redirects user to employees_index TODO
+    ###         redirects user to employees_index
     try:
-        pass
+        test.open(reverse("employee_register"))
+        sleep(3)
+        parts[30]['success'] = test.is_current_url(reverse(\
+            "employees_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
+            
     except Exception as e:
         print e
         parts[30]['test_message'] = str(e)
         
-    ##########  Approved employees are not clickable  TODO
+    ##########  Approved employees are not clickable
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#tab-body-approved-employees div.tr a")
+        except NoSuchElementException:
+            parts[31]['success'] = True
+        
     except Exception as e:
         print e
         parts[31]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting edit employee through url 
-    ###         redirects user to employees index  TODO
+    ###         redirects user to employees index
     try:
-        pass
+        row = test.find("#tab-body-approved-employees div.tr")
+        employee_id = row.get_attribute("id")
+        test.open(reverse("employee_edit", args=(employee_id,)))
+        sleep(3)
+        parts[32]['success'] = test.is_current_url(reverse(\
+            "employees_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
+
     except Exception as e:
         print e
         parts[32]['test_message'] = str(e)
-    ##########  No remove button in approved employees  TODO
+        
+    ##########  No remove button in approved employees
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#tab-body-approved-employees div.tr "+\
+                "div.remove a")
+        except NoSuchElementException:
+            parts[33]['success'] = True
+        
     except Exception as e:
         print e
         parts[33]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting remove employee through url 
-    ###         redirects user to employees index  TODO
+    ###         redirects user to employees index
     try:
-        pass
+        test.open(reverse("employee_delete", args=(employee_id,)))
+        sleep(3)
+        parts[34]['success'] = test.is_current_url(reverse(\
+            "employees_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
+        
     except Exception as e:
         print e
         parts[34]['test_message'] = str(e)
-    ##########  No deny button in pending employees  TODO
+        
+    
+    # create a pending 
+    register_rand_employee(store.objectId)
+    test.new_driver(False)
+    test.login(TEST_EMPLOYEE['username'], TEST_EMPLOYEE['password'],
+        reverse("employees_index"), final_sleep=6)
+        
+    ##########  No deny button in pending employees
     try:
-        pass
+        test.find("#tab-pending-employees").click()
+        sleep(1)
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#tab-body-pending-employees div.tr "+\
+                "div.deny a")
+        except NoSuchElementException:
+            parts[35]['success'] = True
+            
     except Exception as e:
         print e
         parts[35]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting deny employee through url 
-    ###         redirects user to employees index  TODO
+    ###         redirects user to employees index
     try:
-        pass
+        row = test.find("#tab-body-pending-employees div.tr")
+        employee_id = row.get_attribute("id")
+        test.open(reverse("employee_deny", args=(employee_id,)))
+        sleep(3)
+        parts[36]['success'] = test.is_current_url(reverse(\
+            "employees_index")+ urlencode({'error':\
+            "Permission denied"}))
+            
     except Exception as e:
         print e
         parts[36]['test_message'] = str(e)
-    ##########  No approve button in pending employees  TODO
+        
+    ##########  No approve button in pending employees
     try:
-        pass
+        sleep(1)
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#tab-body-pending-employees div.tr "+\
+                "div.approve a")
+        except NoSuchElementException:
+            parts[37]['success'] = True
+            
     except Exception as e:
         print e
         parts[37]['test_message'] = str(e)
+        
     ##########  Requesting approve employee through url 
-    ###         redirects user to employees index  TODO
+    ###         redirects user to employees index 
     try:
-        pass
+        test.open(reverse("employee_approve", args=(employee_id,)))
+        sleep(3)
+        parts[38]['success'] = test.is_current_url(reverse(\
+            "employees_index")+ urlencode({'error':\
+            "Permission denied"}))
+            
     except Exception as e:
         print e
         parts[38]['test_message'] = str(e)
