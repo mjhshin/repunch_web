@@ -19,13 +19,13 @@ from parse.apps.messages import FEEDBACK
 from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
-    "username": "clothing@vandolf.com",
-    "password": "123456",
+    "username": "violette87@repunch.com",
+    "password": "repunch7575",
 }
 
 # IMPORTANT! This patron must have a PatronStore with the store above!
 TEST_PATRON = {
-    "username": "kira@vandolf.com",
+    "username": "vandolf@repunch.com",
     "password": "123456",
 }
 
@@ -128,11 +128,6 @@ def test_messages():
         {'test_name': "Expiration date required if attach offer on"},
         {'test_name': "Expiration date must be at a later date"},
         {'test_name': "Expiration date must be at most 1 year later"},
-        
-        {'test_name': "Clicking cancel prompts the user in deletion"},
-        {'test_name': "Canceling redirects user back to messages" +\
-            "index"},
-            
     ]
     section = {
         "section_name": "Sending messages works?",
@@ -569,25 +564,6 @@ def test_messages():
     except Exception as e:
         print e
         parts[46]['test_message'] = str(e)
-
-    ##########  Clicking cancel prompts the user in deletion. 
-    try:
-        test.find("#delete-button").click()
-        sleep(1)
-        alert = test.switch_to_alert()
-        parts[47]['success'] = alert.text is not None
-    except Exception as e:
-        print e
-        parts[47]['test_message'] = str(e)
-    ##########  Canceling redirects user back to messages index. 
-    try:
-        alert.accept()
-        sleep(1)
-        parts[48]['success'] =\
-            test.is_current_url(reverse("messages_index"))
-    except Exception as e:
-        print e
-        parts[48]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup

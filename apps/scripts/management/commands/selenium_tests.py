@@ -34,7 +34,7 @@ class Command(BaseCommand):
         #results.extend(test_cancel_account())
         
         ### REWARDS
-        results.extend(test_rewards())
+        #results.extend(test_rewards())
         
         ### ANALYSIS
         #results.extend(test_trends()) todo
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         #results.extend(test_reward_redemptions()) todo 
         
         ### MESSAGES
-        #results.extend(test_messages())
+        results.extend(test_messages())
         #results.extend(test_feedbacks())
         
         ### EMPLOYEE
