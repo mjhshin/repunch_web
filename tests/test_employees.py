@@ -15,8 +15,8 @@ from parse.apps.stores import ACCESS_ADMIN, ACCESS_PUNCHREDEEM,\
 ACCESS_NONE
 
 TEST_USER = {
-    "username": "clothing@vandolf.com",
-    "password": "123456",
+    "username": "violette87@repunch.com",
+    "password": "repunch7575",
 }
 
 def test_employees():
@@ -69,7 +69,7 @@ def test_employees():
             "pending table"},
         {'test_name': "The employee is deleted from parse"},
         {'test_name': "The account/user is deleted from parse"},
-        {'test_name': "Multiple employees (4) registering at once" +\
+        {'test_name': "Multiple employees (3) registering at once" +\
             " shows up in dashboard"},
     ]
     section = {
@@ -121,7 +121,7 @@ def test_employees():
     try:
         res = register_employee(first_name, last_name, username,
             email=email)
-        parts[1]['success'] = res.get("result") == "success"
+        parts[1]['success'] = "error" not in res
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
@@ -150,7 +150,7 @@ def test_employees():
     ##########  Email must be valid (cloud code)"
     try:
         res = register_employee("vman", "vman", email="vmahs@vman")
-        parts[5]['success'] = res['error'] == '125'
+        parts[5]['success'] = res['error'] == 'EMAIL_INVALID'
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
@@ -158,21 +158,21 @@ def test_employees():
     try:
         res = register_employee("vman", "vman",
             email=email)
-        parts[6]['success'] = res['error'] == '203'
+        parts[6]['success'] = res['error'] == 'EMAIL_TAKEN'
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
     ##########  Username must be unique (cloud code) "
     try:
         res = register_employee("vman", "vman", username=username)
-        parts[7]['success'] = res['error'] == '202'
+        parts[7]['success'] = res['error'] == 'USERNAME_TAKEN'
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
     ##########  Retailer PIN must exist (cloud code) "
     try:
         res = register_employee("vman", "vman", retailer_pin="sdgdgs")
-        parts[8]['success'] = res['result'] == "invalid_pin"
+        parts[8]['success'] = res['error'] == "RETAILER_PIN_INVALID"
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
@@ -313,12 +313,13 @@ def test_employees():
     ##########  Multiple employees (4) registering at once
     ###         shows up in dashboard"
     try:
-        for i in range(4):
+        for i in range(3):
             register_employee(first_name + str(i), last_name + str(i))
         sleep(COMET_PULL_RATE*2 + 3)
+        test.find("#tab-pending-employees").click()
         parts[23]['success'] = len(test.find(\
             "#tab-body-pending-employees div.tr " +\
-            "div.td.approve a.approve", multiple=True)) == 4
+            "div.td.approve a.approve", multiple=True)) == 3
     except Exception as e:
         print e
         parts[23]['test_message'] = str(e)
