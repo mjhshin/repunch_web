@@ -121,7 +121,7 @@ function bindRemoveRow(rowId){
     
     $(".hours-form ul"+rowId+" .buttons .remove").click(function() {
         // do not remove the last row
-        if ($(".hours-form > ul.hours-row").length > 1) {
+        if ($(".hours-form ul.hours-row").length > 1) {
             $(this).closest("ul.hours-row").remove();
             
         } else { // just deactivate all days
