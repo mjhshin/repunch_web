@@ -372,15 +372,15 @@ def test_employee_access():
             "login to the dashboard through the dedicated dialog pg"},
             
         {"test_name" : "Account settings accessible"},
-        {"test_name" : "No edit store detail button"},
+        {"test_name" : "No store edit button"},
         {"test_name" : "Requesting edit store detail through url " +\
-            "redirects user to store details"},
+            "redirects user to store index"},
         {"test_name" : "No update subscription button"},
         {"test_name" : "Requesting update subscription through url " +\
-            "redirects user to store details"},
+            "redirects user to store index"},
         {"test_name" : "No deactivate my store button"},
         {"test_name" : "Requesting store deactivation through url " +\
-            "redirects user to store details"},
+            "redirects user to store index"},
             
         {"test_name" : "Rewards accessible"},
         {"test_name" : "No create new reward button"},
@@ -578,29 +578,52 @@ def test_employee_access():
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
-    ##########  No update subscription button  TODO
+    ##########  No update subscription button 
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#account-options a[href='%s']" %\
+                (reverse("subscription_update"),))
+        except NoSuchElementException:
+            parts[9]['success'] = True
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting update subscription through url 
-    ###         redirects user to store details  TODO
+    ###         redirects user to store index 
     try:
-        pass
+        test.open(reverse("subscription_update"))
+        sleep(2)
+        parts[10]['success'] = test.is_current_url(reverse(\
+            "store_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    ##########  No deactivate my store button  TODO
+    ##########  No deactivate my store button 
     try:
-        pass
+        test.set_to_implicit_wait(False)
+        try:
+            test.find("#deactivate_account")
+        except NoSuchElementException:
+            parts[11]['success'] = True
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting store deactivation through url 
-    ###         redirects user to store details  TODO
+    ###         redirects user to store index
     try:
-        pass
+        test.open("store_deactivate")
+        sleep(2)
+        parts[12]['success'] = test.is_current_url(reverse(\
+            "store_index")+ "?" + urlencode({'error':\
+            "Permission denied"}))
     except Exception as e:
         print e
         parts[12]['test_message'] = str(e)

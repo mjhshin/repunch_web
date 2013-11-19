@@ -48,6 +48,7 @@ class Command(BaseCommand):
         ### EMPLOYEE
         #results.extend(test_employees())
         results.extend(test_employee_access())
+        # results.extend(test_employee_registration()) # TODO
         
         ### SETTINGS
         #results.extend(test_settings())
