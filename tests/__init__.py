@@ -37,9 +37,15 @@ class SeleniumTest(object):
             ... ]
         """
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
+        self.set_to_implicit_wait(True)
         self.results = []
         self.dev_login()
+        
+    def set_to_implicit_wait(self, wait):
+        if wait:
+            self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
+        else:
+            self.driver.implicitly_wait(0)
             
     def dev_login(self):
         if SeleniumTest.DEV_LOGIN:

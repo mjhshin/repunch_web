@@ -4,7 +4,9 @@ Selenium tests for dashboard 'Employees' tab.
 
 from django.core.urlresolvers import reverse
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 from time import sleep
+from urllib import urlencode
 
 from tests import SeleniumTest
 from parse.test import register_employee
@@ -369,15 +371,15 @@ def test_employee_access():
         {"test_name" : "Employee with ACCESS_PUNCHREDEEM can " +\
             "login to the dashboard through the dedicated dialog pg"},
             
-        {"test_name" : "My Account accessible"},
+        {"test_name" : "Account settings accessible"},
         {"test_name" : "No edit store detail button"},
         {"test_name" : "Requesting edit store detail through url " +\
             "redirects user to store details"},
-        {"test_name" : "No update account button"},
-        {"test_name" : "Requesting update account through url " +\
+        {"test_name" : "No update subscription button"},
+        {"test_name" : "Requesting update subscription through url " +\
             "redirects user to store details"},
-        {"test_name" : "No cancel my account button"},
-        {"test_name" : "Requesting cancel my account through url " +\
+        {"test_name" : "No deactivate my store button"},
+        {"test_name" : "Requesting store deactivation through url " +\
             "redirects user to store details"},
             
         {"test_name" : "Rewards accessible"},
@@ -542,45 +544,60 @@ def test_employee_access():
         print e
         parts[5]['test_message'] = str(e)
         
-    ##########  My Account accessible  TODO
+    ##########  Account settings accessible
     try:
-        pass
+        test.find("#header-right a").click()
+        sleep(2)
+        parts[6]['success'] = test.is_current_url(reverse("account_edit"))
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
-    ##########  No edit store detail button  TODO
+    ##########  No edit store detail button
     try:
-        pass
+        test.open(reverse("store_index"))
+        sleep(2)
+        test.set_to_implicit_wait(False)
+        try: 
+            test.find("#store-details a[href='%s']" % (reverse("store_edit"),))
+        except NoSuchElementException:
+            parts[7]['success'] = True
+        
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
+    finally:
+        test.set_to_implicit_wait(True)
+        
     ##########  Requesting edit store detail through url 
-    ###         redirects user to store details  TODO
+    ###         redirects user to store details 
     try:
-        pass
+        test.open(reverse("store_edit"))
+        sleep(2)
+        parts[8]['success'] = test.is_current_url(reverse("store_index")+\
+            "?" + urlencode({'error': "Permission denied"}))
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
-    ##########  No update account button  TODO
+    ##########  No update subscription button  TODO
     try:
         pass
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
-    ##########  Requesting update account through url 
+    ##########  Requesting update subscription through url 
     ###         redirects user to store details  TODO
     try:
         pass
     except Exception as e:
         print e
         parts[10]['test_message'] = str(e)
-    ##########  No cancel my account button  TODO
+    ##########  No deactivate my store button  TODO
     try:
         pass
     except Exception as e:
         print e
         parts[11]['test_message'] = str(e)
-    ##########  Requesting cancel my account through url 
+    ##########  Requesting store deactivation through url 
     ###         redirects user to store details  TODO
     try:
         pass
