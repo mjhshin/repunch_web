@@ -1208,14 +1208,17 @@ def test_employee_registration():
     ##########  New registered employee is immediately placed
     ###         in the approved group.
     try:
+        acl = test.find("#id_acl option[selected]").get_attribute("value")
+        
         selectors = (
-            ("#id_email", TEST_EMPLOYEE['email']),
+            ("#id_email", TEST_EMPLOYEE['username']),
             ("#id_password", TEST_EMPLOYEE['password']),
             ("#id_confirm_password", TEST_EMPLOYEE['password']),
             ("#id_first_name", TEST_EMPLOYEE['first_name']),
             ("#id_last_name", TEST_EMPLOYEE['last_name']),
         )
         test.action_chain(0, selectors, action="send_keys")
+        test.find("#register-employee-submit").click()
         sleep(7)
         test.open(reverse("employees_index"))
         sleep(3)
@@ -1230,11 +1233,107 @@ def test_employee_registration():
     ##########  Access level of new employee is the same as
     ###         the one chosen in the registration form.
     try:
-        pass # TODO
+        test.find("#tab-body-approved-employees div.tr a").click()
+        sleep(2)
+        parts[2]['success'] = acl ==\
+            test.find("#ACL option[selected]").get_attribute("value")
+    
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
-
+        
+    ##########  A valid email is required.
+    try:
+        test.open(reverse("employee_register"))
+        sleep(2)
+        test.find("#id_email").send_keys("jhfghjdfg@jfgh")
+        test.find("#register-employee-submit").click()
+        sleep(3)
+        parts[3]['success'] = test.find("#email_ic > ul.errorlist > li").text ==\
+            "Enter a valid email address."
+        
+    except Exception as e:
+        print e
+        parts[3]['test_message'] = str(e)    
+    
+    ##########  Email must be unique.
+    try:
+        selectors = (
+            ("#id_email", TEST_EMPLOYEE['username']),
+            ("#id_password", "123456123"),
+            ("#id_confirm_password", "123456123"),
+            ("#id_first_name", "YOLO"),
+            ("#id_last_name", "BOLO"),
+        )
+        test.action_chain(0, selectors, action="clear")
+        test.action_chain(0, selectors, action="send_keys")
+        test.find("#register-employee-submit").click()
+        sleep(5)
+        parts[4]['success'] = test.find("#email_ic > ul.errorlist > li").text ==\
+            "Email is already being used."
+            
+    except Exception as e:
+        print e
+        parts[4]['test_message'] = str(e)
+    
+    ##########  Email is required.              5
+    ##########  First name is required.         6
+    ##########  Last name is required.          7
+    ##########  Password is required.           8
+    ##########  Password confirm is required.   9
+    try:
+        selectors = (
+            "#id_email", 
+            "#id_password",
+            "#id_confirm_password",
+            "#id_first_name",
+            "#id_last_name",
+        )
+        test.action_chain(0, selectors, action="clear")
+        test.find("#register-employee-submit").click()
+        sleep(3)
+        
+        for i, sel in enumerate(selectors):
+            id = sel.replace("#id_", "") + "_ic"
+            parts[i+5]['success'] =\
+                test.find("#%s > ul.errorlist > li" % (id,)).text ==\
+                "This field is required."
+        
+    except Exception as e:
+        print e
+        for i, sel in enumerate(selectors):
+            parts[i+5]['test_message'] = str(e)
+    
+    ##########  Passwords must match.
+    try:
+        selectors = (
+            ("#id_password", "123456"),
+            ("#id_confirm_password", "abcdefg"),
+        )
+        test.action_chain(0, selectors, action="clear")
+        test.action_chain(0, selectors, action="send_keys")
+        test.find("#register-employee-submit").click()
+        sleep(3)
+        parts[10]['success'] = test.find("#password_ic > ul.errorlist > li").text ==\
+            "Passwords don't match."
+        
+    except Exception as e:
+        print e
+        parts[10]['test_message'] = str(e)
+    
+    ##########  Password must be at least 6 characters long.
+    try:
+        test.find("#id_password").clear()
+        test.find("#id_password").send_keys("123")
+        test.find("#register-employee-submit").click()
+        sleep(3)
+        parts[11]['success'] =\
+            test.find("#password_ic > ul.errorlist > li").text ==\
+            "Ensure this value has at least 6 characters (it has 3)."
+        
+    except Exception as e:
+        print e
+        parts[11]['success'] = str(e)
 
 
     # END OF ALL TESTS - cleanup

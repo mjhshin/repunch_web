@@ -14,7 +14,8 @@ from tests.test_rewards import test_rewards
 from tests.test_analysis import test_trends, test_breakdown,\
 test_reward_redemptions
 from tests.test_messages import test_messages, test_feedbacks
-from tests.test_employees import test_employees, test_employee_access
+from tests.test_employees import test_employees, test_employee_access,\
+test_employee_registration
 from tests.test_settings import test_settings
 
 class Command(BaseCommand):

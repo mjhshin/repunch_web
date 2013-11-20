@@ -190,21 +190,21 @@ def test_signup():
         test.open(reverse("public_signup")) # ACTION!
         sleep(1)
         selectors = (
-            ("#id_store_name", "    "),
-            ("#id_street", "   "),
-            ("#id_city", "   "),
-            ("#id_state", "   "),
-            ("#id_zip", "   "),
-            ("#id_first_name", "   "),
-            ("#id_last_name", " "),
-            ("#Ph1", "   "),
-            ("#Ph2", "   "),
-            ("#Ph3", "    "),
-            ("#id_email", "   "),
-            ("#id_password", ""),
-            ("#id_confirm_password", ""),
+            "#id_store_name",
+            "#id_street",
+            "#id_city",
+            "#id_state",
+            "#id_zip",
+            "#id_first_name",
+            "#id_last_name",
+            "#Ph1",
+            "#Ph2",
+            "#Ph3",
+            "#id_email",
+            "#id_password",
+            "#id_confirm_password",
         )
-        test.action_chain(0, selectors, action="send_keys") # ACTION!
+        test.action_chain(0, selectors, action="clear") # ACTION!
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(3)

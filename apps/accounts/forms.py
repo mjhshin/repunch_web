@@ -67,7 +67,7 @@ class AccountSignUpForm(forms.Form):
         p1 = self.cleaned_data.get('password')
         p2 = self.data.get('confirm_password')
         if p1 and p2 and p1 != p2:
-            raise forms.ValidationError("Passwords don't match")
+            raise forms.ValidationError("Passwords don't match.")
         return p1
     
     def clean_email(self):

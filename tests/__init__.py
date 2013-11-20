@@ -157,7 +157,9 @@ class SeleniumTest(object):
     def get_selected(self, selector, type="css"):
         """
         Returns the selected option element from the select.
-        The selectore must select option tags
+        The selectore must select option tags.
+        
+        Depracated. Don't use this.
         """
         els = self.find(selector, type=type, multiple=True)
         for el in els:
