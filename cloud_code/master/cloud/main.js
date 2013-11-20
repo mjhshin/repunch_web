@@ -606,6 +606,139 @@ Parse.Cloud.define("delete_employee", function(request, response)
     
 });
 
+Parse.Cloud.define("add_patronstore_speed_test", function(request, response) {
+    
+    var patronId = "DIPSVwKug4"; 
+    var storeId = "v4SDrlia3d";
+    
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+    
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	var storeQuery = new Parse.Query(Store);
+	var patronQuery = new Parse.Query(Patron);
+	
+	storeQuery.equalTo("objectId", storeId);
+    
+    var i = 0;
+    
+    doQuery();
+    
+    function doQuery() {
+	    patronQuery.get(patronId).then(function(patronResult) {
+		    var punchCode = patronResult.get("punch_code");
+		    patronStoreQuery.equalTo("punch_code", punchCode);
+		    patronStoreQuery.matchesQuery("Store", storeQuery);
+		    return patronStoreQuery.first();
+
+	    }).then(function(patronStoreResult) {
+		    if(patronStoreResult == null) {
+                console.log("No existing PatronStore found.");
+		    }
+		    else {
+                console.log("Existing PatronStore found.");
+		    }
+		    
+		    if (++i < 30) {
+                doQuery();
+            } else {
+                response.success("success");
+            }
+		
+	    });
+	    
+    };
+
+});
+
+Parse.Cloud.define("add_patronstore_speed_test2", function(request, response) {
+    
+    var patronId = "DIPSVwKug4"; 
+    var storeId = "v4SDrlia3d";
+    var punchCode = "00010";
+    
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+    
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	var storeQuery = new Parse.Query(Store);
+	var patronQuery = new Parse.Query(Patron);
+	
+	storeQuery.equalTo("objectId", storeId);
+    patronStoreQuery.equalTo("punch_code", punchCode);
+    patronStoreQuery.matchesQuery("Store", storeQuery);
+    
+    var i = 0;
+    
+    doQuery();
+    
+    function doQuery() {
+	    patronStoreQuery.first().then(function(patronStoreResult) {
+		    if(patronStoreResult == null) {
+                console.log("No existing PatronStore found.");
+		    }
+		    else {
+                console.log("Existing PatronStore found.");
+		    }
+		    
+		    if (++i < 30) {
+                doQuery();
+            } else {
+                response.success("success");
+            }
+		
+	    });
+	    
+    };
+
+});
+
+Parse.Cloud.define("add_patronstore_v2_speed_test", function(request, response) {
+    
+    var patronId = "DIPSVwKug4"; 
+    var storeId = "v4SDrlia3d";
+    
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+	
+	var patron = new Patron();
+	var store = new Store();
+	
+	patron.id = patronId;
+	store.id = storeId;
+    
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	patronStoreQuery.equalTo("Patron", patron);
+	patronStoreQuery.equalTo("Store", store);
+    
+    var i = 0;
+    
+    doQuery();
+    
+    function doQuery() {
+	    patronStoreQuery.first().then(function(patronStore) {
+            if(patronStore == null) {
+                console.log("No existing PatronStore found.");
+		    }
+		    else {
+                console.log("Existing PatronStore found.");
+		    }
+		    
+	        if (++i < 30) {
+	            doQuery();
+	        } else {
+	            response.success("success");
+	        }
+		    
+        });
+	    
+    };
+
+});
+
 ////////////////////////////////////////////////////
 //
 //  

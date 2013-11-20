@@ -1114,7 +1114,7 @@ def test_employee_access():
     try:
         request_redeem_pt("eiZa6Mzu7f")
         sleep(COMET_PULL_RATE+4)
-        # TODO
+        
     except Exception as e:
         print e
         parts[48]['test_message'] = str(e)
