@@ -48,10 +48,10 @@ class Command(BaseCommand):
         ### EMPLOYEE
         #results.extend(test_employees())
         #results.extend(test_employee_access())
-        # results.extend(test_employee_registration()) # TODO
+        results.extend(test_employee_registration())
         
         ### SETTINGS
-        results.extend(test_settings())
+        #results.extend(test_settings())
         
         ### WORKBENCH
         #results.extend(test_punch()) TODO 

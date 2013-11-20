@@ -1144,4 +1144,60 @@ def test_employee_access():
     # END OF ALL TESTS - cleanup
     return test.tear_down() 
 
+def test_employee_registration():
+    """
+    Tests for employee registrain via dashboard.
+    """
+    # delete the employees and associated User objects in the relation
+    account = Account.objects().get(email=TEST_USER['username'],
+        include="Store.Settings")
+    store = account.store
+    settings = store.settings
+    
+    emps = store.get("employees")
+    if emps:
+        for emp in emps:
+            Account.objects().get(Employee=emp.objectId).delete()
+            emp.delete()
+    store.set("employees", None) 
+        
+    test = SeleniumTest()
+    parts = [
+        {"test_name" : "Clicking register new employee button "+\
+            " redirects user to employee register page."},
+        {"test_name" : "New registered employee is immediately placed"+\
+            " in the approved group."},
+        {"test_name" : "Access level of new employee is the same as"+\
+            " the one chosen in the registration form."},
+            
+        {"test_name" : "A valid email is required."},
+        {"test_name" : "Email must be unique."},
+        
+        {"test_name" : "Email is required."},
+        {"test_name" : "First name is required."},
+        {"test_name" : "Last name is required."},
+        {"test_name" : "Password is required."},
+        {"test_name" : "Password confirm is required."},
+        
+        {"test_name" : "Passwords must match."},
+        {"test_name" : "Password must be at least 6 characters long."},
+        
+    ]
+    section = {
+        "section_name":\
+            "Employee registration functional?",
+        "parts": parts,
+    }
+    test.results.append(section)
+
+    test.login(TEST_USER['username'], TEST_USER['password'],
+        reverse("employees_index"))
+    
+    # TODO
+    
+
+
+
+
+
 
