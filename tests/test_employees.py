@@ -1044,6 +1044,8 @@ def test_employee_access():
         
     ##########  Punches employee is readonly
     try:
+        test.open(reverse("store_settings"))
+        sleep(3)
         parts[42]['success'] =\
             test.find("#id_punches_employee").get_attribute(\
                 "readonly") == "true"
@@ -1113,9 +1115,9 @@ def test_employee_access():
     ##########  Employee can reject redeem 
     try:
         request_redeem_pt("eiZa6Mzu7f")
-        sleep(COMET_PULL_RATE+4)
+        sleep(COMET_PULL_RATE*2+4)
         row = test.find("#tab-body-pending-redemptions div.tr")
-        test.find("//div[id='%s'])]/" % (row.get_attribute("id"),) +\
+        test.find("//div[@id='%s']/" % (row.get_attribute("id"),) +\
             "div[contains(@class, 'redemption_redeem')]/a[2]",
             type="xpath").click()
         sleep(3)
@@ -1127,9 +1129,9 @@ def test_employee_access():
     ##########  Employee can validate redeem
     try:
         request_redeem_pt("eiZa6Mzu7f")
-        sleep(COMET_PULL_RATE+4)
+        sleep(COMET_PULL_RATE*2+4)
         row = test.find("#tab-body-pending-redemptions div.tr")
-        test.find("//div[id='%s'])]/" % (row.get_attribute("id"),) +\
+        test.find("//div[@id='%s']/" % (row.get_attribute("id"),) +\
             "div[contains(@class, 'redemption_redeem')]/a[1]",
             type="xpath").click()
         sleep(3)

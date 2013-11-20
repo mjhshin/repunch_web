@@ -10,8 +10,8 @@ from tests import SeleniumTest
 from parse.apps.accounts.models import Account
 
 TEST_USER = {
-    "username": "clothing@vandolf.com",
-    "password": "123456",
+    "username": "violette87@repunch.com",
+    "password": "repunch7575",
 }
 
 
