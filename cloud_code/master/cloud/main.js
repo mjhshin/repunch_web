@@ -608,6 +608,81 @@ Parse.Cloud.define("delete_employee", function(request, response)
 
 ////////////////////////////////////////////////////
 //
+//  
+// 
+////////////////////////////////////////////////////
+Parse.Cloud.define("add_patronstore_v2", function(request, response) {
+    var patronId = request.params.patron_id;
+	var storeId = request.params.store_id;
+	
+	var Store = Parse.Object.extend("Store");
+	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
+	
+	var patron = new Patron();
+	var store = new Store();
+	
+	patron.id = patronId;
+	store.id = storeId;
+	
+	var patronStoreQuery = new Parse.Query(PatronStore);
+	patronStoreQuery.equalTo("Patron", patron);
+	patronStoreQuery.equalTo("Store", store);
+	
+	// first check if the PatronStore already exists
+    patronStoreQuery.first().then(function(patronStore) {
+        if(patronStore == null) {
+            console.log("No existing PatronStore found.");
+			addPatronStore();
+		}
+		else {
+            console.log("Existing PatronStore found.");
+			response.success(patronStore);
+		}
+    });
+    
+    function addPatronStore() {
+        console.log("Creating new PatronStore");
+    
+        var patronStore = new PatronStore();
+	    patronStore.set("all_time_punches", 0);
+	    patronStore.set("punch_count", 0);
+	    patronStore.set("pending_reward", false);
+	    patronStore.set("Store", store);
+	    patronStore.set("Patron", patron);
+	    
+	    patronStore.save().then(function(patronStore) {
+			patron.relation("PatronStores").add(patronStore);
+			store.relation("PatronStores").add(patronStore);
+			
+	        var promises = [];
+	        promises.push(patron);
+	        promises.push(store);
+	        promises.push(store.relation("PatronStores").query().count());
+
+            return Parse.Promise.when(promises);	
+            		
+	    }).then(function(patron, store, patronStoreCount) {
+	    	Parse.Cloud.httpRequest({
+            	method: "POST",
+            	url: "<<COMET_RECEIVE_URL>>" + storeId,
+            	headers: { "Content-Type": "application/json"},
+            	body: { 
+                	"cometrkey": "<<COMET_RECEIVE_KEY>>", 
+                	patronStore_int: patronStoreCount,
+            	}
+        	});
+        
+        	response.success(patronStore);
+	    	
+	    });
+	    
+    }
+
+});
+
+////////////////////////////////////////////////////
+//
 // 
 // 
 ////////////////////////////////////////////////////
