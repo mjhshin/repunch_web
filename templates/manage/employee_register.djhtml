@@ -63,7 +63,7 @@ h2 { margin-bottom: 16px; }
 		    style="margin-top:34px;"
 		    {% endif %}>
 			{{ account_form.confirm_password.errors }}
-			<label for="id_email">Confirm Password</label>
+			<label for="id_confirm_password">Confirm Password</label>
 			{{ account_form.confirm_password }}
 		</div>
 		

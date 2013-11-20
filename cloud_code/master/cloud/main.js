@@ -478,8 +478,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 Parse.Cloud.define("delete_employee", function(request, response) 
 {
     var employeeId = request.params.employee_id;
-    var action = request.params.action;
-    
+
     var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
     
     var AndroidInstallation = Parse.Object.extend("AndroidInstallation");

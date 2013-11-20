@@ -338,6 +338,8 @@ def test_employees():
 TEST_EMPLOYEE = {
     "username": "employee@vandolf.com",
     "password": "123456",
+    "first_name": "Vandolf",
+    "last_name": "Estrellado",
 }
 
 MESSAGE_DETAIL_RE = re.compile(r"messages/(.*)/details")
@@ -1193,11 +1195,49 @@ def test_employee_registration():
     test.login(TEST_USER['username'], TEST_USER['password'],
         reverse("employees_index"))
     
-    # TODO
+    ##########  Clicking register new employee button 
+    ###         redirects user to employee register page.
+    try:
+        test.find("#register_employee").click()
+        sleep(3)
+        parts[0]['success'] = test.is_current_url(reverse("employee_register"))
+    except Exception as e:
+        print e
+        parts[0]['test_message'] = str(e)
     
+    ##########  New registered employee is immediately placed
+    ###         in the approved group.
+    try:
+        selectors = (
+            ("#id_email", TEST_EMPLOYEE['email']),
+            ("#id_password", TEST_EMPLOYEE['password']),
+            ("#id_confirm_password", TEST_EMPLOYEE['password']),
+            ("#id_first_name", TEST_EMPLOYEE['first_name']),
+            ("#id_last_name", TEST_EMPLOYEE['last_name']),
+        )
+        test.action_chain(0, selectors, action="send_keys")
+        sleep(7)
+        test.open(reverse("employees_index"))
+        sleep(3)
+        parts[1]['success'] = test.find("#tab-body-approved-employees"+\
+            " div.tr a div.td.first_name_approved").text ==\
+            TEST_EMPLOYEE['first_name']
+        
+    except Exception as e:
+        print e
+        parts[1]['test_message'] = str(e)
+    
+    ##########  Access level of new employee is the same as
+    ###         the one chosen in the registration form.
+    try:
+        
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
 
 
 
-
+    # END OF ALL TESTS - cleanup
+    return test.tear_down() 
 
 
