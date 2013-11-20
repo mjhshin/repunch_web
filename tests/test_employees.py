@@ -1114,7 +1114,12 @@ def test_employee_access():
     try:
         request_redeem_pt("eiZa6Mzu7f")
         sleep(COMET_PULL_RATE+4)
-        
+        row = test.find("#tab-body-pending-redemptions div.tr")
+        test.find("//div[id='%s'])]/" % (row.get_attribute("id"),) +\
+            "div[contains(@class, 'redemption_redeem')]/a[2]",
+            type="xpath").click()
+        sleep(3)
+        parts[48]['success'] = row.text.__contains__("Successfully")
     except Exception as e:
         print e
         parts[48]['test_message'] = str(e)
@@ -1123,7 +1128,12 @@ def test_employee_access():
     try:
         request_redeem_pt("eiZa6Mzu7f")
         sleep(COMET_PULL_RATE+4)
-        # TODO
+        row = test.find("#tab-body-pending-redemptions div.tr")
+        test.find("//div[id='%s'])]/" % (row.get_attribute("id"),) +\
+            "div[contains(@class, 'redemption_redeem')]/a[1]",
+            type="xpath").click()
+        sleep(3)
+        parts[49]['success'] = row.text.__contains__("Successfully")
     except Exception as e:
         print e
         parts[49]['test_message'] = str(e)
