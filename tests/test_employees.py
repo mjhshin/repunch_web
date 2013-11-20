@@ -1230,7 +1230,7 @@ def test_employee_registration():
     ##########  Access level of new employee is the same as
     ###         the one chosen in the registration form.
     try:
-        
+        pass # TODO
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)

@@ -667,13 +667,21 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
             var promises = [];
             promises.push(patron.save());
             promises.push(store.save());
-	        promises.push(store.relation("PatronStores").query().count());
 
             return Parse.Promise.when(promises);	
             		
-	    }).then(function(patron, store, patronStoreCount) {
-	        console.log("Patron and Store save success. Posting to server.");
-	    
+	    }).then(function(patron, store) {
+	        console.log("Patron and Store save success.");
+	        return store.relation("PatronStores").query().count();
+	        
+	    },
+	    function(error) {
+	        console.log("Patron and Store save failed.");
+	        console.log(error);
+	        
+	    }).then(function(patronStoreCount) {
+	        console.log("PatronStore count query success. Posting to dashboard.");
+	        
 	    	Parse.Cloud.httpRequest({
             	method: "POST",
             	url: "<<COMET_RECEIVE_URL>>" + storeId,
@@ -688,9 +696,12 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 
 	    },
 	    function(error) {
-	        console.log("Patron and Store save failed.");
+	        console.log("PatronStore count query failed.");
 	        console.log(error);
-	        respose.error("error");
+	        // still success here because we accomplished what we wanted to do
+	        // even if we didn't manage to post the new PatronStore count to the dashboard.
+        	response.success(patronStore);
+	    
 	    });
 	    
     }
