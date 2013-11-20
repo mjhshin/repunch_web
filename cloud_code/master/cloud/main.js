@@ -624,7 +624,10 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	patron.id = patronId;
 	store.id = storeId;
 	
+	var storeQuery = new Parse.Query(Store);
+	var patronQuery = new Parse.Query(Store);
 	var patronStoreQuery = new Parse.Query(PatronStore);
+	
 	patronStoreQuery.equalTo("Patron", patron);
 	patronStoreQuery.equalTo("Store", store);
 	
@@ -632,7 +635,14 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
     patronStoreQuery.first().then(function(patronStore) {
         if(patronStore == null) {
             console.log("No existing PatronStore found.");
-			addPatronStore();
+            fetchPatronAndStore().then(function(patron, store) {
+			    addPatronStore(patron, store);
+			},
+			function(error) {
+			    console.log("Failed to fetch Patron and Store.");
+			    console.log(error);
+			    response.error("error");
+			});
 		}
 		else {
             console.log("Existing PatronStore found.");
@@ -640,8 +650,8 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		}
     });
     
-    function addPatronStore() {
-        console.log("Creating new PatronStore");
+    function addPatronStore(patron, store) {
+        console.log("Creating new PatronStore.");
     
         var patronStore = new PatronStore();
 	    patronStore.set("all_time_punches", 0);
@@ -654,14 +664,16 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 			patron.relation("PatronStores").add(patronStore);
 			store.relation("PatronStores").add(patronStore);
 			
-	        var promises = [];
-	        promises.push(patron.save());
-	        promises.push(store.save());
+            var promises = [];
+            promises.push(patron.save());
+            promises.push(store.save());
 	        promises.push(store.relation("PatronStores").query().count());
 
             return Parse.Promise.when(promises);	
             		
 	    }).then(function(patron, store, patronStoreCount) {
+	        console.log("Patron and Store save success. Posting to server.");
+	    
 	    	Parse.Cloud.httpRequest({
             	method: "POST",
             	url: "<<COMET_RECEIVE_URL>>" + storeId,
@@ -673,9 +685,24 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
         	});
         
         	response.success(patronStore);
-	    	
+
+	    },
+	    function(error) {
+	        console.log("Patron and Store save failed.");
+	        console.log(error);
+	        respose.error("error");
 	    });
 	    
+    }
+    
+    function fetchPatronAndStore() {
+        console.log("Fetching Patron and Store in parallel.");
+        
+        var promises = [];
+        promises.push(patron.fetch());
+        promises.push(store.fetch());
+
+        return Parse.Promise.when(promises);	
     }
 
 });
