@@ -69,7 +69,6 @@ class PatronStore(ParseObject):
         self.all_time_punches = data.get('all_time_punches', 0)
         # this is for rewards only! not offers!
         self.pending_reward = data.get("pending_reward", False)
-        self.punch_code = data.get("punch_code")
         
         self.Patron = data.get("Patron")
         self.Store = data.get("Store")
@@ -82,7 +81,7 @@ class PatronStore(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "punch_code", "punch_count", "all_time_punches",
+        return (cls, "punch_count", "all_time_punches",
             "pending_reward", "Patron", "Store")
 
     def get_class(self, className):
