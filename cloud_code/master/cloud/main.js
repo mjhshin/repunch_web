@@ -875,11 +875,16 @@ Parse.Cloud.define("punch", function(request, response)
 	var storeQuery = new Parse.Query(Store);
 	var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	
+	// subtract 1 compound query to patronStoreQuery.
+	var store = new Store();
+	store.id = storeId;
    
 	patronQuery.equalTo("punch_code", punchCode);
 	storeQuery.equalTo("objectId", storeId);
-	patronStoreQuery.equalTo("punch_code", punchCode);
-	patronStoreQuery.matchesQuery("Store", storeQuery);
+	
+	patronStoreQuery.matchesQuery("Patron", patronQuery);
+	patronStoreQuery.equalTo("Store", store);
 	patronStoreQuery.include("Patron");
 	patronStoreQuery.include("Store");
 	
@@ -925,7 +930,6 @@ Parse.Cloud.define("punch", function(request, response)
 				patronStore.set("all_time_punches", numPunches);
 				patronStore.set("pending_reward", false);
 				patronStore.set("Patron", patronResult);
-				patronStore.set("punch_code", punchCode);
 				
 				storeQuery.first().then(function(storeResult) {
 					console.log("Store query success");
