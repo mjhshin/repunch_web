@@ -22,7 +22,7 @@ class CloudCodeTest(object):
     def get_results(self):
         return self._results
     
-    def testit(self, test, verbose=True):
+    def testit(self, test, verbose=False):
         """
         test is a function that must return a bool.
         If a str is returned, then the test is a fail and the str

@@ -45,23 +45,6 @@ def test_add_delete_patronstore():
         {'test_name': "Delete_patronstore deletes the PatronStore"},
         {'test_name': "PatronStore is removed from the Patron's PatronStores relation"},
         {'test_name': "PatronStore is removed from the Store's PatronStores relation"},
-        ###
-        {'test_name': "Punch creates a new PatronStore if does not exist"},
-        {'test_name': "PatronStore is added to Patron's PatronStores relation"},
-        {'test_name': "PatronStore is added to Store's PatronStores relation"},
-        {'test_name': "PatronStore's Patron pointer is set"},
-        {'test_name': "PatronStore's Store pointer is set"},
-        {'test_name': "PatronStore's all_time_punches is set to 0"},
-        {'test_name': "PatronStore's punch_count is set to 0"},
-        {'test_name': "PatronStore's pending_reward is set to false"},
-        
-        {'test_name': "Add_patronstore returns existing PatronStore"},
-        {'test_name': "PatronStore is in the Patron's PatronStores relation"},
-        {'test_name': "PatronStore is in the Store's PatronStores relation"},
-        
-        {'test_name': "Delete_patronstore deletes the PatronStore"},
-        {'test_name': "PatronStore is removed from the Patron's PatronStores relation"},
-        {'test_name': "PatronStore is removed from the Store's PatronStores relation"},
     ])
     
     ##########  Add_patronstore creates a new PatronStore if does not exist
@@ -86,14 +69,14 @@ def test_add_delete_patronstore():
     ##########  PatronStore is added to Patron's PatronStores relation
     def test_1():
         return patron.get("patronStores", count=1, limit=0,
-            objectId=patron_store.objectId) is not None
+            objectId=patron_store.objectId) == 1
     
     test.testit(test_1)
     
     ##########  PatronStore is added to Store's PatronStores relation
     def test_2():
         return store.get("patronStores", count=1, limit=0,
-            objectId=patron_store.objectId) is not None
+            objectId=patron_store.objectId) == 1
     
     test.testit(test_2)
     
@@ -128,32 +111,72 @@ def test_add_delete_patronstore():
     test.testit(test_7)
     
         
-    ##########  Add_patronstore returns existing PatronStore TODO
-    ##########  PatronStore is in the Patron's PatronStores relation TODO
-    ##########  PatronStore is in the Store's PatronStores relation TODO
+    ##########  Add_patronstore returns existing PatronStore
+    def test_8():
+        if PatronStore.objects().count(\
+            objectId=patron_store.objectId) == 0:
+            return "PatronStore does not exists. Test is invalid."
+            
+        cloud_call("add_patronstore", {
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+        })
         
-    ##########  Delete_patronstore deletes the PatronStore TODO
-    ##########  PatronStore is removed from the Patron's PatronStores relation TODO
-    ##########  PatronStore is removed from the Store's PatronStores relation TODO
+        return PatronStore.objects().count(Patron=patron.objectId,
+            Store=store.objectId) == 1 and\
+            PatronStore.objects().get(Patron=patron.objectId,
+            Store=store.objectId).objectId == patron_store.objectId
     
-    ###
+    test.testit(test_8)
+    
+    patron_store = PatronStore.objects().get(Patron=patron.objectId,
+            Store=store.objectId)
+    
+    ##########  PatronStore is in the Patron's PatronStores relation
+    def test_9():
+        return patron.get("patronStores", count=1, limit=0,
+            objectId=patron_store.objectId) == 1
+    
+    test.testit(test_9)
+    
+    ##########  PatronStore is in the Store's PatronStores relation 
+    def test_10():
+        return store.get("patronStores", count=1, limit=0,
+            objectId=patron_store.objectId) == 1
+    
+    test.testit(test_10)
         
-    ##########  Punch creates a new PatronStore if does not exist TODO
-    ##########  PatronStore is added to Patron's PatronStores relation TODO
-    ##########  PatronStore is added to Store's PatronStores relation TODO
-    ##########  PatronStore's Patron pointer is set TODO
-    ##########  PatronStore's Store pointer is set TODO
-    ##########  PatronStore's all_time_punches is set to 0 TODO
-    ##########  PatronStore's punch_count is set to 0 TODO
-    ##########  PatronStore's pending_reward is set to false TODO
+    ##########  Delete_patronstore deletes the PatronStore 
+    def test_11():
+        if PatronStore.objects().count(\
+            objectId=patron_store.objectId) == 0:
+            return "PatronStore does not exists. Test is invalid."
+    
+        cloud_call("delete_patronstore", {
+            "patron_store_id": patron_store.objectId,
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+        })
         
-    ##########  Add_patronstore returns existing PatronStore TODO
-    ##########  PatronStore is in the Patron's PatronStores relation TODO
-    ##########  PatronStore is in the Store's PatronStores relation TODO
-        
-    ##########  Delete_patronstore deletes the PatronStore TODO
-    ##########  PatronStore is removed from the Patron's PatronStores relation TODO
-    ##########  PatronStore is removed from the Store's PatronStores relation TODO
+        return PatronStore.objects().count(\
+            objectId=patron_store.objectId) == 0
+    
+    test.testit(test_11)
+    
+    ##########  PatronStore is removed from the Patron's PatronStores relation 
+    def test_12():
+        return patron.get("patronStores", count=1, limit=0,
+            objectId=patron_store.objectId) == 0
+    
+    test.testit(test_12)
+    
+    ##########  PatronStore is removed from the Store's PatronStores relation 
+    def test_13():
+        return store.get("patronStores", count=1, limit=0,
+            objectId=patron_store.objectId) == 0
+    
+    test.testit(test_13)
+    
     
     # END OF ALL TESTS - cleanup
     return test.get_results()

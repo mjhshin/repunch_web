@@ -12,6 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         results = []
         
-        results.extend(test_add_delete_patronstore()) 
+        for i in range(100):
+            results.extend(test_add_delete_patronstore()) 
         
         send_email_cloud_test_results(results)
