@@ -659,7 +659,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	    patronStore.set("pending_reward", false);
 	    patronStore.set("Store", store);
 	    patronStore.set("Patron", patron);
-	    
+
 	    patronStore.save().then(function(patronStore) {
 			patron.relation("PatronStores").add(patronStore);
 			store.relation("PatronStores").add(patronStore);
@@ -941,7 +941,7 @@ Parse.Cloud.define("punch", function(request, response)
 				patronStore.set("all_time_punches", numPunches);
 				patronStore.set("pending_reward", false);
 				patronStore.set("Patron", patronResult);
-				
+
 				storeQuery.first().then(function(storeResult) {
 					console.log("Store query success");
 					patronStore.set("Store", storeResult);
