@@ -11,7 +11,7 @@ import re
 
 from tests import SeleniumTest
 from parse.test import register_employee, register_rand_employee,\
-request_redeem_pt
+request_redeem_ps
 from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.employees import PENDING, APPROVED
@@ -1116,7 +1116,7 @@ def test_employee_access():
         
     ##########  Employee can reject redeem 
     try:
-        request_redeem_pt("eiZa6Mzu7f")
+        request_redeem_ps("eiZa6Mzu7f")
         sleep(COMET_PULL_RATE*2+4)
         row = test.find("#tab-body-pending-redemptions div.tr")
         test.find("//div[@id='%s']/" % (row.get_attribute("id"),) +\
@@ -1130,7 +1130,7 @@ def test_employee_access():
         
     ##########  Employee can validate redeem
     try:
-        request_redeem_pt("eiZa6Mzu7f")
+        request_redeem_ps("eiZa6Mzu7f")
         sleep(COMET_PULL_RATE*2+4)
         row = test.find("#tab-body-pending-redemptions div.tr")
         test.find("//div[@id='%s']/" % (row.get_attribute("id"),) +\

@@ -7,7 +7,9 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
+from parse.test import request_redeem_ps
 from parse.apps.accounts.models import Account
+from repunch.settings import COMET_PULL_RATE
 
 TEST_USER = {
     "username": "violette87@repunch.com",
@@ -18,9 +20,8 @@ def test_punch():
     """
     Tests for punch customers section of the workbench.
 
-    Assumes that at least 1 PatronStore exists for the above Account.
+    Assumes that at least 1 PatronStore exists for the above Store.
     """
-    # retrieve a patronstore
     account = Account.objects().get(username=TEST_USER['username'],
         include="Store.Settings")
     store = account.store
@@ -183,16 +184,37 @@ def test_punch():
 def test_redemptions():
     """
     Tests for redemptions section of the workbench.
+    Does not test offers/gifts.
+    
+    Assumes that at least 1 PatronStore exists for the above Store.
+    Assumes that at least 1 reward exists for the above Store.
     """
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Settings")
+    store = account.store
+    settings = store.settings
+    ps = store.get("patronStores", include="Patron", limit=1)[0]
+    patron = ps.patron
+    
+    reward = store.rewards[0]
+    reward_id = reward["reward_id"]
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
         {'test_name': "Approving redeem works"},
+        {'test_name': "PatronStore's punch_count is updated"},
+        {'test_name': "PatronStore's pending_reward is set to false"},
+        {'test_name': "The reward's redemption_count is updated"},
         {'test_name': "Rejecting redeem works"},
+        {'test_name': "PatronStore's punch_count remains the same"},
+        {'test_name': "PatronStore's pending_reward is set to false"},
         {'test_name': "Approved redeem is in the history tab"},
         {'test_name': "Rejected redeem is not in the history tab"},
         {'test_name': "Approving a redeem when the PatronStore does" +\
             " not have enough punches shows error"},
+        {'test_name': "PatronStore's punch_count remains the same"},
+        {'test_name': "PatronStore's pending_reward is set to false"},
         {'test_name': "Approving redeem from a PatronStore that does" +\
             " not exist shows error"},
     ]
@@ -217,33 +239,82 @@ def test_redemptions():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
         
-    ##########  Approving redeem works TODO
+    ##########  Approving redeem works
     try:
-        pass 
+        punch_count = ps.punch_count
+        red_count = reward["redemption_count"]
+    
+        request_redeem_ps(ps.objectId, reward_id=reward_id, num_punches=1)
+        sleep(COMET_PULL_RATE*2+4)
+        row_id = test.find("#tab-body-pending-redemptions div.tr").get_attribute("id")
+        test.find("//div[@id='tab-body-pending-redemptions']/"+\
+            "div[contains(@class, 'tr')]/"+\
+            "div[contains(@class, 'redemption_redeem')]/a[1]", type="xpath").click()
+        sleep(4)
+        parts[1]['success'] = test.find("#"+row_id).text.__contains__("Successfully")
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
+        
+    ##########  PatronStore's punch_count is updated
+    try:
+        ps.punch_count = None
+        parts[2]['success'] = punch_count-1 == ps.get("punch_count")
+    except Exception as e:
+        print e
+        parts[2]['test_message'] = str(e)
+        
+    ##########  PatronStore's pending_reward is set to false
+    try:
+        ps.pending_reward = None
+        parts[3]['success'] = not ps.get("pending_reward")
+    except Exception as e:
+        print e
+        parts[3]['test_message'] = str(e)
+        
+    ##########  The reward's redemption_count is updated
+    try:
+        store.rewards = None
+        parts[4]['success'] = red_count+1 ==\
+            store.get("rewards")[0]["redemption_count"]
+    except Exception as e:
+        print e
+        parts[4]['test_message'] = str(e)
         
     ##########  Rejecting redeem works TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[2]['test_message'] = str(e)
+        parts[5]['test_message'] = str(e)
+        
+    ##########  PatronStore's punch_count remains the same TODO
+    try:
+        pass 
+    except Exception as e:
+        print e
+        parts[6]['test_message'] = str(e)
+        
+    ##########  PatronStore's pending_reward is set to false TODO
+    try:
+        pass 
+    except Exception as e:
+        print e
+        parts[7]['test_message'] = str(e)
         
     ##########  Approved redeem is in the history tab TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[3]['test_message'] = str(e)
+        parts[8]['test_message'] = str(e)
         
     ##########  Rejected redeem is not in the history tab TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[4]['test_message'] = str(e)
+        parts[9]['test_message'] = str(e)
         
     ##########  Approving a redeem when the PatronStore does
     ###         not have enough punches shows error TODO
@@ -251,7 +322,22 @@ def test_redemptions():
         pass 
     except Exception as e:
         print e
-        parts[5]['test_message'] = str(e)
+        parts[10]['test_message'] = str(e)
+        
+    ##########  PatronStore's punch_count remains the same TODO
+    try:
+        pass 
+    except Exception as e:
+        print e
+        parts[11]['test_message'] = str(e)
+        
+    ##########  PatronStore's pending_reward is set to false TODO
+    try:
+        pass 
+    except Exception as e:
+        print e
+        parts[12]['test_message'] = str(e)
+        
         
     ##########  Approving redeem from a PatronStore that does
     ###         not exist shows error TODO
@@ -259,9 +345,8 @@ def test_redemptions():
         pass 
     except Exception as e:
         print e
-        parts[6]['test_message'] = str(e)
+        parts[13]['test_message'] = str(e)
         
-    
     
     # END OF ALL TESTS - cleanup
     return test.tear_down() 

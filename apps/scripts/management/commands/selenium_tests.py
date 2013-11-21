@@ -17,7 +17,7 @@ from tests.test_messages import test_messages, test_feedbacks
 from tests.test_employees import test_employees, test_employee_access,\
 test_employee_registration
 from tests.test_settings import test_settings
-from tests.test_workbench import test_punch
+from tests.test_workbench import test_punch, test_redemptions
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -56,8 +56,8 @@ class Command(BaseCommand):
         #results.extend(test_settings())
         
         ### WORKBENCH
-        results.extend(test_punch()) 
-        #results.extend(test_redemptions()) TODO 
+        #results.extend(test_punch()) 
+        results.extend(test_redemptions()) 
         
         ### ACCOUNT SETTINGS
         #results.extend(test_account_settings()) TODO 
