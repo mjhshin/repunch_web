@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
+from parse.apps.accounts.models import Account
 
 TEST_USER = {
     "username": "violette87@repunch.com",
@@ -16,11 +17,23 @@ TEST_USER = {
 def test_punch():
     """
     Tests for punch customers section of the workbench.
+
+    Assumes that at least 1 PatronStore exists for the above Account.
     """
+    # retrieve a patronstore
+    account = Account.objects().get(username=TEST_USER['username'],
+        include="Store.Settings")
+    store = account.store
+    settings = store.settings
+    ps = store.get("patronStores", include="Patron", limit=1)[0]
+    patron = ps.patron
+    
     test = SeleniumTest()
     parts = [
         {'test_name': "User needs to be logged in to access page"},
         {'test_name': "Punching works"},
+        {'test_name': "PatronStore punch_count is updated"},
+        {'test_name': "PatronStore all_time_punches is updated"},
         {'test_name': "Punch Code is required"},
         {'test_name': "Punch Codes consist of only numbers"},
         {'test_name': "Punch Codes are 5 characters long"},
@@ -50,69 +63,118 @@ def test_punch():
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
     
-    ##########  User needs to be logged in to access page TODO
+    def punch(punch_code="", punch_amount="", sleep_prior=0,
+        sleep_after=0):
+        if sleep_prior > 0:
+            sleep(sleep_prior)
+        test.find("#punch_code").clear()
+        test.find("#punch_amount").clear()
+        test.find("#punch_code").send_keys(punch_code)
+        test.find("#punch_amount").send_keys(punch_amount)
+        test.find("#punch-form a.button.blue").click()
+        if sleep_after > 0:
+            sleep(sleep_after)
+        
+    ##########  Punching works
     try:
-        pass 
+        punch_count, all_time_punches =\
+            ps.punch_count, ps.all_time_punches
+        
+        punch(patron.punch_code, "1", sleep_after=3)
+        parts[1]['success'] =\
+            test.find("#punch-notification") is not None
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
         
-    ##########  Punching works TODO
+    ##########  PatronStore punch_count is updated
     try:
-        pass 
+        ps.punch_count = None
+        parts[2]['success'] = punch_count == ps.get("punch_count")
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
         
-    ##########  Punch Code is required TODO
+    ##########  PatronStore all_time_punches is updated
     try:
-        pass 
+        ps.all_time_punches = None
+        parts[2]['success'] =\
+            all_time_punches == ps.get("all_time_punches")
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
         
-    ##########  Punch Codes consist of only numbers TODO
+    ##########  Punch Code is required
     try:
-        pass 
+        punch(sleep_prior=5, sleep_after=1)
+        parts[4]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Please enter the customer's punch code."
     except Exception as e:
         print e
         parts[4]['test_message'] = str(e)
         
-    ##########  Punch Codes are 5 characters long TODO
+    ##########  Punch Codes consist of only numbers
     try:
-        pass 
+        punch("123ab", sleep_prior=5, sleep_after=1)
+        parts[5]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Punch Codes consist of only numbers."
     except Exception as e:
         print e
         parts[5]['test_message'] = str(e)
         
-    ##########  Amount of punches is required TODO
+    ##########  Punch Codes are 5 characters long
     try:
-        pass 
+        punch("123", sleep_prior=5, sleep_after=1)
+        parts[6]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Punch Codes are 5 characters long."
     except Exception as e:
         print e
         parts[6]['test_message'] = str(e)
         
-    ##########  Amount should no            " t exceed maximum employee punches allowed TODO
+    ##########  Amount of punches is required
     try:
-        pass 
+        punch(patron.punch_code, sleep_prior=5, sleep_after=1)
+        parts[7]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Punch Codes are 5 characters long."
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
         
-    ##########  Amount must be greater than 0 TODO
+    ##########  Amount should not exceed maximum employee punches allowed
     try:
-        pass 
+        punch(patron.punch_code, str(settings.punches_employee+1),
+            sleep_prior=5, sleep_after=1)
+        parts[8]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Maximum amount of punches is %s." % (str(settings.punches_employee),)
     except Exception as e:
         print e
         parts[8]['test_message'] = str(e)
         
-    ##########  Non-existent Punch Code shows approprirate message TODO
+    ##########  Amount must be greater than 0
     try:
-        pass 
+        punch(patron.punch_code, "-1", sleep_prior=5, sleep_after=1)
+        parts[9]['success'] =\
+            test.find("#punch-notification").text ==\
+            "Amount of punches must be greater than 0."
     except Exception as e:
         print e
         parts[9]['test_message'] = str(e)
         
+    ##########  Non-existent Punch Code shows approprirate message
+    try:
+        punch("39393", "1", sleep_prior=5, sleep_after=1)
+        parts[10]['success'] =\
+            test.find("#punch-notification").text ==\
+            "A customer with that Punch Code was not found."
+        pass 
+    except Exception as e:
+        print e
+        parts[10]['test_message'] = str(e)
     
     
     # END OF ALL TESTS - cleanup
@@ -154,42 +216,34 @@ def test_redemptions():
     )
     test.action_chain(0, selectors, "send_keys") # ACTION!
     sleep(5) 
-    
-    
-    ##########  User needs to be logged in to access page TODO
-    try:
-        pass 
-    except Exception as e:
-        print e
-        parts[1]['test_message'] = str(e)
         
     ##########  Approving redeem works TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[2]['test_message'] = str(e)
+        parts[1]['test_message'] = str(e)
         
     ##########  Rejecting redeem works TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[3]['test_message'] = str(e)
+        parts[2]['test_message'] = str(e)
         
     ##########  Approved redeem is in the history tab TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[4]['test_message'] = str(e)
+        parts[3]['test_message'] = str(e)
         
     ##########  Rejected redeem is not in the history tab TODO
     try:
         pass 
     except Exception as e:
         print e
-        parts[5]['test_message'] = str(e)
+        parts[4]['test_message'] = str(e)
         
     ##########  Approving a redeem when the PatronStore does
     ###         not have enough punches shows error TODO
@@ -197,7 +251,7 @@ def test_redemptions():
         pass 
     except Exception as e:
         print e
-        parts[6]['test_message'] = str(e)
+        parts[5]['test_message'] = str(e)
         
     ##########  Approving redeem from a PatronStore that does
     ###         not exist shows error TODO
@@ -205,7 +259,7 @@ def test_redemptions():
         pass 
     except Exception as e:
         print e
-        parts[7]['test_message'] = str(e)
+        parts[6]['test_message'] = str(e)
         
     
     
