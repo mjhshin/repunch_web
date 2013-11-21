@@ -90,7 +90,7 @@ def test_punch():
     ##########  PatronStore punch_count is updated
     try:
         ps.punch_count = None
-        parts[2]['success'] = punch_count == ps.get("punch_count")
+        parts[2]['success'] = punch_count+1 == ps.get("punch_count")
     except Exception as e:
         print e
         parts[2]['test_message'] = str(e)
@@ -98,8 +98,8 @@ def test_punch():
     ##########  PatronStore all_time_punches is updated
     try:
         ps.all_time_punches = None
-        parts[2]['success'] =\
-            all_time_punches == ps.get("all_time_punches")
+        parts[3]['success'] =\
+            all_time_punches+1 == ps.get("all_time_punches")
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
@@ -139,7 +139,7 @@ def test_punch():
         punch(patron.punch_code, sleep_prior=5, sleep_after=1)
         parts[7]['success'] =\
             test.find("#punch-notification").text ==\
-            "Punch Codes are 5 characters long."
+            "Please enter the number of punches to give."
     except Exception as e:
         print e
         parts[7]['test_message'] = str(e)
