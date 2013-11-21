@@ -24,7 +24,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCode) {
 		console.log("PunchCode fetch success.");
         punchCode.set("is_taken", true);
-        punchCode.set("username", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCode.set("user_id", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
         											//since facebook users may not have email available.
 		return punchCode.save();
 			
@@ -659,7 +659,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	    patronStore.set("pending_reward", false);
 	    patronStore.set("Store", store);
 	    patronStore.set("Patron", patron);
-	    
+
 	    patronStore.save().then(function(patronStore) {
 			patron.relation("PatronStores").add(patronStore);
 			store.relation("PatronStores").add(patronStore);
@@ -941,7 +941,7 @@ Parse.Cloud.define("punch", function(request, response)
 				patronStore.set("all_time_punches", numPunches);
 				patronStore.set("pending_reward", false);
 				patronStore.set("Patron", patronResult);
-				
+
 				storeQuery.first().then(function(storeResult) {
 					console.log("Store query success");
 					patronStore.set("Store", storeResult);
