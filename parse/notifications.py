@@ -459,7 +459,46 @@ def send_email_selenium_test_results(tests, connection=None):
             template = Template(f.read())
             
         date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
-        subject = "Repunch Inc. Selenium test results."
+        subject = "Repunch Inc. Selenium Test Results."
+        ctx = get_notification_ctx()
+        ctx.update({'date':date, 'tests':tests})
+        timezone.activate(pytz.timezone(TIME_ZONE))
+        body = template.render(Context(ctx)).__str__()
+        timezone.deactivate()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), EMAIL_FROM,
+                    [ADMINS[0][1]])
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
+   
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
+        
+def send_email_cloud_test_results(tests, connection=None):
+    """
+    Used by cloud code tests to send the results of the test to ADMINS.
+    tests has the following format:
+        tests = [
+            {'section_name": section1,
+                'parts': [ {'success':True, 'test_name':test1,
+                            'test_message':'...'}, ... ],
+            ...
+        ]
+        
+    Email is sent only to repunch.settings.ADMINS[0][1]
+    """
+    def _wrapper():
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-cloud-test-results.html",
+                'r') as f:
+            template = Template(f.read())
+            
+        date = timezone.localtime(timezone.now(),pytz.timezone(TIME_ZONE))
+        subject = "Repunch Inc. Cloud Code Test Results."
         ctx = get_notification_ctx()
         ctx.update({'date':date, 'tests':tests})
         timezone.activate(pytz.timezone(TIME_ZONE))

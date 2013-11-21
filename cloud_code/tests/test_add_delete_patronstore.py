@@ -16,8 +16,8 @@ def test_add_delete_patron_store():
     results = []
     parts = [
         {'test_name': "Non-existent PatronStore is created"},
-        {'test_name': "PatronStore is add to Patron's PatronStores relation"},
-        {'test_name': "PatronStore is add to Store's PatronStores relation"},
+        {'test_name': "PatronStore is added to Patron's PatronStores relation"},
+        {'test_name': "PatronStore is added to Store's PatronStores relation"},
     ]
     section = {
         "section_name": "ADD_PATRONSTORE",
