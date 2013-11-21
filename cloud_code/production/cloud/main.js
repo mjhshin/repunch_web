@@ -24,7 +24,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCode) {
 		console.log("PunchCode fetch success.");
         punchCode.set("is_taken", true);
-        punchCode.set("username", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCode.set("user_id", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
         											//since facebook users may not have email available.
 		return punchCode.save();
 			
@@ -478,8 +478,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 Parse.Cloud.define("delete_employee", function(request, response) 
 {
     var employeeId = request.params.employee_id;
-    var action = request.params.action;
-    
+
     var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
     
     var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
@@ -608,97 +607,115 @@ Parse.Cloud.define("delete_employee", function(request, response)
 
 ////////////////////////////////////////////////////
 //
-// 
+//  
 // 
 ////////////////////////////////////////////////////
 Parse.Cloud.define("add_patronstore", function(request, response) {
     var patronId = request.params.patron_id;
 	var storeId = request.params.store_id;
 	
-	var PatronStore = Parse.Object.extend("PatronStore");
 	var Store = Parse.Object.extend("Store");
 	var Patron = Parse.Object.extend("Patron");
+	var PatronStore = Parse.Object.extend("PatronStore");
 	
-	var patronStore = new PatronStore();
-	var store = new Store();
 	var patron = new Patron();
+	var store = new Store();
+	
+	patron.id = patronId;
+	store.id = storeId;
 	
 	var storeQuery = new Parse.Query(Store);
-	var patronQuery = new Parse.Query(Patron);
+	var patronQuery = new Parse.Query(Store);
+	var patronStoreQuery = new Parse.Query(PatronStore);
 	
-	store.id = storeId;
-	patron.id = patronId;
+	patronStoreQuery.equalTo("Patron", patron);
+	patronStoreQuery.equalTo("Store", store);
 	
-	patronStore.set("all_time_punches", 0);
-	patronStore.set("punch_count", 0);
-	patronStore.set("pending_reward", false);
-	patronStore.set("Store", store);
-	patronStore.set("Patron", patron);
-	
-	patronStore.save().then(function(patronStore) {
-		console.log("PatronStore save success.");
-		return patronQuery.get(patronId);
-		
-	}, function(error) {
-		console.log("PatronStore save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(patron) {
-		console.log("Patron fetch success.");
-		patron.relation("PatronStores").add(patronStore);
-		return patron.save();
-		
-	}, function(error) {
-		console.log("Patron fetch failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(patron) {
-		console.log("Patron save success.");
-		return storeQuery.get(storeId);
-		
-	}, function(error) {
-		console.log("Patron save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(store) {
-		console.log("Store fetch success.");
-		store.relation("PatronStores").add(patronStore);
-		return store.save();
-		
-	}, function(error) {
-		console.log("Store fetch failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(store) {
-		console.log("Store save success.");
-		// calling response.success here will prevent the following promises from executing!
-		// response.success(patronStore);
-	    return store.relation("PatronStores").query().count();
-		
-	}, function(error) {
-		console.log("Store save failed.");
-		response.error("error");
-		return;
-		
-	}).then(function(patronStoreCount) {
-        Parse.Cloud.httpRequest({
-            method: "POST",
-            url: "https://www.repunch.com/manage/comet/receive/" + storeId,
-            headers: { "Content-Type": "application/json"},
-            body: { 
-                "cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
-                patronStore_int: patronStoreCount,
-            }
-        });
+	// first check if the PatronStore already exists
+    patronStoreQuery.first().then(function(patronStore) {
+        if(patronStore == null) {
+            console.log("No existing PatronStore found.");
+            fetchPatronAndStore().then(function(patron, store) {
+			    addPatronStore(patron, store);
+			},
+			function(error) {
+			    console.log("Failed to fetch Patron and Store.");
+			    console.log(error);
+			    response.error("error");
+			});
+		}
+		else {
+            console.log("Existing PatronStore found.");
+			response.success(patronStore);
+		}
+    });
+    
+    function addPatronStore(patron, store) {
+        console.log("Creating new PatronStore.");
+    
+        var patronStore = new PatronStore();
+	    patronStore.set("all_time_punches", 0);
+	    patronStore.set("punch_count", 0);
+	    patronStore.set("pending_reward", false);
+	    patronStore.set("Store", store);
+	    patronStore.set("Patron", patron);
+
+	    patronStore.save().then(function(patronStore) {
+			patron.relation("PatronStores").add(patronStore);
+			store.relation("PatronStores").add(patronStore);
+			
+            var promises = [];
+            promises.push(patron.save());
+            promises.push(store.save());
+
+            return Parse.Promise.when(promises);	
+            		
+	    }).then(function(patron, store) {
+	        console.log("Patron and Store save success.");
+	        return store.relation("PatronStores").query().count();
+	        
+	    },
+	    function(error) {
+	        console.log("Patron and Store save failed.");
+	        console.log(error);
+	        
+	    }).then(function(patronStoreCount) {
+	        console.log("PatronStore count query success. Posting to dashboard.");
+	        
+	    	Parse.Cloud.httpRequest({
+            	method: "POST",
+            	url: "https://www.repunch.com/manage/comet/receive/" + storeId,
+            	headers: { "Content-Type": "application/json"},
+            	body: { 
+                	"cometrkey": "f2cwxn35cxyoq8723c78wnvy", 
+                	patronStore_int: patronStoreCount,
+            	}
+        	});
         
-        response.success(patronStore);
+        	response.success(patronStore);
+
+	    },
+	    function(error) {
+	        console.log("PatronStore count query failed.");
+	        console.log(error);
+	        // still success here because we accomplished what we wanted to do
+	        // even if we didn't manage to post the new PatronStore count to the dashboard.
+        	response.success(patronStore);
+	    
+	    });
+	    
+    }
+    
+    function fetchPatronAndStore() {
+        console.log("Fetching Patron and Store in parallel.");
         
-	});
-	
+        var promises = [];
+        promises.push(patron.fetch());
+        promises.push(store.fetch());
+
+        return Parse.Promise.when(promises);	
+    }
+
 });
 
 ////////////////////////////////////////////////////
@@ -869,11 +886,16 @@ Parse.Cloud.define("punch", function(request, response)
 	var storeQuery = new Parse.Query(Store);
 	var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	var iosInstallationQuery = new Parse.Query(Parse.Installation);
+	
+	// subtract 1 compound query to patronStoreQuery.
+	var store = new Store();
+	store.id = storeId;
    
 	patronQuery.equalTo("punch_code", punchCode);
 	storeQuery.equalTo("objectId", storeId);
+	
 	patronStoreQuery.matchesQuery("Patron", patronQuery);
-	patronStoreQuery.matchesQuery("Store", storeQuery);
+	patronStoreQuery.equalTo("Store", store);
 	patronStoreQuery.include("Patron");
 	patronStoreQuery.include("Store");
 	
@@ -919,7 +941,7 @@ Parse.Cloud.define("punch", function(request, response)
 				patronStore.set("all_time_punches", numPunches);
 				patronStore.set("pending_reward", false);
 				patronStore.set("Patron", patronResult);
-				
+
 				storeQuery.first().then(function(storeResult) {
 					console.log("Store query success");
 					patronStore.set("Store", storeResult);
@@ -1091,7 +1113,7 @@ Parse.Cloud.define("punch", function(request, response)
 				}
 						
 		}, function(error) {
-				console.log("Employee fetch failed.");
+				console.log("Store save failed.");
 				response.error("error");	
 				
 		}).then(function(employee) {
@@ -1103,7 +1125,8 @@ Parse.Cloud.define("punch", function(request, response)
 				}
 				
 		}, function(error) {
-				console.log("Employee save failed.");
+				console.log("Employee fetch failed.");
+				// undo changes above
 				response.error("error");	
 				
 		}).then(function(employee) {
