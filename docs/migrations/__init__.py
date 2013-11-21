@@ -2,6 +2,7 @@
 Database migration transcripts.
 """ 
 
+from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import Patron, PunchCode, PatronStore
 
 def rename_punchcode_username_to_userid():
