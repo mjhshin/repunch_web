@@ -117,7 +117,7 @@ def test_punch():
             return "PatronStore already existed. Test is invalid."
             
         return PatronStore.objects().count(\
-            Patron=patron.objectId, Store=store.objectId)
+            Patron=patron.objectId, Store=store.objectId) == 1
     
     test.testit(test_6)
     

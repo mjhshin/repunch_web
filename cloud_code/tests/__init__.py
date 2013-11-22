@@ -35,7 +35,7 @@ class CloudCodeTest(object):
         test_num = int(test.__name__.split("_")[-1])
         
         if verbose:
-            print "Test #%s:" % (str(test_num),)
+            log = "Test #%s:\t" % (str(test_num),)
             
         try:
             result = test()
@@ -45,10 +45,16 @@ class CloudCodeTest(object):
                 self.tests[test_num]["success"] = result
                 
             if verbose:
-                print str(type(result) is bool and result)
+                if str(type(result) is bool and result):
+                    log += "Success"
+                else:
+                    log += "Fail"
                 
         except Exception as e:
             if verbose:
-                print "Error: %s\n\n" % (e, )
+                log += "Error: %s\n\n" % (e, )
                 
             self.tests[test_num]["test_message"] = str(e)
+        finally:
+            if verbose:
+                print log
