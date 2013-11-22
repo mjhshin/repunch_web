@@ -23,8 +23,7 @@ def test_add_delete_patronstore():
     if store.get("patronStores"):
         for ps in store.patronStores:
             ps.delete()
-        
-    store.patronStores = None
+        store.patronStores = None
     
     test = CloudCodeTest("ADD/DELETE_PATRONSTORE", [
         {'test_name': "Add_patronstore creates a new PatronStore if does not exist"},
