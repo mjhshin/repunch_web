@@ -169,16 +169,69 @@ def test_punch():
     
     test.testit(test_13)
     
-    ##########  Punch creates a new Punch object (from dashboard - owner) TODO
-    ##########  Punch object is added to Store's Punches relation TODO
-    ##########  Patron pointer is set TODO
-    ##########  Punches is set to correct amount TODO
-    ##########  PatronStore's punch_count is updated TODO
-    ##########  PatronStore's all_time_punches is updated TODO
+    punch.delete()
+    
+    ##########  Punch creates a new Punch object (from dashboard - owner)
+    def test_14():
+        if Punch.objects().count(Patron=patron.objectId) > 0:
+            return "Punches for the Store exists. Test is invalid."
         
-    ##########  Using unused punch_code returns error with PATRON_NOT_FOUND TODO
+        cloud_call("punch", {
+            "punch_code": patron.punch_code,
+            "num_punches": 1,
+            "store_id": store.objectId,
+            "store_name": store.store_name,
+        })
     
+        return Punch.objects().count(Patron=patron.objectId) == 1
+        
+    test.testit(test_14)
     
+    punch = Punch.objects().get(Patron=patron.objectId)
+    
+    ##########  Punch object is added to Store's Punches relation
+    def test_15():
+        return store.get("punches", objectId=punch.objectId,
+            count=1, limit=0)
+   
+    test.testit(test_15)
+    
+    ##########  Patron pointer is set
+    def test_16():
+        return punch.Patron == patron.objectId
+    
+    test.testit(test_16)
+    
+    ##########  Punches is set to correct amount 
+    def test_17():
+        return punch.punches == 1
+    
+    test.testit(test_17)
+    
+    ##########  PatronStore's punch_count is updated 
+    def test_18():
+        return patron_store.punch_count == 2
+    
+    test.testit(test_18)
+    
+    ##########  PatronStore's all_time_punches is updated 
+    def test_19():
+        return patron_store.all_time_punches == 2
+    
+    test.testit(test_19)
+        
+    ##########  Using unused punch_code returns error with PATRON_NOT_FOUND 
+    def test_20():
+        res = cloud_call("punch", {
+            "punch_code": "xxxxx",
+            "num_punches": 1,
+            "store_id": store.objectId,
+            "store_name": store.store_name,
+        })
+    
+        return res["error"] == "PATRON_NOT_FOUND"
+        
+    test.testit(test_20)
     
     # END OF ALL TESTS - cleanup
     return test.get_results()

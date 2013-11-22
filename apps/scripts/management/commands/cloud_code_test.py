@@ -16,4 +16,6 @@ class Command(BaseCommand):
         #results.extend(test_add_delete_patronstore()) 
         results.extend(test_punch())
         
-        send_email_cloud_test_results(results)
+        
+        if "dryrun" not in args:
+            send_email_cloud_test_results(results)
