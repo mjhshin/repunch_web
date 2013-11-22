@@ -6,6 +6,7 @@ from parse.utils import cloud_call
 from cloud_code.tests import CloudCodeTest
 from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import PatronStore
+from parse.apps.rewards.models import RedeemReward
 
 # This User exists solely for testing CloudCode.
 # It must have a Store, Employee, and Patron pointers.
@@ -14,12 +15,24 @@ ACCOUNT_EMAIL = "cloudcode@repunch.com"
 def test_request_validate_reject_redeem():
     """
     This first deletes all the PatronStores that points to this Store.
+    This will also set the Store's rewards.
     """
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
     patron = account.patron
     store = account.store
     employee = account.employee
+    
+    store.rewards = [{
+        "reward_id":0,
+        "redemption_count":0,
+        "punches":1,
+        "reward_name":"ATest Reward",
+        "description":"Test Reward",
+    }]
+    store.update()
+    
+    reward = store.rewards[0]
     
     for ps in PatronStore.objects().filter(Store=store.objectId):
         ps.delete()
@@ -87,16 +100,86 @@ def test_request_validate_reject_redeem():
             "PatronStore has been deleted"},
     ])
     
-        ##########  Request_redeem creates a new RedeemReward (reward) TODO
-    ##########  RedeemReward is added to Store's RedeemReward relation TODO
-    ##########  PatronStore's pending_reward is set to true TODO
-    ##########  RedeemReward's patron_id is set TODO
-    ##########  RedeemReward's customer_name is set TODO
-    ##########  RedeemReward's is_redeemed is set to false TODO
-    ##########  RedeemReward's title is set TODO
-    ##########  RedeemReward's PatronStore pointer is set TODO
-    ##########  RedeemReward's num_punches is set TODO
-    ##########  RedeemReward's reward_id is set TODO
+    ##########  Request_redeem creates a new RedeemReward (reward)
+    def test_0():
+        if RedeemReward.objects().count(\
+            PatronStore=patron_store.objectId) > 0:
+            return "PatronStore exists. Test is invalid."
+        
+        cloud_call("request_redeem", {
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+            "patron_store_id": patron_store.objectId,
+            "reward_id": reward["reward_id"],
+            "num_punches": reward["punches"],
+            "name": patron.get_fullname(),
+            "title": reward["reward_name"]
+        })
+        
+        return RedeemReward.objects().count(\
+            PatronStore=patron_store.objectId) == 1
+    
+    test.testit(test_0)
+    
+    redeem_reward = RedeemReward.objects().get(\
+            PatronStore=patron_store.objectId)
+    
+    ##########  RedeemReward is added to Store's RedeemReward relation
+    def test_1():
+        return store.get("redeemRewards", objectId=redeem_reward.objectId,
+            count=1, limit=0) == 1
+    
+    test.testit(test_1)
+    
+    patron_store.fetch_all(clear_first=True, with_cache=False)
+    
+    ##########  PatronStore's pending_reward is set to true
+    def test_2():
+        return patron_store.pending_reward
+    
+    test.testit(test_2)
+    
+    ##########  RedeemReward's patron_id is set 
+    def test_3():
+        return redeem_reward.patron_id == patron.objectId
+    
+    test.testit(test_3)
+    
+    ##########  RedeemReward's customer_name is set
+    def test_4():
+        return redeem_reward.customer_name == patron.get_fullname()
+    
+    test.testit(test_4)
+    
+    ##########  RedeemReward's is_redeemed is set to false
+    def test_5():
+        return not redeem_reward.is_redeemed
+    
+    test.testit(test_5)
+    
+    ##########  RedeemReward's title is set
+    def test_6():
+        return redeem_reward.title == reward["reward_name"]
+    
+    test.testit(test_6)
+    
+    ##########  RedeemReward's PatronStore pointer is set 
+    def test_7():
+        return redeem_reward.PatronStore == patron_store.objectId
+    
+    test.testit(test_7)
+    
+    ##########  RedeemReward's num_punches is set 
+    def test_8():
+        return redeem_reward.num_punches == reward["punches"]
+    
+    test.testit(test_8)
+    
+    ##########  RedeemReward's reward_id is set 
+    def test_9():
+        return redeem_reward.num_punches == reward["reward_id"]
+    
+    test.testit(test_9)
         
     ##########  Validate_redeem successful TODO
     ##########  RedeemReward's is_redeemed is set to true TODO
