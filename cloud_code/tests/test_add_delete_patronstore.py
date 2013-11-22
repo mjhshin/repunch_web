@@ -13,17 +13,15 @@ ACCOUNT_EMAIL = "cloudcode@repunch.com"
 
 def test_add_delete_patronstore():
     """
-    This first deletes all the PatronStores in the Store's PatronStore relation.
+    This first deletes all the PatronStores that points to this Store.
     """
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store")
     patron = account.patron
     store = account.store
     
-    if store.get("patronStores"):
-        for ps in store.patronStores:
-            ps.delete()
-        store.patronStores = None
+    for ps in PatronStore.objects().filter(Store=store.objectId):
+        ps.delete()
     
     test = CloudCodeTest("ADD/DELETE_PATRONSTORE", [
         {'test_name': "Add_patronstore creates a new PatronStore if does not exist"},

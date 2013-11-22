@@ -14,8 +14,8 @@ ACCOUNT_EMAIL = "cloudcode@repunch.com"
 
 def test_punch():
     """
-    This first deletes all the PatronStores in the Store's PatronStore relation.
-    All Punch objects for the Account's Store are deleted.
+    This first deletes all the PatronStores that points to this Store.
+    All Punch objects for the Account's Patron are deleted.
     """
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
@@ -23,12 +23,10 @@ def test_punch():
     store = account.store
     employee = account.employee
     
-    if store.get("patronStores"):
-        for ps in store.patronStores:
-            ps.delete()
-        store.patronStores = None
+    for ps in PatronStore.objects().filter(Store=store.objectId):
+        ps.delete()
     
-    for punch in Punch.objects().filter(Store=store.objectId):
+    for punch in Punch.objects().filter(Patron=patron.objectId):
         punch.delete()
     
     test = CloudCodeTest("PUNCH", [
@@ -37,7 +35,7 @@ def test_punch():
         {'test_name': "Punch object is added to Employee's Punches relation"},
         {'test_name': "Patron pointer is set"},
         {'test_name': "Punches is set to correct amount"},
-        {'test_name': "Employee's life_time_punches is updated"},
+        {'test_name': "Employee's lifetime_punches is updated"},
         {'test_name': "PatronStore is created since it does not yet exist"},
         {'test_name': "PatronStore is added to Patron's PatronStores relation"},
         {'test_name': "PatronStore is added to Store's PatronStores relation"},
@@ -57,13 +55,13 @@ def test_punch():
         {'test_name': "Using unused punch_code returns error with PATRON_NOT_FOUND"},
     ])
     
-    emp_lifetime_punches = employee.life_time_punches
+    emp_lifetime_punches = employee.lifetime_punches
     patron_store = PatronStore.objects().get(\
         Patron=patron.objectId, Store=store.objectId)
     
     ##########  Punch creates a new Punch object (from employee)
     def test_0():
-        if Punch.objects().count(Store=store.objectId) > 0:
+        if Punch.objects().count(Patron=patron.objectId) > 0:
             return "Punches for the Store exists. Test is invalid."
             
         cloud_call("punch", {
@@ -74,11 +72,11 @@ def test_punch():
             "employee_id": employee.objectId,
         })
     
-        return Punch.objects().count(Store=store.objectId) == 1
+        return Punch.objects().count(Patron=patron.objectId) == 1
     
     test.testit(test_0)
     
-    punch = Punch.objects().get()
+    punch = Punch.objects().get(Patron=patron.objectId)
     
     ##########  Punch object is added to Store's Punches relation 
     def test_1():
@@ -93,10 +91,10 @@ def test_punch():
             limit=0, count=1) == 1
     
     test.testit(test_2)
-    
+     
     ##########  Patron pointer is set
     def test_3():
-        return punch.Patron is not None
+        return punch.Patron == patron.objectId
     
     test.testit(test_3)
     
@@ -106,12 +104,12 @@ def test_punch():
     
     test.testit(test_4)
     
-    ##########  Employee's life_time_punches is updated
+    ##########  Employee's lifetime_punches is updated
     def test_5():
-        employee.life_time_punches = None
-        return emp_lifetime_punches+1 == employee.get("life_time_punches")
+        employee.lifetime_punches = None
+        return emp_lifetime_punches+1 == employee.get("lifetime_punches")
     
-    test.tesit(test_5)
+    test.testit(test_5)
     
     ##########  PatronStore is created since it does not yet exist
     def test_6():
@@ -180,3 +178,7 @@ def test_punch():
         
     ##########  Using unused punch_code returns error with PATRON_NOT_FOUND TODO
     
+    
+    
+    # END OF ALL TESTS - cleanup
+    return test.get_results()
