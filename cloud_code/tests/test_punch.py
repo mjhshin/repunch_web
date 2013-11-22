@@ -33,8 +33,8 @@ def test_punch():
         {'test_name': "Punch creates a new Punch object (from employee)"},
         {'test_name': "Punch object is added to Store's Punches relation"},
         {'test_name': "Punch object is added to Employee's Punches relation"},
-        {'test_name': "Patron pointer is set"},
-        {'test_name': "Punches is set to correct amount"},
+        {'test_name': "Punch's Patron pointer is set"},
+        {'test_name': "Punch's  punches is set to correct amount"},
         {'test_name': "Employee's lifetime_punches is updated"},
         {'test_name': "PatronStore is created since it does not yet exist"},
         {'test_name': "PatronStore is added to Patron's PatronStores relation"},
@@ -47,8 +47,8 @@ def test_punch():
         
         {'test_name': "Punch creates a new Punch object (from dashboard - owner)"},
         {'test_name': "Punch object is added to Store's Punches relation"},
-        {'test_name': "Patron pointer is set"},
-        {'test_name': "Punches is set to correct amount"},
+        {'test_name': "Punch's Patron pointer is set"},
+        {'test_name': "Punch's  punches is set to correct amount"},
         {'test_name': "PatronStore's punch_count is updated"},
         {'test_name': "PatronStore's all_time_punches is updated"},
         
@@ -92,13 +92,13 @@ def test_punch():
     
     test.testit(test_2)
      
-    ##########  Patron pointer is set
+    ##########  Punch's Patron pointer is set
     def test_3():
         return punch.Patron == patron.objectId
     
     test.testit(test_3)
     
-    ##########  Punches is set to correct amount
+    ##########  Punch's punches is set to correct amount
     def test_4():
         return punch.punches == 1
     
@@ -196,13 +196,13 @@ def test_punch():
    
     test.testit(test_15)
     
-    ##########  Patron pointer is set
+    ##########  Punch's Patron pointer is set
     def test_16():
         return punch.Patron == patron.objectId
     
     test.testit(test_16)
     
-    ##########  Punches is set to correct amount 
+    ##########  Punch's punches is set to correct amount 
     def test_17():
         return punch.punches == 1
     
