@@ -45,10 +45,10 @@ class CloudCodeTest(object):
                 self.tests[test_num]["success"] = result
                 
             if verbose:
-                if str(type(result) is bool and result):
+                if type(result) is bool and result:
                     log += "Success"
                 else:
-                    log += "Fail"
+                    log += "Fail - %s" % (result,)
                 
         except Exception as e:
             if verbose:

@@ -192,7 +192,7 @@ def test_punch():
     ##########  Punch object is added to Store's Punches relation
     def test_15():
         return store.get("punches", objectId=punch.objectId,
-            count=1, limit=0)
+            count=1, limit=0) == 1
    
     test.testit(test_15)
     
@@ -207,6 +207,8 @@ def test_punch():
         return punch.punches == 1
     
     test.testit(test_17)
+    
+    patron_store.fetch_all(clear_first=True, with_cache=False)
     
     ##########  PatronStore's punch_count is updated 
     def test_18():
