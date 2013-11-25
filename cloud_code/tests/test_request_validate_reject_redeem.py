@@ -22,6 +22,9 @@ def test_request_validate_reject_redeem():
     This will also set the Store's rewards, sentMessages, redeemRewards,
     and the Patron's receivedMessages.
     """
+    print "test_request_validate_reject_redeem:"
+    print "------------------------------------"
+    
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
     patron = account.patron
@@ -57,15 +60,19 @@ def test_request_validate_reject_redeem():
     for ps in PatronStore.objects().filter(Store=store.objectId):
         ps.delete()
     
-    patron_store = PatronStore(**cloud_call("add_patronstore", {
-        "patron_id": patron.objectId,
-        "store_id": store.objectId,
-    })["result"])
-    
-    # first add some punches
-    patron_store.all_time_punches = 10
-    patron_store.punch_count = 10
-    patron_store.update()
+    def add_patronstore(punch_count=10):
+        patron_store = PatronStore(**cloud_call("add_patronstore", {
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+        })["result"])
+        
+        # first add some punches
+        patron_store.all_time_punches = punch_count
+        patron_store.punch_count = punch_count
+        patron_store.update()
+        return patron_store
+        
+    patron_store = add_patronstore()
     
     test = CloudCodeTest("REQUEST/APPROVE/REJECT REDEEM", [
         {'test_name': "Request_redeem creates a new RedeemReward (reward)"},
@@ -450,34 +457,146 @@ def test_request_validate_reject_redeem():
     def test_33():
         patron_store.pending_reward = True
         patron_store.update()
-        res = request_redeem()
-        return res["result"] == "pending"
+        return request_redeem()["result"] == "pending"
     
     test.testit(test_33)
+    
+    patron_store.pending_reward = False
+    patron_store.update()
+    request_redeem()
+    redeem_reward = RedeemReward.objects().get(\
+        PatronStore=patron_store.objectId, is_redeemed=False)
+    redeem_reward.is_redeemed = True
+    redeem_reward.update()
             
     ##########  Validate_redeem succeeds with validated if the
-    ###         RedeemReward has already been redeemed TODO
+    ###         RedeemReward has already been redeemed
+    def test_34():
+        return cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+            "reward_id": reward["reward_id"]
+        })["result"]["code"] == "validated"
+        
+    test.testit(test_34)
+    
+    redeem_reward.is_redeemed = False
+    redeem_reward.update()
+    patron_store.delete()
     
     ##########  Validate_redeem succeeds with PATRONSTORE_REMOVED if the
-    ###         PatronStore has been deleted TODO
-    ##########  The RedeemReward is then deleted TODO
+    ###         PatronStore has been deleted
+    def test_35():
+        return cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+            "reward_id": reward["reward_id"]
+        })["result"]["code"] == "PATRONSTORE_REMOVED"
+    
+    test.testit(test_35)
+    
+    ##########  The RedeemReward is then deleted
+    def test_36():
+        return  RedeemReward.objects().count(\
+            objectId=redeem_reward.objectId) == 0
+            
+    test.testit(test_36)
+    
+    patron_store = add_patronstore(0)
+    request_redeem()
+    redeem_reward = RedeemReward.objects().get(\
+        PatronStore=patron_store.objectId, is_redeemed=False)
         
     ##########  Validate_redeem succeeds with insufficient if the
-    ###         PatronStore does not have neough punches TODO
-    ##########  The RedeemReward is then deleted TODO
+    ###         PatronStore does not have enough punches
+    def test_37():
+        return cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+            "reward_id": reward["reward_id"]
+        })["result"]["code"] == "insufficient"
+    
+    test.testit(test_37)
+    
+    
+    ##########  The RedeemReward is then deleted
+    def test_38():
+        return  RedeemReward.objects().count(\
+            objectId=redeem_reward.objectId) == 0
+            
+    test.testit(test_38)
         
     ##########  Validate_redeem fails with REDEEMREWARD_NOT_FOUND if the
-    ###         RedeemReward has been deleted TODO
+    ###         RedeemReward has been deleted
+    def test_39():
+        redeem_reward.delete()
+        return cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+            "reward_id": reward["reward_id"]
+        })["error"] == "REDEEMREWARD_NOT_FOUND"
+    
+    test.testit(test_39)
+    
+    patron_store.all_time_punches = 10
+    patron_store.punch_count = 10
+    patron_store.update()
+    request_redeem()
+    redeem_reward = RedeemReward.objects().get(\
+        PatronStore=patron_store.objectId, is_redeemed=False)
+    redeem_reward.is_redeemed = True
+    redeem_reward.update()
             
     ##########  Reject_redeem fails with REDEEMREWARD_VALIDATED
-    ###         if the RedeemReward has already been validated TODO
+    ###         if the RedeemReward has already been validated
+    def test_40():
+        return cloud_call("reject_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })["error"] == "REDEEMREWARD_VALIDATED"
+        
+    test.testit(test_40)
+    
+    patron_store.pending = False
+    patron_store.update()
+    request_redeem()
+    redeem_reward = RedeemReward.objects().get(\
+        PatronStore=patron_store.objectId, is_redeemed=False)
+    redeem_reward.delete()
     
     ##########  Reject_redeem fails with REDEEMREWARD_NOT_FOUND if the
-    ###         RedeemReward has been deleted TODO
+    ###         RedeemReward has been deleted 
+    def test_41():
+        return cloud_call("reject_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })["error"] == "REDEEMREWARD_NOT_FOUND"
+        
+    test.testit(test_41)
+    
+    patron_store.pending = False
+    patron_store.update()
+    request_redeem()
+    redeem_reward = RedeemReward.objects().get(\
+        PatronStore=patron_store.objectId, is_redeemed=False)
+    patron_store.delete()
     
     ##########  Reject_redeem fails with PATRONSTORE_REMOVED if the
-    ###         PatronStore has been deleted TODO
-    ##########  The RedeemReward is then deleted TODO
+    ###         PatronStore has been deleted
+    def test_42():
+        return cloud_call("reject_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })["error"] == "PATRONSTORE_REMOVED"
+    
+    test.testit(test_42)
+    
+    ##########  The RedeemReward is then deleted 
+    def test_43():
+        return  RedeemReward.objects().count(\
+            objectId=redeem_reward.objectId) == 0
+            
+    test.testit(test_43)
     
     
     # END OF ALL TESTS - cleanup

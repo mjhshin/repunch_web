@@ -15,6 +15,9 @@ def test_add_delete_patronstore():
     """
     This first deletes all the PatronStores that points to this Store.
     """
+    print "test_add_delete_patronstore:"
+    print "----------------------------"
+    
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store")
     patron = account.patron

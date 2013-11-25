@@ -17,6 +17,9 @@ def test_punch():
     This first deletes all the PatronStores that points to this Store.
     All Punch objects for the Account's Patron are deleted.
     """
+    print "test_punch:"
+    print "-----------"
+    
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
     patron = account.patron
