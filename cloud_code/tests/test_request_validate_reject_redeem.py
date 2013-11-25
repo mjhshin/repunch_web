@@ -2,11 +2,15 @@
 Tests for request, validate, and reject redeem.
 """
 
-from parse.utils import cloud_call
+from django.utils import timezone
+
+from libs.dateutil.relativedelta import relativedelta
 from cloud_code.tests import CloudCodeTest
+from parse.utils import cloud_call
 from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import PatronStore
 from parse.apps.rewards.models import RedeemReward
+from parse.apps.messages.models import Message
 
 # This User exists solely for testing CloudCode.
 # It must have a Store, Employee, and Patron pointers.
@@ -15,7 +19,8 @@ ACCOUNT_EMAIL = "cloudcode@repunch.com"
 def test_request_validate_reject_redeem():
     """
     This first deletes all the PatronStores that points to this Store.
-    This will also set the Store's rewards.
+    This will also set the Store's rewards, sentMessages, redeemRewards,
+    and the Patron's receivedMessages.
     """
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
@@ -33,6 +38,21 @@ def test_request_validate_reject_redeem():
     store.update()
     
     reward = store.rewards[0]
+    
+    if store.get("sentMessages"):
+        for m in store.sentMessages:
+            m.delete()
+        store.sentMessages = None
+        
+    if store.get("redeemRewards"):
+        for r in store.redeemRewards:
+            r.delete()
+        store.redeemRewards = None
+        
+    if patron.get("receivedMessages"):
+        for ms in patron.receivedMessages:
+            ms.delete()
+        patron.receivedMessages = None
     
     for ps in PatronStore.objects().filter(Store=store.objectId):
         ps.delete()
@@ -81,6 +101,7 @@ def test_request_validate_reject_redeem():
         
         {'test_name': "Validate_redeem successful"},
         {'test_name': "RedeemReward's is_redeemed is set to true"},
+        {'test_name': "MessageStatus's redeem_available is set to false"},
         
         {'test_name': "Reject_redeem successful"},
         {'test_name': "RedeemReward is deleted"},
@@ -128,6 +149,7 @@ def test_request_validate_reject_redeem():
     
     redeem_reward = RedeemReward.objects().get(\
             PatronStore=patron_store.objectId)
+    patron_store.fetch_all(clear_first=True, with_cache=False)
     
     ##########  RedeemReward is added to Store's RedeemReward relation
     def test_1():
@@ -135,8 +157,6 @@ def test_request_validate_reject_redeem():
             count=1, limit=0) == 1
     
     test.testit(test_1)
-    
-    patron_store.fetch_all(clear_first=True, with_cache=False)
     
     ##########  PatronStore's pending_reward is set to true
     def test_2():
@@ -231,23 +251,149 @@ def test_request_validate_reject_redeem():
             reward_red_count_b4 + 1
         
     test.testit(test_14)
+    
+    # need a new redeem
+    cloud_call("request_redeem", {
+        "patron_id": patron.objectId,
+        "store_id": store.objectId,
+        "patron_store_id": patron_store.objectId,
+        "reward_id": reward["reward_id"],
+        "num_punches": reward["punches"],
+        "name": patron.get_fullname(),
+        "title": reward["reward_name"]
+    })
         
-    ##########  Reject_redeem successful TODO
-    ##########  RedeemReward is deleted TODO
-    ##########  PatronStore's pending_reward is set to false TODO
+    redeem_reward = RedeemReward.objects().get(\
+            PatronStore=patron_store.objectId, is_redeemed=False)
+    
+    ##########  Reject_redeem successful
+    def test_15():
+        res = cloud_call("reject_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })
         
-    ##########  Request_redeem creates a new RedeemReward (offer/gift) TODO
-    ##########  RedeemReward is added to Store's RedeemReward relation TODO
-    ##########  RedeemReward's num_punches is set to 0 regardless of input TODO
-    ##########  RedeemReward's MessageStatus is set TODO
-    ##########  RedeemReward's patron_id is set TODO
-    ##########  RedeemReward's customer_name is set TODO
-    ##########  RedeemReward's is_redeemed is set to false TODO
-    ##########  RedeemReward's title is set TODO
-    ##########  MessageStatus' redeem_available is set to pending TODO
+        return "error" not in res
+    
+    test.testit(test_15)
+    
+    patron_store.fetch_all(clear_first=True, with_cache=False)
+    
+    ##########  RedeemReward is deleted
+    def test_16():
+        return RedeemReward.objects().count(\
+            objectId=redeem_reward.objectId) == 0
+    
+    test.testit(test_16)
+    
+    ##########  PatronStore's pending_reward is set to false
+    def test_17():
+        return not patron_store.pending_reward
+    
+    test.testit(test_17)
+    
+    # need to create an offer
+    offer = Message.objects().create(**{
+        'subject': u'test_request_validate_redeem script message offer',
+        'body': u'test_request_validate_redeem script generate offer', 
+        'sender_name': u'test_request_validate_redeem', 
+        'store_id': store.objectId, 
+        'is_read': False, 
+        'offer_redeemed': False, 
+        'date_offer_expiration': timezone.now()+relativedelta(days=1), 
+        'filter': u'all', 
+        'offer_title': u'test_request_validate_redeem script offer', 
+        'message_type': 'offer', 
+    })
+    
+    cloud_call("retailer_message", {
+        "filter": offer.filter,
+        "store_name": store.store_name,
+        "message_id": offer.objectId,
+        "store_id": store.objectId,
+        "subject": offer.subject,
+    })
+    
+    message_status = patron.get("receivedMessages", limit=1)[0]
+    patron.receivedMessages = None
+        
+    ##########  Request_redeem creates a new RedeemReward (offer/gift)
+    def test_18():
+        cloud_call("request_redeem", {
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+            "patron_store_id": patron_store.objectId,
+            "reward_id": reward["reward_id"],
+            "num_punches": reward["punches"],
+            "name": patron.get_fullname(),
+            "title": reward["reward_name"],
+            "message_status_id": message_status.objectId,
+        })
+        
+        return RedeemReward.objects().count(\
+            MessageStatus=message_status.objectId,
+            is_redeemed=False) == 1
+    
+    test.testit(test_18)
+    
+    redeem_reward = RedeemReward.objects().get(\
+            MessageStatus=message_status.objectId, is_redeemed=False)
+            
+    ##########  RedeemReward is added to Store's RedeemReward relation
+    def test_19():
+        store.redeemRewards = None
+        return store.get("redeemRewards", objectId=\
+            redeem_reward.objectId, count=1, limit=0) == 1
+        
+    test.testit(test_19)
+    
+    ##########  RedeemReward's num_punches is set to 0 regardless of input
+    def test_20():
+        return redeem_reward.num_punches == 0
+    
+    test.testit(test_20)
+    
+    ##########  RedeemReward's MessageStatus is set
+    def test_21():
+        return redeem_reward.MessageStatus == message_status.objectId
+    
+    test.testit(test_21)
+    
+    ##########  RedeemReward's patron_id is set
+    def test_22():
+        return redeem_reward.patron_id == patron.objectId
+    
+    test.testit(test_22)
+    
+    ##########  RedeemReward's customer_name is set
+    def test_23():
+        return redeem_reward.customer_name == patron.get_fullname()
+    
+    test.testit(test_23)
+    
+    ##########  RedeemReward's is_redeemed is set to false
+    def test_24():
+        return not redeem_reward.is_redeemed
+    
+    test.testit(test_24)
+    
+    ##########  RedeemReward's title is set
+    def test_25():
+        return redeem_reward.title == reward["reward_name"]
+    
+    test.testit(test_25)
+    
+    ##########  MessageStatus' redeem_available is set to pending
+    def test_26():
+        message_status.redeem_available = None
+        return message_status.get("redeem_available") == "pending"
+    
+    test.testit(test_26)
+    
         
     ##########  Validate_redeem successful TODO
     ##########  RedeemReward's is_redeemed is set to true TODO
+    ##########  MessageStatus's redeem_available is set to false TODO
         
     ##########  Reject_redeem successful TODO
     ##########  RedeemReward is deleted TODO
