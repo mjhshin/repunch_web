@@ -91,7 +91,7 @@ from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = ["error"]
-EMAILS = ["vandolf@repunch.com",]
+EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 EMAILS_BOOT = ["vandolf@repunch.com",]
 
 if DEBUG:
