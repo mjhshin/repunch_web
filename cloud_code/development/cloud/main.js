@@ -2596,3 +2596,18 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	}
 	
 });
+
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("trigger_cloud_logger", function(request, response) {
+    
+    console.log("Cloud logger is still running.");
+    console.log("Extra message: ");
+    console.log(request.params.extra_message);
+    response.error("error")
+
+});

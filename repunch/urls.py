@@ -43,6 +43,10 @@ urlpatterns = patterns('',
     #### dev login
     url(r'^repunch-engineer-login/$', views.manage_dev_login,
         name='manage_dev_login'),
+        
+    #### cloud_logget triger
+    url(r'^cloud-logger-trigger/$', views.manage_cloud_trigger,
+        name='manage_cloud_trigger'),
             
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

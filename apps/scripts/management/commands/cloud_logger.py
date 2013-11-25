@@ -91,7 +91,7 @@ from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = ["error"]
-EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
+EMAILS = ["vandolf@repunch.com",]
 EMAILS_BOOT = ["vandolf@repunch.com",]
 
 if DEBUG:
@@ -102,7 +102,7 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 45
+LOGJOB_INTERVAL = 40
 LOGJOB_FAIL = 60
 PARSE_TIMEOUT = 20 
 

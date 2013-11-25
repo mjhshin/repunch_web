@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate
 import json, thread
 
 from parse import session as SESSION
+from parse.utils import cloud_call
 from parse.auth import login, logout
 from parse.auth.decorators import dev_login_required
 from apps.accounts.forms import LoginForm
@@ -137,4 +138,16 @@ def manage_parse_password_reset(request):
 def manage_parse_password_reset_complete(request):
     """ Displays the password reset complete template """
     return render(request, 'manage/parse-password-updated.html')
-
+    
+def manage_cloud_trigger(request):
+    """
+    Simply calls the trigger_cloud_logger cloud code.
+    """
+    if request.method == "GET":
+        cloud_call("trigger_cloud_logger", {
+            "extra_message":\
+                request.GET.get("extra_message", "Still running")
+        })
+        return HttpResponse("Successfully called trigger_cloud_logger")
+    
+    return HttpResponse("Bad Request")
