@@ -16,8 +16,8 @@ class Command(BaseCommand):
         results = []
         
         results.extend(test_add_delete_patronstore()) 
-        results.extend(test_punch())
-        results.extend(test_request_validate_reject_redeem())
+        #results.extend(test_punch())
+        #results.extend(test_request_validate_reject_redeem())
         
         if "dryrun" not in args:
             send_email_cloud_test_results(results)

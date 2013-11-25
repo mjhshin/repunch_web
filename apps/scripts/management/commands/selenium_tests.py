@@ -25,8 +25,8 @@ class Command(BaseCommand):
         
         ####### PUBLIC #########################################
         #results.extend(test_public_pages())
-        results.extend(test_signup())
-        #results.extend(test_login_dialog())
+        #results.extend(test_signup())
+        results.extend(test_login_dialog())
         #results.extend(test_login_page())
         
         ####### DASHBOARD #########################################
