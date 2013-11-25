@@ -22,7 +22,7 @@ def test_request_validate_reject_redeem():
     This will also set the Store's rewards, sentMessages, redeemRewards,
     and the Patron's receivedMessages.
     """
-    print "test_request_validate_reject_redeem:"
+    print "\ntest_request_validate_reject_redeem:"
     print "------------------------------------"
     
     account = Account.objects().get(email=ACCOUNT_EMAIL,
@@ -118,23 +118,23 @@ def test_request_validate_reject_redeem():
             " PatronStore's pending_reward is true before the request."},
             
         {'test_name': "Validate_redeem succeeds with validated if the"+\
-            "RedeemReward has already been redeemed"},
+            " RedeemReward has already been redeemed"},
         {'test_name': "Validate_redeem succeeds with PATRONSTORE_REMOVED if the"+\
-            "PatronStore has been deleted"},
+            " PatronStore has been deleted"},
         {'test_name': "The RedeemReward is then deleted."},
             
         {'test_name': "Validate_redeem succeeds with insufficient if the"+\
-            "PatronStore does not have enough punches"},
+            " PatronStore does not have enough punches"},
         {'test_name': "The RedeemReward is then deleted."},
         {'test_name': "Validate_redeem fails with REDEEMREWARD_NOT_FOUND if the"+\
-            "RedeemReward has been deleted"},
+            " RedeemReward has been deleted"},
             
         {'test_name': "Reject_redeem fails with REDEEMREWARD_VALIDATED"+\
-            "if the RedeemReward has already been validated"},
+            " if the RedeemReward has already been validated"},
         {'test_name': "Reject_redeem fails with REDEEMREWARD_NOT_FOUND if the"+\
-            "RedeemReward has been deleted"},
+            " RedeemReward has been deleted"},
         {'test_name': "Reject_redeem fails with PATRONSTORE_REMOVED if the"+\
-            "PatronStore has been deleted"},
+            " PatronStore has been deleted"},
         {'test_name': "The RedeemReward is then deleted."},
     ])
     
