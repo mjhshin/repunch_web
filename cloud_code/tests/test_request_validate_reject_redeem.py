@@ -177,7 +177,7 @@ def test_request_validate_reject_redeem():
     
     ##########  RedeemReward's reward_id is set 
     def test_9():
-        return redeem_reward.num_punches == reward["reward_id"]
+        return redeem_reward.reward_id == reward["reward_id"]
     
     test.testit(test_9)
         

@@ -34,6 +34,7 @@ class RedeemReward(ParseObject):
         self.is_redeemed = data.get("is_redeemed", False)
         self.num_punches = data.get("num_punches")
         self.reward_id = data.get("reward_id")
+        self.patron_id = data.get("patron_id")
         
         self.MessageStatus = data.get("MessageStatus")
         self.PatronStore = data.get('PatronStore')
@@ -46,7 +47,7 @@ class RedeemReward(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "title", "customer_name", "is_redeemed",
-            "num_punches", ("PatronStore", "reward_id"),
+            "patron_id", "num_punches", ("PatronStore", "reward_id"),
             ("MessageStatus", {"num_punches":0}))
 
     def get_class(self, className):
