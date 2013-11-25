@@ -17,7 +17,7 @@ from parse.notifications import EMAIL_SIGNUP_SUBJECT_PREFIX,\
 EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX
 
 TEST_USER = {
-    "email": "vanman00@repunch.com",
+    "email": "kjsdhgjksh@repunch.com",
 }
 
 def test_signup():
@@ -71,7 +71,7 @@ def test_signup():
             ("", Keys.ARROW_DOWN),
             ("", Keys.RETURN),
         )
-        test.action_chain(1, selectors, action="send_keys") # ACTION!
+        test.action_chain(1, selectors, action="send_keys") 
         selectors = (
             ("#id_store_name", "test business"),
             ("#id_street", "1370 virginia ave 4d"),
@@ -89,7 +89,7 @@ def test_signup():
             ("#id_confirm_password",
                 TEST_USER['email'].replace("@", "").replace(".", "")),
         )
-        test.action_chain(0, selectors, action="send_keys") # ACTION!
+        test.action_chain(0, selectors, action="send_keys") 
         # ToS and submit
         selectors = (
             "#id_recurring",
@@ -99,19 +99,18 @@ def test_signup():
         return True
         
     test.testit(test_1)
-    sleep(1) 
         
     ##########  Popup dialog functional
     def test_2():
-        max_wait_time, time_waited = 10, 0
+        # max_wait_time is large because of stupid localhost
+        max_wait_time, time_waited = 100, 0
         # the orange clock that pops up after signing up.
-        time_img =\
-            test.driver.find_element_by_id("signing-up-time")
+        time_img = test.find("#signing-up-time")
         while not time_img.is_displayed() and\
             time_waited < max_wait_time:
-            sleep(1)
-            time_waited += 1
-        return time_waited < max_wait_time
+            sleep(5)
+            time_waited += 5
+        return time_waited <= max_wait_time
     
     test.testit(test_2)
     
@@ -140,7 +139,7 @@ def test_signup():
             return settings is not None
             
         for i in range(4, 7):
-            locals().get("test_%s" % (str(i),))()
+            test.testit(locals()["test_%s" % (str(i),)])
             
         if SeleniumTest.CHECK_SENT_MAIL:
             mail = Mail()
@@ -173,7 +172,7 @@ def test_signup():
                     "Email is already being used."
     
         for i in range(7, 10):
-            locals().get("test_%s" % (str(i),))()
+            test.testit(locals()["test_%s" % (str(i),)])
     
         if SeleniumTest.CHECK_SENT_MAIL:
             mail.logout()
@@ -257,8 +256,7 @@ def test_signup():
         zip = test.find("#id_zip")
         zip.clear()
         zip.send_keys("941091")
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
+        test.find("#signup-form-submit").click() 
         sleep(2)
         return str(test.find("#street_e ul li").text) ==\
             "Enter a valid adress, city, state, and/or zip."
@@ -269,19 +267,11 @@ def test_signup():
         pass1 = test.find("#id_password")
         pass1.clear()
         pass1.send_keys("12345")
-        # pass2
-        pass2 = test.find("#id_confirm_password")
-        pass2.clear()
-        pass2.send_keys("12345")
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
+        test.find("#signup-form-submit").click()
         sleep(2)
-        return str(test.find("#password_e ul li").text) ==\
-            "Ensure this value has at least 6 characters " +\
-            "(it has 5)." and str(test.find(\
-            "#password2_e ul li").text)== "Ensure this " +\
-            "value has at least 6 characters (it has 5)."
- 
+        return str(test.find("#password_e ul li").text).__contains__(\
+            "Ensure this value has at least 6 characters ")
+            
     ##########  password and corfirmation must be the same
     def test_24():
         # pass1
@@ -292,14 +282,13 @@ def test_signup():
         pass2 = test.find("#id_confirm_password")
         pass2.clear()
         pass2.send_keys("1234467")
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
+        test.find("#signup-form-submit").click() 
         sleep(2)
         return str(test.find("#password_e ul li").text) ==\
-            "Passwords don't match"
+            "Passwords don't match."
             
     for i in range(21, 25):
-        locals().get("test_%s" % (str(i),))()
+        test.testit(locals()["test_%s" % (str(i),)])
     
 
     # END OF ALL TESTS

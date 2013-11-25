@@ -219,10 +219,15 @@ class SeleniumTest(CloudCodeTest):
         
     def fields_required(self, selectors, test_offset=0, type="css"):
         for i, sel in enumerate(selectors):
-            test_name = "test_%s" % (str(i+ind_offset),)
-            locals()[test_name] = lambda: self.field_required(sel)
-            self.testit(locals()[test_name])
+            self.testit(lambda: self.field_required(sel, type), i+test_offset)
         
     def field_required(self, selector, type="css"):
         return str(self.find(selector, type).text) ==\
             "This field is required."
+            
+            
+            
+            
+            
+            
+            

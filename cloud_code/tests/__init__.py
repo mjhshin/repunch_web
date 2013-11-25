@@ -25,17 +25,20 @@ class CloudCodeTest(object):
     def get_results(self):
         return self._results
     
-    def testit(self, test):
+    def testit(self, test, test_num=None):
         """
         test is a function that must return a bool.
         If a str is returned, then the test is a fail and the str
         is set as the test_message.
         
         test must have a name of test_x where x is the number of the test. 
+        test may be a lambda function, in whcih case test_num must
+        be provided.
         """
         verbose = self.VERBOSE
                 
-        test_num = int(test.__name__.split("_")[-1])
+        if test_num is None:
+            test_num = int(test.__name__.split("_")[-1])
         
         if verbose:
             log = "Test #%s:\t" % (str(test_num),)
