@@ -1429,7 +1429,8 @@ Parse.Cloud.define("request_redeem", function(request, response)
 
 ////////////////////////////////////////////////////
 //
-// Deletes the RedeemReward, sets the patron store's pending_reward to false IF IT IS NOT an offer!
+// Deletes the RedeemReward, sets the patron store's pending_reward
+// to false IF IT IS NOT an offer!
 // If RedeemReward does not have a reward_id, then it is an offer, which if it is
 // the MessageStatus's redeem_available will be set 'no'.
 //
@@ -1446,7 +1447,6 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	var Store = Parse.Object.extend("Store");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
 	var redeemRewardQuery = new Parse.Query(RedeemReward);
-	var storeQuery = new Parse.Query(Store);
 	var redeemReward, messageStatus, patronStore, rewardId;
 	
 	redeemRewardQuery.include("MessageStatus");
@@ -1484,17 +1484,10 @@ Parse.Cloud.define("reject_redeem", function(request, response)
             return redeemReward.destroy();
             
         }, function(error) {
-            console.log("Failed to fetch RedeemReward.");
+            console.log("Failed to save PatronStore.");
             return Parse.Promise.error(error);
         
-        }).then(function() {
-            return storeQuery.get(storeId);
-        
-        }, function(error) {
-            console.log("Failed to destory RedeemReward.");
-            return Parse.Promise.error(error);
-        
-        }).then(function(store)
+        }).then(function()
             {
             var promises = [];
             
@@ -1545,7 +1538,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
             });
             
         }, function(error) {
-            console.log("Failed to get store with storeId " + storeId);
+            console.log("Failed to destory RedeemReward.");
             response.error(error);
         });
         
@@ -2602,4 +2595,19 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 		});
 	}
 	
+});
+
+
+////////////////////////////////////////////////////
+//
+//
+//
+////////////////////////////////////////////////////
+Parse.Cloud.define("trigger_cloud_logger", function(request, response) {
+    
+    console.log("Cloud logger is still running.");
+    console.log("Extra message: ");
+    console.log(request.params.extra_message);
+    response.error("error");
+
 });

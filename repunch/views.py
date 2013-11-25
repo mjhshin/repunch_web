@@ -15,7 +15,7 @@ from parse.auth.decorators import dev_login_required
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSessionIndex
 from repunch.settings import PRODUCTION_SERVER, DEVELOPMENT_TOKEN,\
-RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS
+RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS, CLOUD_LOGGER_TRIGGER_KEY
 
 def manage_dev_login(request):
     """
@@ -150,6 +150,8 @@ def manage_cloud_trigger(request):
                 "extra_message":\
                     request.GET.get("extra_message", "Still running")
             })
-            return HttpResponse("Successfully called trigger_cloud_logger")
+            return HttpResponse("<p>Successfully called "+\
+                "trigger_cloud_logger.</p><p>Please wait at most"+\
+                " 40 seconds to receive the notification in your email.</p>")
     
     return HttpResponse("Bad Request")

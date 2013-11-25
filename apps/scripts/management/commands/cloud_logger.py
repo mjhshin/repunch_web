@@ -102,7 +102,7 @@ else:
 PARSE_LOG_CMD = "parse log -n "
 
  # in seconds
-LOGJOB_INTERVAL = 40
+LOGJOB_INTERVAL = 35
 LOGJOB_FAIL = 60
 PARSE_TIMEOUT = 20 
 
@@ -120,7 +120,6 @@ class LogJob(object):
         self.last_log_tag_sent = None
         self.last_log_time = None
         self.n = LogJob.START_N
-        self.first_run = True
         
         # send an email
         specs = "cloud_logger running with ERRORS = " + str(ERRORS) +\
@@ -137,17 +136,14 @@ class LogJob(object):
         
         
     def send(self, log):
-        if not self.first_run:
-            last_log_tag = TAG_RE.findall(log)[-1]
-            # send only if it is not the same log
-            if self.last_log_tag_sent == last_log_tag:
-                return
-            
-            self.last_log_tag_sent = last_log_tag
-            send_mail("Cloud Code Error", log, EMAIL_FROM, 
-                        EMAILS, fail_silently=not DEBUG)
-        else:
-            self.first_run = False
+        last_log_tag = TAG_RE.findall(log)[-1]
+        # send only if it is not the same log
+        if self.last_log_tag_sent == last_log_tag:
+            return
+        
+        self.last_log_tag_sent = last_log_tag
+        send_mail("Cloud Code Error", log, EMAIL_FROM, 
+                    EMAILS, fail_silently=not DEBUG)
             
     def has_unicodedecodeerror(self, subset):
         """
