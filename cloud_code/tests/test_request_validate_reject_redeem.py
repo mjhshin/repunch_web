@@ -131,21 +131,26 @@ def test_request_validate_reject_redeem():
         {'test_name': "The RedeemReward is then deleted."},
     ])
     
+    def request_redeem(reward_id=reward["reward_id"],
+        title=reward["reward_name"], message_status_id=None):
+        return cloud_call("request_redeem", {
+            "patron_id": patron.objectId,
+            "store_id": store.objectId,
+            "patron_store_id": patron_store.objectId,
+            "reward_id": reward_id,
+            "num_punches": reward["punches"],
+            "name": patron.get_fullname(),
+            "title": title,
+            "message_status_id": message_status_id,
+        })
+    
     ##########  Request_redeem creates a new RedeemReward (reward)
     def test_0():
         if RedeemReward.objects().count(\
             PatronStore=patron_store.objectId) > 0:
             return "PatronStore exists. Test is invalid."
         
-        cloud_call("request_redeem", {
-            "patron_id": patron.objectId,
-            "store_id": store.objectId,
-            "patron_store_id": patron_store.objectId,
-            "reward_id": reward["reward_id"],
-            "num_punches": reward["punches"],
-            "name": patron.get_fullname(),
-            "title": reward["reward_name"]
-        })
+        request_redeem()
         
         return RedeemReward.objects().count(\
             PatronStore=patron_store.objectId) == 1
@@ -258,16 +263,7 @@ def test_request_validate_reject_redeem():
     test.testit(test_14)
     
     # need a new redeem
-    cloud_call("request_redeem", {
-        "patron_id": patron.objectId,
-        "store_id": store.objectId,
-        "patron_store_id": patron_store.objectId,
-        "reward_id": reward["reward_id"],
-        "num_punches": reward["punches"],
-        "name": patron.get_fullname(),
-        "title": reward["reward_name"]
-    })
-        
+    request_redeem()
     redeem_reward = RedeemReward.objects().get(\
             PatronStore=patron_store.objectId, is_redeemed=False)
     
@@ -328,15 +324,7 @@ def test_request_validate_reject_redeem():
         
     ##########  Request_redeem creates a new RedeemReward (offer/gift)
     def test_18():
-        cloud_call("request_redeem", {
-            "patron_id": patron.objectId,
-            "store_id": store.objectId,
-            "patron_store_id": patron_store.objectId,
-            "num_punches": reward["punches"],
-            "name": patron.get_fullname(),
-            "title": offer.offer_title,
-            "message_status_id": message_status.objectId,
-        })
+        request_redeem(None, offer.offer_title, message_status.objectId)
         
         return RedeemReward.objects().count(\
             MessageStatus=message_status.objectId,
@@ -429,16 +417,7 @@ def test_request_validate_reject_redeem():
     message_status = patron.get("receivedMessages",
         redeem_available="yes", limit=1)[0]
     patron.receivedMessages = None
-    cloud_call("request_redeem", {
-        "patron_id": patron.objectId,
-        "store_id": store.objectId,
-        "patron_store_id": patron_store.objectId,
-        "num_punches": reward["punches"],
-        "name": patron.get_fullname(),
-        "title": offer.offer_title,
-        "message_status_id": message_status.objectId,
-    })
-        
+    request_redeem(None, offer.offer_title, message_status.objectId)
     redeem_reward = RedeemReward.objects().get(\
             MessageStatus=message_status.objectId, is_redeemed=False)
             
@@ -467,7 +446,14 @@ def test_request_validate_reject_redeem():
     test.testit(test_32)
         
     ##########  Request_redeem succeeds with pending if
-    ###         PatronStore's pending_reward is true before the request. TODO
+    ###         PatronStore's pending_reward is true before the request.
+    def test_33():
+        patron_store.pending_reward = True
+        patron_store.update()
+        res = request_redeem()
+        return res["result"] == "pending"
+    
+    test.testit(test_33)
             
     ##########  Validate_redeem succeeds with validated if the
     ###         RedeemReward has already been redeemed TODO
