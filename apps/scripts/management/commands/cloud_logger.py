@@ -155,7 +155,12 @@ class LogJob(object):
         occurs so we check the datetime of the last tag in the
         in the current subset and start fresh if LOGJOB_FAIL has passed
         """
-        last_log_tag = TAG_RE.findall(subset)[-1]
+        tags = TAG_RE.findall(subset)
+        if len(tags) == 0:
+            # This shouldn't happen but just in case
+            return True
+        
+        last_log_tag = tags[-1]
         # get 16:23:32 from "I2013-11-18T16:23:32.026Z]"
         last_log_time = TAG_TIME_RE.search(last_log_tag).group(1)
         hour, minute, second = last_log_time.split(":")
@@ -196,7 +201,11 @@ class LogJob(object):
                     break
                     
             # set the last tag and time
-            self.last_log_tag = TAG_RE.findall(subset)[-1]
+            tags = TAG_RE.findall(subset)
+            if len(tags) > 0:
+                self.last_log_tag = tags[-1]
+            else:
+                self.last_log_tag = None
             self.last_log_time = timezone.now()
             self.n = LogJob.START_N
             return
@@ -222,7 +231,11 @@ class LogJob(object):
                     break
             
             # set the last tag and time
-            self.last_log_tag = TAG_RE.findall(subset)[-1]
+            tags = TAG_RE.findall(subset)
+            if len(tags) > 0:
+                self.last_log_tag = tags[-1]
+            else:
+                self.last_log_tag = None
             self.last_log_time = timezone.now()
             self.n = LogJob.START_N
             return
