@@ -7,7 +7,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoAlertPresentException,\
 NoSuchElementException
 
-class SeleniumTest(object):
+from cloud_code.tests import CloudCodeTest
+
+class SeleniumTest(CloudCodeTest):
     """
     Wrapper around selenium - makes life easier.
     """
@@ -18,28 +20,27 @@ class SeleniumTest(object):
     notifications are not tested for localhost.
     """
     
-    # SERVER_URL = "https://www.repunch.com"
-    SERVER_URL = "http://dev.repunch.com"
-    #SERVER_URL = "http://localhost:8000"
+    #SERVER_URL = "https://www.repunch.com"
+    #SERVER_URL = "http://dev.repunch.com"
+    SERVER_URL = "http://localhost:8000"
     
     DEV_LOGIN = True
-    CHECK_SENT_MAIL = False # Mail sent by sendgrid
+    # Mail sent by sendgrid
+    CHECK_SENT_MAIL = SERVER_URL !=  "https://www.repunch.com" 
+    
+    VERBOSE = True
     IMPLICITLY_WAIT = 10
     
-    def __init__(self):
+    def __init__(self, test_title, tests):
         """
-        Prepare the driver and results container.
-        
-        results format:
-        [ {'section_name": section1,
-              'parts': [ {'test_name':test1, 'success':True,
-                            'test_message':'...'}, ... ]}
-            ... ]
+        tests has the following format:
+        [ {'test_name': "Test title"}, ... ]
         """
+        super(SeleniumTest, self).__init__(test_title, tests)
         self.driver = webdriver.Firefox()
         self.set_to_implicit_wait(True)
-        self.results = []
         self.dev_login()
+        
         
     def set_to_implicit_wait(self, wait):
         if wait:
@@ -63,7 +64,7 @@ class SeleniumTest(object):
         Quit the driver and return the results of the test.
         """
         self.driver.quit()
-        return self.results
+        return self.get_results()
         
     def open(self, url="/"):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))

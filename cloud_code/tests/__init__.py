@@ -4,9 +4,10 @@ Utility methods for cloud_code tests.
 These should also be used for SeleniumTests.
 """
 
-VERBOSE = True
 
 class CloudCodeTest(object):
+
+    VERBOSE = True
     
     def __init__(self, test_title, tests):
         """
@@ -24,7 +25,7 @@ class CloudCodeTest(object):
     def get_results(self):
         return self._results
     
-    def testit(self, test, verbose=VERBOSE):
+    def testit(self, test):
         """
         test is a function that must return a bool.
         If a str is returned, then the test is a fail and the str
@@ -32,6 +33,8 @@ class CloudCodeTest(object):
         
         test must have a name of test_x where x is the number of the test. 
         """
+        verbose = self.VERBOSE
+                
         test_num = int(test.__name__.split("_")[-1])
         
         if verbose:

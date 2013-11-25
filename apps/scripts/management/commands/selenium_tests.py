@@ -24,7 +24,7 @@ class Command(BaseCommand):
         results = []
         
         ####### PUBLIC #########################################
-        #results.extend(test_public_pages())
+        results.extend(test_public_pages())
         #results.extend(test_signup())
         #results.extend(test_login_dialog())
         #results.extend(test_login_page())
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         
         ### WORKBENCH
         #results.extend(test_punch()) 
-        results.extend(test_redemptions()) 
+        #results.extend(test_redemptions()) TODO finish
         
         ### ACCOUNT SETTINGS
         #results.extend(test_account_settings()) TODO 

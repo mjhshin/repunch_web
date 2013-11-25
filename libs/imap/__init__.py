@@ -8,7 +8,7 @@ from dateutil.tz import tzutc
 from django.utils import timezone
 
 from libs.dateutil.relativedelta import relativedelta
-from repunch.settings import EMAIL_FROM, EMAIL_HOST_PASSWORD
+from repunch.settings import EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 
 class Mail(object):
     """
@@ -18,7 +18,7 @@ class Mail(object):
     SENT_MAILBOX = "[Gmail]/Sent Mail"
     HEADER_DATE_RE = re.compile(r"Date: (?P<date>.*) -", re.DOTALL)
     
-    def __init__(self, username=EMAIL_FROM,
+    def __init__(self, username=EMAIL_HOST_USER,
         password=EMAIL_HOST_PASSWORD, hostname="imap.gmail.com"):
         """
         Open the connection to the email server.
