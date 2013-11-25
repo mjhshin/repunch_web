@@ -58,8 +58,8 @@ def test_punch():
         {'test_name': "Using unused punch_code returns error with PATRON_NOT_FOUND"},
     ])
     
-    emp_lifetime_punches = employee.lifetime_punches
-    patron_store = PatronStore.objects().get(\
+    globals()['emp_lifetime_punches'] = employee.lifetime_punches
+    globals()['patron_store'] = PatronStore.objects().get(\
         Patron=patron.objectId, Store=store.objectId)
     
     ##########  Punch creates a new Punch object (from employee)
@@ -77,105 +77,78 @@ def test_punch():
     
         return Punch.objects().count(Patron=patron.objectId) == 1
     
-    test.testit(test_0)
-    
-    punch = Punch.objects().get(Patron=patron.objectId)
-    
     ##########  Punch object is added to Store's Punches relation 
     def test_1():
+        punch = Punch.objects().get(Patron=patron.objectId)
+        globals()['punch'] = punch
         return store.get("punches", objectId=punch.objectId,
             limit=0, count=1) == 1
     
-    test.testit(test_1)
-    
     ##########  Punch object is added to Employee's Punches relation
     def test_2():
-        return employee.get("punches", objectId=punch.objectId,
+        return employee.get("punches",
+            objectId=globals()['punch'].objectId,
             limit=0, count=1) == 1
     
-    test.testit(test_2)
-     
     ##########  Punch's Patron pointer is set
     def test_3():
-        return punch.Patron == patron.objectId
-    
-    test.testit(test_3)
+        return globals()['punch'].Patron == patron.objectId
     
     ##########  Punch's punches is set to correct amount
     def test_4():
-        return punch.punches == 1
-    
-    test.testit(test_4)
+        return globals()['punch'].punches == 1
     
     ##########  Employee's lifetime_punches is updated
     def test_5():
         employee.lifetime_punches = None
-        return emp_lifetime_punches+1 == employee.get("lifetime_punches")
-    
-    test.testit(test_5)
+        return globals()['emp_lifetime_punches']+1 ==\
+            employee.get("lifetime_punches")
     
     ##########  PatronStore is created since it does not yet exist
     def test_6():
-        if patron_store is not None:
+        if globals()['patron_store'] is not None:
             return "PatronStore already existed. Test is invalid."
             
         return PatronStore.objects().count(\
             Patron=patron.objectId, Store=store.objectId) == 1
     
-    test.testit(test_6)
-    
-    patron_store = PatronStore.objects().get(\
-        Patron=patron.objectId, Store=store.objectId)
-    
     ##########  PatronStore is added to Patron's PatronStores relation
     def test_7():
+        patron_store = PatronStore.objects().get(\
+            Patron=patron.objectId, Store=store.objectId)
+        globals()['patron_store'] = patron_store
         return patron.get("patronStores", objectId=patron_store.objectId,
             limit=0, count=1) == 1
     
-    test.testit(test_7)
-    
-    
     ##########  PatronStore is added to Store's PatronStores relation
     def test_8():
-        return store.get("patronStores", objectId=patron_store.objectId,
+        return store.get("patronStores", objectId=globals()['patron_store'].objectId,
             limit=0, count=1) == 1
-    
-    test.testit(test_8)
     
     ##########  PatronStore's Patron pointer is set
     def test_9():
-        return patron_store.Patron is not None
-    
-    test.testit(test_9)
+        return globals()['patron_store'].Patron is not None
     
     ##########  PatronStore's Store pointer is set 
     def test_10():
-        return patron_store.Store is not None
-    
-    test.testit(test_10)
+        return globals()['patron_store'].Store is not None
     
     ##########  PatronStore's all_time_punches is set to amount given
     def test_11():
-        return patron_store.all_time_punches == 1
-    
-    test.testit(test_11)
+        return globals()['patron_store'].all_time_punches == 1
     
     ##########  PatronStore's punch_count is set to amount given
     def test_12():
-        return patron_store.punch_count == 1
-    
-    test.testit(test_12)
+        return globals()['patron_store'].punch_count == 1
     
     ##########  PatronStore's pending_reward is set to false 
     def test_13():
-        return not patron_store.pending_reward
+        return not globals()['patron_store'].pending_reward
     
-    test.testit(test_13)
-    
-    punch.delete()
     
     ##########  Punch creates a new Punch object (from dashboard - owner)
     def test_14():
+        globals()['punch'].delete()
         if Punch.objects().count(Patron=patron.objectId) > 0:
             return "Punches for the Store exists. Test is invalid."
         
@@ -187,43 +160,31 @@ def test_punch():
         })
     
         return Punch.objects().count(Patron=patron.objectId) == 1
-        
-    test.testit(test_14)
-    
-    punch = Punch.objects().get(Patron=patron.objectId)
     
     ##########  Punch object is added to Store's Punches relation
     def test_15():
+        punch = Punch.objects().get(Patron=patron.objectId)
+        globals()['punch'] = punch
         return store.get("punches", objectId=punch.objectId,
             count=1, limit=0) == 1
    
-    test.testit(test_15)
-    
     ##########  Punch's Patron pointer is set
     def test_16():
-        return punch.Patron == patron.objectId
-    
-    test.testit(test_16)
+        return globals()['punch'].Patron == patron.objectId
     
     ##########  Punch's punches is set to correct amount 
     def test_17():
-        return punch.punches == 1
-    
-    test.testit(test_17)
-    
-    patron_store.fetch_all(clear_first=True, with_cache=False)
+        return globals()['punch'].punches == 1
     
     ##########  PatronStore's punch_count is updated 
     def test_18():
+        patron_store = globals()['patron_store']
+        patron_store.fetch_all(clear_first=True, with_cache=False)
         return patron_store.punch_count == 2
-    
-    test.testit(test_18)
     
     ##########  PatronStore's all_time_punches is updated 
     def test_19():
-        return patron_store.all_time_punches == 2
-    
-    test.testit(test_19)
+        return globals()['patron_store'].all_time_punches == 2
         
     ##########  Using unused punch_code returns error with PATRON_NOT_FOUND 
     def test_20():
@@ -235,8 +196,9 @@ def test_punch():
         })
     
         return res["error"] == "PATRON_NOT_FOUND"
-        
-    test.testit(test_20)
     
+    for i in range(21):
+        test.testit(locals()["test_%s" % (str(i),)])
+        
     # END OF ALL TESTS - cleanup
     return test.get_results()
