@@ -42,6 +42,11 @@ def test_request_validate_reject_redeem():
         "store_id": store.objectId,
     })["result"])
     
+    # first add some punches
+    patron_store.all_time_punches = 10
+    patron_store.punch_count = 10
+    patron_store.update()
+    
     test = CloudCodeTest("REQUEST/APPROVE/REJECT REDEEM", [
         {'test_name': "Request_redeem creates a new RedeemReward (reward)"},
         {'test_name': "RedeemReward is added to Store's RedeemReward relation"},
@@ -57,7 +62,7 @@ def test_request_validate_reject_redeem():
         {'test_name': "Validate_redeem successful"},
         {'test_name': "RedeemReward's is_redeemed is set to true"},
         {'test_name': "PatronStore's pending_reward is set to false"},
-        {'test_name': "PatronStore's punch_Count is updated"},
+        {'test_name': "PatronStore's punch_count is updated"},
         {'test_name': "The reward's redemption_count is updated"},
         
         {'test_name': "Reject_redeem successful"},
@@ -180,12 +185,52 @@ def test_request_validate_reject_redeem():
         return redeem_reward.reward_id == reward["reward_id"]
     
     test.testit(test_9)
+    
+    pt_punch_cout_b4 = patron_store.punch_count
+    reward_red_count_b4 = reward["redemption_count"]
         
-    ##########  Validate_redeem successful TODO
-    ##########  RedeemReward's is_redeemed is set to true TODO
-    ##########  PatronStore's pending_reward is set to false TODO
-    ##########  PatronStore's punch_Count is updated TODO
-    ##########  The reward's redemption_count is updated TODO
+    ##########  Validate_redeem successful
+    def test_10():
+        res = cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+            "reward_id": reward["reward_id"],
+        })
+        
+        return "error" not in res
+    
+    test.testit(test_10)
+    
+    redeem_reward.fetch_all(clear_first=True, with_cache=False)
+    patron_store.fetch_all(clear_first=True, with_cache=False)
+    store.rewards = None
+    reward = store.get("rewards")[0]
+    
+    ##########  RedeemReward's is_redeemed is set to true
+    def test_11():
+        return redeem_reward.is_redeemed
+    
+    test.testit(test_11)
+    
+    ##########  PatronStore's pending_reward is set to false
+    def test_12():
+        return not patron_store.pending_reward
+    
+    test.testit(test_12)
+    
+    ##########  PatronStore's punch_count is updated 
+    def test_13():
+        return patron_store.punch_count ==\
+            pt_punch_cout_b4 - reward["punches"]
+    
+    test.testit(test_13)
+    
+    ##########  The reward's redemption_count is updated 
+    def test_14():
+        return reward["redemption_count"] ==\
+            reward_red_count_b4 + 1
+        
+    test.testit(test_14)
         
     ##########  Reject_redeem successful TODO
     ##########  RedeemReward is deleted TODO
