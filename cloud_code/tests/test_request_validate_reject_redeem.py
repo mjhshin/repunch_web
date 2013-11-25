@@ -101,10 +101,11 @@ def test_request_validate_reject_redeem():
         
         {'test_name': "Validate_redeem successful"},
         {'test_name': "RedeemReward's is_redeemed is set to true"},
-        {'test_name': "MessageStatus's redeem_available is set to false"},
+        {'test_name': "MessageStatus's redeem_available is set to 'no'"},
         
         {'test_name': "Reject_redeem successful"},
         {'test_name': "RedeemReward is deleted"},
+        {'test_name': "MessageStatus's redeem_available is set to 'no'"},
         
         {'test_name': "Request_redeem succeeds with pending if"+\
             " PatronStore's pending_reward is true before the request."},
@@ -113,8 +114,11 @@ def test_request_validate_reject_redeem():
             "RedeemReward has already been redeemed"},
         {'test_name': "Validate_redeem succeeds with PATRONSTORE_REMOVED if the"+\
             "PatronStore has been deleted"},
+        {'test_name': "The RedeemReward is then deleted."},
+            
         {'test_name': "Validate_redeem succeeds with insufficient if the"+\
-            "PatronStore does not have neough punches"},
+            "PatronStore does not have enough punches"},
+        {'test_name': "The RedeemReward is then deleted."},
         {'test_name': "Validate_redeem fails with REDEEMREWARD_NOT_FOUND if the"+\
             "RedeemReward has been deleted"},
             
@@ -124,6 +128,7 @@ def test_request_validate_reject_redeem():
             "RedeemReward has been deleted"},
         {'test_name': "Reject_redeem fails with PATRONSTORE_REMOVED if the"+\
             "PatronStore has been deleted"},
+        {'test_name': "The RedeemReward is then deleted."},
     ])
     
     ##########  Request_redeem creates a new RedeemReward (reward)
@@ -293,27 +298,31 @@ def test_request_validate_reject_redeem():
     test.testit(test_17)
     
     # need to create an offer
-    offer = Message.objects().create(**{
-        'subject': u'test_request_validate_redeem script message offer',
-        'body': u'test_request_validate_redeem script generate offer', 
-        'sender_name': u'test_request_validate_redeem', 
-        'store_id': store.objectId, 
-        'is_read': False, 
-        'offer_redeemed': False, 
-        'date_offer_expiration': timezone.now()+relativedelta(days=1), 
-        'filter': u'all', 
-        'offer_title': u'test_request_validate_redeem script offer', 
-        'message_type': 'offer', 
-    })
+    def create_offer():
+        offer = Message.objects().create(**{
+            'subject': u'test_request_validate_redeem script message offer',
+            'body': u'test_request_validate_redeem script generate offer', 
+            'sender_name': u'test_request_validate_redeem', 
+            'store_id': store.objectId, 
+            'is_read': False, 
+            'offer_redeemed': False, 
+            'date_offer_expiration': timezone.now()+relativedelta(days=1), 
+            'filter': u'all', 
+            'offer_title': u'test_request_validate_redeem script offer', 
+            'message_type': 'offer', 
+        })
+        
+        cloud_call("retailer_message", {
+            "filter": offer.filter,
+            "store_name": store.store_name,
+            "message_id": offer.objectId,
+            "store_id": store.objectId,
+            "subject": offer.subject,
+        })
+        
+        return offer
     
-    cloud_call("retailer_message", {
-        "filter": offer.filter,
-        "store_name": store.store_name,
-        "message_id": offer.objectId,
-        "store_id": store.objectId,
-        "subject": offer.subject,
-    })
-    
+    offer = create_offer()
     message_status = patron.get("receivedMessages", limit=1)[0]
     patron.receivedMessages = None
         
@@ -323,10 +332,9 @@ def test_request_validate_reject_redeem():
             "patron_id": patron.objectId,
             "store_id": store.objectId,
             "patron_store_id": patron_store.objectId,
-            "reward_id": reward["reward_id"],
             "num_punches": reward["punches"],
             "name": patron.get_fullname(),
-            "title": reward["reward_name"],
+            "title": offer.offer_title,
             "message_status_id": message_status.objectId,
         })
         
@@ -379,7 +387,7 @@ def test_request_validate_reject_redeem():
     
     ##########  RedeemReward's title is set
     def test_25():
-        return redeem_reward.title == reward["reward_name"]
+        return redeem_reward.title == offer.offer_title
     
     test.testit(test_25)
     
@@ -389,33 +397,101 @@ def test_request_validate_reject_redeem():
         return message_status.get("redeem_available") == "pending"
     
     test.testit(test_26)
+        
+    ##########  Validate_redeem successful
+    def test_27():
+        res = cloud_call("validate_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })
+        
+        return "error" not in res
     
+    test.testit(test_27)
+    
+    redeem_reward.fetch_all(clear_first=True, with_cache=False)
+    message_status.fetch_all(clear_first=True, with_cache=False)
+    
+    ##########  RedeemReward's is_redeemed is set to true
+    def test_28():
+        return redeem_reward.is_redeemed
+    
+    test.testit(test_28)
+    
+    ##########  MessageStatus's redeem_available is set to "no"
+    def test_29():
+        return message_status.redeem_available == "no"
+    
+    test.testit(test_29)
+    
+    # create another redeem
+    offer = create_offer()
+    message_status = patron.get("receivedMessages",
+        redeem_available="yes", limit=1)[0]
+    patron.receivedMessages = None
+    cloud_call("request_redeem", {
+        "patron_id": patron.objectId,
+        "store_id": store.objectId,
+        "patron_store_id": patron_store.objectId,
+        "num_punches": reward["punches"],
+        "name": patron.get_fullname(),
+        "title": offer.offer_title,
+        "message_status_id": message_status.objectId,
+    })
         
-    ##########  Validate_redeem successful TODO
-    ##########  RedeemReward's is_redeemed is set to true TODO
-    ##########  MessageStatus's redeem_available is set to false TODO
-        
-    ##########  Reject_redeem successful TODO
-    ##########  RedeemReward is deleted TODO
+    redeem_reward = RedeemReward.objects().get(\
+            MessageStatus=message_status.objectId, is_redeemed=False)
+            
+    ##########  Reject_redeem successful
+    def test_30():
+        res = cloud_call("reject_redeem", {
+            "redeem_id": redeem_reward.objectId,
+            "store_id": store.objectId,
+        })
+        return "error" not in res
+    
+    test.testit(test_30)
+    
+    ##########  RedeemReward is deleted
+    def test_31():
+        return  RedeemReward.objects().count(\
+            objectId=redeem_reward.objectId) == 0
+    
+    test.testit(test_31)
+    
+    ##########  MessageStatus' redeem_available is set to "no"
+    def test_32():
+        message_status.redeem_available = None
+        return message_status.get("redeem_available") == "no"
+    
+    test.testit(test_32)
         
     ##########  Request_redeem succeeds with pending if
     ###         PatronStore's pending_reward is true before the request. TODO
             
     ##########  Validate_redeem succeeds with validated if the
     ###         RedeemReward has already been redeemed TODO
+    
     ##########  Validate_redeem succeeds with PATRONSTORE_REMOVED if the
     ###         PatronStore has been deleted TODO
+    ##########  The RedeemReward is then deleted TODO
+        
     ##########  Validate_redeem succeeds with insufficient if the
     ###         PatronStore does not have neough punches TODO
+    ##########  The RedeemReward is then deleted TODO
+        
     ##########  Validate_redeem fails with REDEEMREWARD_NOT_FOUND if the
     ###         RedeemReward has been deleted TODO
             
     ##########  Reject_redeem fails with REDEEMREWARD_VALIDATED
     ###         if the RedeemReward has already been validated TODO
+    
     ##########  Reject_redeem fails with REDEEMREWARD_NOT_FOUND if the
     ###         RedeemReward has been deleted TODO
+    
     ##########  Reject_redeem fails with PATRONSTORE_REMOVED if the
     ###         PatronStore has been deleted TODO
+    ##########  The RedeemReward is then deleted TODO
     
     
     # END OF ALL TESTS - cleanup
