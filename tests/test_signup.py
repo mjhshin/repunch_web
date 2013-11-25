@@ -22,8 +22,10 @@ TEST_USER = {
 
 def test_signup():
     # TODO test place order!
-    test = SeleniumTest()
-    parts = [
+    print "\ntest_signup:"
+    print "--------------"   
+    
+    test = SeleniumTest("SIGNUP", [
         {'test_name': "Sign up page navigable"},
         {'test_name': "Form submission okay"},
         {'test_name': "Popup dialog functional"},
@@ -49,21 +51,18 @@ def test_signup():
         {'test_name': "Invalid address is detected (no coordinates)"},
         {'test_name': "password must be at least 6 characters"},
         {'test_name': "password and corfirmation must be the same"},
-        
-    ]
-    section = {
-        "section_name": "Sign up working properly?",
-        "parts": parts,
-    }
-    test.results.append(section)
+    ])
 
     ##########  Sign up page navigable
-    test.open(reverse("public_signup")) # ACTION!
-    parts[0]['success'] = True
+    def test_0():
+        test.open(reverse("public_signup")) 
+        return test.is_current_url(reverse("public_signup"))
+    
+    test.testit(test_0)
     sleep(1)
     
     ##########  Form submission okay
-    try:
+    def test_1():
         selectors = (
             ("#categories", "baker"),
             ("", Keys.ARROW_DOWN),
@@ -96,220 +95,152 @@ def test_signup():
             "#id_recurring",
             "#signup-form-submit",
         )
-        test.action_chain(0, selectors) # ACTION!
-    except Exception as e:
-        print e
-        parts[1]['test_message'] = str(e)
-    else:
-        parts[1]['success'] = True
-        sleep(1) 
+        test.action_chain(0, selectors) 
+        return True
+        
+    test.testit(test_1)
+    sleep(1) 
         
     ##########  Popup dialog functional
-    max_wait_time, time_waited = 10, 0
-    # the orange clock that pops up after signing up.
-    try:
+    def test_2():
+        max_wait_time, time_waited = 10, 0
+        # the orange clock that pops up after signing up.
         time_img =\
             test.driver.find_element_by_id("signing-up-time")
         while not time_img.is_displayed() and\
             time_waited < max_wait_time:
             sleep(1)
             time_waited += 1
-        parts[2]['success'] = time_waited < max_wait_time
-    except Exception as e:
-        print e
-        parts[2]['test_message'] = str(e)
-
+        return time_waited < max_wait_time
+    
+    test.testit(test_2)
+    
+    user = Account.objects().get(username=TEST_USER['email'],
+        include="Store.Subscription,Store.Settings")
+            
     ##########  User object created
-    try:
-        user = Account.objects().get(username=TEST_USER['email'],
-            include="Store.Subscription,Store.Settings")
-        parts[3]['success'] = user is not None
-    except Exception as e:
-        print e
-        parts[3]['test_message'] = str(e)
-    ##########  Store object created
+    def test_3():
+        return user is not None
+        
+    test.testit(test_3)
+        
     if user is not None:
         store = user.get("store")
-        parts[4]['success'] = store is not None
-        ##########  Subscription object created
         subscription = store.get("subscription")
-        parts[5]['success'] = subscription is not None
-        ##########  Settings object created
         settings = store.get("settings")
-        parts[6]['success'] = settings is not None
         
-        ##########  Email about new user sent to staff
-        sleep(5) # wait for the email to register in gmail
+        ##########  Store object created
+        def test_4():
+            return store is not None
+        ##########  Subscription object created
+        def test_5():
+            return subscription is not None
+        ##########  Settings object created
+        def test_6():
+            return settings is not None
+            
+        for i in range(4, 7):
+            locals().get("test_%s" % (str(i),))()
+            
         if SeleniumTest.CHECK_SENT_MAIL:
             mail = Mail()
-            try:
-                parts[7]['success'] = mail.is_mail_sent(\
-                    EMAIL_SIGNUP_SUBJECT_PREFIX + store.store_name)
-            except Exception as e:
-                print e
-                parts[7]['test_message'] = str(e)
-        else:
-            parts[7]['success'] = True
+        
+        ##########  Email about new user sent to staff
+        def test_7():
+            if SeleniumTest.CHECK_SENT_MAIL:
+                sleep(5) # wait for the email to register in gmail
+                return mail.is_mail_sent(\
+                        EMAIL_SIGNUP_SUBJECT_PREFIX + store.store_name)
+            else:
+                return (True, "Test skipped.")
                 
         ##########  Welcome email sent to user
-        if SeleniumTest.CHECK_SENT_MAIL:
-            try:
-                parts[8]['success'] = mail.is_mail_sent(\
+        def test_8():
+            if SeleniumTest.CHECK_SENT_MAIL:
+                return mail.is_mail_sent(\
                     EMAIL_SIGNUP_WELCOME_SUBJECT_PREFIX +
                     store.get_owner_fullname())
-            except Exception as e:
-                print e
-                parts[8]['test_message'] = str(e)
-        else:
-            parts[8]['success'] = True
+            else:
+                return (True, "Test skipped.")
         
-        test.open(reverse("public_signup")) # ACTION!
-        test.find("#id_email").send_keys(TEST_USER['email'])
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
-        sleep(3)
         ##########  Email must be unique
-        try:
-            parts[9]['success'] =\
-                str(test.find("#email_e ul li").text) ==\
+        def test_9():
+            test.open(reverse("public_signup")) 
+            test.find("#id_email").send_keys(TEST_USER['email'])
+            test.find("#signup-form-submit").click() 
+            sleep(3)
+            return str(test.find("#email_e ul li").text) ==\
                     "Email is already being used."
-        except Exception as e:
-            print e
-            parts[9]['test_message'] = str(e)
+    
+        for i in range(7, 10):
+            locals().get("test_%s" % (str(i),))()
     
         if SeleniumTest.CHECK_SENT_MAIL:
             mail.logout()
             
-        user.delete()
-        store.delete()
-        subscription.delete()
-        settings.delete()
+        try:
+            user.delete()
+            store.delete()
+            subscription.delete()
+            settings.delete()
+        except Exception:
+            pass
         
     ## Required fields are required!
-    try:
-        test.open(reverse("public_signup")) # ACTION!
-        sleep(1)
-        selectors = (
-            "#id_store_name",
-            "#id_street",
-            "#id_city",
-            "#id_state",
-            "#id_zip",
-            "#id_first_name",
-            "#id_last_name",
-            "#Ph1",
-            "#Ph2",
-            "#Ph3",
-            "#id_email",
-            "#id_password",
-            "#id_confirm_password",
-        )
-        test.action_chain(0, selectors, action="clear") # ACTION!
-        # submit
-        test.find("#signup-form-submit").click() # ACTION!
-        sleep(3)
-    except Exception as e:
-        print e
+    test.open(reverse("public_signup")) 
+    sleep(1)
+    selectors = (
+        "#id_store_name",
+        "#id_street",
+        "#id_city",
+        "#id_state",
+        "#id_zip",
+        "#id_first_name",
+        "#id_last_name",
+        "#Ph1",
+        "#Ph2",
+        "#Ph3",
+        "#id_email",
+        "#id_password",
+        "#id_confirm_password",
+    )
+    test.action_chain(0, selectors, action="clear") 
+    test.find("#signup-form-submit").click() 
+    sleep(3)
+    
     
     ##########  Store name is required
-    try:
-        parts[10]['success'] =\
-            str(test.find("#store_name_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[10]['test_message'] = str(e)
     ##########  Street is required
-    try:
-        parts[11]['success'] =\
-            str(test.find("#street_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[11]['test_message'] = str(e)
     ##########  City is required
-    try:
-        parts[12]['success'] =\
-            str(test.find("#city_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[12]['test_message'] = str(e)
     ##########  State is required 
-    try:
-        parts[13]['success'] =\
-            str(test.find("#state_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[13]['test_message'] = str(e)
     ##########  Zip is required 
-    try:
-        parts[14]['success'] =\
-            str(test.find("#zip_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[14]['test_message'] = str(e)
     ##########  First name is required 
-    try:
-        parts[15]['success'] =\
-            str(test.find("#first_name_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[15]['test_message'] = str(e)
     ##########  Last name is required 
-    try:
-        parts[16]['success'] =\
-            str(test.find("#last_name_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[16]['test_message'] = str(e)
     ##########  Phone number is required 
-    try:
-        parts[17]['success'] =\
-            str(test.find("#phone_number_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[17]['test_message'] = str(e)
     ##########  Email is required 
-    try:
-        parts[18]['success'] =\
-            str(test.find("#email_e ul li").text) ==\
-                "This field is required."
-    except Exception as e:
-        print e
-        parts[18]['test_message'] = str(e)
     ##########  Password is required 
-    try:
-        err = test.find("#password_e ul li")
-        parts[19]['success'] =\
-            str(err.text) == "This field is required."
-    except Exception as e:
-        print e
-        parts[19]['test_message'] = str(e)
     ##########  Password confirmation is required
-    try:
-        err = test.find("#password2_e ul li")
-        parts[20]['success'] =\
-            str(err.text) == "This field is required."
-    except Exception as e:
-        print e
-        parts[20]['test_message'] = str(e)
-    ##########  ToS is required 
-    try:
-        parts[21]['success'] =\
-            str(test.find("#recurring_e ul li").text) ==\
-                "You must accept the Terms & Conditions to continue."
-    except Exception as e:
-        print e
-        parts[21]['test_message'] = str(e)
+    test.fields_required((
+        "#store_name_e ul li",
+        "#street_e ul li",
+        "#city_e ul li",
+        "#state_e ul li",
+        "#zip_e ul li",
+        "#first_name_e ul li",
+        "#last_name_e ul li",
+        "#phone_number_e ul li",
+        "#email_e ul li",
+        "#password_e ul li",
+        "#password2_e ul li",
+    ), test_offset=10)
             
+    ##########  ToS is required 
+    def test_21():
+        return str(test.find("#recurring_e ul li").text) ==\
+                "You must accept the Terms & Conditions to continue."
+                
     ##########  Invalid address is detected (no coordinates)
-    try:
+    def test_22():
         # street
         street = test.find("#id_street")
         street.clear()
@@ -329,15 +260,11 @@ def test_signup():
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
-        parts[22]['success'] =\
-            str(test.find("#street_e ul li").text) ==\
+        return str(test.find("#street_e ul li").text) ==\
             "Enter a valid adress, city, state, and/or zip."
-    except Exception as e:
-        print e
-        parts[22]['test_message'] = str(e)
     
     ##########  password must be at least 6 characters
-    try:
+    def test_23():
         # pass1
         pass1 = test.find("#id_password")
         pass1.clear()
@@ -349,18 +276,14 @@ def test_signup():
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
-        parts[23]['success'] =\
-            str(test.find("#password_e ul li").text) ==\
+        return str(test.find("#password_e ul li").text) ==\
             "Ensure this value has at least 6 characters " +\
             "(it has 5)." and str(test.find(\
             "#password2_e ul li").text)== "Ensure this " +\
             "value has at least 6 characters (it has 5)."
-    except Exception as e:
-        print e
-        parts[23]['test_message'] = str(e)
  
     ##########  password and corfirmation must be the same
-    try:
+    def test_24():
         # pass1
         pass1 = test.find("#id_password")
         pass1.clear()
@@ -372,13 +295,12 @@ def test_signup():
         # submit
         test.find("#signup-form-submit").click() # ACTION!
         sleep(2)
-        parts[24]['success'] =\
-            str(test.find("#password_e ul li").text) ==\
+        return str(test.find("#password_e ul li").text) ==\
             "Passwords don't match"
-    except Exception as e:
-        print e
-        parts[24]['test_message'] = str(e)
+            
+    for i in range(21, 25):
+        locals().get("test_%s" % (str(i),))()
     
-    
-    # END OF ALL TESTS - cleanup
+
+    # END OF ALL TESTS
     return test.tear_down()

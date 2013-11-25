@@ -41,7 +41,6 @@ class SeleniumTest(CloudCodeTest):
         self.set_to_implicit_wait(True)
         self.dev_login()
         
-        
     def set_to_implicit_wait(self, wait):
         if wait:
             self.driver.implicitly_wait(SeleniumTest.IMPLICITLY_WAIT)
@@ -217,3 +216,13 @@ class SeleniumTest(CloudCodeTest):
         type is rebound to a string in all functions.
         """
         return type(obj)
+        
+    def fields_required(self, selectors, test_offset=0, type="css"):
+        for i, sel in enumerate(selectors):
+            test_name = "test_%s" % (str(i+ind_offset),)
+            locals()[test_name] = lambda: self.field_required(sel)
+            self.testit(locals()[test_name])
+        
+    def field_required(self, selector, type="css"):
+        return str(self.find(selector, type).text) ==\
+            "This field is required."

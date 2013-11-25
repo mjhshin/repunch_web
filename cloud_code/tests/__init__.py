@@ -42,10 +42,15 @@ class CloudCodeTest(object):
             
         try:
             result = test()
-            if type(result) in (unicode, str):
+            result_type = type(result)
+            
+            if result_type in (unicode, str):
                 self.tests[test_num]["test_message"] = result
-            elif type(result) is bool:
+            elif result_type is bool:
                 self.tests[test_num]["success"] = result
+            elif result_type in (tuple, list):
+                self.tests[test_num]["success"] = result[0]
+                self.tests[test_num]["test_message"] = result[1]
                 
             if verbose:
                 if type(result) is bool and result:

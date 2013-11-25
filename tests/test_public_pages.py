@@ -39,8 +39,6 @@ def test_public_pages():
         sleep(2)
         return test.is_current_url(reverse("public_home"))
         
-    test.testit(test_0)
-    
     ##########  Learn page navigable
     def test_1():
         selectors = (
@@ -56,8 +54,6 @@ def test_public_pages():
         test.action_chain(1, selectors)
         return True
         
-    test.testit(test_1)
-    
     ##########  FAQ page navigable
     def test_2():
         selectors = [
@@ -73,8 +69,6 @@ def test_public_pages():
         test.action_chain(1, selectors, type="xpath")
         return True
         
-    test.testit(test_2)
-    
     ##########  About page navigable
     def test_3():
         test.find("//nav[@id='header-menu']/a[@href='" +\
@@ -87,8 +81,6 @@ def test_public_pages():
                 str(i) + "]")
         test.action_chain(1, selectors, action="move", type="xpath")
         return True
-        
-    test.testit(test_3)
     
     ##########  Footer elements navigable
     def test_4():
@@ -99,15 +91,12 @@ def test_public_pages():
         # facebook and twitter
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-        test.action_chain(3, selectors, type="xpath") # ACTION!
+        test.action_chain(3, selectors, type="xpath") 
         return True
-        
-    test.testit(test_4)
-    
-    test.new_driver()
     
     ##########  FAQ email form working
     def test_5():
+        test.new_driver()
         test.open(reverse("public_faq"))
         selectors = (
             ("#id_full_name", "Test User X"),
@@ -120,21 +109,16 @@ def test_public_pages():
         sleep(1)
         return test.is_current_url(reverse("public_thank_you"))
         
-    test.testit(test_5)
-    
-    if SeleniumTest.CHECK_SENT_MAIL:
-        mail = Mail()
-    
     ##########  FAQ email sent
     def test_6():
         if SeleniumTest.CHECK_SENT_MAIL:
+            globals()["mail"] = Mail()
             sleep(4) # wait for the email to register in gmail
-            return mail.is_mail_sent(SUBJECT_PREFIX + "Test User X")
+            return globals()["mail"].is_mail_sent(\
+                SUBJECT_PREFIX + "Test User X")
         else:
-            return parts[5]['success']
+            return (True, "Test skipped.")
         
-    test.testit(test_6)
-    
     ##########  FAQ email form all fields required
     def test_7():
         test.open(reverse("public_faq"))
@@ -146,13 +130,10 @@ def test_public_pages():
         )
         test.action_chain(0, selectors, action="send_keys") 
         test.find("//form[@id='make-question-form']/a", 
-            type="xpath").click()
+            type="xpath").click() 
+        sleep(1)
         return len(test.find(".errorlist",
             multiple=True)) == 3
-            
-    test.testit(test_7)    
-    
-    sleep(1)
             
     ##########  Contact Us email form working
     def test_8():
@@ -168,17 +149,14 @@ def test_public_pages():
         sleep(1)
         return test.is_current_url(reverse("public_thank_you"))
             
-    test.testit(test_8)
-        
     ##########  Contact Us email sent
     def test_9():
         if SeleniumTest.CHECK_SENT_MAIL:
             sleep(4) # wait for the email to register in gmail
-            return mail.is_mail_sent(SUBJECT_PREFIX + "Test User Y")
+            return globals()["mail"].is_mail_sent(\
+                SUBJECT_PREFIX + "Test User Y")
         else:
-            return parts[8]['success']
-            
-    test.testit(test_9)
+            return (True, "Test skipped.")
             
     ##########  Contact Us email form all fields required
     def test_10():
@@ -191,14 +169,15 @@ def test_public_pages():
         test.action_chain(0, selectors, action="send_keys") 
         test.find("//form[@id='contact-form']/a", 
             type="xpath").click()
+        sleep(1)
         return len(test.find(".errorlist", multiple=True)) == 3
-                
-    test.testit(test_10)
-    sleep(2)
+        
+    for i in range(11):
+        test.testit(locals()["test_%s" % (str(i),)])
     
     # END TEST
     if SeleniumTest.CHECK_SENT_MAIL: 
-        mail.logout()
+        globals()["mail"].logout()
     
     # END OF ALL TESTS
     return test.tear_down()
