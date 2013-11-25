@@ -298,6 +298,9 @@ REQUEST_TIMEOUT = 240 # in seconds
 # check for new stuff in the cache every 4 seconds
 COMET_PULL_RATE = 4
 
+# for the cloud logger
+CLOUD_LOGGER_TRIGGER_KEY = "gjh9x7342t976q3xm78wmeyksuzgx9q63t"
+
 # RECAPTCHA - https://www.google.com/recaptcha/admin/site?siteid=317181713
 # repunch.com domain by vandolf@repunch.com
 RECAPTCHA_PUBLIC_KEY = "6LcRz-cSAAAAAIhbaQAFiiPvWqDrsDtIfd98cCWu"

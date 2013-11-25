@@ -144,10 +144,12 @@ def manage_cloud_trigger(request):
     Simply calls the trigger_cloud_logger cloud code.
     """
     if request.method == "GET":
-        cloud_call("trigger_cloud_logger", {
-            "extra_message":\
-                request.GET.get("extra_message", "Still running")
-        })
-        return HttpResponse("Successfully called trigger_cloud_logger")
+        key = request.GET.get("key")
+        if key == CLOUD_LOGGER_TRIGGER_KEY:
+            cloud_call("trigger_cloud_logger", {
+                "extra_message":\
+                    request.GET.get("extra_message", "Still running")
+            })
+            return HttpResponse("Successfully called trigger_cloud_logger")
     
     return HttpResponse("Bad Request")
