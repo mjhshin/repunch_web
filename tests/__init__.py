@@ -218,12 +218,26 @@ class SeleniumTest(CloudCodeTest):
         """
         return type(obj)
         
-    def fields_required(self, selectors, test_offset=0, type="css"):
+    def fields_required(self, selectors, init_func,
+        test_offset=0, type="css"):
+        """
+        Generates tests for each selector.
+        The selectors is a tuple (selector, __doc__)
+        
+        Calls init_func first, which should return True.
+        """
         for i, sel in enumerate(selectors):
-            self.testit(lambda: self.field_required(sel, type), i+test_offset)
+            if i == 0:
+                func = lambda: init_func() and\
+                    self.field_required(sel[0], type)
+            else:
+                func = lambda: self.field_required(sel[0], type)
+                
+            func.__doc__ = sel[1]
+            setattr(self, "test_%d" % (i+test_offset,), func)
         
     def field_required(self, selector, type="css"):
-        return str(self.find(selector, type).text) ==\
+        return self.find(selector, type).text ==\
             "This field is required."
             
             
