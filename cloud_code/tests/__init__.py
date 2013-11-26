@@ -12,8 +12,6 @@ UN_CAMEL_RE = re.compile(r"([a-z0-9])([A-Z])")
 
 class CloudCodeTest(object):
 
-    VERBOSE = True
-    
     # This User exists solely for testing CloudCode.
     # It must have a Store, Employee, and Patron pointers.
     USER = {
@@ -21,22 +19,24 @@ class CloudCodeTest(object):
         "password": "123456",
     }
     
-    def __init__(self, fetch_user=True):
+    def __init__(self, fetch_user=True, verbose=False):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
         """
+        self.verbose = verbose
+        
         name = UN_CAMEL_RE.sub(r'\1 \2', self.__class__.__name__)
         
-        if self.VERBOSE:
+        if self.verbose:
             print "\n" + name 
             print "--------------------------------------------------"
         
         self._tests = []
-        self._results = [{
+        self._results = {
             "section_name": name,
             "parts": self._tests,
-        }]
+        }
         
         if fetch_user:
             self.account = Account.objects().get(email=\
@@ -72,12 +72,10 @@ class CloudCodeTest(object):
         It should also have a doc string to be used as the test name 
         or description.
         """
-        verbose = self.VERBOSE
-                
         if test_num is None:
             test_num = int(test.__name__.split("_")[-1])
         
-        if verbose:
+        if self.verbose:
             log = "Test #%s:\t" % (str(test_num),)
             
         test = {"test_name": test_func.__doc__}       
@@ -95,17 +93,17 @@ class CloudCodeTest(object):
                 test["success"] = result[0]
                 test["test_message"] = result[1]
                 
-            if verbose:
+            if self.verbose:
                 if type(result) is bool and result:
                     log += "Success"
                 else:
                     log += "Fail - %s" % (result,)
                 
         except Exception as e:
-            if verbose:
-                log += "Error: %s\n\n" % (e, )
+            if self.verbose:
+                log += "Error: %s" % (e, )
                 
             test["test_message"] = str(e)
         finally:
-            if verbose:
+            if self.verbose:
                 print log
