@@ -104,7 +104,8 @@ class CloudCodeTest(object):
                 test["test_message"] = result[1]
                 
             if verbose:
-                if type(result) is bool and result:
+                if type(result) is bool and result or\
+                    type(result) in (tuple, list) and result[0]:
                     log += "Success"
                 else:
                     log += "Fail - %s" % (result,)
