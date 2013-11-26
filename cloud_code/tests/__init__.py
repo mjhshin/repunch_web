@@ -28,10 +28,6 @@ class CloudCodeTest(object):
         
         name = UN_CAMEL_RE.sub(r'\1 \2', self.__class__.__name__)
         
-        if self.verbose:
-            print "\n" + name 
-            print "--------------------------------------------------"
-        
         self._tests = []
         self._results = {
             "section_name": name,
@@ -44,6 +40,14 @@ class CloudCodeTest(object):
             self.patron = self.account.patron
             self.store = self.account.store
             self.employee = self.account.employee
+            
+    def print_tests(self):
+        """
+        Prints all the tests' test_names in order.
+        """
+        for name in self._get_sorted_tests():
+            print "Test #%s:\t%s" %\
+                (name.split("_")[-1], getattr(self, name).__doc__.strip())
     
     def get_results(self):
         """
@@ -52,15 +56,19 @@ class CloudCodeTest(object):
             test_0: <function test_0 >, ...
         }
         """
-        test_nums = [ int(k.split("_")[-1]) for
-            k in dir(self) if k.startswith("test_")]
-        # need to sort
-        test_nums.sort()
-
-        for t in test_nums:
-            self.testit(getattr(self, "test_%d" % (t,)), t)
+        if self.verbose:
+            print "\n" + name 
+            print "--------------------------------------------------"
+            
+        for name in self._get_sorted_tests():
+            self.testit(getattr(self, name), int(name.split("_")[-1]))
             
         return self._results
+        
+    def _get_sorted_tests(self):
+        names = [ k for k in dir(self) if k.startswith("test_") ]
+        names.sort(key=lambda n: int(n.split("_")[-1]))
+        return names
     
     def testit(self, test_func, test_num=None):
         """
@@ -78,7 +86,7 @@ class CloudCodeTest(object):
         if self.verbose:
             log = "Test #%s:\t" % (str(test_num),)
             
-        test = {"test_name": test_func.__doc__}       
+        test = {"test_name": test_func.__doc__.strip()}       
         self._tests.append(test)
             
         try:
