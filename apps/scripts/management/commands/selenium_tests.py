@@ -5,62 +5,65 @@ Run all selenium tests and send the results to ADMIN
 from django.core.management.base import BaseCommand
 
 from parse.notifications import send_email_selenium_test_results
-from tests.test_public_pages import test_public_pages
-from tests.test_signup import test_signup
-from tests.test_login_logout import test_login_dialog, test_login_page
-from tests.test_mystore import test_edit_store_details,\
-test_update_subscription, test_cancel_account
-from tests.test_rewards import test_rewards
-from tests.test_analysis import test_trends, test_breakdown,\
-test_reward_redemptions
-from tests.test_messages import test_messages, test_feedbacks
-from tests.test_employees import test_employees, test_employee_access,\
-test_employee_registration
-from tests.test_settings import test_settings
-from tests.test_workbench import test_punch, test_redemptions
+from tests.test_public_pages import TestPublicPages
+#from tests.test_signup import TestSignUp
+#from tests.test_login_logout import TestLoginDialog, TestLoginPage
+#from tests.test_mystore import TestEditStoreDetails,\
+#TestUpdateSubscription, TestCancelAccount
+#from tests.test_rewards import TestRewards
+#from tests.test_analysis import TestTrends, TestBreakdown,\
+#TestRewardRedemptions
+#from tests.test_messages import TestMessages, TestFeedbacks
+#from tests.test_employees import TestEmployees, TestEmployeeAccess,\
+#TestEmployeeRegistration
+#from tests.test_settings import TestSettings
+#from tests.test_workbench import TestPunch, TestRedemptions
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        results = []
+        dryrun = "dryrun" in args
+        verbose = "verbose" in args
+    
+        results = (
+            ####### PUBLIC #########################################
+            #TestPublicPages().get_results(verbose),
+            #TestSignUp().get_results(verbose),
+            #TestLoginDialog().get_results(verbose),
+            #TestLoginPage().get_results(verbose),
+            
+            ####### DASHBOARD #########################################
+            #### MY STORE
+            #TestEditStoreDetails().get_results(verbose),
+            #TestUpdateSubscription().get_results(verbose),
+            #TestCancelAccount().get_results(verbose),
+            
+            ### REWARDS
+            #TestRewards().get_results(verbose),
+            
+            ### ANALYSIS
+            #TestTrends().get_results(verbose), todo?
+            #TestBreakdown().get_results(verbose), todo?
+            #TestRewardRedemptions().get_results(verboes), todo?
+            
+            ### MESSAGES
+            #TestMessages().get_results(verbose),
+            #TestFeedbacks().get_results(verbose),
+            
+            ### EMPLOYEE
+            #TestEmployees().get_results(verbose),
+            #TestEmployeeAccess().get_results(verbose),
+            #TestEmployeeRegistration().get_results(verbose),
+            
+            ### SETTINGS
+            #TestSettings().get_results(verbose),
+            
+            ### WORKBENCH
+            #TestPunch().get_results(verbose),
+            #TestRedemptions().get_results(verbose), # TODO finish
+            
+            ### ACCOUNT SETTINGS
+            #TestAccountSettings().get_results(verbose), # TODO
+        )
         
-        ####### PUBLIC #########################################
-        #results.extend(test_public_pages())
-        #results.extend(test_signup())
-        results.extend(test_login_dialog())
-        #results.extend(test_login_page())
-        
-        ####### DASHBOARD #########################################
-        #### MY STORE
-        #results.extend(test_edit_store_details()) 
-        #results.extend(test_update_subscription())
-        #results.extend(test_cancel_account())
-        
-        ### REWARDS
-        #results.extend(test_rewards())
-        
-        ### ANALYSIS
-        #results.extend(test_trends()) todo?
-        #results.extend(test_breakdown()) todo?
-        #results.extend(test_reward_redemptions()) todo? 
-        
-        ### MESSAGES
-        #results.extend(test_messages())
-        #results.extend(test_feedbacks())
-        
-        ### EMPLOYEE
-        #results.extend(test_employees())
-        #results.extend(test_employee_access())
-        #results.extend(test_employee_registration())
-        
-        ### SETTINGS
-        #results.extend(test_settings())
-        
-        ### WORKBENCH
-        #results.extend(test_punch()) 
-        #results.extend(test_redemptions()) TODO finish
-        
-        ### ACCOUNT SETTINGS
-        #results.extend(test_account_settings()) TODO 
-
-        
-        send_email_selenium_test_results(results)
+        if not dryrun:
+            send_email_selenium_test_results(results)

@@ -13,8 +13,8 @@ class TestPunch(CloudCodeTest):
     All Punch objects for the Account's Patron are deleted.
     """
 
-    def __init__(self, verbose=False):
-        super(TestPunch, self).__init__(verbose=verbose)
+    def __init__(self):
+        super(TestPunch, self).__init__()
     
         for ps in PatronStore.objects().filter(Store=self.store.objectId):
             ps.delete()

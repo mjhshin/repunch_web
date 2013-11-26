@@ -18,8 +18,8 @@ class TestRequestValidateRejectRedeem(CloudCodeTest):
     and the Patron's receivedMessages.
     """
     
-    def __init__(self, verbose=False):
-        super(TestRequestValidateRejectRedeem, self).__init__(verbose=verbose)
+    def __init__(self):
+        super(TestRequestValidateRejectRedeem, self).__init__()
     
         self.store.rewards = [{
             "reward_id":0,

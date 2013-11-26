@@ -11,8 +11,8 @@ class TestAddDeletePatronStore(CloudCodeTest):
     This first deletes all the PatronStores that points to this Store.
     """
 
-    def __init__(self, verbose=False):
-        super(TestAddDeletePatronStore, self).__init__(verbose=verbose)
+    def __init__(self):
+        super(TestAddDeletePatronStore, self).__init__()
         
         for ps in PatronStore.objects().filter(Store=self.store.objectId):
             ps.delete()

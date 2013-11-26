@@ -19,13 +19,11 @@ class CloudCodeTest(object):
         "password": "123456",
     }
     
-    def __init__(self, fetch_user=True, verbose=False):
+    def __init__(self, fetch_user=True):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
         """
-        self.verbose = verbose
-        
         name = UN_CAMEL_RE.sub(r'\1 \2', self.__class__.__name__)
         
         self._tests = []
@@ -49,19 +47,20 @@ class CloudCodeTest(object):
             print "Test #%s:\t%s" %\
                 (name.split("_")[-1], getattr(self, name).__doc__.strip())
     
-    def get_results(self):
+    def get_results(self, verbose=False):
         """
         Evaluates all tests defined within self.
         {
             test_0: <function test_0 >, ...
         }
         """
-        if self.verbose:
+        if verbose:
             print "\n" + name 
             print "--------------------------------------------------"
             
         for name in self._get_sorted_tests():
-            self.testit(getattr(self, name), int(name.split("_")[-1]))
+            self._testit(getattr(self, name),
+                int(name.split("_")[-1]), verbose=verbose)
             
         return self._results
         
@@ -70,7 +69,7 @@ class CloudCodeTest(object):
         names.sort(key=lambda n: int(n.split("_")[-1]))
         return names
     
-    def testit(self, test_func, test_num=None):
+    def _testit(self, test_func, test_num=None, verbose=False):
         """
         test is a function that must return a bool.
         If a str is returned, then the test is a fail and the str
@@ -83,7 +82,7 @@ class CloudCodeTest(object):
         if test_num is None:
             test_num = int(test.__name__.split("_")[-1])
         
-        if self.verbose:
+        if verbose:
             log = "Test #%s:\t" % (str(test_num),)
             
         test = {"test_name": test_func.__doc__.strip()}       
@@ -101,17 +100,17 @@ class CloudCodeTest(object):
                 test["success"] = result[0]
                 test["test_message"] = result[1]
                 
-            if self.verbose:
+            if verbose:
                 if type(result) is bool and result:
                     log += "Success"
                 else:
                     log += "Fail - %s" % (result,)
                 
         except Exception as e:
-            if self.verbose:
+            if verbose:
                 log += "Error: %s" % (e, )
                 
             test["test_message"] = str(e)
         finally:
-            if self.verbose:
+            if verbose:
                 print log

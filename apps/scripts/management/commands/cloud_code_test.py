@@ -17,9 +17,9 @@ class Command(BaseCommand):
         verbose = "verbose" in args
     
         results = (
-            TestAddDeletePatronStore(verbose).get_results(),
-            TestPunch(verbose).get_results(),
-            TestRequestValidateRejectRedeem(verbose).get_results(),
+            TestAddDeletePatronStore().get_results(verbose),
+            TestPunch().get_results(verbose),
+            TestRequestValidateRejectRedeem().get_results(verbose),
         )
         
         if not dryrun:
