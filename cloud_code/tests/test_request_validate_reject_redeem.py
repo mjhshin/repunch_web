@@ -16,14 +16,12 @@ from parse.apps.messages.models import Message
 # It must have a Store, Employee, and Patron pointers.
 ACCOUNT_EMAIL = "cloudcode@repunch.com"
 
-def test_request_validate_reject_redeem():
+class TestRequestValidateRejectRedeem():
     """
     This first deletes all the PatronStores that points to this Store.
     This will also set the Store's rewards, sentMessages, redeemRewards,
     and the Patron's receivedMessages.
     """
-    print "\ntest_request_validate_reject_redeem:"
-    print "------------------------------------"
     
     account = Account.objects().get(email=ACCOUNT_EMAIL,
         include="Patron,Store,Employee")
@@ -585,6 +583,3 @@ def test_request_validate_reject_redeem():
             objectId=redeem_reward.objectId) == 0
             
     test.testit(test_43)
-    
-    # END OF ALL TESTS 
-    return test.get_results(locals())
