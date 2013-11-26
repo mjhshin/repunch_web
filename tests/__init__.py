@@ -58,12 +58,12 @@ class SeleniumTest(CloudCodeTest):
             self.find("input[type='submit']").click()
             sleep(2)
         
-    def tear_down(self):
+    def get_results(self, test_funcs):
         """
         Quit the driver and return the results of the test.
         """
         self.driver.quit()
-        return self.get_results()
+        return super(SeleniumTest, self).get_results(test_funcs)
         
     def open(self, url="/"):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))

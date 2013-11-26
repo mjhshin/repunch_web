@@ -197,8 +197,5 @@ def test_punch():
     
         return res["error"] == "PATRON_NOT_FOUND"
     
-    for i in range(21):
-        test.testit(locals()["test_%s" % (str(i),)])
-        
-    # END OF ALL TESTS - cleanup
-    return test.get_results()
+    # END OF ALL TESTS
+    return test.get_results(locals())

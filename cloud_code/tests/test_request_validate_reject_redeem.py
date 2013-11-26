@@ -225,17 +225,14 @@ def test_request_validate_reject_redeem():
         
         return "error" not in res
     
-    test.testit(test_10)
-    
     # TODO globals redeem_reward, patron_store, and reward
-    
-    redeem_reward.fetch_all(clear_first=True, with_cache=False)
-    patron_store.fetch_all(clear_first=True, with_cache=False)
-    store.rewards = None
-    reward = store.get("rewards")[0]
     
     ##########  RedeemReward's is_redeemed is set to true
     def test_11():
+        test.extras['redeem_reward'].fetch_all(clear_first=True, with_cache=False)
+        test.extras['patron_store'].fetch_all(clear_first=True, with_cache=False)
+        store.rewards = None
+        reward = store.get("rewards")[0]
         return redeem_reward.is_redeemed
     
     test.testit(test_11)
@@ -589,6 +586,5 @@ def test_request_validate_reject_redeem():
             
     test.testit(test_43)
     
-    
-    # END OF ALL TESTS - cleanup
-    return test.get_results()
+    # END OF ALL TESTS 
+    return test.get_results(locals())

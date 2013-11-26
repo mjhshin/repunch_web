@@ -9,24 +9,32 @@ class CloudCodeTest(object):
 
     VERBOSE = True
     
-    def __init__(self, test_title, tests):
+    def __init__(self, tests):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
         """
-        self._results = []
-        section = {
-            "section_name": test_title,
+        self._results = [{
+            "section_name": self.__class__.__name__,
             "parts": tests,
-        }
-        self._results.append(section)
-        self.tests = tests
-        
-        # instead of using globals() to retain objects through each
-        # test function, use this dict instead
-        self.extras = {}
+        }]
+        self._tests = tests
     
     def get_results(self):
+        """
+        Evaluates all tests defined within self.
+        {
+            test_0: <function test_0 > | <function <lambda> >, ...
+        }
+        """
+        test_nums = [ int(k.split("_")[-1]) for
+            k in dir(self) if k.startswith("test_")]
+        # need to sort
+        test_nums.sort()
+
+        for t in test_nums:
+            self.testit(getattr(self, "test_%d" % (t,)), t)
+            
         return self._results
     
     def testit(self, test, test_num=None):
@@ -52,12 +60,12 @@ class CloudCodeTest(object):
             result_type = type(result)
             
             if result_type in (unicode, str):
-                self.tests[test_num]["test_message"] = result
+                self._tests[test_num]["test_message"] = result
             elif result_type is bool:
-                self.tests[test_num]["success"] = result
+                self._tests[test_num]["success"] = result
             elif result_type in (tuple, list):
-                self.tests[test_num]["success"] = result[0]
-                self.tests[test_num]["test_message"] = result[1]
+                self._tests[test_num]["success"] = result[0]
+                self._tests[test_num]["test_message"] = result[1]
                 
             if verbose:
                 if type(result) is bool and result:
@@ -69,7 +77,7 @@ class CloudCodeTest(object):
             if verbose:
                 log += "Error: %s\n\n" % (e, )
                 
-            self.tests[test_num]["test_message"] = str(e)
+            self._tests[test_num]["test_message"] = str(e)
         finally:
             if verbose:
                 print log
