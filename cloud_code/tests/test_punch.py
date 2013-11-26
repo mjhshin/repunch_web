@@ -19,31 +19,7 @@ class TestPunch(CloudCodeTest):
     """
 
     def __init__(self):
-        super(TestPunch, self).__init__((
-            {'test_name': "Punch creates a new Punch object (from employee)"},
-            {'test_name': "Punch object is added to Store's Punches relation"},
-            {'test_name': "Punch object is added to Employee's Punches relation"},
-            {'test_name': "Punch's Patron pointer is set"},
-            {'test_name': "Punch's  punches is set to correct amount"},
-            {'test_name': "Employee's lifetime_punches is updated"},
-            {'test_name': "PatronStore is created since it does not yet exist"},
-            {'test_name': "PatronStore is added to Patron's PatronStores relation"},
-            {'test_name': "PatronStore is added to Store's PatronStores relation"},
-            {'test_name': "PatronStore's Patron pointer is set"},
-            {'test_name': "PatronStore's Store pointer is set"},
-            {'test_name': "PatronStore's all_time_punches is set to amount given"},
-            {'test_name': "PatronStore's punch_count is set to amount given"},
-            {'test_name': "PatronStore's pending_reward is set to false"},
-            
-            {'test_name': "Punch creates a new Punch object (from dashboard - owner)"},
-            {'test_name': "Punch object is added to Store's Punches relation"},
-            {'test_name': "Punch's Patron pointer is set"},
-            {'test_name': "Punch's  punches is set to correct amount"},
-            {'test_name': "PatronStore's punch_count is updated"},
-            {'test_name': "PatronStore's all_time_punches is updated"},
-            
-            {'test_name': "Using unused punch_code returns error with PATRON_NOT_FOUND"},
-        ))
+        super(TestPunch, self).__init__()
           
         self.account = Account.objects().get(email=ACCOUNT_EMAIL,
             include="Patron,Store,Employee")

@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         results = []
         
-        #results.extend(TestAddDeletePatronStore().get_results()) 
+        results.extend(TestAddDeletePatronStore().get_results()) 
         results.extend(TestPunch().get_results())
         #results.extend(TestRequestValidateRejectRedeem.get_results())
         

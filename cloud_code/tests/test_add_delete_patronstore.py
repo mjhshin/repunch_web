@@ -18,24 +18,7 @@ class TestAddDeletePatronStore(CloudCodeTest):
     """
 
     def __init__(self):
-        super(TestAddDeletePatronStore, self).__init__((
-            {'test_name': "Add_patronstore creates a new PatronStore if does not exist"},
-            {'test_name': "PatronStore is added to Patron's PatronStores relation"},
-            {'test_name': "PatronStore is added to Store's PatronStores relation"},
-            {'test_name': "PatronStore's Patron pointer is set"},
-            {'test_name': "PatronStore's Store pointer is set"},
-            {'test_name': "PatronStore's all_time_punches is set to 0"},
-            {'test_name': "PatronStore's punch_count is set to 0"},
-            {'test_name': "PatronStore's pending_reward is set to false"},
-            
-            {'test_name': "Add_patronstore returns existing PatronStore"},
-            {'test_name': "PatronStore is in the Patron's PatronStores relation"},
-            {'test_name': "PatronStore is in the Store's PatronStores relation"},
-            
-            {'test_name': "Delete_patronstore deletes the PatronStore"},
-            {'test_name': "PatronStore is removed from the Patron's PatronStores relation"},
-            {'test_name': "PatronStore is removed from the Store's PatronStores relation"},
-        ))
+        super(TestAddDeletePatronStore, self).__init__()
             
         self.account = Account.objects().get(email=ACCOUNT_EMAIL,
             include="Patron,Store")
