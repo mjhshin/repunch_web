@@ -31,7 +31,7 @@ class SeleniumTest(CloudCodeTest):
     VERBOSE = True
     IMPLICITLY_WAIT = 10
     
-    def __init__(self, fetch_user=True):
+    def __init__(self, fetch_user=True, user_include="Store"):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]

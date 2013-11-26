@@ -9,7 +9,6 @@ from selenium.webdriver.common.keys import Keys
 from time import sleep
 
 from tests import SeleniumTest
-from parse.apps.accounts.models import Account
 
 class TestLoginDialog(SeleniumTest):
     """
@@ -17,7 +16,7 @@ class TestLoginDialog(SeleniumTest):
     """
     
     def __init__(self):
-        super(TestLoginDialog, self).__init__()
+        super(TestLoginDialog, self).__init__(False)
         
         if not self.DEV_LOGIN:
             self.open(reverse("public_home"))
@@ -111,7 +110,7 @@ class TestLoginDialog(SeleniumTest):
         sleep(1)
         self.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@name='forgot-pass-email']", type="xpath").send_keys(\
-                self.account.email)
+                self.USER['email'])
         self.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
         sleep(5)
@@ -125,7 +124,7 @@ class TestLoginPage(SeleniumTest):
     """
     
     def __init__(self):
-        super(TestLoginPage, self).__init__()
+        super(TestLoginPage, self).__init__(False)
 
         self.open(reverse("manage_login"))
     
@@ -213,7 +212,7 @@ class TestLoginPage(SeleniumTest):
         sleep(1)
         self.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@name='forgot-pass-email']", type="xpath").send_keys(\
-                self.account.email)
+                self.USER['email'])
         self.find("//div[@id='forgot-pass-form-div']/input[" +\
             "@type='submit']", type="xpath").click()
         sleep(5)

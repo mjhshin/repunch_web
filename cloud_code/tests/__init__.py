@@ -20,7 +20,8 @@ class CloudCodeTest(object):
         "password": "123456",
     }
     
-    def __init__(self, fetch_user=True):
+    def __init__(self, fetch_user=True,
+        user_include="Patron,Store,Employee"):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
@@ -35,7 +36,7 @@ class CloudCodeTest(object):
         
         if fetch_user:
             self.account = Account.objects().get(email=\
-                self.USER['email'], include="Patron,Store,Employee")
+                self.USER['email'], include=user_include)
             self.patron = self.account.patron
             self.store = self.account.store
             self.employee = self.account.employee
@@ -115,6 +116,7 @@ class CloudCodeTest(object):
                 log += "Error: %s" % (e, )
                 
             test["test_message"] = str(e)
+            
         finally:
             if verbose:
                 print log

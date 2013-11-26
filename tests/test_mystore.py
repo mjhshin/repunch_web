@@ -17,16 +17,6 @@ from parse.apps.accounts.models import Account
 # TODO test passed_user_limit
 # TODO test monthly_billing - failed to charge
 
-TEST_USER = {
-    "username": "violette87@repunch.com",
-    "password": "repunch7575",
-    "email": "violette87@repunch.com",
-}
-
-TEST_USER_INFO = {
-    "email": "militia@vandolf.com",
-}
-
 IMAGE_UPLOAD = "/home/vestrel00/Pictures/wallpapers/test.png"
 
 STORE_INFO = {
@@ -86,239 +76,216 @@ TEST_SUBSCRIPTION_INFO = {
     "zip": "11571",
 }
 
-def test_edit_store_details():
-    # do the setup here so that if this test is commented out, 
-    # other tests will not be affected
-    account =  Account.objects().get(username=TEST_USER['username'],
-        include="Store.Subscription")
-    store = account.store
-    store.update_locally(STORE_INFO, False)
-    store.update()
-    
-    test = SeleniumTest()
-    parts = [
-        {'test_name': "User needs to be logged in to access page"},
-        {'test_name': "Edit page reachable"},
-        {'test_name': "Changes to store name are visible"},
-        {'test_name': "Changes to store name are saved to Parse"},
-        {'test_name': "Changes to street are visible"},
-        {'test_name': "Changes to street are saved to Parse"},
-        {'test_name': "Changes to city are visible"},
-        {'test_name': "Changes to city are saved to Parse"},
-        {'test_name': "Changes to state are visible"},
-        {'test_name': "Changes to state are saved to Parse"},
-        {'test_name': "Changes to zip are visible"},
-        {'test_name': "Changes to zip are saved to Parse"},
-        {'test_name': "Changes to phone number are visible"},
-        {'test_name': "Changes to phone number are saved to Parse"},
+class TestEditStoreDetails(SeleniumTest):
+
+    def __init__(self):
+        super(TestEditStoreDetails, self).__init__(\
+            user_include="Store.Subscription")
+            
+        self.store = self.account.store
+        self.store.update_locally(STORE_INFO, False)
+        self.store.update()
         
-        {'test_name': "Changes to hours are visible"},
-        {'test_name': "Changes to hours are saved to Parse"},
-        {'test_name': "Changing the zip changes the store_timezone"},
-        {'test_name': "Changing the zip changes the neighborhood"},
-        {'test_name': "Changing the zip changes the coordinates"},
-        {'test_name': "Entering invalid address shows error"},
-        {'test_name': "Entering invalid hours with same open time" +\
-            " as close time shows error"},
-        {'test_name': "Entering invalid hours with later open time" +\
-            " than close time shows error"},
-        {'test_name': "Having no hours is allowed"},
-        {'test_name': "24/7 Hours is functional"},
-        {'test_name': "24/7 Hours is saved as [{'day':0}]"},
-        {'test_name': "Store name is required"},
-        {'test_name': "Street is required"},
-        {'test_name': "City is required"},
-        {'test_name': "State is required"},
-        {'test_name': "Zip is required"},
-        {'test_name': "Phone number is required"},
-        {'test_name': "Cancel button redirects user back to store " +\
-            "details page and no changes are saved to Parse"},
-        {'test_name': "Clicking Add/Change Photo brings up the " +\
-            "image upload dialog"},
-        {'test_name': "Clicking cancel on upload removes the dialog"},
-        {'test_name': "Clicking upload when no file is " +\
-            "selected shows alert"},
-        {'test_name': "Uploading images works"},
-        {'test_name': "Clicking cancel on crop removes the dialog"},
-        {'test_name': "Cropping images works"},
-        {'test_name': "New store avatar is saved to Parse"},
-        {'test_name': "Old store avatar is deleted from Parse files"},
-        {'test_name': "The store avatar thumbnail and image in " +\
-            "store details/edit match the one saved in Parse."},
-    ]
-    section = {
-        "section_name": "Edit store details working properly?",
-        "parts": parts,
-    }
-    test.results.append(section)
-    
-    ##########  User needs to be logged in to access page
-    test.open(reverse("store_index")) # ACTION!
-    sleep(1)
-    parts[0]['success'] = test.is_current_url(reverse(\
-        'manage_login') + "?next=" + reverse("store_index"))
+        ## Required fields are required!
+        def fields_required():
+            self.click_store_edit()
+            sleep(3)
+            selectors = (
+                "#id_store_name", "#id_street", "#id_city",
+                "#id_state", "#id_zip",
+                "#Ph1", "#Ph2", "#Ph3",
+            )
+            self.action_chain(0, selectors, action="clear") 
+            self.find("#save-button").click() 
+            sleep(3)
+            return True
         
-    # login
-    selectors = (
-        ("#login_username", TEST_USER['username']),
-        ("#login_password", TEST_USER['password']),
-        ("", Keys.RETURN)
-    )
-    test.action_chain(0, selectors, "send_keys") # ACTION!
-    sleep(7)
-    
-    def click_store_edit():
-        test.find("//div[@id='store-details']/a[@href='" +\
+        # tests 25 to 30
+        self.fields_required((
+            ("#store_name_e ul li", "Store name is required"),
+            ("#street_e ul li", "Street is required"),
+            ("#city_e ul li", "City is required"),
+            ("#state_e ul li", "State is required"),
+            ("#zip_e ul li", "Zip is required"),
+            ("#phone_number_e ul li", "Phone number is required"),
+        ), init_func=fields_required, test_offset=25)
+        
+    def click_store_edit(self):
+        self.find("//div[@id='store-details']/a[@href='" +\
             reverse("store_edit") + "']", type="xpath").click() 
     
-    ##########  Edit page reachable
-    try:
-        click_store_edit() # ACTION!
+    def test_0(self):
+        """
+        User needs to be logged in to access page
+        """
+        self.open(reverse("store_index")) 
+        sleep(1)
+        return self.is_current_url(reverse(\
+            'manage_login') + "?next=" + reverse("store_index"))
+        
+    def test_1(self):
+        """
+        Edit page reachable
+        """
+        # login
+        selectors = (
+            ("#login_username", self.USER['username']),
+            ("#login_password", self.USER['password']),
+            ("", Keys.RETURN)
+        )
+        self.action_chain(0, selectors, "send_keys") 
+        sleep(7)
+    
+        self.click_store_edit() 
         sleep(3)
-        parts[1]['success']=test.is_current_url(reverse("store_edit"))
-    except Exception as e:
-        print e
+        return self.is_current_url(reverse("store_edit"))
+     
+    def test_2(self):
+        """
+        Changes to store name are visible 
+        """   
+        ### make all the changes
+        selectors = (
+            ("#id_store_name", TEST_STORE_INFO['store_name']),
+            ("#id_street", TEST_STORE_INFO['street']),
+            ("#id_city", TEST_STORE_INFO['city']),
+            ("#id_state", TEST_STORE_INFO['state']),
+            ("#id_zip", TEST_STORE_INFO['zip']),
+            ("#Ph1", TEST_STORE_INFO['Ph1']),
+            ("#Ph2", TEST_STORE_INFO['Ph2']),
+            ("#Ph3", TEST_STORE_INFO['Ph3']),
+            ("#id_store_description", TEST_STORE_INFO['store_description']),
+        )
+        self.action_chain(0, selectors, action="clear")
+        self.action_chain(0, selectors, action="send_keys")
         
-    ### make all the changes
-    # store_name
-    store_name = test.find("#id_store_name")
-    store_name.clear()
-    store_name.send_keys(TEST_STORE_INFO['store_name'])
-    # street
-    street = test.find("#id_street")
-    street.clear()
-    street.send_keys(TEST_STORE_INFO['street'])
-    # city
-    city = test.find("#id_city")
-    city.clear()
-    city.send_keys(TEST_STORE_INFO['city'])
-    # state
-    state = test.find("#id_state")
-    state.clear()
-    state.send_keys(TEST_STORE_INFO['state'])
-    # zip
-    zip = test.find("#id_zip")
-    zip.clear()
-    zip.send_keys(TEST_STORE_INFO['zip'])
-    # phone_number
-    ph1 = test.find("#Ph1")
-    ph2 = test.find("#Ph2")
-    ph3 = test.find("#Ph3")
-    ph1.clear()
-    ph2.clear()
-    ph3.clear()
-    ph1.send_keys(TEST_STORE_INFO['Ph1'])
-    ph2.send_keys(TEST_STORE_INFO['Ph2'])
-    ph3.send_keys(TEST_STORE_INFO['Ph3'])
-    # store_description
-    store_description = test.find("#id_store_description")
-    store_description.clear()
-    store_description.send_keys(TEST_STORE_INFO['store_description'])
-    # hours
-    """
-    [{"close_time":"0030","day":2,"open_time":"0000"},
-    {"close_time":"0130","day":3,"open_time":"0100"},
-    {"close_time":"0230","day":4,"open_time":"0200"},
-    {"close_time":"0330","day":5,"open_time":"0300"},]
-    """
-    for i in range(4):
-        istr = str(i)
+        # hours
+        # [{"close_time":"0030","day":2,"open_time":"0000"},
+        # {"close_time":"0130","day":3,"open_time":"0100"},
+        # {"close_time":"0230","day":4,"open_time":"0200"},
+        # {"close_time":"0330","day":5,"open_time":"0300"},]
+        for i in range(4):
+            istr = str(i)
+                
+            self.find("//ul[@id='hours-{0}-row']/".format(istr) +\
+                "li[@class='days']/div[{0}]".format(str(i+2)),
+                type="xpath").click()
+            sleep(1)
+            self.find("//ul[@id='hours-{0}-row']".format(istr)+\
+                "/li[contains(@class, 'open')]/select[@name='hours-{0}-open']".format(istr) +\
+                "/option[@value='0{0}00']".format(istr),
+                type="xpath").click()
+            sleep(1)
+            self.find("//ul[@id='hours-{0}-row']".format(istr)+\
+                "/li[contains(@class, 'close')]/select[@name='hours-{0}-close']".format(istr) +\
+                "/option[@value='0{0}30']".format(istr),
+                type="xpath").click()
+            sleep(1)
+            self.find(".hours-form div.add").click()
             
-        test.find("//ul[@id='hours-{0}-row']/".format(istr) +\
-            "li[@class='days']/div[{0}]".format(str(i+2)),
-            type="xpath").click()
-        sleep(1)
-        test.find("//ul[@id='hours-{0}-row']".format(istr)+\
-            "/li[contains(@class, 'open')]/select[@name='hours-{0}-open']".format(istr) +\
-            "/option[@value='0{0}00']".format(istr),
-            type="xpath").click()
-        sleep(1)
-        test.find("//ul[@id='hours-{0}-row']".format(istr)+\
-            "/li[contains(@class, 'close')]/select[@name='hours-{0}-close']".format(istr) +\
-            "/option[@value='0{0}30']".format(istr),
-            type="xpath").click()
-        sleep(1)
-        test.find(".hours-form div.add").click()
+        # store the hours preview for comparison
+        self.hours_prev = self.find("#store-hours-preview").text.split("\n")
         
-    # store the hours preview for comparison
-    hours_prev = test.find("#store-hours-preview").text.split("\n")
-    
-    # save!
-    test.find("#save-button").click()
-    sleep(6)
-    
-    address = str(test.find("#address p").text).split("\n")
-    street = address[0]
-    l2 = address[1].split(", ")
-    city = l2[0]
-    state, zip = l2[1].split(" ")
-    phone_number = address[2]
+        # save!
+        self.find("#save-button").click()
+        sleep(6)
+        
+        address = str(self.find("#address p").text).split("\n")
+        l2 = address[1].split(", ")
+        self.street = address[0]
+        self.city = l2[0]
+        self.state, self.zip = l2[1].split(" ")
+        self.phone_number = address[2]
+        
+        self.store.fetch_all(clear_first=True, with_cache=True)
 
-    ##########  Changes to store name are visible 
-    parts[2]['success'] = str(test.find("#address span").text) ==\
-        TEST_STORE_INFO['store_name']
+        return self.find("#address span").text ==\
+            TEST_STORE_INFO['store_name']
     
-    ##########  Changes to store name are saved to Parse 
-    store.store_name = None
-    parts[3]['success'] = store.get("store_name") ==\
-        TEST_STORE_INFO['store_name']
+    def test_3(self):
+        """
+        Changes to store name are saved to Parse 
+        """
+        return self.store.store_name == TEST_STORE_INFO['store_name']
         
-    ##########  Changes to street are visible
-    parts[4]['success'] = street == TEST_STORE_INFO['street']
+    def test_4(self):
+        """
+        Changes to street are visible
+        """
+        return self.street == TEST_STORE_INFO['street']
     
-    ##########  Changes to street are saved to Parse
-    store.street = None
-    parts[5]['success'] = store.get("street") ==\
-        TEST_STORE_INFO['street']
+    def test_5(self):
+        """
+        Changes to street are saved to Parse
+        """
+        return self.store.street == TEST_STORE_INFO['street']
             
-    ##########  Changes to city are visible
-    parts[6]['success'] = city == TEST_STORE_INFO['city']
+    def test_6(self):
+        """
+        Changes to city are visible
+        """
+        return self.city == TEST_STORE_INFO['city']
     
-    ##########  Changes to city are saved to Parse
-    store.city = None
-    parts[7]['success'] = store.get("city") == TEST_STORE_INFO['city']
+    def test_7(self):
+        """
+        Changes to city are saved to Parse
+        """
+        return self.store.city == TEST_STORE_INFO['city']
     
-    ##########  Changes to state are visible
-    parts[8]['success'] = state == TEST_STORE_INFO['state']
+    def test_8(self):
+        """
+        Changes to state are visible
+        """
+        return self.state == TEST_STORE_INFO['state']
     
-    ##########  Changes to state are saved to Parse
-    store.state = None
-    parts[9]['success'] = store.get("state") ==\
-        TEST_STORE_INFO['state']
+    def test_9(self):
+        """
+        Changes to state are saved to Parse
+        """
+        return self.store.state == TEST_STORE_INFO['state']
     
-    ##########  Changes to zip are visible
-    parts[10]['success'] = zip == TEST_STORE_INFO['zip']
+    def test_10(self):
+        """
+        Changes to zip are visible
+        """
+        return self.zip == TEST_STORE_INFO['zip']
     
-    ##########  Changes to zip are saved to Parse
-    store.zip = None
-    parts[11]['success'] = store.get("zip") == TEST_STORE_INFO['zip']
+    def test_11(self):
+        """
+        Changes to zip are saved to Parse
+        """
+        return self.store.zip == TEST_STORE_INFO['zip']
     
-    ##########  Changes to phone number are visible
-    parts[12]['success'] = phone_number ==\
-        TEST_STORE_INFO['phone_number']
+    def test_12(self):
+        """
+        Changes to phone number are visible
+        """
+        return self.phone_number == TEST_STORE_INFO['phone_number']
     
-    ##########  Changes to phone number are saved to Parse
-    store.phone_number = None
-    parts[13]['success'] = store.get("phone_number") ==\
-        TEST_STORE_INFO['phone_number']
+    def test_13(self):
+        """
+        Changes to phone number are saved to Parse
+        """
+        return self.store.phone_number == TEST_STORE_INFO['phone_number']
     
-    ##########  Changes to hours are visible
-    try:
-        hours = test.find("#hours").text.split("\n")[1:]
+    def test_14(self):
+        """
+        Changes to hours are visible
+        """
         equal = True
-        for hour in hours:
-            if hour not in hours_prev:
+        for hour in self.find("#hours").text.split("\n")[1:]:
+            if hour not in self.hours_prev:
                 equal = False
                 break
-        parts[14]['success'] = equal
-    except Exception as e:
-        print e
-        parts[14]['test_message'] = str(e)
+                
+        return equal
     
-    ##########  Changes to hours are saved to Parse
-    try:
-        store.hours, equal = None, True
-        for hour in store.get("hours"):
+    def test_15(self):
+        """
+        Changes to hours are saved to Parse
+        """
+        equal = True
+        for hour in self.store.hours:
             z = False
             for x in TEST_STORE_INFO['hours']:
                 if hour["day"] == x["day"] and hour["open_time"] ==\
@@ -330,288 +297,232 @@ def test_edit_store_details():
                 equal = False
                 break
 
-        parts[15]['success'] = equal
-    except Exception as e:
-        print e
-        parts[15]['test_message'] = str(e)
+        return equal
     
-    ##########  Changing the zip changes the store_timezone
-    store.store_timezone = None
-    parts[16]['success'] = store.get("store_timezone") ==\
-        TEST_STORE_INFO['store_timezone']
+    def test_16(self):
+        """
+        Changing the zip changes the store_timezone
+        """
+        return self.store.store_timezone == TEST_STORE_INFO['store_timezone']
     
-    ##########  Changing the zip changes the neighborhood 
-    store.neighborhood = None
-    parts[17]['success'] = store.get("neighborhood") ==\
-        TEST_STORE_INFO['neighborhood']
+    def test_17(self):
+        """
+        Changing the zip changes the neighborhood 
+        """
+        return self.store.neighborhood == TEST_STORE_INFO['neighborhood']
     
-    ##########  Changing the zip changes the coordinates 
-    store.coordinates = None
-    parts[18]['success'] =\
-        int(math.floor(store.get("coordinates")[0])) ==\
-        int(math.floor(TEST_STORE_INFO['coordinates'][0])) and\
-        int(math.floor(store.get("coordinates")[1])) ==\
-        int(math.floor(TEST_STORE_INFO['coordinates'][1]))
+    def test_18(self):
+        """
+        Changing the zip changes the coordinates 
+        """
+        return int(math.floor(self.store.coordinates[0])) ==\
+            int(math.floor(TEST_STORE_INFO['coordinates'][0])) and\
+            int(math.floor(self.store.coordinates[1])) ==\
+            int(math.floor(TEST_STORE_INFO['coordinates'][1]))
     
-    ##########  Entering invalid address shows error
-    try:
-        click_store_edit()
+    def test_19(self):
+        """
+        Entering invalid address shows error
+        """
+        self.click_store_edit()
         sleep(3)
-        # street
-        street = test.find("#id_street")
-        street.clear()
-        street.send_keys("988 dsgsd s")
-        # city
-        city = test.find("#id_city")
-        city.clear()
-        city.send_keys("mandarin")
-        # state
-        state = test.find("#id_state")
-        state.clear()
-        state.send_keys("klk")
-        # zip
-        zip = test.find("#id_zip")
-        zip.clear()
-        zip.send_keys("941091")
+        selectors = (
+            ("#id_street", "988 dsgsd s"),
+            ("#id_city", "mandarin"),
+            ("#id_state", "klk"),
+            ("#id_zip", "941091"),
+        )        
+        self.action_chain(0, selectors, action="clear")
+        self.action_chain(0, selectors, action="send_keys")
+        
         # save!
-        test.find("#save-button").click()
+        self.find("#save-button").click()
         sleep(3)
-        parts[19]['success'] = str(test.find(".errorlist").text) ==\
+        
+        return self.find(".errorlist").text ==\
             "Enter a valid adress, city, state, and/or zip."
             
-        test.find("//div[@id='edit-store-options']/a[2]",
+    def test_20(self):
+        """        
+        Entering invalid hours with same open time as close time shows error
+        """
+        self.find("//div[@id='edit-store-options']/a[2]",
             type="xpath").click()
         sleep(2)
-    except Exception as e:
-        print e
-        parts[19]['test_message'] = str(e)
         
-    ##########  Entering invalid hours with same open time
-    ########    as close time shows error
-    try:
-        click_store_edit()
+        self.click_store_edit()
         sleep(3)
-        test.find("//ul[@id='hours-0-row']"+\
+        
+        self.find("//ul[@id='hours-0-row']"+\
             "/li[contains(@class, 'open')]/select[@name='hours-0-open']" +\
             "/option[@value='0000']", type="xpath").click()
         sleep(1)
-        test.find("//ul[@id='hours-0-row']"+\
+        self.find("//ul[@id='hours-0-row']"+\
             "/li[contains(@class, 'close')]/select[@name='hours-0-close']" +\
             "/option[@value='0000']", type="xpath").click()
-        parts[20]['success'] = str(test.find(\
-            "#hours_e > .errorlist > li").text) ==\
+            
+        return self.find("#hours_e > .errorlist > li").text ==\
             "The opening time cannot be the same as the closing time."
-    except Exception as e:
-        print e
-        parts[20]['test_message'] = str(e)
         
-    ##########  Entering invalid hours with later open time
-    ########    than close time shows error
-    try:
-        test.find("//ul[@id='hours-0-row']"+\
+    def test_21(self):
+        """
+        Entering invalid hours with later open time than close time shows error
+        """
+        self.find("//ul[@id='hours-0-row']"+\
             "/li[contains(@class, 'open')]/select[@name='hours-0-open']" +\
             "/option[@value='0030']", type="xpath").click()
         sleep(1)
-        test.find("//ul[@id='hours-0-row']"+\
+        self.find("//ul[@id='hours-0-row']"+\
             "/li[contains(@class, 'close')]/select[@name='hours-0-close']" +\
             "/option[@value='0000']", type="xpath").click()
-        parts[21]['success'] = str(test.find(\
-            "#hours_e > .errorlist > li").text) ==\
+            
+        return self.find("#hours_e > .errorlist > li").text ==\
             "The opening time cannot be later than the closing time."
-    except Exception as e:
-        print e
-        parts[21]['test_message'] = str(e)
     
-    ##########  Having no hours is allowed
-    try:
+    def test_22(self):
+        """
+        Having no hours is allowed
+        """
         for i in range(4):
-            test.find("//ul[@id='hours-{0}-row']".format(str(i))+\
+            self.find("//ul[@id='hours-{0}-row']".format(str(i))+\
                 "/li[@class='buttons']/div[@class='remove']",
                 type="xpath").click()
             
-        # save!
-        test.find("#save-button").click()
+        self.find("#save-button").click()
         sleep(6)
-        store.hours = None
-        parts[22]['success'] =\
-            str(test.find("#hours").text.split("\n")[1]) ==\
+        self.store.hours = None
+        return self.find("#hours").text.split("\n")[1] ==\
             'Closed Sunday - Saturday' and\
-            len(store.get("hours")) == 0
-    except Exception as e:
-        print e
-        parts[22]['test_message'] = str(e)
+            len(self.store.get("hours")) == 0
         
-    ##########  24/7 Hours is functional
-    try:
-        click_store_edit()
+    def test_23(self):
+        """
+        24/7 Hours is functional
+        """
+        self.click_store_edit()
         sleep(3)
-        test.find("#open-24-7-label").click()
+        self.find("#open-24-7-label").click()
         sleep(2)
-        parts[23]['success'] = test.find(\
-            "#slide-container").value_of_css_property("display") ==\
-            "none" and test.find("#store-hours-preview").text ==\
-            "Open 24/7"
-    except Exception as e:
-        print e
-        parts[23]['test_message'] = str(e)
+        return self.find("#slide-container").value_of_css_property(\
+            "display") == "none" and\
+            self.find("#store-hours-preview").text == "Open 24/7"
         
-    ##########  24/7 Hours is saved as [{"day":0}]
-    try:
-        test.find("#save-button").click()
+    def test_24(self):
+        """
+        24/7 Hours is saved as [{"day":0}]
+        """
+        self.find("#save-button").click()
         sleep(6)
-        store.hours = None
-        parts[24]['success'] = store.get("hours")[0]["day"] == 0
-    except Exception as e:
-        print e
-        parts[24]["test_message"] = str(e)
+        self.store.hours = None
+        return self.store.get("hours")[0]["day"] == 0
     
-    ## fields required
-    click_store_edit()
-    sleep(3)
-    selectors = [
-        "#id_store_name", "#id_street", "#id_city",
-        "#id_state", "#id_zip",
-        "#Ph1", "#Ph2", "#Ph3",
-        "#id_store_description",
-    ]
-    test.action_chain(0, selectors, action="clear") # ACTION!
-    for i in range(len(selectors)):
-        selectors[i] = (selectors[i], "   ")
-    test.action_chain(0, selectors, action="send_keys") # ACTION!
-    # submit
-    test.find("#save-button").click() # ACTION!
-    sleep(3)
-    
-    ##########  Store name is required 
-    ##########  Street is required 
-    ##########  City is required 
-    ##########  State is required 
-    ##########  Zip is required 
-    ##########  Phone number is required 
-    ##########  Description is required 
-    e_list = ["store_name", "street", "city", "state", "zip",
-                "phone_number"]
-    for i in range(25, 31):
-        selector = "#%s_e ul li" % (e_list.pop(0),)
-        parts[i]['success'] = str(test.find(selector).text) ==\
-            "This field is required."
-    
-    ##########  Cancel button redirects user back to store index
-    try:
-        test.find("//div[@id='edit-store-options']/a[2]",
+    def test_31(self):
+        """
+        Cancel button redirects user back to store index
+        """
+        self.find("//div[@id='edit-store-options']/a[2]",
             type="xpath").click()
         sleep(2)
-        parts[31]['success'] =\
-            test.is_current_url(reverse('store_index'))
-    except Exception as e:
-        print e
-        parts[31]['test_message'] = str(e)
+        return self.is_current_url(reverse('store_index'))
     
-    ##########  Clicking Add/Change Photo brings up the
-    ########    image upload dialog/frame
-    try:
-        click_store_edit()
+    def test_32(self):
+        """
+        Clicking Add/Change Photo brings up the image upload dialog/frame
+        """
+        self.click_store_edit()
         sleep(3)
-        test.find("#upload-avatar").click()
+        self.find("#upload-avatar").click()
         sleep(1)
-        # switch to frame!
-        test.driver.switch_to_frame(\
-            test.find("iframe", type='tag_name'))
+        self.driver.switch_to_frame(self.find("iframe", type='tag_name'))
         
-        parts[32]['success'] =\
-            test.find("#edit-avatar-options").is_displayed()
-    except Exception as e:
-        print e
-        parts[32]['test_message'] = str(e)
+        return self.find("#edit-avatar-options").is_displayed()
     
-    ##########  Clicking cancel on upload removes the dialog /frame
-    try:
-        test.find("//div[@id='edit-avatar-options']/a[2]",
+    def test_33(self):
+        """
+        Clicking cancel on upload removes the dialog /frame
+        """
+        self.find("//div[@id='edit-avatar-options']/a[2]",
             type="xpath").click()
         sleep(1)
-        parts[33]['success'] =\
-            test.element_exists("#edit-store-options")
-    except Exception as e:
-        print e
-        parts[33]['test_message'] = str(e)
+        return self.element_exists("#edit-store-options")
         
-    ##########  Clicking upload when no file is selected shows alert
-    try:
-        test.find("#upload-avatar").click()
+    def test_34(self):
+        """
+        Clicking upload when no file is selected shows alert
+        """
+        self.find("#upload-avatar").click()
         sleep(1)
         # switch to frame!
-        test.driver.switch_to_frame(\
-            test.find("iframe", type='tag_name'))
-        test.find("#upload-btn").click()
+        self.driver.switch_to_frame(\
+            self.find("iframe", type='tag_name'))
+        self.find("#upload-btn").click()
         sleep(1)
-        alert = test.switch_to_alert()
-        parts[34]['success'] = str(alert.text) ==\
+        alert = self.switch_to_alert()
+        success = str(alert.text) ==\
             "Please select an image to upload."
         alert.accept()
-    except Exception as e:
-        print e
-        parts[34]['test_message'] = str(e)
+        return success
     
-    ##########  Uploading images works
-    try:
-        test.find("#id_image").send_keys(IMAGE_UPLOAD)
-        test.find("#upload-btn").click()
+    def test_35(self):
+        """
+        Uploading images works
+        """
+        self.find("#id_image").send_keys(IMAGE_UPLOAD)
+        self.find("#upload-btn").click()
         sleep(3)
-        parts[35]['success'] = test.find("#crop-btn").is_displayed()
-    except Exception as e:
-        print e
-        parts[35]['test_message'] = str(e)
+        return self.find("#crop-btn").is_displayed()
     
-    ##########  Clicking cancel on crop removes the dialog
-    try:
-        test.find("//div[@id='edit-avatar-options']/a[2]",
+    def test_36(self):
+        """
+        Clicking cancel on crop removes the dialog
+        """
+        self.find("//div[@id='edit-avatar-options']/a[2]",
             type="xpath").click()
         sleep(1)
-        parts[36]['success'] =\
-            test.element_exists("#edit-store-options")
-    except Exception as e:
-        print e
-        parts[36]['test_message'] = str(e)
+        return self.element_exists("#edit-store-options")
         
-    ##########  Cropping images works
-    try:
-        test.find("#upload-avatar").click()
+    def test_37(self):
+        """
+        Cropping images works
+        """
+        self.find("#upload-avatar").click()
         sleep(1)
-        # switch to frame!
-        test.driver.switch_to_frame(\
-            test.find("iframe", type='tag_name'))
-        test.find("#id_image").send_keys(IMAGE_UPLOAD)
-        test.find("#upload-btn").click()
+        self.driver.switch_to_frame(\
+            self.find("iframe", type='tag_name'))
+        self.find("#id_image").send_keys(IMAGE_UPLOAD)
+        self.find("#upload-btn").click()
         sleep(3)
-        test.find("#crop-btn").click()
-        parts[37]['success'] = True
-    except Exception as e:
-        print e
-        parts[37]['test_message'] = str(e)
+        self.find("#crop-btn").click()
+        return True
     
-    sleep(5)
-    old_avatar_url = store.store_avatar_url
-    store.store_avatar = None
-    store.store_avatar_url = None
-    new_avatar_url = store.get("store_avatar_url")
+    def test_38(self):
+        """
+        New store avatar is saved to Parse
+        """
+        sleep(5)
+        self.old_avatar_url = self.store.store_avatar_url
+        self.store.store_avatar = None
+        self.store.store_avatar_url = None
+        self.new_avatar_url = self.store.get("store_avatar_url")
+        
+        return self.old_avatar_url != self.new_avatar_url
     
-    ##########  New store avatar is saved to Parse
-    parts[38]['success'] = old_avatar_url != new_avatar_url
+    def test_39(self):
+        """
+        Old store avatar is deleted from Parse files
+        """
+        resp = requests.get(self.old_avatar_url)
+        return not resp.ok and resp.status_code == 403
     
-    ##########  Old store avatar is deleted from Parse files
-    resp = requests.get(old_avatar_url)
-    parts[39]['success'] = not resp.ok and resp.status_code == 403
-    
-    ##########  The store avatar thumbnail and image in
-    ##########  store details/edit match the one saved in Parse
-    parts[40]['success'] = new_avatar_url ==\
-        test.find("#store_avatar").get_attribute("src") and\
-        new_avatar_url ==\
-        test.find("#avatar-thumbnail").get_attribute("src")
-    
-    
-    # END OF ALL TESTS - cleanup
-    return test.tear_down()
+    def test_40(self):
+        """
+        The store avatar thumbnail and image in store details/edit
+        match the one saved in Parse
+        """
+        return self.new_avatar_url ==\
+            self.find("#store_avatar").get_attribute("src") and\
+            self.new_avatar_url ==\
+            self.find("#avatar-thumbnail").get_attribute("src")
     
     
 def test_update_subscription():
@@ -665,12 +576,12 @@ def test_update_subscription():
         "section_name": "Edit account/subscription working properly?",
         "parts": parts,
     }
-    test.results.append(section)
+    self.results.append(section)
     
     ##########  User needs to be logged in to access page
-    test.open(reverse("store_index")) # ACTION!
+    self.open(reverse("store_index")) 
     sleep(1)
-    parts[0]['success'] = test.is_current_url(reverse(\
+    parts[0]['success'] = self.is_current_url(reverse(\
         'manage_login') + "?next=" + reverse("store_index"))
         
     # login
@@ -679,23 +590,23 @@ def test_update_subscription():
         ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(0, selectors, "send_keys") # ACTION!
+    self.action_chain(0, selectors, "send_keys") 
     sleep(7)  
    
     ##########  Update account page reachable
     try:
-        test.find("//div[@id='account-options']/a[1]",
+        self.find("//div[@id='account-options']/a[1]",
             type="xpath").click()
         sleep(3)
         parts[1]['success'] =\
-            test.is_current_url(reverse("subscription_update"))
+            self.is_current_url(reverse("subscription_update"))
     except Exception as e:
         print e
         parts[1]['test_message'] = str(e)
     
     ## Make changes
     # first clear all inputs
-    for el in test.find("input[type='text']", multiple=True):
+    for el in self.find("input[type='text']", multiple=True):
         el.clear()
     
     selectors = (
@@ -708,13 +619,13 @@ def test_update_subscription():
         ("#id_state", TEST_SUBSCRIPTION_INFO['state']), 
         ("#id_zip", TEST_SUBSCRIPTION_INFO['zip']),
     )
-    test.action_chain(0, selectors, action="send_keys")
+    self.action_chain(0, selectors, action="send_keys")
     month_el =\
-        test.find("//select[@id='id_date_cc_expiration_month']/" +\
+        self.find("//select[@id='id_date_cc_expiration_month']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
                 'date_cc_expiration'].month),), type="xpath")
     year_el =\
-        test.find("//select[@id='id_date_cc_expiration_year']/" +\
+        self.find("//select[@id='id_date_cc_expiration_year']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
                 'date_cc_expiration'].year),), type="xpath")
     month = month_el.get_attribute("value")
@@ -722,18 +633,18 @@ def test_update_subscription():
     month_el.click()
     year_el.click()
     
-    test.find("#id_recurring").click()
-    test.find("#update-form-submit").click()
+    self.find("#id_recurring").click()
+    self.find("#update-form-submit").click()
     sleep(5)
     
     # back to update account page
-    test.find("//div[@id='account-options']/a[1]",
+    self.find("//div[@id='account-options']/a[1]",
         type="xpath").click()
     sleep(3)
     
     ##########  Changes to first name are visible
     parts[2]['success'] =\
-        test.find("#id_first_name").get_attribute("value") ==\
+        self.find("#id_first_name").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['first_name']
     ##########  Changes to first name are saved to parse
     subscription.first_name = None
@@ -741,7 +652,7 @@ def test_update_subscription():
         TEST_SUBSCRIPTION_INFO['first_name']
     ##########  Changes to last name are visible
     parts[4]['success'] =\
-        test.find("#id_last_name").get_attribute("value") ==\
+        self.find("#id_last_name").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['last_name']
     ##########  Changes to last name are saved to parse
     subscription.last_name = None
@@ -749,7 +660,7 @@ def test_update_subscription():
         TEST_SUBSCRIPTION_INFO['last_name']
     ##########  Changes to card number are visible
     parts[6]['success'] =\
-        test.find("#id_cc_number").get_attribute("value")[-4:] ==\
+        self.find("#id_cc_number").get_attribute("value")[-4:] ==\
         TEST_SUBSCRIPTION_INFO['cc_number'][-4:]
     ##########  Changes to card number are saved to parse
     subscription.cc_number = None
@@ -761,10 +672,10 @@ def test_update_subscription():
     parts[8]['success'] = subscription.get("pp_cc_id").__contains__(\
         "CARD") and len(subscription.get("pp_cc_id")) == 29
     ##########  Changes to cc expiration are visible 
-    parts[9]['success'] = month == test.get_selected("//select" +\
+    parts[9]['success'] = month == self.get_selected("//select" +\
         "[@id='id_date_cc_expiration_month']/option",
         type="xpath").get_attribute("value") and\
-        year == test.get_selected(\
+        year == self.get_selected(\
         "//select[@id='id_date_cc_expiration_year']/option",
         type="xpath").get_attribute("value")
     ##########  Changes to cc expiration are saved to parse
@@ -775,7 +686,7 @@ def test_update_subscription():
         TEST_SUBSCRIPTION_INFO['date_cc_expiration'].year
     ##########  Changes to address are visible
     parts[11]['success'] =\
-        test.find("#id_address").get_attribute("value") ==\
+        self.find("#id_address").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['address']
     ##########  Changes to address are saved to parse 
     subscription.address = None
@@ -783,18 +694,18 @@ def test_update_subscription():
         TEST_SUBSCRIPTION_INFO['address']
     ##########  Changes to city are visible
     parts[13]['success'] =\
-        test.find("#id_city").get_attribute("value") ==\
+        self.find("#id_city").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['city']
     ##########  Changes to city are saved to parse 
     subscription.city = None
     parts[14]['success'] = subscription.get("city") ==\
         TEST_SUBSCRIPTION_INFO['city']
     ##########  Changes to state are visible
-    test.find("//select[@id='id_date_cc_expiration_year']/" +\
+    self.find("//select[@id='id_date_cc_expiration_year']/" +\
             "option[@value='%s']" % (str(TEST_SUBSCRIPTION_INFO[\
                 'date_cc_expiration'].year)), type="xpath")
     parts[15]['success'] =\
-        test.find("#id_state").get_attribute("value") ==\
+        self.find("#id_state").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['state']
     ##########  Changes to state are saved to parse 
     subscription.state = None
@@ -802,7 +713,7 @@ def test_update_subscription():
         TEST_SUBSCRIPTION_INFO['state']
     ##########  Changes to zip are visible
     parts[17]['success'] =\
-        test.find("#id_zip").get_attribute("value") ==\
+        self.find("#id_zip").get_attribute("value") ==\
         TEST_SUBSCRIPTION_INFO['zip']
     ##########  Changes to zip are saved to parse 
     subscription.zip = None
@@ -815,12 +726,12 @@ def test_update_subscription():
         "#id_cc_number", "#id_cc_cvv",  
         "#id_address", "#id_city", "#id_state", "#id_zip",
     ]
-    test.action_chain(0, selectors, action="clear")
+    self.action_chain(0, selectors, action="clear")
     for i in range(len(selectors)):
         selectors[i] = (selectors[i], "    ")
-    test.action_chain(0, selectors, action="send_keys")
+    self.action_chain(0, selectors, action="send_keys")
     
-    test.find("#update-form-submit").click()
+    self.find("#update-form-submit").click()
     sleep(3)
     
     ##########  First name is required
@@ -835,7 +746,7 @@ def test_update_subscription():
     def field_is_required(part, selector,
         message="This field is required."):
         try:
-            parts[part]['success'] = test.find(selector).text==message
+            parts[part]['success'] = self.find(selector).text==message
         except Exception as e:
             print e
             parts[part]['test_message'] = str(e)
@@ -859,12 +770,12 @@ def test_update_subscription():
     
     ##########  Invalid credit card number shows error
     try:
-        cc_number = test.find("#id_cc_number")
+        cc_number = self.find("#id_cc_number")
         cc_number.clear()
         cc_number.send_keys("8769233313929990")
-        test.find("#update-form-submit").click()
+        self.find("#update-form-submit").click()
         sleep(3)
-        parts[28]['success'] = test.find("#card_number_container " +\
+        parts[28]['success'] = self.find("#card_number_container " +\
             "ul.errorlist li").text ==\
                 "Enter a valid credit card number."
     except Exception as e:
@@ -882,15 +793,15 @@ def test_update_subscription():
     else:
         try:
             # select january of this year.
-            test.find("//select[@id='id_date_cc_expiration_month']/" +\
+            self.find("//select[@id='id_date_cc_expiration_month']/" +\
                     "option[@value='1']", type="xpath").click()
-            test.find("//select[@id='id_date_cc_expiration_year']/" +\
+            self.find("//select[@id='id_date_cc_expiration_year']/" +\
                     "option[@value='%s']" %\
                     (str(timezone.now().year),), type="xpath").click()
-            test.find("#update-form-submit").click()
+            self.find("#update-form-submit").click()
             sleep(3)
             parts[29]['success'] =\
-                test.find("#date_cc_expiration_ic ul.errorlist " +\
+                self.find("#date_cc_expiration_ic ul.errorlist " +\
                 "li").text == "Your credit card has expired!"
         except Exception as e:
             print e
@@ -898,14 +809,14 @@ def test_update_subscription():
         
     ##########  Only the last 4 digits of the card number are shown
     try:
-        test.find("//div[@class='form-options']/a[2]",
+        self.find("//div[@class='form-options']/a[2]",
             type="xpath").click()
         sleep(1)
-        test.find("//div[@id='account-options']/a[1]",
+        self.find("//div[@id='account-options']/a[1]",
             type="xpath").click()
         sleep(3)
         masked_number =\
-            test.find("#id_cc_number").get_attribute("value")
+            self.find("#id_cc_number").get_attribute("value")
         parts[30]['success'] = masked_number[:-4] ==\
             "************" and str(masked_number[-4:]).isdigit()
     except Exception as e:
@@ -917,9 +828,9 @@ def test_update_subscription():
     try:
         subscription.pp_cc_id = None
         cc_id = subscription.get("pp_cc_id")
-        test.find("#id_cc_cvv").send_keys("123")
-        test.find("#id_recurring").click()
-        test.find("#update-form-submit").click()
+        self.find("#id_cc_cvv").send_keys("123")
+        self.find("#id_recurring").click()
+        self.find("#update-form-submit").click()
         sleep(5)
         subscription.pp_cc_id = None
         parts[31]['success'] = cc_id == subscription.get("pp_cc_id")
@@ -928,7 +839,7 @@ def test_update_subscription():
         parts[31]['test_message'] = str(e)
     
     # END OF ALL TESTS - cleanup
-    return test.tear_down()
+    return self.tear_down()
     
 def test_cancel_account():
     """
@@ -953,12 +864,12 @@ def test_cancel_account():
         "section_name": "Deactivate store link functional?",
         "parts": parts,
     }
-    test.results.append(section)
+    self.results.append(section)
     
     ##########  User needs to be logged in to access page
-    test.open(reverse("store_index")) # ACTION!
+    self.open(reverse("store_index")) 
     sleep(1)
-    parts[0]['success'] = test.is_current_url(reverse(\
+    parts[0]['success'] = self.is_current_url(reverse(\
         'manage_login') + "?next=" + reverse("store_index"))
         
     # login
@@ -967,14 +878,14 @@ def test_cancel_account():
         ("#login_password", TEST_USER['password']),
         ("", Keys.RETURN)
     )
-    test.action_chain(0, selectors, "send_keys") # ACTION!
+    self.action_chain(0, selectors, "send_keys") 
     sleep(7)  
     
     ##########  Clicking the cancel button brings up a confrmtn dialog
     try:
-        test.find("#deactivate_account").click()
+        self.find("#deactivate_account").click()
         sleep(1)
-        alert = test.switch_to_alert()
+        alert = self.switch_to_alert()
         parts[1]['success'] = alert is not None
     except Exception as e:
         print e
@@ -995,17 +906,17 @@ def test_cancel_account():
         
     ##########  Clicking OK logs the user out
     try:
-        test.find("#deactivate_account").click()
+        self.find("#deactivate_account").click()
         sleep(1)
-        alert = test.switch_to_alert()
+        alert = self.switch_to_alert()
         alert.accept()
         sleep(4)
         if SeleniumTest.DEV_LOGIN:
             parts[3]["success"] =\
-                test.is_current_url(reverse("manage_dev_login")+"?next=/")
+                self.is_current_url(reverse("manage_dev_login")+"?next=/")
         else:
             parts[3]["success"] =\
-                test.is_current_url(reverse("public_home"))
+                self.is_current_url(reverse("public_home"))
     except Exception as e:
         print e
         parts[3]['test_message'] = str(e)
@@ -1020,7 +931,7 @@ def test_cancel_account():
     store.update()
     
     # END OF ALL TESTS - cleanup
-    return test.tear_down()
+    return self.tear_down()
     
     
     
