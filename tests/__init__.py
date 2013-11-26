@@ -31,12 +31,12 @@ class SeleniumTest(CloudCodeTest):
     VERBOSE = True
     IMPLICITLY_WAIT = 10
     
-    def __init__(self, test_title, tests):
+    def __init__(self, fetch_user=True):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
         """
-        super(SeleniumTest, self).__init__(test_title, tests)
+        super(SeleniumTest, self).__init__(fetch_user)
         self.driver = webdriver.Firefox()
         self.set_to_implicit_wait(True)
         self.dev_login()
@@ -58,12 +58,13 @@ class SeleniumTest(CloudCodeTest):
             self.find("input[type='submit']").click()
             sleep(2)
         
-    def get_results(self, test_funcs):
+    def get_results(self, verbose=False):
         """
         Quit the driver and return the results of the test.
         """
+        results = super(SeleniumTest, self).get_results(verbose)
         self.driver.quit()
-        return super(SeleniumTest, self).get_results(test_funcs)
+        return results
         
     def open(self, url="/"):
         self.driver.get("%s%s" % (SeleniumTest.SERVER_URL, url))

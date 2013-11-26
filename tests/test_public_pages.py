@@ -15,32 +15,23 @@ from tests import SeleniumTest
 
 from apps.public.forms import SUBJECT_PREFIX
 
-def test_public_pages():
-    print "\ntest_public_pages:"
-    print "--------------------"   
-     
-    test = SeleniumTest("PUBLIC_PAGES", [
-        {'test_name': "Home page navigable"},
-        {'test_name': "Learn page navigable"},
-        {'test_name': "FAQ page navigable"},
-        {'test_name': "About page navigable"},
-        {'test_name': "Footer elements navigable"},
-        {'test_name': "FAQ email form working"},
-        {'test_name': "FAQ email sent"},
-        {'test_name': "FAQ email form all fields required"},
-        {'test_name': "Contact Us email form working"},
-        {'test_name': "Contact Us email sent"},
-        {'test_name': "Contact Us email form all fields required"},
-    ])
-    
-    ##########  Home page navigable
-    def test_0():
-        test.open(reverse("public_home"))
+class TestPublicPages(SeleniumTest):
+
+    def __init__(self):
+        super(TestPublicPages, self).__init__(False)
+
+    def test_0(self):
+        """
+        Home page navigable
+        """
+        self.open(reverse("public_home"))
         sleep(2)
-        return test.is_current_url(reverse("public_home"))
+        return self.is_current_url(reverse("public_home"))
         
-    ##########  Learn page navigable
-    def test_1():
+    def test_1(self):
+        """
+        Learn page navigable
+        """
         selectors = (
             # learn page link
             "#header-menu a[href='" + reverse("public_learn") + "']",
@@ -51,11 +42,13 @@ def test_public_pages():
             "#tabSocial",
             "#tabPlans-pricing", 
         )
-        test.action_chain(1, selectors)
+        self.action_chain(1, selectors)
         return True
         
-    ##########  FAQ page navigable
-    def test_2():
+    def test_2(self):
+        """
+        FAQ page navigable
+        """
         selectors = [
             # faq page
             "//nav[@id='header-menu']/a[@href='" +\
@@ -66,12 +59,14 @@ def test_public_pages():
             selectors.append("//div[@id='faq-content']/aside[@" +\
                 "class='col1']/"+\
                 "div[" + str(i) + "]/div[@class='accordionButton']")
-        test.action_chain(1, selectors, type="xpath")
+        self.action_chain(1, selectors, type="xpath")
         return True
         
-    ##########  About page navigable
-    def test_3():
-        test.find("//nav[@id='header-menu']/a[@href='" +\
+    def test_3(self):
+        """
+        About page navigable
+        """
+        self.find("//nav[@id='header-menu']/a[@href='" +\
                reverse("public_about") + "']", type="xpath").click()
         selectors = [] 
         # about member photos
@@ -79,11 +74,13 @@ def test_public_pages():
             selectors.append("//div[@id='the-team']/" +\
                 "div[@class='the-team-member tooltip'][" +\
                 str(i) + "]")
-        test.action_chain(1, selectors, action="move", type="xpath")
+        self.action_chain(1, selectors, action="move", type="xpath")
         return True
     
-    ##########  Footer elements navigable
-    def test_4():
+    def test_4(self):
+        """
+        Footer elements navigable
+        """
         selectors = []
         for i in range(1, 5): # TOS, PP, Contact, Jobs
             selectors.append("//ul[@id='footer-menu']/li[" +\
@@ -91,104 +88,100 @@ def test_public_pages():
         # facebook and twitter
         selectors.append("//ul[@id='footer-menu']/li[5]/a[1]")
         selectors.append("//ul[@id='footer-menu']/li[5]/a[2]")
-        test.action_chain(3, selectors, type="xpath") 
+        self.action_chain(3, selectors, type="xpath") 
         return True
     
-    ##########  FAQ email form working
-    def test_5():
-        test.new_driver()
-        test.open(reverse("public_faq"))
+    def test_5(self):
+        """
+        FAQ email form working
+        """
+        self.new_driver()
+        self.open(reverse("public_faq"))
+        sleep(2)
         selectors = (
             ("#id_full_name", "Test User X"),
-            ("#id_email", "test@test.com"),
+            ("#id_email", "test@self.com"),
             ("#id_message", "FAQ page. This is a test - ignore it.")
         )
-        test.action_chain(0, selectors, action="send_keys") # ACTION!
-        test.find("//form[@id='make-question-form']/a", 
+        self.action_chain(0, selectors, action="send_keys") # ACTION!
+        self.find("//form[@id='make-question-form']/a", 
             type="xpath").click()
         sleep(1)
-        return test.is_current_url(reverse("public_thank_you"))
+        return self.is_current_url(reverse("public_thank_you"))
         
-    ##########  FAQ email sent
-    def test_6():
-        if SeleniumTest.CHECK_SENT_MAIL:
-            test.extras["mail"] = Mail()
+    def test_6(self):
+        """
+        FAQ email sent
+        """
+        if self.CHECK_SENT_MAIL:
+            self.mail = Mail()
             sleep(4) # wait for the email to register in gmail
-            return test.extras["mail"].is_mail_sent(\
+            return self.mail.is_mail_sent(\
                 SUBJECT_PREFIX + "Test User X")
         else:
             return (True, "Test skipped.")
         
-    ##########  FAQ email form all fields required
-    def test_7():
-        test.open(reverse("public_faq"))
+    def test_7(self):
+        """
+        FAQ email form all fields required
+        """
+        self.open(reverse("public_faq"))
         sleep(1)
         selectors = (
             ("#id_full_name", "  "),
             ("#id_email", "  "),
             ("#id_message", "  ")
         )
-        test.action_chain(0, selectors, action="send_keys") 
-        test.find("//form[@id='make-question-form']/a", 
+        self.action_chain(0, selectors, action="send_keys") 
+        self.find("//form[@id='make-question-form']/a", 
             type="xpath").click() 
         sleep(1)
-        return len(test.find(".errorlist",
+        return len(self.find(".errorlist",
             multiple=True)) == 3
             
-    ##########  Contact Us email form working
-    def test_8():
-        test.open(reverse("public_contact"))
+    def test_8(self):
+        """
+        Contact Us email form working
+        """
+        self.open(reverse("public_contact"))
         selectors = (
             ("#id_full_name", "Test User Y"),
-            ("#id_email", "test@test.com"),
+            ("#id_email", "test@self.com"),
             ("#id_message", "Contact Us page. This is a test - ignore it.")
         )
-        test.action_chain(0, selectors, action="send_keys") # ACTION!
-        test.find("//form[@id='contact-form']/a", 
+        self.action_chain(0, selectors, action="send_keys") # ACTION!
+        self.find("//form[@id='contact-form']/a", 
             type="xpath").click()
         sleep(1)
-        return test.is_current_url(reverse("public_thank_you"))
+        return self.is_current_url(reverse("public_thank_you"))
             
-    ##########  Contact Us email sent
-    def test_9():
-        if SeleniumTest.CHECK_SENT_MAIL:
+    def test_9(self):
+        """
+        Contact Us email sent
+        """
+        if self.CHECK_SENT_MAIL:
             sleep(4) # wait for the email to register in gmail
-            return test.extras["mail"].is_mail_sent(\
+            return self.mail.is_mail_sent(\
                 SUBJECT_PREFIX + "Test User Y")
         else:
             return (True, "Test skipped.")
             
-    ##########  Contact Us email form all fields required
-    def test_10():
-        test.open(reverse("public_contact"))
+    def test_10(self):
+        """
+        Contact Us email form all fields required
+        """
+        if self.CHECK_SENT_MAIL: 
+            self.mail.logout()
+            
+        self.open(reverse("public_contact"))
         selectors = (
             ("#id_full_name", "   "),
             ("#id_email", "   "),
             ("#id_message", "   ")
         )
-        test.action_chain(0, selectors, action="send_keys") 
-        test.find("//form[@id='contact-form']/a", 
+        self.action_chain(0, selectors, action="send_keys") 
+        self.find("//form[@id='contact-form']/a", 
             type="xpath").click()
         sleep(1)
-        return len(test.find(".errorlist", multiple=True)) == 3
-        
-    for i in range(11):
-        test.testit(locals()["test_%s" % (str(i),)])
-    
-    # END TEST
-    if SeleniumTest.CHECK_SENT_MAIL: 
-        test.extras["mail"].logout()
-    
-    # END OF ALL TESTS
-    return test.tear_down()
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
+        return len(self.find(".errorlist", multiple=True)) == 3
         

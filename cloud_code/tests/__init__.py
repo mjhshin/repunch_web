@@ -12,10 +12,10 @@ UN_CAMEL_RE = re.compile(r"([a-z0-9])([A-Z])")
 
 class CloudCodeTest(object):
 
-    # This User exists solely for testing CloudCode.
+    # This User exists solely for testing.
     # It must have a Store, Employee, and Patron pointers.
     USER = {
-        "email": "cloudcode@repunch.com",
+        "email": "repunchtest@repunch.com",
         "password": "123456",
     }
     
@@ -24,11 +24,11 @@ class CloudCodeTest(object):
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
         """
-        name = UN_CAMEL_RE.sub(r'\1 \2', self.__class__.__name__)
+        self.name = UN_CAMEL_RE.sub(r'\1 \2', self.__class__.__name__)
         
         self._tests = []
         self._results = {
-            "section_name": name,
+            "section_name": self.name,
             "parts": self._tests,
         }
         
@@ -55,7 +55,7 @@ class CloudCodeTest(object):
         }
         """
         if verbose:
-            print "\n" + name 
+            print "\n" + self.name 
             print "--------------------------------------------------"
             
         for name in self._get_sorted_tests():

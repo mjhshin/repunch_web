@@ -26,7 +26,7 @@ class Command(BaseCommand):
     
         results = (
             ####### PUBLIC #########################################
-            #TestPublicPages().get_results(verbose),
+            TestPublicPages().get_results(verbose),
             #TestSignUp().get_results(verbose),
             #TestLoginDialog().get_results(verbose),
             #TestLoginPage().get_results(verbose),
