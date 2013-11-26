@@ -4,13 +4,7 @@ Tests for add_patronstore and delete_patronstore.
 
 from parse.utils import cloud_call
 from cloud_code.tests import CloudCodeTest
-from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import PatronStore
-
-# This User exists solely for testing CloudCode.
-# It must have a Store and Patron pointers.
-ACCOUNT_EMAIL = "cloudcode@repunch.com"
-
 
 class TestAddDeletePatronStore(CloudCodeTest):
     """
@@ -19,12 +13,7 @@ class TestAddDeletePatronStore(CloudCodeTest):
 
     def __init__(self):
         super(TestAddDeletePatronStore, self).__init__()
-            
-        self.account = Account.objects().get(email=ACCOUNT_EMAIL,
-            include="Patron,Store")
-        self.patron = self.account.patron
-        self.store = self.account.store
-    
+        
         for ps in PatronStore.objects().filter(Store=self.store.objectId):
             ps.delete()
     

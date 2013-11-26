@@ -7,27 +7,19 @@ from django.utils import timezone
 from libs.dateutil.relativedelta import relativedelta
 from cloud_code.tests import CloudCodeTest
 from parse.utils import cloud_call
-from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import PatronStore
 from parse.apps.rewards.models import RedeemReward
 from parse.apps.messages.models import Message
 
-# This User exists solely for testing CloudCode.
-# It must have a Store, Employee, and Patron pointers.
-ACCOUNT_EMAIL = "cloudcode@repunch.com"
-
-class TestRequestValidateRejectRedeem():
+class TestRequestValidateRejectRedeem(CloudCodeTest):
     """
     This first deletes all the PatronStores that points to this Store.
     This will also set the Store's rewards, sentMessages, redeemRewards,
     and the Patron's receivedMessages.
     """
     
-    account = Account.objects().get(email=ACCOUNT_EMAIL,
-        include="Patron,Store,Employee")
-    patron = account.patron
-    store = account.store
-    employee = account.employee
+    def __init__(self):
+        super(TestRequestValidateRejectRedeem, self).__init__()
     
     store.rewards = [{
         "reward_id":0,
@@ -71,70 +63,6 @@ class TestRequestValidateRejectRedeem():
         return patron_store
         
     test.extras['patron_store'] = add_patronstore()
-    
-    test = CloudCodeTest("REQUEST/APPROVE/REJECT REDEEM", [
-        {'test_name': "Request_redeem creates a new RedeemReward (reward)"},
-        {'test_name': "RedeemReward is added to Store's RedeemReward relation"},
-        {'test_name': "PatronStore's pending_reward is set to true"},
-        {'test_name': "RedeemReward's patron_id is set"},
-        {'test_name': "RedeemReward's customer_name is set"},
-        {'test_name': "RedeemReward's is_redeemed is set to false"},
-        {'test_name': "RedeemReward's title is set"},
-        {'test_name': "RedeemReward's PatronStore pointer is set"},
-        {'test_name': "RedeemReward's num_punches is set"},
-        {'test_name': "RedeemReward's reward_id is set"},
-        
-        {'test_name': "Validate_redeem successful"},
-        {'test_name': "RedeemReward's is_redeemed is set to true"},
-        {'test_name': "PatronStore's pending_reward is set to false"},
-        {'test_name': "PatronStore's punch_count is updated"},
-        {'test_name': "The reward's redemption_count is updated"},
-        
-        {'test_name': "Reject_redeem successful"},
-        {'test_name': "RedeemReward is deleted"},
-        {'test_name': "PatronStore's pending_reward is set to false"},
-        
-        {'test_name': "Request_redeem creates a new RedeemReward (offer/gift)"},
-        {'test_name': "RedeemReward is added to Store's RedeemReward relation"},
-        {'test_name': "RedeemReward's num_punches is set to 0 regardless of input"},
-        {'test_name': "RedeemReward's MessageStatus is set"},
-        {'test_name': "RedeemReward's patron_id is set"},
-        {'test_name': "RedeemReward's customer_name is set"},
-        {'test_name': "RedeemReward's is_redeemed is set to false"},
-        {'test_name': "RedeemReward's title is set"},
-        {'test_name': "MessageStatus' redeem_available is set to pending"},
-        
-        {'test_name': "Validate_redeem successful"},
-        {'test_name': "RedeemReward's is_redeemed is set to true"},
-        {'test_name': "MessageStatus's redeem_available is set to 'no'"},
-        
-        {'test_name': "Reject_redeem successful"},
-        {'test_name': "RedeemReward is deleted"},
-        {'test_name': "MessageStatus's redeem_available is set to 'no'"},
-        
-        {'test_name': "Request_redeem succeeds with pending if"+\
-            " PatronStore's pending_reward is true before the request."},
-            
-        {'test_name': "Validate_redeem succeeds with validated if the"+\
-            " RedeemReward has already been redeemed"},
-        {'test_name': "Validate_redeem succeeds with PATRONSTORE_REMOVED if the"+\
-            " PatronStore has been deleted"},
-        {'test_name': "The RedeemReward is then deleted."},
-            
-        {'test_name': "Validate_redeem succeeds with insufficient if the"+\
-            " PatronStore does not have enough punches"},
-        {'test_name': "The RedeemReward is then deleted."},
-        {'test_name': "Validate_redeem fails with REDEEMREWARD_NOT_FOUND if the"+\
-            " RedeemReward has been deleted"},
-            
-        {'test_name': "Reject_redeem fails with REDEEMREWARD_VALIDATED"+\
-            " if the RedeemReward has already been validated"},
-        {'test_name': "Reject_redeem fails with REDEEMREWARD_NOT_FOUND if the"+\
-            " RedeemReward has been deleted"},
-        {'test_name': "Reject_redeem fails with PATRONSTORE_REMOVED if the"+\
-            " PatronStore has been deleted"},
-        {'test_name': "The RedeemReward is then deleted."},
-    ])
     
     def request_redeem(reward_id=test.extras['reward']["reward_id"],
         title=test.extras['reward']["reward_name"], message_status_id=None):

@@ -4,13 +4,8 @@ Tests for punch.
 
 from parse.utils import cloud_call
 from cloud_code.tests import CloudCodeTest
-from parse.apps.accounts.models import Account
 from parse.apps.rewards.models import Punch
 from parse.apps.patrons.models import PatronStore
-
-# This User exists solely for testing CloudCode.
-# It must have a Store, Employee, and Patron pointers.
-ACCOUNT_EMAIL = "cloudcode@repunch.com"
 
 class TestPunch(CloudCodeTest):
     """
@@ -20,12 +15,6 @@ class TestPunch(CloudCodeTest):
 
     def __init__(self):
         super(TestPunch, self).__init__()
-          
-        self.account = Account.objects().get(email=ACCOUNT_EMAIL,
-            include="Patron,Store,Employee")
-        self.patron = self.account.patron
-        self.store = self.account.store
-        self.employee = self.account.employee
     
         for ps in PatronStore.objects().filter(Store=self.store.objectId):
             ps.delete()

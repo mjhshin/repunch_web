@@ -6,13 +6,22 @@ These should also be used for SeleniumTests.
 
 import re
 
+from parse.apps.accounts.models import Account
+
 UN_CAMEL_RE = re.compile(r"([a-z0-9])([A-Z])")
 
 class CloudCodeTest(object):
 
     VERBOSE = True
     
-    def __init__(self):
+    # This User exists solely for testing CloudCode.
+    # It must have a Store, Employee, and Patron pointers.
+    USER = {
+        "email": "cloudcode@repunch.com",
+        "password": "123456",
+    }
+    
+    def __init__(self, fetch_user=True):
         """
         tests has the following format:
         [ {'test_name': "Test title"}, ... ]
@@ -28,6 +37,13 @@ class CloudCodeTest(object):
             "section_name": name,
             "parts": self._tests,
         }]
+        
+        if fetch_user:
+            self.account = Account.objects().get(email=\
+                self.USER['email'], include="Patron,Store,Employee")
+            self.patron = self.account.patron
+            self.store = self.account.store
+            self.employee = self.account.employee
     
     def get_results(self):
         """
