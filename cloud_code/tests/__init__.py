@@ -21,6 +21,10 @@ class CloudCodeTest(object):
         }
         self._results.append(section)
         self.tests = tests
+        
+        # instead of using globals() to retain objects through each
+        # test function, use this dict instead
+        self.extras = {}
     
     def get_results(self):
         return self._results

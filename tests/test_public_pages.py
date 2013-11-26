@@ -112,9 +112,9 @@ def test_public_pages():
     ##########  FAQ email sent
     def test_6():
         if SeleniumTest.CHECK_SENT_MAIL:
-            globals()["mail"] = Mail()
+            test.extras["mail"] = Mail()
             sleep(4) # wait for the email to register in gmail
-            return globals()["mail"].is_mail_sent(\
+            return test.extras["mail"].is_mail_sent(\
                 SUBJECT_PREFIX + "Test User X")
         else:
             return (True, "Test skipped.")
@@ -153,7 +153,7 @@ def test_public_pages():
     def test_9():
         if SeleniumTest.CHECK_SENT_MAIL:
             sleep(4) # wait for the email to register in gmail
-            return globals()["mail"].is_mail_sent(\
+            return test.extras["mail"].is_mail_sent(\
                 SUBJECT_PREFIX + "Test User Y")
         else:
             return (True, "Test skipped.")
@@ -177,7 +177,7 @@ def test_public_pages():
     
     # END TEST
     if SeleniumTest.CHECK_SENT_MAIL: 
-        globals()["mail"].logout()
+        test.extras["mail"].logout()
     
     # END OF ALL TESTS
     return test.tear_down()

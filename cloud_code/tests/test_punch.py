@@ -58,8 +58,8 @@ def test_punch():
         {'test_name': "Using unused punch_code returns error with PATRON_NOT_FOUND"},
     ])
     
-    globals()['emp_lifetime_punches'] = employee.lifetime_punches
-    globals()['patron_store'] = PatronStore.objects().get(\
+    test.extras['emp_lifetime_punches'] = employee.lifetime_punches
+    test.extras['patron_store'] = PatronStore.objects().get(\
         Patron=patron.objectId, Store=store.objectId)
     
     ##########  Punch creates a new Punch object (from employee)
@@ -80,33 +80,33 @@ def test_punch():
     ##########  Punch object is added to Store's Punches relation 
     def test_1():
         punch = Punch.objects().get(Patron=patron.objectId)
-        globals()['punch'] = punch
+        test.extras['punch'] = punch
         return store.get("punches", objectId=punch.objectId,
             limit=0, count=1) == 1
     
     ##########  Punch object is added to Employee's Punches relation
     def test_2():
         return employee.get("punches",
-            objectId=globals()['punch'].objectId,
+            objectId=test.extras['punch'].objectId,
             limit=0, count=1) == 1
     
     ##########  Punch's Patron pointer is set
     def test_3():
-        return globals()['punch'].Patron == patron.objectId
+        return test.extras['punch'].Patron == patron.objectId
     
     ##########  Punch's punches is set to correct amount
     def test_4():
-        return globals()['punch'].punches == 1
+        return test.extras['punch'].punches == 1
     
     ##########  Employee's lifetime_punches is updated
     def test_5():
         employee.lifetime_punches = None
-        return globals()['emp_lifetime_punches']+1 ==\
+        return test.extras['emp_lifetime_punches']+1 ==\
             employee.get("lifetime_punches")
     
     ##########  PatronStore is created since it does not yet exist
     def test_6():
-        if globals()['patron_store'] is not None:
+        if test.extras['patron_store'] is not None:
             return "PatronStore already existed. Test is invalid."
             
         return PatronStore.objects().count(\
@@ -116,39 +116,39 @@ def test_punch():
     def test_7():
         patron_store = PatronStore.objects().get(\
             Patron=patron.objectId, Store=store.objectId)
-        globals()['patron_store'] = patron_store
+        test.extras['patron_store'] = patron_store
         return patron.get("patronStores", objectId=patron_store.objectId,
             limit=0, count=1) == 1
     
     ##########  PatronStore is added to Store's PatronStores relation
     def test_8():
-        return store.get("patronStores", objectId=globals()['patron_store'].objectId,
+        return store.get("patronStores", objectId=test.extras['patron_store'].objectId,
             limit=0, count=1) == 1
     
     ##########  PatronStore's Patron pointer is set
     def test_9():
-        return globals()['patron_store'].Patron is not None
+        return test.extras['patron_store'].Patron is not None
     
     ##########  PatronStore's Store pointer is set 
     def test_10():
-        return globals()['patron_store'].Store is not None
+        return test.extras['patron_store'].Store is not None
     
     ##########  PatronStore's all_time_punches is set to amount given
     def test_11():
-        return globals()['patron_store'].all_time_punches == 1
+        return test.extras['patron_store'].all_time_punches == 1
     
     ##########  PatronStore's punch_count is set to amount given
     def test_12():
-        return globals()['patron_store'].punch_count == 1
+        return test.extras['patron_store'].punch_count == 1
     
     ##########  PatronStore's pending_reward is set to false 
     def test_13():
-        return not globals()['patron_store'].pending_reward
+        return not test.extras['patron_store'].pending_reward
     
     
     ##########  Punch creates a new Punch object (from dashboard - owner)
     def test_14():
-        globals()['punch'].delete()
+        test.extras['punch'].delete()
         if Punch.objects().count(Patron=patron.objectId) > 0:
             return "Punches for the Store exists. Test is invalid."
         
@@ -164,27 +164,27 @@ def test_punch():
     ##########  Punch object is added to Store's Punches relation
     def test_15():
         punch = Punch.objects().get(Patron=patron.objectId)
-        globals()['punch'] = punch
+        test.extras['punch'] = punch
         return store.get("punches", objectId=punch.objectId,
             count=1, limit=0) == 1
    
     ##########  Punch's Patron pointer is set
     def test_16():
-        return globals()['punch'].Patron == patron.objectId
+        return test.extras['punch'].Patron == patron.objectId
     
     ##########  Punch's punches is set to correct amount 
     def test_17():
-        return globals()['punch'].punches == 1
+        return test.extras['punch'].punches == 1
     
     ##########  PatronStore's punch_count is updated 
     def test_18():
-        patron_store = globals()['patron_store']
+        patron_store = test.extras['patron_store']
         patron_store.fetch_all(clear_first=True, with_cache=False)
         return patron_store.punch_count == 2
     
     ##########  PatronStore's all_time_punches is updated 
     def test_19():
-        return globals()['patron_store'].all_time_punches == 2
+        return test.extras['patron_store'].all_time_punches == 2
         
     ##########  Using unused punch_code returns error with PATRON_NOT_FOUND 
     def test_20():

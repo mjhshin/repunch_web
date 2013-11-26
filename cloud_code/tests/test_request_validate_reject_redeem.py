@@ -40,7 +40,7 @@ def test_request_validate_reject_redeem():
     }]
     store.update()
     
-    globals()['reward'] = store.rewards[0]
+    test.extras['reward'] = store.rewards[0]
     
     if store.get("sentMessages"):
         for m in store.sentMessages:
@@ -72,7 +72,7 @@ def test_request_validate_reject_redeem():
         patron_store.update()
         return patron_store
         
-    globals()['patron_store'] = add_patronstore()
+    test.extras['patron_store'] = add_patronstore()
     
     test = CloudCodeTest("REQUEST/APPROVE/REJECT REDEEM", [
         {'test_name': "Request_redeem creates a new RedeemReward (reward)"},
@@ -138,14 +138,14 @@ def test_request_validate_reject_redeem():
         {'test_name': "The RedeemReward is then deleted."},
     ])
     
-    def request_redeem(reward_id=globals()['reward']["reward_id"],
-        title=globals()['reward']["reward_name"], message_status_id=None):
+    def request_redeem(reward_id=test.extras['reward']["reward_id"],
+        title=test.extras['reward']["reward_name"], message_status_id=None):
         return cloud_call("request_redeem", {
             "patron_id": patron.objectId,
             "store_id": store.objectId,
-            "patron_store_id": globals()['patron_store'].objectId,
+            "patron_store_id": test.extras['patron_store'].objectId,
             "reward_id": reward_id,
-            "num_punches": globals()['reward']["punches"],
+            "num_punches": test.extras['reward']["punches"],
             "name": patron.get_fullname(),
             "title": title,
             "message_status_id": message_status_id,
@@ -153,7 +153,7 @@ def test_request_validate_reject_redeem():
     
     ##########  Request_redeem creates a new RedeemReward (reward)
     def test_0():
-        patron_store = globals()['patron_store']
+        patron_store = test.extras['patron_store']
         if RedeemReward.objects().count(\
             PatronStore=patron_store.objectId) > 0:
             return "PatronStore exists. Test is invalid."
@@ -166,59 +166,59 @@ def test_request_validate_reject_redeem():
     ##########  RedeemReward is added to Store's RedeemReward relation
     def test_1():
         redeem_reward = RedeemReward.objects().get(\
-                PatronStore=globals()['patron_store'].objectId)
-        globals()['redeem_reward'] = redeem_reward
+                PatronStore=test.extras['patron_store'].objectId)
+        test.extras['redeem_reward'] = redeem_reward
         return store.get("redeemRewards", objectId=redeem_reward.objectId,
             count=1, limit=0) == 1
     
     ##########  PatronStore's pending_reward is set to true
     def test_2():
-        patron_store = globals()['patron_store']
+        patron_store = test.extras['patron_store']
         patron_store.fetch_all(clear_first=True,
             with_cache=False)
         return patron_store.pending_reward
     
     ##########  RedeemReward's patron_id is set 
     def test_3():
-        return globals()['redeem_reward'].patron_id == patron.objectId
+        return test.extras['redeem_reward'].patron_id == patron.objectId
     
     ##########  RedeemReward's customer_name is set
     def test_4():
-        return globals()['redeem_reward'].customer_name == patron.get_fullname()
+        return test.extras['redeem_reward'].customer_name == patron.get_fullname()
     
     ##########  RedeemReward's is_redeemed is set to false
     def test_5():
-        return not globals()['redeem_reward'].is_redeemed
+        return not test.extras['redeem_reward'].is_redeemed
     
     ##########  RedeemReward's title is set
     def test_6():
-        return globals()['redeem_reward'].title ==\
-            globals()['reward']["reward_name"]
+        return test.extras['redeem_reward'].title ==\
+            test.extras['reward']["reward_name"]
     
     ##########  RedeemReward's PatronStore pointer is set 
     def test_7():
-        return globals()['redeem_reward'].PatronStore ==\
-            globals()['patron_store'].objectId
+        return test.extras['redeem_reward'].PatronStore ==\
+            test.extras['patron_store'].objectId
     
     ##########  RedeemReward's num_punches is set 
     def test_8():
-        return globals()['redeem_reward'].num_punches ==\
-            globals()['reward']["punches"]
+        return test.extras['redeem_reward'].num_punches ==\
+            test.extras['reward']["punches"]
     
     ##########  RedeemReward's reward_id is set 
     def test_9():
-        return globals()['redeem_reward'].reward_id ==\
-            globals()['reward']["reward_id"]
+        return test.extras['redeem_reward'].reward_id ==\
+            test.extras['reward']["reward_id"]
         
     ##########  Validate_redeem successful
     def test_10():
-        globals()['pt_punch_cout_b4'] =\
-            globals()['patron_store'].punch_count
-        globals()['reward_red_count_b4'] =\
+        test.extras['pt_punch_cout_b4'] =\
+            test.extras['patron_store'].punch_count
+        test.extras['reward_red_count_b4'] =\
             globals['reward']["redemption_count"]
             
         res = cloud_call("validate_redeem", {
-            "redeem_id": globals()['redeem_reward'].objectId,
+            "redeem_id": test.extras['redeem_reward'].objectId,
             "store_id": store.objectId,
             "reward_id": globals['reward']["reward_id"],
         })
