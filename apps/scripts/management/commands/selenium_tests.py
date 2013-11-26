@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from parse.notifications import send_email_selenium_test_results
 from tests.test_public_pages import TestPublicPages
 from tests.test_signup import TestSignUp
-#from tests.test_login_logout import TestLoginDialog, TestLoginPage
+from tests.test_login_logout import TestLoginDialog, TestLoginPage
 #from tests.test_mystore import TestEditStoreDetails,\
 #TestUpdateSubscription, TestCancelAccount
 #from tests.test_rewards import TestRewards
@@ -27,9 +27,9 @@ class Command(BaseCommand):
         results = (
             ####### PUBLIC #########################################
             #TestPublicPages().get_results(verbose),
-            TestSignUp().get_results(verbose),
-            #TestLoginDialog().get_results(verbose),
-            #TestLoginPage().get_results(verbose),
+            #TestSignUp().get_results(verbose),
+            TestLoginDialog().get_results(verbose),
+            TestLoginPage().get_results(verbose),
             
             ####### DASHBOARD #########################################
             #### MY STORE

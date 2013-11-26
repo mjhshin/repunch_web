@@ -15,6 +15,7 @@ class CloudCodeTest(object):
     # This User exists solely for testing.
     # It must have a Store, Employee, and Patron pointers.
     USER = {
+        "username": "repunchtest@repunch.com",
         "email": "repunchtest@repunch.com",
         "password": "123456",
     }
@@ -94,8 +95,10 @@ class CloudCodeTest(object):
             
             if result_type in (unicode, str):
                 test["test_message"] = result
+                
             elif result_type is bool:
                 test["success"] = result
+                
             elif result_type in (tuple, list):
                 test["success"] = result[0]
                 test["test_message"] = result[1]

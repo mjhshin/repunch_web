@@ -207,9 +207,11 @@ class SeleniumTest(CloudCodeTest):
                     self.find(selector[0],type).send_keys(selector[1])
             elif action == "clear":
                 if self._type(selector) in (tuple, list):
-                    self.find(selector[0], type).clear()
+                    if len(selector[0]) > 0:
+                        self.find(selector[0], type).clear()
                 else:
-                    self.find(selector, type).clear()
+                    if len(selector) > 0:
+                        self.find(selector, type).clear()
                     
     def _type(self, obj):
         """
