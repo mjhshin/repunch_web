@@ -1,4 +1,4 @@
-{% extends "manage/notification.html" %}{% load parse_tags %}
+{% extends "manage/notification.html" %}
 
 {% block title %}
 Suspicious activity has been detected.
@@ -12,104 +12,6 @@ From {{ start|date:"n/j f a" }} to {{ end|date:"n/j f a" }}
 
 {% block content %}
 
-{# CHUNKS #}
-{% for chunk in chunks %}
-{% if chunk|length > 0 %}
-
-{# TABLE TOP #}
-<div style="background-color:#eee;font-weight:bold;border:8px solid #eee;color:#545454;font-size:16px;">
-{% if forloop.counter == 1 %}
-    {% if chunk|length > 1 %}
-    There are {{ chunk|length }} consumers that have been punched more than 6 times today. 
-    {% else %}
-    There is {{ chunk|length }} consumer that has been punched more than 6 times today. 
-    {% endif %}
-{% else %}
-    {% if chunk|length > 1 %}
-    There are {{ chunk|length }} consumers that have been punched when the store was closed.
-    {% else %}
-    There is {{ chunk|length }} consumer that has been punched when the store was closed.
-    {% endif %}
-{% endif %}
-</div>
-
-{# END TABLE TOP #}
-<table cellpadding="0" cellspacing="0" 
-    style="width:100%;background-color:#eee;display:none;">
-    
-{% for ch in chunk %}
-
-{# ONE ITEM #}
-<tr>
-
-    {# DATE BOX #}
-	<td style="width:32px;background-color:#eee;vertical-align:top;border-top:1px solid #fff;padding:8px 0 8px 8px;">
-		<div style="border:1px solid #555;">
-		    <div style="background-color:#555;text-transform:uppercase;color:#fff;font-weight:bold;text-align:center;font-size:9px;line-height:14px;padding:0 4px;">
-                Punches</div>
-			<div style="background-color:#fff;font-size:16px;font-weight:bold;text-align:center;padding:1px 4px 0 4px;">
-                {{ ch.punches|get_total_punches }}
-            </div>
-		</div>
-    </td>
-    {# END DATE BOX #}
-    
-    {# INNER TABLE #}
-	<td style="vertical-align:top;padding:8px;border-top:1px solid #fff;line-height:120%;">
-		<table cellpadding="0" cellspacing="0" style="width:100%;">
-			<tr>
-				<td style="background-color:#eee;vertical-align:top;padding-right:20px;">
-
-                    {# PATRON INFO #}
-                    <div style="padding:0px;">
-                        <span style="color:#545454;font-weight:bold;">{{ ch.patron.get_fullname }}</span> -   
-                        <span style="text-decoration:none;">{{ ch.account.email }}</span>                  
-					</div>
-                    {# END PATRON INFO #}
-
-                    {# LIST OF PUNCHES #}
-                        <ol style="padding:0px;font-size:0.68em;color:#545454;margin:10 0px;line-height:110%;">
-                        
-                {% for punch in ch.punches %}
-                    <li style="display:inline-block;list-style:none;padding:2px;margin:0px;">
-                        <ul style="padding:4px;margin:0px;list-style:none;margin:0px;border:1px solid gray;background:#f0b264;">
-                          
-                        <li style="padding:0px;margin:0px;">Time:
-                        {{ punch.punch.createdAt|date:"h:i a" }}
-                        </li>
-                        <li style="padding:0px;margin:0px;">Amount:
-                        {{ punch.punch.punches }}
-                        </li>
-                        <li style="padding:0px;margin:0px;">From:
-                        {% if punch.employee %}
-                        {{ punch.employee.get_fullname }}
-                        {% else %}
-                        Dashboard
-                        {% endif %}
-                        </li>
-                          
-                        </ul>
-                    </li>
-                {% endfor %}
-                        
-                        </ol>
-                    {# END LIST OF PUNCHES #}
-				</td>
-
-            </tr>
-        </table>
-    </td>
-    {# END INNER TABLE #}
-    
-
-</tr>
-{# END ONE ITEM #}
-
-{% endfor %}
-
-</table><br/>
-{% endif %}
-{% endfor %}
-{# END CHUNKS #}
+{% include "manage/notification-suspicious-activity-chunk.html" with chunks=chunks %}
 
 {% endblock %}

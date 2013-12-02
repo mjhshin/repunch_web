@@ -33,8 +33,8 @@ class Command(BaseCommand):
             
             ####### DASHBOARD #########################################
             #### MY STORE
-            TestEditStoreDetails().get_results(verbose),
-            #TestUpdateSubscription().get_results(verbose),
+            #TestEditStoreDetails().get_results(verbose),
+            TestUpdateSubscription().get_results(verbose),
             #TestCancelAccount().get_results(verbose),
             
             ### REWARDS

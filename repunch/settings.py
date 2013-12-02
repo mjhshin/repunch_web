@@ -69,11 +69,14 @@ else:
 # for order_placed event
 if DEBUG:
     ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
+    REPUNCH_ADMINS = ORDER_PLACED_EMAILS[:] 
 else:
+    REPUNCH_ADMINS = ['vandolf@repunch.com', 'mike@repunch.com']
+    
     if PRODUCTION_SERVER:
         ORDER_PLACED_EMAILS = ['matt@repunch.com', 'andrew@repunch.com']
     else:
-        ORDER_PLACED_EMAILS = ['vandolf@repunch.com', 'mike@repunch.com']
+        ORDER_PLACED_EMAILS = REPUNCH_ADMINS[:]
     
 # for template rendering
 if DEBUG:

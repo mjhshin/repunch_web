@@ -1,0 +1,19 @@
+{% extends "manage/notification-suspicious-activity-chunk.html" %}
+
+{% block table_title %}
+
+{% if forloop.counter == 1 %}
+    {% if chunk|length > 1 %}
+    {{ store.store_name }}: {{ chunk|length }} consumers that have been punched more than 6 times today. 
+    {% else %}
+    {{ store.store_name }}: {{ chunk|length }} consumer that has been punched more than 6 times today. 
+    {% endif %}
+{% else %}
+    {% if chunk|length > 1 %}
+    {{ store.store_name }}: {{ chunk|length }} consumers that have been punched when the store was closed.
+    {% else %}
+    {{ store.store_name }}: {{ chunk|length }} consumer that has been punched when the store was closed.
+    {% endif %}
+{% endif %}
+
+{% endblock %}

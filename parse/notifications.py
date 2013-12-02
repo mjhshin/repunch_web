@@ -23,7 +23,7 @@ from django.template import Template, Context, loader
 from libs.dateutil.relativedelta import relativedelta
 from parse.apps.accounts import sub_type
 from repunch.settings import ABSOLUTE_HOST, FS_SITE_DIR,\
-EMAIL_FROM, STATIC_URL, DEBUG, TIME_ZONE, ADMINS,\
+EMAIL_FROM, STATIC_URL, DEBUG, TIME_ZONE, ADMINS, REPUNCH_ADMINS,\
 ORDER_PLACED_EMAILS, MAIN_TRANSPORT_PROTOCOL
 
 # declare here for selenium tests use also
@@ -345,7 +345,8 @@ def send_email_signup(account, connection=None):
 def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         start, end, connection=None):
     """
-    chunk1 and chunk2 are a list of dictionaries - 
+    chunk1 and chunk2 are a list of dictionaries corresponding to patrons
+    gettings punched more than 6 times today and when the store was closed - 
     See the detect_suspicious_activity management command docstring.
     Note that start and end are utc dates.
     """
@@ -368,6 +369,38 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         email = mail.EmailMultiAlternatives(subject,
                     strip_tags(body), EMAIL_FROM,
                     [account.get('email')])
+        email.attach_alternative(body, 'text/html')
+        
+        _send_emails([email], connection)
+    
+    if connection:
+        _wrapper()
+    else:
+        Thread(target=_wrapper).start()
+        
+def send_email_suspicious_activity_admin(infos, start, end, connection=None):
+    """
+    Same as send_email_suspicious_activity except the chunks are in a list.
+    """
+    def _wrapper():
+        timezone.activate(pytz.timezone(TIME_ZONE))
+        
+        with open(FS_SITE_DIR +\
+            "/templates/manage/notification-suspicious-activity-admin.html",
+                'r') as f:
+            template = Template(f.read())
+        
+        if len(infos) > 0:
+            subject = "Suspicious Activities Detected."
+        else:
+            subject = "No Suspicious Activities Today."
+            
+        ctx = get_notification_ctx()
+        ctx.update({'start':start, 'end':end, 'infos':infos})
+        body = template.render(Context(ctx)).__str__()
+        
+        email = mail.EmailMultiAlternatives(subject,
+                    strip_tags(body), EMAIL_FROM, REPUNCH_ADMINS)
         email.attach_alternative(body, 'text/html')
         
         _send_emails([email], connection)
