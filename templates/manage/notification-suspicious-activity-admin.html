@@ -1,7 +1,7 @@
-{% extends "manage/notification-suspicious-activity-admin.html" %}
+{% extends "manage/notification-suspicious-activity.html" %}
 
 {% block title %}
-    {% with count=admin_chunks|length %}
+    {% with count=infos|length %}
     {% if count > 0 %}
         Suspicious activity has been dectected in {{ count }} store{{ count|pluralize }}.
     {% else %}
@@ -14,7 +14,7 @@
 {% block content %}
 
 {% for info in infos %}
-    {% include "manage/notification-suspicious-activity-admin-chunk.html" with chunks=info.data store=info.store %}
+    {% include "manage/notification-suspicious-activity-admin-chunk.html" with chunks=info.data store=info.store store_acc=info.store_acc %}
 {% endfor %}
 
 {% endblock %}

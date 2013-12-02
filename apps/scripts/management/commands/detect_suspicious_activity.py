@@ -33,6 +33,7 @@ List of patrons that were punched when the store is closed:
 The admins also get a copy.
     
     Dict format: {
+                "store_acc": account, # store owner's account
                 "store": store,
                 "activity": {
                         "account": account,
@@ -62,7 +63,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
     
         # first count the number of active stores
-        store_count = Store.objects().count(active=True, objectId="o72LmDy0YK")
+        store_count = Store.objects().count(active=True)
         end = timezone.now()
         start = end + relativedelta(hours=-24)
         conn = mail.get_connection(fail_silently=(not DEBUG))
@@ -75,7 +76,7 @@ class Command(BaseCommand):
         LIMIT, skip = 500, 0
         while store_count > 0:
             for store in Store.objects().filter(active=True, 
-                limit=LIMIT, skip=skip, order="createdAt", objectId="o72LmDy0YK"):
+                limit=LIMIT, skip=skip, order="createdAt"):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
                 total_punches = []
@@ -248,13 +249,14 @@ class Command(BaseCommand):
                 
                 # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
+                    store_acc = Account.objects().get(Store=store.objectId)
                     ADMIN_CHUNKS.append({
+                        "store_acc": store_acc,
                         "store": store,
                         "data": (chunk1, chunk2),
                     })
                     try:
-                        send_email_suspicious_activity(\
-                            Account.objects().get(Store=store.objectId),
+                        send_email_suspicious_activity(store_acc,
                             store, chunk1, chunk2, start, end, conn)
                     except SMTPServerDisconnected:
                         conn = mail.get_connection(fail_silently=(not DEBUG))
@@ -267,7 +269,6 @@ class Command(BaseCommand):
             store_count -= LIMIT
             skip += LIMIT
             
-        print ADMIN_CHUNKS
         send_email_suspicious_activity_admin(ADMIN_CHUNKS, start, end, conn)
         
         # everything is done. close the connection
