@@ -114,12 +114,13 @@ class LogJob(object):
     START_N = 20
     N_ADDER = 200 # may want to make this bigger
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ignore_first_error=False):
         # let's start the very first job with a relatively large n
         self.last_log_tag = None
         self.last_log_tag_sent = None
         self.last_log_time = None
         self.n = LogJob.START_N
+        self.ignore_first_error = ignore_first_error
         
         # send an email
         specs = "cloud_logger running with ERRORS = " + str(ERRORS) +\
@@ -136,6 +137,11 @@ class LogJob(object):
         
         
     def send(self, log):
+        # dont't send first run
+        if self.ignore_first_error:
+            self.ignore_first_error = False
+            return
+    
         last_log_tag = TAG_RE.findall(log)[-1]
         # send only if it is not the same log
         if self.last_log_tag_sent == last_log_tag:
@@ -275,6 +281,9 @@ class LogJob(object):
 class Command(BaseCommand):
     def handle(self, *args, **options):
     
+        # if True, will not send the email about the first error it encounters
+        ignore_first_error = "ignore_first" in args
+        
         count = LogBoss.objects.count()
             
         if "start" in args:
@@ -296,7 +305,7 @@ class Command(BaseCommand):
             boss.save()
             
             # now just just ignite the LogJob
-            LogJob().work()
+            LogJob(ignore_first_error).work()
         
         elif "stop" in args:
             if count == 0:
