@@ -70,7 +70,7 @@ class Command(BaseCommand):
         conn.open()
         
         # to send to the admins
-        ADMIN_CHUNKS = []
+        admin_chunks = []
         
         # get 500 stores at a time
         LIMIT, skip = 500, 0
@@ -250,7 +250,7 @@ class Command(BaseCommand):
                 # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
                     store_acc = Account.objects().get(Store=store.objectId)
-                    ADMIN_CHUNKS.append({
+                    admin_chunks.append({
                         "store_acc": store_acc,
                         "store": store,
                         "data": (chunk1, chunk2),
@@ -269,7 +269,8 @@ class Command(BaseCommand):
             store_count -= LIMIT
             skip += LIMIT
             
-        send_email_suspicious_activity_admin(ADMIN_CHUNKS, start, end, conn)
+        if len(admin_chunks) > 0:
+            send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
         
         # everything is done. close the connection
         try:
