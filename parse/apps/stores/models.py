@@ -50,7 +50,6 @@ class Store(ParseObject):
         self.store_avatar = data.get('store_avatar')
         self.store_timezone = data.get('store_timezone', TIME_ZONE) 
         self.neighborhood = data.get('neighborhood')
-        self.cross_streets = data.get('cross_streets')
         # GeoPoint [latitude, longtitude]
         self.coordinates = data.get('coordinates')
         
