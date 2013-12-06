@@ -19,8 +19,7 @@ from parse.apps.messages.models import Message, MessageStatus
 from parse.apps.rewards.models import Punch, RedeemReward
 from parse.apps.stores.models import Store, Settings, Subscription, Invoice
 from parse.apps.patrons.models import Patron, PatronStore, PunchCode, FacebookPost
-
-EMAILS = ("vandolf@repunch.com", "mike@repunch.com")
+from repunch.settings import REPUNCH_ADMINS
 
 MODELS = (Account, Employee, Message, MessageStatus, Punch,
     RedeemReward, Store, Settings, Subscription, Invoice,
@@ -28,7 +27,7 @@ MODELS = (Account, Employee, Message, MessageStatus, Punch,
     
 class Command(BaseCommand):
     """
-    Keeps track of abnormalities to be emailed to EMAILS.
+    Keeps track of abnormalities to be emailed to REPUNCH_ADMINS.
     The format is as follows
         { 
             cls.__name__ : {
@@ -60,7 +59,8 @@ class Command(BaseCommand):
                 self.process_field(model_class, field)
                 
         # send the results
-        send_email_validate_models(self.status, self.abnormalities, EMAILS)
+        send_email_validate_models(self.status, self.abnormalities,
+            REPUNCH_ADMINS)
     
     def process_field(self, model_class, field):
         """
@@ -141,50 +141,4 @@ class Command(BaseCommand):
         self.add_to_abnormalities(model_class, tuple(fields),
             model_class.objects().filter(**{f:None for f in fields}))
         
-       
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    
     
