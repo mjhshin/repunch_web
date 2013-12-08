@@ -44,6 +44,7 @@ class Command(BaseCommand):
                 update_store = False
                 sub_cost = sub_type[subscription.get(\
                             "subscriptionType")]["monthly_cost"]
+                store = None # prevent UnboundLocalError
                 if sub_cost == 0: # FREE account
                     subscription.date_last_billed =\
                         subscription.date_last_billed +\
