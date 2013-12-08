@@ -26,6 +26,9 @@ class Command(BaseCommand):
         IMPORTANT! This includes accounts of type FREE, which are
         not charged or included in the email notifications
         """
+        # for logging when ran by CRON
+        print "Running monthly_billing: " + str(timezone.now())
+        
         date_30_ago = timezone.now() + relativedelta(days=-30)
         date_now = timezone.now()
         sub_count = pointer_query("Subscription",

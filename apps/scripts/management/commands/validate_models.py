@@ -11,6 +11,7 @@ See ParseObject.fields_required for full documentation.
 """
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from parse.notifications import send_email_validate_models
 from parse.apps.accounts.models import Account
@@ -45,6 +46,9 @@ class Command(BaseCommand):
         self.status = True # True if no abnormalitites
 
     def handle(self, *args, **options):
+        # for logging when ran by CRON
+        print "Running validate_models: " + str(timezone.now())
+        
         # Loop through all of the models in MODELS
         for model in MODELS:
             fields_required = model.fields_required()

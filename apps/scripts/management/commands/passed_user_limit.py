@@ -34,6 +34,9 @@ COMET_RECEIVE_KEY
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        # for logging when ran by CRON
+        print "Running passed_user_limit: " + str(timezone.now())
+        
         now = timezone.now()
         b4_now = now + relativedelta(hours=-1)
         

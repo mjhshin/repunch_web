@@ -61,6 +61,8 @@ from repunch.settings import DEBUG
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        # for logging when ran by CRON
+        print "Running detect_suspicious_activity: " + str(timezone.now())
     
         # first count the number of active stores
         store_count = Store.objects().count(active=True)

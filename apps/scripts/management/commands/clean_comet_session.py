@@ -34,12 +34,14 @@ class Command(BaseCommand):
         posible values in args:
             - force : terminate ALL sessions - even active ones
         """
+        # for logging when ran by CRON
+        print "Running clean_comet_session: " + str(timezone.now())
+        
         force = "force" in args
     
         now = timezone.now()
         timedout_time = now + relativedelta(hours=\
             -1*LAST_UPDATED_THRESHOLD)
-            
         to_del = []
         
         for cometi in  CometSessionIndex.objects.all():
