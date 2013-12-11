@@ -12,7 +12,7 @@ class RewardForm(forms.Form):
     description = forms.CharField(max_length=125, 
         widget=forms.Textarea(\
         attrs={"maxlength":125}), required=False)
-    punches = forms.IntegerField(min_value=1)
+    punches = forms.IntegerField(min_value=1, max_value=999)
         
 class RewardAvatarForm(forms.Form):
     employee_avatar = forms.FileField()
