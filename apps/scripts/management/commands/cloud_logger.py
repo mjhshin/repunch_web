@@ -90,7 +90,7 @@ from libs.dateutil.relativedelta import relativedelta
 from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
-ERRORS = ["error"]
+ERRORS = ["[Ee]rror"]
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 EMAILS_BOOT = ["vandolf@repunch.com",]
 
@@ -111,7 +111,7 @@ TAG_TIME_RE = re.compile(r"T(\d{2,2}\:\d{2,2}\:\d{2,2})\.")
 
 class LogJob(object):
 
-    START_N = 20
+    START_N = 10 # make this a bit bigger
     N_ADDER = 200 # may want to make this bigger
     
     def __init__(self, ignore_first_error=False):
