@@ -91,13 +91,13 @@ def get_redemptions_past(session):
     return session['redemptions_past']
         
 def get_store_locations(session):
-    """ limit of 100 store locations for now """
+    """ limit of 500 store locations for now """
     if "store_locations" not in session:
         store = get_store(session)
-        session['store_locations'] = 
+        session['store_locations'] = store.get("storeLocations",
+            order="createdAt", limit=500)
         
     return session['store_locations']
-    
         
 def get_active_store_location_id(session):
     if 'active_store_location_id' not in session:
