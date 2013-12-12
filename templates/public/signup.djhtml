@@ -25,7 +25,7 @@ $(document).ready(function(){
     {% endif %}
     
     function initPhoneNumber() {
-        var p_num = "{{ store_form.phone_number.value }}";
+        var p_num = "{{ store_location_form.phone_number.value }}";
         if (p_num == "None"){
             return;
         }
@@ -82,7 +82,7 @@ function validate(which, next) {
 					</div>
 				</div>
 				
-				{% if store_form.errors or account_form.errors or subscription_form.errors %}
+				{% if store_form.errors or store_location_form.errors or account_form.errors or subscription_form.errors %}
 					<div class="error-box">
 						There was an error processing your information. Please fix the errors below and click "Create Account" again.
 					</div>
@@ -112,40 +112,40 @@ function validate(which, next) {
 			        <label for="id_store_name">Business Name</label>
 			        {{ store_form.store_name }}
 				
-				    <div id="street_e">{{ store_form.street.errors }}</div>
+				    <div id="street_e">{{ store_location_form.street.errors }}</div>
 				    <label for="id_street">Business Address</label>
-				    {{ store_form.street }}
+				    {{ store_location_form.street }}
 				
 				    <div class="clear-both"></div>
 				    <div class="floated" 
-				        {% if not store_form.city.errors %}
-				            {% if store_form.state.errors or store_form.zip.errors %}
+				        {% if not store_location_form.city.errors %}
+				            {% if store_location_form.state.errors or store_location_form.zip.errors %}
 				            style="margin-top:28px;"
 				            {% endif %}
 				        {% endif %}>
-					    <div id="city_e">{{ store_form.city.errors }}</div>
+					    <div id="city_e">{{ store_location_form.city.errors }}</div>
 					    <label for="id_city">City</label>
-					    {{ store_form.city }}
+					    {{ store_location_form.city }}
 				    </div>
 				    <div class="floated"
-				        {% if not store_form.state.errors %}
-				            {% if store_form.city.errors or store_form.zip.errors %}
+				        {% if not store_location_form.state.errors %}
+				            {% if store_location_form.city.errors or store_location_form.zip.errors %}
 				            style="margin-top:28px;"
 				            {% endif %}
 				        {% endif %}>
-					    <div id="state_e">{{ store_form.state.errors }}</div>
+					    <div id="state_e">{{ store_location_form.state.errors }}</div>
 					    <label for="id_state">State</label>
-					    {{ store_form.state }}
+					    {{ store_location_form.state }}
 				    </div>
 				    <div class="floated"
-				        {% if not store_form.zip.errors %}
-				            {% if store_form.state.errors or store_form.city.errors %}
+				        {% if not store_location_form.zip.errors %}
+				            {% if store_location_form.state.errors or store_location_form.city.errors %}
 				            style="margin-top:28px;"
 				            {% endif %}
 				        {% endif %}>
-					    <div id="zip_e">{{ store_form.zip.errors }}</div>
+					    <div id="zip_e">{{ store_location_form.zip.errors }}</div>
 					    <label for="id_zip">Zip</label>
-					    {{ store_form.zip }}
+					    {{ store_location_form.zip }}
 				    </div>
 				    <div class="clear-both"></div>
 				
@@ -173,7 +173,7 @@ function validate(which, next) {
 				    </div>
 					
 				    <div class="clear-both"></div>
-				    <div id="phone_number_e">{{ store_form.phone_number.errors }}</div>
+				    <div id="phone_number_e">{{ store_location_form.phone_number.errors }}</div>
 				    <label for="id_phone_number">Your Phone Number</label>
 				    <input id="id_phone_number" name="phone_number" type="hidden" />
 				    <span style="font-size:22px;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
