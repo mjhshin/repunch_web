@@ -94,8 +94,10 @@ def get_store_locations(session):
     """ limit of 500 store locations for now """
     if "store_locations" not in session:
         store = get_store(session)
-        session['store_locations'] = store.get("storeLocations",
-            order="createdAt", limit=500)
+        store_locations = {}
+        for sl in store.get("storeLocations", order="createdAt", limit=500):
+            store_locations[sl.objectId] = sl
+        session['store_locations'] = store_locations
         
     return session['store_locations']
         
@@ -106,6 +108,9 @@ def get_active_store_location_id(session):
             get_store_locations(session).keys()[0]
         
     return session['active_store_location_id']
+    
+def get_store_location(session, store_location_id):
+    return get_store_locations(session)[store_location_id]
         
 def get_store_timezone(session):
     """ returns the pytz.timezone object """
@@ -230,7 +235,7 @@ def get_message_count(session):
             count=1, limit=0)
         session['message_count'] = message_count
         
-    return message_count
+    return session['message_count']
     
 def load_all(session, commit=True):
     """

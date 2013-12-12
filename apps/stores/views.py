@@ -140,7 +140,7 @@ def edit(request, store_location_id):
         store_form = StoreForm(None)
         store_location_form = StoreLocationForm(None)
         store_form.initial = store.__dict__.copy()
-        store_location_form = store_location.copy()
+        store_location_form.initial = store_location.__dict__.copy()
         # make sure that the phone number is unformatted
         store_location_form.initial['phone_number'] =\
             store_location_form.initial['phone_number'].replace("(",

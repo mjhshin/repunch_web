@@ -23,7 +23,7 @@ $(document).ready(function() {
 {% block content %}
 
 {# REQUIRED FOR AVATAR UPLOAD JS #}
-<input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
+<input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' active_store_location.objectId %}" />
 
 {% with store=request.session.store %}
 	<!-- possibly move to header -->
@@ -111,7 +111,7 @@ $(document).ready(function() {
 		</div>
 		
 		{% if is_admin %}
-		<a href="{% url 'store_edit'  %}" class="button blue">Edit Store Details</a>
+		<a href="{% url 'store_edit' active_store_location.objectId %}" class="button blue">Edit Store Details</a>
 		{% endif %}
 	</div>
 	
