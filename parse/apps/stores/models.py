@@ -91,10 +91,8 @@ class Store(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "active", "owner_id", "store_name", "street",
-            "city", "state", "zip", "country", "first_name",
-            "last_name", "phone_number", "store_timezone",
-            "coordinates", "punches_facebook", "hours", "rewards",
+        return (cls, "active", "owner_id", "store_name", 
+            "first_name", "last_name", "punches_facebook", "rewards",
             "categories", "Subscription", "Settings")
             
     def get_class(self, className):
@@ -206,20 +204,20 @@ class StoreLocation(ParseObject):
     A Store may have multiple Chains.
     """
     def __init__(self, **data):
-        self.street = data.get("street")
-        self.city = data.get('city')
-        self.state = data.get('state')
-        self.zip = data.get('zip')
-        self.country = data.get('country')
-        self.phone_number = data.get('phone_number')
-        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
-        self.neighborhood = data.get('neighborhood')
+        self.street = data.get("street") # TODO
+        self.city = data.get('city') # TODO
+        self.state = data.get('state') # TODO
+        self.zip = data.get('zip') # TODO
+        self.country = data.get('country') # TODO
+        self.phone_number = data.get('phone_number') # TODO
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) # TODO
+        self.neighborhood = data.get('neighborhood') # TODO
         # GeoPoint [latitude, longtitude]
-        self.coordinates = data.get('coordinates')
+        self.coordinates = data.get('coordinates') # TODO
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
-        self.hours = data.get("hours", [])
-        self.store_avatar = data.get('store_avatar')
+        self.hours = data.get("hours", []) # TODO
+        self.store_avatar = data.get('store_avatar') # TODO
         
         self.Store = data.get("Store")
         

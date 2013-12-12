@@ -18,16 +18,19 @@ import requests
 
 from parse.utils import create_png
 from parse.apps.accounts.models import Account
-from parse.apps.stores.models import Store, Settings, Subscription
+from parse.apps.stores.models import Store, StoreLocation, Settings, Subscription
 from repunch.settings import TIME_ZONE
 
 DIR = "docs/create_store/"
 
 STORE = {
     "active": True,
-    "country": "US",
     "punches_facebook": 1,
+    "ACL": {"*": {"read": True,"write": True}},
+}
+STORE_LOCATION = {
     "store_timezone": TIME_ZONE,
+    "country": "US",
     "hours": [
         {"day":2,"open_time":"0900","close_time":"1700"},
         {"day":3,"open_time":"0900","close_time":"1700"},
@@ -35,7 +38,6 @@ STORE = {
         {"day":5,"open_time":"0900","close_time":"1700"},
         {"day":6,"open_time":"0900","close_time":"1700"},
     ],
-    "ACL": {"*": {"read": True,"write": True}},
 }
 
 USER_EMAIL_POSTFIX = "@repunch.com"
@@ -82,8 +84,9 @@ class RandomStoreGenerator(object):
             neighborhood = self.neighborhoods[i]
             store_name = self.stores[i]
             store_i = STORE.copy()
+            store_location_i = STORE_LOCATION.copy()
             
-            self.get_store_avatar(i)
+            self.get_store_location_avatar(i)
             avatar = create_png(TMP_IMG_PATH)
             while "error" in avatar:
                 print "Retrying create_png"
@@ -91,6 +94,10 @@ class RandomStoreGenerator(object):
             
             store_i.update({
                 "store_name": store_name,
+                "first_name": first_name,
+                "last_name": last_name,
+            })
+            store_location_i.update({
                 "street": street,
                 "city": city,
                 "state": state,
@@ -98,14 +105,17 @@ class RandomStoreGenerator(object):
                 "neighborhood": neighborhood,
                 "country": country,
                 "phone_number": phone_number,
-                "first_name": first_name,
-                "last_name": last_name,
                 "coordinates": self.get_random_coordinates(),
                 "store_avatar": avatar.get("name"),
             })
             
-            store = Store(**store_i)   
-            store.create()    
+            # create the store
+            store = Store.objects().create(**store_i)   
+    
+            # create the store location
+            store_location = StoreLocation(**store_location_i)
+            store_location.Store = store.objectId
+            store_location.update()
             
             # create the settings
             settings = Settings.objects().create(Store=store.objectId)
@@ -129,9 +139,10 @@ class RandomStoreGenerator(object):
             store.Subscription = subscription.objectId
             store.owner_id = acc.objectId
             store.ACL[acc.objectId] = {"read": True,"write": True}
+            store.add_relation("StoreLocations_", [store_location.objectId]) 
             store.update()
             
-    def get_store_avatar(self, i):
+    def get_store_location_avatar(self, i):
         """
         Read the image to tmp.png.
         Thanks to 
