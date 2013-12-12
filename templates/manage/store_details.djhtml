@@ -68,8 +68,8 @@ $(document).ready(function() {
 		<h2>Store Details</h2><br/>
 		
 		<div class="white-box" id="store-details-content">
-	    {% if request.session.has_store_avatar and store|get:'store_avatar' %}
-	        <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+	    {% if active_store_location.store_avatar %}
+	        <img src="{{ active_store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	    {% else %}
 	        {% if is_admin %}
 	        <a href="{% url 'store_avatar' %}" id="upload-avatar">

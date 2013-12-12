@@ -219,6 +219,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.static',
     'django.core.context_processors.media',
+    'libs.repunch.template_context_processors.active_store_location',
 )
 
 MIDDLEWARE_CLASSES = (

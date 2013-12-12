@@ -127,17 +127,6 @@ def login(request, requestDict, no_recaptcha=False):
                     request.session['employee'] = employee
                 
                 SESSION.load_all(request.session)
-                
-                # moved to SESSION.load_all
-                #if store.get('store_timezone'):
-                #    # the store timezone is inserted into the request
-                #    rputils.set_timezone(request, 
-                #        pytz.timezone(store.get('store_timezone')))
-                        
-                # for stores that have not yet uploaded a store avatar
-                # need to set this back to True on upload success
-                #request.session['has_store_avatar'] =\
-                #    store.get("store_avatar") is not None
                         
                 # If value is None, the session reverts to using 
                 # the global session expiry policy.

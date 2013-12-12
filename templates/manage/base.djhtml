@@ -49,8 +49,8 @@
 			<div id="header-right">
 			    <a href="{% url 'account_edit' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
-					    {% if request.session.has_store_avatar and request.session.store|get:'store_avatar' %}
-						<img src="{{ request.session.store|get:'store_avatar_url' }}" alt="" class="avatar-small" id="avatar-thumbnail" />
+					    {% if active_store_location.store_avatar %}
+						<img src="{{ active_store_location.store_avatar_url }}" alt="" class="avatar-small" id="avatar-thumbnail" />
 						{% else %}
 						<img class="avatar-small" id="avatar-thumbnail" style="visibility:hidden" />
 					    {% endif %}

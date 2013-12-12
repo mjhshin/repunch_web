@@ -285,7 +285,6 @@ def crop_avatar(request, store_location_id):
             # delete the model and file since it's useless to keep
             avatar.avatar.delete()
             avatar.delete()
-            session['has_store_avatar'] = True
             
         store_location.update()
         
