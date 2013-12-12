@@ -43,31 +43,32 @@ def index(request):
 @dev_login_required
 @login_required
 @admin_only(reverse_url="store_index")
-def edit(request, store_location_id):
-    store = SESSION.get_store(request.session)
+def edit_store(request):
+    pass # TODO
+
+@dev_login_required
+@login_required
+@admin_only(reverse_url="store_index")
+def edit_location(request, store_location_id):
     store_location = SESSION.get_store_location(request.session,
         store_location_id)
     data = {'account_nav': True}
     
-    def common(store_form, store_location_form):
-        # update the session cache TODO update location
-        request.session['store'] = store
+    def common(store_location_form):
+        request.session['store_locations'][store_location.objectId] =\
+            store_location
         data['store_location'] = store_location
-        data['store_form'] = store_form
         data['store_location_form'] = store_location_form
-        return render(request, 'manage/store_edit.djhtml', data)
+        return render(request, 'manage/store_location_edit.djhtml', data)
             
     if request.method == 'POST': 
-        store_form = StoreForm(request.POST)
         store_location_form = StoreLocationForm(request.POST)
         
         postDict = request.POST.dict()
         hours = HoursInterpreter(json.loads(postDict["hours"]))
 
-        if store_form.is_valid() and store_location_form.is_valid(): 
-            store = Store(**store.__dict__)
+        if store_location_form.is_valid(): 
             store_location = StoreLocation(**store_location.__dict__)
-            store.update_locally(postDict, False)
             store_location.update()
             
             # validate and format the hours
@@ -79,7 +80,7 @@ def edit(request, store_location_id):
                 data['hours_error'] = hours_validation
                 return HttpResponse(json.dumps({
                     "result": "error",
-                    "html": common(store_form, store_location_form).content,
+                    "html": common(store_location_form).content,
                 }), content_type="application/json")
             
             # set the timezone
@@ -99,7 +100,6 @@ def edit(request, store_location_id):
                 store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
                     
-            store.update()
             store_location.update()
             
             # update the session cache
@@ -117,10 +117,9 @@ def edit(request, store_location_id):
             # notify other dashboards of this change
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-                "updatedStore": store.jsonify(),
                 "updatedStoreLocation": store_location.jsonify(),
             }
-            comet_receive(store.objectId, payload)
+            comet_receive(SESSION.get_store(request.session).objectId, payload)
             
             return HttpResponse(json.dumps({
                 "result": "success",
@@ -137,9 +136,7 @@ def edit(request, store_location_id):
             }), content_type="application/json")
                 
     else:
-        store_form = StoreForm(None)
         store_location_form = StoreLocationForm(None)
-        store_form.initial = store.__dict__.copy()
         store_location_form.initial = store_location.__dict__.copy()
         # make sure that the phone number is unformatted
         store_location_form.initial['phone_number'] =\
@@ -149,7 +146,7 @@ def edit(request, store_location_id):
         data['hours_data'] = HoursInterpreter(\
             store_location.hours)._format_parse_input()
          
-    return common(store_form, store_location_form)
+    return common(store_location_form)
 
 # this accessed only through the edit_store detail page, which
 # requires admin access but this might be useful somewhere else

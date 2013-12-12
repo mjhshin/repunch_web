@@ -2,10 +2,6 @@ h2{
 	margin-bottom:6px;
 }
 
-input#id_store_name{
-	width: 398px;
-}
-
 div#street-container{
 	clear:left;
 }
@@ -41,13 +37,6 @@ label#character_limit{
 	font-style:italic;
 	margin-top:20px;
 }
-
-textarea#id_store_description{
-	clear:both;
-	float:left;
-}
-
-div#notification { }
 
 
 /* hours form style */

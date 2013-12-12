@@ -5,12 +5,12 @@
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_edit.1.2.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_location_edit.1.2.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
-	<script type="text/javascript" src="{% static 'manage/js/store_edit.1.3.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/store_location_edit.1.3.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
     {# REQUIRED FOR STORE EDIT JS #}
     <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 	
-	<form action="{% url 'store_edit' store_location.objectId %}" method="POST" id="account-edit-form">{% csrf_token %}
+	<form action="{% url 'store_location_edit' store_location.objectId %}" method="POST" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
 		<div class="notification {% if success %}success{% endif %} hide">
 			<div>{{ error }}{{ success }}</div>
@@ -46,57 +46,51 @@
 		
 		<h2>Edit Store Details</h2>	
 		<br><br><br>
-		{{ form.non_field_errors }}
-		<div class="input-container">
-			<div id="store_name_e">{{ form.store_name.errors }}</div>
-			<label for="id_store_name">Store Name</label>
-			{{ form.store_name }}
-		</div>
-		
+		{{ store_location_form.non_field_errors }}
 		<div class="input-container street-container">
-			<div id="street_e">{{ form.street.errors }}</div>
+			<div id="street_e">{{ store_location_form.street.errors }}</div>
 			<label for="id_street">Street</label>
-			{{ form.street }}
+			{{ store_location_form.street }}
 		</div>
 		
 		<div class="input-container clearheight" 
-		    {% if not form.city.errors %}
-		        {% if form.state.errors or form.zip.errors %}
+		    {% if not store_location_form.city.errors %}
+		        {% if store_location_form.state.errors or store_location_form.zip.errors %}
 		        style="margin-top:24px;"
 		        {% endif %}
 		    {% endif %}>
-			<div id="city_e">{{ form.city.errors }}</div>
+			<div id="city_e">{{ store_location_form.city.errors }}</div>
 			<label for="id_city">City</label>
-			{{ form.city }}
+			{{ store_location_form.city }}
 		</div>
 		
 		<div class="input-container"
-		    {% if not form.state.errors %}
-		        {% if form.city.errors or form.zip.errors %}
+		    {% if not store_location_form.state.errors %}
+		        {% if store_location_form.city.errors or store_location_form.zip.errors %}
 		        style="margin-top:24px;"
 		        {% endif %}
 		    {% endif %}>
-			<div id="state_e">{{ form.state.errors }}</div>
+			<div id="state_e">{{ store_location_form.state.errors }}</div>
 			<label for="id_state">State</label>
-			{{ form.state }}
+			{{ store_location_form.state }}
 		</div>
 		
 		<div class="input-container"
-		    {% if not form.zip.errors %}
-		        {% if form.state.errors or form.city.errors %}
+		    {% if not store_location_form.zip.errors %}
+		        {% if store_location_form.state.errors or store_location_form.city.errors %}
 		        style="margin-top:24px;"
 		        {% endif %}
 		    {% endif %}>
-			<div id="zip_e">{{ form.zip.errors }}</div>
+			<div id="zip_e">{{ store_location_form.zip.errors }}</div>
 			<label for="id_zip">Zip</label>
-			{{ form.zip }}
+			{{ store_location_form.zip }}
 		</div>
 		
 		<div class="input-container"
-		    {% if form.city.errors or form.state.errors or form.zip.errors %}
+		    {% if store_location_form.city.errors or store_location_form.state.errors or store_location_form.zip.errors %}
 	        style="margin-top:24px;"
 		    {% endif %}>
-			<div id="country_e">{{ form.country.errors }}</div>
+			<div id="country_e">{{ store_location_form.country.errors }}</div>
 			<label for="country">Country</label>
 			<select name="country" id="country">
 				<option value="US">United States of America</option>
@@ -104,7 +98,7 @@
 		</div>
 		
 		<div class="input-container clearheight">
-			<div id="phone_number_e">{{ form.phone_number.errors }}</div>
+			<div id="phone_number_e">{{ store_location_form.phone_number.errors }}</div>
 			<label for="id_phone_number">Phone Number</label>
 			<input id="id_phone_number" name="phone_number" type="hidden" />
 			<span style="font-size:1.1em;position:relative;top:2px;left:-4px;">(</span><input type = "text" id = "Ph1" 
@@ -116,7 +110,7 @@
 			<script type = "text/javascript">
 			// fill in the values of the 3 input boxes
 			$(document).ready(function(){
-			    var p_num = "{{ form.phone_number.value }}";
+			    var p_num = "{{ store_location_form.phone_number.value }}";
 			    if (p_num == "None"){
 	                return;
 	            }
@@ -138,12 +132,6 @@
             }
             
             </script>
-		</div>
-		
-		<div class="input-container clearheight">
-			<div id="store_description_e">{{ form.store_description.errors }}</div>
-			<label for="id_store_description" id="label_store_description">Store Description</label><label id="character_limit">500 character limit</label>
-			{{ form.store_description }}
 		</div>
 		
 	</form>
