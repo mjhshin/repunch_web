@@ -11,6 +11,7 @@ class Punch(ParseObject):
     def __init__(self, **data):
         # use createdAt for date created - the timestamp
         self.punches = data.get("punches")
+        self.store_location_id = data.get("store_location_id")
         
         self.Patron = data.get('Patron')
         

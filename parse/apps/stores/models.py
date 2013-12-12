@@ -29,6 +29,8 @@ SHORT_DAYS = ((1, 'Sun'),
         (5, 'Thurs'),
         (6, 'Fri'),
         (7, 'Sat'))
+        
+
 
 class Store(ParseObject):
     """ Equivalence class of apps.stores.models.Store """
@@ -37,27 +39,11 @@ class Store(ParseObject):
         # the owner_id is the objectId of the original account that 
         # created this object at signup
         self.owner_id = data.get("owner_id")
-        self.store_name = data.get('store_name')
-        self.street = data.get("street")
-        self.city = data.get('city')
-        self.state = data.get('state')
-        self.zip = data.get('zip')
-        self.country = data.get('country')
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
-        self.phone_number = data.get('phone_number')
+        self.store_name = data.get('store_name')
         self.store_description = data.get('store_description')
-        self.store_avatar = data.get('store_avatar')
-        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
-        self.neighborhood = data.get('neighborhood')
-        # GeoPoint [latitude, longtitude]
-        self.coordinates = data.get('coordinates')
         
-        self.punches_facebook = data.get("punches_facebook", 1)  
-
-        # [{"day":1,"open_time":"0900","close_time":"2200"}, 
-        #    ... up to day 7]
-        self.hours = data.get("hours", [])
         # [{"reward_name":"Free bottle of wine", "description":
         # "Must be under $25 in value",
         # "punches":10,"redemption_count":0, reward_id:0},]
@@ -65,6 +51,8 @@ class Store(ParseObject):
         # [{"alias":"bakery","name":"Bakeries"},
         # {"alias":"coffee","name":"Coffee & Tea"}]
         self.categories = data.get('categories', [])
+        
+        self.punches_facebook = data.get("punches_facebook", 1)  
 
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
@@ -76,9 +64,28 @@ class Store(ParseObject):
         self.SentMessages_ = "Message"
         self.ReceivedMessages_ = "Message"
         self.RedeemRewards_ = "RedeemReward"
+        self.StoreLocations_ = "StoreLocation"
+        
+        # These are also in StoreLocation class
+        # we are just keep it in here for backwards compatibility
+        self.store_avatar = data.get('store_avatar')
+        self.street = data.get("street")
+        self.city = data.get('city')
+        self.state = data.get('state')
+        self.zip = data.get('zip')
+        self.country = data.get('country')
+        self.phone_number = data.get('phone_number')
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.neighborhood = data.get('neighborhood')
+        # GeoPoint [latitude, longtitude]
+        self.coordinates = data.get('coordinates')
+        # [{"day":1,"open_time":"0900","close_time":"2200"}, 
+        #    ... up to day 7]
+        self.hours = data.get("hours", [])
+        #####################
         
         super(Store, self).__init__(False, **data)
-    
+            
     @classmethod  
     def fields_required(cls):
         """
@@ -89,6 +96,22 @@ class Store(ParseObject):
             "last_name", "phone_number", "store_timezone",
             "coordinates", "punches_facebook", "hours", "rewards",
             "categories", "Subscription", "Settings")
+            
+    def get_class(self, className):
+        if className in ("PatronStore", "FacebookPost"):
+            return getattr(import_module('parse.apps.patrons.models'), className)
+        elif className == "Settings":
+            return Settings
+        elif className == "StoreLocation":
+            return StoreLocation
+        elif className == "Subscription":
+            return Subscription
+        elif className in ("Punch", "RedeemReward"):
+            return getattr(import_module('parse.apps.rewards.models'), className)
+        elif className == "Employee":
+            return getattr(import_module('parse.apps.employees.models'), className)
+        elif className == "Message":
+            return getattr(import_module('parse.apps.messages.models'), className)
      
     def update(self):
         """
@@ -176,7 +199,64 @@ class Store(ParseObject):
         Returns true if the account does not have an ACL = ACCESS_NONE
         """
         return self.get_access_level(account)[1] > ACCESS_NONE[1]
-   
+        
+class StoreLocation(ParseObject):
+    """
+    Contains location information for a Store.
+    A Store may have multiple Chains.
+    """
+    def __init__(self, **data):
+        self.street = data.get("street")
+        self.city = data.get('city')
+        self.state = data.get('state')
+        self.zip = data.get('zip')
+        self.country = data.get('country')
+        self.phone_number = data.get('phone_number')
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.neighborhood = data.get('neighborhood')
+        # GeoPoint [latitude, longtitude]
+        self.coordinates = data.get('coordinates')
+        # [{"day":1,"open_time":"0900","close_time":"2200"}, 
+        #    ... up to day 7]
+        self.hours = data.get("hours", [])
+        self.store_avatar = data.get('store_avatar')
+        
+        self.Store = data.get("Store")
+        
+        super(StoreLocation, self).__init__(False, **data)
+            
+    @classmethod  
+    def fields_required(cls):
+        """
+        See ParseObject for documentation.
+        """
+        return (cls, "street", "city", "state", "zip", "country", 
+            "phone_number", "store_timezone", "coordinates", 
+            "hours", "Store")
+            
+    def get_class(self, className):
+        if className == "Store":
+            return Store
+            
+    def update(self):
+        """
+        Capitalize certain strings before saving to parse.
+        """
+        self.street = title(self.street).strip()
+        self.city = title(self.city).strip()
+        if self.state:
+            self.state = self.state.upper().strip()
+        if self.zip:
+            self.zip = self.zip.strip()
+            
+        data = self._get_formatted_data()
+        res = parse("PUT", self.path() + "/" + self.objectId, data)
+        if res and "error" not in res:
+            self.update_locally(res, False)
+            return True
+
+        return False
+        
     def get_full_address(self):
         """
         Returns street, city, state, zip, country
@@ -193,7 +273,7 @@ class Store(ParseObject):
         if self.country:
             full_address += self.country
         return full_address
-            
+        
     def get_best_fit_neighborhood(self, exact_neighborhood):
         """
         neighborhood of exact address may sometimes be incorrect.
@@ -236,20 +316,7 @@ class Store(ParseObject):
                 best_fit = n
         
         return best_fit
-
-    def get_class(self, className):
-        if className in ("PatronStore", "FacebookPost") :
-            return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className == "Settings":
-            return Settings
-        elif className == "Subscription":
-            return Subscription
-        elif className in ("Punch", "RedeemReward"):
-            return getattr(import_module('parse.apps.rewards.models'), className)
-        elif className == "Employee":
-            return getattr(import_module('parse.apps.employees.models'), className)
-        elif className == "Message":
-            return getattr(import_module('parse.apps.messages.models'), className)
+        
 
 class Invoice(ParseObject):
     """ Equivalence class of apps.accounts.models.Invoice """
