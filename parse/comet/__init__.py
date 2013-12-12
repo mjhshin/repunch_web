@@ -16,7 +16,8 @@ from parse.apps.employees import APPROVED, DENIED
 from parse.apps.employees.models import Employee
 from parse.apps.rewards.models import RedeemReward
 from parse.apps.accounts.models import Account
-from parse.apps.stores.models import Store, Subscription, Settings
+from parse.apps.stores.models import Store, StoreLocation,\
+Subscription, Settings
 
 def comet_receive(store_id, postDict):
     """
@@ -28,6 +29,7 @@ def comet_receive(store_id, postDict):
     This adds to the related session's cache:
         updatedAccount
         updatedStore 
+        updatedStoreLocation
         updatedSubscription
         updatedSettings 
         newReward 
@@ -45,8 +47,6 @@ def comet_receive(store_id, postDict):
         approvedRedemption 
         deletedRedemption 
         
-        updatedStoreAvatarName_str
-        updatedStoreAvatarUrl_str
         updatedPunchesFacebook_int
         patronStore_int = request.POST.get("patronStore_int")
         
@@ -270,24 +270,6 @@ def comet_receive(store_id, postDict):
         updatedStore = postDict.get("updatedStore")
         if updatedStore:
             store = Store(**updatedStore)
-            session['store'] = store
-            try: # also update the store_timezone
-                session['store_timezone'] =\
-                    pytz.timezone(store.get('store_timezone'))
-            except Exception: # assign a default timezone
-                session['store_timezone'] =\
-                    pytz.timezone(TIME_ZONE)
-            
-        updatedStoreAvatarName_str =\
-            postDict.get("updatedStoreAvatarName_str")
-        if updatedStoreAvatarName_str:
-            store = session['store']
-            updatedStoreAvatarUrl_str =\
-                postDict.get("updatedStoreAvatarUrl_str")
-            if updatedStoreAvatarUrl_str:
-                store.store_avatar_url = updatedStoreAvatarUrl_str
-            store.store_avatar = updatedStoreAvatarName_str  
-            session['store'] = store      
            
         # this is in the settings tab in the dashboard but the field
         # is in the Store class
@@ -297,6 +279,21 @@ def comet_receive(store_id, postDict):
             store = session['store']
             store.punches_facebook = int(updatedPunchesFacebook_int)
             session['store'] = store
+            
+            
+        #############################################################
+        # STORE LOCATION UPDATED ##############################
+        updatedStoreLocation = postDict.get("updatedStoreLocation")
+        if updatedStoreLocation:
+            store_location = StoreLocation
+            session['store_location'] = store_location
+            try: # also update the store_timezone
+                session['store_timezone'] =\
+                    pytz.timezone(store_location.get('store_timezone'))
+            except Exception: # assign a default timezone
+                session['store_timezone'] =\
+                    pytz.timezone(TIME_ZONE)
+            
             
         #############################################################
         # ACCOUNT UPDATED ##############################

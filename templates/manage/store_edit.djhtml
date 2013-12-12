@@ -18,11 +18,11 @@
 	{% account_is_owner request.session as is_owner %}
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
-    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' %}" />
+    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location.objectId %}" />
     {# REQUIRED FOR STORE EDIT JS #}
     <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 	
-	<form action="{% url 'store_edit' %}" method="POST" id="account-edit-form">{% csrf_token %}
+	<form action="{% url 'store_edit' store_location.objectId %}" method="POST" id="account-edit-form">{% csrf_token %}
 		{% if error or success %}
 		<div class="notification {% if success %}success{% endif %} hide">
 			<div>{{ error }}{{ success }}</div>

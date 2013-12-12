@@ -11,7 +11,8 @@ from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
 from apps.stores.models import StoreLocationAvatarTmp, StoreActivate
-from apps.stores.forms import StoreForm, SettingsForm, StoreLocationAvatarForm
+from apps.stores.forms import StoreForm, StoreLocationForm,\
+SettingsForm, StoreLocationAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
@@ -22,7 +23,7 @@ from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import access_required, admin_only
 from parse.utils import delete_file, create_png
-from parse.apps.stores.models import Store, Settings
+from parse.apps.stores.models import Store, StoreLocation, Settings
 from parse.apps.stores import format_phone_number
 from parse.auth.decorators import login_required, dev_login_required
 
@@ -42,70 +43,82 @@ def index(request):
 @dev_login_required
 @login_required
 @admin_only(reverse_url="store_index")
-def edit(request):
+def edit(request, store_location_id):
     store = SESSION.get_store(request.session)
+    store_location = SESSION.get_store_location(request.session,
+        store_location_id) # TODO
     data = {'account_nav': True}
     
-    def common(form):
-        # update the session cache
+    def common(store_form, store_location_form):
+        # update the session cache TODO update location
         request.session['store'] = store
-        data['form'] = form
+        data['store_location'] = store_location
+        data['store_form'] = store_form
+        data['store_location_form'] = store_location_form
         return render(request, 'manage/store_edit.djhtml', data)
             
     if request.method == 'POST': 
-        form = StoreForm(request.POST)
+        store_form = StoreForm(request.POST)
+        store_location_form = StoreLocationForm(request.POST)
+        
         postDict = request.POST.dict()
         hours = HoursInterpreter(json.loads(postDict["hours"]))
 
-        if form.is_valid(): 
+        if store_form.is_valid() and store_location_form.is_valid(): 
             store = Store(**store.__dict__)
+            store_location = StoreLocation(**store_location.__dict__)
             store.update_locally(postDict, False)
+            store_location.update()
             
             # validate and format the hours
             hours_validation = hours.is_valid()
             if type(hours_validation) is bool:
-                store.set("hours", hours.from_javascript_to_parse())
+                store_location.set("hours", hours.from_javascript_to_parse())
             else:
                 data['hours_data'] = hours._format_javascript_input()
                 data['hours_error'] = hours_validation
                 return HttpResponse(json.dumps({
                     "result": "error",
-                    "html": common(form).content,
+                    "html": common(store_form, store_location_form).content,
                 }), content_type="application/json")
             
             # set the timezone
-            if store.get('zip'):
-                store.store_timezone =\
-                    get_timezone(store.get('zip')).zone
+            if store_location.get('zip'):
+                store_location.store_timezone =\
+                    get_timezone(store_location.get('zip')).zone
                     
             # format the phone number
-            store.phone_number =\
+            store_location.phone_number =\
                 format_phone_number(request.POST['phone_number'])
             # update the store's coordinates and neighborhood
             full_address = " ".join(\
-                store.get_full_address().split(", "))
+                store_location.get_full_address().split(", "))
             map_data = get_map_data(full_address)
-            store.set("coordinates", map_data.get("coordinates"))
-            store.set("neighborhood", 
-                store.get_best_fit_neighborhood(\
+            store_location.set("coordinates", map_data.get("coordinates"))
+            store_location.set("neighborhood", 
+                store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
                     
             store.update()
+            store_location.update()
             
             # update the session cache
             try:
                 request.session['store_timezone'] =\
-                    pytz.timezone(store.store_timezone)
+                    pytz.timezone(store_location.store_timezone)
             except Exception:
                 request.session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
                 
             request.session['store'] = store
+            request.session['store_location']['store_location_id'] =\
+                store_location
             
             # notify other dashboards of this change
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
+                "updatedStoreLocation": store_location.jsonify(),
             }
             comet_receive(store.objectId, payload)
             
@@ -124,17 +137,19 @@ def edit(request):
             }), content_type="application/json")
                 
     else:
-        form = StoreForm(None)
-        form.initial = store.__dict__.copy()
+        store_form = StoreForm(None)
+        store_location_form = StoreLocationForm(None)
+        store_form.initial = store.__dict__.copy()
+        store_location_form = store_location.copy()
         # make sure that the phone number is unformatted
-        form.initial['phone_number'] =\
-            form.initial['phone_number'].replace("(",
+        store_location_form.initial['phone_number'] =\
+            store_location_form.initial['phone_number'].replace("(",
                 "").replace(")","").replace(" ", "").replace("-","")
                 
         data['hours_data'] = HoursInterpreter(\
-            store.hours)._format_parse_input()
+            store_location.hours)._format_parse_input()
          
-    return common(form)
+    return common(store_form, store_location_form)
 
 # this accessed only through the edit_store detail page, which
 # requires admin access but this might be useful somewhere else
@@ -167,8 +182,8 @@ def hours_preview(request):
 content_type="text/html")
 @csrf_exempt
 def avatar(request):
+    """ avatar upload """
     data = {}
-    store = SESSION.get_store(request.session)
     
     if request.method == 'POST': 
         form = StoreLocationAvatarForm(request.POST, request.FILES)
@@ -203,9 +218,6 @@ def avatar(request):
     else:
         form = StoreLocationAvatarForm()
     
-    # update the session cache
-    request.session['store'] = store
-    
     data['form'] = form
     data['url'] = reverse('store_avatar')
     return render(request, 'manage/avatar_upload.djhtml', data)
@@ -214,11 +226,12 @@ def avatar(request):
 @login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
-def get_avatar(request):
+def get_avatar(request, store_location_id):
     """ returns the store's avatar url """
     if request.method == "GET":
-        store = SESSION.get_store(request.session)
-        return HttpResponse(store.get("store_avatar_url"))
+        store_location = SESSION.get_store_location(\
+            request.session, store_location_id)
+        return HttpResponse(store_location_id.get("store_avatar_url"))
         
     raise Http404
 
@@ -227,15 +240,16 @@ def get_avatar(request):
 @admin_only(http_response="<h1>Permission denied</h1>",\
 content_type="text/html")
 @csrf_exempt
-def crop_avatar(request):
+def crop_avatar(request, store_location_id):
     """ takes in crop coordinates and creates a new png image """
     if request.method == "POST":
         data = {}
-        store = SESSION.get_store(request.session)
+        store_location = SESSION.get_store_location(\
+            request.session, store_location_id)
         
         old_avatar = None
-        if store.get("store_avatar"):
-            old_avatar = store.store_avatar
+        if store_location.get("store_avatar"):
+            old_avatar = store_location.store_avatar
             
         crop_coords = {
             "x1": int(request.POST["x1"]),
@@ -264,8 +278,8 @@ def crop_avatar(request):
         session = SessionStore(request.session.session_key)
         store = SESSION.get_store(session)
         if res and 'error' not in res:
-            store.store_avatar = res.get('name')
-            store.store_avatar_url =\
+            store_location.store_avatar = res.get('name')
+            store_location.store_avatar_url =\
                 res.get('url').replace("http:/",
                     "https://s3.amazonaws.com")
             # delete the model and file since it's useless to keep
@@ -273,17 +287,16 @@ def crop_avatar(request):
             avatar.delete()
             session['has_store_avatar'] = True
             
-        store.update()
+        store_location.update()
         
-        session["store"] = store
+        session["store_location"] = store_location
         request.session.clear()
         request.session.update(session)
         
         # notify other dashboards of this change
         payload = {
             COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            "updatedStoreAvatarName_str":store.store_avatar,
-            "updatedStoreAvatarUrl_str":store.store_avatar_url, 
+            "updatedStoreLocation": store_location.jsonify(),
         }
         comet_receive(store.objectId, payload)
         
