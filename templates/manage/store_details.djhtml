@@ -110,7 +110,7 @@ $(document).ready(function() {
 			<div class="clear">&nbsp;</div>
 		</div>
 		
-		{% if is_admin %}
+		{% if is_admin %} {# TODO change to store_edit #}
 		<a href="{% url 'store_location_edit' active_store_location.objectId %}" class="button blue">Edit Store Details</a>
 		{% endif %}
 	</div>

@@ -132,7 +132,7 @@ def edit_location(request, store_location_id):
             data['hours_data'] = hours._format_javascript_input()
             return HttpResponse(json.dumps({
                 "result": "error",
-                "html": common(form).content,
+                "html": common(store_location_form).content,
             }), content_type="application/json")
                 
     else:

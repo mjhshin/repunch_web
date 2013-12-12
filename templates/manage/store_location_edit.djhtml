@@ -31,8 +31,8 @@
 		
 		<div id="photo-edit">
 			<div class="white-box">
-	        {% if active_store_location.store_avatar %}
-	            <img src="{{ active_store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+	        {% if store_location.store_avatar %}
+	            <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% else %}
 	            <a href="{% url 'store_avatar' %}" id="upload-avatar">
 	            <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" id="store_avatar"
@@ -45,7 +45,6 @@
 	
 		
 		<h2>Edit Store Details</h2>	
-		<br><br><br>
 		{{ store_location_form.non_field_errors }}
 		<div class="input-container street-container">
 			<div id="street_e">{{ store_location_form.street.errors }}</div>
@@ -53,11 +52,9 @@
 			{{ store_location_form.street }}
 		</div>
 		
-		<div class="input-container clearheight" 
-		    {% if not store_location_form.city.errors %}
-		        {% if store_location_form.state.errors or store_location_form.zip.errors %}
+		<div class="input-container " 
+		    {% if not store_location_form.city.errors and store_location_form.state.errors %}
 		        style="margin-top:24px;"
-		        {% endif %}
 		    {% endif %}>
 			<div id="city_e">{{ store_location_form.city.errors }}</div>
 			<label for="id_city">City</label>
@@ -65,30 +62,23 @@
 		</div>
 		
 		<div class="input-container"
-		    {% if not store_location_form.state.errors %}
-		        {% if store_location_form.city.errors or store_location_form.zip.errors %}
+		    {% if store_location_form.city.errors and not store_location_form.state.errors %}
 		        style="margin-top:24px;"
-		        {% endif %}
 		    {% endif %}>
 			<div id="state_e">{{ store_location_form.state.errors }}</div>
 			<label for="id_state">State</label>
 			{{ store_location_form.state }}
 		</div>
 		
-		<div class="input-container"
-		    {% if not store_location_form.zip.errors %}
-		        {% if store_location_form.state.errors or store_location_form.city.errors %}
-		        style="margin-top:24px;"
-		        {% endif %}
-		    {% endif %}>
+		<div class="input-container">
 			<div id="zip_e">{{ store_location_form.zip.errors }}</div>
 			<label for="id_zip">Zip</label>
 			{{ store_location_form.zip }}
 		</div>
 		
 		<div class="input-container"
-		    {% if store_location_form.city.errors or store_location_form.state.errors or store_location_form.zip.errors %}
-	        style="margin-top:24px;"
+		    {% if store_location_form.zip.errors %}
+	            style="margin-top:24px;"
 		    {% endif %}>
 			<div id="country_e">{{ store_location_form.country.errors }}</div>
 			<label for="country">Country</label>
@@ -139,8 +129,9 @@
 	{# Must process the elements below manually. #}
     <div class="hours-form input-container clearheight">
     
-        <div id="hours_e"><ul class="errorlist"><li>{{ hours_error }}</li></ul></div>
+        <div id="hours_e" ><ul class="errorlist" ><li>{{ hours_error }}</li></ul></div>
         <div id="hours-top">
+        
 		    <label>Hours</label><label for="open-24-7" id="open-24-7-label">Open 24/7</label>
 		    <input type="checkbox" id="open-24-7" name="open-24-7" value="1" {% if hours_data.0 == None %}checked{% endif %}/>
 		</div>
