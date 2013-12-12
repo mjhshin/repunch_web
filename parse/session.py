@@ -21,11 +21,12 @@ SESSION_CACHE = [
     'message_count',
     'patronStore_count', # PUSH
     'store_timezone',
-    "has_store_avatar", 
+    "active_store_location_id",
     
     # actual objects
     'account',
-    'store', # PUSH (for rewards)
+    'store', # PUSH 
+    'store_locations',
     'subscription',
     'settings',
     'employees_pending_list', # PUSH
@@ -50,9 +51,8 @@ def get_store(session):
             store = session['account'].get('store')
             
         session['store'] = store
-        return store
-    else:
-        return session['store']
+        
+    return session['store']
         
 def get_redemptions_pending(session):
     """ 
@@ -68,9 +68,8 @@ def get_redemptions_pending(session):
         store.redeemRewards = None
         session['store'] = store
         session['redemptions_pending'] = redemptions_pending
-        return redemptions_pending
-    else:
-        return session['redemptions_pending']
+
+    return session['redemptions_pending']
         
 def get_redemptions_past(session):
     """ 
@@ -88,28 +87,43 @@ def get_redemptions_past(session):
         store.redeemRewards = None
         session['store'] = store
         session['redemptions_past'] = redemptions
-        return redemptions
-    else:
-        return session['redemptions_past']
+
+    return session['redemptions_past']
+        
+def get_store_locations(session):
+    """ limit of 100 store locations for now """
+    if "store_locations" not in session:
+        store = get_store(session)
+        session['store_locations'] = 
+        
+    return session['store_locations']
+    
+        
+def get_active_store_location_id(session):
+    if 'active_store_location_id' not in session:
+        # pick a random store location
+        session['active_store_location_id'] =\
+            get_store_locations(session).keys()[0]
+        
+    return session['active_store_location_id']
         
 def get_store_timezone(session):
     """ returns the pytz.timezone object """
     if "store_timezone" not in session:
-        store_timezone =\
-            pytz.timezone(get_store(session).get('store_timezone'))
-        session['store_timezone'] = store_timezone
-        return store_timezone
-    else:
-        return session['store_timezone']
+        store_location = get_store_location(session,
+            get_active_store_location_id(session))
+        session['store_timezone'] =\
+            pytz.timezone(store_location.get('store_timezone'))
+
+    return session['store_timezone']
         
 def get_patronStore_count(session):
     if 'patronStore_count' not in session:
         patronStore_count =\
             get_store(session).get("patronStores", count=1, limit=0)
         session['patronStore_count'] = patronStore_count
-        return patronStore_count
-    else:
-        return session['patronStore_count']
+        
+    return session['patronStore_count']
         
 def get_messages_sent_list(session):
     """ 
@@ -130,9 +144,7 @@ def get_messages_sent_list(session):
         store.sentMessages = None
         session['store'] = store
         
-        return messages_sent_list
-    else:
-        return session['messages_sent_list']
+    return session['messages_sent_list']
         
 def get_messages_received_list(session):
     if 'messages_received_list' not in session:
@@ -150,9 +162,7 @@ def get_messages_received_list(session):
         store.receivedMessages = None
         session['store'] = store
         
-        return messages_received_list
-    else:
-        return session['messages_received_list']
+    return session['messages_received_list']
        
 def get_employees_pending_list(session):
     if 'employees_pending_list' not in session:
@@ -171,9 +181,7 @@ def get_employees_pending_list(session):
         store.employees = None
         session['store'] = store
         
-        return employees_pending_list
-    else:
-        return session['employees_pending_list']
+    return session['employees_pending_list']
         
 def get_employees_approved_list(session):
     if 'employees_approved_list' not in session:
@@ -192,25 +200,19 @@ def get_employees_approved_list(session):
         store.employees = None
         session['store'] = store
         
-        return employees_approved_list
-    else:
-        return session['employees_approved_list']
+    return session['employees_approved_list']
      
 def get_subscription(session):
     if "subscription" not in session:
-        subscription = get_store(session).get("subscription")
-        session['subscription'] = subscription
-        return subscription
-    else:
-        return session['subscription']
+        session['subscription'] = get_store(session).get("subscription")
+        
+    return session['subscription']
 
 def get_settings(session):
     if "settings" not in session:
-        settings = get_store(session).get("settings")
-        session['settings'] = settings
-        return settings
-    else:
-        return session['settings']
+        session['settings'] = get_store(session).get("settings")
+        
+    return session['settings']
         
 def get_message_count(session):
     """ 
@@ -227,8 +229,7 @@ def get_message_count(session):
             message_type2=OFFER,
             count=1, limit=0)
         session['message_count'] = message_count
-    else:
-        message_count = session['message_count']
+        
     return message_count
     
 def load_all(session, commit=True):
@@ -247,9 +248,6 @@ def load_all(session, commit=True):
     get_subscription(session)
     get_settings(session)
     get_message_count(session)
-    
-    session['has_store_avatar'] =\
-        get_store(session).get("store_avatar") is not None
     
     if commit:
         session.save()

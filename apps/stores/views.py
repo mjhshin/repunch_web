@@ -46,7 +46,7 @@ def index(request):
 def edit(request, store_location_id):
     store = SESSION.get_store(request.session)
     store_location = SESSION.get_store_location(request.session,
-        store_location_id) # TODO
+        store_location_id)
     data = {'account_nav': True}
     
     def common(store_form, store_location_form):
@@ -111,7 +111,7 @@ def edit(request, store_location_id):
                     pytz.timezone(TIME_ZONE)
                 
             request.session['store'] = store
-            request.session['store_location']['store_location_id'] =\
+            request.session['store_locations']['store_location_id'] =\
                 store_location
             
             # notify other dashboards of this change

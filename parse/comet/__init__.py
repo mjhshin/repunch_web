@@ -285,8 +285,10 @@ def comet_receive(store_id, postDict):
         # STORE LOCATION UPDATED ##############################
         updatedStoreLocation = postDict.get("updatedStoreLocation")
         if updatedStoreLocation:
-            store_location = StoreLocation
-            session['store_location'] = store_location
+            store_location = StoreLocation(**updatedStoreLocation)
+            session['store_locations'][store_location.objectId] =\
+                store_location
+                
             try: # also update the store_timezone
                 session['store_timezone'] =\
                     pytz.timezone(store_location.get('store_timezone'))
