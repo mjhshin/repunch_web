@@ -49,8 +49,11 @@ def supported_chain_stores():
         store.add_relation("StoreLocations_", [store_location.objectId])
         
         # update all the punches for this store
-        for punch in store.get("punches", order="createdAt", limit=1000):
-            punch.store_location_id = store_location.objectId
+        punches = store.get("punches", order="createdAt", limit=1000)
+        if punches:
+            for punch in punches:
+                punch.store_location_id = store_location.objectId
+                punch.update()
         
         print "Updated Store #" + str(i) + ": " + store.objectId
         
