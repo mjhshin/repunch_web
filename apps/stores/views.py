@@ -11,7 +11,7 @@ from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
 from apps.stores.models import StoreLocationAvatarTmp, StoreActivate
-from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
+from apps.stores.forms import StoreForm, SettingsForm, StoreLocationAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
@@ -171,7 +171,7 @@ def avatar(request):
     store = SESSION.get_store(request.session)
     
     if request.method == 'POST': 
-        form = StoreAvatarForm(request.POST, request.FILES)
+        form = StoreLocationAvatarForm(request.POST, request.FILES)
         if form.is_valid():
         
             # save the file locallly
@@ -201,7 +201,7 @@ def avatar(request):
             return render(request, 'manage/avatar_crop.djhtml', data)
             
     else:
-        form = StoreAvatarForm()
+        form = StoreLocationAvatarForm()
     
     # update the session cache
     request.session['store'] = store
