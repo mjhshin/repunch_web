@@ -3,16 +3,14 @@ from django.utils import timezone
 from random import randint
 import os, re, datetime
 
-from models import Store, StoreAvatarTmp
+from models import Store, StoreLocationAvatarTmp
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric, numeric, required,\
 alphanumeric_no_space
 from repunch import settings
 from parse.apps.accounts.models import Account
 
-class StoreSignUpForm(forms.Form):
-    store_name = forms.CharField(max_length=255,
-        validators=[required])
+class StoreLocationForm(forms.Form):
     street = forms.CharField(max_length=255,
         validators=[required])
     city = forms.CharField(max_length=255,
@@ -23,20 +21,7 @@ class StoreSignUpForm(forms.Form):
         validators=[required, numeric])
     country = forms.CharField(max_length=255,
         validators=[required])
-    first_name = forms.CharField(max_length=50,
-        validators=[required])
-    last_name = forms.CharField(max_length=50,
-        validators=[required])
     phone_number = forms.CharField()
-    
-    recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
-    
-    def clean_recurring(self):
-        data = self.cleaned_data['recurring']
-        if not data:
-            raise forms.ValidationError("You must accept the Terms"+\
-                                    " & Conditions to continue.")
-        return data
     
     def get_full_address(self):
         return self.data['street'] + ", " + self.data['city']  + ", " +\
@@ -62,55 +47,36 @@ class StoreSignUpForm(forms.Form):
             
         return data
 
+class StoreSignUpForm(forms.Form):
+    store_name = forms.CharField(max_length=255,
+        validators=[required])
+    first_name = forms.CharField(max_length=50,
+        validators=[required])
+    last_name = forms.CharField(max_length=50,
+        validators=[required])
+    
+    recurring = forms.NullBooleanField(widget=forms.CheckboxInput())
+    
+    def clean_recurring(self):
+        data = self.cleaned_data['recurring']
+        if not data:
+            raise forms.ValidationError("You must accept the Terms"+\
+                                    " & Conditions to continue.")
+        return data
+
 class StoreForm(forms.Form):
     store_name = forms.CharField(max_length=255,
         validators=[required])
-    street = forms.CharField(max_length=255,
-        validators=[required])
-    city = forms.CharField(max_length=75,
-        validators=[required])
-    state = forms.CharField(max_length=50,
-        validators=[required])
-    zip = forms.CharField(max_length=50,
-        validators=[required, numeric])
-    country = forms.CharField(max_length=50,
-        validators=[required])
-    phone_number = forms.CharField(max_length=50)
     store_description = forms.CharField(required=False, 
         max_length=500, widget=forms.Textarea(attrs={"maxlength":500}))
-             
-    def get_full_address(self):
-        return self.data['street'] + ", " + self.data['city']  + ", " +\
-            self.data['state'] + ", " + self.data['zip']  + ", " +\
-            self.data['country']
-                                    
-    def clean_street(self):
-        # WARNING! get_map_data is unreliable due to google api 
-        # query limit!!!!
-        data = self.cleaned_data['street']
-        full_address = " ".join(\
-            self.get_full_address().split(", "))
-        map_data = rputils.get_map_data(full_address)
-        if not map_data.get('coordinates'):
-            raise forms.ValidationError("Enter a valid adress, city, "+\
-                    "state, and/or zip.")
-        return data
-                                    
-    def clean_phone_number(self):
-        data = self.cleaned_data['phone_number']
-        if len(data) < 10:
-            raise forms.ValidationError("Enter a valid phone number.")
-            
-        return data
         
-class StoreAvatarForm(forms.Form):
+class StoreLocationAvatarForm(forms.Form):
     """
     Returns the ImageFieldFile associated with the StoreAvatar Model
     """
     
     image = forms.ImageField(widget=forms.ClearableFileInput(attrs=\
         {"accept":"image/*"}))
-        
    
     def save(self, session_key):    
         def rename():
@@ -124,7 +90,7 @@ class StoreAvatarForm(forms.Form):
                  str(randint(0, 999)).zfill(3))
             return uploaded_img
         # remove previous session image
-        av = StoreAvatarTmp.objects.filter(session_key=session_key)
+        av = StoreLocationAvatarTmp.objects.filter(session_key=session_key)
         if av:
             av = av[0]
             try:
@@ -135,7 +101,7 @@ class StoreAvatarForm(forms.Form):
                 av.avatar = rename()
                 av.save()
         else:
-            av = StoreAvatarTmp.objects.create(session_key=\
+            av = StoreLocationAvatarTmp.objects.create(session_key=\
                 session_key, avatar=rename())
         return av.avatar
 

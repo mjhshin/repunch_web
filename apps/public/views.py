@@ -6,7 +6,8 @@ from django.forms.util import ErrorList
 from datetime import datetime
 import json, pytz
 
-from forms import ContactForm
+from apps.public.forms import ContactForm
+from libs.repunch import rputils
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup,\
@@ -16,8 +17,8 @@ from apps.db_static.models import Category
 from apps.accounts.models import AssociatedAccountNonce
 from apps.accounts.forms import AccountSignUpForm
 from parse.apps.stores import format_phone_number
-from apps.stores.forms import StoreSignUpForm, SubscriptionSignUpForm
-from libs.repunch import rputils
+from apps.stores.forms import StoreSignUpForm, StoreLocationForm,\
+SubscriptionSignUpForm
 
 from repunch.settings import STATIC_URL
 from parse.auth import login
@@ -27,8 +28,8 @@ from parse.notifications import get_notification_ctx
 from parse.apps.accounts.models import Account
 from parse.apps.accounts import sub_type
 from parse.apps.stores import IPOD
-from parse.apps.stores.models import Store, Subscription,\
-Settings
+from parse.apps.stores.models import Store, StoreLocation,\
+Subscription, Settings
 
 def terms_mobile(request):
     return render(request, "public/terms-mobile.djhtml",
@@ -168,6 +169,7 @@ def sign_up(request):
     
         # some keys are repeated so must catch this at init
         store_form = StoreSignUpForm(request.POST)
+        store_location_form = StoreLocationForm(request.POST)
         account_form = AccountSignUpForm(request.POST)
         subscription_form = SubscriptionSignUpForm(request.POST)
         
@@ -182,7 +184,7 @@ def sign_up(request):
         
         if not from_associated_account:
             all_forms_valid = store_form.is_valid() and\
-                account_form.is_valid()
+                store_location_form.is_valid() and account_form.is_valid()
         else:
             all_forms_valid = True
             
@@ -207,8 +209,6 @@ def sign_up(request):
             subscription_form = SubscriptionSignUpForm()
         
         if all_forms_valid:
-            postDict = request.POST.dict()
-            
             # check if email already taken here to handle the case where 
             # the user already has a patron/employee account 
             # but also want to sign up for a Store account
@@ -223,16 +223,10 @@ def sign_up(request):
             #########################################################
 
             # create store
-            tz = rputils.get_timezone(request.POST.get("zip"))
-            store = Store(**postDict)
-            store.store_timezone = tz.zone
+            store = Store(**request.POST)
             # set defaults for these guys to prevent 
             # ParseObjects from making parse calls repeatedly
             store.punches_facebook = 1
-            # format the phone number
-            store.phone_number =\
-                format_phone_number(request.POST['phone_number'])
-            store.set("hours", [])
             store.set("rewards", [])
             store.set("categories", [])
             if category_names:
@@ -242,29 +236,20 @@ def sign_up(request):
                         store.categories.append({
                             "alias":alias[0].alias,
                             "name":name })
-            # coordinates
-            # the call to get map data is actually also in the clean 
-            full_address = " ".join(\
-                store.get_full_address().split(", "))
-            map_data = rputils.get_map_data(full_address)
-            store.set("coordinates", map_data.get("coordinates"))
-            store.set("neighborhood", 
-                store.get_best_fit_neighborhood(\
-                    map_data.get("neighborhood")))
-            
+                            
             # create settings
             settings = Settings(Store=store.objectId)
             store.set('settings', settings)
 
             # create account
             if not from_associated_account:
-                account = Account(**postDict)
+                account = Account(**request.POST)
                 # username = email
                 # we should be doing this in the form but ehh
                 account.set("username", 
-                    postDict['email'].strip().lower())
+                    request.POST['email'].strip().lower())
                 account.set("email", 
-                    postDict['email'].strip().lower())
+                    request.POST['email'].strip().lower())
                 account.set_password(request.POST.get('password'))
             else:
                 account =\
@@ -274,11 +259,16 @@ def sign_up(request):
 
             # create subscription
             if request.POST.get("place_order"):
-                subscription = Subscription(first_name=postDict.get("first_name2"),
-                    last_name=postDict.get("last_name2"), cc_number=postDict.get("cc_number"),
-                    date_cc_expiration=postDict.get("date_cc_expiration"),
-                    address=postDict.get("address"), city=postDict.get("city2"),
-                    state=postDict.get("state2"), zip=postDict.get("zip2"), country=postDict.get("country2"))
+                subscription = Subscription(\
+                    first_name=request.POST.get("first_name2"),
+                    last_name=request.POST.get("last_name2"),
+                    cc_number=request.POST.get("cc_number"),
+                    date_cc_expiration=request.POST.get("date_cc_expiration"),
+                    address=request.POST.get("address"),
+                    city=request.POST.get("city2"),
+                    state=request.POST.get("state2"),
+                    zip=request.POST.get("zip2"),
+                    country=request.POST.get("country2"))
             else:
                 subscription = Subscription() 
             subscription.subscriptionType = 0
@@ -288,17 +278,42 @@ def sign_up(request):
             
             # create settings
             settings.create()
-                
+            
             # create store
+            store.StoreLocation = store_location.objectId
             store.Settings = settings.objectId
             store.Subscription = subscription.objectId
             store.create()
             
-            # add the store pointers to settings and subscription
+            # add the pointer to the created store
             settings.Store = store.objectId
             settings.update()
             subscription.Store = store.objectId
             subscription.update()
+            
+            # create the store location
+            store_location = StoreLocation(**request.POST)
+            # format the phone number
+            store_location.store_timezone =\
+                rputils.get_timezone(request.POST.get("zip")).zone
+            store_location.set("hours", [])
+            # coordinates and neighborhood
+            # the call to get map data is actually also in the clean 
+            full_address = " ".join(\
+                store_location.get_full_address().split(", "))
+            map_data = rputils.get_map_data(full_address)
+            store_location.set("coordinates", map_data.get("coordinates"))
+            store_location.set("neighborhood", 
+                store_location.get_best_fit_neighborhood(\
+                    map_data.get("neighborhood")))
+            store_location.phone_number =\
+                format_phone_number(request.POST["phone_number"])
+            store_location.Store = store.objectId
+            store_location.create()
+            
+            # add the StoreLocation to the relation
+            store.add_relation("StoreLocations_", [store_location.objectId]) 
+            store.update()
             
             # create account
             account.Store = store.objectId
@@ -346,8 +361,8 @@ def sign_up(request):
             subscription.Store = store.objectId
             if request.POST.get("place_order"):
                 exp = make_aware_to_utc(datetime(\
-                    int(postDict['date_cc_expiration_year']),
-                    int(postDict['date_cc_expiration_month']), 1), tz)
+                    int(request.POST['date_cc_expiration_year']),
+                    int(request.POST['date_cc_expiration_month']), 1), tz)
                 subscription.set("date_cc_expiration", exp)
                 # make sure to use the correct POST info
                 subscription.first_name = request.POST['first_name2']
@@ -380,14 +395,14 @@ def sign_up(request):
             # note that username has been fed the email
             # this shouldn't change anything though shouldn't matter
             # need to put username and pass in request
-            postDict['username'] = account.username
-            postDict['password'] = account.password
+            request.POST['username'] = account.username
+            request.POST['password'] = account.password
             
             # send matt and new user a pretty email.
             send_email_signup(account)
 
             # auto login
-            user_login = login(request, postDict, no_recaptcha=True)
+            user_login = login(request, request.POST, no_recaptcha=True)
             if user_login != None:
                 data = {"code":-1}
                 # response to signup.js - not login returns
@@ -405,10 +420,12 @@ def sign_up(request):
            
     else:
         store_form = StoreSignUpForm()
+        store_location_form = StoreLocationForm()
         account_form = AccountSignUpForm()
         subscription_form = SubscriptionSignUpForm()
         
     data['store_form'] = store_form
+    data['store_location_form'] = store_location_form
     data['account_form'] = account_form
     data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)

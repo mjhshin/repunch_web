@@ -10,7 +10,7 @@ from datetime import datetime
 from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
-from apps.stores.models import StoreAvatarTmp, StoreActivate
+from apps.stores.models import StoreLocationAvatarTmp, StoreActivate
 from apps.stores.forms import StoreForm, SettingsForm, StoreAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
@@ -244,7 +244,7 @@ def crop_avatar(request):
             "y2": int(request.POST["y2"]),
         }
         
-        avatar = StoreAvatarTmp.objects.filter(session_key=\
+        avatar = StoreLocationAvatarTmp.objects.filter(session_key=\
             request.session.session_key)
         # if there are 2 windows with the same session_key editing the 
         # store avatar, the avatar will be deleted by the first window
