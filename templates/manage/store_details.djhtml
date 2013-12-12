@@ -23,7 +23,7 @@ $(document).ready(function() {
 {% block content %}
 
 {# REQUIRED FOR AVATAR UPLOAD JS #}
-<input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' active_store_location.objectId %}" />
+<input type="hidden" id="get_store_avatar_url" value="{% url 'store_location_get_avatar' active_store_location.objectId %}" />
 
 {% with store=request.session.store %}
 	<!-- possibly move to header -->

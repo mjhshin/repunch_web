@@ -63,7 +63,11 @@
 
 </head>
 <body style="background-image: none; background-color: transparent;">
-	<form action="{% url 'store_crop_avatar' %}" method="POST" id="avatar-crop-form" >
+    {% if store_location %}
+	<form action="{% url 'store_location_crop_avatar' store_location.objectId %}" method="POST" id="avatar-crop-form" >
+	{% else %}
+	<form action="{% url 'store_crop_avatar'  %}" method="POST" id="avatar-crop-form" >
+	{% endif %}
 	    {% csrf_token %}
 		<div class="input-container" >
 			<img src="{{ avatar.url }}" id="jcrop_target" alt="store avatar" width="{{avatar.width}}" height="{{avatar.height}}" />

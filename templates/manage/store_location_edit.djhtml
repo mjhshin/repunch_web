@@ -3,7 +3,7 @@
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
-{% block title %}Edit Store Details{% endblock %}
+{% block title %}Edit Store Location{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_location_edit.1.2.css" %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
@@ -18,7 +18,7 @@
 	{% account_is_owner request.session as is_owner %}
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
-    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location.objectId %}" />
+    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_location_get_avatar' store_location.objectId %}" />
     {# REQUIRED FOR STORE EDIT JS #}
     <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 	
@@ -44,7 +44,7 @@
 		</div>
 	
 		
-		<h2>Edit Store Details</h2>	
+		<h2>Edit Store Location</h2>	
 		{{ store_location_form.non_field_errors }}
 		<div class="input-container street-container">
 			<div id="street_e">{{ store_location_form.street.errors }}</div>
