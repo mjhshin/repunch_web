@@ -83,15 +83,15 @@ $(document).ready(function() {
 				<div id="address">
 					<span class="bold">{{ store|get:'store_name' }}</span>
 					<p>
-						{{ store|get:'street' }}<br />
-						{{ store|get:'city' }}, {{ store|get:'state' }} {{ store|get:'zip' }}<br />
-						{{ store|get:'phone_number' }}
+						{{ active_store_location|get:'street' }}<br />
+						{{ active_store_location|get:'city' }}, {{ active_store_location|get:'state' }} {{ active_store_location|get:'zip' }}<br />
+						{{ active_store_location|get:'phone_number' }}
 					</p>
 				</div>
 				<div id="hours">
 					<span class="bold">Hours:</span>
 					<p>
-						{% hours request.session %}
+						{% hours request.session active_store_location.objectId %}
 						<!--
 						Mon-Fri: 11:00 am - 11:00 pm<br />
 						Closed Saturday &amp; Sunday
@@ -99,10 +99,10 @@ $(document).ready(function() {
 					</p>
 				</div>
 				
-				{% if store.store_description %}
+				{% if active_store_location.store_description %}
 				<div id="description">
 					<span class="bold">Store Description</span>
-					<p>{{ store.store_description }}</p>
+					<p>{{ active_store_location.store_description }}</p>
 				</div>
 				{% endif %}
 				

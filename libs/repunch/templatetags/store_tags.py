@@ -30,9 +30,9 @@ def redemptions_pending(session):
     return len(SESSION.get_redemptions_pending(session))
 
 @register.simple_tag
-def hours(session):
-    return HoursInterpreter(\
-        session["store"].hours).from_parse_to_readable() 
+def hours(session, store_location_id):
+    return HoursInterpreter(SESSION.get_store_location(session,
+        store_location_id).hours).from_parse_to_readable() 
         
 @register.assignment_tag
 def hours_names(day, postfix):
@@ -110,24 +110,6 @@ def time_selector(name, selected_value):
         options.append(opt % (hour+"30", readable_hours(hour+"30")))
     
     return select % (name, "".join(options))
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
