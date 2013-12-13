@@ -20,7 +20,7 @@ class Punch(ParseObject):
         """
         See ParseObject for documentation.
         """
-        return (cls, "punches", "Patron")
+        return (cls, "punches", "store_location_id", "Patron")
         
 class RedeemReward(ParseObject):
     def __init__(self, **data):

@@ -98,7 +98,7 @@ class Store(ParseObject):
         """
         return (cls, "active", "owner_id", "store_name", 
             "first_name", "last_name", "punches_facebook", "rewards",
-            "categories", "Subscription", "Settings")
+            "categories", "store_locations", "Subscription", "Settings")
             
     def update(self):
         """

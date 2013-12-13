@@ -96,7 +96,7 @@ class ParseObjectManager(object):
         gte (greater than or equal to). 
         """
         res = parse("GET", self.path, query=query(constraints))
-                  
+
         if res and "results" in res:
             objs = []
             for data in res['results']:
@@ -374,7 +374,6 @@ class ParseObject(object):
         Pointer caches are created if data for the Pointer is in data.
         """
         for key, value in data.iteritems():
-            print key, value
 
             # don't touch relation attrs, pointer meta, and array pointer meta 
             if (key.endswith("_") and key[0].isupper()) or\
@@ -430,13 +429,11 @@ class ParseObject(object):
             # check if it is an array of pointers
             # as with dates and pointers, skip if the array already 
             # contains formatted data (ParseObjects)
-            elif "_" + key.upper() in self.__dict__ and\
+            elif "_" + key.upper() in self.__dict__ and value and\
                 len(value) > 0 and type(value[0]) is dict:
                 obj_array = []
                 for v in value:
-                    # only process it if it is of __type "Object"
-                    if "Object" in v:
-                        obj_array.append(get_class(v['className'])(**v))
+                    obj_array.append(get_class(v['className'])(**v))
                         
                 setattr(self, key, obj_array)
             
@@ -461,7 +458,8 @@ class ParseObject(object):
             # dicts, or lists/tuples!
             elif type(val) in JSONIFIABLE_TYPES:
                 # check if it is an array of pointers
-                if "_" + key.upper() in self.__dict__:
+                if "_" + key.upper() in self.__dict__ and\
+                    len(val) > 0 and isinstance(val[0], ParseObject):
                     data[key] = [ obj.jsonify() for obj in val if\
                         isinstance(obj, ParseObject) ]
                 else:
@@ -569,7 +567,6 @@ class ParseObject(object):
             res = parse("GET", "classes/" + className +\
                     "/" + self.__dict__.get(attr[0].upper() +\
                     attr[1:]), query=q)
-
             if res and "error" not in res:
                 setattr(self, attr, get_class(className)(**res))
             else:
@@ -635,6 +632,7 @@ class ParseObject(object):
                 setattr(self, attr.replace("_url",""), 
                     res['results'][0].get(\
                     attr.replace("_url", "")).get('name'))
+                    
         # attr is a geopoint
         elif attr == "coordinates" and attr in self.__dict__:
             res = parse("GET", self.path(), query={"keys":attr,
@@ -647,15 +645,37 @@ class ParseObject(object):
                     setattr(self, attr, [latitude, longitude])
                 else:
                     setattr(self, attr, None)
+                    
+        # array of pointers
+        elif "_" + attr.upper() in self.__dict__:
+            query={"keys":attr,
+                    "where":dumps({"objectId":self.objectId})}
+            if "include" in constraints:
+                query["include"] = constraints['include']     
+                
+            res = parse("GET", self.path(), query=query)
+            if 'results' in res and res['results']:
+                result = res['results'][0][attr]
+                if result is not None:
+                    setattr(self, attr, [ get_class(\
+                        v['className'])(**v) for v in result ])
+            
         # attr is a regular attr or Pointer/Relation attr
         elif attr in self.__dict__: 
             res = parse("GET", self.path(), query={"keys":attr,
                     "where":dumps({"objectId":self.objectId})})
             if 'results' in res and res['results']:
-                # TODO what if Pointer/Relation attr was set to None?
+                # what if Pointer attr was set to None?
                 # getting them will return a dict!
-                setattr(self, attr, res.get('results')[0].get(attr) )
-
+                if attr[0].isupper() and not attr.endswith("_"):
+                    p = res.get('results')[0].get(attr)
+                    if type(p) is dict:
+                        setattr(self, attr, p.get("objectId") )
+                    else:
+                        setattr(self, attr, None)
+                else:
+                    setattr(self, attr, res.get('results')[0].get(attr) )
+                
         return self.__dict__.get(attr)
 
     def set(self, attr, val):
@@ -918,8 +938,8 @@ class ParseObject(object):
                 if value is not None and type(value) is dict:
                     data[key] = value
                     
-            # array of pointers
-            elif "_" + key.upper() in self.__dict__:
+            # array of pointers not None or empty list
+            elif "_" + key.upper() in self.__dict__ and value:
                 data[key] = [ format_pointer(val.__class__.__name__, val.objectId) for\
                     val in value if isinstance(val, ParseObject) ]
                     
