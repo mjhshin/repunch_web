@@ -18,7 +18,7 @@
 	{% account_is_owner request.session as is_owner %}
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
-    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_location_get_avatar' store_location.objectId %}" />
+    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location.objectId %}" />
     {# REQUIRED FOR STORE EDIT JS #}
     <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 	
@@ -34,13 +34,13 @@
 	        {% if store_location.store_avatar %}
 	            <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% else %}
-	            <a href="{% url 'store_avatar' %}" id="upload-avatar">
+	            <a href="{% url 'store_avatar_upload' %}" id="upload-avatar">
 	            <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" id="store_avatar"
 	                class="avatar-big" width="200px" height="200px"/>
 	            </a>
             {% endif %}
 			</div>
-			<a href="{% url 'store_avatar' %}" id="upload-avatar">Add/Change Photo</a>
+			<a href="{% url 'store_avatar_upload' %}" id="upload-avatar">Add/Change Photo</a>
 		</div>
 	
 		

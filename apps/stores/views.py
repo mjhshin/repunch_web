@@ -177,7 +177,7 @@ def hours_preview(request):
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
 @csrf_exempt
-def avatar(request):
+def avatar_upload(request):
     """ avatar upload for both location and global """
     data = {}
     
@@ -215,26 +215,14 @@ def avatar(request):
         form = StoreLocationAvatarForm()
     
     data['form'] = form
-    data['url'] = reverse('store_avatar')
+    data['url'] = reverse('store_avatar_upload')
     return render(request, 'manage/avatar_upload.djhtml', data)
     
 @dev_login_required
 @login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
-def get_global_avatar(request):
-    """ returns the store's global avatar url """
-    if request.method == "GET":
-        return HttpResponse(SESSION.get_store(\
-            request.session).get("store_avatar_url"))
-        
-    raise Http404
-    
-@dev_login_required
-@login_required
-@access_required(http_response="<h1>Access denied</h1>",\
-content_type="text/html")
-def get_location_avatar(request, store_location_id):
+def get_avatar(request, store_location_id):
     """ returns the store location's avatar url """
     if request.method == "GET":
         store_location = SESSION.get_store_location(\
@@ -248,84 +236,7 @@ def get_location_avatar(request, store_location_id):
 @admin_only(http_response="<h1>Permission denied</h1>",\
 content_type="text/html")
 @csrf_exempt
-def crop_global_avatar(request):
-    """ takes in crop coordinates and creates a new png image """
-    if request.method == "POST":
-        data = {}
-        store = SESSION.get_store(request.session)
-        
-        old_avatar = None
-        if store.get("store_avatar"):
-            old_avatar = store.store_avatar
-            
-        crop_coords = {
-            "x1": int(request.POST["x1"]),
-            "y1": int(request.POST["y1"]),
-            "x2": int(request.POST["x2"]),
-            "y2": int(request.POST["y2"]),
-        }
-        
-        avatar = StoreLocationAvatarTmp.objects.filter(session_key=\
-            request.session.session_key)
-        # if there are 2 windows with the same session_key editing the 
-        # store avatar, the avatar will be deleted by the first window
-        # to crop. The 2nd window will then have no avatar.
-        if not avatar:
-            # flag the execution of avatarCropComplete js function
-            data['success'] = True
-            return render(request, 'manage/avatar_crop.djhtml', data)
-            
-        avatar = avatar[0]
-        
-        # save the session before a cloud call!
-        request.session.save()
-        res = create_png(avatar.avatar.path, crop_coords)
-        
-        # make sure that we have the latest session
-        session = SessionStore(request.session.session_key)
-        store = SESSION.get_store(session)
-        if res and 'error' not in res:
-            store.store_avatar = res.get('name')
-            store.store_avatar_url =\
-                res.get('url').replace("http:/",
-                    "https://s3.amazonaws.com")
-                    
-        # delete the model and file since it's useless to keep
-        avatar.avatar.delete()
-        avatar.delete()
-            
-        store.update()
-        
-        session["store"] = store
-        request.session.clear()
-        request.session.update(session)
-        
-        # notify other dashboards of this change
-        payload = {
-            COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            "updatedStore": store.jsonify(),
-        }
-        comet_receive(store.objectId, payload)
-        
-        # need to remove old file
-        if old_avatar:
-            delete_file(old_avatar, 'image/png')
-        
-        # flag the execution of avatarCropComplete js function
-        data['success'] = True
-    
-        # update the session cache
-        request.session['store'] = store
-        return render(request, 'manage/avatar_crop.djhtml', data)
-    
-    raise Http404
-
-@dev_login_required
-@login_required
-@admin_only(http_response="<h1>Permission denied</h1>",\
-content_type="text/html")
-@csrf_exempt
-def crop_location_avatar(request, store_location_id):
+def crop_avatar(request, store_location_id):
     """ takes in crop coordinates and creates a new png image """
     if request.method == "POST":
         data = {"store_location": SESSION.get_store_location(\
