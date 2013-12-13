@@ -457,9 +457,8 @@ class ParseObject(object):
             # must be strings/unicode, numbers (int, long, float),
             # dicts, or lists/tuples!
             elif type(val) in JSONIFIABLE_TYPES:
-                # check if it is an array of pointers
                 if "_" + key.upper() in self.__dict__ and\
-                    len(val) > 0 and isinstance(val[0], ParseObject):
+                    len(val) > 0:
                     data[key] = []
                     for obj in val:
                         # need to include className
@@ -707,54 +706,33 @@ class ParseObject(object):
     def _array_op(self, op, arrName, vals):
         """ array operations 
         If the array corresponding to arrName is an array of pointers,
-        vals must be an array of ParseObjects.
+        vals must be an array of ParseObjects. WARNING! This will
+        set the current array to the 1 returned, which only has objectId.
         """
         # format vals to pointers if it is an array of objects
         arr_ptrs = "_" + arrName.upper() 
+        
+        array_not_none = getattr(self, arrName) is not None
+        
+        if self.__dict__[arrName] is None:
+            self.__dict__[arrName] = []
+        
         if arr_ptrs in self.__dict__:
-            # add/remove the vals to the array
-            if op == "AddUnique":
-                for val in vals:
-                    append = True
-                    for obj in self.__dict__[arrName][:]:
-                        if obj.objectId != val.objectId:
-                            append = False
-                            break
-                    if append:
-                        self.__dict__[arrName].append(val)
-            
-            elif op == "Remove":
-                new_arr = []
-                for val in vals:
-                    append = True
-                    for obj in self.__dict__[arrName][:]:
-                        if obj.objectId == val.objectId:
-                            append = False
-                            break
-                            
-                    if append:
-                        new_arr.append[val]
-                            
-                setattr(self, arrName, new_arr)
-                    
             vals = [ format_pointer(val.__class__.__name__, val.objectId) for\
                 val in vals ]
            
-        
-        if getattr(self, arrName) is not None: # array is not null/None
+        if array_not_none: # array is not null/None
             res = parse("PUT", self.path() + '/' + self.objectId, 
                 {arrName: {'__op':op, 'objects':vals} })
+                
         else: # array does not exist. initialize it here.
             res = parse("PUT", self.path() + '/' + self.objectId, 
                 {arrName:vals })
                 
-        # remove the array of pointers to prevent setting the list to empty
-        if arr_ptrs in self.__dict__ and arrName in res:
-            res.pop(arrName)
-                
         if res and 'error' not in res:
             self.update_locally(res, False)
             return True
+            
         return False 
         
     def _relation_op(self, op, relAttrName, objectIds):
