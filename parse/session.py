@@ -110,7 +110,7 @@ def get_active_store_location_id(session):
     return session['active_store_location_id']
     
 def get_store_location(session, store_location_id):
-    return get_store_locations(session)[store_location_id]
+    return get_store_locations(session).get(store_location_id)
         
 def get_store_timezone(session):
     """ returns the pytz.timezone object """

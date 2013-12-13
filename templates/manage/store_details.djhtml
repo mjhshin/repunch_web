@@ -72,7 +72,7 @@ $(document).ready(function() {
 	        <img src="{{ active_store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	    {% else %}
 	        {% if is_admin %}
-	        <a href="{% url 'store_avatar_upload' %}" id="upload-avatar">
+	        <a href="{% url 'store_avatar_upload' '0' %}" id="upload-avatar">
 	            <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        </a>
 	        {% else %}

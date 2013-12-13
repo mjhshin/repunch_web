@@ -177,10 +177,8 @@ def hours_preview(request):
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
 @csrf_exempt
-def avatar_upload(request):
+def avatar_upload(request, store_location_id):
     """ avatar upload for both location and global """
-    data = {}
-    
     if request.method == 'POST': 
         form = StoreLocationAvatarForm(request.POST, request.FILES)
         if form.is_valid():
@@ -201,22 +199,22 @@ def avatar_upload(request):
                 init_y1 = center_height - avatar.width/2
                 init_y2 = center_height + avatar.width/2
                 
-            data = {
+            return render(request, 'manage/avatar_crop.djhtml', {
+                "store_location_id": store_location_id,
                 'avatar': avatar,
                 'init_x1': init_x1,
                 'init_y1': init_y1,
                 'init_x2': init_x2,
                 'init_y2': init_y2,
-            }
-            
-            return render(request, 'manage/avatar_crop.djhtml', data)
+            })
             
     else:
         form = StoreLocationAvatarForm()
     
-    data['form'] = form
-    data['url'] = reverse('store_avatar_upload')
-    return render(request, 'manage/avatar_upload.djhtml', data)
+    return render(request, 'manage/avatar_upload.djhtml', {
+        'form': form,
+        'url': reverse('store_avatar_upload', args=(store_location_id,))
+    })
     
 @dev_login_required
 @login_required
@@ -225,9 +223,12 @@ content_type="text/html")
 def get_avatar(request, store_location_id):
     """ returns the store location's avatar url """
     if request.method == "GET":
-        store_location = SESSION.get_store_location(\
-            request.session, store_location_id)
-        return HttpResponse(store_location.get("store_avatar_url"))
+        if str(store_location_id) == '0':
+            store_avatar_url = SESSION.get_store(request.session).get("store_avatar_url")
+        else:
+            store_avatar_url = SESSION.get_store_location(\
+                request.session, store_location_id).get("store_avatar_url")
+        return HttpResponse(store_avatar_url)
         
     raise Http404
     
@@ -239,15 +240,19 @@ content_type="text/html")
 def crop_avatar(request, store_location_id):
     """ takes in crop coordinates and creates a new png image """
     if request.method == "POST":
-        data = {"store_location": SESSION.get_store_location(\
-            request.session, store_location_id)}
+        data = {"store_location_id": store_location_id}
         store = SESSION.get_store(request.session)
         store_location = SESSION.get_store_location(\
             request.session, store_location_id)
+            
+        if str(store_location_id) == '0':
+            s = store
+        else:
+            s = store_location
         
         old_avatar = None
-        if store_location.get("store_avatar"):
-            old_avatar = store_location.store_avatar
+        if s.get("store_avatar"):
+            old_avatar = s.store_avatar
             
         crop_coords = {
             "x1": int(request.POST["x1"]),
@@ -276,17 +281,17 @@ def crop_avatar(request, store_location_id):
         session = SessionStore(request.session.session_key)
         store = SESSION.get_store(session)
         if res and 'error' not in res:
-            store_location.store_avatar = res.get('name')
-            store_location.store_avatar_url =\
-                res.get('url').replace("http:/",
-                    "https://s3.amazonaws.com")
+            s.store_avatar = res.get('name')
+            s.store_avatar_url = res.get('url').replace("http:/",
+                "https://s3.amazonaws.com")
                     
         # delete the model and file since it's useless to keep
         avatar.avatar.delete()
         avatar.delete()
             
-        store_location.update()
+        s.update()
         
+        session["store"] = store
         session["store_location"] = store_location
         request.session.clear()
         request.session.update(session)
@@ -294,8 +299,13 @@ def crop_avatar(request, store_location_id):
         # notify other dashboards of this change
         payload = {
             COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            "updatedStoreLocation": store_location.jsonify(),
         }
+        
+        if str(store_location_id) == '0':
+            payload["updatedStore"] = store.jsonify()
+        else:
+            payload["updatedStoreLocation"] = store_location.jsonify()
+        
         comet_receive(store.objectId, payload)
         
         # need to remove old file
@@ -306,6 +316,7 @@ def crop_avatar(request, store_location_id):
         data['success'] = True
     
         # update the session cache
+        request.session["store"] = store
         request.session['store_location'] = store_location
         return render(request, 'manage/avatar_crop.djhtml', data)
     
