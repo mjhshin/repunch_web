@@ -51,7 +51,11 @@ class Store(ParseObject):
         # {"alias":"coffee","name":"Coffee & Tea"}]
         self.categories = data.get('categories', [])
         
-        self.punches_facebook = data.get("punches_facebook", 1)  
+        self.punches_facebook = data.get("punches_facebook", 1) 
+        
+        # array of StoreLocations
+        self.store_locations = data.get("store_locations", [])
+        self._STORE_LOCATIONS = True 
 
         self.Subscription = data.get("Subscription")
         self.Settings = data.get("Settings")
@@ -63,6 +67,8 @@ class Store(ParseObject):
         self.SentMessages_ = "Message"
         self.ReceivedMessages_ = "Message"
         self.RedeemRewards_ = "RedeemReward"
+        
+        # unused
         self.StoreLocations_ = "StoreLocation"
         
         # These are also in StoreLocation class
