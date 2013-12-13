@@ -1,12 +1,9 @@
 """
 Parse models corresponding to Django models.
-
-TODO: create a proper meta class to store info like which attributes
-are dates, or coordinates, etc. instead of restricting to attribute
-name prefixes and postfixes.
 """
 from json import dumps
 from dateutil import parser
+from importlib import import_module
 
 from repunch.settings import USER_CLASS
 from parse.utils import parse
@@ -16,6 +13,39 @@ NOT_WHERE_CONSTRAINTS
 
 JSONIFIABLE_TYPES = (int, bool, float, long, str, unicode, list, 
                     dict, tuple)
+                    
+# This is to support creating objects from within objects.
+# Register all classes here.
+GET_CLASS = {
+    "parse.apps.stores.models": (
+        "Store", "StoreLocation", "Invoice", "Subscription", "Settings",
+    ),
+    "parse.apps.patrons.models": (
+        "Patron", "PatronStore", "PunchCode", "FacebookPost",
+    ),
+    "parse.apps.messages.models": (
+        "Message", "MessageStatus",
+    ),
+    "parse.apps.rewards.models": (
+        "Punch", "RedeemReward",
+    ),
+    "parse.apps.accounts.models": (
+        "Account",
+    ),
+    "parse.apps.employees.models": (
+        "Employee"
+    ),
+}
+
+
+def get_class(className):
+    """
+    Enables retrieval of classes from within classes.
+    """
+    for pkg, models in GET_CLASS.iteritems():
+        for model in models:
+            if model == className:
+                return getattr(import_module(pkg), className)
 
 class ParseObjectManager(object):
     """
@@ -152,6 +182,29 @@ class ParseObject(object):
     
             e.g. self.get("milkyWay")
 
+
+        -------------------------------
+
+    ### Array of Pointers:
+
+        In addition to arrays containing non-relational data-types,
+        arrays may also contain actual objects. You must provide a 
+        meta attribute to indicate that it is an array of pointers. 
+        The value of the meta attribute does not matter.
+        
+            e.g. the meta attribute of self.array_of_cars is 
+                self._ARRAY_OF_CARS
+                
+        To get an object with all of the objects in the array included:
+        
+            e.g. car = Car.objects().get(objectId="carId", include="arrayOfDrivers")
+            car.arrayOfDrivers = [ driver1, driver2, ...]
+            
+        If the include is not provided, then the array will contain
+        unformatted JSON objects.
+            
+        Also the array may contain different types of objects.
+        
         -------------------------------
 
     ### Dates:
@@ -322,9 +375,10 @@ class ParseObject(object):
         """
         for key, value in data.iteritems():
 
-            # don't touch pointer meta and relation attrs
+            # don't touch relation attrs, pointer meta, and array pointer meta 
             if (key.endswith("_") and key[0].isupper()) or\
                 (key.islower() and key.startswith("_")) or\
+                (key.isupper() and key.startswith("_")) or\
                 (key not in self.__dict__ and not create):
                 continue
                 
@@ -344,7 +398,7 @@ class ParseObject(object):
                     else:
                         className = key
                     setattr(self, key[0].lower() + key[1:], 
-                        self.get_class(className)(**value))
+                        get_class(className)(**value))
             # image file type
             elif key.endswith("_avatar") and type(value) is dict: 
                 setattr(self, key, value.get('name'))
@@ -366,10 +420,22 @@ class ParseObject(object):
             elif key in ("createdAt", "updatedAt") and\
                 type(value) in (str, unicode):
                 setattr(self, key, parser.parse(value) )
+                
             # GeoPoint
             elif key == "coordinates" and type(value) is dict:
                 setattr(self, key, 
                     [value.get('latitude'),value.get('longitude')] )
+                    
+            # check if it is an array of pointers
+            elif "_" + key.upper() in self.__dict__:
+                obj_array = []
+                for v in value:
+                    # only process it if it is of __type "Object"
+                    if "Object" in v:
+                        obj_array.append(get_class(v['className'])(**v))
+                        
+                setattr(self, key, obj_array)
+            
             else:
                 setattr(self, key, value)
                 
@@ -390,17 +456,14 @@ class ParseObject(object):
             # must be strings/unicode, numbers (int, long, float),
             # dicts, or lists/tuples!
             elif type(val) in JSONIFIABLE_TYPES:
-                data[key] = val
+                # check if it is an array of pointers
+                if "_" + key.upper() in self.__dict__:
+                    data[key] = [ obj.jsonify() for obj in val if\
+                        isinstance(obj, ParseObject) ]
+                else:
+                    data[key] = val
             
         return data
-
-    def get_class(self, className):
-        """
-        Need to override this for every class in order to use caching.
-        Returns the class with the className.
-        TODO Automate this process?
-        """
-        return None
 
     def fetch_all(self, clear_first=False, with_cache=True):
         """
@@ -420,11 +483,13 @@ class ParseObject(object):
                     
         if with_cache:
             cache_attrs = ""
-            # fill up the Pointer cache attributes 
+            # fill up the Pointer cache attributes and array of pointers
             for key in self.__dict__.iterkeys():
                 if key[0].isupper() and not key.endswith("_") and\
                     not key == "ACL":
                     cache_attrs = cache_attrs + key + ","
+                elif key.startswith("_") and key.isupper():
+                    cache_attrs = cache_attrs + k[1:].lower() + ","
             
             if len(cache_attrs) > 0:
                 res = parse("GET", self.path() + "/" + self.objectId,
@@ -463,6 +528,10 @@ class ParseObject(object):
         If the attr is a #2, then it is treated
         as a cache for a ParseObject. Note that all of this 
         attribute's data is retrieved.
+        
+        Getting an array of pointers using this method will return
+        just a list of unformatted JSONObjects of __type Pointer even
+        with an include provided. 
 
         Constraints may also be provided to filter objects
         in a relation. If limit of 0 is given or result is empty, 
@@ -498,8 +567,7 @@ class ParseObject(object):
                     attr[1:]), query=q)
 
             if res and "error" not in res:
-                c = self.get_class(className)
-                setattr(self, attr, c(**res))
+                setattr(self, attr, get_class(className)(**res))
             else:
                 return None
 
@@ -532,7 +600,7 @@ class ParseObject(object):
                 if len(res['results']) == 0:
                     setattr(self, attr, None)
                 else:
-                    c = self.get_class(className)
+                    c = get_class(className)
                     setattr(self, attr, 
                                 [ c(**d) for d in res['results'] ])
                 if 'count' in res:
@@ -541,6 +609,7 @@ class ParseObject(object):
                 if 'count' in constraints:
                     return 0
                 return None 
+                
         # date object
         elif attr.startswith("date_"):
             res = parse("GET", self.path(), query={"keys":attr,
@@ -608,6 +677,11 @@ class ParseObject(object):
 
     def _array_op(self, op, arrName, vals):
         """ array operations """
+        # format vals to pointers if it is an array of objects
+        if "_" + arrName.upper() in self.__dict__:
+            vals = [ format_pointer(val.__class__.__name__, val) for\
+                val in vals if isinstance(val, ParseObject) ]
+        
         if getattr(self, arrName): # array is not null/None
             res = parse("PUT", self.path() + '/' + self.objectId, 
                 {arrName: {'__op':op, 'objects':vals} })
@@ -747,8 +821,9 @@ class ParseObject(object):
                 # to None when changing file!
                 continue
 
-            # exclude Pointer meta 
-            if key.islower() and key.startswith("_"):
+            # exclude Pointer meta and array of pointers meta
+            if (key.islower() and key.startswith("_")) or\
+                (key.isupper() and key.startswith("_")):
                 continue
 
             # Pointers
@@ -775,8 +850,15 @@ class ParseObject(object):
                 # note that ACL must be a hash/dict!!!
                 if value is not None and type(value) is dict:
                     data[key] = value
+                    
+            # array of pointers
+            elif "_" + key.upper() in self.__dict__:
+                data[key] = [ format_pointer(val.__class__.__name__, val) for\
+                    val in value if isinstance(val, ParseObject) ]
+                    
             # regular attributes
             else:
                 data[key] = value
+                
         return data
 

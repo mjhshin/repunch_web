@@ -2,8 +2,6 @@
 Parse equivalence of Django apps.accounts.models
 """
 
-from importlib import import_module
-
 from parse.core.models import ParseObject
 from parse.apps.patrons import UNKNOWN
 
@@ -35,13 +33,6 @@ class Patron(ParseObject):
     def get_fullname(self):
         return self.first_name.capitalize()+\
                 " " + self.last_name.capitalize()
-
-    def get_class(self, className):
-        if className in ("Message", "MessageStatus"):
-            return getattr(import_module('parse.apps.messages.models'),
-                                className)
-        elif className == "PatronStore":
-            return PatronStore
 
 class PunchCode(ParseObject):
     """ New class not in Django """
@@ -84,15 +75,6 @@ class PatronStore(ParseObject):
         return (cls, "punch_count", "all_time_punches",
             "pending_reward", "Patron", "Store")
 
-    def get_class(self, className):
-        if className == "Patron":
-            return Patron
-        elif className == "FacebookPost":
-            return FacebookPost
-        elif className == "Store":
-            return getattr(import_module('parse.apps.stores.models'),
-                    className)
-
 class FacebookPost(ParseObject):
     """ Equivalence class of apps.patrons.models.FacebookPost """
     def __init__(self, **data):
@@ -108,9 +90,3 @@ class FacebookPost(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "reward", "Patron")
-
-    def get_class(self, className):
-        if className == "Patron":
-            return getattr(import_module('parse.apps.patrons.models'),
-                                className)
-

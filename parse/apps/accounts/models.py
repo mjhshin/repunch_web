@@ -2,8 +2,6 @@
 Parse equivalence of Django apps.accounts.models
 """
 
-from importlib import import_module
-
 from parse.core.models import ParseObject, ParseObjectManager
 from parse.apps.accounts import sub_type, FREE
 from parse.utils import parse
@@ -67,14 +65,6 @@ class Account(ParseObject):
             return True
 
         return False
-
-    def get_class(self, className):
-        if className == "Patron":
-            return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className == "Employee":
-            return getattr(import_module('parse.apps.employees.models'), className)
-        elif className == "Store":
-            return getattr(import_module('parse.apps.stores.models'), className)
 
     def set_password(self, new_pass):
         """ may want to do some extra stuff here in the future """

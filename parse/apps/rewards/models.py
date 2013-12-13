@@ -2,8 +2,6 @@
 Parse equivalence of Django apps.employees.models
 """ 
 
-from importlib import import_module
-
 from parse.core.models import ParseObject
 
 class Punch(ParseObject):
@@ -24,10 +22,6 @@ class Punch(ParseObject):
         """
         return (cls, "punches", "Patron")
         
-    def get_class(self, className):
-        if className == "Patron":
-            return getattr(import_module('parse.apps.patrons.models'), className)
-            
 class RedeemReward(ParseObject):
     def __init__(self, **data):
         self.title = data.get("title")
@@ -50,10 +44,4 @@ class RedeemReward(ParseObject):
         return (cls, "title", "customer_name", "is_redeemed",
             "patron_id", "num_punches", ("PatronStore", "reward_id"),
             ("MessageStatus", {"num_punches":0}))
-
-    def get_class(self, className):
-        if className == "PatronStore":
-            return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className == "MessageStatus":
-            return getattr(import_module('parse.apps.messages.models'), className)
 

@@ -1,7 +1,6 @@
 """
 Parse equivalence of Django apps.stores.models
 """ 
-from importlib import import_module
 from dateutil import parser
 import string, random
 
@@ -95,22 +94,6 @@ class Store(ParseObject):
             "first_name", "last_name", "punches_facebook", "rewards",
             "categories", "Subscription", "Settings")
             
-    def get_class(self, className):
-        if className in ("PatronStore", "FacebookPost"):
-            return getattr(import_module('parse.apps.patrons.models'), className)
-        elif className == "Settings":
-            return Settings
-        elif className == "StoreLocation":
-            return StoreLocation
-        elif className == "Subscription":
-            return Subscription
-        elif className in ("Punch", "RedeemReward"):
-            return getattr(import_module('parse.apps.rewards.models'), className)
-        elif className == "Employee":
-            return getattr(import_module('parse.apps.employees.models'), className)
-        elif className == "Message":
-            return getattr(import_module('parse.apps.messages.models'), className)
-     
     def update(self):
         """
         Capitalize certain strings before saving to parse.
@@ -231,10 +214,6 @@ class StoreLocation(ParseObject):
         return (cls, "street", "city", "state", "zip", "country", 
             "phone_number", "store_timezone", "coordinates", 
             "hours", "Store")
-            
-    def get_class(self, className):
-        if className == "Store":
-            return Store
             
     def update(self):
         """
@@ -405,12 +384,6 @@ class Subscription(ParseObject):
         #    "date_pp_valid")
         return (cls, "subscriptionType", "date_last_billed", "Store")
     
-    def get_class(self, className):
-        if className == "Invoice":
-            return Invoice
-        elif className == "Store":
-            return Store
-    
     def get_full_address(self):
         """
         Returns address, city, state, zip, country
@@ -542,8 +515,4 @@ class Settings(ParseObject):
             return gid
 
         return generate_id()
-
-    def get_class(self, className):
-        if className == "Store":
-            return Store
 

@@ -3,7 +3,6 @@ Parse equivalence of Django apps.messages.models
 """
 
 from django.core.urlresolvers import reverse
-from importlib import import_module
 
 from parse.core.models import ParseObject
 
@@ -50,11 +49,6 @@ class Message(ParseObject):
 
     def get_absolute_url(self):
 		return reverse('message_details', args=[self.objectId])
-
-    def get_class(self, className):
-        """ note that a reply/feedback is also a message """
-        if className == "Message":
-            return Message
             
 class MessageStatus(ParseObject):
     """ 
@@ -76,7 +70,3 @@ class MessageStatus(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "is_read", "redeem_available", "Message")
-
-    def get_class(self, className):
-        if className == "Message":
-            return Message

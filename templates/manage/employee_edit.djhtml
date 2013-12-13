@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}{% load account_tags %}
+{% load static %}{% load account_tags %}
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
@@ -56,12 +56,12 @@
     
 		<div class="input-container info" id="date_added">
 			<label>Date Added</label>
-			<span>{{ employee|get:'createdAt'|date:"m/d/y" }}</span>
+			<span>{{ employee.createdAt|date:"m/d/y" }}</span>
 		</div>
 		
 		<div class="input-container info">
 			<label>Lifetime Punches</label>
-			<span>{{ employee|get:'lifetime_punches' }}</span>
+			<span>{{ employee.lifetime_punches }}</span>
 		</div>
 		
 		<div class="section" style="margin:20px 0px;">
