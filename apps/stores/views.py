@@ -69,7 +69,7 @@ def edit_location(request, store_location_id):
 
         if store_location_form.is_valid(): 
             store_location = StoreLocation(**store_location.__dict__)
-            store_location.update()
+            store_location.update_locally(postDict, False)
             
             # validate and format the hours
             hours_validation = hours.is_valid()
@@ -110,7 +110,7 @@ def edit_location(request, store_location_id):
                 request.session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
                 
-            request.session['store_locations']['store_location_id'] =\
+            request.session['store_locations'][store_location_id] =\
                 store_location
             
             # notify other dashboards of this change
@@ -288,7 +288,6 @@ def crop_avatar(request, store_location_id):
         # delete the model and file since it's useless to keep
         avatar.avatar.delete()
         avatar.delete()
-            
         s.update()
         
         session["store"] = store
@@ -302,9 +301,16 @@ def crop_avatar(request, store_location_id):
         }
         
         if str(store_location_id) == '0':
-            payload["updatedStore"] = store.jsonify()
+            payload.update({
+                "updatedStoreAvatarName": s.store_avatar,
+                "updatedStoreAvatarUrl": s.store_avatar_url,
+            })
         else:
-            payload["updatedStoreLocation"] = store_location.jsonify()
+            payload.update({
+                "updatedStoreLocationAvatarSLID": s.objectId,
+                "updatedStoreLocationAvatarName": s.store_avatar,
+                "updatedStoreLocationAvatarUrl": s.store_avatar_url,
+            })
         
         comet_receive(store.objectId, payload)
         

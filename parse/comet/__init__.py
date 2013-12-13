@@ -47,8 +47,14 @@ def comet_receive(store_id, postDict):
         approvedRedemption 
         deletedRedemption 
         
+        updatedStoreAvatarName
+        updatedStoreAvatarUrl
+        updatedStoreLocationAvatarSLID
+        updatedStoreLocationAvatarName
+        updatedStoreLocationAvatarUrl
+        
         updatedPunchesFacebook_int
-        patronStore_int = request.POST.get("patronStore_int")
+        patronStore_int
         
     Note that since each CometSession is no longer unique to 1 session
     we need to keep track of the session_keys that have already been 
@@ -270,7 +276,16 @@ def comet_receive(store_id, postDict):
         updatedStore = postDict.get("updatedStore")
         if updatedStore:
             store = Store(**updatedStore)
-           
+            session['store'] = store
+            
+            
+        updatedStoreAvatarName = postDict.get("updatedStoreAvatarName")
+        if updatedStoreAvatarName:
+            store = session['store']
+            store.store_avatar = updatedStoreAvatarName
+            store.store_avatar_url = postDict.get("updatedStoreAvatarUrl")
+            session['store'] = store
+        
         # this is in the settings tab in the dashboard but the field
         # is in the Store class
         updatedPunchesFacebook_int =\
@@ -295,7 +310,19 @@ def comet_receive(store_id, postDict):
             except Exception: # assign a default timezone
                 session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
-            
+               
+        updatedStoreLocationAvatarName = postDict.get("updatedStoreLocationAvatarName")
+        if updatedStoreLocationAvatarName:
+            store_location = SESSION.get_store_location(session,
+                postDict.get('updatedStoreLocationAvatarSLID'))
+            if store_location:
+                store_location.store_avatar = updatedStoreLocationAvatarName
+                store_location.store_avatar_url = postDict.get("updatedStoreLocationAvatarUrl")
+                session['store_locations'][store_location.objectId] = store_location    
+                for k, v in session['store_locations'].iteritems():
+                    print k + " ####################################"
+                    print v.__dict__
+        
             
         #############################################################
         # ACCOUNT UPDATED ##############################
