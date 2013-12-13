@@ -460,8 +460,13 @@ class ParseObject(object):
                 # check if it is an array of pointers
                 if "_" + key.upper() in self.__dict__ and\
                     len(val) > 0 and isinstance(val[0], ParseObject):
-                    data[key] = [ obj.jsonify() for obj in val if\
-                        isinstance(obj, ParseObject) ]
+                    data[key] = []
+                    for obj in val:
+                        # need to include className
+                        jsonified = obj.jsonify()
+                        jsonified['className'] = obj.__class__.__name__
+                        data[key].append(jsonified)
+                        
                 else:
                     data[key] = val
             
@@ -491,7 +496,7 @@ class ParseObject(object):
                     not key == "ACL":
                     cache_attrs = cache_attrs + key + ","
                 elif key.startswith("_") and key.isupper():
-                    cache_attrs = cache_attrs + k[1:].lower() + ","
+                    cache_attrs = cache_attrs + key[1:].lower() + ","
             
             if len(cache_attrs) > 0:
                 res = parse("GET", self.path() + "/" + self.objectId,
@@ -532,8 +537,8 @@ class ParseObject(object):
         attribute's data is retrieved.
         
         Getting an array of pointers using this method will return
-        just a list of unformatted JSONObjects of __type Pointer even
-        with an include provided. 
+        a list of ParseObjects with only the objectId set even if
+        an include is provided.
 
         Constraints may also be provided to filter objects
         in a relation. If limit of 0 is given or result is empty, 
@@ -709,60 +714,31 @@ class ParseObject(object):
         if arr_ptrs in self.__dict__:
             # add/remove the vals to the array
             if op == "AddUnique":
-                # array of pointers
-                if len(self.__dict__[arrName]) > 0 and\
-                    type(self.__dict__[arrName][0]) is dict:
-                    for val in vals:
-                        append = True
-                        for obj in self.__dict__[arrName][:]:
-                            if obj.get('objectId') != val.objectId:
-                                append = False
-                                break
-                        if append:
-                            self.__dict__[arrName].append(\
-                                format_pointer(val.__class__.__name__, val))
-                            
-                else: # formatted objects
-                    for val in vals:
-                        append = True
-                        for obj in self.__dict__[arrName][:]:
-                            if obj.objectId != val.objectId:
-                                append = False
-                                break
-                        if append:
-                            self.__dict__[arrName].append(val)
+                for val in vals:
+                    append = True
+                    for obj in self.__dict__[arrName][:]:
+                        if obj.objectId != val.objectId:
+                            append = False
+                            break
+                    if append:
+                        self.__dict__[arrName].append(val)
             
             elif op == "Remove":
                 new_arr = []
-                # array of pointers
-                if len(self.__dict__[arrName]) > 0 and\
-                    type(self.__dict__[arrName][0]) is dict:
-                    for val in vals:
-                        append = True
-                        for obj in self.__dict__[arrName][:]:
-                            if obj.get('objectId') == val.objectId:
-                                append = False
-                                break
-                                
-                        if append:
-                            new_arr.append(format_pointer(\
-                                val.__class__.__name__, val))
+                for val in vals:
+                    append = True
+                    for obj in self.__dict__[arrName][:]:
+                        if obj.objectId == val.objectId:
+                            append = False
+                            break
                             
-                else: # formatted objects
-                    for val in vals:
-                        append = True
-                        for obj in self.__dict__[arrName][:]:
-                            if obj.objectId == val.objectId:
-                                append = False
-                                break
-                                
-                        if append:
-                            new_arr.append[val]
+                    if append:
+                        new_arr.append[val]
                             
                 setattr(self, arrName, new_arr)
                     
             vals = [ format_pointer(val.__class__.__name__, val.objectId) for\
-                val in vals if isinstance(val, ParseObject) ]
+                val in vals ]
            
         
         if getattr(self, arrName) is not None: # array is not null/None
@@ -941,7 +917,7 @@ class ParseObject(object):
             # array of pointers not None or empty list
             elif "_" + key.upper() in self.__dict__ and value:
                 data[key] = [ format_pointer(val.__class__.__name__, val.objectId) for\
-                    val in value if isinstance(val, ParseObject) ]
+                    val in value ]
                     
             # regular attributes
             else:
