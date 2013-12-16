@@ -11,7 +11,7 @@
 {% account_is_admin request.session as is_admin %}
 {% if is_admin %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
-<link rel="stylesheet" type="text/css" href="{% static 'manage/js/store_locations.1.0.js' %}" />
+<script type="text/javascript" src="{% static 'manage/js/store_locations.1.0.js' %}" ></script>
 <script>
 $(document).ready(function() {
     $("#deactivate_account").click(function() {
@@ -71,7 +71,7 @@ $(document).ready(function() {
 		
 		{# STORE LOCATIONS LIST #}
 		<div class="white-box" id="store-locations">
-    		<div class="scroll up">UP</div>
+    		<div class="scroll up"><img src="{% static 'manage/images/scroll_up.1.0.png' %}"/></div>
             <div class="nav">
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
@@ -84,10 +84,10 @@ $(document).ready(function() {
                 <a href="#"><div class="add">Add Location</div></a>
                 
             </div>
-            <div class="scroll down">DOWN</div>
+            <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
     
             <div class="content">
-                <img src="http://placehold.it/150x150"/>
+                <img src="http://placehold.it/200x200"/>
                 <div><label>Address:</label>
                     1440 Taylor Ave 2f<br/>
                     Bronx, NY 10460<br/>

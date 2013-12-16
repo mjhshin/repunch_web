@@ -3,6 +3,8 @@
 */
 
 #store-locations {
+	font: 'Cabin', sans-serif;
+	color:#666;
     min-height:400px; width: 670px;
     background:white; overflow: hidden;
     position: relative;
@@ -15,14 +17,14 @@
 
 #store-locations > div.nav {
     width:223px; height: 400px;
-    background: yellow;
     float: left;
 }
 
 #store-locations > div.scroll {
-    text-align: center;
+	background: #666 url('../images/bkg_sidebar.png') repeat top left;
+    text-align: center; height: 20px;
     position: absolute; left: 0px;
-    background: yellow;
+    cursor: pointer;
 }
 
 #store-locations > div.scroll.up {
@@ -35,18 +37,16 @@
 
 #store-locations > div.content {
     width: 364px; height: 100%;
-    background: green;
     padding: 20px 40px;
 }
 
 #store-locations > div.content > div > label,
-#store-locations > div.nav > a > div,
-#store-locations > div.scroll {
-	font: bold 16px sans-serif;
-    color: #333;
+#store-locations > div.nav > a {
+	font: bold 15px/20px 'Cabin', sans-serif;
 }
 
 #store-locations > div.nav > a {
+	color:#666;
     position: relative; top: 0px;
     text-decoration: none;
     z-index: 1;
@@ -60,13 +60,13 @@
 #store-locations > div.scroll,
 #store-locations > div.nav > a > div {
     width: 200px;
-    border: 2px solid #111;
+	border:1px solid #CCC;
     border-left: 0px; border-top: 0px;
     padding: 10px 10px;
 }
 
 #store-locations > div.scroll.down {
-    border-top: 2px solid #111;
+	border:1px solid #CCC;
     border-bottom: 0px;
 }
 

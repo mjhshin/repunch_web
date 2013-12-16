@@ -6,6 +6,7 @@
 // the lower this number is, the faster the scroll will be
 var ANIMATION_DURATION = 1000;
 
+// TODO prevent overscroll
 $(document).ready(function() {
     // clicks on nav items
     $("#store-locations > div.nav > a").click(function() {
