@@ -319,10 +319,7 @@ def comet_receive(store_id, postDict):
                 store_location.store_avatar = updatedStoreLocationAvatarName
                 store_location.store_avatar_url = postDict.get("updatedStoreLocationAvatarUrl")
                 session['store_locations'][store_location.objectId] = store_location    
-                for k, v in session['store_locations'].iteritems():
-                    print k + " ####################################"
-                    print v.__dict__
-        
+
             
         #############################################################
         # ACCOUNT UPDATED ##############################

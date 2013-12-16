@@ -68,9 +68,11 @@ def edit_location(request, store_location_id):
         hours = HoursInterpreter(json.loads(postDict["hours"]))
 
         if store_location_form.is_valid(): 
+            # the avatar will be lost in the creation so save it
+            store_location_avatar_url = store_location.store_avatar_url
             store_location = StoreLocation(**store_location.__dict__)
             store_location.update_locally(postDict, False)
-            
+
             # validate and format the hours
             hours_validation = hours.is_valid()
             if type(hours_validation) is bool:
@@ -113,12 +115,20 @@ def edit_location(request, store_location_id):
             request.session['store_locations'][store_location_id] =\
                 store_location
             
-            # notify other dashboards of this change
+            # the store location at this point has lost its
+            # store_avatar_url so we need to update that too 
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStoreLocation": store_location.jsonify(),
+                "updatedStoreLocationAvatarSLID": store_location.objectId,
+                "updatedStoreLocationAvatarName": store_location.store_avatar,
+                "updatedStoreLocationAvatarUrl": store_location_avatar_url,
             }
             comet_receive(SESSION.get_store(request.session).objectId, payload)
+            
+            # make sure that we have the latest session
+            request.session.clear()
+            request.session.update(SessionStore(request.session.session_key))
             
             return HttpResponse(json.dumps({
                 "result": "success",
@@ -290,11 +300,6 @@ def crop_avatar(request, store_location_id):
         avatar.delete()
         s.update()
         
-        session["store"] = store
-        session["store_location"] = store_location
-        request.session.clear()
-        request.session.update(session)
-        
         # notify other dashboards of this change
         payload = {
             COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
@@ -321,9 +326,10 @@ def crop_avatar(request, store_location_id):
         # flag the execution of avatarCropComplete js function
         data['success'] = True
     
-        # update the session cache
-        request.session["store"] = store
-        request.session['store_location'] = store_location
+        # make sure we have latest session data
+        request.session.clear()
+        request.session.update(SessionStore(request.session.session_key))
+        
         return render(request, 'manage/avatar_crop.djhtml', data)
     
     raise Http404
