@@ -12,17 +12,12 @@ Hey {{ store.get_owner_fullname }},
 We were unable to charge you for your monthly subscription from {{ subscription.date_last_billed|date:"F d, Y" }} to {{ date_now|date:"F d, Y" }}
 </p>
 
-<p>
-The billing information we have is invalid. Please update your billing information by logging into your <a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{STORE_INDEX}}">dashboard</a>.
-</p>
-
-<p>
 {% if account_disabled %}
-Your store, {{ store.store_name }}, has been deactivated. Please contact us if you want to re-activate your store.
+<p>Your store, {{ store.store_name }}, has been deactivated. Please contact us if you want to re-activate your store.</p>
 {% else %}
-Please be sure to update your information prior to {{ date_disable|date:"F d, Y" }} to enjoy uninterrupted service for {{ store.store_name }}.
+<p>The billing information we have is invalid. Please update your billing information by logging into your <a href="{{ MAIN_TRANSPORT_PROTOCOL }}://{{ ABSOLUTE_HOST }}{{STORE_INDEX}}">dashboard</a>.</p>
+<p>Please be sure to update your information prior to {{ date_disable|date:"F d, Y" }} to enjoy uninterrupted service for {{ store.store_name }}.</p>
 {% endif %}
-</p>
 
 <p>If you have any questions regarding your account, please let us know at <a href="mailto:{{EMAIL_FROM}}">{{EMAIL_FROM}}</a>.</p>
 

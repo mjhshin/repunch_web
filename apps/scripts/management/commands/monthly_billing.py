@@ -44,10 +44,10 @@ class Command(BaseCommand):
                     "Store", {"active":True}, limit=LIMIT,
                     skip=skip, order="createdAt")['results']:
                 subscription = Subscription(**each)
-                update_store = False
                 sub_cost = sub_type[subscription.get(\
                             "subscriptionType")]["monthly_cost"]
                 store = None # prevent UnboundLocalError
+                update_store = False
                 if sub_cost == 0: # FREE account
                     subscription.date_last_billed =\
                         subscription.date_last_billed +\
@@ -78,8 +78,8 @@ class Command(BaseCommand):
                         # notify user via email- payment is done via 
                         # dashboard to also validate cc realtime
                         # 1st day time range
-                        day1_end = date_30_ago.replace()
-                        day1_start = day1_end + relativedelta(hours=-24)
+                        day0_end = date_30_ago.replace()
+                        day0_start = day0_end + relativedelta(hours=-24)
                         # 4th day time range
                         day4_end = date_30_ago + relativedelta(days=-4)
                         day4_start = day4_end + relativedelta(hours=-24)
@@ -91,26 +91,27 @@ class Command(BaseCommand):
                         day14_start = day14_end + relativedelta(hours=-24)
                         # only send email after 1, 4, and 8 days
                         last_billed = subscription.date_last_billed
-                        if (last_billed >= day1_start and\
-                            last_billed <= day1_end) or\
+                        if (last_billed >= day0_start and\
+                            last_billed <= day0_end) or\
                             (last_billed >= day4_start and\
                             last_billed <= day4_end) or\
                             (last_billed >= day8_start and\
                             last_billed <= day8_end):
                             send_email_receipt_monthly_failed(account, store,
                                 subscription)
+                        elif last_billed >= day14_start and\
+                            last_billed <= day14_end:
+                            # send final notification
+                            send_email_receipt_monthly_failed(account,
+                                store, subscription, account_disabled=True)
+                        else:
+                            send_user_email = False
                                 
-                        else: # make sure that the store is deactivated 
+                        # make sure that the store is deactivated after the 14th day
+                        if last_billed <= day14_end:
                             store.active = False
                             store.update()
                             update_store = True
-                            if last_billed >= day14_start and\
-                                last_billed <= day14_end:
-                                # send final notification
-                                send_email_receipt_monthly_failed(account,
-                                    store, subscription, account_disabled=True)
-                            else:
-                                send_user_email = False
                         
                     # do not send email after account deactivation
                     if send_user_email:
