@@ -81,7 +81,6 @@ $(document).ready(function() {
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>1440 Taylor Ave<br/>Bronx, NY</div></a>
-                <a href="#"><div class="add">Add Location</div></a>
                 
             </div>
             <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
