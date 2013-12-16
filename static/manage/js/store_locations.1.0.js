@@ -19,10 +19,13 @@ function getNavItemCount() {
 }
 
 /*
-    Returns the max height before scrolling is enabled.
+    Returns the max up scroll offset.
 */
-function getNavScrollHeight() {
-    return NAV_ITEM_HEIGHT * NAV_ITEM_SCROLL;
+function getNavScrollUpHeightOffset() {
+    // the height of the arrow and the add button
+    var navBottomStaticHeight = SCROLL_ARROW_HEIGHT; // TODO add the button height
+    return  -1*(getNavTotalHeight() - (NAV_ITEM_HEIGHT * NAV_ITEM_SCROLL) +
+        navBottomStaticHeight);
 }
 
 function getNavTotalHeight() {
@@ -38,27 +41,28 @@ function animateStart(direction) {
         var self = $(this);
         var top = Number(self.css("top").replace("px", ""));
         if (direction == "up") {
-            top -= 100;
-            // prevent overscroll
-            // the height of the arrow and the add button
-            var navBottomStaticHeight = SCROLL_ARROW_HEIGHT; // TODO add the button height
-            var maxDownScrollOffset = -1*(getNavTotalHeight() -
-                getNavScrollHeight() + navBottomStaticHeight);
-            if (top < maxDownScrollOffset) {
-                top = maxDownScrollOffset;
-            }
-            
-        } else {
             top += 100;
             // prevent overscroll
             if (top > SCROLL_ARROW_HEIGHT) { 
                 top = SCROLL_ARROW_HEIGHT;
+            }
+            
+        } else {
+            top -= 100;
+            // prevent overscroll
+            var maxOffset = getNavScrollUpHeightOffset();
+            if (top < maxOffset) {
+                top = maxOffset;
             } 
         
         }
             
         self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, function(){
-            animateStart(direction);
+            if (top != SCROLL_ARROW_HEIGHT && top != getNavScrollUpHeightOffset()) {
+                animateStart(direction);
+                alert("animating");
+            }
+            
         });
     });
 }

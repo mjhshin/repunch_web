@@ -73,6 +73,7 @@
 #store-locations > div.scroll.down {
 	border:1px solid #CCC;
     border-bottom: 0px;
+    border-left: 0px;
 }
 
 #store-locations > div.nav > a > div {
