@@ -197,9 +197,8 @@ def get_employees_pending_list(session):
 def get_employees_approved_list(session):
     if 'employees_approved_list' not in session:
         store = get_store(session)
-        employees_approved_list = store.get(\
-                                "employees", status=APPROVED,
-                                order="-createdAt", limit=900)     
+        employees_approved_list = store.get("employees",
+            status=APPROVED, order="-createdAt", limit=900)     
         
         # make sure that the list is a list and not none
         if employees_approved_list is None:

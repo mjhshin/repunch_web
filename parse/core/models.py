@@ -33,7 +33,7 @@ GET_CLASS = {
         "Account",
     ),
     "parse.apps.employees.models": (
-        "Employee"
+        "Employee",
     ),
 }
 
