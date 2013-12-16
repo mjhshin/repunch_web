@@ -38,14 +38,22 @@ $(document).ready(function() {
     
     $("#store-locations > div.scroll.up").hover(function() {
         animateStart("up");
+        $(this).addClass("active");
+        
     }, function() {
          animateStop();
+        $(this).removeClass("active");
+        
     });
     
      $("#store-locations > div.scroll.down").hover(function() {
         animateStart("down");
+        $(this).addClass("active");
+        
     }, function() {
          animateStop();
+        $(this).removeClass("active");
+        
     });
     
 });

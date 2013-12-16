@@ -27,6 +27,11 @@
     cursor: pointer;
 }
 
+
+#store-locations > div.scroll.active {
+	background: #666 url('../images/bkg_sidebar-active.png') repeat top left;
+}
+
 #store-locations > div.scroll.up {
     top: 0px;
 }
