@@ -2,14 +2,16 @@
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_details.1.2.css" %}" />
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.2.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.0.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'manage/css/avatar_upload.css' %}" />
 {% endblock %}
 
 {% block javascript %}
 {% account_is_admin request.session as is_admin %}
 {% if is_admin %}
 <script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.1.js' %}" ></script>
+<link rel="stylesheet" type="text/css" href="{% static 'manage/js/store_locations.1.0.js' %}" />
 <script>
 $(document).ready(function() {
     $("#deactivate_account").click(function() {
@@ -67,48 +69,38 @@ $(document).ready(function() {
 	<div class="section first" id="store-details">
 		<h2>Store Details</h2><br/>
 		
-		<div class="white-box" id="store-details-content">
-	    {% if active_store_location.store_avatar %}
-	        <img src="{{ active_store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	    {% else %}
-	        {% if is_admin %}
-	        <a href="{% url 'store_avatar_upload' '0' %}" id="upload-avatar">
-	            <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	        </a>
-	        {% else %}
-	        <img src="{% static "manage/images/store_avatar_placeholder.1.1.png" %}"" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	        {% endif %}
-        {% endif %}
-			<div id="store-details-content-right">
-				<div id="address">
-					<span class="bold">{{ store.store_name }}</span>
-					<p>
-						{{ active_store_location.street }}<br />
-						{{ active_store_location.city }}, {{ active_store_location.state }} {{ active_store_location.zip }}<br />
-						{{ active_store_location.phone_number }}
-					</p>
-				</div>
-				<div id="hours">
-					<span class="bold">Hours:</span>
-					<p>
-						{% hours request.session active_store_location.objectId %}
-						<!--
-						Mon-Fri: 11:00 am - 11:00 pm<br />
-						Closed Saturday &amp; Sunday
-						-->
-					</p>
-				</div>
-				
-				{% if active_store_location.store_description %}
-				<div id="description">
-					<span class="bold">Store Description</span>
-					<p>{{ active_store_location.store_description }}</p>
-				</div>
-				{% endif %}
-				
-			</div>
-			<div class="clear">&nbsp;</div>
+		{# STORE LOCATIONS LIST #}
+		<div class="white-box" id="store-locations">
+    		<div class="scroll up">UP</div>
+            <div class="nav">
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#" class="active"><div>123 Alpha St<br/>San Francisco, CA</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>1440 Taylor Ave<br/>Bronx, NY</div></a>
+                <a href="#"><div class="add">Add Location</div></a>
+                
+            </div>
+            <div class="scroll down">DOWN</div>
+    
+            <div class="content">
+                <img src="http://placehold.it/150x150"/>
+                <div><label>Address:</label>
+                    1440 Taylor Ave 2f<br/>
+                    Bronx, NY 10460<br/>
+                    (111) 111-1111<br/>
+                </div>
+                <div><label>Hours:</label>
+                    Monday - Friday    9:00 AM - 5:00 PM<br/>
+                    Tuesday and Thursday    9:00 PM - 1:00 AM<br/>
+                    Saturday - Sunday    10:00 AM - 9:30 PM<br/>
+                </div>
+            </div>
 		</div>
+        {# END STORE LOCATIONS LIST #}
 		
 		{% if is_admin %} {# TODO change to store_edit #}
 		<a href="{% url 'store_location_edit' active_store_location.objectId %}" class="button blue">Edit Store Details</a>
