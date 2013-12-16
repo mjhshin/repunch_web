@@ -99,6 +99,8 @@ def login(request, requestDict, no_recaptcha=False):
         
         # if the User object has a store then we are good to go
         if store: 
+            store.fetch_all()
+        
             # check if employee with no access level or still pending
             if account_type == "employee":
                 if employee.status == PENDING:

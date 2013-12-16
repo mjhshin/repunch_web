@@ -90,7 +90,7 @@ def get_redemptions_past(session):
         session['redemptions_past'] = redemptions
 
     return session['redemptions_past']
-        
+    
 def get_store_locations(session):
     """ limit of 100 store locations for now """
     if "store_locations" not in session:
@@ -117,7 +117,9 @@ def get_store_location(session, store_location_id):
     return get_store_locations(session).get(store_location_id)
         
 def get_store_timezone(session):
-    """ returns the pytz.timezone object """
+    """
+    Returns the pytz.timezone object for the active store location.
+    """
     if "store_timezone" not in session:
         store_location = get_store_location(session,
             get_active_store_location_id(session))
@@ -246,9 +248,11 @@ def load_all(session, commit=True):
     Loads calls all loadeers for each in SESSION_CACHE
     """
     get_store(session)
+    get_active_store_location_id(session)
+    get_store_locations(session)
+    get_store_timezone(session)
     get_redemptions_pending(session)
     get_redemptions_past(session)
-    get_store_timezone(session)
     get_patronStore_count(session)
     get_messages_sent_list(session)
     get_messages_received_list(session)
