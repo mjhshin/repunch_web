@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load util_tags %}{% load parse_tags %}
+{% load static %}{% load util_tags %}
 
 {# NOTE that this page and all of its contents are accessible by any1 with acces to the dashboard #}
 

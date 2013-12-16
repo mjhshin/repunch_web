@@ -1,4 +1,4 @@
-{% load parse_tags %}{% load text_tags %}
+{% load text_tags %}
 
 {% for fb in feedback %}
 <div class="tr {% cycle '' 'odd' %} {% if not fb.is_read %}unread{% endif %}">

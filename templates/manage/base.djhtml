@@ -1,4 +1,4 @@
-{% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}{% load parse_tags %}
+{% load static %}{% load store_tags %}{% load account_tags %}{% load util_tags %}
 
 {# ASSIGNMENTS UP HERE TO MAKE IT GLOBAL #}
 {% account_alert_users request.session as alert_users %}

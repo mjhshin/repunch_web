@@ -1,4 +1,4 @@
-{% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}{% load parse_tags %}
+{% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
@@ -81,11 +81,11 @@ $(document).ready(function() {
         {% endif %}
 			<div id="store-details-content-right">
 				<div id="address">
-					<span class="bold">{{ store|get:'store_name' }}</span>
+					<span class="bold">{{ store.store_name }}</span>
 					<p>
-						{{ active_store_location|get:'street' }}<br />
-						{{ active_store_location|get:'city' }}, {{ active_store_location|get:'state' }} {{ active_store_location|get:'zip' }}<br />
-						{{ active_store_location|get:'phone_number' }}
+						{{ active_store_location.street }}<br />
+						{{ active_store_location.city }}, {{ active_store_location.state }} {{ active_store_location.zip }}<br />
+						{{ active_store_location.phone_number }}
 					</p>
 				</div>
 				<div id="hours">

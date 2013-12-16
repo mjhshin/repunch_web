@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 

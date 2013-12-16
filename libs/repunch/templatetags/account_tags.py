@@ -10,6 +10,11 @@ from parse import session as SESSION
 
 register = template.Library()
 
+@register.filter
+def get_sub_type(level):
+    """ returns the sub dict corresponding to the level """
+    return sub_type[level]
+
 @register.simple_tag
 def account_user_usage(session, percent_of=None):
     atype = sub_type[SESSION.get_subscription(\

@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load util_tags %}{% load parse_tags %}{% load text_tags %}
+{% load static %}{% load util_tags %}{% load text_tags %}
 
 {% block title %}Analysis{% endblock %}
 {% block styles %}	

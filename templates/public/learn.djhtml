@@ -1,5 +1,5 @@
 {% extends "public/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}
 
 {% block title %}Learn More for Business{% endblock %}
 {% block javascript %}

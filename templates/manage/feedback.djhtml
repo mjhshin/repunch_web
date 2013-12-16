@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}{% load account_tags %}
+{% load static %}{% load account_tags %}
 
 {% block title %}Feedback Details{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.1.css" %}" />{% endblock %}
@@ -30,22 +30,22 @@ $(document).ready(function(){
 	
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ feedback|get:'createdAt'|date:"m/d/y" }}</span>
-			<label>From:</label><span>{{ feedback|get:'sender_name' }}</span>
+			<label>Date:</label><span>{{ feedback.createdAt|date:"m/d/y" }}</span>
+			<label>From:</label><span>{{ feedback.sender_name }}</span>
 			<div style="clear: left;" /></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>{{ feedback|get:'subject' }}</span>
+			<label>Subject:</label><span>{{ feedback.subject }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">{{ feedback|get:'body' }}</div>
+		<div class="sect body">{{ feedback.body }}</div>
 	</div>
 
 	<div class="divider" style="height: 20px;"></div>
     {% if reply %}
 	<div class="white-box response" id="reply-box">
 		<div class="sect meta">
-			<label>Date:</label><span>{{ reply|get:'createdAt'|date:"m/d/y" }}</span>
+			<label>Date:</label><span>{{ reply.createdAt|date:"m/d/y" }}</span>
 			<label>From:</label>
 			<span>
 				{{ store_name }}
@@ -53,10 +53,10 @@ $(document).ready(function(){
 			<div style="clear: left;" /></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>Re: {{ feedback|get:'subject' }}</span>
+			<label>Subject:</label><span>Re: {{ feedback.subject }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body">{{ reply|get:'body' }}</div>
+		<div class="sect body">{{ reply.body }}</div>
 	</div>
 	<div class="divider"></div>
     {% endif %}

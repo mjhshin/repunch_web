@@ -1,5 +1,4 @@
 {% extends "manage/notification.html" %}
-{% load parse_tags %}
 
 {% block title %}
 {% if for_customer %}
@@ -34,23 +33,23 @@ This is an invoice for your recent purchase of {{ amount }} iPod Touch{% if amou
 <span style="color:#545454;font-weight:bold;">ACCOUNT INFO</span>
 <ul>
     <li><span style="color:#545454;font-weight:bold;">Business name:</span>
-    {{ store|get:"store_name" }}
+    {{ store.store_name }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Owner name:</span>
-    {{ store|get:"first_name"|capfirst }}
-    {{ store|get:"last_name"|capfirst }}
+    {{ store.first_name|capfirst }}
+    {{ store.last_name|capfirst }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Store ID:</span>
     {{ store.objectId }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Username:</span>
-    {{ account|get:"username" }}
+    {{ account.username }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Email:</span>
-    {{ account|get:"email" }}
+    {{ account.email }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Phone number:</span>
-    {{ store|get:"phone_number" }}
+    {{ store.phone_number }}
     </li>
     <li><span style="color:#545454;font-weight:bold;">Subscription Type:</span>
     {% for key, val in sub_type.iteritems %}

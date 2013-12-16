@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}{% load account_tags %}
+{% load static %}{% load account_tags %}
 
 {% block title %}Settings{% endblock %}
 {% block styles %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "manage/css/settings.css" %}" />{% endblock %}

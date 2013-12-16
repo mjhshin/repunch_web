@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load parse_tags %}
+{% load static %}
 
 {% block title %}Message Details{% endblock %}
 {% block styles %}<link rel="stylesheet" type="text/css" href="{% static "manage/css/feedback.1.1.css" %}" />{% endblock %}
@@ -34,21 +34,21 @@
 	
 	<div class="white-box">
 		<div class="sect meta">
-			<label>Date sent:</label><span>{{ message|get:'createdAt'|date:"m/d/y" }}</span>
+			<label>Date sent:</label><span>{{ message.createdAt|date:"m/d/y" }}</span>
 			<div style="clear: left;" /></div>
 		</div>
 		<div class="sect subject">
-			<label>Subject:</label><span>{{ message|get:'subject' }}</span>
+			<label>Subject:</label><span>{{ message.subject }}</span>
 			<div style="clear: left;"></div>
 		</div>
-		<div class="sect body" >{{ message|get:'body' }}</div>
+		<div class="sect body" >{{ message.body }}</div>
 	</div>
     <br>
-    {% if message|get:'offer_title' %}
+    {% if message.offer_title %}
     <div class="white-box">
         <div class="sect meta"> 
-		    <label>Offer Title: </label><span>{{ message|get:'offer_title' }}</span>
-            <label>Expiration Date: </label><span>{{ message|get:'date_offer_expiration' }}</span>
+		    <label>Offer Title: </label><span>{{ message.offer_title }}</span>
+            <label>Expiration Date: </label><span>{{ message.date_offer_expiration }}</span>
 		    <div style="clear: left;"></div>
 	    </div>
     </div>
