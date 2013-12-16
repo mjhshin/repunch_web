@@ -80,10 +80,17 @@ $(document).ready(function() {
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
+                <a href="#"><div>155 Water St<br/>Brooklyn, NY</div></a>
                 <a href="#"><div>1440 Taylor Ave<br/>Bronx, NY</div></a>
+                <a href="#" class="add">
+                    <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
+                </a>
                 
             </div>
             <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
+            <a href="#" class="add" >
+                <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
+            </a>
     
             <div class="content">
                 <img src="http://placehold.it/200x200"/>

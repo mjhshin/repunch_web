@@ -24,12 +24,10 @@
 	background: #666 url('../images/bkg_sidebar.png') repeat top left;
     text-align: center; height: 20px;
     position: absolute; left: 0px;
-    cursor: pointer;
 }
 
-
-#store-locations > div.scroll.active {
-	background: #666 url('../images/bkg_sidebar-active.png') repeat top left;
+#store-locations > div.scroll:hover {
+    background: #555;
 }
 
 #store-locations > div.scroll.up {
@@ -37,14 +35,11 @@
 }
 
 #store-locations > div.scroll.down {
-    bottom: 0px;
+    /* this should be on top of the add button */
+    bottom: 80px;
 }
 
-#store-locations > div.content {
-    width: 364px; height: 100%;
-    padding: 20px 40px;
-}
-
+#store-locations > a.add,
 #store-locations > div.content > div > label,
 #store-locations > div.nav > a {
 	font: bold 15px/20px 'Cabin', sans-serif;
@@ -58,7 +53,7 @@
 }
 
 #store-locations > div.scroll,
-#store-locations > div.nav > a.add {
+#store-locations > a.add {
     z-index: 5;
 }
 
@@ -81,13 +76,42 @@
     background: #ddd;
 }
 
+#store-locations > div.nav > a > div:hover {
+    background: #ccc;
+}
+
 #store-locations > div.nav > a.active > div {
     border-right: 0px;
     background: inherit;
 }
 
+#store-locations > a.add {
+	border-right:1px solid #CCC;
+    position: absolute; left: 0px; bottom: 0px;
+    text-decoration: none;
+	color:#666;
+}
+
+#store-locations > a.add > div,
+#store-locations > div.nav > a.add > div {
+    background: white;
+    text-align: center;
+    width: 200px; height: 60px;
+    padding: 10px 10px;
+}
+
+#store-locations > a.add > div > img,
+#store-locations > div.nav > a.add > div >img {
+    margin-top: 6px;
+}
+    
+    
+#store-locations > div.content {
+    width: 364px; height: 100%;
+    padding: 20px 40px;
+}
+
 #store-locations > div.content > div {
     margin: 20px 0;
 }
-
 

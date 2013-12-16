@@ -13,9 +13,14 @@ var NAV_ITEM_HEIGHT = 40 + 20;
 var NAV_ITEM_SCROLL = 8;
 // height of the scroll arrows (height + padding)
 var SCROLL_ARROW_HEIGHT = 20 + 20;
+// height of the add button (height + padding)
+var ADD_BUTTON_HEIGHT = 60 + 20;
 
+/*
+    Does not include the add button.
+*/
 function getNavItemCount() {
-    return $("#store-locations > div.nav > a").length;
+    return $("#store-locations > div.nav > a[class!=add]").length;
 }
 
 /*
@@ -23,7 +28,7 @@ function getNavItemCount() {
 */
 function getNavScrollUpHeightOffset() {
     // the height of the arrow and the add button
-    var navBottomStaticHeight = SCROLL_ARROW_HEIGHT; // TODO add the button height
+    var navBottomStaticHeight = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT;
     return  -1*(getNavTotalHeight() - (NAV_ITEM_HEIGHT * NAV_ITEM_SCROLL) +
         navBottomStaticHeight);
 }
@@ -60,7 +65,6 @@ function animateStart(direction) {
         self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, function(){
             if (top != SCROLL_ARROW_HEIGHT && top != getNavScrollUpHeightOffset()) {
                 animateStart(direction);
-                alert("animating");
             }
             
         });
@@ -68,21 +72,27 @@ function animateStart(direction) {
 }
 
 
-// TODO prevent overscroll
 $(document).ready(function() {
 
     // clicks on nav items
-    $("#store-locations > div.nav > a").click(function() {
+    $("#store-locations > div.nav > a[class!=add]").click(function() {
         var self = $(this);
         self.siblings().removeClass("active");
         self.addClass("active");
     });
     
     
-    // Hide the scroll arrows if passed NAV_ITEM_SCROLL
+    // Hide the scroll arrows if scrolling is not yet enabled.
     if (getNavItemCount() < NAV_ITEM_SCROLL) {
         $("#store-locations > div.scroll").css("display", "none");
+        // Show the add button in the nav item list and hide the one below the down arrow.
+        $("#store-locations > div.nav > a.add").show();
+        $("#store-locations > a.add").hide();
         return;
+    } else {
+        // Hide the add button in the nav item list and show the one below the down arrow.
+        $("#store-locations > div.nav > a.add").hide();
+        $("#store-locations > a.add").show();
     }
     
     // displace the nav item's initial position
@@ -101,12 +111,8 @@ $(document).ready(function() {
     
      $("#store-locations > div.scroll.down").hover(function() {
         animateStart("down");
-        $(this).addClass("active");
-        
     }, function() {
          animateStop();
-        $(this).removeClass("active");
-        
     });
     
     
