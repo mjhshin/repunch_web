@@ -49,7 +49,7 @@
 		
 		<div class="white-box table tab-body {% if not tab_feedback %}active{% endif %}" id="tab-body-sent">
 			<div class="table-header">
-				<div class="th sorted desc" id="header-date">Date sent <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
+				<div class="th sorted desc" id="header-date">Date <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 				<div class="th not-sortable" id="header-subject">Subject <img src="{% static 'manage/images/arrow-up.png' %}" alt="" class="asc" /><img src="{% static 'manage/images/arrow-down.png' %}" alt="" class="desc" /></div>
 			</div>
 			

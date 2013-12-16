@@ -12,7 +12,7 @@ var NAV_ITEM_HEIGHT = 40 + 20;
 // the amount of items before the scroll arrows are shown
 var NAV_ITEM_SCROLL = 8;
 // height of the scroll arrows (height + padding)
-var SCROLL_ARROW_HEIGHT = 20 + 20;
+var SCROLL_ARROW_HEIGHT = 10 + 20;
 // height of the add button (height + padding)
 var ADD_BUTTON_HEIGHT = 60 + 20;
 
@@ -71,7 +71,7 @@ function animateStart(direction) {
     });
 }
 
-
+// TODO FIX OVERSCROLL BOTTOM
 $(document).ready(function() {
 
     // clicks on nav items
@@ -79,6 +79,9 @@ $(document).ready(function() {
         var self = $(this);
         self.siblings().removeClass("active");
         self.addClass("active");
+        
+        // TODO
+        return false;
     });
     
     

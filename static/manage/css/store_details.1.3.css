@@ -53,6 +53,11 @@ div.limit-details div.description {
 	position: relative;
 }
 
+
+div.limit-details div.description div {
+	font-family: 'Cabin', sans-serif;
+}
+
 div.limit-details div.description div.label {
 	font-size: 13px;
 }
@@ -96,6 +101,6 @@ div#description{
 }
 
 div span.bold {
-	font: 'Cabin', sans-serif;
+	font-family: 'Cabin', sans-serif;
 }
 

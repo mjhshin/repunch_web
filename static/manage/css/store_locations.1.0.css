@@ -3,9 +3,9 @@
 */
 
 #store-locations {
-	font: 'Cabin', sans-serif;
+	font: normal 15px/20px 'Cabin', sans-serif;
 	color:#666;
-    min-height:486px; width: 670px;
+    min-height: 506px; width: 670px;
     background:white; overflow: hidden;
     position: relative;
     padding: 0;
@@ -22,7 +22,7 @@
 
 #store-locations > div.scroll {
 	background: #666 url('../images/bkg_sidebar.png') repeat top left;
-    text-align: center; height: 20px;
+    text-align: center; height: 10px;
     position: absolute; left: 0px;
 }
 
@@ -40,10 +40,10 @@
 }
 
 #store-locations > a.add,
-#store-locations > div.content > div > label,
-#store-locations > div.nav > a {
+#store-locations > div.content > div > label {
 	font: bold 15px/20px 'Cabin', sans-serif;
 }
+
 
 #store-locations > div.nav > a {
 	color:#666;
@@ -52,9 +52,23 @@
     z-index: 1;
 }
 
+#store-locations > div.nav > a > div {
+	font: normal 15px/20px 'Cabin', sans-serif;
+}
+
+
+#store-locations > div.nav > a.active > div {
+    font-weight: bold;
+}
+
 #store-locations > div.scroll,
 #store-locations > a.add {
     z-index: 5;
+}
+
+#store-locations > div.scroll > img {
+    position: relative; top: -2px;
+    width: 32px; height: 12px;
 }
 
 #store-locations > div.scroll,
@@ -73,11 +87,11 @@
 
 #store-locations > div.nav > a > div {
     height: 40px;
-    background: #ddd;
+	background-color:#F0F8FB;
 }
 
 #store-locations > div.nav > a > div:hover {
-    background: #ccc;
+	background-color:#e0e7ea;
 }
 
 #store-locations > div.nav > a.active > div {
@@ -94,6 +108,7 @@
 
 #store-locations > a.add > div,
 #store-locations > div.nav > a.add > div {
+	font: bold 15px/20px 'Cabin', sans-serif;
     background: white;
     text-align: center;
     width: 200px; height: 60px;
@@ -112,6 +127,7 @@
 }
 
 #store-locations > div.content > div {
+	font: normal 16px/24px sans-serif;
     margin: 20px 0;
 }
 
