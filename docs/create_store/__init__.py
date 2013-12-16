@@ -139,7 +139,7 @@ class RandomStoreGenerator(object):
             store.Subscription = subscription.objectId
             store.owner_id = acc.objectId
             store.ACL[acc.objectId] = {"read": True,"write": True}
-            store.add_relation("StoreLocations_", [store_location.objectId]) 
+            store.store_locations = [store_location]
             store.update()
             
     def get_store_location_avatar(self, i):

@@ -312,7 +312,7 @@ def sign_up(request):
             store_location.create()
             
             # add the StoreLocation to the relation
-            store.add_relation("StoreLocations_", [store_location.objectId]) 
+            store.store_locations = [store_location] 
             store.update()
             
             # create account

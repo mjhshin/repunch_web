@@ -10,6 +10,7 @@ from libs.dateutil.relativedelta import relativedelta
 
 from parse.apps.employees import PENDING, APPROVED
 from parse.apps.messages import FEEDBACK, BASIC, OFFER
+from parse.apps.stores.models import Store
 
 # Note another thing in the session is the 
 # django.contrib.auth.SESSION_KEY ehose value is the Parse
@@ -91,11 +92,14 @@ def get_redemptions_past(session):
     return session['redemptions_past']
         
 def get_store_locations(session):
-    """ limit of 500 store locations for now """
+    """ limit of 100 store locations for now """
     if "store_locations" not in session:
         store = get_store(session)
+        if not store.store_locations:
+            store.fetch_all(with_cache=True)
+            
         store_locations = {}
-        for sl in store.get("storeLocations", order="createdAt", limit=500):
+        for sl in store.store_locations:
             store_locations[sl.objectId] = sl
         session['store_locations'] = store_locations
         
