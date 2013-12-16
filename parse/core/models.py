@@ -652,12 +652,12 @@ class ParseObject(object):
                     
         # array of pointers
         elif "_" + attr.upper() in self.__dict__:
-            query={"keys":attr,
+            q={"keys":attr,
                     "where":dumps({"objectId":self.objectId})}
             if "include" in constraints:
-                query["include"] = constraints['include']     
+                q["include"] = constraints['include']     
                 
-            res = parse("GET", self.path(), query=query)
+            res = parse("GET", self.path(), query=q)
             if 'results' in res and res['results']:
                 result = res['results'][0][attr]
                 if result is not None:

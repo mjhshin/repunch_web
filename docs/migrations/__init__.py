@@ -25,7 +25,7 @@ def supported_chain_stores():
     information. A Store may have multiple StoreLocations.
     Punches also now have store_location_id.
     
-    This adds a new StoreLocation to the StoreLocations relation of each store.
+    This assigns a new StoreLocation to the store_locations aray of pointers of each store.
     All existing Punches are also assigned the newly created StoreLocation's id.
     
     WARNING! Assumes this assumes that # Stores < 1000 and that each store
@@ -46,7 +46,8 @@ def supported_chain_stores():
             "store_avatar": store.store_avatar,
             "Store": store.objectId,
         })
-        store.add_relation("StoreLocations_", [store_location.objectId])
+        store.store_locations = [store_location]
+        store.update()
         
         # update all the punches for this store
         punches = store.get("punches", order="createdAt", limit=1000)
