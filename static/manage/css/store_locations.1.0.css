@@ -56,13 +56,25 @@
 	font: normal 15px/20px 'Cabin', sans-serif;
 }
 
-
 #store-locations > div.nav > a.active > div {
     font-weight: bold;
 }
 
+#store-locations > div.nav > a.active > div > span {
+    display: block;
+    margin-top: 4px;
+    color: #669900;
+}
+
+#store-locations > div.nav > a.active > div > span:before {
+    position: relative; top: 2px;
+    margin-right: 6px;
+    content: url('../images/icon_green-check.png');
+}
+
 #store-locations > div.scroll,
 #store-locations > a.add {
+    width: 200px;
     z-index: 5;
 }
 
@@ -73,10 +85,9 @@
 
 #store-locations > div.scroll,
 #store-locations > div.nav > a > div {
-    width: 200px;
 	border:1px solid #CCC;
     border-left: 0px; border-top: 0px;
-    padding: 10px 10px;
+    padding: 10px;
 }
 
 #store-locations > div.scroll.down {
@@ -86,7 +97,8 @@
 }
 
 #store-locations > div.nav > a > div {
-    height: 40px;
+    width: 190px; height: 40px;
+    padding: 10px 10px 10px 20px;
 	background-color:#F0F8FB;
 }
 
@@ -95,6 +107,7 @@
 }
 
 #store-locations > div.nav > a.active > div {
+    height: 70px;
     border-right: 0px;
     background: inherit;
 }
@@ -130,4 +143,6 @@
 	font: normal 16px/24px sans-serif;
     margin: 20px 0;
 }
+
+
 

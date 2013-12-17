@@ -9,12 +9,16 @@ var ANIMATION_DURATION = 1000;
 // The values below ust be synced with the values in store_locations.css
 // need to know the height of a nav item (height + padding)
 var NAV_ITEM_HEIGHT = 40 + 20;
+// need to know the height of the active nav item (height + padding)
+var NAV_ITEM_ACTIVE_HEIGHT = 60 + 20;
 // the amount of items before the scroll arrows are shown
 var NAV_ITEM_SCROLL = 8;
 // height of the scroll arrows (height + padding)
 var SCROLL_ARROW_HEIGHT = 10 + 20;
 // height of the add button (height + padding)
 var ADD_BUTTON_HEIGHT = 60 + 20;
+// Total height of the add button and the arrow down when scrolling is enabled.
+var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT;
 
 /*
     Does not include the add button.
@@ -24,18 +28,27 @@ function getNavItemCount() {
 }
 
 /*
+    One of the item is active.
+*/
+function getNavTotalHeight() {
+    return (NAV_ITEM_HEIGHT * getNavItemCount()) - NAV_ITEM_HEIGHT + NAV_ITEM_ACTIVE_HEIGHT;
+}
+
+/*
+    The Root container height.
+*/
+function getContainerHeight() {
+    return Number($("#store-locations").css("height").replace("px", ""));
+}
+
+/*
     Returns the max up scroll offset.
 */
 function getNavScrollUpHeightOffset() {
     // the height of the arrow and the add button
-    var navBottomStaticHeight = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT;
-    return  -1*(getNavTotalHeight() - (NAV_ITEM_HEIGHT * NAV_ITEM_SCROLL) +
-        navBottomStaticHeight);
+    return  -1*(getNavTotalHeight() - getContainerHeight() + NAV_SCROLL_BOTTOM_STATIC_HEIGHT);
 }
 
-function getNavTotalHeight() {
-    return NAV_ITEM_HEIGHT * getNavItemCount();
-}
 
 function animateStop() {
     $("#store-locations > div.nav > a").stop();
@@ -71,7 +84,6 @@ function animateStart(direction) {
     });
 }
 
-// TODO FIX OVERSCROLL BOTTOM
 $(document).ready(function() {
 
     // clicks on nav items

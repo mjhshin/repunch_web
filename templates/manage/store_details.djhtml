@@ -71,23 +71,35 @@ $(document).ready(function() {
 		
 		{# STORE LOCATIONS LIST #}
 		<div class="white-box" id="store-locations">
-		
+
     		<div class="scroll up"><img src="{% static 'manage/images/scroll_up.1.0.png' %}"/></div>
+    		
             <div class="nav">
                 {% for location in store_locations.itervalues %}
                 <a href="{% url 'store_location_edit' location.objectId %}" id="nav-{{ location.objectId }}"
                     {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
-                    <div>{{ location.street }}<br/>{{ location.city }}, {{ location.state }}</div>
+                    <div>{{ location.street }}<br/>{{ location.city }}, {{ location.state }}
+                        {% if location.objectId == active_store_location.objectId %}
+                        <span>Current Location</span>
+                        {% endif %}
+                    </div>
                 </a>
                 {% endfor %}
+                
+                {% if is_admin %}
                 <a href="{% url 'store_location_edit' '0' %}" class="add">
                     <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
                 </a>
+                {% endif %}
             </div>
+
             <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
+
+            {% if is_admin %}
             <a href="{% url 'store_location_edit' '0' %}" class="add" >
                 <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
             </a>
+            {% endif %}
     
             <div class="content">
             {% for location in store_locations.itervalues %}
@@ -105,6 +117,10 @@ $(document).ready(function() {
                     <div><label>Hours:</label>
                     {% hours request.session location.objectId %}
                     </div>
+                    
+		            {% if is_admin %}
+		            <a href="{% url 'store_location_edit' location.objectId %}" class="button blue">Edit Location</a>
+		            {% endif %}
                 </div>
             {% endfor %}
             </div>
