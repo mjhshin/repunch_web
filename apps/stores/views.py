@@ -31,7 +31,10 @@ from parse.auth.decorators import login_required, dev_login_required
 @login_required
 @access_required
 def index(request):
-    data = {'account_nav': True}
+    data = {
+        'account_nav': True,
+        "store_locations": SESSION.get_store_locations(request.session),
+    }
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
@@ -134,7 +137,7 @@ def edit_location(request, store_location_id):
                 "result": "success",
                 "url": reverse('store_index')+ "?%s" %\
                     urllib.urlencode({'success':\
-                            'Store details has been updated.'})
+                            'Store location has been updated.'})
             }), content_type="application/json")
             
         else:

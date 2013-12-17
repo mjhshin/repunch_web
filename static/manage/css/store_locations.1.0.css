@@ -40,7 +40,7 @@
 }
 
 #store-locations > a.add,
-#store-locations > div.content > div > label {
+#store-locations > div.content div label {
 	font: bold 15px/20px 'Cabin', sans-serif;
 }
 
@@ -126,7 +126,7 @@
     padding: 20px 40px;
 }
 
-#store-locations > div.content > div {
+#store-locations > div.content div {
 	font: normal 16px/24px sans-serif;
     margin: 20px 0;
 }
