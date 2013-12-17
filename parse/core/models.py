@@ -626,16 +626,17 @@ class ParseObject(object):
         # File types avatar
         elif attr.endswith("_avatar_url") and\
             attr.replace("_url", "") in self.__dict__:
-            res = parse("GET", self.path(), query={"keys":\
-                    attr.replace("_url",""),
+            attr_name = attr.replace("_url","")
+            
+            res = parse("GET", self.path(), query={"keys":attr_name,
                     "where":dumps({"objectId":self.objectId})})
+                    
             if 'results' in res and res['results']:
-                setattr(self, attr, res['results'][0].get(\
-                    attr.replace("_url", "")).get('url').replace(\
-                    "http:/", "https://s3.amazonaws.com")) 
-                setattr(self, attr.replace("_url",""), 
-                    res['results'][0].get(\
-                    attr.replace("_url", "")).get('name'))
+                avatar = res['results'][0].get(attr_name)
+                if avatar:
+                    setattr(self, attr, avatar.get('url').replace(\
+                        "http:/", "https://s3.amazonaws.com")) 
+                    setattr(self, attr_name, avatar.get('name'))
                     
         # attr is a geopoint
         elif attr == "coordinates" and attr in self.__dict__:

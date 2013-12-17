@@ -9,6 +9,16 @@ from parse.apps.accounts import sub_type
 register = template.Library()
 
 @register.filter
+def get(parseObject, attr):
+    """
+    This simply calls the get method of the parseObject with the
+    parameter attr.
+    """
+    if parseObject:
+        return parseObject.get(attr)
+
+
+@register.filter
 def get_total_punches(punches_map):
     """ 
     Returns the total number of punches in the list of Punches.

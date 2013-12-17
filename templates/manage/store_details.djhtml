@@ -1,4 +1,4 @@
-{% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}
+{% extends "manage/base.djhtml" %}{% load static %}{% load store_tags %}{% load account_tags %}{% load parse_tags %}
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
@@ -100,8 +100,8 @@ $(document).ready(function() {
                 <div class="wrapper {% if location.objectId == active_store_location.objectId %}active{% endif %}" id="content-{{ location.objectId }}">
                     {% if location.store_avatar_url %}
                     <img src="{{ location.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
-                    {% elif active_store_location.store_avatar_url %}
-                    <img src="{{ active_store_location.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
+                    {% elif store|get:'store_avatar_url' %}
+                    <img src="{{ store.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
                     {% else %}
                     <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" class="avatar-big" width="200px" height="200px"/>
                     {% endif %}

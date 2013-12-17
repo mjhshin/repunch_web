@@ -36,7 +36,7 @@ def index(request):
     store_locations = [ v for v in SESSION.get_store_locations(\
         request.session).values() ]
     store_locations.sort(key=lambda l: l.createdAt)
-    
+        
     data = {'account_nav': True, 'store_locations': store_locations}
     
     if request.GET.get("success"):

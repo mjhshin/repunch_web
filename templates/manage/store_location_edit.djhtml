@@ -1,5 +1,5 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load store_tags %}{% load util_tags %}{% load account_tags %}
+{% load static %}{% load store_tags %}{% load util_tags %}{% load account_tags %}{% load parse_tags %}
 
 {# NOTE only accounts with full admin access may access this page!!! #}
 
@@ -32,7 +32,7 @@
 		<div id="photo-edit">
 			<div class="white-box">
 	        {% if store_location and store_location.store_avatar %}
-	            <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+	            <img src="{{ store_location|get:"store_avatar_url" }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% elif store_location_avatar_tmp %}
 	            <img src="{{ store_location_avatar_tmp }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
 	        {% else %}
