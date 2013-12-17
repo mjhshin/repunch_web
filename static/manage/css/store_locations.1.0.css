@@ -152,5 +152,14 @@
     margin-top: 10px;
 }
 
+#store-locations > div.content div.wrapper {
+    display: none;
+}
+
+
+#store-locations > div.content div.wrapper.active {
+    display: block;
+}
+
 
 

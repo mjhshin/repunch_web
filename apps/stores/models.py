@@ -2,7 +2,7 @@ from django.db import models
 
 from libs.repunch import rpforms
 from repunch.settings import TIME_ZONE, MEDIA_ROOT
-
+from parse.utils import delete_file
 	
 class StoreActivate(models.Model):
 	store_id = models.CharField(max_length=30)
@@ -18,7 +18,7 @@ class NewStoreLocationAvatarTmp(models.Model):
     
     def delete(self, delete_from_parse=False):
         if delete_from_parse:
-            pass # TODO      
+            delete_file(self.avatar_name, 'image/png') 
                   
         super(NewStoreLocationAvatarTmp, self).delete()
 

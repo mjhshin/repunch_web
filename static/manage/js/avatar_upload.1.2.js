@@ -39,9 +39,11 @@ function avatarCropComplete() {
         type: "GET",
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
-	        $("#store_avatar").attr("src", result);
-            $("#avatar-thumbnail").attr("src", result);
-            $("#avatar-thumbnail").css("visibility", "visible");
+	        $("#store_avatar").attr("src", result.src);
+	        if (result.thumbnail) {
+                $("#avatar-thumbnail").attr("src", result.src);
+                $("#avatar-thumbnail").css("visibility", "visible");
+            }
         },
     });
     

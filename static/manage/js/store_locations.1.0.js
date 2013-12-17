@@ -92,7 +92,11 @@ $(document).ready(function() {
         self.siblings().removeClass("active");
         self.addClass("active");
         
-        // TODO
+        // show the corresponding content and hide the rest
+        var selfContent = $("#content-"+self.attr("id"));
+        selfContent.siblings().removeClass("active");
+        selfContent.addClass("active");
+        
         return false;
     });
     
