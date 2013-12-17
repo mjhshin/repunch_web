@@ -6,6 +6,21 @@ from repunch.settings import TIME_ZONE, MEDIA_ROOT
 	
 class StoreActivate(models.Model):
 	store_id = models.CharField(max_length=30)
+	
+class NewStoreLocationAvatarTmp(models.Model):
+    """ 
+    Used when creating a new StoreLocation and the user decides to
+    crop an image for a non-existent StoreLocation.
+    """
+    session_key = models.CharField(max_length=100)
+    avatar_name = models.TextField()
+    avatar_url = models.TextField()
+    
+    def delete(self, delete_from_parse=False):
+        if delete_from_parse:
+            pass # TODO      
+                  
+        super(NewStoreLocationAvatarTmp, self).delete()
 
 class StoreLocationAvatarTmp(models.Model):
     """ 
@@ -13,10 +28,8 @@ class StoreLocationAvatarTmp(models.Model):
     uploaded first so that the user may crop the image and finally
     create the parse file.
     
-    Need to clean this out every night!
-    for each in StoreLocationAvatarTmp.objects.all():
-        each.avatar.delete()
-        each.delete()
+    Might need to clean this every now and then because it is not 
+    guaranteed that a user will crop what they upload before logging out.
     """
     session_key = models.CharField(max_length=100)
     avatar = models.ImageField(upload_to='tmp/images/avatars')
@@ -26,6 +39,8 @@ class StoreLocationAvatarTmp(models.Model):
             avatar.delete()
         except Exception:
             pass
+       
+        super(StoreLocationAvatarTmp, self).delete()
 
 class Store(models.Model):
     store_name = models.CharField(max_length=255, 
