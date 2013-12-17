@@ -88,15 +88,16 @@ def edit_location(request, store_location_id):
         hours = HoursInterpreter(json.loads(postDict["hours"]))
 
         if store_location_form.is_valid(): 
-            # the avatar will be lost in the creation so save it
             if new_location:
                 store_location = StoreLocation(**postDict)
             else:
                 store_location = SESSION.get_store_location(\
                     request.session, store_location_id)
-                store_location_avatar_url = store_location.store_avatar_url
+                # the avatar will be lost in the creation so add it in
+                avatar_url = store_location.store_avatar_url
                 store_location = StoreLocation(**store_location.__dict__)
                 store_location.update_locally(postDict, False)
+                store_location.store_avatar_url = avatar_url
 
             # validate and format the hours
             hours_validation = hours.is_valid()
@@ -134,7 +135,7 @@ def edit_location(request, store_location_id):
                 if new_avatar:
                     new_avatar = new_avatar[0]
                     store_location.store_avatar = new_avatar.avatar_name
-                    store_location_avatar_url = new_avatar.avatar_url
+                    store_location.store_avatar_url = new_avatar.avatar_url
                     new_avatar.delete(False)
                     
                 store_location.create()
@@ -149,13 +150,6 @@ def edit_location(request, store_location_id):
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStoreLocation": store_location.jsonify(),
             }
-            if store_location.store_avatar:
-                payload.update({
-                    "updatedStoreLocationAvatarSLID": store_location.objectId,
-                    "updatedStoreLocationAvatarName": store_location.store_avatar,
-                    "updatedStoreLocationAvatarUrl": store_location_avatar_url,
-                })
-            
             comet_receive(store.objectId, payload)
             
             # make sure that we have the latest session

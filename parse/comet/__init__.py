@@ -276,8 +276,9 @@ def comet_receive(store_id, postDict):
         updatedStore = postDict.get("updatedStore")
         if updatedStore:
             store = Store(**updatedStore)
+            # have to add the avatar url manually
+            store.store_avatar_url = updatedStore.get("store_avatar_url")
             session['store'] = store
-            
             
         updatedStoreAvatarName = postDict.get("updatedStoreAvatarName")
         if updatedStoreAvatarName:
@@ -302,6 +303,9 @@ def comet_receive(store_id, postDict):
         updatedStoreLocation = postDict.get("updatedStoreLocation")
         if updatedStoreLocation:
             store_location = StoreLocation(**updatedStoreLocation)
+            # have to add the avatar url manually
+            store_location.store_avatar_url =\
+                updatedStoreLocation.get("store_avatar_url")
             session['store_locations'][store_location.objectId] =\
                 store_location
                 
