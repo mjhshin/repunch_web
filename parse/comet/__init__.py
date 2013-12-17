@@ -298,6 +298,7 @@ def comet_receive(store_id, postDict):
             
         #############################################################
         # STORE LOCATION UPDATED ##############################
+        ### Note that this is also being used to insert new StoreLocations
         updatedStoreLocation = postDict.get("updatedStoreLocation")
         if updatedStoreLocation:
             store_location = StoreLocation(**updatedStoreLocation)

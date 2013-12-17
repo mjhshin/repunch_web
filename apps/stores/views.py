@@ -53,14 +53,13 @@ def edit_store(request):
 @login_required
 @admin_only(reverse_url="store_index")
 def edit_location(request, store_location_id):
-    store_location = SESSION.get_store_location(request.session,
-        store_location_id)
-    data = {'account_nav': True}
+    data = {'account_nav': True, 'store_location_id': store_location_id}
+    store = SESSION.get_store(request.session)
     
+    new_location = store_location_id.isdigit() and\
+        int(store_location_id) == 0
+        
     def common(store_location_form):
-        request.session['store_locations'][store_location.objectId] =\
-            store_location
-        data['store_location'] = store_location
         data['store_location_form'] = store_location_form
         return render(request, 'manage/store_location_edit.djhtml', data)
             
@@ -72,9 +71,12 @@ def edit_location(request, store_location_id):
 
         if store_location_form.is_valid(): 
             # the avatar will be lost in the creation so save it
-            store_location_avatar_url = store_location.store_avatar_url
-            store_location = StoreLocation(**store_location.__dict__)
-            store_location.update_locally(postDict, False)
+            if new_location:
+                store_location = StoreLocation(**postDict)
+            else:
+                store_location_avatar_url = store_location.store_avatar_url
+                store_location = StoreLocation(**store_location.__dict__)
+                store_location.update_locally(postDict, False)
 
             # validate and format the hours
             hours_validation = hours.is_valid()
@@ -104,40 +106,41 @@ def edit_location(request, store_location_id):
             store_location.set("neighborhood", 
                 store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
-                    
-            store_location.update()
-            
-            # update the session cache
-            try:
-                request.session['store_timezone'] =\
-                    pytz.timezone(store_location.store_timezone)
-            except Exception:
-                request.session['store_timezone'] =\
-                    pytz.timezone(TIME_ZONE)
-                
-            request.session['store_locations'][store_location_id] =\
-                store_location
+                  
+            if new_location:
+                store_location.create()
+                store.array_add_unique("store_locations", [store_location])
+            else:  
+                store_location.update()
             
             # the store location at this point has lost its
             # store_avatar_url so we need to update that too 
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStoreLocation": store_location.jsonify(),
-                "updatedStoreLocationAvatarSLID": store_location.objectId,
-                "updatedStoreLocationAvatarName": store_location.store_avatar,
-                "updatedStoreLocationAvatarUrl": store_location_avatar_url,
             }
-            comet_receive(SESSION.get_store(request.session).objectId, payload)
+            if not new_location:
+                payload.update({
+                    "updatedStoreLocationAvatarSLID": store_location.objectId,
+                    "updatedStoreLocationAvatarName": store_location.store_avatar,
+                    "updatedStoreLocationAvatarUrl": store_location_avatar_url,
+                })
+            
+            comet_receive(store.objectId, payload)
             
             # make sure that we have the latest session
             request.session.clear()
             request.session.update(SessionStore(request.session.session_key))
             
+            if new_location:
+                success_msg = 'New store location has been added.'
+            else:
+                success_msg = 'Store location has been updated.'
+            
             return HttpResponse(json.dumps({
                 "result": "success",
                 "url": reverse('store_index')+ "?%s" %\
-                    urllib.urlencode({'success':\
-                            'Store location has been updated.'})
+                    urllib.urlencode({'success': success_msg})
             }), content_type="application/json")
             
         else:
@@ -149,14 +152,18 @@ def edit_location(request, store_location_id):
                 
     else:
         store_location_form = StoreLocationForm(None)
-        store_location_form.initial = store_location.__dict__.copy()
-        # make sure that the phone number is unformatted
-        store_location_form.initial['phone_number'] =\
-            store_location_form.initial['phone_number'].replace("(",
-                "").replace(")","").replace(" ", "").replace("-","")
-                
-        data['hours_data'] = HoursInterpreter(\
-            store_location.hours)._format_parse_input()
+        if not new_location:
+            store_location = SESSION.get_store_location(\
+                request.session, store_location_id)
+            store_location_form.initial = store_location.__dict__.copy()
+            # make sure that the phone number is unformatted
+            store_location_form.initial['phone_number'] =\
+                store_location_form.initial['phone_number'].replace("(",
+                    "").replace(")","").replace(" ", "").replace("-","")
+                    
+            data['store_location'] = store_location
+            data['hours_data'] = HoursInterpreter(\
+                store_location.hours)._format_parse_input()
          
     return common(store_location_form)
 

@@ -69,7 +69,7 @@
 #store-locations > div.nav > a.active > div > span:before {
     position: relative; top: 2px;
     margin-right: 6px;
-    content: url('../images/icon_green-check.png');
+    content: url('../images/icon_active_location.png');
 }
 
 #store-locations > div.nav > a.active > div > span:after {

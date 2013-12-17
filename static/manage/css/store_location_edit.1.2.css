@@ -26,19 +26,6 @@ select#id_country{
 	margin-top:4px;
 }
 
-label#label_store_description{
-	float:left;
-}
-
-label#character_limit{
-	float:right;
-	font-weight:normal;
-	font-size:10px;
-	font-style:italic;
-	margin-top:20px;
-}
-
-
 /* hours form style */
 .hours-form {
     width: 640px; 
