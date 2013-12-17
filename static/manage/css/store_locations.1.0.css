@@ -5,7 +5,7 @@
 #store-locations {
 	font: normal 15px/20px 'Cabin', sans-serif;
 	color:#666;
-    min-height: 506px; width: 670px;
+    min-height: 560px; width: 670px;
     background:white; overflow: hidden;
     position: relative;
     padding: 0;
@@ -72,6 +72,10 @@
     content: url('../images/icon_green-check.png');
 }
 
+#store-locations > div.nav > a.active > div > span:after {
+    content: "Current Location";
+}
+
 #store-locations > div.scroll,
 #store-locations > a.add {
     width: 200px;
@@ -113,7 +117,6 @@
 }
 
 #store-locations > a.add {
-	border-right:1px solid #CCC;
     position: absolute; left: 0px; bottom: 0px;
     text-decoration: none;
 	color:#666;
@@ -126,13 +129,13 @@
     text-align: center;
     width: 200px; height: 60px;
     padding: 10px 10px;
-}
+	border-right:1px solid #CCC;
+} 
 
 #store-locations > a.add > div > img,
 #store-locations > div.nav > a.add > div >img {
     margin-top: 6px;
 }
-    
     
 #store-locations > div.content {
     width: 364px; height: 100%;
@@ -142,6 +145,11 @@
 #store-locations > div.content div {
 	font: normal 16px/24px sans-serif;
     margin: 20px 0;
+}
+
+
+#store-locations > div.content div a.button.blue {
+    margin-top: 10px;
 }
 
 

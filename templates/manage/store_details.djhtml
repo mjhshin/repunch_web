@@ -78,11 +78,7 @@ $(document).ready(function() {
                 {% for location in store_locations.itervalues %}
                 <a href="{% url 'store_location_edit' location.objectId %}" id="nav-{{ location.objectId }}"
                     {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
-                    <div>{{ location.street }}<br/>{{ location.city }}, {{ location.state }}
-                        {% if location.objectId == active_store_location.objectId %}
-                        <span>Current Location</span>
-                        {% endif %}
-                    </div>
+                    <div>{{ location.street }}<br/>{{ location.city }}, {{ location.state }}<span></span></div>
                 </a>
                 {% endfor %}
                 

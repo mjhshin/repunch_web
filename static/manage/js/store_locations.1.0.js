@@ -7,10 +7,10 @@
 var ANIMATION_DURATION = 1000;
 
 // The values below ust be synced with the values in store_locations.css
-// need to know the height of a nav item (height + padding)
-var NAV_ITEM_HEIGHT = 40 + 20;
-// need to know the height of the active nav item (height + padding)
-var NAV_ITEM_ACTIVE_HEIGHT = 60 + 20;
+// need to know the height of a nav item (height + padding + border)
+var NAV_ITEM_HEIGHT = 40 + 20 + 1;
+// need to know the height of the active nav item (height + padding + border)
+var NAV_ITEM_ACTIVE_HEIGHT = 70 + 20 + 1;
 // the amount of items before the scroll arrows are shown
 var NAV_ITEM_SCROLL = 8;
 // height of the scroll arrows (height + padding)
