@@ -48,9 +48,25 @@ def index(request):
 
 @dev_login_required
 @login_required
+@access_required
+def set_active_location(request):
+    store_location_id = request.GET.get("store_location_id")
+    success = False
+    if store_location_id in SESSION.get_store_locations(\
+        request.session).keys():
+        request.session['active_store_location_id'] =\
+            store_location_id
+        success = True
+        
+    return HttpResponse(json.dumps({"success": success}),
+        content_type="application/json")
+
+@dev_login_required
+@login_required
 @admin_only(reverse_url="store_index")
 def edit_store(request):
     pass # TODO
+    
 
 @dev_login_required
 @login_required

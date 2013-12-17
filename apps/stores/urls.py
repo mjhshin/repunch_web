@@ -4,6 +4,7 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^$', 'index', name='store_index'),
     url(r'^edit$', 'edit_store', name='store_edit'),
     url(r'^hours$', 'hours_preview', name='store_hours'),
+    url(r'^set-active-location$', 'set_active_location', name='store_set_active_location'),
     
     url(r'^avatar-upload/(?P<store_location_id>.+)$', 'avatar_upload', name='store_avatar_upload'),
     url(r'^get-avatar/(?P<store_location_id>.+)$', 'get_avatar', name='store_get_avatar'),

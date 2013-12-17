@@ -1,9 +1,7 @@
 ##############################################
 ####################  TODO: 
 
-0. Migration for:
-    * Punch + store_location_id
-    * Store + StoreLocation
+0. 
 
 1. Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
     - in redemptions.js

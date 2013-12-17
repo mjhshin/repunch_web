@@ -23,7 +23,10 @@ $(document).ready(function() {
 {% block content %}
 
 {% with store=request.session.store %}
-	<!-- possibly move to header -->
+
+    {# USED BY store_location.js #}
+    <span id="set_active_store_location_url" style="display:none;">{% url 'store_set_active_location' %}</span>
+
 	{% account_is_admin request.session as is_admin %}
 	{% account_alert_users request.session as alert_users %}
 	{% account_alert_billing request.session as alert_billing %}
@@ -73,7 +76,7 @@ $(document).ready(function() {
                 {% for location in store_locations %}
                 <a href="{% url 'store_location_edit' location.objectId %}" id="{{ location.objectId }}"
                     {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
-                    <div>{{ location.street }}<br/>{{ location.city }}, {{ location.state }}<span></span></div>
+                    <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
                 </a>
                 {% endfor %}
                 
@@ -97,12 +100,14 @@ $(document).ready(function() {
                 <div class="wrapper {% if location.objectId == active_store_location.objectId %}active{% endif %}" id="content-{{ location.objectId }}">
                     {% if location.store_avatar_url %}
                     <img src="{{ location.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
-                    {% else %}<img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
-	                    class="avatar-big" width="200px" height="200px"/>
+                    {% elif active_store_location.store_avatar_url %}
+                    <img src="{{ active_store_location.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
+                    {% else %}
+                    <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" class="avatar-big" width="200px" height="200px"/>
                     {% endif %}
                     <div><label>Address:</label>
-                        {{ location.street }}<br/>
-                        {{ location.city }}, {{ location.state }} {{ location.zip }}<br/>
+                        {{ location.street|title }}<br/>
+                        {{ location.city|title }}, {{ location.state|upper }} {{ location.zip }}<br/>
                         {{ location.phone_number }}<br/>
                     </div>
                     <div><label>Hours:</label>

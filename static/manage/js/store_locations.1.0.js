@@ -84,10 +84,23 @@ function animateStart(direction) {
     });
 }
 
+function setActiveStoreLocation(storeLocationId) {
+    $.ajax({
+        url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
+        type: "GET",
+        cache: false, // required to kill internet explorer 304 bug
+        success: function(res) {
+            // do nothing?
+        },
+    });
+    
+}
+
 $(document).ready(function() {
 
     // clicks on nav items
     $("#store-locations > div.nav > a[class!=add]").click(function() {
+        // activate this nav and deactive the rest
         var self = $(this);
         self.siblings().removeClass("active");
         self.addClass("active");
@@ -96,6 +109,14 @@ $(document).ready(function() {
         var selfContent = $("#content-"+self.attr("id"));
         selfContent.siblings().removeClass("active");
         selfContent.addClass("active");
+        
+        // replace the thumbnail
+        var selfImg = selfContent.find("img.avatar-big");
+        $("#avatar-thumbnail").attr("src", selfImg.attr("src"));
+        $("#avatar-thumbnail").css("visibility", "visible");
+        
+        // set active_store_location in server
+        setActiveStoreLocation(self.attr("id"));
         
         return false;
     });
