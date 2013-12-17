@@ -54,8 +54,8 @@ def set_active_location(request):
     success = False
     if store_location_id in SESSION.get_store_locations(\
         request.session).keys():
-        request.session['active_store_location_id'] =\
-            store_location_id
+        SESSION.set_active_store_location_id(request.session,
+            store_location_id)
         success = True
         
     return HttpResponse(json.dumps({"success": success}),
@@ -160,6 +160,10 @@ def edit_location(request, store_location_id):
                 success_msg = 'New store location has been added.'
             else:
                 success_msg = 'Store location has been updated.'
+                
+            # set the active location to this one
+            SESSION.set_active_store_location_id(request.session,
+                store_location.objectId)
             
             return HttpResponse(json.dumps({
                 "result": "success",

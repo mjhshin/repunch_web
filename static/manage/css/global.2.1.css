@@ -232,13 +232,13 @@ img.avatar-small{
 }
 
 img.avatar-medium{
-	border-radius: 6px;
+	border-radius: 16px;
 	width:40px;
 	vertical-align:middle;
 }
 
 img.avatar-big{
-	border-radius: 6px;
+	border-radius: 18px;
 }
 
 span#account-name{

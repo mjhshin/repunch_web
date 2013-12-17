@@ -67,12 +67,14 @@
 }
 
 #store-locations > div.nav > a.active > div > span:before {
-    position: relative; top: 2px;
+    position: relative; top: 8px;
     margin-right: 6px;
     content: url('../images/icon_active_location.png');
 }
 
 #store-locations > div.nav > a.active > div > span:after {
+    position: relative; top: 6px;
+	font: normal 15px/20px 'Cabin', sans-serif;
     content: "Current Location";
 }
 
@@ -152,13 +154,17 @@
     margin-top: 10px;
 }
 
-#store-locations > div.content div.wrapper {
+#store-locations > div.content > div.wrapper {
     display: none;
 }
 
-
-#store-locations > div.content div.wrapper.active {
+#store-locations > div.content > div.wrapper.active {
     display: block;
+}
+
+#store-locations > div.content > div.wrapper > img {
+    /* for some reason this is not left aligned */
+    position: relative; left: 0px;
 }
 
 

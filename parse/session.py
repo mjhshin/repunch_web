@@ -116,6 +116,13 @@ def get_active_store_location_id(session):
 def get_store_location(session, store_location_id):
     return get_store_locations(session).get(store_location_id)
         
+def set_active_store_location_id(session, store_location_id):
+    session['active_store_location_id'] = store_location_id
+    session['store_timezone'] = pytz.timezone(get_store_location(\
+        session, store_location_id).get('store_timezone'))
+        
+    return session['active_store_location_id']
+    
 def get_store_timezone(session):
     """
     Returns the pytz.timezone object for the active store location.
