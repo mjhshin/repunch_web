@@ -5,7 +5,7 @@
 #store-locations {
 	font: normal 15px/20px 'Cabin', sans-serif;
 	color:#666;
-    min-height: 560px; width: 670px;
+    min-height: 560px; width: 650px;
     background:white; overflow: hidden;
     position: relative;
     padding: 0;
@@ -140,7 +140,7 @@
 }
     
 #store-locations > div.content {
-    width: 364px; height: 100%;
+    width: 344px; height: 100%;
     padding: 20px 40px;
 }
 

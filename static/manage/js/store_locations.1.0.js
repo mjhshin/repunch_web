@@ -110,11 +110,6 @@ $(document).ready(function() {
         selfContent.siblings().removeClass("active");
         selfContent.addClass("active");
         
-        // replace the thumbnail
-        var selfImg = selfContent.find("img.avatar-big");
-        $("#avatar-thumbnail").attr("src", selfImg.attr("src"));
-        $("#avatar-thumbnail").css("visibility", "visible");
-        
         // set active_store_location in server
         setActiveStoreLocation(self.attr("id"));
         

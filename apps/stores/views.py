@@ -275,19 +275,28 @@ def avatar_upload(request, store_location_id):
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
 def get_avatar(request, store_location_id):
-    """ returns the store location's avatar url """
+    """
+    If store_location_id is '0' then it refers to a new StoreLocation,
+    'x' refers to the Store, and anything else refers to an existing
+    StoreLocation.
+    """
     if request.method == "GET":
         
         if store_location_id == '0':
             store_avatar_url = NewStoreLocationAvatarTmp.objects.get(\
                 session_key=request.session.session_key).avatar_url
+                
+        elif store_location_id == 'x':
+            store_avatar_url =\
+                SESSION.get_store(request.session).store_avatar_url
+                
         else:
             store_avatar_url = SESSION.get_store_location(\
                 request.session, store_location_id).get("store_avatar_url")
     
         return HttpResponse(json.dumps({
             "src": store_avatar_url,
-            "thumbnail": store_location_id != '0',
+            "thumbnail": store_location_id == 'x',
         }), content_type="application/json")
         
     raise Http404
@@ -300,6 +309,7 @@ content_type="text/html")
 def crop_avatar(request, store_location_id):
     """
     Takes in crop coordinates and creates a new png image.
+    
     If store_location_id is '0' then it refers to a new StoreLocation,
     'x' refers to the Store, and anything else refers to an existing
     StoreLocation.

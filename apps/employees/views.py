@@ -539,32 +539,5 @@ def avatar(request, employee_id):
     """
     Unused at the moment.
     """
-    """
-    employee_id = int(employee_id)
-    data = {}
-    employee = None
-    store = request.session['account'].store
-    
-    # need to make sure this reward really belongs to this store
-    if(employee_id > 0):
-        try:
-            employee = Employee.objects.filter(store=store.id).get(id=employee_id)
-        except Employee.DoesNotExist:
-            raise Http404
-    else:
-        raise Http404
-    
-    if request.method == 'POST': # If the form has been submitted...
-        form = EmployeeAvatarForm(request.POST, request.FILES, instance=employee) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            form.save()
-            data['success'] = True
-    else:
-        form = EmployeeAvatarForm();
-    
-    data['form'] = form
-    data['url'] = reverse('employee_avatar', args=[employee_id])
-    return render(request, 'manage/avatar_upload.djhtml', data)
-    """
     raise Http404
 

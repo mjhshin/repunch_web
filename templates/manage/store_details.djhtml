@@ -2,7 +2,7 @@
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.3.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.4.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.0.css' %}" />
 {% endblock %}
 
@@ -100,8 +100,6 @@ $(document).ready(function() {
                 <div class="wrapper {% if location.objectId == active_store_location.objectId %}active{% endif %}" id="content-{{ location.objectId }}">
                     {% if location.store_avatar_url %}
                     <img src="{{ location.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
-                    {% elif store.store_avatar_url %}
-                    <img src="{{ store.store_avatar_url }}" class="avatar-big" width="200px" height="200px"/>
                     {% else %}
                     <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" class="avatar-big" width="200px" height="200px"/>
                     {% endif %}
@@ -136,7 +134,7 @@ $(document).ready(function() {
 			Current Subscription: {{ type.name }}
 		</div>
 		
-		<div class="white-box" id="limits-box">
+		<div class="white-box" id="limits-box" >
 			<div class="limit-details">
 				{% if tmp != 2 %} {# 2 is heavyweight #}
 				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>

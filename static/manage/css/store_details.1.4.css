@@ -60,6 +60,7 @@ div.limit-details div.description div {
 
 div.limit-details div.description div.label {
 	font-size: 13px;
+	font-weight: bold;
 }
 
 div.limit-details div.description div.count {
@@ -72,7 +73,7 @@ div.limit-details div.description div.count {
 }
 
 div.limit-details div.description div.limit {
-	font-size: 11px;
+	font-size: 16px;
 	float: left;
 	white-space: nowrap;
 	position: relative;
