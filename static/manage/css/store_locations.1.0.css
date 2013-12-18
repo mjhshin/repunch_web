@@ -51,21 +51,25 @@
 
 .store-locations.header > div.current,
 .store-locations > div.nav {
-    width:222px;
+    width:222px; 
     float: left;clear: both;
 }
 
-
 .store-locations.header > div.current {
-    font-size: 12px; font-weight: bold;
-    height: 55px; width:192px;
-    background: inherit;
-    padding: 5px 10px 10px 20px;
+	white-space: nowrap; overflow: hidden;
+	font: bold 12px/18px 'Cabin', sans-serif;
+    height: 52px; width:192px;
+    padding: 8px 10px 10px 20px;
     /*  
         relative positioning required for z-index
         (relative to other relative positioned elements) to take effect
     */
     position: relative;  z-index: 6;
+}
+
+.store-locations.header > div.current:after {
+    position:absolute; top:6px; right:10px;
+	content: url('../images/arrow-down-large.png');
 }
 
 .store-locations > div.scroll {
@@ -112,6 +116,11 @@
 
 .store-locations > div.nav > a > div {
 	font: normal 15px/20px 'Cabin', sans-serif;
+	white-space: nowrap; overflow: hidden;
+}
+
+.store-locations.header > div.nav > a > div {
+    font-size: 12px;
 }
 
 .store-locations > div.nav > a.active > div {
@@ -129,22 +138,20 @@
     margin-top: 0;
 }
 
-.store-locations > div.nav > a.active > div > span:before {
-    position: relative; top: 8px;
-    margin-right: 6px;
-    content: url('../images/icon_active_location.png');
-}
-
 .store-locations.header > div.current span:after,
 .store-locations > div.nav > a.active > div > span:after {
     position: relative; top: 6px;
-	font: normal 15px/20px 'Cabin', sans-serif;
+	font: bold 15px/20px 'Cabin', sans-serif;
     content: "Current Location";
+    color: #0965ad;
+}
+
+.store-locations.header > div.nav > a.active > div > span:after {
+    content: "";
 }
 
 .store-locations.header > div.current span:after {
-    top: 0;
-	font: bold 12px/6px 'Cabin', sans-serif;
+    top: 0; font: bold 12px/6px 'Cabin', sans-serif;
 }
 
 .store-locations > div.scroll,
@@ -154,7 +161,7 @@
 }
 
 .store-locations > div.scroll > img {
-    position: relative; top: -2px;
+    position: relative; top: -3px;
     width: 32px; height: 12px;
 }
 
@@ -166,7 +173,7 @@
 }
 
 .store-locations > div.scroll {
-    padding: 10px 10px 10px 11px;
+    padding: 5px 10px 5px 11px;
 }
 
 .store-locations.header > div.scroll {
@@ -193,6 +200,10 @@
     height: 70px;
     border-right: 0px;
     background: white;
+}
+
+.store-locations.header > div.nav > a.active > div {
+    height: 40px;
 }
 
 .store-locations > a.add {

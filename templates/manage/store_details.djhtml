@@ -22,9 +22,6 @@ $(document).ready(function() {
 
 {% with store=request.session.store %}
 
-    {# USED BY store_location.js #}
-    <span id="set_active_store_location_url" style="display:none;">{% url 'store_set_active_location' %}</span>
-
 	{% account_is_admin request.session as is_admin %}
 	{% account_alert_users request.session as alert_users %}
 	{% account_alert_billing request.session as alert_billing %}

@@ -18,7 +18,7 @@ var NAV_ITEM_ACTIVE_HEIGHT = 70 + 20 + 1;
 // the amount of items before the scroll arrows are shown
 var NAV_ITEM_SCROLL = 8;
 // height of the scroll arrows (height + padding)
-var SCROLL_ARROW_HEIGHT = 10 + 20;
+var SCROLL_ARROW_HEIGHT = 10 + 10;
 // height of the add button (height + padding)
 var ADD_BUTTON_HEIGHT = 60 + 20;
 // Total height of the add button and the arrow down when scrolling is enabled.
@@ -35,6 +35,7 @@ function isInStoreDetails() {
     return $("#"+CONTAINER_ID).length > 0;
 }
 
+
 /*
     Does not include the add button.
 */
@@ -43,11 +44,11 @@ function getNavItemCount(containerId) {
 }
 
 /*
-    One of the item is active.
+    One of the item is active (different height in body but not in header).
 */
 function getNavTotalHeight(containerId) {
     return (NAV_ITEM_HEIGHT * getNavItemCount(containerId)) -
-        NAV_ITEM_HEIGHT + NAV_ITEM_ACTIVE_HEIGHT;
+        NAV_ITEM_HEIGHT + (containerId == CONTAINER_ID ? NAV_ITEM_ACTIVE_HEIGHT : NAV_ITEM_HEIGHT);
 }
 
 /*
@@ -117,6 +118,7 @@ function animateStart(containerId, direction) {
 }
 
 function setActiveStoreLocation(containerId, storeLocationId) {
+
     $.ajax({
         url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
         type: "GET",
@@ -124,10 +126,13 @@ function setActiveStoreLocation(containerId, storeLocationId) {
         success: function(res) {
             // replace the header current div
             $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
-                $("#header-"+storeLocationId).html().replace("<span></span>", ""));
+                $("#header-"+storeLocationId).html().replace("<span></span>", "")
+                    .replace("<div>", "").replace("</div>", ""));
             
             // if the click was from the header, reload page content
-            
+            if (containerId == HEADER_CONTAINER_ID && !isInStoreDetails()) {
+                location.reload(true);
+            }
             
         },
     });
