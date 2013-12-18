@@ -635,7 +635,7 @@ $(document).ready(function(){
     
     // Immediately make a connection
     // IMPORTANT that this is called after server's COMET_DIE_TIME has passed.
-    // TODO uncomment makeRequest();
+    makeRequest();
     
 
 });
