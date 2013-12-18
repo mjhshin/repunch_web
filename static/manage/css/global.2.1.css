@@ -141,6 +141,7 @@ div#site-frame{
 }
 
 div#header{
+    position:absolute; width:945px;
 	height:70px;
 	line-height:70px;
 	padding-left:15px;
@@ -166,12 +167,6 @@ img#logo-header {
 	vertical-align:middle;
 }
 
-div#header-middle {
-    display: inline-block;
-    width: 100px; height: 100%;
-}
-
-div#header-middle,
 div#header-right {
 	float:right;
 	/* This is required so that children with absolute positioning

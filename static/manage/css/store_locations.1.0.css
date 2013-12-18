@@ -2,130 +2,150 @@
     Styles for the store locations list in store details.
 */
 
-#store-locations {
+.store-locations {
 	font: normal 15px/20px 'Cabin', sans-serif;
 	color:#666;
-    min-height: 560px; width: 650px;
     background:white; overflow: hidden;
     position: relative;
     padding: 0;
+	border:1px solid #CCC;
 }
 
-#store-locations > div {
+/*
+    List in the header.
+*/
+.store-locations.navonly {
+    float: right;
+    max-height: 400px;
+    z-index: 11;
+    border-top: 0;
+}
+
+/*
+    List in store_details.
+*/
+.store-locations.navcontent {
+	border-radius:4px;
+    min-height: 560px; width: 650px;
+}
+
+.store-locations > div {
     display: inline-block;
 }
 
-#store-locations > div.nav {
-    width:223px; height: 400px;
+
+.store-locations > div.nav {
+    width:223px; 
     float: left;
 }
 
-#store-locations > div.scroll {
+.store-locations > div.scroll {
 	background: #666 url('../images/bkg_sidebar.png') repeat top left;
     text-align: center; height: 10px;
     position: absolute; left: 0px;
 }
 
-#store-locations > div.scroll:hover {
+.store-locations > div.scroll:hover {
     background: #555;
 }
 
-#store-locations > div.scroll.up {
+.store-locations > div.scroll.up {
     top: 0px;
 }
 
-#store-locations > div.scroll.down {
+.store-locations > div.scroll.down {
     /* this should be on top of the add button */
     bottom: 80px;
 }
 
-#store-locations > a.add,
-#store-locations > div.content div label {
+.store-locations > a.add,
+.store-locations > div.content div label {
 	font: bold 15px/20px 'Cabin', sans-serif;
 }
 
 
-#store-locations > div.nav > a {
+.store-locations > div.nav > a {
 	color:#666;
     position: relative; top: 0px;
     text-decoration: none;
+    cursor: pointer;
     z-index: 1;
 }
 
-#store-locations > div.nav > a > div {
+.store-locations > div.nav > a > div {
 	font: normal 15px/20px 'Cabin', sans-serif;
 }
 
-#store-locations > div.nav > a.active > div {
+.store-locations > div.nav > a.active > div {
     font-weight: bold;
 }
 
-#store-locations > div.nav > a.active > div > span {
+.store-locations > div.nav > a.active > div > span {
     display: block;
     margin-top: 4px;
     color: #669900;
 }
 
-#store-locations > div.nav > a.active > div > span:before {
+.store-locations > div.nav > a.active > div > span:before {
     position: relative; top: 8px;
     margin-right: 6px;
     content: url('../images/icon_active_location.png');
 }
 
-#store-locations > div.nav > a.active > div > span:after {
+.store-locations > div.nav > a.active > div > span:after {
     position: relative; top: 6px;
 	font: normal 15px/20px 'Cabin', sans-serif;
     content: "Current Location";
 }
 
-#store-locations > div.scroll,
-#store-locations > a.add {
+.store-locations > div.scroll,
+.store-locations > a.add {
     width: 200px;
     z-index: 5;
 }
 
-#store-locations > div.scroll > img {
+.store-locations > div.scroll > img {
     position: relative; top: -2px;
     width: 32px; height: 12px;
 }
 
-#store-locations > div.scroll,
-#store-locations > div.nav > a > div {
+.store-locations > div.scroll,
+.store-locations > div.nav > a > div {
 	border:1px solid #CCC;
     border-left: 0px; border-top: 0px;
     padding: 10px;
 }
 
-#store-locations > div.scroll.down {
+.store-locations > div.scroll.down {
 	border:1px solid #CCC;
     border-bottom: 0px;
     border-left: 0px;
 }
 
-#store-locations > div.nav > a > div {
+.store-locations > div.nav > a > div {
     width: 190px; height: 40px;
     padding: 10px 10px 10px 20px;
 	background-color:#F0F8FB;
 }
 
-#store-locations > div.nav > a > div:hover {
+.store-locations > div.nav > a > div:hover {
 	background-color:#e0e7ea;
 }
 
-#store-locations > div.nav > a.active > div {
+.store-locations > div.nav > a.active > div {
     height: 70px;
     border-right: 0px;
     background: inherit;
 }
 
-#store-locations > a.add {
+.store-locations > a.add {
     position: absolute; left: 0px; bottom: 0px;
     text-decoration: none;
 	color:#666;
 }
 
-#store-locations > a.add > div,
-#store-locations > div.nav > a.add > div {
+.store-locations > a.add > div,
+.store-locations > div.nav > a.add > div {
 	font: bold 15px/20px 'Cabin', sans-serif;
     background: white;
     text-align: center;
@@ -134,38 +154,35 @@
 	border-right:1px solid #CCC;
 } 
 
-#store-locations > a.add > div > img,
-#store-locations > div.nav > a.add > div >img {
+.store-locations > a.add > div > img,
+.store-locations > div.nav > a.add > div >img {
     margin-top: 6px;
 }
     
-#store-locations > div.content {
+.store-locations > div.content {
     width: 344px; height: 100%;
     padding: 20px 40px;
 }
 
-#store-locations > div.content div {
+.store-locations > div.content div {
 	font: normal 16px/24px sans-serif;
     margin: 20px 0;
 }
 
 
-#store-locations > div.content div a.button.blue {
+.store-locations > div.content div a.button.blue {
     margin-top: 10px;
 }
 
-#store-locations > div.content > div.wrapper {
+.store-locations > div.content > div.wrapper {
     display: none;
 }
 
-#store-locations > div.content > div.wrapper.active {
+.store-locations > div.content > div.wrapper.active {
     display: block;
 }
 
-#store-locations > div.content > div.wrapper > img {
+.store-locations > div.content > div.wrapper > img {
     /* for some reason this is not left aligned */
     position: relative; left: 0px;
 }
-
-
-

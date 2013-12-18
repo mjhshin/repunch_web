@@ -68,13 +68,13 @@ $(document).ready(function() {
 		<h2>Store Details</h2><br/>
 		
 		{# STORE LOCATIONS LIST #}
-		<div class="white-box" id="store-locations">
+		<div class="store-locations navcontent" id="store-locations">
 
     		<div class="scroll up"><img src="{% static 'manage/images/scroll_up.1.0.png' %}"/></div>
     		
             <div class="nav">
                 {% for location in store_locations %}
-                <a href="{% url 'store_location_edit' location.objectId %}" id="{{ location.objectId }}"
+                <a id="navcontent-{{ location.objectId }}"
                     {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
                     <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
                 </a>
@@ -145,7 +145,7 @@ $(document).ready(function() {
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count request.session %}</div>
-					<div class="limit">of {% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
+					<div class="limit">of &nbsp;&nbsp;{% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="limit-details right">
@@ -153,7 +153,7 @@ $(document).ready(function() {
 				<div class="description">
 					<div class="label">SENT MESSAGES</div>
 					<div class="count">{% account_message_count request.session %}</div>
-					<div class="limit">of {{ type.max_messages }}</div>
+					<div class="limit">of &nbsp;&nbsp;{{ type.max_messages }}</div>
 				</div>
 			</div>
 			<div class="clear"></div>

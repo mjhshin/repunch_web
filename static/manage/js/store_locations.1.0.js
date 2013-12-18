@@ -106,12 +106,13 @@ $(document).ready(function() {
         self.addClass("active");
         
         // show the corresponding content and hide the rest
-        var selfContent = $("#content-"+self.attr("id"));
+        var storeLocationId = self.attr("id").replace("nvacontent-", "");
+        var selfContent = $("#content-"+storeLocationId);
         selfContent.siblings().removeClass("active");
         selfContent.addClass("active");
         
         // set active_store_location in server
-        setActiveStoreLocation(self.attr("id"));
+        setActiveStoreLocation(storeLocationId);
         
         return false;
     });

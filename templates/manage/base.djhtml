@@ -32,7 +32,7 @@
 	
 </head>
 <body>
-
+{% account_is_admin request.session as is_admin %}
 
 {# NEEDED FOR comet.js #}
 <input id="comet_url" type="hidden" value="{% url 'comet_pull' %}" />
@@ -40,6 +40,7 @@
 
 
 	<div id="site-frame">
+	
 		<div id="header">
 		
 			<a id="header-left" href="{% url 'store_index' %}" style="background:green;">
@@ -71,10 +72,36 @@
                 </ul>
 			</div>
 			
-			{# this will be placed in the middle because this and header-right floats right #}
-			<div id="header-middle" style="background: pink;">
-			a
-			</div>
+			{# STORE LOCATIONS LIST #}
+		    <div class="store-locations navonly" id="store-locations-header">
+
+        		<div class="scroll up"><img src="{% static 'manage/images/scroll_up.1.0.png' %}"/></div>
+        		
+                <div class="nav">
+                    {% for location in store_locations %}
+                    <a id="navonly-{{ location.objectId }}"
+                        {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
+                        <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
+                    </a>
+                    {% endfor %}
+                    
+                    {% if is_admin %}
+                    <a href="{% url 'store_location_edit' '0' %}" class="add">
+                        <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
+
+                {% if is_admin %}
+                <a href="{% url 'store_location_edit' '0' %}" class="add" >
+                    <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
+                </a>
+                {% endif %}
+        
+		    </div>
+            {# END STORE LOCATIONS LIST #}
 			
 		</div>
 		<div id="content-frame">
