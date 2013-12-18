@@ -32,12 +32,7 @@ from parse.auth.decorators import login_required, dev_login_required
 @login_required
 @access_required
 def index(request):
-    # use sorted locations by createdAt
-    store_locations = [ v for v in SESSION.get_store_locations(\
-        request.session).values() ]
-    store_locations.sort(key=lambda l: l.createdAt)
-        
-    data = {'account_nav': True, 'store_locations': store_locations}
+    data = {'account_nav': True}
     
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")

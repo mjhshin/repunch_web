@@ -42,11 +42,11 @@
 	<div id="site-frame">
 		<div id="header">
 		
-			<a id="header-left" href="{% url 'store_index' %}">
+			<a id="header-left" href="{% url 'store_index' %}" style="background:green;">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</a>
 			
-			<div id="header-right">
+			<div id="header-right" style="background:yellow;">
 			    <a href="{% url 'account_edit' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
 					    {% if request.session.store.store_avatar_url %}
@@ -71,6 +71,10 @@
                 </ul>
 			</div>
 			
+			{# this will be placed in the middle because this and header-right floats right #}
+			<div id="header-middle" style="background: pink;">
+			a
+			</div>
 			
 		</div>
 		<div id="content-frame">

@@ -154,18 +154,24 @@ div#header{
     background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
 }
 
-div#header a{
+div#header a {
 	text-decoration:none;
 }
 
-a#header-left{
+a#header-left {
 	float:left;
 }
 
-img#logo-header{
+img#logo-header {
 	vertical-align:middle;
 }
 
+div#header-middle {
+    display: inline-block;
+    width: 100px; height: 100%;
+}
+
+div#header-middle,
 div#header-right {
 	float:right;
 	/* This is required so that children with absolute positioning
