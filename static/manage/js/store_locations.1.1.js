@@ -191,14 +191,7 @@ function toStoreLocations(containerId) {
     // Hide the scroll arrows if scrolling is not yet enabled.
     if (getNavItemCount(containerId) < getScrollThreshold(containerId)) {
         $("#"+containerId+" > div.scroll").css("display", "none");
-        // Show the add button in the nav item list and hide the one below the down arrow.
-        $("#"+containerId+" > div.nav > a.add").show();
-        $("#"+containerId+" > a.add").hide();
         return;
-    } else {
-        // Hide the add button in the nav item list and show the one below the down arrow.
-        $("#"+containerId+" > div.nav > a.add").hide();
-        $("#"+containerId+" > a.add").show();
     }
     
     // displace the nav item's initial position

@@ -74,12 +74,6 @@ $(document).ready(function() {
                     <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
                 </a>
                 {% endfor %}
-                
-                {% if is_admin %}
-                <a href="{% url 'store_location_edit' '0' %}" class="add">
-                    <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
-                </a>
-                {% endif %}
             </div>
 
             <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>

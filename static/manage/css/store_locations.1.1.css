@@ -51,8 +51,14 @@
 
 .store-locations.header > div.current,
 .store-locations > div.nav {
-    width:222px; 
-    float: left;clear: both;
+    width: 222px; 
+    float: left; clear: both;
+}
+
+.store-locations > div.nav {
+    width: 220px;
+    min-height: inherit;
+	border-right:1px solid #CCC;
 }
 
 .store-locations.header > div.current {
@@ -211,10 +217,12 @@
     height: 70px;
     border-right: 0px;
     background: white;
+    /* add width to cover up div.nav's right border */
+    width: 191px; 
 }
 
 .store-locations.header > div.nav > a.active > div {
-    height: 40px;
+    width: 190px; height: 40px;
 }
 
 .store-locations > a.add {
@@ -223,18 +231,17 @@
 	color:#666;
 }
 
-.store-locations > a.add > div,
-.store-locations > div.nav > a.add > div {
+.store-locations > a.add > div {
 	font: bold 15px/20px 'Cabin', sans-serif;
     background: white;
     text-align: center;
     width: 200px; height: 60px;
     padding: 10px 10px;
 	border-right:1px solid #CCC;
+	border-top:1px solid #CCC;
 } 
 
 .store-locations.header > a.add > div,
-.store-locations.header > div.nav > a.add > div,
 .store-locations.header > div.nav > a > div {
 	border:1px solid #CCC;
 	border-top: 0;

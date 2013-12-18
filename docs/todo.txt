@@ -1,7 +1,7 @@
 ##############################################
 ####################  TODO: 
 
-0. 
+0. check out what store details look like for non admins.
 
 1. Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
     - in redemptions.js
