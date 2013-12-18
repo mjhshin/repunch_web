@@ -12,6 +12,8 @@
 	
 	<style>
 	div#header { 
+	    position: relative;
+	    width: auto;
 	    margin-top: 20px;
 	    margin-left:auto; margin-right:auto;
 	}

@@ -249,6 +249,7 @@ span#account-name{
 }
 
 div#content-frame{
+    position: relative; top: 71px; /* height of the header, which is absolute positioned. */
 	background: #666 url('../images/bkg_sidebar.png') repeat top left;
 }
 

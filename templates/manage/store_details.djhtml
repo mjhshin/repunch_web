@@ -3,13 +3,11 @@
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.4.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.0.css' %}" />
 {% endblock %}
 
 {% block javascript %}
 {% account_is_admin request.session as is_admin %}
 {% if is_admin %}
-<script type="text/javascript" src="{% static 'manage/js/store_locations.1.0.js' %}" ></script>
 <script>
 $(document).ready(function() {
     $("#deactivate_account").click(function() {

@@ -21,11 +21,13 @@
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
     <link href="{% static 'public/css/tooltipster-repunch.1.0.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'public/css/tooltipster.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.0.css' %}" />
 	{% block styles %}{% endblock %}
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script src="{% static 'manage/js/global.js' %}"></script>
+    <script type="text/javascript" src="{% static 'manage/js/store_locations.1.0.js' %}" ></script>
 	{% block javascript %}{% endblock %}
 	{# this needs to be last to be able to use the paginator #}
 	<script src="{% static 'manage/js/comet.1.8.js' %}"></script>
