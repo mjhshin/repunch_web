@@ -118,6 +118,11 @@ function animateStart(containerId, direction) {
 }
 
 function setActiveStoreLocation(containerId, storeLocationId) {
+    var reloadPage = containerId == HEADER_CONTAINER_ID && !isInStoreDetails();
+    
+    if (reloadPage) {
+        $(".store-locations.header").addClass("reloading");
+    }
 
     $.ajax({
         url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
@@ -130,7 +135,7 @@ function setActiveStoreLocation(containerId, storeLocationId) {
                     .replace("<div>", "").replace("</div>", ""));
             
             // if the click was from the header, reload page content
-            if (containerId == HEADER_CONTAINER_ID && !isInStoreDetails()) {
+            if (reloadPage) {
                 location.reload(true);
             }
             
