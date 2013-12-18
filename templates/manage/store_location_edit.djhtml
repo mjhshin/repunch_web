@@ -17,6 +17,9 @@
     {% with store=request.session.store %}
 	{% account_is_owner request.session as is_owner %}
 
+    {# FLAG FOR locations.js #}
+    <input id="in-storelocation-edit" type="hidden" />
+
     {# REQUIRED FOR AVATAR UPLOAD JS #}
     <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location_id %}" />
     {# REQUIRED FOR STORE EDIT JS #}

@@ -35,6 +35,9 @@ function isInStoreDetails() {
     return $("#"+CONTAINER_ID).length > 0;
 }
 
+function isInStoreLocationEdit() {
+    return $("#in-storelocation-edit").length > 0;
+}
 
 /*
     Does not include the add button.
@@ -136,7 +139,13 @@ function setActiveStoreLocation(containerId, storeLocationId) {
             
             // if the click was from the header, reload page content
             if (reloadPage) {
-                location.reload(true);
+                var url = document.URL;
+                if (isInStoreLocationEdit()) {
+                    url = url.replace(/edit-location\/.+/, "edit-location/"+storeLocationId);
+                }
+                
+                // this does not create history
+                window.location.replace(url);
             }
             
         },
