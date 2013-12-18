@@ -31,6 +31,9 @@ var HEADER_NAV_ITEM_SCROLL = 4;
 // added 70 to this because of the offset from the header
 var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + 70;
 
+function isInStoreDetails() {
+    return $("#"+CONTAINER_ID).length > 0;
+}
 
 /*
     Does not include the add button.
@@ -113,13 +116,19 @@ function animateStart(containerId, direction) {
     });
 }
 
-function setActiveStoreLocation(storeLocationId) {
+function setActiveStoreLocation(containerId, storeLocationId) {
     $.ajax({
         url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
         type: "GET",
         cache: false, // required to kill internet explorer 304 bug
         success: function(res) {
-            // do nothing?
+            // replace the header current div
+            $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
+                $("#header-"+storeLocationId).html().replace("<span></span>", ""));
+            
+            // if the click was from the header, reload page content
+            
+            
         },
     });
     
@@ -130,26 +139,31 @@ function setActiveStoreLocation(storeLocationId) {
 */
 function toStoreLocations(containerId) {
     // clicks on nav items
-    $("#"+containerId+" > div.nav > a[class!=add]").click(function() {
+    $(".store-locations > div.nav > a[class!=add]").click(function() {
         var self = $(this);
         
         // do nothing if it's already active
         if (self.hasClass("active")){
             return false;
         }
-    
-        // activate this nav and deactive the rest
-        self.siblings().removeClass("active");
-        self.addClass("active");
         
         // show the corresponding content and hide the rest
-        var storeLocationId = self.attr("id").replace("navcontent-", "");
-        var selfContent = $("#content-"+storeLocationId);
-        selfContent.siblings().removeClass("active");
-        selfContent.addClass("active");
+        var storeLocationId = self.attr("id").replace( containerId == CONTAINER_ID ? "navcontent-" : "header-", "");
+    
+        // activate this row and deactive the rest
+        $(".store-locations > div.nav > a[class!=add]").removeClass("active");
+        $("#header-"+storeLocationId).addClass("active");
+        
+        if (isInStoreDetails()) {
+            $("#navcontent-"+storeLocationId).addClass("active");
+        
+            var selfContent = $("#content-"+storeLocationId);
+            selfContent.siblings().removeClass("active");
+            selfContent.addClass("active");
+        }
         
         // set active_store_location in server
-        setActiveStoreLocation(storeLocationId);
+        setActiveStoreLocation(containerId, storeLocationId);
         
         return false;
     });
@@ -192,10 +206,12 @@ function toStoreLocations(containerId) {
 
 $(document).ready(function() {
 
-    // the store_details store locations
-    toStoreLocations(CONTAINER_ID);
-    
     // the header store locations
     toStoreLocations(HEADER_CONTAINER_ID);
+    
+    // the store_details store locations
+    if (isInStoreDetails()) {
+        toStoreLocations(CONTAINER_ID);
+    }
     
 });
