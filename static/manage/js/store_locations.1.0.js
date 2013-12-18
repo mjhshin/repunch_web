@@ -22,13 +22,14 @@ var SCROLL_ARROW_HEIGHT = 10 + 20;
 // height of the add button (height + padding)
 var ADD_BUTTON_HEIGHT = 60 + 20;
 // Total height of the add button and the arrow down when scrolling is enabled.
-var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT
+var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT;
 
 /* NAV HEADER SPECIFICS */
 // the amount of items before the scroll arrows are shown
 var HEADER_NAV_ITEM_SCROLL = 4;
 // Static height at the bottom of the list when scrolling is enabled.
-var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT;
+// added 70 to this because of the offset from the header
+var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + 70;
 
 
 /*
@@ -53,13 +54,12 @@ function getContainerHeight(containerId) {
     return Number($("#"+containerId).css("height").replace("px", ""));
 }
 
-/*
-    Returns the max up scroll offset.
-*/
-function getScrollUpHeightOffset(containerId) {
-    // the height of the arrow and the add button
-    return  -1*(getNavTotalHeight(containerId) -
-        getContainerHeight(containerId) + NAV_SCROLL_BOTTOM_STATIC_HEIGHT);
+function getScrollBottomStaticHeight(containerId){
+    if (containerId == CONTAINER_ID) {
+        return NAV_SCROLL_BOTTOM_STATIC_HEIGHT;
+    } else {
+        return HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT;
+    }
 }
 
 function getScrollThreshold(containerId) {
@@ -68,6 +68,15 @@ function getScrollThreshold(containerId) {
     } else {
         return HEADER_NAV_ITEM_SCROLL;
     }
+}
+
+/*
+    Returns the max up scroll offset.
+*/
+function getScrollUpHeightOffset(containerId) {
+    // the height of the arrow and the add button
+    return  -1*(getNavTotalHeight(containerId) -
+        getContainerHeight(containerId) + getScrollBottomStaticHeight(containerId));
 }
 
 function animateStop(containerId) {
@@ -89,7 +98,6 @@ function animateStart(containerId, direction) {
             top -= 100;
             // prevent overscroll
             var maxOffset = getScrollUpHeightOffset(containerId);
-            alert(maxOffset);
             if (top < maxOffset) {
                 top = maxOffset;
             } 

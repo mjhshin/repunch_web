@@ -42,7 +42,7 @@
 .store-locations.navcontent {
 	border:1px solid #CCC;
 	border-radius:4px;
-    min-height: 560px; width: 650px;
+    min-height: 560px; width: 670px; 
 }
 
 .store-locations > div {
@@ -61,6 +61,11 @@
     height: 55px; width:192px;
     background: inherit;
     padding: 5px 10px 10px 20px;
+    /*  
+        relative positioning required for z-index
+        (relative to other relative positioned elements) to take effect
+    */
+    position: relative;  z-index: 6;
 }
 
 .store-locations > div.scroll {
@@ -219,8 +224,8 @@
 }
     
 .store-locations > div.content {
-    width: 344px; height: 100%;
-    padding: 20px 40px;
+    width: 384px; height: 100%;
+    padding: 20px 20px 20px 40px;
 }
 
 .store-locations > div.content div {

@@ -77,7 +77,7 @@
 			{# STORE LOCATIONS LIST #}
 		    <div class="store-locations header" id="store-locations-header">
 		    
-		        <div class="current"><span></span>
+		        <div class="current" ><span></span>
 	                {{ active_store_location.street|title }}<br/>
 	                {{ active_store_location.city|title }}, {{ active_store_location.state|upper }}
 		        </div>
