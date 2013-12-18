@@ -43,11 +43,11 @@
 	
 		<div id="header">
 		
-			<a id="header-left" href="{% url 'store_index' %}" style="background:green;">
+			<a id="header-left" href="{% url 'store_index' %}">
 				<img src="{% static "manage/images/logo_header.png" %}" alt="Repunch" id="logo-header" />&nbsp;
 			</a>
 			
-			<div id="header-right" style="background:yellow;">
+			<div id="header-right">
 			    <a href="{% url 'account_edit' %}">
 					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
 					    {% if request.session.store.store_avatar_url %}
@@ -73,32 +73,25 @@
 			</div>
 			
 			{# STORE LOCATIONS LIST #}
-		    <div class="store-locations navonly" id="store-locations-header">
+		    <div class="store-locations header" id="store-locations-header">
+		    
+		        <div class="current"><span></span>
+	                {{ active_store_location.street|title }}<br/>
+	                {{ active_store_location.city|title }}, {{ active_store_location.state|upper }}
+		        </div>
 
         		<div class="scroll up"><img src="{% static 'manage/images/scroll_up.1.0.png' %}"/></div>
         		
                 <div class="nav">
                     {% for location in store_locations %}
-                    <a id="navonly-{{ location.objectId }}"
+                    <a id="header-{{ location.objectId }}"
                         {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
                         <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
                     </a>
                     {% endfor %}
-                    
-                    {% if is_admin %}
-                    <a href="{% url 'store_location_edit' '0' %}" class="add">
-                        <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
-                    </a>
-                    {% endif %}
                 </div>
 
                 <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
-
-                {% if is_admin %}
-                <a href="{% url 'store_location_edit' '0' %}" class="add" >
-                    <div>Add Location<br/><img src="{% static 'manage/images/icon_add.1.0.png' %}"/></div>
-                </a>
-                {% endif %}
         
 		    </div>
             {# END STORE LOCATIONS LIST #}

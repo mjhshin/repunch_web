@@ -106,7 +106,7 @@ $(document).ready(function() {
         self.addClass("active");
         
         // show the corresponding content and hide the rest
-        var storeLocationId = self.attr("id").replace("nvacontent-", "");
+        var storeLocationId = self.attr("id").replace("navcontent-", "");
         var selfContent = $("#content-"+storeLocationId);
         selfContent.siblings().removeClass("active");
         selfContent.addClass("active");

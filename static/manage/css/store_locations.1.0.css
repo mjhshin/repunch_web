@@ -8,23 +8,39 @@
     background:white; overflow: hidden;
     position: relative;
     padding: 0;
-	border:1px solid #CCC;
 }
 
 /*
     List in the header.
 */
-.store-locations.navonly {
+.store-locations.header {
     float: right;
     max-height: 400px;
     z-index: 11;
-    border-top: 0;
+	border-bottom:1px solid #CCC;
+	
+    background-image: -ms-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -moz-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -o-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #F1F1F1), color-stop(1, #FFFFFF));
+    background-image: -webkit-linear-gradient(bottom, #F1F1F1 0%, #FFFFFF 100%);
+    background-image: linear-gradient(to top, #F1F1F1 0%, #FFFFFF 100%);
+}
+
+.store-locations.header:hover {
+    background-image: -ms-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -moz-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -o-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #E1E1E1), color-stop(1, #EEEEEE));
+    background-image: -webkit-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
+    background-image: linear-gradient(to top, #E1E1E1 0%, #EEEEEE 100%);
 }
 
 /*
     List in store_details.
 */
 .store-locations.navcontent {
+	border:1px solid #CCC;
 	border-radius:4px;
     min-height: 560px; width: 650px;
 }
@@ -33,10 +49,18 @@
     display: inline-block;
 }
 
-
+.store-locations.header > div.current,
 .store-locations > div.nav {
-    width:223px; 
-    float: left;
+    width:222px;
+    float: left;clear: both;
+}
+
+
+.store-locations.header > div.current {
+    font-size: 12px; font-weight: bold;
+    height: 55px; width:192px;
+    background: inherit;
+    padding: 5px 10px 10px 20px;
 }
 
 .store-locations > div.scroll {
@@ -58,6 +82,11 @@
     bottom: 80px;
 }
 
+.store-locations.header > div.scroll.down {
+    /* no add button in the header */
+    bottom: 0px;
+}
+
 .store-locations > a.add,
 .store-locations > div.content div label {
 	font: bold 15px/20px 'Cabin', sans-serif;
@@ -72,6 +101,10 @@
     z-index: 1;
 }
 
+.store-locations.header > div.scroll.up {
+    top: 70px;
+}
+
 .store-locations > div.nav > a > div {
 	font: normal 15px/20px 'Cabin', sans-serif;
 }
@@ -80,10 +113,15 @@
     font-weight: bold;
 }
 
+.store-locations.header > div.current span,
 .store-locations > div.nav > a.active > div > span {
     display: block;
     margin-top: 4px;
     color: #669900;
+}
+
+.store-locations.header > div.current span {
+    margin-top: 0;
 }
 
 .store-locations > div.nav > a.active > div > span:before {
@@ -92,10 +130,16 @@
     content: url('../images/icon_active_location.png');
 }
 
+.store-locations.header > div.current span:after,
 .store-locations > div.nav > a.active > div > span:after {
     position: relative; top: 6px;
 	font: normal 15px/20px 'Cabin', sans-serif;
     content: "Current Location";
+}
+
+.store-locations.header > div.current span:after {
+    top: 0;
+	font: bold 12px/6px 'Cabin', sans-serif;
 }
 
 .store-locations > div.scroll,
@@ -114,6 +158,14 @@
 	border:1px solid #CCC;
     border-left: 0px; border-top: 0px;
     padding: 10px;
+}
+
+.store-locations > div.scroll {
+    padding: 10px 10px 10px 11px;
+}
+
+.store-locations.header > div.scroll {
+    padding-right: 11px;
 }
 
 .store-locations > div.scroll.down {
@@ -135,7 +187,7 @@
 .store-locations > div.nav > a.active > div {
     height: 70px;
     border-right: 0px;
-    background: inherit;
+    background: white;
 }
 
 .store-locations > a.add {
@@ -153,6 +205,13 @@
     padding: 10px 10px;
 	border-right:1px solid #CCC;
 } 
+
+.store-locations.header > a.add > div,
+.store-locations.header > div.nav > a.add > div,
+.store-locations.header > div.nav > a > div {
+	border:1px solid #CCC;
+	border-top: 0;
+}
 
 .store-locations > a.add > div > img,
 .store-locations > div.nav > a.add > div >img {
@@ -186,3 +245,21 @@
     /* for some reason this is not left aligned */
     position: relative; left: 0px;
 }
+
+/***
+    Header specifics.
+*/
+.store-locations.header > div.scroll,
+.store-locations.header > div.nav,
+.store-locations.header > a {
+    display: none;
+}
+
+
+.store-locations.header:hover > div.scroll,
+.store-locations.header:hover > div.nav,
+.store-locations.header:hover > a {
+    display: block;
+}
+
+
