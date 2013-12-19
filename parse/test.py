@@ -18,17 +18,19 @@ def request_redeem():
     """
     """
     print _request_redeem("zef0o3YjIm", "o72LmDy0YK", "kfWmOOlIWD",
-        "Test Redeem#"+str(randint(0,9999)), 1, 1, "Vandolf Estrellado", None)
+        "Test Redeem#"+str(randint(0,9999)), 1, 1,
+        "Vandolf Estrellado", None, "nSqxOtPMik")
         
 def request_redeem_ps(patron_store_id, reward_id=0, num_punches=1):
     ps = PatronStore.objects().get(objectId=patron_store_id,
         include="Patron,Store")
     print _request_redeem(ps.patron.objectId, ps.store.objectId,
         patron_store_id, "Test Redeem#"+str(randint(0,9999)), reward_id,
-        num_punches, "Vandolf Estrellado", None)
+        num_punches, "Vandolf Estrellado", None,
+        ps.store.store_locations[0].objectId)
 
 def _request_redeem(patron_id, store_id, patron_store_id, title,
-    reward_id, num_punches, name, message_status_id):
+    reward_id, num_punches, name, message_status_id, store_location_id):
     """
     var patronId = request.params.patron_id;
 	var storeId = request.params.store_id;
@@ -43,6 +45,7 @@ def _request_redeem(patron_id, store_id, patron_store_id, title,
     return cloud_call("request_redeem", {
         "patron_id": patron_id,
         "store_id": store_id,
+        "store_location_id": store_location_id,
         "patron_store_id": patron_store_id,
         "title": title,
         "reward_id": reward_id,
@@ -93,8 +96,8 @@ def request_redeem_offers(patron_store_id):
     Requests all offers in the given patron_store's MessageStatus
     """
     ps = PatronStore.objects().get(objectId=patron_store_id,
-        include="Patron")
-    patron = ps.patron
+        include="Patron,Store")
+    patron, store = ps.patron, ps.store
     message_statuses = patron.get("receivedMessages",
         redeem_available="yes", limit=999)
 
@@ -103,6 +106,7 @@ def request_redeem_offers(patron_store_id):
         cloud_call("request_redeem", {
             "patron_id": ps.Patron,
             "store_id": ps.Store,
+            "store_location_id": store.store_locations[0].objectId,
             "patron_store_id": ps.objectId,
             "title": message.offer_title,
             "reward_id": None,
