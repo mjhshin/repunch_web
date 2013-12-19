@@ -60,8 +60,19 @@ def set_active_location(request):
 @login_required
 @admin_only(reverse_url="store_index")
 def edit_store(request):
-    pass # TODO
+    data = {'account_nav': True}
+    store = SESSION.get_store(request.session)
     
+    if request.method == "POST":
+        pass # TODO
+        
+    else:
+        store_form = StoreForm()
+        store_form.initial = store.__dict__.copy()
+        
+    data['store_form'] = store_form 
+    
+    return render(request, 'manage/store_edit.html', data)
 
 @dev_login_required
 @login_required

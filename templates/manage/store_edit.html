@@ -15,113 +15,38 @@
     {% with store=request.session.store %}
 
     {# REQUIRED FOR AVATAR UPLOAD JS #}
-    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location_id %}" />
-    {# REQUIRED FOR STORE EDIT JS #}
-    <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
+    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' 'x' %}" />
 	
-	<form action="{% url 'store_location_edit' store_location_id %}" method="POST" id="account-edit-form">{% csrf_token %}
-		{% if error or success %}
-		<div class="notification {% if success %}success{% endif %} hide">
-			<div>{{ error }}{{ success }}</div>
-		</div>
-		{% endif %}
-		
+	<form action="{% url 'store_edit' %}" method="POST">{% csrf_token %}
+	
 		<div id="photo-edit">
 			<div class="white-box">
-	        {% if store_location and store_location.store_avatar_url %}
-	            <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	        {% elif store_location_avatar_tmp %}
-	            <img src="{{ store_location_avatar_tmp }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-	        {% else %}
-	            <a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">
-	            <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
-	                class="avatar-big" width="200px" height="200px"/>
-	            </a>
-            {% endif %}
+                <a href="{% url 'store_avatar_upload' 'x' %}" id="upload-avatar">
+	            {% if store.store_avatar_url %}
+	                <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+	            {% else %}
+	                <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
+	                    class="avatar-big" width="200px" height="200px"/>
+                {% endif %}
+                </a>
 			</div>
-			<a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">Add/Change Photo</a>
+			<a href="{% url 'store_avatar_upload' 'x' %}" id="upload-avatar">Add/Change Photo</a>
 		</div>
 	
 		
-		<h2>{% if store_location_id == '0' %}Add{% else %}Edit{% endif %} Store Location</h2>	
-		{{ store_location_form.non_field_errors }}
-		<div class="input-container street-container">
-			<div id="street_e">{{ store_location_form.street.errors }}</div>
-			<label for="id_street">Street</label>
-			{{ store_location_form.street }}
+		<h2>Edit Store Details</h2>	
+		{{ store_form.non_field_errors }}
+		
+		<div class="input-container store_name-container">
+			<div id="store_name_e">{{ store_form.store_name.errors }}</div>
+			<label for="id_store_name">Store Name</label>
+			{{ store_form.store_name }}
 		</div>
 		
-		<div class="input-container " 
-		    {% if not store_location_form.city.errors and store_location_form.state.errors %}
-		        style="margin-top:24px;"
-		    {% endif %}>
-			<div id="city_e">{{ store_location_form.city.errors }}</div>
-			<label for="id_city">City</label>
-			{{ store_location_form.city }}
-		</div>
-		
-		<div class="input-container"
-		    {% if store_location_form.city.errors and not store_location_form.state.errors %}
-		        style="margin-top:24px;"
-		    {% endif %}>
-			<div id="state_e">{{ store_location_form.state.errors }}</div>
-			<label for="id_state">State</label>
-			{{ store_location_form.state }}
-		</div>
-		
-		<div class="input-container">
-			<div id="zip_e">{{ store_location_form.zip.errors }}</div>
-			<label for="id_zip">Zip</label>
-			{{ store_location_form.zip }}
-		</div>
-		
-		<div class="input-container"
-		    {% if store_location_form.zip.errors %}
-	            style="margin-top:24px;"
-		    {% endif %}>
-			<div id="country_e">{{ store_location_form.country.errors }}</div>
-			<label for="country">Country</label>
-			<select name="country" id="country">
-				<option value="US">United States of America</option>
-			</select>
-		</div>
-		
-		<div class="input-container clearheight">
-			<div id="phone_number_e">{{ store_location_form.phone_number.errors }}</div>
-			<label for="id_phone_number">Phone Number</label>
-			<input id="id_phone_number" name="phone_number" type="hidden" />
-			<span style="font-size:1.1em;position:relative;top:2px;left:-4px;color:#666;">(</span><input type = "text" id = "Ph1" 
-					    style="width:30px;" maxlength = "3" onkeyup = "validate(this,2)" />
-					    <span style="font-size:1.1em;position:relative;top:2px;left:2px;margin-right:8px;color:#666;">)</span>
-            <input type = "text" id = "Ph2" size =" 3" maxlength = "3" onkeyup = "validate(this,3)" />
-            <span style="font-size:1.1em;font-weight:bold;color:#666;">-</span>
-            <input type = "text" id = "Ph3" size =" 4" maxlength = "4" onkeyup = "validate(this,3)" />
-			
-			<script type = "text/javascript">
-			// fill in the values of the 3 input boxes
-			$(document).ready(function(){
-			    var p_num = "{{ store_location_form.phone_number.value }}";
-			    if (p_num == "None"){
-	                return;
-	            }
-	            $("#Ph1").val(p_num.substring(0,3));
-	            $("#Ph2").val(p_num.substring(3,6));
-	            $("#Ph3").val(p_num.substring(6,10));        
-			});
-			
-			// stolen from http://www.codingforums.com/showthread.php?t=202208
-			// laziness ftw!
-            function validate(which, next) {
-                var val = which.value;
-                val = val.replace(/[^0-9]/g,"");  // strip non-digits
-                which.value = val;
-                next = "Ph" + next;
-                if (val.length == 3) {  // field completed
-                    document.getElementById(next).focus();
-                }
-            }
-            
-            </script>
+		<div class="input-container store_description-container">
+			<div id="store_description_e">{{ store_form.store_description.errors }}</div>
+			<label for="id_store_description">Description</label>
+			{{ store_form.store_description }}
 		</div>
 		
 	</form>

@@ -20,28 +20,23 @@
 
 {# REQUIRED FOR AVATAR UPLOAD JS #}
 <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location_id %}" />
-{# REQUIRED FOR STORE EDIT JS #}
+{# REQUIRED FOR STORE LOCATION EDIT JS #}
 <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 
-<form action="{% url 'store_location_edit' store_location_id %}" method="POST" id="account-edit-form">{% csrf_token %}
-	{% if error or success %}
-	<div class="notification {% if success %}success{% endif %} hide">
-		<div>{{ error }}{{ success }}</div>
-	</div>
-	{% endif %}
+<form action="{% url 'store_location_edit' store_location_id %}" method="POST" id="store-location-edit-form">{% csrf_token %}
 	
 	<div id="photo-edit">
 		<div class="white-box">
-        {% if store_location and store_location.store_avatar_url %}
-            <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-        {% elif store_location_avatar_tmp %}
-            <img src="{{ store_location_avatar_tmp }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-        {% else %}
             <a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">
-            <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
-                class="avatar-big" width="200px" height="200px"/>
+            {% if store_location and store_location.store_avatar_url %}
+                <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+            {% elif store_location_avatar_tmp %}
+                <img src="{{ store_location_avatar_tmp }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+            {% else %}
+                <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
+                    class="avatar-big" width="200px" height="200px"/>
+            {% endif %}
             </a>
-        {% endif %}
 		</div>
 		<a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">Add/Change Photo</a>
 	</div>

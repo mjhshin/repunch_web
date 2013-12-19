@@ -213,7 +213,7 @@ function submitForm(submitButton){
     $("#id_phone_number").val(new String($("#Ph1").val()) + 
         new String($("#Ph2").val()) + new String($("#Ph3").val()));	   
                     
-    var form = $("#account-edit-form");
+    var form = $("#store-location-edit-form");
     var data = form.serializeArray();
     data.push({
         name: "hours",
