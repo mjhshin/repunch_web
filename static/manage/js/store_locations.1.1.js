@@ -21,15 +21,15 @@ var NAV_ITEM_SCROLL = 8;
 var SCROLL_ARROW_HEIGHT = 10 + 10;
 // height of the add button (height + padding)
 var ADD_BUTTON_HEIGHT = 60 + 20;
-// Total height of the add button and the arrow down when scrolling is enabled.
-var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + ADD_BUTTON_HEIGHT;
+// Total height of the add button when scrolling is enabled.
+var NAV_SCROLL_BOTTOM_STATIC_HEIGHT = ADD_BUTTON_HEIGHT;
 
 /* NAV HEADER SPECIFICS */
 // the amount of items before the scroll arrows are shown
 var HEADER_NAV_ITEM_SCROLL = 4;
 // Static height at the bottom of the list when scrolling is enabled.
-// added 70 to this because of the offset from the header
-var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = SCROLL_ARROW_HEIGHT + 70;
+// this is 70 because of the offset from the header
+var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = 70;
 
 function isInStoreDetails() {
     return $("#"+CONTAINER_ID).length > 0;
@@ -97,8 +97,8 @@ function animateStart(containerId, direction) {
         if (direction == DIR_UP) {
             top += 100;
             // prevent overscroll
-            if (top > SCROLL_ARROW_HEIGHT) { 
-                top = SCROLL_ARROW_HEIGHT;
+            if (top > 0) { 
+                top = 0;
             }
             
         } else {
@@ -112,7 +112,17 @@ function animateStart(containerId, direction) {
         }
             
         self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, function(){
-            if (top != SCROLL_ARROW_HEIGHT && top != getScrollUpHeightOffset(containerId)) {
+            // reached the top - hide the arrow up
+            if (top == 0) {
+                $("#"+containerId+" > div.scroll.up").fadeOut();
+            } 
+            // reached the bottom - hide the arrow down
+            else if (top == getScrollUpHeightOffset(containerId)) {
+                $("#"+containerId+" > div.scroll.down").fadeOut();
+            }
+            // animate and show both arrows
+            else {
+                $("#"+containerId+" > div.scroll").fadeIn();
                 animateStart(containerId, direction);
             }
             
@@ -194,8 +204,8 @@ function toStoreLocations(containerId) {
         return;
     }
     
-    // displace the nav item's initial position
-    $("#"+containerId+" > div.nav > a").css("top", SCROLL_ARROW_HEIGHT);
+    // hide the scroll up arrow initially since the list top is 0
+    $("#"+containerId+" > div.scroll.up").hide();
     
     // hover on up/down scroll
     $("#"+containerId+" > div.scroll.up").hover(function() {

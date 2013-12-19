@@ -89,7 +89,7 @@ def edit_location(request, store_location_id):
                 store_location = SESSION.get_store_location(\
                     request.session, store_location_id)
                 # the avatar will be lost in the creation so add it in
-                avatar_url = store_location.store_avatar_url
+                avatar_url = store_location.get("store_avatar_url")
                 store_location = StoreLocation(**store_location.__dict__)
                 store_location.update_locally(postDict, False)
                 store_location.store_avatar_url = avatar_url
