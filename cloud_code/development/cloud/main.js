@@ -1191,7 +1191,8 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	var patronStoreId = request.params.patron_store_id;
 	var rewardTitle = request.params.title;
 	var rewardId = parseInt(request.params.reward_id);
-	var numPunches = parseInt(request.params.num_punches); //comes in as string!
+	var numPunches = parseInt(request.params.num_punches);
+	var storeLocationId = request.params.store_location_id;
 	var customerName = request.params.name;
 	var messageStatusId = request.params.message_status_id;
 	var isOfferOrGift = (messageStatusId != null);
@@ -1202,6 +1203,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	var Message = Parse.Object.extend("Message");
 	
 	var redeemReward = new RedeemReward();
+	redeemReward.set("store_location_id", storeLocationId);
 	redeemReward.set("patron_id", patronId);
 	redeemReward.set("customer_name", customerName);	
 	redeemReward.set("is_redeemed", false);

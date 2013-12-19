@@ -30,6 +30,7 @@ class RedeemReward(ParseObject):
         self.num_punches = data.get("num_punches")
         self.reward_id = data.get("reward_id")
         self.patron_id = data.get("patron_id")
+        self.store_location_id = data.get("store_location_id")
         
         self.MessageStatus = data.get("MessageStatus")
         self.PatronStore = data.get('PatronStore')
@@ -42,6 +43,7 @@ class RedeemReward(ParseObject):
         See ParseObject for documentation.
         """
         return (cls, "title", "customer_name", "is_redeemed",
-            "patron_id", "num_punches", ("PatronStore", "reward_id"),
+            "patron_id", "store_location_id", "num_punches",
+            ("PatronStore", "reward_id"),
             ("MessageStatus", {"num_punches":0}))
 
