@@ -86,8 +86,39 @@ function getScrollUpHeightOffset(containerId) {
         getContainerHeight(containerId) + getScrollBottomStaticHeight(containerId));
 }
 
+/*
+    Checks if the first row in the list has reached max up/down scroll.
+    This will reanimate in the direction given if direction is provided and
+    the list has not yet reached its max scroll in that direction.
+*/
+function animateComplete(containerId, top, direction) {
+    // reached the top - hide the arrow up
+    if (top == 0) {
+        $("#"+containerId+" > div.scroll.up").fadeOut();
+    } else {
+        $("#"+containerId+" > div.scroll.up").fadeIn();
+    }
+    
+    // reached the bottom - hide the arrow down
+    if (top == getScrollUpHeightOffset(containerId)) {
+        $("#"+containerId+" > div.scroll.down").fadeOut();
+    } else {
+        $("#"+containerId+" > div.scroll.down").fadeIn();
+    }
+    
+    // animate and show both arrows
+    if (direction != null && top != 0 && top != getScrollUpHeightOffset(containerId)){
+        $("#"+containerId+" > div.scroll").fadeIn();
+        animateStart(containerId, direction);
+    }
+}
+
+/*
+    Stops the animation of all items in the list and calls animateComplete without direction.
+*/
 function animateStop(containerId) {
     $("#"+containerId+" > div.nav > a").stop();
+    animateComplete(containerId, Number($("#"+containerId+" > div.nav > a:first-child").css("top").replace("px", "")));
 }
 
 function animateStart(containerId, direction) {
@@ -112,20 +143,11 @@ function animateStart(containerId, direction) {
         }
             
         self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, function(){
-            // reached the top - hide the arrow up
-            if (top == 0) {
-                $("#"+containerId+" > div.scroll.up").fadeOut();
-            } 
-            // reached the bottom - hide the arrow down
-            else if (top == getScrollUpHeightOffset(containerId)) {
-                $("#"+containerId+" > div.scroll.down").fadeOut();
-            }
-            // animate and show both arrows
-            else {
-                $("#"+containerId+" > div.scroll").fadeIn();
-                animateStart(containerId, direction);
-            }
-            
+            // check if we should animate again and the visibility of the scroll arrows
+            if (!self.is(":first-child")) {
+                animateComplete(containerId, top, direction);
+            }     
+           
         });
     });
 }
@@ -168,7 +190,7 @@ function setActiveStoreLocation(containerId, storeLocationId) {
 */
 function toStoreLocations(containerId) {
     // clicks on nav items
-    $(".store-locations > div.nav > a[class!=add]").click(function() {
+    $("#"+containerId+" > div.nav > a[class!=add]").click(function() {
         var self = $(this);
         
         // do nothing if it's already active
