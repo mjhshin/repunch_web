@@ -140,6 +140,8 @@ def punch(request):
     
         store = SESSION.get_store(request.session)
         data = {
+            "store_location_id":\
+                SESSION.get_active_store_location_id(request.session),
             "store_id":store.objectId,
             "store_name":str(store.get('store_name')),
             "punch_code":str(request.POST['punch_code']),
@@ -240,9 +242,11 @@ def redeem(request):
             if action == "approve":
                 redemptions_past =\
                     SESSION.get_redemptions_past(session)
+                    
                 if result and result in ("insufficient",
                     "PATRONSTORE_REMOVED") and i_remove != -1:
                     redemptions_pending.pop(i_remove)
+                    
                 elif i_remove != -1: # success
                     redemption = redemptions_pending.pop(i_remove)
                     redemption.is_redeemed = True

@@ -105,7 +105,7 @@ def comet_receive(store_id, postDict, session_key=None):
             
             
         #############################################################
-        # MESSAGE SENT ##################################For fit people. By fit people. Four fit people.
+        # MESSAGE SENT ##################################
         # need to check if this new message is an original message 
         # or a reply to a feedback (the message sent by the patron)!
         # also may increment the message count!
@@ -440,6 +440,7 @@ def comet_receive(store_id, postDict, session_key=None):
         session.save()
         
         # flag all threads with this session_key about the new stuff
+        # same browser - different tabs
         CometSession.objects.update()
         for comet in CometSession.objects.filter(session_key=skey):
             comet.modified = True

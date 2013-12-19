@@ -874,6 +874,7 @@ Parse.Cloud.define("punch", function(request, response)
 	var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
 	var employeeId = request.params.employee_id;
+	var storeLocationId = request.params.store_location_id;
    
 	var Patron = Parse.Object.extend("Patron");
 	var PatronStore = Parse.Object.extend("PatronStore");
@@ -1089,6 +1090,8 @@ Parse.Cloud.define("punch", function(request, response)
 		
 		punch.set("Patron", patronStore.get("Patron"));
 		punch.set("punches", numPunches);
+		punch.set("store_location_id", storeLocationId);
+		
 		punch.save().then(function(punch) {
 			console.log("Punch save was successful.");
 			store.relation("Punches").add(punch);
