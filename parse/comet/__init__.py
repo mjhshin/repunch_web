@@ -19,12 +19,16 @@ from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store, StoreLocation,\
 Subscription, Settings
 
-def comet_receive(store_id, postDict):
+def comet_receive(store_id, postDict, session_key=None):
     """
     Returns True if the injection to the session and SessionComet
     is successful.
     
     Note that postDict must be contain values that are jsonified!
+    
+    If session_key is provided, then this comet_receive will only take
+    effect for that session - not all sessions with the given store_id
+    (store_id is ignored).
     
     This adds to the related session's cache:
         updatedAccount
@@ -101,7 +105,7 @@ def comet_receive(store_id, postDict):
             
             
         #############################################################
-        # MESSAGE SENT ##################################
+        # MESSAGE SENT ##################################For fit people. By fit people. Four fit people.
         # need to check if this new message is an original message 
         # or a reply to a feedback (the message sent by the patron)!
         # also may increment the message count!
@@ -421,18 +425,13 @@ def comet_receive(store_id, postDict):
             patronStore_int = int(patronStore_int)
             session['patronStore_count'] = patronStore_int
             
-    # check if key is present and valid
-    if postDict.get(COMET_RECEIVE_KEY_NAME) != COMET_RECEIVE_KEY:
-        return False
-        
-    for scomet in CometSessionIndex.objects.filter(\
-        store_id=store_id):
+            
+    def processSession(skey):
         # get the latest session associated with this object
-        session = SessionStore(scomet.session_key)
+        session = SessionStore(skey)
         # do not go if the session has already been logged out
-        if session.get('account') is None or\
-            SESSION_KEY not in session:
-            continue
+        if session.get('account') is None or SESSION_KEY not in session:
+            return
             
         processCometReceivedDict(session, postDict)
         
@@ -442,10 +441,25 @@ def comet_receive(store_id, postDict):
         
         # flag all threads with this session_key about the new stuff
         CometSession.objects.update()
-        for comet in CometSession.objects.filter(session_key=\
-            scomet.session_key):
+        for comet in CometSession.objects.filter(session_key=skey):
             comet.modified = True
             comet.save()
+            
+            
+    # check if request is valid (key is present and correct)
+    if postDict.get(COMET_RECEIVE_KEY_NAME) != COMET_RECEIVE_KEY:
+        return False
+        
+        
+    # receive only for this particular session
+    if session_key:
+        processSession(session_key)
+        return True        
+          
+    # recieve for all sessions with the given store_id
+    for scomet in CometSessionIndex.objects.filter(\
+        store_id=store_id):
+        processSession(scomet.session_key)
                  
     return True
             
