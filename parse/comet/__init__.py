@@ -222,58 +222,73 @@ def comet_receive(store_id, postDict, session_key=None):
            
         #############################################################
         # REDEMPTIONS PENDING
+        ### Only added to cache if it has the store_location_id as
+        ### active_store_location_id
         pendingRedemption = postDict.get("pendingRedemption")
         if pendingRedemption:
-            redemptions_pending_ids =\
-                [ red.objectId for red in redemptions_pending ]
-            redemptions_past_ids =\
-                [ red.objectId for red in redemptions_past ]
             rr = RedeemReward(**pendingRedemption)
-            # need to check here if the redemption is new because 
-            # the dashboard that validated it will also receive
-            # the validated redemption back.
-            if rr.objectId not in redemptions_past_ids and\
-                rr.objectId not in redemptions_pending_ids:
-                redemptions_pending.insert(0, rr)
-                
-            session['redemptions_pending'] =\
-                redemptions_pending
+            
+            if rr.store_location_id ==\
+                session.get('active_store_location_id'):
+                redemptions_pending_ids =\
+                    [ red.objectId for red in redemptions_pending ]
+                redemptions_past_ids =\
+                    [ red.objectId for red in redemptions_past ]
+                # need to check here if the redemption is new because 
+                # the dashboard that validated it will also receive
+                # the validated redemption back.
+                if rr.objectId not in redemptions_past_ids and\
+                    rr.objectId not in redemptions_pending_ids:
+                    redemptions_pending.insert(0, rr)
+                    
+                session['redemptions_pending'] =\
+                    redemptions_pending
             
         #############################################################
         # REDEMPTIONS APPROVED (pending to history)
+        # Save cpu by skipping those that do not have the same 
+        # store_location_id as active_store_location_id
         approvedRedemption = postDict.get("approvedRedemption") 
         if approvedRedemption:  
             redemp = RedeemReward(**approvedRedemption)
-            # check if redemp is still in pending
-            for i, redem in enumerate(redemptions_pending):
-                if redem.objectId == redemp.objectId:
-                    r = redemptions_pending.pop(i)
-                    r.is_redeemed = True
-                    r.updatedAt = redemp.updatedAt
-                    redemptions_past.insert(0, r)
-                    break
-            # if not then check if it is in the history already
-            # the above shouldn't happen!
-                
-            session['redemptions_pending'] =\
-                redemptions_pending
-            session['redemptions_past'] =\
-                redemptions_past
+            
+            if redemp.store_location_id ==\
+                session.get('active_store_location_id'):
+                # check if redemp is still in pending
+                for i, redem in enumerate(redemptions_pending):
+                    if redem.objectId == redemp.objectId:
+                        r = redemptions_pending.pop(i)
+                        r.is_redeemed = True
+                        r.updatedAt = redemp.updatedAt
+                        redemptions_past.insert(0, r)
+                        break
+                # if not then check if it is in the history already
+                # the above shouldn't happen!
+                    
+                session['redemptions_pending'] =\
+                    redemptions_pending
+                session['redemptions_past'] =\
+                    redemptions_past
             
         #############################################################
         # REDEMPTIONS DELETED ##############################
         # remove from pending (should not be in history!)
+        # Save cpu by skipping those that do not have the same 
+        # store_location_id as active_store_location_id
         deletedRedemption = postDict.get("deletedRedemption")
         if deletedRedemption:
             redemp = RedeemReward(**deletedRedemption)
-            # check if redemp is still in pending
-            for i, redem in enumerate(redemptions_pending):
-                if redem.objectId == redemp.objectId:
-                    redemptions_pending.pop(i)
-                    break
-                
-            session['redemptions_pending'] =\
-                redemptions_pending
+            
+            if redemp.store_location_id ==\
+                session.get('active_store_location_id'):
+                # check if redemp is still in pending
+                for i, redem in enumerate(redemptions_pending):
+                    if redem.objectId == redemp.objectId:
+                        redemptions_pending.pop(i)
+                        break
+                    
+                session['redemptions_pending'] =\
+                    redemptions_pending
                
         #############################################################
         # STORE UPDATED ##############################
