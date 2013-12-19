@@ -1183,6 +1183,7 @@ ul.errorlist li { margin: 0px; padding: 0px; color: red; font-size: 12px; positi
 	padding:19px 14px 0;
 	margin-left:5px;
 	margin-right:15px;
+	white-space: nowrap;
 	font: normal 16px 'Cabin', sans-serif;
 }
 

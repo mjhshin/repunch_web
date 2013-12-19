@@ -52,6 +52,7 @@ def set_active_location(request):
         SESSION.set_active_store_location_id(request.session,
             store_location_id)
         success = True
+        # TODO notify other tabs of this change.
         
     return HttpResponse(json.dumps({"success": success}),
         content_type="application/json")
