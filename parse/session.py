@@ -55,11 +55,11 @@ def get_store(session):
         
     return session['store']
         
-def get_redemptions_pending(session, store_location_id=None):
+def get_redemptions_pending(session, store_location_id=None, refresh=False):
     """ 
     returns all the pending redemptions (limit of 900)
     """
-    if "redemptions_pending" not in session:
+    if "redemptions_pending" not in session or refresh:
         store = get_store(session)
         redemptions_pending = store.get('redeemRewards',
             store_location_id=store_location_id,
@@ -74,12 +74,12 @@ def get_redemptions_pending(session, store_location_id=None):
 
     return session['redemptions_pending']
         
-def get_redemptions_past(session, store_location_id=None):
+def get_redemptions_past(session, store_location_id=None, refresh=False):
     """ 
     returns all the redeemed redemptions (limit of 900)
     Ordered based on updatedAt attr.
     """
-    if "redemptions_past" not in session:
+    if "redemptions_past" not in session or refresh:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=True,
             store_location_id=store_location_id,
@@ -119,6 +119,10 @@ def set_active_store_location_id(session, store_location_id):
     session['active_store_location_id'] = store_location_id
     session['store_timezone'] = pytz.timezone(get_store_location(\
         session, store_location_id).get('store_timezone'))
+        
+    # reload redeems cache     
+    get_redemptions_pending(session, store_location_id, True)
+    get_redemptions_past(session, store_location_id, True)
         
     return session['active_store_location_id']
     

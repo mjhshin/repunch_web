@@ -158,17 +158,17 @@ function setActiveStoreLocation(containerId, storeLocationId) {
     if (reloadPage) {
         $(".store-locations.header").addClass("reloading");
     }
+    
+    // replace the header current div
+    $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
+        $("#header-"+storeLocationId).html().replace("<span></span>", "")
+            .replace("<div>", "").replace("</div>", ""));
 
     $.ajax({
         url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
         type: "GET",
         cache: false, // required to kill internet explorer 304 bug
         success: function(res) {
-            // replace the header current div
-            $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
-                $("#header-"+storeLocationId).html().replace("<span></span>", "")
-                    .replace("<div>", "").replace("</div>", ""));
-            
             // if the click was from the header, reload page content
             if (reloadPage) {
                 var url = document.URL;
