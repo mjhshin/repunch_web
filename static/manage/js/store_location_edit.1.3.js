@@ -205,7 +205,7 @@ function submitForm(submitButton){
         return;
     }
 
-    var loader = $("#store-save-loading");
+    var loader = $(".form-options img");
     if (loader.is(":visible")) { return; }
     loader.show();
     
@@ -270,7 +270,7 @@ $(document).ready(function(){
         submitForm($(this));
     });
     
-    var loader = $("#store-save-loading");
+    var loader = $(".form-options img");
     // clicks on cancel
     $(".form-options a.red").click(function() {
         return !loader.is(":visible");

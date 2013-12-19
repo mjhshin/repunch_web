@@ -433,6 +433,7 @@ def comet_receive(store_id, postDict):
         if session.get('account') is None or\
             SESSION_KEY not in session:
             continue
+            
         processCometReceivedDict(session, postDict)
         
         # need to save session to commit modifications

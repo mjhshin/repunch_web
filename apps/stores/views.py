@@ -64,7 +64,23 @@ def edit_store(request):
     store = SESSION.get_store(request.session)
     
     if request.method == "POST":
-        pass # TODO
+        store_form = StoreForm(request.POST)
+        
+        if store_form.is_valid():
+            store.update_locally(request.POST.dict(), False)
+            
+            # notify other dashboards
+            comet_receive(store.objectId, {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedStore": store.jsonify(),
+            })
+
+            # make sure that we have the latest session
+            request.session.clear()
+            request.session.update(SessionStore(request.session.session_key))
+            
+            return redirect(reverse('store_index')+ "?%s" %\
+                urllib.urlencode({'success': 'Store details has been updated.'}))
         
     else:
         store_form = StoreForm()

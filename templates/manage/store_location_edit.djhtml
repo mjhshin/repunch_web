@@ -246,12 +246,9 @@
 	</div>
 </div>
 		
-<div id="edit-store-options" class="form-options">
+<div id="edit-store-location-options" class="form-options">
 	<a class="button blue" id="save-button">Save Changes</a>
 	<a href="{% url 'store_index' %}" class="red">Cancel</a>
-    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
-            alt="processing punch request..." 
-            id="store-save-loading" 
-            style="display:none;position:relative;top:5px;left:4px;"/>
+    <img src="{% static 'manage/images/ajax-loader.gif' %}"  />
 </div>
 {% endblock %}

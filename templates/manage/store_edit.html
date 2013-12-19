@@ -5,10 +5,11 @@
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.2.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.2.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +18,7 @@
     {# REQUIRED FOR AVATAR UPLOAD JS #}
     <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' 'x' %}" />
 	
-	<form action="{% url 'store_edit' %}" method="POST">{% csrf_token %}
+	<form action="{% url 'store_edit' %}" method="POST" id="store-edit-form">{% csrf_token %}
 	
 		<div id="photo-edit">
 			<div class="white-box">
@@ -53,10 +54,9 @@
 		
 			
 	<div id="edit-store-options" class="form-options">
-		<a class="button blue" id="save-button">Save Changes</a>
+		<a class="button blue">Save Changes</a>
 		<a href="{% url 'store_index' %}" class="red">Cancel</a>
-	    <img src="{% static 'manage/images/ajax-loader.gif' %}" 
-	            style="display:none;position:relative;top:5px;left:4px;"/>
+	    <img src="{% static 'manage/images/ajax-loader.gif' %}" />
 	</div>
 {% endwith %}
 {% endblock %}
