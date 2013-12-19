@@ -55,14 +55,16 @@ def get_store(session):
         
     return session['store']
         
-def get_redemptions_pending(session):
+def get_redemptions_pending(session, store_location_id=None):
     """ 
     returns all the pending redemptions (limit of 900)
     """
     if "redemptions_pending" not in session:
         store = get_store(session)
         redemptions_pending = store.get('redeemRewards',
-                    is_redeemed=False, order="-createdAt", limit=900)
+            store_location_id=store_location_id,
+            is_redeemed=False, order="-createdAt", limit=900)
+            
         if redemptions_pending is None:
             redemptions_pending = []
             
@@ -72,7 +74,7 @@ def get_redemptions_pending(session):
 
     return session['redemptions_pending']
         
-def get_redemptions_past(session):
+def get_redemptions_past(session, store_location_id=None):
     """ 
     returns all the redeemed redemptions (limit of 900)
     Ordered based on updatedAt attr.
@@ -80,7 +82,9 @@ def get_redemptions_past(session):
     if "redemptions_past" not in session:
         store = get_store(session)
         redemptions = store.get('redeemRewards', is_redeemed=True,
-                        order="-createdAt", limit=900)
+            store_location_id=store_location_id,
+            order="-createdAt", limit=900)
+            
         if redemptions is None:
             redemptions = []
         #else:
@@ -104,22 +108,25 @@ def get_store_locations(session):
         session['store_locations'] = store_locations
         
     return session['store_locations']
-        
-def get_active_store_location_id(session):
-    if 'active_store_location_id' not in session:
-        # pick a random store location
-        session['active_store_location_id'] =\
-            get_store_locations(session).keys()[0]
-        
-    return session['active_store_location_id']
     
 def get_store_location(session, store_location_id):
     return get_store_locations(session).get(store_location_id)
         
 def set_active_store_location_id(session, store_location_id):
+    """
+    This will also set the pending and history redeems in cache.
+    """
     session['active_store_location_id'] = store_location_id
     session['store_timezone'] = pytz.timezone(get_store_location(\
         session, store_location_id).get('store_timezone'))
+        
+    return session['active_store_location_id']
+    
+def get_active_store_location_id(session):
+    if 'active_store_location_id' not in session:
+        # pick a random store location
+        set_active_store_location_id(session,
+            get_store_locations(session).keys()[0])
         
     return session['active_store_location_id']
     
@@ -257,8 +264,9 @@ def load_all(session, commit=True):
     get_active_store_location_id(session)
     get_store_locations(session)
     get_store_timezone(session)
-    get_redemptions_pending(session)
-    get_redemptions_past(session)
+    # loaded in set_active_store_location_id
+    # get_redemptions_pending(session)
+    # get_redemptions_past(session)
     get_patronStore_count(session)
     get_messages_sent_list(session)
     get_messages_received_list(session)
