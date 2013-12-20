@@ -2,15 +2,17 @@
 
 {% comment %}
 Chunk format:
-[{
-    "account": account,
-    "patron": patron, 
-    "punches": {
-        "store_location_id":\
-            [{"store_location": store_location,
-                "punch":punch, "employee":employee}]),
-    },
-},...]
+{
+    "patron_id": {
+        "account": account,
+        "patron": patron, 
+        "punches": [{
+            "store_location": store_location,
+            "punch": punch,
+            "employee":employee
+        }],
+    },...
+ }
 {% endcomment %}
 
 
@@ -43,7 +45,7 @@ Chunk format:
 <table cellpadding="0" cellspacing="0" 
     style="width:100%;background-color:#eee;display:none;">
     
-{% for ch in chunk %}
+{% for ch in chunk.itervalues %}
 
 {# ONE ITEM #}
 <tr>
@@ -74,13 +76,11 @@ Chunk format:
                     {# END PATRON INFO #}
 
                     {# LIST OF PUNCHES #}
-                        <ol style="padding:0px;font-size:0.68em;color:white;margin:10 0px;line-height:110%;">
+                        <ol style="padding:0px;font-size:11px;color:white;margin:10 0px;line-height:16px;">
                         
-                {% for lst in ch.punches.itervalues %}
-                {% for punch in lst %}
-                
+                {% for punch in ch.punches %}
                     <li style="display:inline-block;list-style:none;padding:2px;margin:0px;">
-                        <ul style="padding:4px;margin:0px;list-style:none;margin:0px;border:1px solid gray;background:#f0b264;">
+                        <ul style="padding:8px;margin:0;list-style:none;margin:0px;border:1px solid gray;background:#f0b264;">
                           
                         {% with loc=punch.store_location %}
                         <li style="padding:0px;margin:0px;">Location:
@@ -91,7 +91,7 @@ Chunk format:
                         {# first activate the location's timezone #}
                         <input type="hidden" value="{{ punch.store_location.activate_timezone }}" />
                         <li style="padding:0px;margin:0px;">Time:
-                        {{ punch.punch.createdAt|date:"h:i a" }}
+                        {{ punch.punch.createdAt|date:"h:i a  e" }}
                         </li>
                         <li style="padding:0px;margin:0px;">Amount:
                         {{ punch.punch.punches }}
@@ -106,7 +106,6 @@ Chunk format:
                           
                         </ul>
                     </li>
-                {% endfor %}
                 {% endfor %}
                         
                         </ol>

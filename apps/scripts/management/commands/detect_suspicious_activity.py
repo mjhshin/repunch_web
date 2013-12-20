@@ -30,7 +30,7 @@ Each chunk has the following format (both grouped by patron):
                             "employee":employee
                         }],
                     },...
-                 },...
+                 }
                  
 The admins also get a copy.
     
@@ -63,9 +63,8 @@ class Command(BaseCommand):
         print "Running detect_suspicious_activity: " + str(timezone.now())
     
         # first count the number of active stores
-        #store_count = Store.objects().count(active=True)
-        store_count = Store.objects().count(objectId="o72LmDy0YK")
-        
+        store_count = Store.objects().count(active=True)
+
         end = timezone.now()
         start = end + relativedelta(hours=-24)
         conn = mail.get_connection(fail_silently=(not DEBUG))
@@ -77,13 +76,11 @@ class Command(BaseCommand):
         # get 500 stores at a time
         LIMIT, skip = 500, 0
         while store_count > 0:
-            #for store in Store.objects().filter(active=True,
-                # include="store_locations", 
-                #limit=LIMIT, skip=skip, order="createdAt"):
-            for store in Store.objects().filter(objectId="o72LmDy0YK",
-                include="store_locations"):
+            for store in Store.objects().filter(active=True,
+                include="store_locations", 
+                limit=LIMIT, skip=skip, order="createdAt"):
                 ### CHUNK1 ####################################
-                chunk1, account_patron, patron_punch = [], {}, {}
+                chunk1, account_patron, patron_punch = {}, {}, {}
                 total_punches = []
                 
                 # check approved EMPLOYEES
@@ -137,7 +134,8 @@ class Command(BaseCommand):
                     if val and len(val) >= 6:
                         for punch in val:
                             suspicious_punches.append({
-                                "store_location": get_location(punch.store_location_id),
+                                "store_location":\
+                                    get_location(punch["punch"].store_location_id),
                                 "punch": punch["punch"],
                                 "employee": punch["employee"]
                             })
@@ -165,9 +163,10 @@ class Command(BaseCommand):
                 ### CHUNK2 ####################################
                 # hours per location
                 # punches are still grouped per patron
-                chunk2 = []
+                chunk2 = {}
                 for loc in store.store_locations:
-                    if loc.hours and len(loc.hours) > 0:
+                    if loc.hours and len(loc.hours) > 0 and\
+                        loc.hours[0]['day'] != 0: # 24/7
                         # check for punches out of hours
                         tz = pytz.timezone(loc.store_timezone)
                         start = timezone.localtime(start, tz)
@@ -258,7 +257,6 @@ class Command(BaseCommand):
                             else:
                                 chunk2[key]['punches'].extend(suspicious_punches)
                     
-                
                 # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
                     store_acc = Account.objects().get(Store=store.objectId)
@@ -281,7 +279,7 @@ class Command(BaseCommand):
             store_count -= LIMIT
             skip += LIMIT
             
-        #if len(admin_chunks) > 0:
+        #if len(admin_chunks) > 0: TODO
         #   send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
         
         # everything is done. close the connection
