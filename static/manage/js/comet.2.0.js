@@ -593,6 +593,13 @@ $(document).ready(function(){
             }
         } // end hasOwnProperty
         
+        if (res.hasOwnProperty('active_store_location_id_changed')){
+            // refresh page 
+            window.location.replace(document.URL);
+            alert("AFSF");
+            return;
+        } 
+        
         // establish another connection
         makeRequest();
                

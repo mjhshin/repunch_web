@@ -10,6 +10,7 @@ from datetime import datetime
 from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
+from apps.comet.models import CometSession
 from apps.stores.models import StoreLocationAvatarTmp, StoreActivate,\
 NewStoreLocationAvatarTmp
 from apps.stores.forms import StoreForm, StoreLocationForm,\

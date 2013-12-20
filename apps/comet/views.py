@@ -282,9 +282,9 @@ def pull(request):
             
         #############################################################
         # ACTIVE_STORE_LOCATION_ID ############################
-        data['active_store_location_id_changed'] =\
-            session['active_store_location_id'] ==\
-            session_copy['active_store_location_id']
+        if session['active_store_location_id'] !=\
+            session_copy['active_store_location_id']:
+            data['active_store_location_id_changed'] = True
             
 
         # IMPORTANT! The request.session is the same as the 
