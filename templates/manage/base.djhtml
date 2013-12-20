@@ -27,7 +27,7 @@
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
     <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
 	<script src="{% static 'manage/js/global.js' %}"></script>
-    <script type="text/javascript" src="{% static 'manage/js/store_locations.1.2.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'manage/js/store_locations.1.3.js' %}" ></script>
 	{% block javascript %}{% endblock %}
 	{# this needs to be last to be able to use the paginator #}
 	<script src="{% static 'manage/js/comet.2.0.js' %}"></script>

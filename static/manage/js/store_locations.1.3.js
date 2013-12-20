@@ -31,6 +31,9 @@ var HEADER_NAV_ITEM_SCROLL = 4;
 // this is 70 because of the offset from the header
 var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = 70;
 
+/*
+    Also used by comet.js
+*/
 function isInStoreDetails() {
     return $("#"+CONTAINER_ID).length > 0;
 }
@@ -152,6 +155,13 @@ function animateStart(containerId, direction) {
     });
 }
 
+function setActiveStoreLocationInHeader(storeLocationId) {
+    // replace the header current div
+    $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
+        $("#header-"+storeLocationId).html().replace("<span></span>", "")
+            .replace("<div>", "").replace("</div>", ""));
+}
+
 function setActiveStoreLocation(containerId, storeLocationId) {
     var reloadPage = containerId == HEADER_CONTAINER_ID && !isInStoreDetails();
     
@@ -159,10 +169,7 @@ function setActiveStoreLocation(containerId, storeLocationId) {
         $(".store-locations.header").addClass("reloading");
     }
     
-    // replace the header current div
-    $("#"+HEADER_CONTAINER_ID+" > div.current").html("<span></span>" +
-        $("#header-"+storeLocationId).html().replace("<span></span>", "")
-            .replace("<div>", "").replace("</div>", ""));
+    setActiveStoreLocationInHeader(storeLocationId);
 
     $.ajax({
         url: $("#set_active_store_location_url").text()+"?store_location_id="+storeLocationId,
@@ -183,6 +190,22 @@ function setActiveStoreLocation(containerId, storeLocationId) {
         },
     });
     
+}
+
+/*
+    Used by comet.js if in store details page.
+    Since a refresh does not occur in the store detaiils page
+    when the store location id changes, we do it here.
+    This does not make a set store location id request.
+*/
+function setActiveStoreLocationInStoreDetails(storeLocationId) {
+    setActiveStoreLocationInHeader(storeLocationId);
+    $(".store-locations > div.nav > a[class!=add]").removeClass("active");
+    $("#header-"+storeLocationId+", #navcontent-"+storeLocationId).addClass("active");
+    
+    var selfContent = $("#content-"+storeLocationId);
+    selfContent.siblings().removeClass("active");
+    selfContent.addClass("active");
 }
 
 /*

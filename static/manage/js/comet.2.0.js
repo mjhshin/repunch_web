@@ -593,11 +593,17 @@ $(document).ready(function(){
             }
         } // end hasOwnProperty
         
-        if (res.hasOwnProperty('active_store_location_id_changed')){
-            // refresh page 
-            window.location.replace(document.URL);
-            alert("AFSF");
-            return;
+        if (res.hasOwnProperty('active_store_location_id')) {
+            // either refresh or just change the content of the header
+            if (!isInStoreDetails()){
+                window.location.replace(document.URL);
+                return;
+                
+            } else {
+                // from store_locations.js
+                setActiveStoreLocationInStoreDetails(res.active_store_location_id);
+            
+            }
         } 
         
         // establish another connection
