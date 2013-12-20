@@ -20,19 +20,19 @@ activity detected. Each email is divided into 2 chunks:
 
 Each chunk has the following format:
  
-    Dict format: {
+    Chunk format: [{
                     "account": account,
                     "patron": patron, 
                     "punches": {
                         "store_location_id":\
                             [{"store_location": store_location,
-                                "punch":punch, "employee":employee}]),
+                                "punch":punch, "employee":employee}],
                     }
-                 }
+                 },...]
                  
 The admins also get a copy.
     
-    Dict format: {
+    Chunk format: [{
                 "store_acc": account, # store owner's account
                 "store": store,
                 "activity": {
@@ -44,7 +44,7 @@ The admins also get a copy.
                                 "punch":punch, "employee":employee}],
                         }
                     }
-                }
+                },...]
 """
 
 from django.core.management.base import BaseCommand
@@ -183,7 +183,7 @@ class Command(BaseCommand):
                         day2_weekday = (end.isoweekday()) % 7 + 1
                         # get the hours for day1 and day2
                         def get_hours_range(weekday, d):
-                            for hr in hours:
+                            for hr in loc.hours:
                                 if hr["day"] == weekday:
                                     hr_start_hour =\
                                         int(hr["open_time"][:2])
@@ -221,11 +221,10 @@ class Command(BaseCommand):
                                 continue
                                 
                             suspicious_punches = {}
-                            
+
                             # process only those punches that are in this location
                             for p in [ x for x in val if
-                                val["punch"].store_location_id == loc.objectId ]:
-                                
+                                x["punch"].store_location_id == loc.objectId ]:
                                 punch = p["punch"]
                                 # suspicious if not in hours1 and 2
                                 if not (hours1_start and\
@@ -273,22 +272,22 @@ class Command(BaseCommand):
                         "store": store,
                         "data": (chunk1, chunk2),
                     })
+                    
                     try:
                         send_email_suspicious_activity(store_acc,
                             store, chunk1, chunk2, start, end, conn)
                     except SMTPServerDisconnected:
                         conn = mail.get_connection(fail_silently=(not DEBUG))
                         conn.open()
-                        send_email_suspicious_activity(\
-                            Account.objects().get(Store=store.objectId),
+                        send_email_suspicious_activity(store_acc,
                             store, chunk1, chunk2, start, end, conn)
                         
             # end of while loop
             store_count -= LIMIT
             skip += LIMIT
             
-        if len(admin_chunks) > 0:
-            send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
+        #if len(admin_chunks) > 0:
+        #   send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
         
         # everything is done. close the connection
         try:

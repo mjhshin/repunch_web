@@ -1,5 +1,19 @@
 {% load parse_tags %}
 
+{% comment %}
+Chunk format:
+[{
+    "account": account,
+    "patron": patron, 
+    "punches": {
+        "store_location_id":\
+            [{"store_location": store_location,
+                "punch":punch, "employee":employee}]),
+    },
+},...]
+{% endcomment %}
+
+
 {# CHUNKS #}
 {% for chunk in chunks %}
 {% if chunk|length > 0 %}
@@ -62,7 +76,9 @@
                     {# LIST OF PUNCHES #}
                         <ol style="padding:0px;font-size:0.68em;color:#545454;margin:10 0px;line-height:110%;">
                         
-                {% for punch in ch.punches %}
+                {% for lst in ch.punches.itervalues %}
+                {% for punch in lst %}
+                
                     <li style="display:inline-block;list-style:none;padding:2px;margin:0px;">
                         <ul style="padding:4px;margin:0px;list-style:none;margin:0px;border:1px solid gray;background:#f0b264;">
                           
@@ -82,6 +98,7 @@
                           
                         </ul>
                     </li>
+                {% endfor %}
                 {% endfor %}
                         
                         </ol>
