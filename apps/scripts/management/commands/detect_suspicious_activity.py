@@ -85,9 +85,11 @@ class Command(BaseCommand):
         # get 500 stores at a time
         LIMIT, skip = 500, 0
         while store_count > 0:
-            #for store in Store.objects().filter(active=True, 
+            #for store in Store.objects().filter(active=True,
+                # include="store_locations", 
                 #limit=LIMIT, skip=skip, order="createdAt"):
-            for store in Store.objects().filter(objectId="o72LmDy0YK"):
+            for store in Store.objects().filter(objectId="o72LmDy0YK",
+                include="store_locations"):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
                 total_punches = []
@@ -166,114 +168,95 @@ class Command(BaseCommand):
                         
                 ### CHUNK2 ####################################
                 # TODO hours per location
-                chunk2, hours = [], store.hours
-                if hours or len(hours) > 0:
-                    # check for punches out of hours
-                    tz = pytz.timezone(store.store_timezone)
-                    start = timezone.localtime(start, tz)
-                    end = timezone.localtime(end, tz)
-                    # isoweekday is from 1-7 monday to sunday
-                    # convert to 1-7 sunday to saturday
-                    day1_weekday = (start.isoweekday()) % 7 + 1
-                    day2_weekday = (end.isoweekday()) % 7 + 1
-                    # get the hours for day1 and day2
-                    def get_hours_range(weekday, d):
-                        for hr in hours:
-                            if hr["day"] == weekday:
-                                hr_start_hour =\
-                                    int(hr["open_time"][:2])
-                                hr_start_minute =\
-                                    int(hr["open_time"][2:])
-                                hr_end_hour =\
-                                    int(hr["close_time"][:2])
-                                hr_end_minute =\
-                                    int(hr["close_time"][2:])
-                                return d.replace(hour=hr_start_hour,
-                                    minute=hr_start_minute),\
-                                    d.replace(hour=hr_end_hour,
-                                    minute=hr_end_minute)
-                        return None, None
+                chunk2 = []
+                for loc in store.store_locations:
+                    if loc.hours and len(loc.hours) > 0:
+                        # check for punches out of hours
+                        tz = pytz.timezone(loc.store_timezone)
+                        start = timezone.localtime(start, tz)
+                        end = timezone.localtime(end, tz)
+                        # isoweekday is from 1-7 monday to sunday
+                        # convert to 1-7 sunday to saturday
+                        day1_weekday = (start.isoweekday()) % 7 + 1
+                        day2_weekday = (end.isoweekday()) % 7 + 1
+                        # get the hours for day1 and day2
+                        def get_hours_range(weekday, d):
+                            for hr in hours:
+                                if hr["day"] == weekday:
+                                    hr_start_hour =\
+                                        int(hr["open_time"][:2])
+                                    hr_start_minute =\
+                                        int(hr["open_time"][2:])
+                                    hr_end_hour =\
+                                        int(hr["close_time"][:2])
+                                    hr_end_minute =\
+                                        int(hr["close_time"][2:])
+                                    return d.replace(hour=hr_start_hour,
+                                        minute=hr_start_minute),\
+                                        d.replace(hour=hr_end_hour,
+                                        minute=hr_end_minute)
+                            return None, None
                         
-                    def get_hours_range_of_store_location(weekday, d):
-                        for hr in hours:
-                            if hr["day"] == weekday:
-                                hr_start_hour =\
-                                    int(hr["open_time"][:2])
-                                hr_start_minute =\
-                                    int(hr["open_time"][2:])
-                                hr_end_hour =\
-                                    int(hr["close_time"][:2])
-                                hr_end_minute =\
-                                    int(hr["close_time"][2:])
-                                return d.replace(hour=hr_start_hour,
-                                    minute=hr_start_minute),\
-                                    d.replace(hour=hr_end_hour,
-                                    minute=hr_end_minute)
-                        return None, None
-                        
-                    
-                    (hours1_start, hours1_end) =\
-                        get_hours_range(day1_weekday, start)
-                    (hours2_start, hours2_end) =\
-                        get_hours_range(day2_weekday, end)
-                        
-                    # now convert to utc since punch times are in utc
-                    if hours1_start:
-                        hours1_start =\
-                            timezone.localtime(hours1_start, tzutc())
-                        hours1_end =\
-                            timezone.localtime(hours1_end, tzutc())
-                    if hours2_start:
-                        hours2_start =\
-                            timezone.localtime(hours2_start, tzutc())
-                        hours2_end =\
-                            timezone.localtime(hours2_end, tzutc())
-                    
-                    for key, val in patron_punch.iteritems():
-                        if not val:
-                            continue
+                        (hours1_start, hours1_end) =\
+                            get_hours_range(day1_weekday, start)
+                        (hours2_start, hours2_end) =\
+                            get_hours_range(day2_weekday, end)
                             
-                        suspicious_punches = {}
-                        for p in val:
-                            punch = p["punch"]
-                            employee = p["employee"]
-                            # suspicious if not in hours1 and 2
-                            if not (hours1_start and\
-                                punch.createdAt>hours1_start and\
-                                punch.createdAt<hours1_end) and\
-                                not (hours2_start and\
-                                punch.createdAt>hours2_start and\
-                                punch.createdAt<hours2_end):
-                                # not in hours1 or 2 so suspicious!   
-                                suspicious_punch_list.append({
-                                    "punch":punch,
-                                    "employee": employee
-                                })
+                        # now convert to utc since punch times are in utc
+                        if hours1_start:
+                            hours1_start =\
+                                timezone.localtime(hours1_start, tzutc())
+                            hours1_end =\
+                                timezone.localtime(hours1_end, tzutc())
+                        if hours2_start:
+                            hours2_start =\
+                                timezone.localtime(hours2_start, tzutc())
+                            hours2_end =\
+                                timezone.localtime(hours2_end, tzutc())
                         
-                        if len(suspicious_punch_list) == 0:
-                            continue
+                        for key, val in patron_punch.iteritems():
+                            if not val:
+                                continue
+                                
+                            suspicious_punches = {}
                             
-                        # cache the account and patron
-                        if key not in account_patron:
-                            account_patron[key] = {
+                            # process only those punches that are in this location
+                            for p in [ x for x in val if
+                                val["punch"].store_location_id == loc.objectId ]:
+                                
+                                punch = p["punch"]
+                                # suspicious if not in hours1 and 2
+                                if not (hours1_start and\
+                                    punch.createdAt>hours1_start and\
+                                    punch.createdAt<hours1_end) and\
+                                    not (hours2_start and\
+                                    punch.createdAt>hours2_start and\
+                                    punch.createdAt<hours2_end):
+                                    # not in hours1 or 2 so suspicious!   
+                                    suspicious_punches[loc.objectId].append({
+                                        "punch":punch,
+                                        "employee": p["employee"],
+                                    })
+                            
+                            if len(suspicious_punches) == 0:
+                                continue
+                                
+                            # cache the account and patron
+                            if key not in account_patron:
+                                acc = Account.objects().get(Patron=key,
+                                    include="Patron")
+                                account_patron[key] = {
+                                    "account": acc,
+                                    "patron": acc.patron,
+                                }
+                            chunk2.append({
                                 "account":\
-                                    Account.objects().get(\
-                                        Patron=key),
+                                   account_patron[key]['account'],
                                 "patron":\
-                                    Patron.objects().get(\
-                                        objectId=key)
-                            }
-                        chunk2.append({
-                            "account":\
-                               account_patron[key]['account'],
-                            "patron":\
-                               account_patron[key]['patron'],
-                            "punches": suspicious_punch_list
-                        })
-                
-                # store has no hours (or unspecified)- no punches are suspicious!
-                else:        
-                    pass
+                                   account_patron[key]['patron'],
+                                "punches": suspicious_punches,
+                            })
+                    
                 
                 # all tasks are done for this store - send email
                 if len(chunk1) > 0 or len(chunk2) > 0:
