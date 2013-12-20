@@ -27,7 +27,10 @@ List of patrons that were punched when the store is closed:
     Dict format: {
                     "account": account,
                     "patron": patron, 
-                    "punches": [{"punch":punch, "employee":employee}]
+                    "punches": {
+                        "store_location_id":\
+                            [{"punch":punch, "employee":employee}],
+                    }
                  }
                  
 The admins also get a copy.
@@ -38,7 +41,10 @@ The admins also get a copy.
                 "activity": {
                         "account": account,
                         "patron": patron, 
-                        "punches": [{"punch":punch, "employee":employee}]
+                        "punches": {
+                            "store_location_id":\
+                                [{"punch":punch, "employee":employee}],
+                        }
                     }
                 }
 """
@@ -65,7 +71,9 @@ class Command(BaseCommand):
         print "Running detect_suspicious_activity: " + str(timezone.now())
     
         # first count the number of active stores
-        store_count = Store.objects().count(active=True)
+        #store_count = Store.objects().count(active=True)
+        store_count = Store.objects().count(objectId="o72LmDy0YK")
+        
         end = timezone.now()
         start = end + relativedelta(hours=-24)
         conn = mail.get_connection(fail_silently=(not DEBUG))
@@ -77,8 +85,9 @@ class Command(BaseCommand):
         # get 500 stores at a time
         LIMIT, skip = 500, 0
         while store_count > 0:
-            for store in Store.objects().filter(active=True, 
-                limit=LIMIT, skip=skip, order="createdAt"):
+            #for store in Store.objects().filter(active=True, 
+                #limit=LIMIT, skip=skip, order="createdAt"):
+            for store in Store.objects().filter(objectId="o72LmDy0YK"):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
                 total_punches = []
@@ -131,33 +140,32 @@ class Command(BaseCommand):
                 
                 # check for a group with a list >= 6
                 for key, val in patron_punch.iteritems():
-                    suspicious_punch_list = []
+                    suspicious_punches = {}
                     if val and len(val) >= 6:
                         for punch in val:
-                            suspicious_punch_list.append({
+                            suspicious_punches[punch.store_location_id].append({
                                 "punch":punch["punch"],
                                 "employee": punch["employee"]
                             })
                                 
                         # cache the account and patron
                         if key not in account_patron:
+                            acc = Account.objects().get(Patron=key, include="Patron")
                             account_patron[key] = {
-                                "account":\
-                                Account.objects().get(\
-                                    Patron=key),
-                                "patron":\
-                                    Patron.objects().get(objectId=key)
+                                "account": acc,
+                                "patron": acc.patron,
                             }
                         chunk1.append({
                             "account":\
                                account_patron[key]['account'],
                             "patron":\
                                account_patron[key]['patron'],
-                            "punches": suspicious_punch_list
+                            "punches": suspicious_punches
                         })
                         
                         
                 ### CHUNK2 ####################################
+                # TODO hours per location
                 chunk2, hours = [], store.hours
                 if hours or len(hours) > 0:
                     # check for punches out of hours
@@ -185,6 +193,24 @@ class Command(BaseCommand):
                                     d.replace(hour=hr_end_hour,
                                     minute=hr_end_minute)
                         return None, None
+                        
+                    def get_hours_range_of_store_location(weekday, d):
+                        for hr in hours:
+                            if hr["day"] == weekday:
+                                hr_start_hour =\
+                                    int(hr["open_time"][:2])
+                                hr_start_minute =\
+                                    int(hr["open_time"][2:])
+                                hr_end_hour =\
+                                    int(hr["close_time"][:2])
+                                hr_end_minute =\
+                                    int(hr["close_time"][2:])
+                                return d.replace(hour=hr_start_hour,
+                                    minute=hr_start_minute),\
+                                    d.replace(hour=hr_end_hour,
+                                    minute=hr_end_minute)
+                        return None, None
+                        
                     
                     (hours1_start, hours1_end) =\
                         get_hours_range(day1_weekday, start)
@@ -207,7 +233,7 @@ class Command(BaseCommand):
                         if not val:
                             continue
                             
-                        suspicious_punch_list = []
+                        suspicious_punches = {}
                         for p in val:
                             punch = p["punch"]
                             employee = p["employee"]
