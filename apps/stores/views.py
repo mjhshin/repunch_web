@@ -52,7 +52,12 @@ def set_active_location(request):
         SESSION.set_active_store_location_id(request.session,
             store_location_id)
         success = True
-        # TODO notify other tabs of this change.
+        
+        # trigger the comet response for other tabs.
+        for comet in CometSession.objects.filter(\
+            session_key=request.session.session_key):
+            comet.modified = True
+            comet.save()
         
     return HttpResponse(json.dumps({"success": success}),
         content_type="application/json")

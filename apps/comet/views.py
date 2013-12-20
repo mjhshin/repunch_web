@@ -278,6 +278,14 @@ def pull(request):
         patronStore_count = int(session["patronStore_count"])
         if patronStore_count_copy != patronStore_count:
             data['patronStore_count'] = patronStore_count
+            
+            
+        #############################################################
+        # ACTIVE_STORE_LOCATION_ID ############################
+        data['active_store_location_id_changed'] =\
+            session['active_store_location_id'] ==\
+            session_copy['active_store_location_id']
+            
 
         # IMPORTANT! The request.session is the same as the 
         # SessionStore(session_key)! so we must use the 
