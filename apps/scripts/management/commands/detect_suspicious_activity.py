@@ -1,35 +1,32 @@
 """
 Detects suspicious activity:
-    * One patron getting punched 6+ times in one day
-    * Punches being granted when the store is closed
+    * One patron getting punched 6+ times in one day in any location (cummulative)
+    * Punches being granted when the store is closed for each location
     
 This scans through each store. Then for each employee, if any, scans
 through all the punches given today and checks for one patron
-getting punched more than 6 times AND punches being granted when the 
+getting punched more than 6 times and punches being granted when the 
 store is closed (only if hours are provided). 
-After accumulating all the punches given by all the employees, scans
-the punches given out from the dashboard and checks the same thing.
 
 An email is sent to the store owner if there is any suspicious 
 activity detected. Each email is divided into 2 chunks:
 
-List of patrons that got punched more than 6 times today:
-List of patrons that were punched when the store is closed:
-    1. patron name
-        * patron email
-        * X punches received
-            - time of punch
-            - # of punches received
-            - punch came from dashboard or employee
-                if from employee:
-                + employee name
+1. List of patrons that got punched more than 6 times today.
+    - This is the total count for all punches in all store locations
+        for this patron.
+
+2. List of patrons that were punched when the store is closed.
+    - The suspicious punches are grouped per location.
+
+Each chunk has the following format:
  
     Dict format: {
                     "account": account,
                     "patron": patron, 
                     "punches": {
                         "store_location_id":\
-                            [{"punch":punch, "employee":employee}],
+                            [{"store_location": store_location,
+                                "punch":punch, "employee":employee}]),
                     }
                  }
                  
@@ -43,7 +40,8 @@ The admins also get a copy.
                         "patron": patron, 
                         "punches": {
                             "store_location_id":\
-                                [{"punch":punch, "employee":employee}],
+                            [{"store_location": store_location,
+                                "punch":punch, "employee":employee}],
                         }
                     }
                 }
@@ -93,9 +91,25 @@ class Command(BaseCommand):
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = [], {}, {}
                 total_punches = []
+                
                 # check approved EMPLOYEES
                 employees = store.get("employees", status=APPROVED,
                     limit=900)
+                employee_punches = []
+                
+                def add_to_patron_punch(punch, employee=None):
+                    if punch.Patron not in patron_punch:
+                        patron_punch[punch.Patron] =\
+                            [{"punch":punch, "employee": employee}]
+                    else:
+                        patron_punch[punch.Patron].append({"punch":\
+                            punch, "employee":employee})
+                            
+                def get_location(location_id):
+                    for loc in store.store_locations:
+                        if loc.objectId == location_id:
+                            return loc
+                
                 if employees and len(employees) > 0:
                     # check all the punches of each employee
                     for employee in employees:
@@ -104,49 +118,36 @@ class Command(BaseCommand):
                             createdAt__lte=end, createdAt__gte=start)
                         if not punches:
                             continue
-                        # cache the punches
-                        total_punches.append({"punches":punches,
-                            "employee":employee})
+                            
+                        # for querying the dashboard punches
+                        employee_punches.extend([p.objectId for p in\
+                            punches])
+                            
                         # group the punches by patron
                         for punch in punches:
-                            if punch.Patron not in patron_punch:
-                                patron_punch[punch.Patron] =\
-                                    [{"punch":punch, "employee":\
-                                        employee}]
-                            else:
-                                patron_punch[\
-                                    punch.Patron].append({"punch":\
-                                        punch, "employee":employee})
+                            add_to_patron_punch(punch, employee)
                                 
                 # now check DASHBOARD
-                employee_punches = []
-                for pe in total_punches:
-                    employee_punches.extend([p.objectId for p in\
-                    pe["punches"]])
                 punches = store.get("punches", limit=900,
                     createdAt__lte=end, createdAt__gte=start,
                     objectId__nin=employee_punches)
-                # cache the punches
-                total_punches.append({"punches":punches,
-                            "employee":None})
+
                 # group the punches by patron
                 if punches:
                     for punch in punches:
-                        if punch.Patron not in patron_punch:
-                            patron_punch[punch.Patron] =\
-                                [{"punch":punch, "employee": None}]
-                        else:
-                            patron_punch[punch.Patron].append(\
-                                {"punch":punch, "employee":None})
-                # patron_punch now has all of the punches grouped!
+                        add_to_patron_punch(punch, None)
                 
                 # check for a group with a list >= 6
                 for key, val in patron_punch.iteritems():
                     suspicious_punches = {}
                     if val and len(val) >= 6:
                         for punch in val:
+                            if punch.store_location_id not in suspicious_punches:
+                                suspicious_punches[punch.store_location_id] = []
+                            
                             suspicious_punches[punch.store_location_id].append({
-                                "punch":punch["punch"],
+                                "store_location": get_location(punch.store_location_id),
+                                "punch": punch["punch"],
                                 "employee": punch["employee"]
                             })
                                 
@@ -167,7 +168,8 @@ class Command(BaseCommand):
                         
                         
                 ### CHUNK2 ####################################
-                # TODO hours per location
+                # hours per location
+                # this results in a grouping of all punches for 1 location.
                 chunk2 = []
                 for loc in store.store_locations:
                     if loc.hours and len(loc.hours) > 0:
@@ -233,7 +235,12 @@ class Command(BaseCommand):
                                     punch.createdAt>hours2_start and\
                                     punch.createdAt<hours2_end):
                                     # not in hours1 or 2 so suspicious!   
+                                    
+                                    if loc.objectId not in suspicious_punches:
+                                        suspicious_punches[loc.objectId] = []
+                                        
                                     suspicious_punches[loc.objectId].append({
+                                        "store_location": loc,
                                         "punch":punch,
                                         "employee": p["employee"],
                                     })
