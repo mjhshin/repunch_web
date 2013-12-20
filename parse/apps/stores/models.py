@@ -2,7 +2,8 @@
 Parse equivalence of Django apps.stores.models
 """ 
 from dateutil import parser
-import string, random
+from django.utils import timezone
+import string, random, pytz
 
 from parse.utils import parse, title
 from parse.apps.accounts import sub_type
@@ -193,20 +194,20 @@ class StoreLocation(ParseObject):
     A Store may have multiple Chains.
     """
     def __init__(self, **data):
-        self.street = data.get("street") # TODO
-        self.city = data.get('city') # TODO
-        self.state = data.get('state') # TODO
-        self.zip = data.get('zip') # TODO
-        self.country = data.get('country') # TODO
-        self.phone_number = data.get('phone_number') # TODO
-        self.store_timezone = data.get('store_timezone', TIME_ZONE) # TODO
-        self.neighborhood = data.get('neighborhood') # TODO
+        self.street = data.get("street") 
+        self.city = data.get('city') 
+        self.state = data.get('state') 
+        self.zip = data.get('zip') 
+        self.country = data.get('country') 
+        self.phone_number = data.get('phone_number') 
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.neighborhood = data.get('neighborhood') 
         # GeoPoint [latitude, longtitude]
-        self.coordinates = data.get('coordinates') # TODO
+        self.coordinates = data.get('coordinates') 
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
-        self.hours = data.get("hours", []) # TODO
-        self.store_avatar = data.get('store_avatar') # TODO
+        self.hours = data.get("hours", []) 
+        self.store_avatar = data.get('store_avatar') 
         
         self.Store = data.get("Store")
         
@@ -239,6 +240,9 @@ class StoreLocation(ParseObject):
             return True
 
         return False
+        
+    def activate_timezone(self):
+        timezone.activate(pytz.timezone(self.store_timezone))
         
     def get_full_address(self):
         """

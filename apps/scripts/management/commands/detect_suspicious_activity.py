@@ -16,34 +16,28 @@ activity detected. Each email is divided into 2 chunks:
         for this patron.
 
 2. List of patrons that were punched when the store is closed.
-    - The suspicious punches are grouped per location.
+    - The suspicious punches are grouped per patron.
 
-Each chunk has the following format:
+Each chunk has the following format (both grouped by patron):
  
-    Chunk format: [{
-                    "account": account,
-                    "patron": patron, 
-                    "punches": {
-                        "store_location_id":\
-                            [{"store_location": store_location,
-                                "punch":punch, "employee":employee}],
-                    }
-                 },...]
+    Chunk format: {
+                    "patron_id": {
+                        "account": account,
+                        "patron": patron, 
+                        "punches": [{
+                            "store_location": store_location,
+                            "punch": punch,
+                            "employee":employee
+                        }],
+                    },...
+                 },...
                  
 The admins also get a copy.
     
     Chunk format: [{
                 "store_acc": account, # store owner's account
                 "store": store,
-                "activity": {
-                        "account": account,
-                        "patron": patron, 
-                        "punches": {
-                            "store_location_id":\
-                            [{"store_location": store_location,
-                                "punch":punch, "employee":employee}],
-                        }
-                    }
+                "data": (chunk1, chunk2),
                 },...]
 """
 
@@ -139,13 +133,10 @@ class Command(BaseCommand):
                 
                 # check for a group with a list >= 6
                 for key, val in patron_punch.iteritems():
-                    suspicious_punches = {}
+                    suspicious_punches = []
                     if val and len(val) >= 6:
                         for punch in val:
-                            if punch.store_location_id not in suspicious_punches:
-                                suspicious_punches[punch.store_location_id] = []
-                            
-                            suspicious_punches[punch.store_location_id].append({
+                            suspicious_punches.append({
                                 "store_location": get_location(punch.store_location_id),
                                 "punch": punch["punch"],
                                 "employee": punch["employee"]
@@ -158,18 +149,22 @@ class Command(BaseCommand):
                                 "account": acc,
                                 "patron": acc.patron,
                             }
-                        chunk1.append({
-                            "account":\
-                               account_patron[key]['account'],
-                            "patron":\
-                               account_patron[key]['patron'],
-                            "punches": suspicious_punches
-                        })
+                            
+                        if key not in chunk1:
+                            chunk1[key] = {
+                                "account":\
+                                   account_patron[key]['account'],
+                                "patron":\
+                                   account_patron[key]['patron'],
+                                "punches": suspicious_punches
+                            }
+                        else:
+                            chunk1[key]['punches'].extend(suspicious_punches)
                         
                         
                 ### CHUNK2 ####################################
                 # hours per location
-                # this results in a grouping of all punches for 1 location.
+                # punches are still grouped per patron
                 chunk2 = []
                 for loc in store.store_locations:
                     if loc.hours and len(loc.hours) > 0:
@@ -220,7 +215,7 @@ class Command(BaseCommand):
                             if not val:
                                 continue
                                 
-                            suspicious_punches = {}
+                            suspicious_punches = []
 
                             # process only those punches that are in this location
                             for p in [ x for x in val if
@@ -234,11 +229,7 @@ class Command(BaseCommand):
                                     punch.createdAt>hours2_start and\
                                     punch.createdAt<hours2_end):
                                     # not in hours1 or 2 so suspicious!   
-                                    
-                                    if loc.objectId not in suspicious_punches:
-                                        suspicious_punches[loc.objectId] = []
-                                        
-                                    suspicious_punches[loc.objectId].append({
+                                    suspicious_punches.append({
                                         "store_location": loc,
                                         "punch":punch,
                                         "employee": p["employee"],
@@ -255,13 +246,17 @@ class Command(BaseCommand):
                                     "account": acc,
                                     "patron": acc.patron,
                                 }
-                            chunk2.append({
-                                "account":\
-                                   account_patron[key]['account'],
-                                "patron":\
-                                   account_patron[key]['patron'],
-                                "punches": suspicious_punches,
-                            })
+                                
+                            if key not in chunk2:
+                                chunk2[key] = {
+                                    "account":\
+                                       account_patron[key]['account'],
+                                    "patron":\
+                                       account_patron[key]['patron'],
+                                    "punches": suspicious_punches
+                                }
+                            else:
+                                chunk2[key]['punches'].extend(suspicious_punches)
                     
                 
                 # all tasks are done for this store - send email
@@ -275,12 +270,12 @@ class Command(BaseCommand):
                     
                     try:
                         send_email_suspicious_activity(store_acc,
-                            store, chunk1, chunk2, start, end, conn)
+                            store, chunk1, chunk2, conn)
                     except SMTPServerDisconnected:
                         conn = mail.get_connection(fail_silently=(not DEBUG))
                         conn.open()
                         send_email_suspicious_activity(store_acc,
-                            store, chunk1, chunk2, start, end, conn)
+                            store, chunk1, chunk2, conn)
                         
             # end of while loop
             store_count -= LIMIT

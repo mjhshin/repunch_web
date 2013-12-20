@@ -342,8 +342,7 @@ def send_email_signup(account, connection=None):
     else:
         Thread(target=_wrapper).start()
     
-def send_email_suspicious_activity(account, store, chunk1, chunk2,\
-        start, end, connection=None):
+def send_email_suspicious_activity(account, store, chunk1, chunk2, connection=None):
     """
     chunk1 and chunk2 are a list of dictionaries corresponding to patrons
     gettings punched more than 6 times today and when the store was closed - 
@@ -352,8 +351,6 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
     """
     def _wrapper():
         # need to activate the store's timezone for template rendering!
-        timezone.activate(pytz.timezone(store.store_timezone))
-        
         with open(FS_SITE_DIR +\
             "/templates/manage/notification-suspicious-activity.html",
                 'r') as f:
@@ -362,8 +359,7 @@ def send_email_suspicious_activity(account, store, chunk1, chunk2,\
         subject = "Repunch Inc. Suspicious activity has been detected " +\
                     "at " + store.store_name + "."
         ctx = get_notification_ctx()
-        ctx.update({'store':store, 'start':start, 'end':end, 
-                    'chunks':(chunk1, chunk2)})
+        ctx.update({'store':store, 'chunks':(chunk1, chunk2)})
         body = template.render(Context(ctx)).__str__()
         
         email = mail.EmailMultiAlternatives(subject,

@@ -74,7 +74,7 @@ Chunk format:
                     {# END PATRON INFO #}
 
                     {# LIST OF PUNCHES #}
-                        <ol style="padding:0px;font-size:0.68em;color:#545454;margin:10 0px;line-height:110%;">
+                        <ol style="padding:0px;font-size:0.68em;color:white;margin:10 0px;line-height:110%;">
                         
                 {% for lst in ch.punches.itervalues %}
                 {% for punch in lst %}
@@ -82,6 +82,14 @@ Chunk format:
                     <li style="display:inline-block;list-style:none;padding:2px;margin:0px;">
                         <ul style="padding:4px;margin:0px;list-style:none;margin:0px;border:1px solid gray;background:#f0b264;">
                           
+                        {% with loc=punch.store_location %}
+                        <li style="padding:0px;margin:0px;">Location:
+                        {{ loc.street|title }} {{ loc.city|title }}, {{ loc.state|upper }}
+                        </li>
+                        {% endwith %}
+                        
+                        {# first activate the location's timezone #}
+                        <input type="hidden" value="{{ punch.store_location.activate_timezone }}" />
                         <li style="padding:0px;margin:0px;">Time:
                         {{ punch.punch.createdAt|date:"h:i a" }}
                         </li>
