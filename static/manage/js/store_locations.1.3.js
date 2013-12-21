@@ -7,7 +7,7 @@ var HEADER_CONTAINER_ID = "store-locations-header"
 var CONTAINER_ID = "store-locations"
 
 // the lower this number is, the faster the scroll will be
-var ANIMATION_DURATION = 1000;
+var ANIMATION_DURATION = 800;
 var DIR_UP = 0, DIR_DOWN=1;
 
 // The values below ust be synced with the values in store_locations.css
@@ -95,6 +95,8 @@ function getScrollUpHeightOffset(containerId) {
     the list has not yet reached its max scroll in that direction.
 */
 function animateComplete(containerId, top, direction) {
+    top = Math.round(top);
+
     // reached the top - hide the arrow up
     if (top == 0) {
         $("#"+containerId+" > div.scroll.up").fadeOut();
@@ -145,9 +147,9 @@ function animateStart(containerId, direction) {
         
         }
             
-        self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, function(){
+        self.stop().animate({"top": String(top) + "px"}, ANIMATION_DURATION, "linear", function(){
             // check if we should animate again and the visibility of the scroll arrows
-            if (!self.is(":first-child")) {
+            if (self.is(":first-child")) {
                 animateComplete(containerId, top, direction);
             }     
            
