@@ -90,7 +90,7 @@ from libs.dateutil.relativedelta import relativedelta
 from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
-ERRORS = ["[Ee]rror"]
+ERRORS = r"([Ee]rror)|([Uu]ncaught)"
 EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
 EMAILS_BOOT = ["vandolf@repunch.com",]
 
@@ -106,6 +106,7 @@ LOGJOB_INTERVAL = 35
 LOGJOB_FAIL = 60
 PARSE_TIMEOUT = 20 
 
+ERROR_RE = re.compile(ERRORS)
 TAG_RE = re.compile(r"[IE]\d{4,4}\-\d{2,2}\-\d{2,2}T\d{2,2}\:\d{2,2}\:\d{2,2}\.\d{3,3}Z]", re.DOTALL)
 TAG_TIME_RE = re.compile(r"T(\d{2,2}\:\d{2,2}\:\d{2,2})\.")
 
@@ -171,7 +172,6 @@ class LogJob(object):
             relativedelta(seconds=LOGJOB_FAIL)
 
         if timezone.now() > last_log_time:
-            print timezone.now() , last_log_time
             self.last_log_tag = None
             self.last_log_time = timezone.now()
             self.n = LogJob.START_N
@@ -197,10 +197,9 @@ class LogJob(object):
         
         # evaluate if first run
         if not self.last_log_tag or not self.last_log_time:
-            for error in ERRORS:
-                if re.search(error, subset):
-                    self.send(subset)
-                    break
+            if ERROR_RE.search(subset):
+                self.send(subset)
+                break
                     
             # set the last tag and time
             tags = TAG_RE.findall(subset)
@@ -227,10 +226,9 @@ class LogJob(object):
                 return
             
             # if it is not then we evaluate it
-            for error in ERRORS:
-                if re.search(error, subset):
-                    self.send(subset)
-                    break
+            if ERROR_RE.search(subset):
+                self.send(subset)
+                break
             
             # set the last tag and time
             tags = TAG_RE.findall(subset)
