@@ -199,7 +199,6 @@ class LogJob(object):
         if not self.last_log_tag or not self.last_log_time:
             if ERROR_RE.search(subset):
                 self.send(subset)
-                break
                     
             # set the last tag and time
             tags = TAG_RE.findall(subset)
@@ -228,7 +227,6 @@ class LogJob(object):
             # if it is not then we evaluate it
             if ERROR_RE.search(subset):
                 self.send(subset)
-                break
             
             # set the last tag and time
             tags = TAG_RE.findall(subset)
