@@ -75,14 +75,18 @@
 }
 
 .store-locations.header > div.current:before {
-    position:absolute; top:8px; right:10px;
+    position:absolute; top:24px; right:10px;
 	content: url('../images/arrow-down-large.png');
 }
 
 .store-locations.header > div.current:after {
     display: none; opacity: 0.7;
-    position:absolute; bottom:4px; right:10px;
+    position:absolute; top:28px; right:10px;
 	content: url('../images/ajax-loader-small.gif');
+}
+
+.store-locations.header.reloading > div.current:before {
+    display: none;
 }
 
 .store-locations.header.reloading > div.current:after {
