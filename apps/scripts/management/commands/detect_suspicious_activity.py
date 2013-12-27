@@ -64,6 +64,7 @@ class Command(BaseCommand):
     
         # first count the number of active stores
         store_count = Store.objects().count(active=True)
+        # store_count = Store.objects().count(objectId="o72LmDy0YK")
 
         end = timezone.now()
         start = end + relativedelta(hours=-24)
@@ -79,6 +80,9 @@ class Command(BaseCommand):
             for store in Store.objects().filter(active=True,
                 include="store_locations", 
                 limit=LIMIT, skip=skip, order="createdAt"):
+            # for store in Store.objects().filter(\
+            #     objectId="o72LmDy0YK", include="store_locations"):
+
                 ### CHUNK1 ####################################
                 chunk1, account_patron, patron_punch = {}, {}, {}
                 total_punches = []
@@ -279,8 +283,8 @@ class Command(BaseCommand):
             store_count -= LIMIT
             skip += LIMIT
             
-        #if len(admin_chunks) > 0: TODO
-        #   send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
+        if len(admin_chunks) > 0:
+            send_email_suspicious_activity_admin(admin_chunks, start, end, conn)
         
         # everything is done. close the connection
         try:

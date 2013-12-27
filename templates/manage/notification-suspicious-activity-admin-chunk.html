@@ -5,18 +5,5 @@
 Store name: {{ store.store_name }}<br/>
 Store email: {{ store_acc.email }}<br/>
 </div>
-{% if forloop.counter == 1 %}
-    {% if chunk|length > 1 %}
-    There are {{ chunk|length }} consumers that have been punched more than 6 times today. 
-    {% else %}
-    There is {{ chunk|length }} consumer that has been punched more than 6 times today. 
-    {% endif %}
-{% else %}
-    {% if chunk|length > 1 %}
-    There are {{ chunk|length }} consumers that have been punched when the store was closed.
-    {% else %}
-    There is {{ chunk|length }} consumer that has been punched when the store was closed.
-    {% endif %}
-{% endif %}
-
+{{ block.super }}
 {% endblock %}
