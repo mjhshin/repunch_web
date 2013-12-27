@@ -31,6 +31,10 @@ var HEADER_NAV_ITEM_SCROLL = 4;
 // this is 70 because of the offset from the header
 var HEADER_NAV_SCROLL_BOTTOM_STATIC_HEIGHT = 70;
 
+// prevent changes originating from store details page from allowing responses
+// to set active store location in comet.js
+var setActiveStoreLocationInStoreDetailsToken = true;
+
 /*
     Also used by comet.js
 */
@@ -164,7 +168,12 @@ function setActiveStoreLocationInHeader(storeLocationId) {
             .replace("<div>", "").replace("</div>", ""));
 }
 
-function setActiveStoreLocation(containerId, storeLocationId) {
+
+function setActiveStoreLocation(containerId, storeLocationId, extraData) {
+    // prevent the response from comet.js from changing the store details body list,
+    // which will result in duplicate delayed calls to set active store location
+    setActiveStoreLocationInStoreDetailsToken = false;
+    
     var reloadPage = containerId == HEADER_CONTAINER_ID && !isInStoreDetails();
     
     if (reloadPage) {
@@ -201,13 +210,19 @@ function setActiveStoreLocation(containerId, storeLocationId) {
     This does not make a set store location id request.
 */
 function setActiveStoreLocationInStoreDetails(storeLocationId) {
-    setActiveStoreLocationInHeader(storeLocationId);
-    $(".store-locations > div.nav > a[class!=add]").removeClass("active");
-    $("#header-"+storeLocationId+", #navcontent-"+storeLocationId).addClass("active");
-    
-    var selfContent = $("#content-"+storeLocationId);
-    selfContent.siblings().removeClass("active");
-    selfContent.addClass("active");
+    // do not allow changes by comet.js if changes originated from this page.
+    if (setActiveStoreLocationInStoreDetailsToken) {
+        setActiveStoreLocationInHeader(storeLocationId);
+        $(".store-locations > div.nav > a[class!=add]").removeClass("active");
+        $("#header-"+storeLocationId+", #navcontent-"+storeLocationId).addClass("active");
+        
+        var selfContent = $("#content-"+storeLocationId);
+        selfContent.siblings().removeClass("active");
+        selfContent.addClass("active");
+    } else {
+        // allow comet.js changes again
+        setActiveStoreLocationInStoreDetailsToken = true;
+    }
 }
 
 /*
