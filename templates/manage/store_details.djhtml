@@ -2,7 +2,7 @@
 
 {% block title %}My Account{% endblock %}
 {% block styles %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.4.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_details.1.5.css' %}" />
 {% endblock %}
 
 {% block javascript %}
@@ -128,7 +128,7 @@ $(document).ready(function() {
 				{% if tmp != 2 %} {# 2 is heavyweight #}
 				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>
 				{% else %}
-				<div class="bar-graph" style="visibility:hidden;width:10px;"><div></div></div>
+				<div class="bar-graph" style="visibility:hidden;width:1px;"><div></div></div>
 				{% endif %}
 				
 				<div class="description">
