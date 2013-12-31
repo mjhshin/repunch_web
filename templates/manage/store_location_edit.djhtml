@@ -247,7 +247,7 @@
 </div>
 		
 <div id="edit-store-location-options" class="form-options">
-	<a class="button blue" id="save-button">Save Changes</a>
+	<a class="button blue" id="save-button">{% if store_location_id == '0' %}Add Location{% else %}Save Changes{% endif %}</a>
 	<a href="{% url 'store_index' %}" class="red">Cancel</a>
     <img src="{% static 'manage/images/ajax-loader.gif' %}"  />
 </div>

@@ -21,7 +21,7 @@
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
     <link href="{% static 'public/css/tooltipster-repunch.1.0.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'public/css/tooltipster.css' %}" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.3.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.4.css' %}" />
 	{% block styles %}{% endblock %}
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
