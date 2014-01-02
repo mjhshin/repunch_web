@@ -256,6 +256,9 @@ function toStoreLocations(containerId) {
         $("#header-"+storeLocationId).addClass("active");
         
         if (isInStoreDetails()) {
+            // have the height auto resize
+            $(".store-locations.navcontent > div.nav").css("height", "auto");
+        
             $("#navcontent-"+storeLocationId).addClass("active");
         
             var selfContent = $("#content-"+storeLocationId);

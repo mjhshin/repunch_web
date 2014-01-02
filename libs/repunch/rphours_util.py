@@ -6,6 +6,7 @@ from apps.stores.models import DAYS, SHORT_DAYS
 from parse.apps.stores import models
 
 SPACE = "&nbsp;"
+MAX_HOURS_PER_DAY = 3
 
 def readable_hours(value):
     """
@@ -114,6 +115,7 @@ class HoursInterpreter:
                must be earlier than or equal to 5.30 am.
             3. if open 24/7, which is represented by day 0.
             4. Close time and open time cannot be the same.
+            5. No more than MAX_HOURS_PER_DAY different hours in a day.
             
         This is only used to validate javascript input - not Parse hours,
         which will always be valid.
@@ -133,7 +135,7 @@ class HoursInterpreter:
         # 
         # order = {
         #     1: ("0600", "1330"),
-        #     2: ("1530", "1530"), # valid since third bit is "1"
+        #     2: ("1530", "1530"), 
         # }
         order_list, days_map = [ i for i in order.keys() ], {}
         order_list.sort() # order doesn't really matter but whatever
@@ -156,33 +158,23 @@ class HoursInterpreter:
             close_time = get_lexicographical_time(close_time)
             
             for day in days:
-                if day not in days_map:
+                if day not in days_map.keys():
                     days_map[day] = []
                 
                 # check hours on the same day
                 hours_today = days_map[day]
+                
                 for hours in hours_today:
                     open, close = hours[:2]
                     open = get_lexicographical_time(open)
                     close = get_lexicographical_time(close)
-                    if open == close:
-                        if close_time == open_time or close_time > open:
-                            # close_time has to be <= todays's opening
-                            return True
-                    else:
-                        if close_time == open_time and open_time < close:
-                            return True
-                            
-                        elif close_time != open_time:
-                            if not ((open_time < open and\
-                                close_time <= open) or\
-                                (open_time >= close and\
-                                close_time > close)):
-                                return True
-            
-                # all valid - add the hours to the days map
+                    if not ((open_time >= close and close_time > close) or\
+                        (open_time < open and close_time <= open)):
+                        return True
+                        
+                # add the hours to the days map
                 days_map[day].append(time)
-                
+            
             return False
         
         for i in order_list:
@@ -204,6 +196,13 @@ class HoursInterpreter:
             # Here comes the hard part - condition 1
             if hours_overlap(time, days):
                 return "The store hours cannot overlap."
+                
+        # at this point days_map is filled and everything is still valid
+        # check for a day that has MAX_HOURS_PER_DAY or more hours
+        for k, v in days_map.iteritems():
+            if len(v) > MAX_HOURS_PER_DAY:
+                return "You can only have up to %d entries per day." %\
+                    (MAX_HOURS_PER_DAY, )
         
         return True
         
