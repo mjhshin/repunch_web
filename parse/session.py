@@ -109,6 +109,16 @@ def get_store_locations(session):
         
     return session['store_locations']
     
+def get_store_locations_list(session):
+    """
+    Returns the store locations in a list orderred by createdAt in
+    ascending order.
+    """
+    # use sorted locations by createdAt
+    store_locations = [ v for v in get_store_locations(session).values() ]
+    store_locations.sort(key=lambda l: l.createdAt) 
+    return store_locations
+    
 def get_store_location(session, store_location_id):
     return get_store_locations(session).get(store_location_id)
         

@@ -156,6 +156,10 @@ def edit_location(request, store_location_id):
             store_location.set("neighborhood", 
                 store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
+           
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            }
                   
             if new_location:
                 # add the avatar file if exist
@@ -175,14 +179,19 @@ def edit_location(request, store_location_id):
                 store_location.update()
                 # if this location is the first location then update 
                 # the corresponding store columns for backwards compat
-                # TODO
+                sl_list = SESSION.get_store_locations_list(request.session)
+                if sl_list[0].objectId == store_location.objectId:
+                    store.inherit_store_location(store_location)
+                    store.update()
+                    payload.update({
+                        "updatedStore": store.jsonify(),
+                    })
             
             # the store location at this point has lost its
             # store_avatar_url so we need to update that too 
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            payload.update({
                 "updatedStoreLocation": store_location.jsonify(),
-            }
+            })
             comet_receive(store.objectId, payload)
             
             # make sure that we have the latest session

@@ -43,6 +43,8 @@ class Store(ParseObject):
         self.last_name = data.get('last_name')
         self.store_name = data.get('store_name')
         self.store_description = data.get('store_description')
+        # global avatar for this store
+        self.store_avatar = data.get('store_avatar')
         
         # [{"reward_name":"Free bottle of wine", "description":
         # "Must be under $25 in value",
@@ -74,7 +76,6 @@ class Store(ParseObject):
         
         # These are also in StoreLocation class
         # we are just keep it in here for backwards compatibility
-        self.store_avatar = data.get('store_avatar')
         self.street = data.get("street")
         self.city = data.get('city')
         self.state = data.get('state')
@@ -91,6 +92,25 @@ class Store(ParseObject):
         #####################
         
         super(Store, self).__init__(False, **data)
+        
+    def inherit_store_location(self, store_location):
+        """
+        Used for backward compatibility.
+        """
+        data = store_location.__dict__
+        self.street = data.get("street")
+        self.city = data.get('city')
+        self.state = data.get('state')
+        self.zip = data.get('zip')
+        self.country = data.get('country')
+        self.phone_number = data.get('phone_number')
+        self.store_timezone = data.get('store_timezone', TIME_ZONE) 
+        self.neighborhood = data.get('neighborhood')
+        # GeoPoint [latitude, longtitude]
+        self.coordinates = data.get('coordinates')
+        # [{"day":1,"open_time":"0900","close_time":"2200"}, 
+        #    ... up to day 7]
+        self.hours = data.get("hours", [])
             
     @classmethod  
     def fields_required(cls):
