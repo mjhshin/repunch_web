@@ -172,6 +172,9 @@ def edit_location(request, store_location_id):
 
             else:  
                 store_location.update()
+                # if this location is the first location then update 
+                # the corresponding store columns for backwards compat
+                # TODO
             
             # the store location at this point has lost its
             # store_avatar_url so we need to update that too 

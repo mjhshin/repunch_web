@@ -294,7 +294,7 @@ def punches(request, employee_id):
     skip = (page-1) * PAGINATION_THRESHOLD
     
     employee.set("punches", None)
-    punches = employee.get('punches', order=order_by,
+    punches = employee.get('punches', include="Patron", order=order_by,
         limit=limit, skip=skip)
         
     # make sure to pop the PAGINATION_THRESHOLD + 1 row if exist

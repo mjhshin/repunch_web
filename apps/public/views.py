@@ -280,7 +280,6 @@ def sign_up(request):
             settings.create()
             
             # create store
-            store.StoreLocation = store_location.objectId
             store.Settings = settings.objectId
             store.Subscription = subscription.objectId
             store.create()
