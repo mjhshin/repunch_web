@@ -1,0 +1,27 @@
+.tr.draft, .tr.unread{
+	font-weight:bold;
+}
+
+.subject,
+.feedback-subject,
+.feedback-from {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+#header-date, #header-feedback-date, .feedback-date, .date {
+	width:120px;
+}
+
+#header-feedback-subject, .feedback-subject {
+	width:320px; 
+}
+#header-subject, .subject {
+	width:490px;
+}
+
+#header-feedback-from, .feedback-from {
+	width:160px;
+}

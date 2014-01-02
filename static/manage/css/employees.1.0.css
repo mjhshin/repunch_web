@@ -16,6 +16,17 @@
 	text-align:center;
 }
 
+.first_name_approved,
+.first_name_pending,
+.last_name_approved,
+.last_name_pending {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+
+
+
 #header-graph, .graph{
 	width:70px;
 	text-align:center;

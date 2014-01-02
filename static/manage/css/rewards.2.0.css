@@ -35,6 +35,15 @@
 	margin-right:10px;
 }
 
+.reward_title,
+.reward_description {
+    display: inline-block;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+	width: 540px;
+}
+
 .reward_title{
 	font-weight:bold;
 	font-size:16px;
@@ -42,10 +51,6 @@
 
 .reward_description{
 	font-size:11px;
-	white-space:nowrap;
-	text-overflow:ellipsis;
-	overflow:hidden;
-	display:block;
 	margin-top:4px;
 }
 

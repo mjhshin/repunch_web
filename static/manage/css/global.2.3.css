@@ -192,7 +192,7 @@ div#header-right > a {
 }
 
 div#header-right > a > img {
-    position:absolute; right:15px; top: 32px;
+    position:absolute; right:15px; top: 33px;
 }
 
 div#header-right:hover > a {
@@ -481,6 +481,12 @@ div.white-box.table{
 
 .tab-body.active{
 	display:block;
+}
+
+.ellipsized {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }
 
 div#footer{

@@ -1,9 +1,9 @@
 {% extends "manage/base.djhtml" %}
-{% load static %}{% load util_tags %}{% load text_tags %}
+{% load static %}{% load util_tags %}
 
 {% block title %}Analysis{% endblock %}
 {% block styles %}	
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/analysis.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/analysis.1.0.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/jquery/jquery.tinysort.min.js" %}"></script>
@@ -94,7 +94,7 @@
 			</div>
 			{% for reward in rewards %}
 		    <div class="tr  {% cycle '' 'odd' %}" id="{{ reward.reward_id }}">
-				<div class="td reward_name">{{ reward.reward_name|trim_to_dots:40 }}</div>
+				<div class="td reward_name">{{ reward.reward_name }}</div>
 				<div class="td reward_redemptions">{{ reward.redemption_count }}</div>
 			</div>
 			{% empty %}

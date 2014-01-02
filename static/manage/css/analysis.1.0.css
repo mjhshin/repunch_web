@@ -2,6 +2,12 @@
 	width:400px;
 }
 
+.reward_name {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+
 #header-reward_redemptions, .reward_redemptions {
 	width:110px;
 }

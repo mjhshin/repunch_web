@@ -5,7 +5,7 @@
 
 {% block title %}Edit Employee{% endblock %}
 {% block styles %}
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.1.2.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/employee_edit.2.0.css" %}" />
 {% endblock %}
 {% block javascript %}
 	<script src="{% static "manage/js/employee_edit.1.1.js" %}"></script>

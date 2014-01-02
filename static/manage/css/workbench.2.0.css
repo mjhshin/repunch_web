@@ -17,7 +17,6 @@
 
 #header-redemption_redeem, div.redemption_redeem{
     width:80px;
-
 }
 
 div.redemption_redeem img.redemp-loader{
@@ -99,4 +98,14 @@ img#punch-loading {
 #keymap img { 
 	margin: 0px 5px 0px 10px;
 	vertical-align: middle
+}
+
+
+.redemption_customer_name,
+.redemption_customer_name-past,
+.redemption_title,
+.redemption_title-past {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	overflow:hidden;
 }

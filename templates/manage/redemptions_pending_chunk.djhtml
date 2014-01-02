@@ -1,4 +1,4 @@
-{% load static %}{% load text_tags %}
+{% load static %}
 
 <input type="hidden" id="loading_icon_url" value="{% static 'manage/images/ajax-loader.gif' %}" />
 <input type="hidden" id="green_check_url" value="{% static 'manage/images/icon_green-check.png' %}" />
@@ -14,9 +14,9 @@
 	{{ redemp.createdAt|date:"h:i a" }}
 	{% endif %}</div>
 	<div class="td redemption_customer_name">
-	{{ redemp.customer_name|trim_to_dots:18 }}</div>
+	{{ redemp.customer_name }}</div>
 	<div class="td redemption_title">
-	{{ redemp.title|trim_to_dots:18 }}</div>
+	{{ redemp.title }}</div>
 	<div class="td redemption_punches">
     {% if redemp.num_punches > 0 %}{{ redemp.num_punches }}{% else %}-{% endif %}
 	</div>

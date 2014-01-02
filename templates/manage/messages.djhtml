@@ -3,7 +3,7 @@
 
 {% block title %}{% if fcount > 0 %}({{ fcount }}){% endif %} Messages{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/messages.1.0.css" %}" />
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/paginator.css" %}" />
 {% endblock %}
 {% block javascript %}

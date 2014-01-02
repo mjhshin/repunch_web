@@ -1,5 +1,3 @@
-{% load text_tags %}
-
 {% for redemp in past_redemptions %}
 <div id="{{redemp.objectId}}" class="tr  {% cycle '' 'odd' %}">
     <input type="hidden" value="{{redemp.reward_id}}" />
@@ -10,9 +8,9 @@
     {{ redemp.updatedAt|date:"h:i a" }}
     {% endif %}</div>
     <div class="td redemption_customer_name-past">
-    {{ redemp.customer_name|trim_to_dots:18 }}</div>
+    {{ redemp.customer_name }}</div>
     <div class="td redemption_title-past">
-    {{ redemp.title|trim_to_dots:18 }}</div>
+    {{ redemp.title }}</div>
     <div class="td redemption_punches-past">
     {% if redemp.num_punches > 0 %}{{ redemp.num_punches }}{% else %}-{% endif %}
     </div>
