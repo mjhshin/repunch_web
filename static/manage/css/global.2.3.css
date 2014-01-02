@@ -56,10 +56,16 @@ div.notification div ul.errorlist li {
 	top: 0px; 
 }
 
+
+div.notification div,
+div.notification div a {
+	font: bold 14px 'Cabin', sans-serif;
+}
+
+
 div.notification div{
 	background-color: #FFFFCB;
 	border:1px solid #F9B64D;
-	font: bold 14px 'Cabin', sans-serif;
 	padding: 15px;
 	color:#666;
 	margin-bottom:30px;
@@ -182,11 +188,21 @@ div#header-right > a {
     display: inline-block;
     float:right;
 	padding: 0 15px;
+	width: 191px;
 }
 
 div#header-right:hover > a {
 	color:#666;
 }
+
+div#header-right > a > span#account-name {
+    display: inline-block;
+    width: 126px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 div#header-right:hover {
     background-image: -ms-linear-gradient(bottom, #E1E1E1 0%, #EEEEEE 100%);
@@ -200,8 +216,8 @@ div#header-right:hover {
 div#header-right > ul {
     list-style: none;
     border: 1px solid #CCC; border-top: none; border-right: none;
-	background:white;
-    width: 194px; 
+	background: white;
+    width: 220px; 
     position:absolute; 
     margin-top: 70px; padding: 0px;
     display:none;
@@ -213,7 +229,7 @@ div#header-right:hover > ul {
 }
 
 div#header-right > ul > a > li {
-    width: 164px; /* this + padding must = width of header-right ul */
+    width: 190px; /* this + padding must = width of header-right ul */
     margin:0px; padding: 0px;
 	font: normal 16px/44px 'Cabin', sans-serif;
 	padding-left: 30px;

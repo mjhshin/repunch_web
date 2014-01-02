@@ -29,7 +29,7 @@ $(document).ready(function() {
 	<div class="notification">
 	    <div>
 	    {% if alert_users == 2  %}
-	        <span style="color:red">ALERT!</span> You have passed your maximum number of users.<br/><br/>
+	        <span style="color:red;margin-right:4px;">ALERT!</span> You have passed your maximum number of users.<br/><br/>
 		    Please <a href="{% url 'subscription_update' %}" >update your subscription</a> for continued service.
 	    {% else %}
 		    You are reaching your maximum number of users.<br/>
@@ -46,7 +46,7 @@ $(document).ready(function() {
     {% if alert_billing %}
 	<div class="notification">
 	    <div>
-        <span style="color:red">ALERT!</span> We were unable to charge you for your monthly membership.<br/>
+        <span style="color:red;margin-right:4px;">ALERT!</span> We were unable to charge you for your monthly membership.<br/>
         The billing information we have is invalid.<br/><br/>
 	    Please <a href="{% url 'subscription_update' %}" >update your subscription</a> for continued service.
 		</div>
@@ -71,7 +71,7 @@ $(document).ready(function() {
                 {% for location in store_locations %}
                 <a id="navcontent-{{ location.objectId }}"
                     {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
-                    <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
+                    <div><span></span>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}</div>
                 </a>
                 {% endfor %}
             </div>

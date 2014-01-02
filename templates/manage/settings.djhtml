@@ -28,7 +28,7 @@
 		{% endif %}
 		
 		<div id="punches_facebook_e">{{ form.punches_facebook.errors }}</div>
-		<label for="id_punches_facebook">Free Punch Allowance for Facebook</label>
+		<label for="id_punches_facebook">Number of punches given to customers for posting redeems to Facebook</label>
 		{% if is_admin %}
 		{{ form.punches_facebook }}
 		{% else %}

@@ -16,12 +16,12 @@
 	<link rel="shortcut icon" href="{% static 'public/images/favicon.2.1.png' %}" />
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	
-	<link href="{% static 'manage/css/global.2.2.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.2.3.css' %}" rel="stylesheet" />
     <link href="{% static 'public/css/jquery-ui-repunch.css' %}" rel="stylesheet" />
 	<link href="{% static 'manage/css/jquery/jquery-ui-smoothness.min.css' %}" rel="stylesheet" />
     <link href="{% static 'public/css/tooltipster-repunch.1.0.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'public/css/tooltipster.css' %}" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.4.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'manage/css/store_locations.1.5.css' %}" />
 	{% block styles %}{% endblock %}
 	
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
@@ -78,6 +78,7 @@
 			</div>
 			
 			{# STORE LOCATIONS LIST #}
+			{% if store_locations|length > 1 %}
 		    <div class="store-locations header" id="store-locations-header">
 		    
 		        <div class="current" ><span></span>
@@ -91,7 +92,7 @@
                     {% for location in store_locations %}
                     <a id="header-{{ location.objectId }}"
                         {% if location.objectId == active_store_location.objectId %}class="active"{% endif %}>
-                        <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}<span></span></div>
+                        <div>{{ location.street|title }}<br/>{{ location.city|title }}, {{ location.state|upper }}</div>
                     </a>
                     {% endfor %}
                 </div>
@@ -99,6 +100,7 @@
                 <div class="scroll down"><img src="{% static 'manage/images/scroll_down.1.0.png' %}"/></div>
         
 		    </div>
+		    {% endif %}
             {# END STORE LOCATIONS LIST #}
 			
 		</div>

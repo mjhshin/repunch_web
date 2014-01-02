@@ -151,24 +151,20 @@
 .store-locations.header > div.current span,
 .store-locations > div.nav > a.active > div > span {
     display: block;
-    margin-top: 4px;
+    margin-top: 0;
     color: #669900;
 }
 
-.store-locations.header > div.current span {
-    margin-top: 0;
+.store-locations > div.nav > a.active > div > span {
+    margin-bottom: 10px;
 }
+
 
 .store-locations.header > div.current span:after,
 .store-locations > div.nav > a.active > div > span:after {
-    position: relative; top: 6px;
 	font: bold 15px/20px 'Cabin', sans-serif;
     content: "Current Location";
     color: #0965ad;
-}
-
-.store-locations.header > div.nav > a.active > div > span:after {
-    content: "";
 }
 
 .store-locations.header > div.current span:after {
