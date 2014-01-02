@@ -18,12 +18,12 @@ from parse.apps.accounts.models import Account
 from parse.apps.employees.models import Employee
 from parse.apps.messages.models import Message, MessageStatus
 from parse.apps.rewards.models import Punch, RedeemReward
-from parse.apps.stores.models import Store, Settings, Subscription, Invoice
+from parse.apps.stores.models import Store, StoreLocation, Settings, Subscription, Invoice
 from parse.apps.patrons.models import Patron, PatronStore, PunchCode, FacebookPost
 from repunch.settings import REPUNCH_ADMINS
 
 MODELS = (Account, Employee, Message, MessageStatus, Punch,
-    RedeemReward, Store, Settings, Subscription, Invoice,
+    RedeemReward, Store, StoreLocation, Settings, Subscription, Invoice,
     Patron, PatronStore, PunchCode, FacebookPost)
     
 class Command(BaseCommand):

@@ -166,7 +166,8 @@ def edit_location(request, store_location_id):
                     store_location.store_avatar = new_avatar.avatar_name
                     store_location.store_avatar_url = new_avatar.avatar_url
                     new_avatar.delete(False)
-                    
+                  
+                store_location.Store = store.objectId  
                 store_location.create()
                 store.array_add_unique("store_locations", [store_location])
 
