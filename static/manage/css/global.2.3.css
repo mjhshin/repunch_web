@@ -187,8 +187,12 @@ div#header-right > a {
 	color:#888;
     display: inline-block;
     float:right;
-	padding: 0 15px;
-	width: 191px;
+	padding: 0 10px;
+	width: 201px;
+}
+
+div#header-right > a > img {
+    position:absolute; right:15px; top: 32px;
 }
 
 div#header-right:hover > a {
@@ -197,7 +201,7 @@ div#header-right:hover > a {
 
 div#header-right > a > span#account-name {
     display: inline-block;
-    width: 126px;
+    width: 140px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

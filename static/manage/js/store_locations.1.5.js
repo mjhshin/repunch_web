@@ -225,6 +225,16 @@ function setActiveStoreLocationInStoreDetails(storeLocationId) {
     }
 }
 
+
+/*
+    Make sure that the height of the nav is same as the container so that
+    the right border does not break
+*/
+function fixNavContentNavHeight() {
+    $(".store-locations.navcontent > div.nav").css("height", $(".store-locations.navcontent").css("height"));
+
+}
+
 /*
     This is where the magic happens.
 */
@@ -251,6 +261,8 @@ function toStoreLocations(containerId) {
             var selfContent = $("#content-"+storeLocationId);
             selfContent.siblings().removeClass("active");
             selfContent.addClass("active");
+            
+            fixNavContentNavHeight();
         }
         
         // set active_store_location in server
@@ -296,6 +308,7 @@ $(document).ready(function() {
     // the store_details store locations
     if (isInStoreDetails()) {
         toStoreLocations(CONTAINER_ID);
+        fixNavContentNavHeight();
     }
     
 });
