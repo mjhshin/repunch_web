@@ -147,7 +147,7 @@ def edit_location(request, store_location_id):
                     
             # format the phone number
             store_location.phone_number =\
-                format_phone_number(request.POST['phone_number'])
+                format_phone_number(postDict['phone_number'])
             # update the store's coordinates and neighborhood
             full_address = " ".join(\
                 store_location.get_full_address().split(", "))

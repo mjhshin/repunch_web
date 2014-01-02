@@ -155,11 +155,14 @@ def sign_up(request):
     data = {'sign_up_nav': True}
             
     if request.method == 'POST':
+        # this conversion to a regular dictionay is important
+        postDict = request.POST.dict()
+    
         from_associated_account = False
         # check if this post is from the associated account dialog
         # if it is then skip form validations
-        aaf_nonce_id = request.POST.get('aaf-nonce')
-        aaf_account_id = request.POST.get('aaf-account_id')
+        aaf_nonce_id = postDict.get('aaf-nonce')
+        aaf_account_id = postDict.get('aaf-account_id')
         if len(aaf_nonce_id) > 0 and len(aaf_account_id) > 0:
             aa_nonce = AssociatedAccountNonce.objects.filter(\
                 id=aaf_nonce_id, account_id=aaf_account_id)
@@ -173,7 +176,7 @@ def sign_up(request):
         account_form = AccountSignUpForm(request.POST)
         subscription_form = SubscriptionSignUpForm(request.POST)
         
-        cats = request.POST.get("categories")
+        cats = postDict.get("categories")
         category_names = None
         if cats and len(cats) > 0:
             category_names = cats.split("|")[:-1]
@@ -189,10 +192,10 @@ def sign_up(request):
             all_forms_valid = True
             
         ### Bad form of validation lol
-        if request.POST.get("place_order"):
+        if postDict.get("place_order"):
             data["place_order_checked"] = True
-            if isdigit(request.POST.get("place_order_amount")):
-                amount = int(request.POST.get("place_order_amount"))
+            if isdigit(postDict.get("place_order_amount")):
+                amount = int(postDict.get("place_order_amount"))
                 if amount > 0:
                     all_forms_valid = all_forms_valid and\
                         subscription_form.is_valid()
@@ -223,7 +226,7 @@ def sign_up(request):
             #########################################################
 
             # create store
-            store = Store(**request.POST)
+            store = Store(**postDict)
             # set defaults for these guys to prevent 
             # ParseObjects from making parse calls repeatedly
             store.punches_facebook = 1
@@ -243,14 +246,14 @@ def sign_up(request):
 
             # create account
             if not from_associated_account:
-                account = Account(**request.POST)
+                account = Account(**postDict)
                 # username = email
                 # we should be doing this in the form but ehh
                 account.set("username", 
-                    request.POST['email'].strip().lower())
+                    postDict['email'].strip().lower())
                 account.set("email", 
-                    request.POST['email'].strip().lower())
-                account.set_password(request.POST.get('password'))
+                    postDict['email'].strip().lower())
+                account.set_password(postDict.get('password'))
             else:
                 account =\
                     Account.objects().get(objectId=aaf_account_id)
@@ -258,17 +261,17 @@ def sign_up(request):
             account.set("store", store)
 
             # create subscription
-            if request.POST.get("place_order"):
+            if postDict.get("place_order"):
                 subscription = Subscription(\
-                    first_name=request.POST.get("first_name2"),
-                    last_name=request.POST.get("last_name2"),
-                    cc_number=request.POST.get("cc_number"),
-                    date_cc_expiration=request.POST.get("date_cc_expiration"),
-                    address=request.POST.get("address"),
-                    city=request.POST.get("city2"),
-                    state=request.POST.get("state2"),
-                    zip=request.POST.get("zip2"),
-                    country=request.POST.get("country2"))
+                    first_name=postDict.get("first_name2"),
+                    last_name=postDict.get("last_name2"),
+                    cc_number=postDict.get("cc_number"),
+                    date_cc_expiration=postDict.get("date_cc_expiration"),
+                    address=postDict.get("address"),
+                    city=postDict.get("city2"),
+                    state=postDict.get("state2"),
+                    zip=postDict.get("zip2"),
+                    country=postDict.get("country2"))
             else:
                 subscription = Subscription() 
             subscription.subscriptionType = 0
@@ -291,10 +294,10 @@ def sign_up(request):
             subscription.update()
             
             # create the store location
-            store_location = StoreLocation(**request.POST)
+            store_location = StoreLocation(**postDict)
             # format the phone number
             store_location.store_timezone =\
-                rputils.get_timezone(request.POST.get("zip")).zone
+                rputils.get_timezone(postDict.get("zip")).zone
             store_location.set("hours", [])
             # coordinates and neighborhood
             # the call to get map data is actually also in the clean 
@@ -306,7 +309,7 @@ def sign_up(request):
                 store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
             store_location.phone_number =\
-                format_phone_number(request.POST["phone_number"])
+                format_phone_number(postDict["phone_number"])
             store_location.Store = store.objectId
             store_location.create()
             
@@ -358,19 +361,19 @@ def sign_up(request):
                        
             
             subscription.Store = store.objectId
-            if request.POST.get("place_order"):
+            if postDict.get("place_order"):
                 exp = make_aware_to_utc(datetime(\
-                    int(request.POST['date_cc_expiration_year']),
-                    int(request.POST['date_cc_expiration_month']), 1), tz)
+                    int(postDict['date_cc_expiration_year']),
+                    int(postDict['date_cc_expiration_month']), 1), tz)
                 subscription.set("date_cc_expiration", exp)
                 # make sure to use the correct POST info
-                subscription.first_name = request.POST['first_name2']
-                subscription.last_name  = request.POST['last_name2']
-                subscription.city = request.POST['city2']
-                subscription.state = request.POST['state2']
-                subscription.zip = request.POST['zip2']
-                subscription.country = request.POST['country2']
-                amount = int(request.POST.get("place_order_amount"))
+                subscription.first_name = postDict['first_name2']
+                subscription.last_name  = postDict['last_name2']
+                subscription.city = postDict['city2']
+                subscription.state = postDict['state2']
+                subscription.zip = postDict['zip2']
+                subscription.country = postDict['country2']
+                amount = int(postDict.get("place_order_amount"))
                 subscription.update()
                 res = subscription.store_cc(\
                         subscription_form.data['cc_number'],
@@ -394,14 +397,14 @@ def sign_up(request):
             # note that username has been fed the email
             # this shouldn't change anything though shouldn't matter
             # need to put username and pass in request
-            request.POST['username'] = account.username
-            request.POST['password'] = account.password
+            postDict['username'] = account.username
+            postDict['password'] = account.password
             
             # send matt and new user a pretty email.
             send_email_signup(account)
 
             # auto login
-            user_login = login(request, request.POST, no_recaptcha=True)
+            user_login = login(request, postDict, no_recaptcha=True)
             if user_login != None:
                 data = {"code":-1}
                 # response to signup.js - not login returns
