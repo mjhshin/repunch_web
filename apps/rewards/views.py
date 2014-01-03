@@ -49,6 +49,11 @@ def index(request):
     # update session cache
     request.session['store'] = store
     
+    
+    for v in SESSION.get_store(request.session).store_locations:
+        print "##############"
+        print v.__dict__
+    
     return render(request, 'manage/rewards.djhtml', data)
 
 
@@ -68,15 +73,16 @@ def edit(request, reward_id):
  
     # reward id being -1 is a flag for new reward which don't exist
     is_new, reward = False, None
-    if reward_id in rewards_map or reward_id == -1:
-        if reward_id == -1:
-            is_new = True
-            # a reward is now just a dictionary to be added to 
-            # the rewards array
-            reward = {'reward_name':None, "description":None, 
-                        "punches":None, 'redemption_count':0}
-        else: # reward exists
-            old_reward = rewards_map[reward_id]
+    if reward_id in rewards_map: # reward exists
+        old_reward = rewards_map[reward_id]
+        
+    elif reward_id == -1:
+        is_new = True
+        # a reward is now just a dictionary to be added to 
+        # the rewards array
+        reward = {'reward_name':None, "description":None, 
+                    "punches":None, 'redemption_count':0}
+                    
     else: 
         return redirect(reverse('rewards_index'))
     
