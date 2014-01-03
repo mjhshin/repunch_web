@@ -39,7 +39,7 @@ def index(request):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
-    
+        
     return render(request, 'manage/store_details.djhtml', data)
 
 @dev_login_required
@@ -75,6 +75,7 @@ def edit_store(request):
         
         if store_form.is_valid():
             store.update_locally(request.POST.dict(), False)
+            store.update()
             
             # notify other dashboards
             comet_receive(store.objectId, {
@@ -115,19 +116,19 @@ def edit_location(request, store_location_id):
         
         postDict = request.POST.dict()
         hours = HoursInterpreter(json.loads(postDict["hours"]))
-
+        
+        if new_location:
+            store_location = StoreLocation(**postDict)
+        else:
+            store_location = SESSION.get_store_location(\
+                request.session, store_location_id)
+            # the avatar url will be lost in the creation so add it in
+            avatar_url = store_location.get("store_avatar_url")
+            store_location = StoreLocation(**store_location.__dict__)
+            store_location.update_locally(postDict, False)
+            store_location.store_avatar_url = avatar_url
+            
         if store_location_form.is_valid(): 
-            if new_location:
-                store_location = StoreLocation(**postDict)
-            else:
-                store_location = SESSION.get_store_location(\
-                    request.session, store_location_id)
-                # the avatar will be lost in the creation so add it in
-                avatar_url = store_location.get("store_avatar_url")
-                store_location = StoreLocation(**store_location.__dict__)
-                store_location.update_locally(postDict, False)
-                store_location.store_avatar_url = avatar_url
-
             # validate and format the hours
             hours_validation = hours.is_valid()
             if type(hours_validation) is bool:
@@ -157,10 +158,6 @@ def edit_location(request, store_location_id):
                 store_location.get_best_fit_neighborhood(\
                     map_data.get("neighborhood")))
            
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            }
-                  
             if new_location:
                 # add the avatar file if exist
                 new_avatar = NewStoreLocationAvatarTmp.objects.filter(\
@@ -183,15 +180,14 @@ def edit_location(request, store_location_id):
                 if sl_list[0].objectId == store_location.objectId:
                     store.inherit_store_location(store_location)
                     store.update()
-                    payload.update({
-                        "updatedStore": store.jsonify(),
-                    })
             
             # the store location at this point has lost its
             # store_avatar_url so we need to update that too 
-            payload.update({
+            payload = {
+                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                "updatedStore": store.jsonify(),
                 "updatedStoreLocation": store_location.jsonify(),
-            })
+            }
             comet_receive(store.objectId, payload)
             
             # make sure that we have the latest session
@@ -220,7 +216,9 @@ def edit_location(request, store_location_id):
                 data['store_location_avatar_tmp'] =\
                     new_avatar[0].avatar_url
                 
+            data['store_location'] = store_location
             data['hours_data'] = hours._format_javascript_input()
+            
             return HttpResponse(json.dumps({
                 "result": "error",
                 "html": common(store_location_form).content,
