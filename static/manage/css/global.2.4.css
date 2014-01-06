@@ -144,6 +144,8 @@ div#site-frame{
 	width:960px; 
 	margin:0 auto;
 	box-shadow: 0 0 5px 3px #BBB;
+	/* height of the header, which is absolute positioned. */
+	padding-bottom: 71px; 
 }
 
 div#header{

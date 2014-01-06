@@ -60,7 +60,7 @@ $(document).ready(function() {
 	{% endif %}
 	
 	<div class="section first" id="store-details">
-		<h2>Store Details</h2><br/>
+		<h2>{{ store.store_name|title }}</h2><br/>
 		
 		{# STORE LOCATIONS LIST #}
 		<div class="store-locations navcontent" id="store-locations">
