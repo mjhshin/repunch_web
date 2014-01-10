@@ -228,7 +228,8 @@ def comet_receive(store_id, postDict, session_key=None):
         if pendingRedemption:
             rr = RedeemReward(**pendingRedemption)
             
-            if rr.store_location_id ==\
+            # store_location_id can be null for backwards compat
+            if not rr.store_location_id or rr.store_location_id ==\
                 session.get('active_store_location_id'):
                 redemptions_pending_ids =\
                     [ red.objectId for red in redemptions_pending ]
@@ -252,7 +253,8 @@ def comet_receive(store_id, postDict, session_key=None):
         if approvedRedemption:  
             redemp = RedeemReward(**approvedRedemption)
             
-            if redemp.store_location_id ==\
+            # store_location_id can be null for backwards compat
+            if not redemp.store_location_id or redemp.store_location_id ==\
                 session.get('active_store_location_id'):
                 # check if redemp is still in pending
                 for i, redem in enumerate(redemptions_pending):
@@ -279,7 +281,8 @@ def comet_receive(store_id, postDict, session_key=None):
         if deletedRedemption:
             redemp = RedeemReward(**deletedRedemption)
             
-            if redemp.store_location_id ==\
+            # store_location_id can be null for backwards compat
+            if not redemp.store_location_id or redemp.store_location_id ==\
                 session.get('active_store_location_id'):
                 # check if redemp is still in pending
                 for i, redem in enumerate(redemptions_pending):

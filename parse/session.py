@@ -61,8 +61,9 @@ def get_redemptions_pending(session, store_location_id=None, refresh=False):
     """
     if "redemptions_pending" not in session or refresh:
         store = get_store(session)
+        # include None in store_location_id for backwards compat
         redemptions_pending = store.get('redeemRewards',
-            store_location_id=store_location_id,
+            store_location_id__in=(store_location_id, None),
             is_redeemed=False, order="-createdAt", limit=900)
             
         if redemptions_pending is None:
@@ -81,8 +82,9 @@ def get_redemptions_past(session, store_location_id=None, refresh=False):
     """
     if "redemptions_past" not in session or refresh:
         store = get_store(session)
+        # include None in store_location_id for backwards compat
         redemptions = store.get('redeemRewards', is_redeemed=True,
-            store_location_id=store_location_id,
+            store_location_id__in=(store_location_id, None),
             order="-createdAt", limit=900)
             
         if redemptions is None:
