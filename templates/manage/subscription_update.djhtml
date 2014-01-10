@@ -3,12 +3,10 @@
 
 {% block title %}Account {% if update %}Update{% else %}Upgrade{% endif %}{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/subscription_update.1.0.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/subscription_update.1.1.css" %}" />
 {% endblock %}
 
 {% block javascript %}
-<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
-<script src="{% static 'public/js/place-order.1.0.js' %}"></script>
 <script>
     $(document).ready(function(){
         var pf = $("#processing-form");
@@ -78,19 +76,13 @@
 	<div class="section first">
 		<h2>Billing Information</h2>
 		
-		<div class="input-container" id="first_name_ic"
-		    {% if not form.first_name.errors and form.last_name.errors %}
-		    style="margin-top:24px;"
-		    {% endif %}>
+		<div class="input-container {% if not form.first_name.errors and form.last_name.errors %}with-errors{% endif %}" id="first_name_ic">
 			{{ form.first_name.errors }}
 			<label for="id_first_name">First Name</label>
 			{{ form.first_name }}
 		</div>
 		
-		<div class="input-container" id="last_name_ic"
-		    {% if not form.last_name.errors and form.first_name.errors %}
-		    style="margin-top:24px;"
-		    {% endif %}>
+		<div class="input-container {% if not form.last_name.errors and form.first_name.errors %}with-errors{% endif %}" id="last_name_ic">
 			{{ form.last_name.errors }}
 			<label for="id_last_name">Last Name</label>
 			{{ form.last_name }}
@@ -106,19 +98,13 @@
 			<img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
 		</div>
 		
-		<div class="input-container clearheight" id="cc_cvv_ic"
-		    {% if not form.cc_cvv.errors and form.date_cc_expiration.errors %}
-		    style="margin-top:24px;"
-		    {% endif %}>
+		<div class="input-container clearheight {% if not form.cc_cvv.errors and form.date_cc_expiration.errors %}with-errors{% endif %}" id="cc_cvv_ic">
 			{{ form.cc_cvv.errors }}
 			<label for="id_cc_cvv">CVC</label>
 			{{ form.cc_cvv }}
 		</div>
 		
-		<div class="input-container" id="date_cc_expiration_ic"
-		    {% if not form.date_cc_expiration.errors and form.cc_cvv.errors %}
-		    style="margin-top:24px;"
-		    {% endif %}>
+		<div class="input-container {% if not form.date_cc_expiration.errors and form.cc_cvv.errors %}with-errors{% endif %}" id="date_cc_expiration_ic">
 			{{ form.date_cc_expiration.errors }}
 			<label>Expiration</label>
 			{{ form.date_cc_expiration }}
@@ -128,67 +114,38 @@
 	<div class="section">
 		<h2>Billing Address</h2>
 		
-		<div class="input-container" id="address_ic">
+		<div class="input-container {% if form.city.errors and not form.address.errors %}with-errors{% endif %}" id="address_ic">
 			{{ form.address.errors }}
 			<label for="id_address">Street</label>
 			{{ form.address }}
 		</div>
 		
-		<div class="input-container" id="city_ic">
+		<div class="input-container {% if not form.city.errors and form.address.errors %}with-errors{% endif %}" id="city_ic">
 			{{ form.city.errors }}
 			<label for="id_city">City</label>
 			{{ form.city }}
 		</div>
 		
-		<div class="input-container clearheight" id="state_ic">
+		<div class="input-container clearheight {% if form.zip.errors and not form.state.errors %}with-errors{% endif %}" id="state_ic">
 			{{ form.state.errors }}
 			<label for="id_state">State</label>
 			{{ form.state }}
 		</div>
 		
-		<div class="input-container" id="zip_ic">
+		<div class="input-container {% if not form.zip.errors and form.state.errors %}with-errors{% endif %}" id="zip_ic">
 			{{ form.zip.errors }}
 			<label for="id_zip">Zip</label>
 			{{ form.zip }}
 		</div>
 		
-		<div class="input-container">
+		<div class="input-container {% if form.zip.errors or form.state.errors %}with-errors{% endif %}">
 			<label for="id_country">Country</label>
 			{{ form.country }}
 		</div>
 		
-		<div style="clear: left;"></div>
-        {% if place_order_amount_error %}
-        <ul class="errorlist" style="position:relative;top:8px;"><li>{{ place_order_amount_error }}</li></ul>
-        {% endif %}
-		<div class="input-container"
-		        id="place_order_container">
-		    {% if place_order_checked %}
-			<input type="checkbox" name="place_order"
-			        value="yes" id="place_order" checked/>
-	        {% else %}
-			<input type="checkbox" name="place_order"
-			        value="yes" id="place_order" />
-	        {% endif %}
-			<label for="place_order">Order Repunch-enabled devices:</label>
-		    
-			<span id="place_order_span"
-			    {% if not place_order_checked %}
-			    style="display:none;"
-			    {% endif %}>
-			    amount&nbsp;&nbsp;
-			    <input type="number" min="1"  step="1" 
-			        name="place_order_amount" 
-			        style="width:40px;height:26px;" value="1" />
-			</span>
-			<img class="question_mark"
-			    src="{% static 'public/images/question_mark.png' %}" 
-			    style="position:relative;top:4px;left:4px;"
-			    title="<div class='tooltipBox'><h4>$149/device</h4><div><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App.</p><br/><p>Remember that we will automatically notify you via email if we detect any suspicious punching activity.</p></div></div>" />
-		</div>
 		
 		<div style="clear: left;"></div>
-		<div class="input-container" id="recurring_charge_container" {% if form.recurring.errors %}style="margin-top:10px;"{% endif %}>
+		<div class="input-container" id="recurring_charge_container" >
 			{{ form.recurring.errors }}
 			{{ form.recurring }}&nbsp;<label for="id_recurring">I accept the <a href="{% url 'manage_terms' %}" target="_blank">Terms &amp; Conditions</a> and understand that my credit card will be rebilled every 30 days.</label>
 		</div>

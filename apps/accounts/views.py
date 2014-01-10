@@ -22,8 +22,7 @@ from parse.apps.stores import IPOD, MONTHLY
 from parse.apps.stores.models import Store, Subscription
 from parse.utils import make_aware_to_utc
 from parse.notifications import EMAIL_MONTHLY_SUBJECT,\
-send_email_receipt_ipod, send_email_account_upgrade,\
-send_email_receipt_monthly_success
+send_email_account_upgrade, send_email_receipt_monthly_success
 
 
 @dev_login_required
@@ -102,23 +101,6 @@ def update_subscription(request):
         form.subscription = subscription # to validate cc_number
         all_forms_valid = form.is_valid()
         
-        ### Bad form of validation lol
-        if request.POST.get("place_order"):
-            data["place_order_checked"] = True
-            if isdigit(request.POST.get("place_order_amount")):
-                amount = int(request.POST.get("place_order_amount"))
-                if amount > 0:
-                    all_forms_valid = all_forms_valid and\
-                        form.is_valid()
-                else:
-                    all_forms_valid = False
-                    data["place_order_amount_error"] =\
-                        "Amount must be greater than 0."
-            else:
-                all_forms_valid = False
-                data["place_order_amount_error"] =\
-                    "Amount must be a number greater than 0."
-        
         if all_forms_valid:      
             # upgrade account if date_passed_user_limit is on
             # should fetch the most up-to-date subscription first
@@ -187,21 +169,6 @@ def update_subscription(request):
                 else:
                     return invalid_card()
             ###########
-                        
-            if request.POST.get("place_order") and\
-                isdigit(request.POST.get("place_order_amount")) and\
-                int(request.POST.get("place_order_amount")) > 0:
-                amount = int(request.POST.get("place_order_amount"))
-                account = request.session['account']
-                invoice = subscription.charge_cc(\
-                    PHONE_COST_UNIT_COST*amount,
-                    "Order placed for " +\
-                    str(amount) + " phones", IPOD)
-                if invoice:
-                    send_email_receipt_ipod(account, 
-                        subscription, invoice, amount) 
-                else:
-                    return invalid_card()
                         
             if upgraded:  
                 max_users = sub_type[\

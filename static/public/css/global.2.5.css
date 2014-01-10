@@ -1056,18 +1056,6 @@ float: right;
 	-webkit-border-radius:5px;
 }
 
-#signup-form label#same_address_span{
-	color:#ababab;
-	font-size:15px;
-	display:inline;
-	font-weight:bold;
-	margin:0 0 7px;
-}
-
-#signup-form input#same_address{
-    position:relative; top:3px; left:2px;
-}
-
 #signup-form textarea{
 	resize:none;
 	height:148px;
@@ -1081,15 +1069,15 @@ float: right;
 	width:338px;
 }
 
-#signup-form #id_city, #signup-form #id_city2{
+#signup-form #id_city{
 	width:196px;
 }
 
-#signup-form #id_state, #signup-form #id_state2{
+#signup-form #id_state{
 	width:96px;
 }
 
-#signup-form #id_zip, #signup-form #id_zip2{
+#signup-form #id_zip{
 	width:96px;
 }
 
@@ -1118,35 +1106,15 @@ float: right;
     width:14px; height:14px;
 }
 
-#card_number_container {
-	margin-bottom: 23px;
-}
 
-#card_number_container img {
-	vertical-align: middle;
-}
-#card_number_container input {
-	margin-bottom: 0px;
-}
-
-#signup-form #id_date_cc_expiration_month, #signup-form #id_date_cc_expiration_year {
-	width: 100px;
-}
-
-#signup-form #id_cc_cvv {
-	width: 50px;
-}
-
-#signup-form #recurring_charge_container input,
-#signup-form #place_order_container input {
+#signup-form #recurring_charge_container input {
 	width: auto;
 	height: auto;
 	border: none; 
 	margin: 0px;
 }
 
-#signup-form #recurring_charge_container label,
-#signup-form #place_order_container label {
+#signup-form #recurring_charge_container label {
 	display: inline; line-height: 12px;
 }
 

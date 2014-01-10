@@ -10,16 +10,13 @@ from apps.public.forms import ContactForm
 from libs.repunch import rputils
 from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
 from parse.auth.utils import request_password_reset
-from parse.notifications import send_email_signup,\
-send_email_receipt_ipod
+from parse.notifications import send_email_signup
 from apps import isdigit
 from apps.db_static.models import Category
 from apps.accounts.models import AssociatedAccountNonce
 from apps.accounts.forms import AccountSignUpForm
 from parse.apps.stores import format_phone_number
-from apps.stores.forms import StoreSignUpForm, StoreLocationForm,\
-SubscriptionSignUpForm
-
+from apps.stores.forms import StoreSignUpForm, StoreLocationForm
 from repunch.settings import STATIC_URL
 from parse.auth import login
 from parse.auth.decorators import dev_login_required
@@ -174,7 +171,6 @@ def sign_up(request):
         store_form = StoreSignUpForm(request.POST)
         store_location_form = StoreLocationForm(request.POST)
         account_form = AccountSignUpForm(request.POST)
-        subscription_form = SubscriptionSignUpForm(request.POST)
         
         cats = postDict.get("categories")
         category_names = None
@@ -191,26 +187,6 @@ def sign_up(request):
         else:
             all_forms_valid = True
             
-        ### Bad form of validation lol
-        if postDict.get("place_order"):
-            data["place_order_checked"] = True
-            if isdigit(postDict.get("place_order_amount")):
-                amount = int(postDict.get("place_order_amount"))
-                if amount > 0:
-                    all_forms_valid = all_forms_valid and\
-                        subscription_form.is_valid()
-                else:
-                    all_forms_valid = False
-                    data["place_order_amount_error"] =\
-                        "Amount must be greater than 0."
-            else:
-                all_forms_valid = False
-                data["place_order_amount_error"] =\
-                    "Amount must be a number greater than 0."
-                
-        else:
-            subscription_form = SubscriptionSignUpForm()
-        
         if all_forms_valid:
             # check if email already taken here to handle the case where 
             # the user already has a patron/employee account 
@@ -261,22 +237,9 @@ def sign_up(request):
             account.set("store", store)
 
             # create subscription
-            if postDict.get("place_order"):
-                subscription = Subscription(\
-                    first_name=postDict.get("first_name2"),
-                    last_name=postDict.get("last_name2"),
-                    cc_number=postDict.get("cc_number"),
-                    date_cc_expiration=postDict.get("date_cc_expiration"),
-                    address=postDict.get("address"),
-                    city=postDict.get("city2"),
-                    state=postDict.get("state2"),
-                    zip=postDict.get("zip2"),
-                    country=postDict.get("country2"))
-            else:
-                subscription = Subscription() 
+            subscription = Subscription() 
             subscription.subscriptionType = 0
             subscription.date_last_billed = timezone.now()
-            subscription.Store = store.objectId 
             subscription.create()
             
             # create settings
@@ -332,68 +295,6 @@ def sign_up(request):
             store.owner_id = account.objectId
             store.update()
             
-            # call this incase store_cc returns False or 
-            # charge_cc returns None
-            def invalid_card():
-                data['store_form'] =\
-                    StoreSignUpForm(store.__dict__.copy())
-                errs = subscription_form._errors.setdefault(\
-                    "cc_number", ErrorList())
-                errs.append("Invalid credit " +\
-                    "card. Please make sure that you provide " +\
-                    "correct credit card information and that you " +\
-                    "have sufficient funds, then try again.")
-                    
-                # delete the objects created!
-                subscription.delete()
-                settings.delete()
-                store.delete()
-                if not from_associated_account:
-                    account.delete()
-                else:
-                    account.Store = None
-                    account.update()
-                    
-                data['store_form'] = store_form
-                data['account_form'] = account_form
-                data['subscription_form'] = subscription_form
-                return render(request,'public/signup.djhtml',data)
-                       
-            
-            subscription.Store = store.objectId
-            if postDict.get("place_order"):
-                exp = make_aware_to_utc(datetime(\
-                    int(postDict['date_cc_expiration_year']),
-                    int(postDict['date_cc_expiration_month']), 1), tz)
-                subscription.set("date_cc_expiration", exp)
-                # make sure to use the correct POST info
-                subscription.first_name = postDict['first_name2']
-                subscription.last_name  = postDict['last_name2']
-                subscription.city = postDict['city2']
-                subscription.state = postDict['state2']
-                subscription.zip = postDict['zip2']
-                subscription.country = postDict['country2']
-                amount = int(postDict.get("place_order_amount"))
-                subscription.update()
-                res = subscription.store_cc(\
-                        subscription_form.data['cc_number'],
-                        subscription_form.data['cc_cvv'])
-                        
-                if not res:
-                    return invalid_card()
-                
-                if amount > 0:
-                    invoice = subscription.charge_cc(\
-                        PHONE_COST_UNIT_COST*amount,
-                        "Order placed for " +\
-                        str(amount) + " iPod Touch", IPOD)
-                        
-                    if invoice:
-                        send_email_receipt_ipod(account, 
-                            subscription, invoice, amount)
-                    else:
-                        return invalid_card()
-            
             # note that username has been fed the email
             # this shouldn't change anything though shouldn't matter
             # need to put username and pass in request
@@ -424,11 +325,9 @@ def sign_up(request):
         store_form = StoreSignUpForm()
         store_location_form = StoreLocationForm()
         account_form = AccountSignUpForm()
-        subscription_form = SubscriptionSignUpForm()
         
     data['store_form'] = store_form
     data['store_location_form'] = store_location_form
     data['account_form'] = account_form
-    data['subscription_form'] = subscription_form
     return render(request, 'public/signup.djhtml', data)
         

@@ -23,7 +23,7 @@ def request_redeem():
         
 def request_redeem_ps(patron_store_id, reward_id=0, num_punches=1):
     ps = PatronStore.objects().get(objectId=patron_store_id,
-        include="Patron,Store")
+        include="Patron,Store", order="createdAt")
     print _request_redeem(ps.patron.objectId, ps.store.objectId,
         patron_store_id, "Test Redeem#"+str(randint(0,9999)), reward_id,
         num_punches, "Vandolf Estrellado", None,

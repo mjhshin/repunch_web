@@ -4,7 +4,7 @@
 <html>
 <head>
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
-	<link href="{% static 'manage/css/global.2.3.css' %}" rel="stylesheet" />
+	<link href="{% static 'manage/css/global.2.4.css' %}" rel="stylesheet" />
 	<style>
 	#avatar-form {
 	    padding-left:15px;

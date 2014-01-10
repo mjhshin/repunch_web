@@ -6,14 +6,11 @@
 {% block styles %}
 <link href="{% static 'public/css/dialog-signup.1.0.css' %}" rel="stylesheet" />
 <link href="{% static 'public/css/categories.1.0.css' %}" rel="stylesheet" />
-<style>select { margin-top:2px; }</style>
 {% endblock %}
 
 {% block javascript %}
 <script src="{% static 'public/js/autocomplete.1.0.js' %}" type="text/javascript"></script>
-<script type="text/javascript" src="{% static "public/js/jquery.tooltipster.min.js" %}"></script>
-<script src="{% static 'public/js/place-order.1.0.js' %}"></script>
-<script src="{% static 'public/js/signup.1.5.c.js' %}"></script>
+<script src="{% static 'public/js/signup.2.0.js' %}"></script>
 <script type = "text/javascript">
 // fill in the values of the 3 input boxes
 $(document).ready(function(){
@@ -82,17 +79,11 @@ function validate(which, next) {
 					</div>
 				</div>
 				
-				{% if store_form.errors or store_location_form.errors or account_form.errors or subscription_form.errors %}
+				{% if store_form.errors or store_location_form.errors or account_form.errors %}
 					<div class="error-box">
 						There was an error processing your information. Please fix the errors below and click "Create Account" again.
 					</div>
 				{% endif %}
-				
-				{% if subscription_form.non_field_errors %}
-	            <div class="notification">
-		            <div>{{ subscription_form.non_field_errors }}</div>
-	            </div>
-	            {% endif %}
 				
 				{# SIGNUP-FORM DIV #}
 				<form id="signup-form">{% csrf_token %}
@@ -194,148 +185,6 @@ function validate(which, next) {
 				    {{ account_form.confirm_password }}					
 				    <div class="clear-both"></div>		            
 				
-				    <div style="clear: left;"></div>
-		            {% if place_order_amount_error %}
-		            <ul class="errorlist"><li>{{ place_order_amount_error }}</li></ul>
-		            {% endif %}
-				    <div class="input-container"
-				            id="place_order_container"
-				            style="margin-bottom: 15px;">
-				        {% if place_order_checked %}
-					    <input type="checkbox" name="place_order"
-					            value="yes" id="place_order" checked/>
-			            {% else %}
-					    <input type="checkbox" name="place_order"
-					            value="yes" id="place_order" />
-			            {% endif %}
-					    <label for="place_order">Order Repunch-enabled devices:</label>
-				        {% if place_order_checked %}
-					    <span id="place_order_span">
-			            {% else %}
-					    <span style="display:none;"
-					            id="place_order_span">
-			            {% endif %}
-					       amount&nbsp;&nbsp;
-					        <input type="number" min="1"  step="1" 
-					            name="place_order_amount" 
-					            style="width:40px;" value="1" />
-					    </span>
-					
-					    <img class="question_mark" 
-					        src="{% static 'public/images/question_mark.png' %}" 
-					        style="position:relative;top:4px;left:4px;"
-					        title="<div class='tooltipBox'><h4>$149/device</h4><div><p>An employee from this store can give punches or redeem rewards from the web or from the Repunch Retailer App. If you'd prefer to have your employees run the app from a device that is not their personal cell phone, you can choose to order iPod Touches that come pre-installed with the Repunch Retailer App.</p><br/><p>Remember that we will automatically notify you via email if we detect any suspicious punching activity.</p><br/><p>You can also order these at anytime after signing up.</p></div></div>" />
-				    </div>
-
-                    {# CREDIT CARD SECTION #}
-				    {% if place_order_checked %}
-                    <div id="cc_section">
-                    {% else %}
-                    <div id="cc_section" style="display:none;">
-                    {% endif %}
-                    
-					    <p id="cc_info">Credit Card Information</p>
-					    <div class="floated"
-					        {% if not subscription_form.first_name2.errors and subscription_form.last_name2.errors %}
-					        style="margin-top:28px;"
-					        {% endif %}>
-					    <div id="first_name2_e">{{ subscription_form.first_name2.errors }}</div>
-					    <label for="id_first_name2">First Name</label>
-					    {{ subscription_form.first_name2 }}
-					    </div>
-					
-					    <div class="floated"
-					        {% if not subscription_form.last_name2.errors and subscription_form.first_name2.errors %}
-					        style="margin-top:28px;"
-					        {% endif %}>
-					    <div id="last_name2_e">{{ subscription_form.last_name2.errors }}</div>
-					    <label for="id_last_name2">Last Name</label>
-					    {{ subscription_form.last_name2 }}
-					    </div>
-					
-					
-					    <div class="clear-both"></div>
-					    <div class="input-container" id="card_number_container">
-						    <div id="cc_number_e">{{ subscription_form.cc_number.errors }}</div>
-						    <label for="id_cc_number" style="clear:left;">Card Number</label>
-						    {{ subscription_form.cc_number }}
-						    <img src="{% static "manage/images/icon_visa.png" %}" alt="VISA" />
-						    <img src="{% static "manage/images/icon_mastercard.png" %}" alt="MasterCard" />
-						    <img src="{% static "manage/images/icon_discover.png" %}" alt="Discover" />
-						    <img src="{% static "manage/images/icon_americanexpress.png" %}" alt="American Express" />
-					    </div>
-					
-					
-					    <div class="floated"
-					        {% if not subscription_form.cc_cvv.errors and subscription_form.date_cc_expiration.errors %}
-					        style="margin-top:28px;"
-					        {% endif %}>
-					    <div id="cc_cvv_e">{{ subscription_form.cc_cvv.errors }}</div>
-					    <label for="id_cc_cvv">CVC</label>
-					    {{ subscription_form.cc_cvv }}
-					    </div>
-				
-					    <div class="floated"
-					        {% if not subscription_form.date_cc_expiration.errors and subscription_form.cc_cvv.errors %}
-					        style="margin-top:28px;"
-					        {% endif %}>
-					    <div id="date_cc_expiration_e">{{ subscription_form.date_cc_expiration.errors }}</div>
-					    <label for="id_expiration_month">Expiration</label>
-					    {{ subscription_form.date_cc_expiration }}
-					    </div>
-					
-					    <div class="clear-both"></div>
-					    <p style="display:inline-block" id="billing_address">Billing Address</p>
-					    <label for="same_address" id="same_address_span">&nbsp;&nbsp;&nbsp;same as business address</label>
-					    <input type="checkbox" id="same_address" />
-					
-				
-					    <div id="address_e">{{ subscription_form.address.errors }}</div>
-					    <label for="id_address">Address</label>
-					    {{ subscription_form.address }}
-					
-					
-					    <div class="clear-both"></div>
-					    <div class="floated">
-						    <div id="city2_e"
-					        {% if not subscription_form.city2.errors %}
-					            {% if subscription_form.state2.errors or subscription_form.zip2.errors %}
-					            style="margin-top:28px;"
-					            {% endif %}
-					        {% endif %}>{{ subscription_form.city2.errors }}</div>
-						    <label for="id_city2">City</label>
-						    {{ subscription_form.city2 }}
-					    </div>
-					    <div class="floated"
-					        {% if not subscription_form.state2.errors %}
-					            {% if subscription_form.zip2.errors or subscription_form.city2.errors %}
-					            style="margin-top:28px;"
-					            {% endif %}
-					        {% endif %}>					
-						    <div id="state2_e">{{ subscription_form.state2.errors }}</div>
-						    <label for="id_state2">State</label>
-						    {{ subscription_form.state2 }}
-					    </div>
-					    <div class="floated"
-					        {% if not subscription_form.zip2.errors %} 
-					            {% if subscription_form.state2.errors or subscription_form.city2.errors %}
-					            style="margin-top:28px;"
-					            {% endif %}
-					        {% endif %}>
-						    <div id="zip2_e">{{ subscription_form.zip2.errors }}</div>
-						    <label for="id_zip2">Zip</label>
-						    {{ subscription_form.zip2 }}
-					    </div>
-					    <div class="clear-both"></div>
-					
-					    <div class="input-container">
-						    <label for="id_country2">Country</label>
-						    {{ subscription_form.country2 }}
-					    </div>
-					
-				    </div>
-				    {# END CREDIT CARD SECTION #}
-					
 				    <div style="clear: left;"></div>
 				    <div class="input-container" id="recurring_charge_container" style="margin-bottom: 15px;">
 					    <div id="recurring_e">{{ store_form.recurring.errors }}</div>

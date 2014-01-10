@@ -225,65 +225,6 @@ def send_email_receipt_monthly_batch(asiss, connection=None):
     else:
         Thread(target=_wrapper).start()
 
-def send_email_receipt_ipod(account, subscription, invoice,
-    amount, connection=None):
-    """
-    Sends the user and ORDER_PLACED_EMAILS pretty receipt.
-    """
-    def _wrapper():
-        with open(FS_SITE_DIR +\
-            "/templates/manage/notification-receipt-ipod.html", 'r') as f:
-            template = Template(f.read())
-       
-        store = account.get("store")
-        timezone.activate(pytz.timezone(store.store_timezone))
-        # for account
-        subject = "Repunch Inc. Transaction Invoice."
-        ctx = get_notification_ctx()
-        ctx.update({
-                'store': store,
-                'amount': amount,
-                'invoice': invoice,
-                'for_customer': True})
-        body = template.render(Context(ctx)).__str__()
-        timezone.deactivate()
-                
-        emails = []
-        email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), EMAIL_FROM,
-                    [account.get('email')])
-        email.attach_alternative(body, 'text/html')
-        emails.append(email)
-        
-        # for ORDER_PLACED_EMAILS
-        subject = "iPod Touch(es) purchased by " +\
-             store.get_owner_fullname() + "."
-        ctx = get_notification_ctx()
-        ctx.update({
-                'account': account,
-                'subscription': subscription,
-                'store': store,
-                'amount': amount,
-                'invoice': invoice,
-                'sub_type': sub_type,
-                'for_customer': False})
-                
-        timezone.activate(pytz.timezone(TIME_ZONE))
-        body = template.render(Context(ctx)).__str__()
-        timezone.deactivate()
-        email = mail.EmailMultiAlternatives(subject,
-                    strip_tags(body), EMAIL_FROM,
-                    ORDER_PLACED_EMAILS)
-        email.attach_alternative(body, 'text/html')
-        emails.append(email)
-        
-        _send_emails(emails, connection)
-    
-    if connection:
-        _wrapper()
-    else:
-        Thread(target=_wrapper).start()
-
 def send_email_signup(account, connection=None):
     """
     Sends a welcome notification to the account and 
