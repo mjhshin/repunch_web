@@ -14,12 +14,12 @@ from django.utils import timezone
 
 from random import randint
 
-def request_redeem():
+def request_redeem(store_location_id=None):
     """
     """
     print _request_redeem("zef0o3YjIm", "o72LmDy0YK", "kfWmOOlIWD",
         "Test Redeem#"+str(randint(0,9999)), 1, 1,
-        "Vandolf Estrellado", None, None)
+        "Vandolf Estrellado", None, store_location_id)
         
 def request_redeem_ps(patron_store_id, reward_id=0, num_punches=1):
     ps = PatronStore.objects().get(objectId=patron_store_id,
