@@ -79,7 +79,7 @@ def _retailer_message(store_id, subject, body,
         filter=filter, sender_name=sender_name, offer_title=offer_title,
         message_type=message_type, date_offer_expiration=\
         date_offer_expiration, is_read=is_read, gift_description=\
-        gift_description, gift_title=gift_title, offer_redeemed=False)
+        gift_description, gift_title=gift_title)
     message.create()
     
     return cloud_call("retailer_message", {

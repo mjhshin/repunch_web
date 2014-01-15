@@ -183,13 +183,10 @@ def edit(request, message_id):
                         SESSION.get_store_timezone(request.session))
                     message.set('date_offer_expiration', d)
                     message.set('message_type', OFFER)
-                    message.set("offer_redeemed", False)
                 else:
                     # pop the offer
                     message.set('offer_title', None)
                     message.set('date_offer_expiration', None)
-                    # already defaults to None but whatever.
-                    message.set("offer_redeemed", None)
                     message.set('message_type', BASIC)
                     
                 message.create()
