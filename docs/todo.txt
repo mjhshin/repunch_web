@@ -1,8 +1,9 @@
 ##############################################
 ####################  TODO: 
 
-0. check out what store details look like for non admins.
-1. fix store_details active location twitching because of multiple requests to set active location.
+0. Store: store_avatar -> thumbnail_image 
+   StoreLocation: store_avatar -> cover_image (640by512)
 
-9. Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
+1. check out what store details look like for non admins.
+2. Fix Pending redeem updating the count incorrectly after row fades out if pag_count > 1.
     - in redemptions.js
