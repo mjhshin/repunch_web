@@ -43,7 +43,10 @@ class Store(ParseObject):
         self.last_name = data.get('last_name')
         self.store_name = data.get('store_name')
         self.store_description = data.get('store_description')
+        
         # global avatar for this store
+        self.thumbnail_image = data.get("thumbnail_image")
+        # still here for backwards compat
         self.store_avatar = data.get('store_avatar')
         
         # [{"reward_name":"Free bottle of wine", "description":
@@ -227,6 +230,9 @@ class StoreLocation(ParseObject):
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
         self.hours = data.get("hours", []) 
+        
+        self.cover_image = data.get("cover_image")
+        # still here for backwards compat
         self.store_avatar = data.get('store_avatar') 
         
         self.Store = data.get("Store")

@@ -51,11 +51,11 @@ def comet_receive(store_id, postDict, session_key=None):
         approvedRedemption 
         deletedRedemption 
         
-        updatedStoreAvatarName
-        updatedStoreAvatarUrl
-        updatedStoreLocationAvatarSLID
-        updatedStoreLocationAvatarName
-        updatedStoreLocationAvatarUrl
+        updatedStoreAvatarName              updatedStoreThumbnailName
+        updatedStoreAvatarUrl               updatedStoreThumbnailUrl
+        updatedStoreLocationAvatarSLID      updatedStoreLocationCoverID
+        updatedStoreLocationAvatarName      updatedStoreLocationCoverName
+        updatedStoreLocationAvatarUrl       updatedStoreLocationCoverUrl
         
         updatedPunchesFacebook_int
         patronStore_int
@@ -298,15 +298,20 @@ def comet_receive(store_id, postDict, session_key=None):
         updatedStore = postDict.get("updatedStore")
         if updatedStore:
             store = Store(**updatedStore)
-            # have to add the avatar url manually
-            store.store_avatar_url = updatedStore.get("store_avatar_url")
+            # have to add the image url manually
+            store.thumbnail_image_url = updatedStore.get("store_thumbnail_url")
+            # below here for backwards compat
+            store.store_avatar_url = store.thumbnail_image_url
             session['store'] = store
             
-        updatedStoreAvatarName = postDict.get("updatedStoreAvatarName")
-        if updatedStoreAvatarName:
+        updatedStoreThumbnailName = postDict.get("updatedStoreThumbnailName")
+        if updatedStoreThumbnailName:
             store = session['store']
-            store.store_avatar = updatedStoreAvatarName
-            store.store_avatar_url = postDict.get("updatedStoreAvatarUrl")
+            store.thumbnail_image = updatedStoreThumbnailName
+            store.thumbnail_image_url = postDict.get("updatedStoreThumbnailUrl")
+            # below here for backwards compat
+            store.store_avatar = store.thumbnail_image
+            store.store_avatar_url = store.thumbnail_image_url
             session['store'] = store
         
         # this is in the settings tab in the dashboard but the field
@@ -325,9 +330,12 @@ def comet_receive(store_id, postDict, session_key=None):
         updatedStoreLocation = postDict.get("updatedStoreLocation")
         if updatedStoreLocation:
             store_location = StoreLocation(**updatedStoreLocation)
-            # have to add the avatar url manually
+            # have to add the image url manually
+            store_location.cover_image_url =\
+                updatedStoreLocation.get("cover_image_url")
+            # below here for backwards compat
             store_location.store_avatar_url =\
-                updatedStoreLocation.get("store_avatar_url")
+                store_location.cover_image_url
             session['store_locations'][store_location.objectId] =\
                 store_location
                 
@@ -338,13 +346,16 @@ def comet_receive(store_id, postDict, session_key=None):
                 session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
                
-        updatedStoreLocationAvatarName = postDict.get("updatedStoreLocationAvatarName")
-        if updatedStoreLocationAvatarName:
+        updatedStoreLocationCoverName = postDict.get("updatedStoreLocationCoverName")
+        if updatedStoreLocationCoverName:
             store_location = SESSION.get_store_location(session,
-                postDict.get('updatedStoreLocationAvatarSLID'))
+                postDict.get('updatedStoreLocationCoverID'))
             if store_location:
-                store_location.store_avatar = updatedStoreLocationAvatarName
-                store_location.store_avatar_url = postDict.get("updatedStoreLocationAvatarUrl")
+                store_location.cover_image = updatedStoreLocationCoverName
+                store_location.cover_image_url = postDict.get("updatedStoreLocationCoverUrl")
+                # below here for backwards compat
+                store_location.store_avatar = store_location.cover_image
+                store_location.store_avatar_url = store_location.cover_image_url
                 session['store_locations'][store_location.objectId] = store_location    
 
             
