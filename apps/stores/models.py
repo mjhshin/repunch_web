@@ -32,11 +32,11 @@ class UploadedImageFile(models.Model):
     guaranteed that a user will crop what they upload before logging out.
     """
     session_key = models.CharField(max_length=100)
-    avatar = models.ImageField(upload_to='tmp/images/avatars')
+    image = models.ImageField(upload_to='tmp/images/avatars')
     
     def delete(self):
         try:
-            self.avatar.delete()
+            self.image.delete()
         except Exception:
             pass
        

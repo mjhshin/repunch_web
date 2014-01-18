@@ -6,7 +6,7 @@
     <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
 	<link href="{% static 'manage/css/global.2.4.css' %}" rel="stylesheet" />
 	<style>
-	#avatar-form {
+	#image-form {
 	    padding-left:15px;
 	}
 	div.input-container label {
@@ -40,7 +40,7 @@
 				    }
 				    
 				    $("#img-upload-loading").show();
-					$('#avatar-form').submit();
+					$('#image-form').submit();
 				}
 			});
 			
@@ -52,14 +52,14 @@
 
 </head>
 <body style="background-image: none; background-color: transparent;">
-	<form action="{{ url }}" method="POST" id="avatar-form" enctype="multipart/form-data" >{% csrf_token %}
+	<form action="{{ url }}" method="POST" id="image-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}
 		</div>
 		
-		<div id="edit-avatar-options" class="form-options" style="margin-top:16px;">
+		<div id="edit-image-options" class="form-options" style="margin-top:16px;">
 			<a style="cursor: pointer;" class="button blue" id="upload-btn">Upload</a>
-			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
+			<a onclick="window.parent.cancelImageUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="img-upload-loading" />
 		</div>
 	</form>

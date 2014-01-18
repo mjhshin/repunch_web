@@ -248,19 +248,19 @@ div#header-right > ul > a > li:hover {
     background: #f1f1f1;
 }
 
-img.avatar-small{
+img.image-small{
 	vertical-align:middle;
 	border-radius: 5px;
 	width:35px; height: 35px;
 }
 
-img.avatar-medium{
+img.image-medium{
 	border-radius: 16px;
 	width:40px;
 	vertical-align:middle;
 }
 
-img.avatar-big{
+img.image-big{
 	border-radius: 18px;
 }
 

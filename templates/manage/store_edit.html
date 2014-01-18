@@ -5,33 +5,34 @@
 
 {% block title %}Edit Store Details{% endblock %}
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "manage/css/image_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
-<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.2.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/image_upload.1.2.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
     {% with store=request.session.store %}
 
-    {# REQUIRED FOR AVATAR UPLOAD JS #}
-    <input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' 'x' %}" />
+    {# REQUIRED FOR IMAGE UPLOAD JS #}
+    <input type="hidden" id="get_image_url" value="{% url 'store_image_get' 'x' %}" />
+    <input type="hidden" id="get_image_id" value="store_thumbnail" />
 	
 	<form action="{% url 'store_edit' %}" method="POST" id="store-edit-form">{% csrf_token %}
 	
 		<div id="photo-edit">
 			<div class="white-box">
-                <a href="{% url 'store_avatar_upload' 'x' %}" id="upload-avatar">
-	            {% if store.store_avatar_url %}
-	                <img src="{{ store.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+                <a href="{% url 'store_image_upload' 'x' %}" id="upload-image">
+	            {% if store.thumbnail_image_url %}
+	                <img src="{{ store.thumbnail_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_thumbnail"/>
 	            {% else %}
-	                <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
-	                    class="avatar-big" width="200px" height="200px"/>
+	                <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" alt="" id="store_thumbnail"
+	                    class="image-big" width="200px" height="200px"/>
                 {% endif %}
                 </a>
 			</div>
-			<a href="{% url 'store_avatar_upload' 'x' %}" id="upload-avatar">Add/Change Photo</a>
+			<a href="{% url 'store_image_upload' 'x' %}" id="upload-image">Add/Change Photo</a>
 		</div>
 	
 		

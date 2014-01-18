@@ -51,11 +51,11 @@ def comet_receive(store_id, postDict, session_key=None):
         approvedRedemption 
         deletedRedemption 
         
-        updatedStoreAvatarName              updatedStoreThumbnailName
-        updatedStoreAvatarUrl               updatedStoreThumbnailUrl
-        updatedStoreLocationAvatarSLID      updatedStoreLocationCoverID
-        updatedStoreLocationAvatarName      updatedStoreLocationCoverName
-        updatedStoreLocationAvatarUrl       updatedStoreLocationCoverUrl
+        updatedStoreThumbnailName
+        updatedStoreThumbnailUrl
+        updatedStoreLocationCoverID
+        updatedStoreLocationCoverName
+        updatedStoreLocationCoverUrl
         
         updatedPunchesFacebook_int
         patronStore_int

@@ -54,11 +54,11 @@
 			
 			<div id="header-right">
 			    <a href="{% url 'account_edit' %}">
-					<span href="{% url 'store_index' %}" id="avatar-thumbnail-wrapper">
-					    {% if request.session.store.store_avatar_url %}
-						<img src="{{ request.session.store.store_avatar_url }}" alt="" class="avatar-small" id="avatar-thumbnail" />
+					<span href="{% url 'store_index' %}" id="account-thumbnail-wrapper">
+					    {% if request.session.store.thumbnail_image_url %}
+						<img src="{{ request.session.store.thumbnail_image_url }}" alt="" class="image-small" id="account-thumbnail" />
 						{% else %}
-						<img class="avatar-small" id="avatar-thumbnail" style="visibility:hidden" />
+						<img class="image-small" id="account-thumbnail" style="visibility:hidden" />
 					    {% endif %}
 					</span>
 				    <span id="account-name">

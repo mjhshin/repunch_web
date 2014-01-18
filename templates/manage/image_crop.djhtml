@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="{% static 'manage/css/jquery/jquery.Jcrop.min.css' %}"
         type="text/css" />
 	<style>
-	#avatar-crop-form {
+	#image-crop-form {
 	    padding-left:15px;
 	    padding-top:8px;
 	}
 	</style>
 	{% if success %}
 	<script type="text/javascript">
-		window.parent.avatarCropComplete();
+		window.parent.imageCropComplete();
 	</script>
 	{% else %}
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
@@ -30,7 +30,7 @@
 			    }
 			    
 			    $("#img-upload-loading").show();
-				$('#avatar-crop-form').submit();
+				$('#image-crop-form').submit();
 			});
 			
 			function changeCoords(c) {
@@ -41,7 +41,7 @@
             };
 
             function clearCoords() {
-                $('#avatar-crop-form input').val('');
+                $('#image-crop-form input').val('');
             };
 			
             $('#jcrop_target').Jcrop({
@@ -54,8 +54,8 @@
             
             
             // resize the dialog
-            window.parent.resizeFrame({ "width": {{ avatar.width|add:"34" }},
-                "height": {{ avatar.height|add:"90" }} });           
+            window.parent.resizeFrame({ "width": {{ image.width|add:"34" }},
+                "height": {{ image.height|add:"90" }} });           
 		});
 	</script>
 	{% endif %}
@@ -63,10 +63,10 @@
 
 </head>
 <body style="background-image: none; background-color: transparent;">
-	<form action="{% url 'store_crop_avatar' store_location_id %}" method="POST" id="avatar-crop-form" >
+	<form action="{% url 'store_crop_image' store_location_id %}" method="POST" id="image-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
-			<img src="{{ avatar.url }}" id="jcrop_target" alt="store avatar" width="{{avatar.width}}" height="{{avatar.height}}" />
+			<img src="{{ image.url }}" id="jcrop_target" width="{{image.width}}" height="{{image.height}}" />
 		</div>
 		
         <input type="hidden" id="x1" name="x1" />
@@ -74,9 +74,9 @@
         <input type="hidden" id="x2" name="x2" />
         <input type="hidden" id="y2" name="y2" />
 		
-		<div id="edit-avatar-options" class="form-options">
+		<div id="edit-image-options" class="form-options">
 			<a style="cursor: pointer;" class="button blue" id="crop-btn">Crop</a>
-			<a onclick="window.parent.cancelAvatarUpload(); return false;" href="#" class="red">Cancel</a>
+			<a onclick="window.parent.cancelImageUpload(); return false;" href="#" class="red">Cancel</a>
 		    <img src="{% static 'manage/images/ajax-loader.gif' %}" id="img-upload-loading" />
 		</div>
 	</form>

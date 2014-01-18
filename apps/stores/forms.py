@@ -70,9 +70,9 @@ class StoreForm(forms.Form):
     store_description = forms.CharField(required=False, 
         max_length=500, widget=forms.Textarea(attrs={"maxlength":500}))
         
-class StoreLocationAvatarForm(forms.Form):
+class UploadImageForm(forms.Form):
     """
-    Returns the ImageFieldFile associated with the StoreAvatar Model
+    Returns the ImageFieldFile associated with the session 
     """
     
     image = forms.ImageField(widget=forms.ClearableFileInput(attrs=\
@@ -90,20 +90,21 @@ class StoreLocationAvatarForm(forms.Form):
                  str(randint(0, 999)).zfill(3))
             return uploaded_img
         # remove previous session image
-        av = UploadedImageFile.objects.filter(session_key=session_key)
-        if av:
-            av = av[0]
+        img = UploadedImageFile.objects.filter(session_key=session_key)
+        if img:
+            img = img[0]
             try:
-                av.avatar.delete()
+                img.image.delete()
             except Exception:
                 pass
             finally:
-                av.avatar = rename()
-                av.save()
+                img.image = rename()
+                img.save()
         else:
-            av = UploadedImageFile.objects.create(session_key=\
-                session_key, avatar=rename())
-        return av.avatar
+            img = UploadedImageFile.objects.create(session_key=\
+                session_key, image=rename())
+                
+        return img.image
         
 class SubscriptionForm(forms.Form):
     """

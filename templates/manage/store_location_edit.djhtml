@@ -6,10 +6,10 @@
 {% block title %}{% if store_location_id == '0' %}Add{% else %}Edit{% endif %} Store Location{% endblock %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href="{% static "manage/css/store_location_edit.1.2.css" %}" />
-	<link rel="stylesheet" type="text/css" href="{% static "manage/css/avatar_upload.css" %}" />
+	<link rel="stylesheet" type="text/css" href="{% static "manage/css/image_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-	<script type="text/javascript" src="{% static 'manage/js/avatar_upload.1.2.js' %}" ></script>
+	<script type="text/javascript" src="{% static 'manage/js/image_upload.1.2.js' %}" ></script>
 	<script type="text/javascript" src="{% static 'manage/js/store_location_edit.1.3.js' %}" ></script>
 {% endblock %}
 
@@ -18,8 +18,9 @@
 {# FLAG FOR locations.js #}
 <input id="in-storelocation-edit" type="hidden" />
 
-{# REQUIRED FOR AVATAR UPLOAD JS #}
-<input type="hidden" id="get_store_avatar_url" value="{% url 'store_get_avatar' store_location_id %}" />
+{# REQUIRED FOR IMAGE UPLOAD JS #}
+<input type="hidden" id="get_image_url" value="{% url 'store_image_get' store_location_id %}" />
+<input type="hidden" id="get_image_id" value="store_location_cover" />
 {# REQUIRED FOR STORE LOCATION EDIT JS #}
 <input type="hidden" id="hours_preview_url" value="{% url 'store_hours' %}" />
 
@@ -27,18 +28,18 @@
 	
 	<div id="photo-edit">
 		<div class="white-box">
-            <a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">
-            {% if store_location and store_location.store_avatar_url %}
-                <img src="{{ store_location.store_avatar_url }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
-            {% elif store_location_avatar_tmp %}
-                <img src="{{ store_location_avatar_tmp }}" alt="" class="avatar-big" width="200px" height="200px" id="store_avatar"/>
+            <a href="{% url 'store_image_upload' store_location_id %}" id="upload-image">
+            {% if store_location and store_location.cover_image_url %}
+                <img src="{{ store_location.cover_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_location_cover"/>
+            {% elif store_location_image_url %}
+                <img src="{{ store_location_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_location_cover"/>
             {% else %}
-                <img src="{% static 'manage/images/store_avatar_placeholder.1.2.png' %}" alt="" id="store_avatar"
-                    class="avatar-big" width="200px" height="200px"/>
+                <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" alt="" id="store_location_cover"
+                    class="image-big" width="200px" height="200px"/>
             {% endif %}
             </a>
 		</div>
-		<a href="{% url 'store_avatar_upload' store_location_id %}" id="upload-avatar">Add/Change Photo</a>
+		<a href="{% url 'store_image_upload' store_location_id %}" id="upload-image">Add/Change Photo</a>
 	</div>
 
 	
