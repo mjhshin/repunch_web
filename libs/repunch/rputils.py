@@ -3,36 +3,8 @@ import calendar
 from libs.dateutil.relativedelta import relativedelta
 from datetime import timedelta, datetime
 from django.utils import timezone
-from PIL import Image
 from threading import Timer
 import json, time, pytz, httplib, urllib
-
-def rescale(image_path, width=400, height=400):
-    max_width = width
-    max_height = height
-
-    img = Image.open(image_path)
-    
-    src_width, src_height = img.size
-    src_ratio = float(src_width) / float(src_height)
-    dst_width, dst_height = max_width, max_height
-    dst_ratio = float(dst_width) / float(dst_height)
-    
-    if dst_ratio < src_ratio:
-        crop_height = src_height
-        crop_width = crop_height * dst_ratio
-        x_offset = float(src_width - crop_width) / 2
-        y_offset = 0
-    else:
-        crop_width = src_width
-        crop_height = crop_width / dst_ratio
-        x_offset = 0
-        y_offset = float(src_height - crop_height) / 3
-        
-    img = img.crop((int(x_offset), int(y_offset), int(x_offset+crop_width), int(y_offset+crop_height)))
-    img = img.resize((int(dst_width), int(dst_height)), Image.ANTIALIAS)
-        
-    img.save(image_path)
 
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)+1):

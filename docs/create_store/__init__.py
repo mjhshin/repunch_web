@@ -16,10 +16,10 @@ from django.utils import timezone
 from random import randint
 import requests
 
-from parse.utils import create_png
+from parse.utils import create_png, delete_file
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store, StoreLocation, Settings, Subscription
-from repunch.settings import TIME_ZONE
+from repunch.settings import TIME_ZONE, IMAGE_THUMBNAIL_SIZE, IMAGE_COVER_SIZE
 
 DIR = "docs/create_store/"
 
@@ -86,11 +86,18 @@ class RandomStoreGenerator(object):
             store_i = STORE.copy()
             store_location_i = STORE_LOCATION.copy()
             
-            self.get_store_location_avatar(i)
-            avatar = create_png(TMP_IMG_PATH)
-            while "error" in avatar:
+            # create the thumbnaiil and cover (same image different size)
+            self.get_store_location_image(i)
+            
+            thumbnail = create_png(TMP_IMG_PATH, IMAGE_THUMBNAIL_SIZE)
+            while "error" in image:
                 print "Retrying create_png"
-                avatar = create_png(TMP_IMG_PATH)
+                thumbnail = create_png(TMP_IMG_PATH)
+                
+            cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
+            while "error" in cover:
+                print "Retrying create_png"
+                cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
             
             store_i.update({
                 "store_name": store_name,
@@ -106,7 +113,8 @@ class RandomStoreGenerator(object):
                 "country": country,
                 "phone_number": phone_number,
                 "coordinates": self.get_random_coordinates(),
-                "store_avatar": avatar.get("name"),
+                "thumbnail_image": thumbnail.get("name"),
+                "cover_image": cover.get("name"),
             })
             
             # create the store
@@ -142,7 +150,7 @@ class RandomStoreGenerator(object):
             store.store_locations = [store_location]
             store.update()
             
-    def get_store_location_avatar(self, i):
+    def get_store_location_image(self, i):
         """
         Read the image to tmp.png.
         Thanks to 
@@ -167,7 +175,51 @@ class RandomStoreGenerator(object):
         latitude = float("".join(latitude))
         longitude = float("".join(longitude))
         return [latitude, longitude]    
-
+        
+class StoreLocationCoverUpdater(object):
+    """
+    Replaces cover images for all store locations with new ones.
+    """
+    
+    def __init__(self):
+        with open(DIR+"image_urls.txt", "r") as images:
+            self.images = images.read().split("\n")
+            
+    def get_store_location_image(self, i):
+        """
+        Read the image to tmp.png.
+        Thanks to 
+            http://stackoverflow.com/questions/13137817/
+            how-to-download-image-using-requests
+        """
+        r = requests.get(self.images[i], stream=True)
+        if r.status_code == 200:
+            with open(TMP_IMG_PATH, 'wb') as fid:
+                for chunk in r.iter_content():
+                    fid.write(chunk)
+    
+    def update_covers(self):
+        for i, loc in enumerate(StoreLocation.objects().filter(limit=999)):
+            self.get_store_location_image(i)
+            cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
+            while "error" in cover:
+                print "Retrying create_png"
+                cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
+          
+            # delete covers if exist
+            if loc.store_avatar:
+                delete_file(loc.store_avatar, "image/png")
+            elif loc.cover_image:
+                delete_file(loc.cover_image, "image/png")
+                
+            loc.cover_image = cover.get("name")
+            loc.store_avatar = loc.cover_image
+                            
+            loc.update()
+            
+            print "Updated StoreLocation #%d: %s" % (i, loc.objectId)
+                
+                
 if __name__ == "__main__":
-    generator = RandomStoreGenerator()
-    generator.create_random_stores(200)
+    # RandomStoreGenerator().create_random_stores(200)
+    StoreLocationCoverUpdater().update_covers()

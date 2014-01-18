@@ -9,7 +9,7 @@ from PIL import Image
 
 from repunch.settings import PARSE_VERSION, PARSE_BATCH_LIMIT,\
 REST_CONNECTION_META, SUPPORTED_IMAGE_FORMATS,\
-PARSE_MASTER_KEY, PARSE_IMAGE_DIMENSIONS as PID
+PARSE_MASTER_KEY
 
 BAD_FILE_CHR = re.compile('[\W_]+')
 
@@ -133,24 +133,13 @@ def account_login(username, password):
     return parse("GET", "login", query=\
                 {"username":username, "password":password} )
 
-def rescale(image_path, img_format, crop_coords=None,
-        dst_width=PID[0], dst_height=PID[1]):
+def rescale(image_path, img_format, size, crop_coords=None):
+    """
+    size is a tuple (width, height).
+    """
     img = Image.open(image_path)
     
-    src_width, src_height = img.size
-    src_ratio = float(src_width) / float(src_height)
-    dst_ratio = float(dst_width) / float(dst_height)
-    
-    if dst_ratio < src_ratio:
-        crop_height = src_height
-        crop_width = crop_height * dst_ratio
-        x_offset = float(src_width - crop_width) / 2
-        y_offset = 0
-    else:
-        crop_width = src_width
-        crop_height = crop_width / dst_ratio
-        x_offset = 0
-        y_offset = float(src_height - crop_height) / 3
+    # TODO
         
     # crop if given the coords
     if crop_coords:
@@ -159,17 +148,17 @@ def rescale(image_path, img_format, crop_coords=None,
         x2 = crop_coords["x2"]
         y2 = crop_coords["y2"]
         img = img.crop((x1, y1, x2, y2))
-    img = img.resize((int(dst_width), int(dst_height)), Image.ANTIALIAS)
         
+    img = img.resize(size, Image.ANTIALIAS)
     img.save(image_path, img_format)
 
-def create_png(file_path, coords=None):
+def create_png(file_path, size, coords=None):
     """ 
     creates the given uploadedFile, which is a png image.
     """
     im = Image.open(file_path)
     im.save(file_path, 'png')
-    rescale(file_path, 'png', coords)
+    rescale(file_path, 'png', size, coords)
     file_name = file_path.split("/")[-1]
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
                 file_name), file_path, content_type="image/png")

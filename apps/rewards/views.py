@@ -8,7 +8,7 @@ from parse import session as SESSION
 from parse.comet import comet_receive
 from parse.decorators import admin_only, access_required
 from parse.auth.decorators import login_required, dev_login_required
-from apps.rewards.forms import RewardForm, RewardAvatarForm
+from apps.rewards.forms import RewardForm
 
 @dev_login_required
 @login_required

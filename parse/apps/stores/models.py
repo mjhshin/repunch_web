@@ -44,7 +44,6 @@ class Store(ParseObject):
         self.store_name = data.get('store_name')
         self.store_description = data.get('store_description')
         
-        # global avatar for this store
         self.thumbnail_image = data.get("thumbnail_image")
         # still here for backwards compat
         self.store_avatar = data.get('store_avatar')

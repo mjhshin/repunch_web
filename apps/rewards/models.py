@@ -9,18 +9,10 @@ class Reward(models.Model):
 	reward_name = models.CharField(max_length=255)
 	description = models.TextField()
 	punches = models.IntegerField()
-	reward_avatar = models.ImageField(max_length=255,upload_to='images/avatars/rewards',blank=True,null=True)
 	
 	def __unicode__(self):
 		return self.reward_name	
 	
-	def delete(self):
-		#we need to take care of deleting this file
-		if self.reward_avatar:
-			self.reward_avatar.delete(save=False)
-		
-		super(Reward, self).delete()
-		
 	def get_absolute_url(self):
 		return reverse('reward_edit', args=[self.id])
 	

@@ -74,5 +74,24 @@ def supported_chain_stores():
         print "Updated Store #" + str(i) + ": " + store.objectId
         
         
+def store_avatar_to_thumbnail_and_cover():
+    """
+    Created column thumbnail_image in Store and cover_image in StoreLocation.
+    This just copies the store_avatar in Store to thumbnail_image.
+    The store_avatar columns are kept for backwards compatibility.
+    """
+    for i, store in enumerate(Store.objects().filter(limit=999)):
+        store.thumbnail_image = store.store_avatar
+        store.update()
+        
+        print "Updated Store #" + str(i) + ": " + store.objectId
+    
+    
+    
+    
+    
+    
+    
+    
         
     

@@ -533,11 +533,4 @@ def associated_account_confirm(request):
     return HttpResponse(json.dumps({"code": 1}), 
         content_type="application/json")
 
-@dev_login_required
-@login_required
-def avatar(request, employee_id):
-    """
-    Unused at the moment.
-    """
-    raise Http404
 

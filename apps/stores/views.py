@@ -19,7 +19,8 @@ from libs.repunch.rphours_util import HoursInterpreter
 from libs.repunch.rputils import get_timezone, get_map_data
 
 from repunch.settings import MEDIA_ROOT, TIME_ZONE,\
-COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY, IMAGE_THUMBNAIL_SIZE,\
+IMAGE_COVER_SIZE
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
@@ -367,9 +368,11 @@ def image_crop(request, store_location_id):
             if store_location_id == 'x':
                 s = store
                 image_name = "thumbnail_image"
+                image_size = IMAGE_THUMBNAIL_SIZE
             else:
                 s = store_location
                 image_name = "cover_image"
+                image_size = IMAGE_COVER_SIZE
             
             if s.get(image_name):
                 old_image = s.get(image_name)
@@ -395,7 +398,7 @@ def image_crop(request, store_location_id):
         
         # save the session before a cloud call!
         request.session.save()
-        res = create_png(image.image.path, crop_coords)
+        res = create_png(image.image.path, image_size, crop_coords)
         
         # make sure that we have the latest session
         session = SessionStore(request.session.session_key)
