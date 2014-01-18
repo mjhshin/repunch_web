@@ -3,7 +3,7 @@ from django.utils import timezone
 from random import randint
 import os, re, datetime
 
-from models import Store, StoreLocationAvatarTmp
+from models import Store, UploadedImageFile
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric, numeric, required,\
 alphanumeric_no_space
@@ -90,7 +90,7 @@ class StoreLocationAvatarForm(forms.Form):
                  str(randint(0, 999)).zfill(3))
             return uploaded_img
         # remove previous session image
-        av = StoreLocationAvatarTmp.objects.filter(session_key=session_key)
+        av = UploadedImageFile.objects.filter(session_key=session_key)
         if av:
             av = av[0]
             try:
@@ -101,7 +101,7 @@ class StoreLocationAvatarForm(forms.Form):
                 av.avatar = rename()
                 av.save()
         else:
-            av = StoreLocationAvatarTmp.objects.create(session_key=\
+            av = UploadedImageFile.objects.create(session_key=\
                 session_key, avatar=rename())
         return av.avatar
         

@@ -7,22 +7,22 @@ from parse.utils import delete_file
 class StoreActivate(models.Model):
 	store_id = models.CharField(max_length=30)
 	
-class NewStoreLocationAvatarTmp(models.Model):
+class UploadedAndCreatedImageFile(models.Model):
     """ 
     Used when creating a new StoreLocation and the user decides to
-    crop an image for a non-existent StoreLocation.
+    crop an image for a non-existent ParseObject.
     """
     session_key = models.CharField(max_length=100)
-    avatar_name = models.TextField()
-    avatar_url = models.TextField()
+    image_name = models.TextField()
+    image_url = models.TextField()
     
     def delete(self, delete_from_parse=False):
         if delete_from_parse:
-            delete_file(self.avatar_name, 'image/png') 
+            delete_file(self.image_name, 'image/png') 
                   
-        super(NewStoreLocationAvatarTmp, self).delete()
+        super(UploadedImageFile, self).delete()
 
-class StoreLocationAvatarTmp(models.Model):
+class UploadedImageFile(models.Model):
     """ 
     This is used in the image upload sequence. The file needs to be 
     uploaded first so that the user may crop the image and finally
@@ -36,11 +36,11 @@ class StoreLocationAvatarTmp(models.Model):
     
     def delete(self):
         try:
-            avatar.delete()
+            self.avatar.delete()
         except Exception:
             pass
        
-        super(StoreLocationAvatarTmp, self).delete()
+        super(UploadedImageFile, self).delete()
 
 class Store(models.Model):
     store_name = models.CharField(max_length=255, 

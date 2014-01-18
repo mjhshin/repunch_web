@@ -11,8 +11,8 @@ from io import BytesIO
 import json, urllib, urllib2, os, pytz
 
 from apps.comet.models import CometSession
-from apps.stores.models import StoreLocationAvatarTmp, StoreActivate,\
-NewStoreLocationAvatarTmp
+from apps.stores.models import UploadedImageFile, StoreActivate,\
+UploadedAndCreatedImageFile
 from apps.stores.forms import StoreForm, StoreLocationForm,\
 SettingsForm, StoreLocationAvatarForm
 from libs.repunch.rphours_util import HoursInterpreter
@@ -122,11 +122,11 @@ def edit_location(request, store_location_id):
         else:
             store_location = SESSION.get_store_location(\
                 request.session, store_location_id)
-            # the avatar url will be lost in the creation so add it in
-            avatar_url = store_location.get("store_avatar_url")
+            # the image url will be lost in the creation so add it in
+            image_url = store_location.get("store_image_url")
             store_location = StoreLocation(**store_location.__dict__)
             store_location.update_locally(postDict, False)
-            store_location.store_avatar_url = avatar_url
+            store_location.store_image_url = image_url
             
         if store_location_form.is_valid(): 
             # validate and format the hours
@@ -159,14 +159,14 @@ def edit_location(request, store_location_id):
                     map_data.get("neighborhood")))
            
             if new_location:
-                # add the avatar file if exist
-                new_avatar = NewStoreLocationAvatarTmp.objects.filter(\
+                # add the image file if exist
+                new_image = UploadedAndCreatedImageFile.objects.filter(\
                     session_key=request.session.session_key)
-                if new_avatar:
-                    new_avatar = new_avatar[0]
-                    store_location.store_avatar = new_avatar.avatar_name
-                    store_location.store_avatar_url = new_avatar.avatar_url
-                    new_avatar.delete(False)
+                if new_image:
+                    new_image = new_image[0]
+                    store_location.store_avatar = new_image.image_name
+                    store_location.store_image_url = new_image.image_url
+                    new_image.delete(False)
                   
                 store_location.Store = store.objectId  
                 store_location.create()
@@ -182,7 +182,7 @@ def edit_location(request, store_location_id):
                     store.update()
             
             # the store location at this point has lost its
-            # store_avatar_url so we need to update that too 
+            # store_image_url so we need to update that too 
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
@@ -210,11 +210,11 @@ def edit_location(request, store_location_id):
             }), content_type="application/json")
             
         else:
-            new_avatar = NewStoreLocationAvatarTmp.objects.filter(\
+            new_image = UploadedAndCreatedImageFile.objects.filter(\
                 session_key=request.session.session_key)
-            if new_avatar:
+            if new_image:
                 data['store_location_avatar_tmp'] =\
-                    new_avatar[0].avatar_url
+                    new_image[0].image_url
                 
             data['store_location'] = store_location
             data['hours_data'] = hours._format_javascript_input()
@@ -323,19 +323,19 @@ def get_avatar(request, store_location_id):
     if request.method == "GET":
         
         if store_location_id == '0':
-            store_avatar_url = NewStoreLocationAvatarTmp.objects.get(\
-                session_key=request.session.session_key).avatar_url
+            store_image_url = UploadedAndCreatedImageFile.objects.get(\
+                session_key=request.session.session_key).image_url
                 
         elif store_location_id == 'x':
-            store_avatar_url =\
-                SESSION.get_store(request.session).store_avatar_url
+            store_image_url =\
+                SESSION.get_store(request.session).store_image_url
                 
         else:
-            store_avatar_url = SESSION.get_store_location(\
-                request.session, store_location_id).get("store_avatar_url")
+            store_image_url = SESSION.get_store_location(\
+                request.session, store_location_id).get("store_image_url")
     
         return HttpResponse(json.dumps({
-            "src": store_avatar_url,
+            "src": store_image_url,
             "thumbnail": store_location_id == 'x',
         }), content_type="application/json")
         
@@ -382,7 +382,7 @@ def crop_avatar(request, store_location_id):
         # if there are 2 windows with the same session_key editing the 
         # store avatar, the avatar will be deleted by the first window
         # to crop. The 2nd window will then have no avatar.
-        avatar = StoreLocationAvatarTmp.objects.filter(session_key=\
+        avatar = UploadedImageFile.objects.filter(session_key=\
             request.session.session_key)
         if not avatar:
             # flag the execution of avatarCropComplete js function
@@ -402,23 +402,23 @@ def crop_avatar(request, store_location_id):
         if res and 'error' not in res:
             if new_location:
                 # first delete an exiting object if any
-                new_avatar = NewStoreLocationAvatarTmp.objects.filter(\
+                new_avatar = UploadedAndCreatedImageFile.objects.filter(\
                     session_key=request.session.session_key)
                     
-                if new_avatar:
+                if new_avatar:h
                     # delete the file from parse as well
                     new_avatar[0].delete(True)
                     
                 # create new 1 for get avatar and saving the new
                 # StoreLocation, which is where this will be deleted
-                NewStoreLocationAvatarTmp.objects.create(\
+                UploadedAndCreatedImageFile.objects.create(\
                     session_key=request.session.session_key,
-                    avatar_name=res.get('name'),
-                    avatar_url=res.get('url'))
+                    image_name=res.get('name'),
+                    image_url=res.get('url'))
                 
             else:
                 s.store_avatar = res.get('name')
-                s.store_avatar_url = res.get('url').replace("http:/",
+                s.store_image_url = res.get('url').replace("http:/",
                     "https://s3.amazonaws.com")
                 s.update()
                     
@@ -434,14 +434,14 @@ def crop_avatar(request, store_location_id):
             if str(store_location_id) == 'x': # Store
                 payload.update({
                     "updatedStoreAvatarName": s.store_avatar,
-                    "updatedStoreAvatarUrl": s.store_avatar_url,
+                    "updatedStoreAvatarUrl": s.store_image_url,
                 })
                 
             else: # existing StoreLocation
                 payload.update({
                     "updatedStoreLocationAvatarSLID": s.objectId,
                     "updatedStoreLocationAvatarName": s.store_avatar,
-                    "updatedStoreLocationAvatarUrl": s.store_avatar_url,
+                    "updatedStoreLocationAvatarUrl": s.store_image_url,
                 })
             
             comet_receive(store.objectId, payload)

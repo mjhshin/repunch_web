@@ -14,6 +14,16 @@ NOT_WHERE_CONSTRAINTS
 JSONIFIABLE_TYPES = (int, bool, float, long, str, unicode, list, 
                     dict, tuple)
                     
+# avatar is here for backwards compatibility
+IMAGE_DELIMITERS = ("avatar", "image")
+
+def is_image(attr_name):
+    for delim in IMAGE_DELIMITERS:
+        if delim in attr_name:
+            return True
+    
+    return False
+                    
 # This is to support creating objects from within objects.
 # Register all classes here.
 GET_CLASS = {
@@ -231,12 +241,12 @@ class ParseObject(object):
 
     ### Files:
 
-        Images have a postfix of _avatar and contains the name attr.
-        Use get with a postfix of _avatar_url to get the url.
+        Image attributes contain the word image or avatar.
+        Use get with a postfix of _url to get the url.
 
         e.g. 
-            self.employee_avatar
-            self.get('employee_avatar_url')
+            self.employee_image
+            self.get('employee_image_url')
             
     ### GeoPoints:
     
@@ -399,12 +409,14 @@ class ParseObject(object):
                         className = key
                     setattr(self, key[0].lower() + key[1:], 
                         get_class(className)(**value))
+                        
             # image file type
-            elif key.endswith("_avatar") and type(value) is dict: 
+            elif is_image(key) and type(value) is dict: 
                 setattr(self, key, value.get('name'))
                 setattr(self, key + "_url", value.get('url').replace(\
                     "http:/", "https://s3.amazonaws.com")) 
-            elif key.endswith("_avatar_url") and\
+                    
+            elif is_image(key) and key.endswith("_url") and\
                 type(value) is not dict and value:
                 setattr(self, key, value.replace(\
                     "http:/", "https://s3.amazonaws.com")) 
@@ -623,8 +635,9 @@ class ParseObject(object):
                 setattr(self, attr, 
                     parser.parse(res.get('results')[0].get(\
                         attr).get("iso")))
-        # File types avatar
-        elif attr.endswith("_avatar_url") and\
+                        
+        # Image types 
+        elif is_image(attr) and attr.endswith("_url") and\
             attr.replace("_url", "") in self.__dict__:
             attr_name = attr.replace("_url","")
             
@@ -632,11 +645,11 @@ class ParseObject(object):
                     "where":dumps({"objectId":self.objectId})})
                     
             if 'results' in res and res['results']:
-                avatar = res['results'][0].get(attr_name)
-                if avatar:
-                    setattr(self, attr, avatar.get('url').replace(\
+                img = res['results'][0].get(attr_name)
+                if img:
+                    setattr(self, attr, img.get('url').replace(\
                         "http:/", "https://s3.amazonaws.com")) 
-                    setattr(self, attr_name, avatar.get('name'))
+                    setattr(self, attr_name, img.get('name'))
                     
         # attr is a geopoint
         elif attr == "coordinates" and attr in self.__dict__:
@@ -857,8 +870,8 @@ class ParseObject(object):
                     self.__dict__[key[0].upper() + key[1:]]:
                     setattr(self, key, None)
                 continue
-            # exclude avatar url
-            if key.endswith("_avatar_url"):
+            # exclude image url
+            if is_image(key) and key.endswith("_url"):
                 # NOTE cache is not cleared so manually set cache
                 # to None when changing file!
                 continue
@@ -882,8 +895,8 @@ class ParseObject(object):
             elif key.startswith("date_") or\
                 key in ("createdAt", "updatedAt"):
                 data[key] = format_date(value)
-            # File avatars
-            elif key.endswith("_avatar"):
+            # Image files
+            elif is_image(key):
                 data[key] = format_file(value)
             # GeoPoint
             elif key == "coordinates" and value:
