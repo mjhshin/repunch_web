@@ -165,8 +165,11 @@ def edit_location(request, store_location_id):
                     session_key=request.session.session_key)
                 if new_image:
                     new_image = new_image[0]
-                    store_location.store_avatar = new_image.image_name
-                    store_location.store_image_url = new_image.image_url
+                    store_location.cover_image = new_image.image_name
+                    store_location.cover_image_url = new_image.image_url
+                    # below for backwards compat
+                    store_location.store_avatar = store_location.cover_image
+                    store_location.store_avatar_url = store_location.cover_image_url
                     new_image.delete(False)
                   
                 store_location.Store = store.objectId  

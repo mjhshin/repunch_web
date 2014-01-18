@@ -138,8 +138,6 @@ def rescale(image_path, img_format, size, crop_coords=None):
     size is a tuple (width, height).
     """
     img = Image.open(image_path)
-    
-    # TODO
         
     # crop if given the coords
     if crop_coords:

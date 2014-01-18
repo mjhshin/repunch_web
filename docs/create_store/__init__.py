@@ -60,19 +60,41 @@ RANGE_LONG = -73783150 + 74014635
 
 TMP_IMG_PATH = DIR+"tmp.png"
 
-class RandomStoreGenerator(object):
+class ImageHolder(object):
+    def __init__(self):
+        with open(DIR+"image_urls.txt", "r") as images:
+            self.images = images.read().split("\n")
+            
+    def get_store_location_image(self, i, url=None):
+        """
+        Read the image to tmp.png.
+        Thanks to 
+            http://stackoverflow.com/questions/13137817/
+            how-to-download-image-using-requests
+        """
+        if not url:
+            r = requests.get(self.images[i], stream=True)
+        else:
+            r = requests.get(url, stream=True)
+            
+        if r.status_code == 200:
+            with open(TMP_IMG_PATH, 'wb') as fid:
+                for chunk in r.iter_content():
+                    fid.write(chunk)
+
+class RandomStoreGenerator(ImageHolder):
 
     def __init__(self):
         with open(DIR+"addresses.txt", "r") as addrs,\
             open(DIR+"neighborhoods.txt", "r") as neighborhoods,\
             open(DIR+"store_names.txt", "r") as stores,\
-            open(DIR+"image_urls.txt", "r") as images,\
             open(DIR+"owner_names.txt", "r") as owners:
             self.owners = owners.read().split("\n")
             self.addrs = addrs.read().split("\n")
             self.stores = stores.read().split("\n")
             self.neighborhoods = neighborhoods.read().split("\n")
-            self.images = images.read().split("\n")
+            
+            super(RandomStoreGenerator, self).__init__()
         
     def create_random_stores(self, amount):
         for i in range(amount):
@@ -176,27 +198,10 @@ class RandomStoreGenerator(object):
         longitude = float("".join(longitude))
         return [latitude, longitude]    
         
-class StoreLocationCoverUpdater(object):
+class StoreLocationCoverUpdater(ImageHolder):
     """
     Replaces cover images for all store locations with new ones.
     """
-    
-    def __init__(self):
-        with open(DIR+"image_urls.txt", "r") as images:
-            self.images = images.read().split("\n")
-            
-    def get_store_location_image(self, i):
-        """
-        Read the image to tmp.png.
-        Thanks to 
-            http://stackoverflow.com/questions/13137817/
-            how-to-download-image-using-requests
-        """
-        r = requests.get(self.images[i], stream=True)
-        if r.status_code == 200:
-            with open(TMP_IMG_PATH, 'wb') as fid:
-                for chunk in r.iter_content():
-                    fid.write(chunk)
     
     def update_covers(self):
         for i, loc in enumerate(StoreLocation.objects().filter(limit=999)):
@@ -206,20 +211,42 @@ class StoreLocationCoverUpdater(object):
                 print "Retrying create_png"
                 cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
           
-            # delete covers if exist
-            if loc.store_avatar:
-                delete_file(loc.store_avatar, "image/png")
-            elif loc.cover_image:
+            # delete cover if exist
+            if loc.cover_image:
                 delete_file(loc.cover_image, "image/png")
                 
             loc.cover_image = cover.get("name")
             loc.store_avatar = loc.cover_image
-                            
             loc.update()
             
             print "Updated StoreLocation #%d: %s" % (i, loc.objectId)
+      
+class StoreThumbnailResizer(ImageHolder):
+    """
+    Resizes the store thumbnail to IMAGE_THUMBNAIL_SIZE.
+    """
+    
+    def resize_thumbnails(self):
+        for i, store in enumerate(Store.objects().filter(limit=999)):
+            old_thumbnail = store.thumbnail_image
+            self.get_store_location_image(0, store.thumbnail_image_url)
+            thumbnail = create_png(TMP_IMG_PATH, IMAGE_THUMBNAIL_SIZE)
+            while "error" in thumbnail:
+                print "Retrying create_png"
+                thumbnail = create_png(TMP_IMG_PATH, IMAGE_THUMBNAIL_SIZE)
+            
+            store.thumbnail_image = thumbnail.get("name")
+            store.store_avatar = store.thumbnail_image
+            store.update()
+            
+            # delete thumbnail if exist
+            if old_thumbnail:
+                delete_file(old_thumbnail, "image/png")
                 
+            
+            print "Updated Store #%d: %s" % (i, store.objectId)
                 
 if __name__ == "__main__":
     # RandomStoreGenerator().create_random_stores(200)
-    StoreLocationCoverUpdater().update_covers()
+    # StoreLocationCoverUpdater().update_covers()
+    StoreThumbnailResizer().resize_thumbnails()
