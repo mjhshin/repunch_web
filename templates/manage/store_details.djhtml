@@ -87,10 +87,10 @@ $(document).ready(function() {
             <div class="content">
             {% for location in store_locations %}
                 <div class="wrapper {% if location.objectId == active_store_location.objectId %}active{% endif %}" id="content-{{ location.objectId }}">
-                    {% if location.store_avatar_url %}
-                    <img src="{{ location.store_avatar_url }}" class="image-big" width="200px" height="200px"/>
+                    {% if location.cover_image_url %}
+                    <img src="{{ location.cover_image_url }}" class="image-big" width="340px" height="272px"/>
                     {% else %}
-                    <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" class="image-big" width="200px" height="200px"/>
+                    <img src="{% static 'manage/images/storelocation_cover_placeholder.1.2.png' %}" class="image-big" width="340px" height="272px"/>
                     {% endif %}
                     <div><label>Address:</label>
                         {{ location.street|title }}<br/>

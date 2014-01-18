@@ -56,19 +56,13 @@ div.notification div ul.errorlist li {
 	top: 0px; 
 }
 
-
-div.notification div,
-div.notification div a {
-	font: bold 14px 'Cabin', sans-serif;
-}
-
-
 div.notification div{
 	background-color: #FFFFCB;
 	border:1px solid #F9B64D;
 	padding: 15px;
 	color:#666;
 	margin-bottom:30px;
+	font: bold 14px 'Cabin', sans-serif;
 }
 
 div.notification.success div {
@@ -95,10 +89,7 @@ a.button{
 	height:38px;
 	text-decoration:none;
 	color:white;
-	line-height:38px;
 	float:left;
-	font-size:12px;
-	font-weight:bold;
 	padding:0 30px;
 	cursor: pointer;
 	font: bold 14px/38px 'Cabin', sans-serif;

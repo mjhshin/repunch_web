@@ -24,6 +24,7 @@
 	
 	<script type="text/javascript">
 		$(document).ready(function(){
+		
 			$('#crop-btn').click(function(){
 			    if ($("#img-upload-loading").css("display") != "none" || $('#x1').val() == null || $('#x1').val().length < 1){
 			        return false;
@@ -38,17 +39,19 @@
                 $('#y1').val(c.y);
                 $('#x2').val(c.x2);
                 $('#y2').val(c.y2);
+                $("#crop-btn").removeClass("gray").addClass("blue");
             };
 
             function clearCoords() {
                 $('#image-crop-form input').val('');
+                $("#crop-btn").removeClass("blue").addClass("gray");
             };
 			
             $('#jcrop_target').Jcrop({
 	            onChange: changeCoords,
 	            onSelect: changeCoords,
                 onRelease:  clearCoords,
-                aspectRatio: 1, 
+                aspectRatio: {{ aspect_ratio }}, 
                 setSelect: [ {{init_x1}}, {{init_y1}}, {{init_x2}}, {{init_y2}} ],
             });
             
@@ -62,11 +65,11 @@
 	
 
 </head>
-<body style="background-image: none; background-color: transparent;">
-	<form action="{% url 'store_crop_image' store_location_id %}" method="POST" id="image-crop-form" >
+<body style="background-image: none; background-color: transparent;" >
+	<form action="{% url 'store_image_crop' store_location_id %}" method="POST" id="image-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
-			<img src="{{ image.url }}" id="jcrop_target" width="{{image.width}}" height="{{image.height}}" />
+			<img src="{{ image.url }}" id="jcrop_target" width="{{image.width}}" height="{{image.height}}" id="crop-image"/>
 		</div>
 		
         <input type="hidden" id="x1" name="x1" />

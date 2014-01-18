@@ -20,7 +20,7 @@ from libs.repunch.rputils import get_timezone, get_map_data
 
 from repunch.settings import MEDIA_ROOT, TIME_ZONE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY, IMAGE_THUMBNAIL_SIZE,\
-IMAGE_COVER_SIZE
+IMAGE_THUMBNAIL_ASPECT_RATIO, IMAGE_COVER_SIZE, IMAGE_COVER_ASPECT_RATIO
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
@@ -124,10 +124,12 @@ def edit_location(request, store_location_id):
             store_location = SESSION.get_store_location(\
                 request.session, store_location_id)
             # the image url will be lost in the creation so add it in
-            image_url = store_location.get("store_image_url")
+            image_url = store_location.get("cover_image_url")
             store_location = StoreLocation(**store_location.__dict__)
             store_location.update_locally(postDict, False)
-            store_location.store_image_url = image_url
+            store_location.cover_image_url = image_url
+            # below for backwwards compat
+            store_location.store_avatar_url = image_url
             
         if store_location_form.is_valid(): 
             # validate and format the hours
@@ -186,7 +188,7 @@ def edit_location(request, store_location_id):
                     store.update()
             
             # the store location at this point has lost its
-            # store_image_url so we need to update that too 
+            # image_url so we need to update that too 
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
@@ -297,6 +299,13 @@ def image_upload(request, store_location_id):
                 init_y1 = center_height - image.width/2
                 init_y2 = center_height + image.width/2
                 
+            if store_location_id == "x":
+                aspect_ratio = IMAGE_THUMBNAIL_ASPECT_RATIO
+                
+            else:
+                aspect_ratio = IMAGE_COVER_ASPECT_RATIO
+                
+                
             return render(request, 'manage/image_crop.djhtml', {
                 "store_location_id": store_location_id,
                 'image': image,
@@ -304,6 +313,8 @@ def image_upload(request, store_location_id):
                 'init_y1': init_y1,
                 'init_x2': init_x2,
                 'init_y2': init_y2,
+                'aspect_ratio':\
+                    float(aspect_ratio[0])/float(aspect_ratio[1]), 
             })
             
     else:
@@ -332,11 +343,11 @@ def image_get(request, store_location_id):
                 
         elif store_location_id == 'x':
             store_image_url =\
-                SESSION.get_store(request.session).store_image_url
+                SESSION.get_store(request.session).thumbnail_image_url
                 
         else:
             store_image_url = SESSION.get_store_location(\
-                request.session, store_location_id).get("store_image_url")
+                request.session, store_location_id).get("cover_image_url")
     
         return HttpResponse(json.dumps({
             "src": store_image_url,
@@ -365,6 +376,7 @@ def image_crop(request, store_location_id):
         new_location = store_location_id == '0'
         old_image = None
         
+        image_size = IMAGE_COVER_SIZE
         if not new_location:
             store_location = SESSION.get_store_location(\
                 request.session, store_location_id)
@@ -375,18 +387,10 @@ def image_crop(request, store_location_id):
             else:
                 s = store_location
                 image_name = "cover_image"
-                image_size = IMAGE_COVER_SIZE
             
             if s.get(image_name):
                 old_image = s.get(image_name)
             
-        crop_coords = {
-            "x1": int(request.POST["x1"]),
-            "y1": int(request.POST["y1"]),
-            "x2": int(request.POST["x2"]),
-            "y2": int(request.POST["y2"]),
-        }
-        
         # if there are 2 windows with the same session_key editing the 
         # store image, the image will be deleted by the first window
         # to crop. The 2nd window will then have no image.
@@ -398,6 +402,15 @@ def image_crop(request, store_location_id):
             return render(request, 'manage/image_crop.djhtml', data)
             
         image = image[0]
+        
+        crop_coords = None
+        if len(request.POST["x1"]) > 0:
+            crop_coords = {
+                "x1": int(request.POST["x1"].split(".")[0]),
+                "y1": int(request.POST["y1"].split(".")[0]),
+                "x2": int(request.POST["x2"].split(".")[0]),
+                "y2": int(request.POST["y2"].split(".")[0]),
+            }
         
         # save the session before a cloud call!
         request.session.save()

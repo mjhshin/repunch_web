@@ -299,7 +299,7 @@ def comet_receive(store_id, postDict, session_key=None):
         if updatedStore:
             store = Store(**updatedStore)
             # have to add the image url manually
-            store.thumbnail_image_url = updatedStore.get("store_thumbnail_url")
+            store.thumbnail_image_url = updatedStore.get("thumbnail_image_url")
             # below here for backwards compat
             store.store_avatar_url = store.thumbnail_image_url
             session['store'] = store
@@ -336,6 +336,7 @@ def comet_receive(store_id, postDict, session_key=None):
             # below here for backwards compat
             store_location.store_avatar_url =\
                 store_location.cover_image_url
+                
             session['store_locations'][store_location.objectId] =\
                 store_location
                 
@@ -356,6 +357,7 @@ def comet_receive(store_id, postDict, session_key=None):
                 # below here for backwards compat
                 store_location.store_avatar = store_location.cover_image
                 store_location.store_avatar_url = store_location.cover_image_url
+                
                 session['store_locations'][store_location.objectId] = store_location    
 
             

@@ -36,7 +36,7 @@ function imageCropComplete() {
         type: "GET",
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
-	        $($("#get_image_id").val()).attr("src", result.src);
+	        $("#"+$("#get_image_id").val()).attr("src", result.src);
 	        if (result.thumbnail) {
                 $("#account-thumbnail").attr("src", result.src);
                 $("#account-thumbnail").css("visibility", "visible");

@@ -20,7 +20,7 @@ class UploadedAndCreatedImageFile(models.Model):
         if delete_from_parse:
             delete_file(self.image_name, 'image/png') 
                   
-        super(UploadedImageFile, self).delete()
+        super(UploadedAndCreatedImageFile, self).delete()
 
 class UploadedImageFile(models.Model):
     """ 
