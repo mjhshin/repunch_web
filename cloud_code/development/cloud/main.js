@@ -760,8 +760,7 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 
 	}, function(error) {
 		console.log("PatronStore/Store/Patron fetch fail (in parallel).");
-		response.error("error");
-		return;
+		return Parse.Promise.error(error);
 		
 	}).then(function() {
 		console.log("Store/Patron save success (in parallel).");
@@ -769,8 +768,7 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 
 	}, function(error) {
 		console.log("Store/Patron save fail (in parallel).");
-		response.error("error");
-		return;
+		return Parse.Promise.error(error);
 		
 	}).then(function() {
 		console.log("PatronStore delete success.");
@@ -778,8 +776,8 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 
 	}, function(error) {
 		console.log("PatronStore delete fail.");
+		console.log(error);
 		response.error("error");
-		return;
 	});
 });
 
