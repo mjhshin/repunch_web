@@ -14,27 +14,28 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	
 	var Patron = Parse.Object.extend("Patron");
 	var PunchCode = Parse.Object.extend("PunchCode");
-	var patron = new Patron();
-	var user = new Parse.User();
+	var patron, user, punchCode;
 	
 	var userQuery = new Parse.Query(Parse.User);
 	var punchCodeQuery = new Parse.Query(PunchCode);
 	punchCodeQuery.equalTo("is_taken", false);
 	
-	punchCodeQuery.first().then(function(punchCode) {
+	punchCodeQuery.first().then(function(punchCodeResult) {
 		console.log("PunchCode fetch success.");
-        punchCode.set("is_taken", true);
-        punchCode.set("user_id", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCodeResult.set("is_taken", true);
+        punchCodeResult.set("user_id", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
         											//since facebook users may not have email available.
-		return punchCode.save();
+		return punchCodeResult.save();
 			
 	}, function(error) {
 		console.log("PunchCode fetch failed.");
-		response.error("error");
-		return;	
+		return Parse.Promise.error(error);
 					
-	}).then(function(punchCode) {
+	}).then(function(punchCodeResult) {
+	    punchCode = punchCodeResult;
+	    
 		console.log("PunchCode save success.");
+		patron = new Patron();
 		patron.set("first_name", firstName);
 		patron.set("last_name", lastName);
 		patron.set("gender", gender);
@@ -54,8 +55,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 			
 	}, function(error) {
 		console.log("PunchCode save failed.");
-		response.error("error");
-		return;
+		return Parse.Promise.error(error);
 				
 	}).then(function(patronResult) {
 		console.log("Patron save success.");
@@ -64,8 +64,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 			
 	}, function(error) {
 		console.log("Patron save failed.");
-		response.error("error");
-		return;
+		return Parse.Promise.error(error);
 				
 	}).then(function(userResult) {
 		console.log("User fetch success.");
@@ -81,39 +80,53 @@ Parse.Cloud.define("register_patron", function(request, response) {
 			
 	}, function(error) {
 		console.log("User fetch failed.");
-		response.error("error");
-		return;	
+		return Parse.Promise.error(error);
 				
 	}).then(function(user) {
 		console.log("User save success. Registration complete!");
 		response.success(patron);
-		return;
 			
 	}, function(error) {
 		console.log("User save failed.");
 		
-		if(error.code == Parse.Error.EMAIL_TAKEN) {
-			console.log("User save failed because this email is already taken.");
-			response.error(error.message);
-			deleteAccount();
+		if(error.code == Parse.Error.EMAIL_TAKEN || error.code == Parse.Error.USERNAME_TAKEN) {
+			console.log("User save failed because this username/email is already taken.");
 
-		} else {
-			response.error("error");
-		}	
-	});
-	
-	function deleteAccount() {
+		} else
+		{
+			console.log(error.message);
+		}
+
+		// we undo everything that might have been done
 		var promises = [];
-		promises.push( user.destroy() );
-		promises.push( patron.destroy() );
+		
+		// always undo changes to PunchCode
+        punchCode.set("is_taken", false);
+        punchCode.set("user_id", null);
+		promises.push(punchCode.save());
+		
+		// patron will be null if punch code save failed
+		if (patron != null) {
+		    promises.push(patron.destroy());
+		}
+		
+		// user will be null if patron save failed
+		if (user != null) {
+		    promises.push(user.destroy());
+		}
 		
 		Parse.Promise.when(promises).then(function() {
-		    console.log("Patron and User delete success (in parallel).");
+		    console.log("Error correction success.");
+            response.error("error");
 			
 		}, function(error) {
-		    console.log("Patron and User delete fail (in parallel).");
+		    console.log("Error correction failed");
+            response.error("error");
+		    
         });
-	}
+		
+		
+	});
 
 });
 
