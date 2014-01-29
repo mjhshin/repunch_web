@@ -100,10 +100,12 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		// we undo everything that might have been done
 		var promises = [];
 		
-		// always undo changes to PunchCode
-        punchCode.set("is_taken", false);
-        punchCode.set("user_id", null);
-		promises.push(punchCode.save());
+		// punch code will be null if we failed to fetch it
+		if (punchCode != null) {
+            punchCode.set("is_taken", false);
+            punchCode.set("user_id", null);
+		    promises.push(punchCode.save());
+		}
 		
 		// patron will be null if punch code save failed
 		if (patron != null) {
