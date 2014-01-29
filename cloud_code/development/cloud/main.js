@@ -113,6 +113,9 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		// user will be null if patron save failed
 		if (user != null) {
 		    promises.push(user.destroy());
+		} // need to fetch and delete
+		else {
+		    promises.push(getUserAndDestroy());
 		}
 		
 		Parse.Promise.when(promises).then(function() {
@@ -127,6 +130,36 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		
 	});
+	
+	/*
+	 * Warning! This function does not guarantee the user object being destroyed.
+	 * We only try to destroy it once. Therefore, the Application calling this cloud function
+	 * will need to take care of the case in which this fails to destroy the user object.
+	 * 
+	 */
+	function getUserAndDestroy(){
+	    var promise = new Parse.Promise();
+	    
+	    var userQuery = new Parse.Query(Parse.User);
+	    userQuery.get(userObjectId).then(function(userResult)
+	    {
+	        return userResult.destroy();
+	    },
+	    function (error) {
+	        promise.resolve();
+	        
+	    }).then(function(destroyedUser)
+	    {
+	        promise.resolve();
+	    
+	    },
+	    function(error) {
+	        promise.resolve();
+	    
+	    });
+	    
+	    return promise;
+	}
 
 });
 

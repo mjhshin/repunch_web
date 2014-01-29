@@ -60,7 +60,7 @@ def retailer_message(store_id, message_type):
     if message_type == "offer":
         print _retailer_message(store_id, "Test Message #"+rand_str,
             "This is a test message", 
-            timezone.now() + relativedelta(years=1),
+            timezone.now() + relativedelta(minutes=1, seconds=20),
             message_type, "Offer #"+rand_str, None,
             None, sender_name="Test Store")
     
