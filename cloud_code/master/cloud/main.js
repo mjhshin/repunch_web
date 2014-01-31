@@ -2310,7 +2310,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		
 	}, function(error) {
 		console.log("Message save failed.");
-		response.error("error");
+		return Parse.Promise.error(error);
 				
 	}).then(function(store) {
 		console.log("Store fetch was successful.");
@@ -2319,7 +2319,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		
 	}, function(error) {
 		console.log("Store fetch failed.");
-		response.error("error");
+		return Parse.Promise.error(error);
 						
 	}).then(function(store) {
 		console.log("Store save was successful.");
@@ -2328,7 +2328,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		
 	}, function(error) {
 		console.log("Store save failed.");
-		response.error("error");
+		return Parse.Promise.error(error);
 					
 	}).then(function(patron) {
 		console.log("Patron fetch was successful.");
@@ -2337,7 +2337,7 @@ Parse.Cloud.define("send_feedback", function(request, response) {
 		
 	}, function(error) {
 		console.log("Patron fetch failed.");
-		response.error("error");
+		return Parse.Promise.error(error);
 					
 	}).then(function(patron) {
 		console.log("Patron save was successful.");
