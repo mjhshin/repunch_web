@@ -1071,11 +1071,12 @@ Parse.Cloud.define("punch", function(request, response)
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
                     repunch_receivers: repunchReceivers, 
-			        action: "com.repunch.consumer.PUNCH",
-			        name: storeName,
-			        id: storeId,
+			        action: "com.repunch.consumer.intent.PUNCH",
+			        ordered_broadcast: true,
+			        notification_id: Math.floor((Math.random()*1000)+1),
+			        store_name: storeName,
+			        store_id: storeId,
 			        punches: numPunches,
-			        total_punches: patronStore.get("punch_count"),
                 }, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);
