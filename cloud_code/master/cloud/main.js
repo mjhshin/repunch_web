@@ -1073,7 +1073,7 @@ Parse.Cloud.define("punch", function(request, response)
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.consumer.intent.PUNCH",
 			        ordered_broadcast: true,
-			        notification_id: Math.floor((Math.random()*1000)+1),
+			        notification_id: String(new Date().getTime()).substring(1,10),
 			        store_name: storeName,
 			        store_id: storeId,
 			        punches: numPunches,
