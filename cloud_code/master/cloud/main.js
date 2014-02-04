@@ -2108,9 +2108,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	var patron_ids = new Array(); 
 	
 	
-    var androidInstallationQuery = new Parse.Query(Parse.Installation);
+    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
     var iosInstallationQuery = new Parse.Query(Parse.Installation);
-	androidInstallationQuery.equalTo("deviceType", "android");
 	iosInstallationQuery.equalTo("deviceType", "ios");
 	
 	function setMessage(messageResult) {
@@ -2241,16 +2241,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
         }
 		
 		var promises = [];
-		promises.push( Parse.Push.send({
-            where: androidInstallationQuery, 
-            data: {
-                action: "com.repunch.intent.MESSAGE",
-                subject: subject,
-                store_id: storeId,
-                store_name: storeName,
-                message_id: messageId
-            }
-		}) );
+		promises.push( gcmPost() );
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
@@ -2276,6 +2267,65 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 			
 		});
 	}
+	
+	function gcmPost(){
+	    var promise = new Parse.Promise();
+	    
+	    androidInstallationQuery.select("registration_id", "patron_id");
+	    androidInstallationQuery.find().then(function(installations) {
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var repunchReceivers = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                patron_id: installations[i].get("patron_id"),
+	            });
+	        }
+	        
+	        var postBody = {
+                gcmrkey: "<<GCM_RECEIVE_KEY>>",
+                repunch_receivers: repunchReceivers, 
+		        action: "com.repunch.consumer.intent.RETAILER_MESSAGE",
+		        ordered_broadcast: "y",
+		        notification_id: String(new Date().getTime()).substring(1,10),
+                store_name: storeName,
+                message_id: messageId,
+                subject: message.subject.substring(0, 50),
+                preview: message.body.substring(0, 100),
+            }
+            
+            if (message.offer_title != null) {
+                postBody.offer_title = message.offer_title;
+            }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "<<GCM_RECEIVE_URL>>",
+                headers: { "Content-Type": "application/json"},
+                body: postBody, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	    
+	    return promise;
+	}
+	
  
 }); // end Parse.Cloud.define
 
