@@ -2294,12 +2294,12 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		        notification_id: String(new Date().getTime()).substring(1,10),
                 store_name: storeName,
                 message_id: messageId,
-                subject: message.subject.substring(0, 50),
-                preview: message.body.substring(0, 100),
+                subject: message.get("subject"),
+                preview: message.get("body").substring(0, 100),
             }
             
             if (message.offer_title != null) {
-                postBody.offer_title = message.offer_title;
+                postBody.offer_title = message.get("offer_title");
             }
 	    
 	        Parse.Cloud.httpRequest({
