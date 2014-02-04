@@ -1072,7 +1072,7 @@ Parse.Cloud.define("punch", function(request, response)
                     gcmrkey: "p9wn84m8450yot4ureh",
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.consumer.intent.PUNCH",
-			        ordered_broadcast: true,
+			        ordered_broadcast: "y",
 			        notification_id: String(new Date().getTime()).substring(1,10),
 			        store_name: storeName,
 			        store_id: storeId,
