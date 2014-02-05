@@ -1871,7 +1871,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    return promise;
 	}
 	
-	function gcmConsumerPost() {
+	function gcmConsumerPost(postBody) {
 	    var promise = new Parse.Promise();
 	    
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
@@ -1892,22 +1892,23 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
+	        
+	        var extendedPostBody = {
+                gcmrkey: "p9wn84m8450yot4ureh",
+                repunch_receivers: repunchReceivers, 
+	            ordered_broadcast: "y",
+	            notification_time: String(new Date().getTime()),
+            }
+            
+            for (var i in postBody) {
+                extendedPostBody[i] = postBody[i];
+            }
 	    
 	        Parse.Cloud.httpRequest({
                 method: "POST",
                 url: "http://dev.repunch.com/gcm/receive",
                 headers: { "Content-Type": "application/json"},
-                body: {
-                    gcmrkey: "p9wn84m8450yot4ureh",
-                    repunch_receivers: repunchReceivers, 
-			        action: "com.repunch.consumer.intent.VALIDATE_REDEEM",
-		            ordered_broadcast: "y",
-		            notification_time: String(new Date().getTime()),
-	                store_id: storeId,
-	                store_name: store.get("store_name"),
-				    reward_title: rewardTitle,
-				    total_punches: patronStore.get("punch_count")
-                }, 
+                body: extendedPostBody, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);
                 },
@@ -1944,7 +1945,13 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		var promises = [];
 		// Consumer push
-	    promises.push(gcmConsumerPost());
+	    promises.push( gcmConsumerPost({
+	        action: "com.repunch.consumer.intent.VALIDATE_REDEEM_REWARD",
+            store_id: storeId,
+            store_name: store.get("store_name"),
+		    reward_title: rewardTitle,
+		    total_punches: patronStore.get("punch_count")
+	    })  );
 	    
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
@@ -2002,18 +2009,12 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		var promises = [];
 		// Consumer push
-		/*
-		promises.push( Parse.Push.send({
-	        where: androidInstallationQuery,
-	        data: {
-	            title: rewardTitle,
-	            id: storeId, 
-	            store: store.get("store_name"),
-				message_status_id: messageStatus.id,
-				action: "com.repunch.intent.REDEEM_OFFER_GIFT"
-	        }
-	    }) );
-	    */
+	    promises.push( gcmConsumerPost({
+	        action: "com.repunch.consumer.intent.VALIDATE_REDEEM_GIFT",
+            message_status_id: messageStatus.id,
+            store_name: store.get("store_name"),
+		    reward_title: rewardTitle,
+	    })  );
 	    
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
