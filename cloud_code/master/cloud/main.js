@@ -2799,7 +2799,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	        var postBody = {
                 gcmrkey: "<<GCM_RECEIVE_KEY>>",
                 repunch_receivers: repunchReceivers, 
-		        action: "com.repunch.consumer.intent.SEND_GIFT",
+		        action: "com.repunch.consumer.intent.REPLY_TO_GIFT",
 		        ordered_broadcast: "y",
 		        notification_time: String(new Date().getTime()),
                 sender_name: senderName,
