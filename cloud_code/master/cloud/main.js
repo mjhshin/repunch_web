@@ -2361,11 +2361,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
             }
             
             if (feedbackReplyBody == null) {
-                postBody.preview = message.get("body").substring(0, 75);
+                postBody.body_preview = message.get("body").substring(0, 75);
             }
             else
             {
-                postBody.preview = feedbackReplyBody.substring(0, 75);
+                postBody.body_preview = feedbackReplyBody.substring(0, 75);
             }
             
             if (message.get("subject") != null) {
@@ -2604,7 +2604,6 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	function gcmPost() {
 	    var promise = new Parse.Promise();
 	    
-	    
         var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
         var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 		androidInstallationQuery.equalTo("patron_id", giftRecepientId);
@@ -2775,26 +2774,71 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 			
 	});
 	
+	function gcmPost() {
+	    var promise = new Parse.Promise();
+	    
+        var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+        var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+		androidInstallationQuery.equalTo("patron_id", receiverPatronId);
+	    androidInstallationQuery.select("registration_id", "patron_id");
+	    
+	    androidInstallationQuery.find().then(function(installations) {
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var repunchReceivers = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                patron_id: installations[i].get("patron_id"),
+	            });
+	        }
+	        
+	        var postBody = {
+                gcmrkey: "<<GCM_RECEIVE_KEY>>",
+                repunch_receivers: repunchReceivers, 
+		        action: "com.repunch.consumer.intent.SEND_GIFT",
+		        ordered_broadcast: "y",
+		        notification_time: String(new Date().getTime()),
+                sender_name: senderName,
+                message_status_id: messageStatus.id,
+                body_preview: body.substring(0, 75),
+            }
+            
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "<<GCM_RECEIVE_URL>>",
+                headers: { "Content-Type": "application/json"},
+                body: postBody, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	    
+	    return promise;
+	}
+	
 	function executePush() {
-		var androidInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosInstallationQuery = new Parse.Query(Parse.Installation);
  
-		androidInstallationQuery.equalTo("patron_id", receiverPatronId);
-		androidInstallationQuery.equalTo("deviceType", "android");
 		iosInstallationQuery.equalTo("patron_id", receiverPatronId);
 		iosInstallationQuery.equalTo("deviceType", "ios");
 		
 		var promises = [];
-		promises.push( Parse.Push.send({
-            where: androidInstallationQuery, 
-            data: {
-                action: "com.repunch.intent.GIFT",
-                subject: "RE: " + subject,
-                store_id: storeId,
-                sender: senderName,
-                message_status_id: messageStatus.id
-			}
-        }) );
+		promises.push( gcmPost() );
 		promises.push( Parse.Push.send({
             where: iosInstallationQuery, 
             data: {
