@@ -2360,7 +2360,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 message_id: messageId,
             }
             
-            if (feedbackReply == null) {
+            if (feedbackReplyBody == null) {
                 postBody.preview = message.get("body").substring(0, 75);
             }
             else
