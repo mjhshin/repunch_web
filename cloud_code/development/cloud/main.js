@@ -2010,7 +2010,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		var promises = [];
 		// Consumer push
 	    promises.push( gcmConsumerPost({
-	        action: "com.repunch.consumer.intent.VALIDATE_REDEEM_GIFT",
+	        action: "com.repunch.consumer.intent.VALIDATE_REDEEM_OFFERGIFT",
             message_status_id: messageStatus.id,
             store_name: store.get("store_name"),
 		    reward_title: rewardTitle,
