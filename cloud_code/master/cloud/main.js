@@ -2298,7 +2298,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
                 preview: message.get("body").substring(0, 100),
             }
             
-            if (message.offer_title != null) {
+            if (message.get("offer_title") != null) {
                 postBody.offer_title = message.get("offer_title");
             }
 	    
