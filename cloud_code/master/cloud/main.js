@@ -1871,6 +1871,61 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    return promise;
 	}
 	
+	function gcmConsumerPost() {
+	    var promise = new Parse.Promise();
+	    
+	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
+	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
+	    androidInstallationQuery.equalTo("patron_id", storeId);
+	    androidInstallationQuery.select("registration_id", "patron_id");
+	    
+	    androidInstallationQuery.find().then(function(installations) {
+	        if(installations.length == 0) {
+	            promise.resolve();
+	            return;
+	        }
+	    
+	        var repunchReceivers = new Array();
+	        for(var i=0; i<installations.length; i++) {
+	            repunchReceivers.push({
+	                registration_id: installations[i].get("registration_id"),
+	                patron_id: installations[i].get("patron_id"),
+	            });
+	        }
+	    
+	        Parse.Cloud.httpRequest({
+                method: "POST",
+                url: "<<GCM_RECEIVE_URL>>",
+                headers: { "Content-Type": "application/json"},
+                body: {
+                    gcmrkey: "<<GCM_RECEIVE_KEY>>",
+                    repunch_receivers: repunchReceivers, 
+			        action: "com.repunch.consumer.intent.VALIDATE_REDEEM",
+		            ordered_broadcast: "y",
+		            notification_id: String(new Date().getTime()).substring(1,10),
+	                store_id: storeId,
+				    reward_title: rewardTitle,
+				    total_punches: patronStore.get("punch_count")
+                }, 
+                success: function(httpResponse) {
+                    console.log("Post success with " + httpResponse.text);
+                },
+                error: function(httpResponse) {
+                    console.error("Request failed with response code " + httpResponse.status);
+                }
+              
+            });
+            
+            promise.resolve();
+            
+	    }, function(error) {
+	        console.log("error");
+	    });
+	    
+	
+	    return promise;
+	}
+	
 	function executePushReward(redeemReward)
 	{
 	    
@@ -1888,6 +1943,8 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 		
 		var promises = [];
 		// Consumer push
+	    promises.push(gcmConsumerPost());
+	    
 		promises.push( Parse.Push.send({
 	        where: iosPatronInstallationQuery,
 	        data: {
@@ -1899,6 +1956,8 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 				total_punches: patronStore.get("punch_count")
 	        }
 	    }) );
+	    
+	    
 	    
 	    // Employee push
 	    promises.push(gcmEmployeePost());
