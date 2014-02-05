@@ -2165,6 +2165,9 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     var storeId = request.params.store_id;
 	var storeName = request.params.store_name;
     var filter = request.params.filter; 
+    // this is provided when the retailer is replying to a feedback
+    var feedbackReplyBody = request.params.feedback_reply_body;
+    
     var message, receiver_count, redeem_available;
 	var patron_ids = new Array(); 
 	
@@ -2355,7 +2358,14 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		        notification_time: String(new Date().getTime()),
                 store_name: storeName,
                 message_id: messageId,
-                preview: message.get("body").substring(0, 75),
+            }
+            
+            if (feedbackReply == null) {
+                postBody.preview = message.get("body").substring(0, 75);
+            }
+            else
+            {
+                postBody.preview = feedbackReplyBody.substring(0, 75);
             }
             
             if (message.get("subject") != null) {

@@ -414,6 +414,7 @@ def feedback_reply(request, feedback_id):
                 "message_id":feedback.objectId,
                 "filter":'one',
                 "patron_id":feedback.get('patron_id'),
+                "feedback_reply_body": body,
             })
             
             payload = {
