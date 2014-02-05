@@ -2355,8 +2355,11 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 		        notification_time: String(new Date().getTime()),
                 store_name: storeName,
                 message_id: messageId,
-                subject: message.get("subject").substring(0, 40),
                 preview: message.get("body").substring(0, 75),
+            }
+            
+            if (message.get("subject") != null) {
+                postBody.subject = message.get("subject").substring(0, 40);
             }
             
             if (message.get("offer_title") != null) {
