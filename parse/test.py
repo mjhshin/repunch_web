@@ -17,7 +17,7 @@ from random import randint
 def request_redeem(store_location_id=None):
     """
     """
-    print _request_redeem("zef0o3YjIm", "o72LmDy0YK", "kfWmOOlIWD",
+    print _request_redeem("zef0o3YjIm", STORE_ID, "kfWmOOlIWD",
         "Test Redeem#"+str(randint(0,9999)), 1, 1,
         "Vandolf Estrellado", None, store_location_id)
         
@@ -54,7 +54,22 @@ def _request_redeem(patron_id, store_id, patron_store_id, title,
         "message_status_id": message_status_id,
     })
     
-    
+
+def send_gift(receipient_patron_id):
+    gift_num = randint(0,9999)
+    return cloud_call("send_gift", {
+        "store_id": "o72LmDy0YK",
+        "patron_id": "03yp6VcveQ",
+        "patron_store_id": "uNmwDYA7MN",
+        "sender_name": "Kentavious Teste",
+        "body": "My #%d gift to you. This is the body." % (gift_num, ),
+        "recepient_id": receipient_patron_id,
+        "gift_title": "The Gift Title",
+        "gift_description": "The gift description which is supposed "+\
+            "to be a bit lengthy",
+        "gift_punches": 1,
+    })
+
 def retailer_message(store_id, message_type):
     rand_str = str(randint(0,9999))
     if message_type == "offer":
@@ -65,9 +80,6 @@ def retailer_message(store_id, message_type):
             None, sender_name="Test Store")
     
     elif message_type == "basic":
-        pass
-    
-    elif message_type == "gift":
         pass
     
 def _retailer_message(store_id, subject, body, 
