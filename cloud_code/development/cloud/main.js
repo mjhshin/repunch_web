@@ -1876,7 +1876,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
 	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
-	    androidInstallationQuery.equalTo("patron_id", storeId);
+	    androidInstallationQuery.equalTo("patron_id", patronId);
 	    androidInstallationQuery.select("registration_id", "patron_id");
 	    
 	    androidInstallationQuery.find().then(function(installations) {
