@@ -376,7 +376,6 @@ def feedback_reply(request, feedback_id):
             
         data['body'] = body
         data['from_address'] = store.get("store_name")
-        data['subject'] = 'Re: ' + feedback.get('subject')
         
         if len(body) == 0:
             data['error'] = 'Please enter a message.'  
@@ -410,7 +409,6 @@ def feedback_reply(request, feedback_id):
             cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
-                "subject":feedback.get('subject'),
                 "message_id":feedback.objectId,
                 "filter":'one',
                 "patron_id":feedback.get('patron_id'),
@@ -433,7 +431,6 @@ def feedback_reply(request, feedback_id):
                         'Reply has been sent.'}))
     else:
         data['from_address'] = store.get("store_name")
-        data['subject'] = 'Re: ' + feedback.get('subject')
         # if the user manually tweaks the url, then s/he might be
         # able to reply to a feedback that already has a reply.
         if feedback.get("Reply"):

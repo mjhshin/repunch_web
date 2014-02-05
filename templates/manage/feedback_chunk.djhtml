@@ -3,7 +3,7 @@
 	<a href="{% url 'feedback_details' fb.objectId %}">
 		<div class="td feedback-date">{{ fb.createdAt|date:"m/d/y" }}</div>
 		<div class="td feedback-from">{{ fb.sender_name }}</div>
-		<div class="td feedback-subject">{{ fb.subject }}</div>
+		<div class="td feedback-subject">{{ fb.body }}</div>
 	</a>
 </div>
 {% empty %}

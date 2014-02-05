@@ -93,7 +93,7 @@ $(document).ready(function(){
 				            "<div class='td feedback-from'>" +
 				            feedbacks_unread[i].sender_name + "</div>" +
 				            "<div class='td feedback-subject'>" +
-				            feedbacks_unread[i].subject + "</div>" +
+				            feedbacks_unread[i].body + "</div>" +
 			                "</a></div>";
 			            // prepend if in page 1 and desc
                         if (is_desc && inFirstPage) {

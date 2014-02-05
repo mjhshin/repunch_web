@@ -34,10 +34,6 @@ $(document).ready(function(){
 			<label>From:</label><span>{{ feedback.sender_name }}</span>
 			<div style="clear: left;" /></div>
 		</div>
-		<div class="sect subject">
-			<label>Subject:</label><span>{{ feedback.subject }}</span>
-			<div style="clear: left;"></div>
-		</div>
 		<div class="sect body">{{ feedback.body }}</div>
 	</div>
 
@@ -51,10 +47,6 @@ $(document).ready(function(){
 				{{ store_name }}
 			</span>
 			<div style="clear: left;" /></div>
-		</div>
-		<div class="sect subject">
-			<label>Subject:</label><span>Re: {{ feedback.subject }}</span>
-			<div style="clear: left;"></div>
 		</div>
 		<div class="sect body">{{ reply.body }}</div>
 	</div>
