@@ -4,7 +4,7 @@
 //
 ////////////////////////////////////////////////////
 Parse.Cloud.define("register_patron", function(request, response) {
-    var userObjectId = request.params.user_id;
+    //var userObjectId = request.params.user_id;
 	var email = request.params.email;
 	var birthday = request.params.birthday;
 	var gender = request.params.gender;
@@ -23,7 +23,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCodeResult) {
 		console.log("PunchCode fetch success.");
         punchCodeResult.set("is_taken", true);
-        punchCodeResult.set("user_id", userObjectId);	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCodeResult.set("user_id", request.user.get("objectId"));	//for record keeping purposes. also we use ParseUuser.objectId
         											//since facebook users may not have email available.
 		return punchCodeResult.save();
 			
@@ -60,26 +60,17 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	}).then(function(patronResult) {
 		console.log("Patron save success.");
 		patron = patronResult;
-		return userQuery.get(userObjectId);
+		request.user.set("Patron", patron);
+		
+		if(email != null && facebookId == null) {
+			request.user.set("email", email);
+			request.user.set("username", email);
+		}
+		  
+		return request.user.save();
 			
 	}, function(error) {
 		console.log("Patron save failed.");
-		return Parse.Promise.error(error);
-				
-	}).then(function(userResult) {
-		console.log("User fetch success.");
-		user = userResult;
-		userResult.set("Patron", patron);
-		
-		if(email != null && facebookId == null) {
-			userResult.set("email", email);
-			userResult.set("username", email);
-		}
-		  
-		return userResult.save();
-			
-	}, function(error) {
-		console.log("User fetch failed.");
 		return Parse.Promise.error(error);
 				
 	}).then(function(user) {
@@ -92,8 +83,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		if(error.code == Parse.Error.EMAIL_TAKEN || error.code == Parse.Error.USERNAME_TAKEN) {
 			console.log("User save failed because this username/email is already taken.");
 
-		} else
-		{
+		} else {
 			console.log(error.message);
 		}
 
@@ -104,21 +94,16 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		if (punchCode != null) {
             punchCode.set("is_taken", false);
             punchCode.set("user_id", null);
-		    promises.push(punchCode.save());
+		    promises.push( punchCode.save() );
 		}
 		
 		// patron will be null if punch code save failed
 		if (patron != null) {
-		    promises.push(patron.destroy());
+		    promises.push( patron.destroy() ); // TODO: if this fails?
 		}
 		
-		// user will be null if patron save failed
-		if (user != null) {
-		    promises.push(user.destroy());
-		} // need to fetch and delete
-		else {
-		    promises.push(getUserAndDestroy());
-		}
+		//destroy user object
+		promises.push( request.user.destroy() );
 		
 		Parse.Promise.when(promises).then(function() {
 		    console.log("Error correction success.");
@@ -132,36 +117,6 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		
 		
 	});
-	
-	/*
-	 * Warning! This function does not guarantee the user object being destroyed.
-	 * We only try to destroy it once. Therefore, the Application calling this cloud function
-	 * will need to take care of the case in which this fails to destroy the user object.
-	 * 
-	 */
-	function getUserAndDestroy(){
-	    var promise = new Parse.Promise();
-	    
-	    var userQuery = new Parse.Query(Parse.User);
-	    userQuery.get(userObjectId).then(function(userResult)
-	    {
-	        return userResult.destroy();
-	    },
-	    function (error) {
-	        promise.resolve();
-	        
-	    }).then(function(destroyedUser)
-	    {
-	        promise.resolve();
-	    
-	    },
-	    function(error) {
-	        promise.resolve();
-	    
-	    });
-	    
-	    return promise;
-	}
 
 });
 
@@ -829,11 +784,156 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 	});
 });
 
-////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 //
+// 						POST_TO_FACEBOOK
 //
+// Will replace soon-to-be-deprecated FACEBOOK_POST function
+// Performs actual posting (Facebook API call) and resolves
+// its effects in Repunch
 //
-////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+Parse.Cloud.define("post_to_facebook", function(request, response)
+{
+	// inputs - request.user containing Parse.User included by default
+	var acceptPost = (request.params.accept == "true");
+	var patronStoreId = request.params.patron_store_id;
+	var rewardTitle = request.params.reward_title;
+
+	var PatronStore = Parse.Object.extend("PatronStore");
+	var patronStoreQuery = new Parse.Query(PatronStore);
+
+	patronStoreQuery.include("Store");
+	
+	patronStoreQuery.get(patronStoreId).then(function(patronStore)
+	{
+		console.log("PatronStore fetch success.");
+
+		if(acceptPost)
+		{
+			if(patronStore.get("FacebookPost") == null)
+			{
+				console.error("FacebookPost pointer is null");
+				response.error("NULL_FACEBOOK_POST");
+			}
+			else
+			{
+				executeFacebookPost(patronStore);
+			}
+		}
+		else
+		{
+			console.log("User declined to post to Facebook");
+			patronStore.set("FacebookPost", null);
+			patronStore.save().then(function()
+			{
+				console.log("PatronStore save success");
+				response.success("");
+		
+			}, function(error) {
+				console.error("PatronStore save fail " + error.message);
+				response.error("");
+			});
+		}
+				
+	}, function(error) {
+		console.error("PatronStore query fail " + error.message);
+		response.error("");
+	});
+
+	function executeFacebookPost(patronStore)
+	{
+		if ( Parse.FacebookUtils.isLinked(request.user) )
+		{
+			var store = patronStore.get("Store");
+			/*
+			var parameters = {
+
+					"title" : 'Redeemed a reward using Repunch!',
+					"caption" : 'At ' + store.get('store_name'),
+					"description" : rewardTitle,
+					"link" : 'https://www.repunch.com/',
+					"picture" : store.get('thumbnail_image').url
+				};
+			var param2 = JSON.stringify(parameters);
+			*/
+
+			console.log( store.get('thumbnail_image').url() );
+			console.log( encodeURIComponent( store.get('thumbnail_image').url() ) );
+
+			Parse.Cloud.httpRequest({
+				method: 'POST',
+
+				//TODO: Move to Open Graph
+				url:'https://graph.facebook.com/me/feed?'
+						+ 'access_token=' + request.user.get('authData').facebook.access_token
+						+ '&name=' + encodeURIComponent( 'Redeemed a reward using Repunch!' )
+						+ '&caption=' + encodeURIComponent( 'At ' + store.get('store_name') )
+						+ '&description=' + encodeURIComponent( rewardTitle )
+						+ '&link=https://www.repunch.com/'
+						+ '&picture=' + encodeURIComponent( store.get('thumbnail_image').url() ),
+
+				//headers: {'Content-Type': 'application/json'},
+
+				//body: param2,
+
+				success: function(httpResponse) {
+		    		console.log(httpResponse.text);
+		    		resolvePatronStore(patronStore);
+	 			},
+	  			error: function(httpResponse) {
+	    			console.error('POST request failed with response code ' + httpResponse.status);
+	    			console.error('POST request failed with response code ' + httpResponse.text);
+	    			console.error('access token ' + request.user.get('authData').facebook.access_token);
+	    			response.error(httpResponse.status);
+	  			}
+	  		});
+		}
+		else
+		{
+			console.log("User not linked to a Facebook account");
+			response.error("NOT_FACEBOOK_USER");
+		}
+	}
+
+	function resolvePatronStore(patronStore)
+	{
+		var store = patronStore.get("Store");
+		var facebookPost = patronStore.get("FacebookPost");
+		var freePunches = store.get("punches_facebook");
+		
+		store.relation("FacebookPosts").add( facebookPost );
+		
+		patronStore.increment("all_time_punches", freePunches);
+		patronStore.increment("punch_count", freePunches);
+		patronStore.set("FacebookPost", null);
+
+		var promises = [];
+		promises.push( store.save() );
+		promises.push( patronStore.save() );
+
+		Parse.Promise.when(promises).then(function()
+		{
+			console.log("Store and PatronStore save success (in parallel)");
+			response.success("");
+
+		}, function(error) {
+			console.error("Store and PatronStore save fail (in parallel) " + error.message);
+			response.error("");
+	  	});
+	}
+
+});
+
+///////////////////////////////////////////////////////////////////
+//
+// 						FACEBOOK_POST
+//
+// Resolves effect of posting to Facebook.
+// DOES NOT perform the actual post (i.e. call Facebook API)
+// Soon to be DEPRECATED
+//
+///////////////////////////////////////////////////////////////////
 Parse.Cloud.define("facebook_post", function(request, response)
 {
 	var patronStoreId = request.params.patron_store_id;
@@ -842,7 +942,6 @@ Parse.Cloud.define("facebook_post", function(request, response)
     var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStoreQuery = new Parse.Query(PatronStore);
 	patronStoreQuery.include("Store");
-	patronStoreQuery.include("Patron");
 	
 	patronStoreQuery.get(patronStoreId).then(function(patronStore)
 	{
@@ -1930,7 +2029,6 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	
 	function executePushReward(redeemReward)
 	{
-	    
 		var iosPatronInstallationQuery = new Parse.Query(Parse.Installation);
 		var iosEmployeeInstallationQuery = new Parse.Query(Parse.Installation);
 
