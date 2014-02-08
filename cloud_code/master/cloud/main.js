@@ -799,6 +799,7 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 	var acceptPost = (request.params.accept == "true");
 	var patronStoreId = request.params.patron_store_id;
 	var rewardTitle = request.params.reward_title;
+	var freePunches = request.params.free_punches;
 
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStoreQuery = new Parse.Query(PatronStore);
@@ -880,7 +881,6 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 	{
 		var store = patronStore.get("Store");
 		var facebookPost = patronStore.get("FacebookPost");
-		var freePunches = store.get("punches_facebook");
 		
 		store.relation("FacebookPosts").add( facebookPost );
 		

@@ -799,6 +799,7 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 	var acceptPost = (request.params.accept == "true");
 	var patronStoreId = request.params.patron_store_id;
 	var rewardTitle = request.params.reward_title;
+	var freePunches = request.params.free_punches;
 
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var patronStoreQuery = new Parse.Query(PatronStore);
@@ -846,20 +847,6 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 		if ( Parse.FacebookUtils.isLinked(request.user) )
 		{
 			var store = patronStore.get("Store");
-			/*
-			var parameters = {
-
-					"title" : 'Redeemed a reward using Repunch!',
-					"caption" : 'At ' + store.get('store_name'),
-					"description" : rewardTitle,
-					"link" : 'https://www.repunch.com/',
-					"picture" : store.get('thumbnail_image').url
-				};
-			var param2 = JSON.stringify(parameters);
-			*/
-
-			console.log( store.get('thumbnail_image').url() );
-			console.log( encodeURIComponent( store.get('thumbnail_image').url() ) );
 
 			Parse.Cloud.httpRequest({
 				method: 'POST',
@@ -873,18 +860,12 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 						+ '&link=https://www.repunch.com/'
 						+ '&picture=' + encodeURIComponent( store.get('thumbnail_image').url() ),
 
-				//headers: {'Content-Type': 'application/json'},
-
-				//body: param2,
-
 				success: function(httpResponse) {
 		    		console.log(httpResponse.text);
 		    		resolvePatronStore(patronStore);
 	 			},
 	  			error: function(httpResponse) {
-	    			console.error('POST request failed with response code ' + httpResponse.status);
 	    			console.error('POST request failed with response code ' + httpResponse.text);
-	    			console.error('access token ' + request.user.get('authData').facebook.access_token);
 	    			response.error(httpResponse.status);
 	  			}
 	  		});
@@ -900,7 +881,6 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 	{
 		var store = patronStore.get("Store");
 		var facebookPost = patronStore.get("FacebookPost");
-		var freePunches = store.get("punches_facebook");
 		
 		store.relation("FacebookPosts").add( facebookPost );
 		
