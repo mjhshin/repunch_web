@@ -884,11 +884,8 @@ Parse.Cloud.define("post_to_facebook", function(request, response)
 		
 		store.relation("FacebookPosts").add( facebookPost );
 		
-		if (acceptPost) {
 		patronStore.increment("all_time_punches", freePunches);
 		patronStore.increment("punch_count", freePunches);
-		}
-		
 		patronStore.set("FacebookPost", null);
 
 		var promises = [];
