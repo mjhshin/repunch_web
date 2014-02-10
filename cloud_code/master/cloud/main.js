@@ -16,7 +16,6 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	var PunchCode = Parse.Object.extend("PunchCode");
 	var patron, user, punchCode;
 	
-	var userQuery = new Parse.Query(Parse.User);
 	var punchCodeQuery = new Parse.Query(PunchCode);
 	punchCodeQuery.equalTo("is_taken", false);
 	
@@ -628,7 +627,6 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 	store.id = storeId;
 	
 	var storeQuery = new Parse.Query(Store);
-	var patronQuery = new Parse.Query(Store);
 	var patronStoreQuery = new Parse.Query(PatronStore);
 	
 	patronStoreQuery.equalTo("Patron", patron);
