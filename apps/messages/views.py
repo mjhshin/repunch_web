@@ -115,6 +115,9 @@ def index(request):
 @login_required
 @admin_only(reverse_url="messages_index")
 def message_no_limit(request):
+    if PRODUCTION_SERVER:
+        raise Http404 
+
     if request.method == "GET":
         request.session["message_limit_off"] = True
         return HttpResponse("Limit for sending messages has been turned off." +\
