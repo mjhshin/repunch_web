@@ -20,6 +20,7 @@ from parse.apps.stores.models import Store
 SESSION_CACHE = [
     # temps
     'message_count',
+    'message_limit_off',
     'patronStore_count', # PUSH
     'store_timezone',
     "active_store_location_id",

@@ -19,7 +19,7 @@ from parse.apps.messages import BASIC, OFFER, FEEDBACK, FILTERS
 from apps.messages.forms import MessageForm
 from parse.apps.accounts import sub_type
 from repunch.settings import PAGINATION_THRESHOLD, DEBUG,\
-COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+PRODUCTION_SERVER, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from libs.repunch import rputils
 from libs.dateutil.relativedelta import relativedelta
 
@@ -111,6 +111,16 @@ def index(request):
     data['tab_feedback'] = request.GET.get('tab_feedback')
     return render(request, 'manage/messages.djhtml', data)
 
+@dev_login_required
+@login_required
+@admin_only(reverse_url="messages_index")
+def message_no_limit(request):
+    if request.method == "GET":
+        request.session["message_limit_off"] = True
+        return HttpResponse("Limit for sending messages has been turned off." +\
+            "To turn it back on, please log out and log back in.")
+    
+    return HttpResponse("fail")
 
 @dev_login_required
 @login_required
@@ -160,7 +170,11 @@ def edit(request, message_id):
                                     
             limit_reached = message_count >= sub_type[subType]['max_messages']
             
-            if limit_reached:
+            # we always enforce the limit when we are in production
+            # otherwise, we ignore it if we have message_limit_off in our session
+            if limit_reached and (PRODUCTION_SERVER or\
+                (not PRODUCTION_SERVER and "message_limit_off" not in request.session)):
+                
                 if subType != 2:
                     data['limit_reached'] = limit_reached
                     # save the dict to the session

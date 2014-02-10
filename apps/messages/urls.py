@@ -15,5 +15,8 @@ urlpatterns = patterns('apps.messages.views',
     url(r'^feedback/(?P<feedback_id>\w+)/delete$', 'feedback_delete',
                                             name='feedback_delete'),
                                             
+    url(r'^no-message-limit$', 'message_no_limit',
+                                            name='message_no_limit'),
+                                            
     url(r'^message-page$', 'get_page', name='message_page')
 )
