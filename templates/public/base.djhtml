@@ -65,7 +65,7 @@
 				<li class="menuitem">
 					<span>Follow us:</span>
 					<a href="https://www.facebook.com/Repunch" target="_blank"><img src="{% static "public/images/icon_facebook.png" %}" alt="Follow Us in Facebook"></a>
-					<a href="https://twitter.com/repunchapp" target="_blank"><img src="{% static "public/images/icon_twitter.png" %}" alt="Follow Us in twitter"></a>
+					<a href="https://twitter.com/RepunchApp" target="_blank"><img src="{% static "public/images/icon_twitter.png" %}" alt="Follow Us in twitter"></a>
 				</li>
 			</ul>
 			<div id="footer-links">

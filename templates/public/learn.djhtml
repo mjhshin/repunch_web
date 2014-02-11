@@ -149,7 +149,6 @@ ul.orangy li div {
 					<aside class="col1" style="width:100%;">
 						<h2><!--<img src="{% static "public/images/icon_avatar-orange.png" %}" alt="">-->Control Repunch Activity</h2><br />
 						<ul class="orangy">
-						
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points" >CHOOSE HOW TO PUNCH AND REDEEM</span> <div>Input a customer's Punch Code right into the dashboard from your internet-enabled POS, computer, or tablet.</div><br/><div>Or use our Retailer Mobile App. Your employees can download the app onto their devices and begin granting punches once you authorize them.</div><br/><div>If you would prefer to have Repunch-enabled devices, we can supply these to you at cost.</div></li>
 							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points">PREVENT FRAUD</span> <div>We automatically let you know about any suspicious activity that may occur. Details include the name of the employee and the abnormal quantity or time of the punches.</div></li>
 						
@@ -157,7 +156,12 @@ ul.orangy li div {
 						
 					    {# PLANS AND PRICING #}
 					    <h2>Plans & Pricing</h2>
-					    TODO
+					    <ul class="orangy">
+							<li><span class="blue bold"><img src="{% static "public/images/icon_tag-orange.png" %}" alt="" class="ul-points" >
+							REPUNCH IS ABSOLUTELY FREE TO START
+							</span>
+							<div>You only begin paying a modest fee once we are demonstrating tangible value for your business.<br/>We would love to discuss our pricing options with you. Please <a href="{% url 'public_contact' %}">contact us</a> or <a href="{% url 'public_signup' %}">sign-up</a> below risk free.</div></li>
+						</ul>
 					    {# END PLANS AND PRICING #}
                     </aside>		
                     
