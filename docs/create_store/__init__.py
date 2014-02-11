@@ -216,7 +216,6 @@ class StoreLocationCoverUpdater(ImageHolder):
                 delete_file(loc.cover_image, "image/png")
                 
             loc.cover_image = cover.get("name")
-            loc.store_avatar = loc.cover_image
             loc.update()
             
             print "Updated StoreLocation #%d: %s" % (i, loc.objectId)

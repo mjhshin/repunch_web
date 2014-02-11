@@ -128,8 +128,6 @@ def edit_location(request, store_location_id):
             store_location = StoreLocation(**store_location.__dict__)
             store_location.update_locally(postDict, False)
             store_location.cover_image_url = image_url
-            # below for backwwards compat
-            store_location.store_avatar_url = image_url
             
         if store_location_form.is_valid(): 
             # validate and format the hours
@@ -169,9 +167,6 @@ def edit_location(request, store_location_id):
                     new_image = new_image[0]
                     store_location.cover_image = new_image.image_name
                     store_location.cover_image_url = new_image.image_url
-                    # below for backwards compat
-                    store_location.store_avatar = store_location.cover_image
-                    store_location.store_avatar_url = store_location.cover_image_url
                     new_image.delete(False)
                   
                 store_location.Store = store.objectId  
@@ -441,9 +436,12 @@ def image_crop(request, store_location_id):
                 setattr(s, image_name, res.get('name'))
                 setattr(s, image_name+"_url", res.get('url').replace(\
                     "http:/", "https://s3.amazonaws.com"))
-                # below here for backwards compat
-                s.store_avatar = getattr(s, image_name)
-                s.store_avatar_url = getattr(s, image_name+"_url")
+                    
+                # below here for backwards compat - only if Store
+                if store_location_id == 'x':
+                    s.store_avatar = getattr(s, image_name)
+                    s.store_avatar_url = getattr(s, image_name+"_url")
+                    
                 s.update()
                     
         # delete the model and file since it's useless to keep

@@ -231,8 +231,6 @@ class StoreLocation(ParseObject):
         self.hours = data.get("hours", []) 
         
         self.cover_image = data.get("cover_image")
-        # still here for backwards compat
-        self.store_avatar = data.get('store_avatar') 
         
         self.Store = data.get("Store")
         

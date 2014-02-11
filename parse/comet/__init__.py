@@ -333,10 +333,6 @@ def comet_receive(store_id, postDict, session_key=None):
             # have to add the image url manually
             store_location.cover_image_url =\
                 updatedStoreLocation.get("cover_image_url")
-            # below here for backwards compat
-            store_location.store_avatar_url =\
-                store_location.cover_image_url
-                
             session['store_locations'][store_location.objectId] =\
                 store_location
                 
@@ -354,10 +350,6 @@ def comet_receive(store_id, postDict, session_key=None):
             if store_location:
                 store_location.cover_image = updatedStoreLocationCoverName
                 store_location.cover_image_url = postDict.get("updatedStoreLocationCoverUrl")
-                # below here for backwards compat
-                store_location.store_avatar = store_location.cover_image
-                store_location.store_avatar_url = store_location.cover_image_url
-                
                 session['store_locations'][store_location.objectId] = store_location    
 
             

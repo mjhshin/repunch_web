@@ -157,33 +157,8 @@ ul.orangy li div {
 						
 					    {# PLANS AND PRICING #}
 					    <h2>Plans & Pricing</h2>
-					    <ul class="orangy">
-						    <li>
-                            <div class="bkg_price-plan-box">
-                                <h3>{{ sub_type.0.name }}</h3>
-                                <p class="orange-text">${{ sub_type.0.monthly_cost }}</p>
-                                <p class="blue-text">Fewer than 50 Users</p>
-                                <span>Send up to 2 messages or<br/>time-sensitive offers to your customers' Repunch app<br/>every month</span>
-                            </div>
-                                
-                            <div class="bkg_price-plan-box">
-                                <h3>{{ sub_type.1.name }}</h3>
-                                <p class="orange-text">${{ sub_type.1.monthly_cost }}</p>
-                                <p class="blue-text">50-100 Users</p>
-                                <span>Send up to 4 messages/month</span>
-                            </div>
-                                
-                            <div class="bkg_price-plan-box">
-                                <h3>{{ sub_type.2.name }}</h3>
-                                <p class="orange-text">${{ sub_type.2.monthly_cost }}</p>
-                                <p class="blue-text">Unlimited Users</p>
-                                <span>Send up to 8 messages/month<br/><span style="line-height:30px;">Premium marketing campaigns</span></span>
-                            </div>
-                                
-						    </li>
-						    {# END PLANS AND PRICING #}
-			    			
-						</ul>
+					    TODO
+					    {# END PLANS AND PRICING #}
                     </aside>		
                     
 					<aside class="col2" style="width:0px;">
