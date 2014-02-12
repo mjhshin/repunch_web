@@ -9,30 +9,32 @@
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
-<script type="text/javascript" src="{% static 'manage/js/image_upload.1.5.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/image_upload.1.6.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
     {% with store=request.session.store %}
 
     {# REQUIRED FOR IMAGE UPLOAD JS #}
-    <input type="hidden" id="get_image_url" value="{% url 'store_image_get' 'x' %}" />
+    <input type="hidden" id="get_image_url" value="{% url 'store_image_get' %}" />
     <input type="hidden" id="get_image_id" value="store_thumbnail" />
 	
 	<form action="{% url 'store_edit' %}" method="POST" id="store-edit-form">{% csrf_token %}
 	
 		<div id="photo-edit">
 			<div class="white-box">
-                <a href="{% url 'store_image_upload' 'x' %}" id="upload-image">
-	            {% if store.thumbnail_image_url %}
-	                <img src="{{ store.thumbnail_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_thumbnail"/>
+	            {% if store.thumbnail_image_url and store.cover_image_url %}
+                <a href="{% url 'store_image_view_cover' %}" class="upload-image">
+                    <img src="{{ store.thumbnail_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_thumbnail"/>
+                </a>
 	            {% else %}
+                <a href="{% url 'store_image_upload' %}" class="upload-image">
 	                <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" alt="" id="store_thumbnail"
 	                    class="image-big" width="200px" height="200px"/>
-                {% endif %}
                 </a>
+                {% endif %}
 			</div>
-			<a href="{% url 'store_image_upload' 'x' %}" id="upload-image">Add/Change Photo</a>
+			<a href="{% url 'store_image_upload' %}" class="upload-image">Add/Change Photo</a>
 		</div>
 	
 		

@@ -4,8 +4,9 @@ Helpers methods for parse.apps to enfore the DRY principle.
 from django.utils import timezone
 from dateutil.tz import tzutc
 from dateutil import parser
-import json, httplib, urllib, re
 from PIL import Image
+from random import randint
+import json, httplib, urllib, re, os
 
 from repunch.settings import PARSE_VERSION, PARSE_BATCH_LIMIT,\
 REST_CONNECTION_META, SUPPORTED_IMAGE_FORMATS,\
@@ -133,7 +134,7 @@ def account_login(username, password):
     return parse("GET", "login", query=\
                 {"username":username, "password":password} )
 
-def rescale(image_path, img_format, size, crop_coords=None):
+def rescale(image_path, img_format, size=None, crop_coords=None):
     """
     size is a tuple (width, height).
     """
@@ -147,20 +148,25 @@ def rescale(image_path, img_format, size, crop_coords=None):
         y2 = crop_coords["y2"]
         img = img.crop((x1, y1, x2, y2))
         
-    img = img.resize(size, Image.ANTIALIAS)
-    img.save(image_path, img_format)
+    if size:
+        size = int(size[0]), int(size[1])
+        img = img.resize(size, Image.ANTIALIAS)
+        
+    # save to a different path so we don't modify the image in the given path
+    tmp_path = image_path + str(randint(0, 999)).zfill(3)
+    img.save(tmp_path, img_format)
+    return tmp_path
 
-def create_png(file_path, size, coords=None):
+def create_png(file_path, size=None, coords=None):
     """ 
     creates the given uploadedFile, which is a png image.
     """
-    im = Image.open(file_path)
-    im.save(file_path, 'png')
-    rescale(file_path, 'png', size, coords)
-    file_name = file_path.split("/")[-1]
+    tmp_path = rescale(file_path, 'png', size, coords)
     res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-                file_name), file_path, content_type="image/png")
-    return res 
+        file_path.split("/")[-1]), tmp_path , content_type="image/png") 
+    # now delete the tmp path that was created
+    os.remove(tmp_path)    
+    return res
 
 def delete_file(name, content_type):
     """ deletes the given file """   

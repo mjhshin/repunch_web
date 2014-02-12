@@ -19,7 +19,7 @@ import requests
 from parse.utils import create_png, delete_file
 from parse.apps.accounts.models import Account
 from parse.apps.stores.models import Store, StoreLocation, Settings, Subscription
-from repunch.settings import TIME_ZONE, IMAGE_THUMBNAIL_SIZE, IMAGE_COVER_SIZE
+from repunch.settings import TIME_ZONE, IMAGE_THUMBNAIL_SIZE
 
 DIR = "docs/create_store/"
 
@@ -116,15 +116,17 @@ class RandomStoreGenerator(ImageHolder):
                 print "Retrying create_png"
                 thumbnail = create_png(TMP_IMG_PATH)
                 
-            cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
+            cover = create_png(TMP_IMG_PATH)
             while "error" in cover:
                 print "Retrying create_png"
-                cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
+                cover = create_png(TMP_IMG_PATH)
             
             store_i.update({
                 "store_name": store_name,
                 "first_name": first_name,
                 "last_name": last_name,
+                "thumbnail_image": thumbnail.get("name"),
+                "cover_image": cover.get("name"),
             })
             store_location_i.update({
                 "street": street,
@@ -135,8 +137,6 @@ class RandomStoreGenerator(ImageHolder):
                 "country": country,
                 "phone_number": phone_number,
                 "coordinates": self.get_random_coordinates(),
-                "thumbnail_image": thumbnail.get("name"),
-                "cover_image": cover.get("name"),
             })
             
             # create the store
@@ -198,27 +198,6 @@ class RandomStoreGenerator(ImageHolder):
         longitude = float("".join(longitude))
         return [latitude, longitude]    
         
-class StoreLocationCoverUpdater(ImageHolder):
-    """
-    Replaces cover images for all store locations with new ones.
-    """
-    
-    def update_covers(self):
-        for i, loc in enumerate(StoreLocation.objects().filter(limit=999)):
-            self.get_store_location_image(i)
-            cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
-            while "error" in cover:
-                print "Retrying create_png"
-                cover = create_png(TMP_IMG_PATH, IMAGE_COVER_SIZE)
-          
-            # delete cover if exist
-            if loc.cover_image:
-                delete_file(loc.cover_image, "image/png")
-                
-            loc.cover_image = cover.get("name")
-            loc.update()
-            
-            print "Updated StoreLocation #%d: %s" % (i, loc.objectId)
       
 class StoreThumbnailResizer(ImageHolder):
     """
@@ -247,5 +226,4 @@ class StoreThumbnailResizer(ImageHolder):
                 
 if __name__ == "__main__":
     # RandomStoreGenerator().create_random_stores(200)
-    # StoreLocationCoverUpdater().update_covers()
     StoreThumbnailResizer().resize_thumbnails()

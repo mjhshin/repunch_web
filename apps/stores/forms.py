@@ -1,5 +1,6 @@
 from django import forms
 from django.utils import timezone
+from django.core.files.images import get_image_dimensions
 from random import randint
 import os, re, datetime
 
@@ -7,8 +8,9 @@ from models import Store, UploadedImageFile
 from libs.repunch import rputils, rpforms, rpccutils
 from libs.repunch.validators import alphanumeric, numeric, required,\
 alphanumeric_no_space
-from repunch import settings
 from parse.apps.accounts.models import Account
+from repunch.settings import IMAGE_COVER_MIN_EDGE,\
+IMAGE_COVER_ASPECT_RATIO_RANGE
 
 class StoreLocationForm(forms.Form):
     street = forms.CharField(max_length=255,
@@ -77,6 +79,53 @@ class UploadImageForm(forms.Form):
     
     image = forms.ImageField(widget=forms.ClearableFileInput(attrs=\
         {"accept":"image/*"}))
+        
+    def clean_image(self):
+        """
+        The aspect ratio must be from 16:9 to 9:16.
+        The shortest edge must be at least IMAGE_COVER_MIN_EDGE.
+        
+        We do not check for the longest edge. If we happen to exceed
+        it, we will simply scale to down to IMAGE_COVER_MAX_EDGE and
+        maintain the aspect ratio.
+        """
+        image = self.cleaned_data.get("image")
+        
+        if not image:
+            raise forms.ValidationError(\
+                "Image is corrupted or not supported.")
+                
+        width, height = get_image_dimensions(image)
+        width, height = float(width), float(height)
+
+        # first check for aspect ratio
+        min_aspect, max_aspect = IMAGE_COVER_ASPECT_RATIO_RANGE
+        min_aspect = min_aspect[0] / min_aspect[1]
+        max_aspect = max_aspect[0] / max_aspect[1]
+        
+        if height <= 0.0: # prevent division by 0
+            img_aspect = 0.0
+        else:
+            img_aspect = width/height
+            
+        if img_aspect < min_aspect or img_aspect > max_aspect:
+            raise forms.ValidationError(\
+                "Image aspect ratio must be between 16:9 and 9:16")
+                
+        # now check for min and max edges
+        if width < height and width < IMAGE_COVER_MIN_EDGE:
+            raise forms.ValidationError(\
+                "Image width must be at least " + str(IMAGE_COVER_MIN_EDGE))
+        
+        elif width > height and height < IMAGE_COVER_MIN_EDGE:
+            raise forms.ValidationError(\
+                "Image height must be at least " + str(IMAGE_COVER_MIN_EDGE))
+            
+        elif width == height and width < IMAGE_COVER_MIN_EDGE:
+            raise forms.ValidationError(\
+                "Image width must be at least " + str(IMAGE_COVER_MIN_EDGE))
+            
+        return image
    
     def save(self, session_key):    
         def rename():
@@ -89,6 +138,7 @@ class UploadImageForm(forms.Form):
                  timezone.now().strftime("%d%H%M%S") +\
                  str(randint(0, 999)).zfill(3))
             return uploaded_img
+            
         # remove previous session image
         img = UploadedImageFile.objects.filter(session_key=session_key)
         if img:

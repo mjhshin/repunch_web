@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-	$('a#upload-image').click(function(e) {
+	$('a.upload-image').click(function(e) {
 		e.preventDefault();
 		var $this = $(this);
 		var href = $this.attr('href');

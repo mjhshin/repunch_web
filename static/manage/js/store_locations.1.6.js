@@ -16,7 +16,7 @@ var NAV_ITEM_HEIGHT = 40 + 20 + 1;
 // need to know the height of the active nav item (height + padding + border)
 var NAV_ITEM_ACTIVE_HEIGHT = 70 + 20 + 1;
 // the amount of items before the scroll arrows are shown
-var NAV_ITEM_SCROLL = 8;
+var NAV_ITEM_SCROLL = 5;
 // height of the scroll arrows (height + padding)
 var SCROLL_ARROW_HEIGHT = 10 + 10;
 // height of the add button (height + padding)
@@ -231,7 +231,7 @@ function setActiveStoreLocationInStoreDetails(storeLocationId) {
     the right border does not break
 */
 function fixNavContentNavHeight() {
-    $(".store-locations.navcontent > div.nav").css("height", $(".store-locations.navcontent").css("height"));
+    $(".store-locations.navcontent > div.nav").css("height", $(".store-locations.navcontent > .content").css("height"));
 
 }
 

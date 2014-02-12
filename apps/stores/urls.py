@@ -6,9 +6,11 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^hours$', 'hours_preview', name='store_hours'),
     url(r'^set-active-location$', 'set_active_location', name='store_set_active_location'),
     
-    url(r'^image-upload/(?P<store_location_id>.+)$', 'image_upload', name='store_image_upload'),
-    url(r'^image-get/(?P<store_location_id>.+)$', 'image_get', name='store_image_get'),
-    url(r'^image-crop/(?P<store_location_id>.+)$', 'image_crop', name='store_image_crop'),
+    url(r'^image-view/cover$', 'image_view_cover', name='store_image_view_cover'),
+    url(r'^image-upload$', 'image_upload', name='store_image_upload'),
+    url(r'^image-get$', 'image_get', name='store_image_get'),
+    url(r'^image-crop$', 'image_crop', name='store_image_crop'),
+    
     url(r'^edit-location/(?P<store_location_id>.+)$', 'edit_location', name='store_location_edit'),
     
     url(r'^settings$', 'settings', name='store_settings'),

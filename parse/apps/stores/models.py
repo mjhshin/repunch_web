@@ -45,6 +45,7 @@ class Store(ParseObject):
         self.store_description = data.get('store_description')
         
         self.thumbnail_image = data.get("thumbnail_image")
+        self.cover_image = data.get("cover_image")
         # still here for backwards compat
         self.store_avatar = data.get('store_avatar')
         
@@ -229,8 +230,6 @@ class StoreLocation(ParseObject):
         # [{"day":1,"open_time":"0900","close_time":"2200"}, 
         #    ... up to day 7]
         self.hours = data.get("hours", []) 
-        
-        self.cover_image = data.get("cover_image")
         
         self.Store = data.get("Store")
         

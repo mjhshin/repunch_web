@@ -53,9 +53,8 @@ def comet_receive(store_id, postDict, session_key=None):
         
         updatedStoreThumbnailName
         updatedStoreThumbnailUrl
-        updatedStoreLocationCoverID
-        updatedStoreLocationCoverName
-        updatedStoreLocationCoverUrl
+        updatedStoreCoverName
+        updatedStoreCoverUrl
         
         updatedPunchesFacebook_int
         patronStore_int
@@ -300,6 +299,7 @@ def comet_receive(store_id, postDict, session_key=None):
             store = Store(**updatedStore)
             # have to add the image url manually
             store.thumbnail_image_url = updatedStore.get("thumbnail_image_url")
+            store.cover_image_url = updatedStore.get("cover_image_url")
             # below here for backwards compat
             store.store_avatar_url = store.thumbnail_image_url
             session['store'] = store
@@ -313,6 +313,14 @@ def comet_receive(store_id, postDict, session_key=None):
             store.store_avatar = store.thumbnail_image
             store.store_avatar_url = store.thumbnail_image_url
             session['store'] = store
+            
+            
+        updatedStoreCoverName = postDict.get("updatedStoreCoverName")
+        if updatedStoreCoverName:
+            store = session['store']
+            store.cover_image = updatedStoreCoverName
+            store.cover_image_url = postDict.get("updatedStoreCoverUrl")
+            session['store'] = store 
         
         # this is in the settings tab in the dashboard but the field
         # is in the Store class
@@ -324,15 +332,15 @@ def comet_receive(store_id, postDict, session_key=None):
             session['store'] = store
             
             
+            
+            
+            
         #############################################################
         # STORE LOCATION UPDATED ##############################
         ### Note that this is also being used to insert new StoreLocations
         updatedStoreLocation = postDict.get("updatedStoreLocation")
         if updatedStoreLocation:
             store_location = StoreLocation(**updatedStoreLocation)
-            # have to add the image url manually
-            store_location.cover_image_url =\
-                updatedStoreLocation.get("cover_image_url")
             session['store_locations'][store_location.objectId] =\
                 store_location
                 
@@ -342,15 +350,6 @@ def comet_receive(store_id, postDict, session_key=None):
             except Exception: # assign a default timezone
                 session['store_timezone'] =\
                     pytz.timezone(TIME_ZONE)
-               
-        updatedStoreLocationCoverName = postDict.get("updatedStoreLocationCoverName")
-        if updatedStoreLocationCoverName:
-            store_location = SESSION.get_store_location(session,
-                postDict.get('updatedStoreLocationCoverID'))
-            if store_location:
-                store_location.cover_image = updatedStoreLocationCoverName
-                store_location.cover_image_url = postDict.get("updatedStoreLocationCoverUrl")
-                session['store_locations'][store_location.objectId] = store_location    
 
             
         #############################################################

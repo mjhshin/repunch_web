@@ -1,0 +1,17 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href='http{% if not request.session.dev_token %}s{% endif %}://fonts.googleapis.com/css?family=Cabin:400,600,700' rel='stylesheet' type='text/css' />
+	<link href="{% static 'manage/css/global.2.5.css' %}" rel="stylesheet" />
+	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
+    <script src="{% static 'manage/js/jquery/jquery-ui.min.js' %}"></script>
+</head>
+<body style="background-image: none; background-color: transparent;" >
+	<img src="{{ image_url }}" style="display:block;" />
+	<div id="view-image-options" class="form-options">
+		<a onclick="window.parent.cancelImageUpload(); return false;" href="#" class="red">Go back</a>
+	</div>
+</body>
+</html>

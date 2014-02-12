@@ -20,7 +20,7 @@ from libs.repunch.rputils import get_timezone, get_map_data
 
 from repunch.settings import MEDIA_ROOT, TIME_ZONE,\
 COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY, IMAGE_THUMBNAIL_SIZE,\
-IMAGE_THUMBNAIL_ASPECT_RATIO, IMAGE_COVER_SIZE, IMAGE_COVER_ASPECT_RATIO
+IMAGE_THUMBNAIL_ASPECT_RATIO, IMAGE_COVER_MAX_EDGE
 from parse.apps.patrons.models import Patron
 from parse import session as SESSION
 from parse.comet import comet_receive
@@ -121,13 +121,8 @@ def edit_location(request, store_location_id):
         if new_location:
             store_location = StoreLocation(**postDict)
         else:
-            store_location = SESSION.get_store_location(\
-                request.session, store_location_id)
-            # the image url will be lost in the creation so add it in
-            image_url = store_location.get("cover_image_url")
             store_location = StoreLocation(**store_location.__dict__)
             store_location.update_locally(postDict, False)
-            store_location.cover_image_url = image_url
             
         if store_location_form.is_valid(): 
             # validate and format the hours
@@ -160,15 +155,6 @@ def edit_location(request, store_location_id):
                     map_data.get("neighborhood")))
            
             if new_location:
-                # add the image file if exist
-                new_image = UploadedAndCreatedImageFile.objects.filter(\
-                    session_key=request.session.session_key)
-                if new_image:
-                    new_image = new_image[0]
-                    store_location.cover_image = new_image.image_name
-                    store_location.cover_image_url = new_image.image_url
-                    new_image.delete(False)
-                  
                 store_location.Store = store.objectId  
                 store_location.create()
                 store.array_add_unique("store_locations", [store_location])
@@ -182,8 +168,6 @@ def edit_location(request, store_location_id):
                     store.inherit_store_location(store_location)
                     store.update()
             
-            # the store location at this point has lost its
-            # image_url so we need to update that too 
             payload = {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "updatedStore": store.jsonify(),
@@ -211,12 +195,6 @@ def edit_location(request, store_location_id):
             }), content_type="application/json")
             
         else:
-            new_image = UploadedAndCreatedImageFile.objects.filter(\
-                session_key=request.session.session_key)
-            if new_image:
-                data['store_location_image_url'] =\
-                    new_image[0].image_url
-                
             data['store_location'] = store_location
             data['hours_data'] = hours._format_javascript_input()
             
@@ -271,9 +249,19 @@ def hours_preview(request):
 @dev_login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
+def image_view_cover(request):
+    return render(request, 'manage/image_view.html', {
+        "image_url":\
+            SESSION.get_store(request.session).get("cover_image_url"),
+    })
+
+
+@login_required
+@dev_login_required
+@access_required(http_response="<h1>Access denied</h1>",\
+content_type="text/html")
 @csrf_exempt
-def image_upload(request, store_location_id):
-    """ image upload for both location and store """
+def image_upload(request):
     if request.method == 'POST': 
         form = UploadImageForm(request.POST, request.FILES)
         if form.is_valid():
@@ -294,22 +282,14 @@ def image_upload(request, store_location_id):
                 init_y1 = center_height - image.width/2
                 init_y2 = center_height + image.width/2
                 
-            if store_location_id == "x":
-                aspect_ratio = IMAGE_THUMBNAIL_ASPECT_RATIO
-                
-            else:
-                aspect_ratio = IMAGE_COVER_ASPECT_RATIO
-                
                 
             return render(request, 'manage/image_crop.djhtml', {
-                "store_location_id": store_location_id,
                 'image': image,
                 'init_x1': init_x1,
                 'init_y1': init_y1,
                 'init_x2': init_x2,
                 'init_y2': init_y2,
-                'aspect_ratio':\
-                    float(aspect_ratio[0])/float(aspect_ratio[1]), 
+                'aspect_ratio': IMAGE_THUMBNAIL_ASPECT_RATIO, 
             })
             
     else:
@@ -317,36 +297,20 @@ def image_upload(request, store_location_id):
     
     return render(request, 'manage/image_upload.djhtml', {
         'form': form,
-        'url': reverse('store_image_upload', args=(store_location_id,))
+        'url': reverse('store_image_upload')
     })
     
 @dev_login_required
 @login_required
 @access_required(http_response="<h1>Access denied</h1>",\
 content_type="text/html")
-def image_get(request, store_location_id):
+def image_get(request):
     """
-    If store_location_id is '0' then it refers to a new StoreLocation,
-    'x' refers to the Store, and anything else refers to an existing
-    StoreLocation.
     """
     if request.method == "GET":
-        
-        if store_location_id == '0':
-            store_image_url = UploadedAndCreatedImageFile.objects.get(\
-                session_key=request.session.session_key).image_url
-                
-        elif store_location_id == 'x':
-            store_image_url =\
-                SESSION.get_store(request.session).thumbnail_image_url
-                
-        else:
-            store_image_url = SESSION.get_store_location(\
-                request.session, store_location_id).get("cover_image_url")
-    
         return HttpResponse(json.dumps({
-            "src": store_image_url,
-            "thumbnail": store_location_id == 'x',
+            "src": SESSION.get_store(request.session).thumbnail_image_url,
+            "thumbnail": True,
         }), content_type="application/json")
         
     raise Http404
@@ -356,41 +320,26 @@ def image_get(request, store_location_id):
 @admin_only(http_response="<h1>Permission denied</h1>",\
 content_type="text/html")
 @csrf_exempt
-def image_crop(request, store_location_id):
+def image_crop(request):
     """
     Takes in crop coordinates and creates a new png image.
-    
-    If store_location_id is '0' then it refers to a new StoreLocation,
-    'x' refers to the Store, and anything else refers to an existing
-    StoreLocation.
     """
     if request.method == "POST":
-        data = {"store_location_id": store_location_id}
+        data = {}
         store = SESSION.get_store(request.session)
         
-        new_location = store_location_id == '0'
-        old_image = None
-        
-        image_size = IMAGE_COVER_SIZE
-        if not new_location:
-            store_location = SESSION.get_store_location(\
-                request.session, store_location_id)
-            if store_location_id == 'x':
-                s = store
-                image_name = "thumbnail_image"
-                image_size = IMAGE_THUMBNAIL_SIZE
-            else:
-                s = store_location
-                image_name = "cover_image"
-            
-            if s.get(image_name):
-                old_image = s.get(image_name)
+        old_cover, old_thumbnail = None, None
+        if store.get("cover_image"):
+            old_cover = store.get("cover_image")
+        if store.get("thumbnail_image"):
+            old_thumbnail = store.get("thumbnail_image")
             
         # if there are 2 windows with the same session_key editing the 
         # store image, the image will be deleted by the first window
         # to crop. The 2nd window will then have no image.
         image = UploadedImageFile.objects.filter(session_key=\
             request.session.session_key)
+            
         if not image:
             # flag the execution of image Crop Complete js function
             data['success'] = True
@@ -398,6 +347,7 @@ def image_crop(request, store_location_id):
             
         image = image[0]
         
+        # the crop coords are used for the thumbnail_image
         crop_coords = None
         if len(request.POST["x1"]) > 0:
             crop_coords = {
@@ -407,70 +357,69 @@ def image_crop(request, store_location_id):
                 "y2": int(request.POST["y2"].split(".")[0]),
             }
         
+        # at this point our image has been validated at image_upload
+        # we still need to scale it down if the max edge exceeded
+        width, height = image.image.width, image.image.height
+        width, height = float(width), float(height)
+        aspect = width / height
+        
+        if height > width and height > IMAGE_COVER_MAX_EDGE:
+            height = IMAGE_COVER_MAX_EDGE
+            width = height * aspect
+                
+        elif width > height and width > IMAGE_COVER_MAX_EDGE:
+            width = IMAGE_COVER_MAX_EDGE
+            height = width / aspect
+            
+        elif width == height and width > IMAGE_COVER_MAX_EDGE:
+            width = IMAGE_COVER_MAX_EDGE
+            height = width
+        
         # save the session before a cloud call!
         request.session.save()
-        res = create_png(image.image.path, image_size, crop_coords)
+        
+        res_cover = create_png(image.image.path, (width,height), None)
+        res_thumbnail = create_png(image.image.path, IMAGE_THUMBNAIL_SIZE, crop_coords)
         
         # make sure that we have the latest session
         session = SessionStore(request.session.session_key)
         store = SESSION.get_store(session)
         
-        if res and 'error' not in res:
-            if new_location:
-                # first delete an exiting object if any
-                new_image = UploadedAndCreatedImageFile.objects.filter(\
-                    session_key=request.session.session_key)
-                    
-                if new_image:
-                    # delete the file from parse as well
-                    new_image[0].delete(True)
-                    
-                # create new 1 for get image and saving the new
-                # StoreLocation, which is where this will be deleted
-                UploadedAndCreatedImageFile.objects.create(\
-                    session_key=request.session.session_key,
-                    image_name=res.get('name'),
-                    image_url=res.get('url'))
+        if res_cover and 'error' not in res_cover:
+            setattr(store, "cover_image", res_cover.get('name'))
+            setattr(store, "cover_image_url", res_cover.get('url').replace(\
+                "http:/", "https://s3.amazonaws.com"))
+        
+        if res_thumbnail and 'error' not in res_thumbnail:
+            setattr(store, "thumbnail_image", res_thumbnail.get('name'))
+            setattr(store, "thumbnail_image_url", res_thumbnail.get('url').replace(\
+                "http:/", "https://s3.amazonaws.com"))
                 
-            else:
-                setattr(s, image_name, res.get('name'))
-                setattr(s, image_name+"_url", res.get('url').replace(\
-                    "http:/", "https://s3.amazonaws.com"))
-                    
-                # below here for backwards compat - only if Store
-                if store_location_id == 'x':
-                    s.store_avatar = getattr(s, image_name)
-                    s.store_avatar_url = getattr(s, image_name+"_url")
-                    
-                s.update()
-                    
+            # below here for backwards compat
+            store.store_avatar = getattr(store, "thumbnail_image")
+            store.store_avatar_url = getattr(store, "thumbnail_image_url")
+            store.update()
+                
         # delete the model and file since it's useless to keep
         image.delete()
         
-        if not new_location:
-            # notify other dashboards of this change
-            payload = {
-                COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-            }
-            
-            if str(store_location_id) == 'x': # Store
-                payload.update({
-                    "updatedStoreThumbnailName": s.thumbnail_image,
-                    "updatedStoreThumbnailUrl": s.thumbnail_image_url,
-                })
-                
-            else: # existing StoreLocation
-                payload.update({
-                    "updatedStoreLocationCoverID": s.objectId,
-                    "updatedStoreLocationCoverName": s.cover_image,
-                    "updatedStoreLocationCoverUrl": s.cover_image_url,
-                })
-            
-            comet_receive(store.objectId, payload)
+        # notify other dashboards of this change
+        payload = {
+            COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+            "updatedStoreThumbnailName": store.thumbnail_image,
+            "updatedStoreThumbnailUrl": store.thumbnail_image_url,
+            "updatedStoreCoverName": store.cover_image,
+            "updatedStoreCoverUrl": store.cover_image_url,
+        }
         
-        # need to remove old file
-        if old_image:
-            delete_file(old_image, 'image/png')
+        comet_receive(store.objectId, payload)
+        
+        # need to remove old files
+        if old_cover:
+            delete_file(old_cover, 'image/png')
+            
+        if old_thumbnail:
+            delete_file(old_thumbnail, 'image/png')
         
         # flag the execution of image Crop Complete js function
         data['success'] = True
