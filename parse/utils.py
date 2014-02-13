@@ -134,7 +134,7 @@ def account_login(username, password):
     return parse("GET", "login", query=\
                 {"username":username, "password":password} )
 
-def rescale(image_path, img_format, size=None, crop_coords=None):
+def rescale_crop(image_path, img_format, size=None, crop_coords=None):
     """
     size is a tuple (width, height).
     """
@@ -149,8 +149,7 @@ def rescale(image_path, img_format, size=None, crop_coords=None):
         img = img.crop((x1, y1, x2, y2))
         
     if size:
-        size = int(size[0]), int(size[1])
-        img = img.resize(size, Image.ANTIALIAS)
+        img = img.resize((int(size[0]), int(size[1])), Image.ANTIALIAS)
         
     # save to a different path so we don't modify the image in the given path
     tmp_path = image_path + str(randint(0, 999)).zfill(3)
@@ -161,11 +160,16 @@ def create_png(file_path, size=None, coords=None):
     """ 
     creates the given uploadedFile, which is a png image.
     """
-    tmp_path = rescale(file_path, 'png', size, coords)
-    res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
-        file_path.split("/")[-1]), tmp_path , content_type="image/png") 
-    # now delete the tmp path that was created
-    os.remove(tmp_path)    
+    if size or coords:
+        tmp_path = rescale_crop(file_path, 'png', size, coords)
+        res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
+            file_path.split("/")[-1]), tmp_path , content_type="image/png") 
+        # now delete the tmp path that was created
+        os.remove(tmp_path) 
+    else:
+        res = parse("POST", 'files/' + BAD_FILE_CHR.sub('',
+            file_path.split("/")[-1]), file_path , content_type="image/png") 
+           
     return res
 
 def delete_file(name, content_type):

@@ -46,6 +46,7 @@
                 $('#image-crop-form input').val('');
                 $("#crop-btn").removeClass("blue").addClass("gray");
             };
+            
 			
             $('#jcrop_target').Jcrop({
 	            onChange: changeCoords,
@@ -56,9 +57,10 @@
             });
             
             
-            // resize the dialog
-            window.parent.resizeFrame({ "width": {{ image.width|add:"34" }},
-                "height": {{ image.height|add:"90" }} });           
+            window.parent.resizeFrame({
+                "width": {{image.width|add:"34"}},
+                "height": {{image.height|add:"90"}},
+            });           
 		});
 	</script>
 	{% endif %}
@@ -69,7 +71,7 @@
 	<form action="{% url 'store_image_crop' %}" method="POST" id="image-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
-			<img src="{{ image.url }}" id="jcrop_target" width="{{image.width}}" height="{{image.height}}" id="crop-image"/>
+			<img src="{{ image.url }}" id="jcrop_target" id="crop-image" style="max-width: 100%; height: 100%;"/>
 		</div>
 		
         <input type="hidden" id="x1" name="x1" />

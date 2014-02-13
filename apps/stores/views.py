@@ -357,29 +357,12 @@ def image_crop(request):
                 "y2": int(request.POST["y2"].split(".")[0]),
             }
         
-        # at this point our image has been validated at image_upload
-        # we still need to scale it down if the max edge exceeded
-        width, height = image.image.width, image.image.height
-        width, height = float(width), float(height)
-        aspect = width / height
-        
-        if height > width and height > IMAGE_COVER_MAX_EDGE:
-            height = IMAGE_COVER_MAX_EDGE
-            width = height * aspect
-                
-        elif width > height and width > IMAGE_COVER_MAX_EDGE:
-            width = IMAGE_COVER_MAX_EDGE
-            height = width / aspect
-            
-        elif width == height and width > IMAGE_COVER_MAX_EDGE:
-            width = IMAGE_COVER_MAX_EDGE
-            height = width
-        
         # save the session before a cloud call!
         request.session.save()
         
-        res_cover = create_png(image.image.path, (width,height), None)
-        res_thumbnail = create_png(image.image.path, IMAGE_THUMBNAIL_SIZE, crop_coords)
+        res_cover = create_png(image.image.path)
+        res_thumbnail = create_png(image.image.path,
+            IMAGE_THUMBNAIL_SIZE, crop_coords)
         
         # make sure that we have the latest session
         session = SessionStore(request.session.session_key)

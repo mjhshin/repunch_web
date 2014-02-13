@@ -1,8 +1,10 @@
 from django import forms
 from django.utils import timezone
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.images import get_image_dimensions
 from random import randint
-import os, re, datetime
+from PIL import Image
+import os, re, datetime, StringIO
 
 from models import Store, UploadedImageFile
 from libs.repunch import rputils, rpforms, rpccutils
@@ -10,7 +12,7 @@ from libs.repunch.validators import alphanumeric, numeric, required,\
 alphanumeric_no_space
 from parse.apps.accounts.models import Account
 from repunch.settings import IMAGE_COVER_MIN_EDGE,\
-IMAGE_COVER_ASPECT_RATIO_RANGE
+IMAGE_COVER_ASPECT_RATIO_RANGE, IMAGE_COVER_MAX_EDGE
 
 class StoreLocationForm(forms.Form):
     street = forms.CharField(max_length=255,
@@ -127,17 +129,64 @@ class UploadImageForm(forms.Form):
             
         return image
    
-    def save(self, session_key):    
-        def rename():
+    def resize_image(self, image, size):
+        """
+        image is django.core.files.uploadedfile.InMemoryUploadedFile
+        """
+        image.file.seek(0) # just in case
+        img = Image.open(image.file)
+        img = img.resize((int(size[0]), int(size[1])), Image.ANTIALIAS)
+        imageString = StringIO.StringIO()
+        img.save(imageString, 'png')
+
+        # for some reason content_type is e.g. 'images/jpeg' instead of 'image/jpeg'
+        return InMemoryUploadedFile(imageString, None,
+            image.name, 'image/png', imageString.len, None)
+   
+    def save(self, session_key):  
+        """
+        If the longest image edge exceeds the IMAGE_COVER_MAX_EDGE,
+        we scaled it down here (maintaining the aspect ratio) so that
+        we save an image that is smaller (albeit temporarily).
+        This results in less space taken server size and less 
+        bandwidth used client side.
+        """  
+        def renameAndResize():
             #'django.core.files.uploadedfile.InMemoryUploadedFile
-            uploaded_img = self.cleaned_data['image']
+            img = self.cleaned_data['image']
             # to avoid path conflicts, append a timestamp
             # plus a number from 000 to 999
-            uploaded_img._set_name(\
-                "".join(uploaded_img.name.split(".")[:-1]) +\
+            img._set_name(\
+                "".join(img.name.split(".")[:-1]) +\
                  timezone.now().strftime("%d%H%M%S") +\
                  str(randint(0, 999)).zfill(3))
-            return uploaded_img
+                 
+            # resize image if exceed max 
+            width, height = get_image_dimensions(img)
+            width, height = float(width), float(height)
+            aspect = width / height
+            resized = False
+        
+            if height > width and height > IMAGE_COVER_MAX_EDGE:
+                height = IMAGE_COVER_MAX_EDGE
+                width = height * aspect
+                resized = True
+                    
+            elif width > height and width > IMAGE_COVER_MAX_EDGE:
+                width = IMAGE_COVER_MAX_EDGE
+                height = width / aspect
+                resized = True
+                
+            elif width == height and width > IMAGE_COVER_MAX_EDGE:
+                width = IMAGE_COVER_MAX_EDGE
+                height = width
+                resized = True
+                
+            if resized:
+                img = self.resize_image(img, (width, height))
+                print get_image_dimensions(img)
+                
+            return img
             
         # remove previous session image
         img = UploadedImageFile.objects.filter(session_key=session_key)
@@ -148,11 +197,11 @@ class UploadImageForm(forms.Form):
             except Exception:
                 pass
             finally:
-                img.image = rename()
+                img.image = renameAndResize()
                 img.save()
         else:
             img = UploadedImageFile.objects.create(session_key=\
-                session_key, image=rename())
+                session_key, image=renameAndResize())
                 
         return img.image
         
