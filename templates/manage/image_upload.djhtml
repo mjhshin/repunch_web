@@ -7,7 +7,7 @@
 	<link href="{% static 'manage/css/global.2.5.css' %}" rel="stylesheet" />
 	<style>
 	#image-form {
-	    padding-left:15px;
+	    padding-left:15px; 
 	}
 	div.input-container label {
 	    padding:0px; margin-bottom:2px;
@@ -51,7 +51,7 @@
 	</script>
 
 </head>
-<body style="background-image: none; background-color: transparent;">
+<body style="background-image: none; background-color: white;">
 	<form action="{{ url }}" method="POST" id="image-form" enctype="multipart/form-data" >{% csrf_token %}
 		<div class="input-container">
 			{{ form }}

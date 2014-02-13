@@ -25,6 +25,8 @@ $(document).ready(function() {
 function resizeFrame(settings) {
     $('#image-upload-dialog').dialog(settings);
     $('#image-upload-dialog').css(settings);
+    
+    $('#image-upload-dialog').dialog({position : ["center", "center"]});
 }
 
 function imageCropComplete() {

@@ -24,11 +24,11 @@
 		<div id="photo-edit">
 			<div class="white-box">
 	            {% if store.thumbnail_image_url and store.cover_image_url %}
-                <a href="{% url 'store_image_view_cover' %}" class="upload-image">
+                <a href="{% url 'store_image_view_cover' %}" class="upload-image" id="image-preview">
                     <img src="{{ store.thumbnail_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_thumbnail"/>
                 </a>
 	            {% else %}
-                <a href="{% url 'store_image_upload' %}" class="upload-image">
+                <a href="{% url 'store_image_upload' %}" class="upload-image" id="image-preview">
 	                <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" alt="" id="store_thumbnail"
 	                    class="image-big" width="200px" height="200px"/>
                 </a>

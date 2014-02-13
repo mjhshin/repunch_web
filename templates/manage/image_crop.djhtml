@@ -15,7 +15,7 @@
 	</style>
 	{% if success %}
 	<script type="text/javascript">
-		window.parent.imageCropComplete();
+	window.parent.imageCropComplete();
 	</script>
 	{% else %}
 	<script src="{% static 'manage/js/jquery/jquery-1.9.1.min.js' %}"></script>
@@ -23,51 +23,51 @@
 	<script src="{% static 'manage/js/jquery/jquery.Jcrop.js' %}"></script>
 	
 	<script type="text/javascript">
-		$(document).ready(function(){
-		
-			$('#crop-btn').click(function(){
-			    if ($("#img-upload-loading").css("display") != "none" || $('#x1').val() == null || $('#x1').val().length < 1){
-			        return false;
-			    }
-			    
-			    $("#img-upload-loading").show();
-				$('#image-crop-form').submit();
-			});
-			
-			function changeCoords(c) {
-                $('#x1').val(c.x);
-                $('#y1').val(c.y);
-                $('#x2').val(c.x2);
-                $('#y2').val(c.y2);
-                $("#crop-btn").removeClass("gray").addClass("blue");
-            };
-
-            function clearCoords() {
-                $('#image-crop-form input').val('');
-                $("#crop-btn").removeClass("blue").addClass("gray");
-            };
-            
-			
-            $('#jcrop_target').Jcrop({
-	            onChange: changeCoords,
-	            onSelect: changeCoords,
-                onRelease:  clearCoords,
-                aspectRatio: {{ aspect_ratio }}, 
-                setSelect: [ {{init_x1}}, {{init_y1}}, {{init_x2}}, {{init_y2}} ],
-            });
-            
-            
-            window.parent.resizeFrame({
-                "width": {{image.width|add:"34"}},
-                "height": {{image.height|add:"90"}},
-            });           
+	$(document).ready(function(){
+	
+		$('#crop-btn').click(function(){
+		    if ($("#img-upload-loading").css("display") != "none" || $('#x1').val() == null || $('#x1').val().length < 1){
+		        return false;
+		    }
+		    
+		    $("#img-upload-loading").show();
+			$('#image-crop-form').submit();
 		});
+		
+		function changeCoords(c) {
+            $('#x1').val(c.x);
+            $('#y1').val(c.y);
+            $('#x2').val(c.x2);
+            $('#y2').val(c.y2);
+            $("#crop-btn").removeClass("gray").addClass("blue");
+        };
+
+        function clearCoords() {
+            $('#image-crop-form input').val('');
+            $("#crop-btn").removeClass("blue").addClass("gray");
+        };
+        
+		
+        $('#jcrop_target').Jcrop({
+            onChange: changeCoords,
+            onSelect: changeCoords,
+            onRelease:  clearCoords,
+            aspectRatio: {{ aspect_ratio }}, 
+            setSelect: [ {{init_x1}}, {{init_y1}}, {{init_x2}}, {{init_y2}} ],
+        });
+        
+        
+        window.parent.resizeFrame({
+            "width": {{image.width|add:"34"}},
+            "height": {{image.height|add:"90"}},
+        });           
+	});
 	</script>
 	{% endif %}
 	
 
 </head>
-<body style="background-image: none; background-color: transparent;" >
+<body style="background-image: none; background-color: white;" >
 	<form action="{% url 'store_image_crop' %}" method="POST" id="image-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
