@@ -41,6 +41,7 @@ function imageCropComplete() {
 	        $("#cover_upload-img").hide();
 	        $("#cover_view-img").show();
 	        $("#view-cover-image").attr("src", result.src_cover);
+	        resizeDialogOnImageLoad(result.src_cover);
 	        
 	        $("#"+$("#get_image_id").val()).attr("src", result.src_thumbnail);
             $("#account-thumbnail").attr("src", result.src_thumbnail);

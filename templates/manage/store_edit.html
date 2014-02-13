@@ -8,29 +8,11 @@
 <link rel="stylesheet" type="text/css" href="{% static "manage/css/image_upload.css" %}" />
 {% endblock %}
 {% block javascript %}
-<script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
-<script type="text/javascript" src="{% static 'manage/js/image_upload.1.8.js' %}" ></script>
-<script>
-$(document).ready(function() {
-    $( "a.view-image" ).click(function() {
-        $( "#dialog-cover-view" ).dialog( "open" );
-        return false;
-    });
-    
-    $( "#cover-image-options > a" ).click(function() {
-        $( "#dialog-cover-view" ).dialog( "close" );
-        return false;
-    });
-    
-    var loading = $("#image-loading");
-    var options = $("#cover-image-options");
-	    
+<script>        
+function resizeDialogOnImageLoad(src) {
     var img = new Image();
-    img.src = "http://www.mrconservative.com/files/2013/03/star-trek.jpg";
+    img.src = src;
     img.onload = function() {
-        loading.css("display", "none");
-        options.css("display", "block");
-    
         var width = img.width;
         var height = img.height;
         var aspect = width / height;
@@ -51,7 +33,7 @@ $(document).ready(function() {
     
         var dl = $( "#dialog-cover-view" );
          // prep the login dialog
-        dl.dialog({ autoOpen: false, modal: true,  height: height+86, width:width+40});
+        dl.dialog({ autoOpen: false, modal: true,  height: height+90, width:width+40});
         
          // prep the login dialog
         dl.dialog({ position: { at: "top" },
@@ -68,9 +50,29 @@ $(document).ready(function() {
             },
         }).dialog("widget").css({opacity:0});
     }
+}
+
+$(document).ready(function() {
+    $( "a.view-image" ).click(function() {
+        $( "#dialog-cover-view" ).dialog( "open" );
+        return false;
+    });
+    
+    $( "#cover-image-options > a" ).click(function() {
+        $( "#dialog-cover-view" ).dialog( "close" );
+        return false;
+    });
+        
+    {% with store=request.session.store %}
+    {% if store.thumbnail_image_url and store.cover_image_url %}
+    resizeDialogOnImageLoad("{{ store.cover_image_url}}");
+    {% endif %}
+    {% endwith %}
     
 });
 </script>
+<script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/image_upload.2.0.js' %}" ></script>
 {% endblock %}
 
 {% block content %}
@@ -133,9 +135,7 @@ $(document).ready(function() {
 	        src="{{ store.cover_image_url }}" 
 	        {% endif %} />
        
-        <img id="image-loading" src="{% static 'manage/images/ajax-loader.gif' %}" style="position:relative; top:5px;" />
-		
-	    <div id="cover-image-options" class="form-options" style="display:none;">
+	    <div id="cover-image-options" class="form-options">
 		    <a style="padding:0; margin:0;font: 14px 'Cabin', sans-serif; color:#900;text-decoration:none; cursor:pointer;">Close</a>
 	    </div>
 	</div>
