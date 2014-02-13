@@ -16,7 +16,7 @@ var NAV_ITEM_HEIGHT = 40 + 20 + 1;
 // need to know the height of the active nav item (height + padding + border)
 var NAV_ITEM_ACTIVE_HEIGHT = 70 + 20 + 1;
 // the amount of items before the scroll arrows are shown
-var NAV_ITEM_SCROLL = 5;
+var NAV_ITEM_SCROLL = 4;
 // height of the scroll arrows (height + padding)
 var SCROLL_ARROW_HEIGHT = 10 + 10;
 // height of the add button (height + padding)
