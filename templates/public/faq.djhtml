@@ -3,29 +3,34 @@
 
 {% block title %}FAQ{% endblock %}
 
+{% block styles %}
+<style>
+.accordionContent { display: none; }
+</style>
+{% endblock %}
+
 {% block javascript %}
 <!---Accordion Javascript--->
 <script type="text/javascript">
-
-jQuery(document).ready(function() {
+$(document).ready(function() {
 	 
 	//ACCORDION BUTTON ACTION (ON CLICK DO THE FOLLOWING)
-	jQuery('.accordionButton').click(function() {
+	$('.accordionButton').click(function() {
 
 		//REMOVE THE ON CLASS FROM ALL BUTTONS
-		jQuery('.accordionButton').removeClass('on');
+		$('.accordionButton').removeClass('on');
 		  
 		//NO MATTER WHAT WE CLOSE ALL OPEN SLIDES
-	 	jQuery('.accordionContent').slideUp('normal');
+	 	$('.accordionContent').slideUp('normal');
    
 		//IF THE NEXT SLIDE WASN'T OPEN THEN OPEN IT
-		if(jQuery(this).next().is(':hidden') == true) {
+		if($(this).next().is(':hidden') == true) {
 			
 			//ADD THE ON CLASS TO THE BUTTON
-			jQuery(this).addClass('on');
+			$(this).addClass('on');
 			  
 			//OPEN THE SLIDE
-			jQuery(this).next().slideDown('normal');
+			$(this).next().slideDown('normal');
 		 } 
 		  
 	 });
@@ -34,22 +39,16 @@ jQuery(document).ready(function() {
 	/*** REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
 	
 	//ADDS THE .OVER CLASS FROM THE STYLESHEET ON MOUSEOVER 
-	jQuery('.accordionButton').mouseover(function() {
-		jQuery(this).addClass('over');
+	$('.accordionButton').mouseover(function() {
+		$(this).addClass('over');
 		
 	//ON MOUSEOUT REMOVE THE OVER CLASS
 	}).mouseout(function() {
-		jQuery(this).removeClass('over');										
+		$(this).removeClass('over');										
 	});
 	
 	/*** END REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
 	
-	
-	/********************************************************************************************************************
-	CLOSES ALL S ON PAGE LOAD
-	********************************************************************************************************************/	
-	jQuery('.accordionContent').hide();
-
 });
 </script>
 <!---Accordion Javascript--->
