@@ -15,7 +15,7 @@
 */
 .store-locations.header {
     float: right;
-    max-height: 400px;
+    max-height: 300px;
     z-index: 11;
 	border-bottom:1px solid #CCC;
 	
