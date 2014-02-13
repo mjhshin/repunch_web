@@ -38,12 +38,13 @@ function imageCropComplete() {
         type: "GET",
         cache:false, // required to kill internet explorer 304 bug
         success: function(result) {
-	        $("#"+$("#get_image_id").val()).attr("src", result.src);
-	        $("#store_thumbnail-link").attr("href", $("#view_image_url").val());
-	        if (result.thumbnail) {
-                $("#account-thumbnail").attr("src", result.src);
-                $("#account-thumbnail").css("visibility", "visible");
-            }
+	        $("#cover_upload-img").hide();
+	        $("#cover_view-img").show();
+	        $("#view-cover-image").attr("src", result.src_cover);
+	        
+	        $("#"+$("#get_image_id").val()).attr("src", result.src_thumbnail);
+            $("#account-thumbnail").attr("src", result.src_thumbnail);
+            $("#account-thumbnail").css("visibility", "visible");
         },
     });
     

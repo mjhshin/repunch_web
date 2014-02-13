@@ -6,7 +6,6 @@ urlpatterns = patterns('apps.stores.views',
     url(r'^hours$', 'hours_preview', name='store_hours'),
     url(r'^set-active-location$', 'set_active_location', name='store_set_active_location'),
     
-    url(r'^image-view/cover$', 'image_view_cover', name='store_image_view_cover'),
     url(r'^image-upload$', 'image_upload', name='store_image_upload'),
     url(r'^image-get$', 'image_get', name='store_image_get'),
     url(r'^image-crop$', 'image_crop', name='store_image_crop'),

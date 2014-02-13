@@ -9,7 +9,68 @@
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript" src="{% static 'manage/js/store_edit.1.0.js' %}" ></script>
-<script type="text/javascript" src="{% static 'manage/js/image_upload.1.7.js' %}" ></script>
+<script type="text/javascript" src="{% static 'manage/js/image_upload.1.8.js' %}" ></script>
+<script>
+$(document).ready(function() {
+    $( "a.view-image" ).click(function() {
+        $( "#dialog-cover-view" ).dialog( "open" );
+        return false;
+    });
+    
+    $( "#cover-image-options > a" ).click(function() {
+        $( "#dialog-cover-view" ).dialog( "close" );
+        return false;
+    });
+    
+    var loading = $("#image-loading");
+    var options = $("#cover-image-options");
+	    
+    var img = new Image();
+    img.src = "http://www.mrconservative.com/files/2013/03/star-trek.jpg";
+    img.onload = function() {
+        loading.css("display", "none");
+        options.css("display", "block");
+    
+        var width = img.width;
+        var height = img.height;
+        var aspect = width / height;
+        
+        if (width > height && width > 800) {
+            width = 800;
+            height = width / aspect;
+            
+        } else if (height > width && height > 800) {
+            height = 800;
+            width = height * aspect;
+            
+        } else if (width == height && width > 800) {
+            width = 800;
+            height = width;
+        
+        }
+    
+        var dl = $( "#dialog-cover-view" );
+         // prep the login dialog
+        dl.dialog({ autoOpen: false, modal: true,  height: height+86, width:width+40});
+        
+         // prep the login dialog
+        dl.dialog({ position: { at: "top" },
+            open: function(event, ui) {
+                var self = $(this);
+                var container = $(window);
+                var top = (container.height()/2.0)-(self.outerHeight()/2.14);
+                self.dialog("widget").animate({top: top, opacity:1.0}, {duration: 300});
+            },
+            beforeClose: function(event, ui) {
+                var self = $(this);
+                var container = $(window);
+                self.dialog("widget").animate({top: 0, opacity:0}, {duration: 300});
+            },
+        }).dialog("widget").css({opacity:0});
+    }
+    
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -18,22 +79,24 @@
     {# REQUIRED FOR IMAGE UPLOAD JS #}
     <input type="hidden" id="get_image_url" value="{% url 'store_image_get' %}" />
     <input type="hidden" id="get_image_id" value="store_thumbnail" />
-    <input type="hidden" id="view_image_url" value="{% url 'store_image_view_cover' %}" />
 	
 	<form action="{% url 'store_edit' %}" method="POST" id="store-edit-form">{% csrf_token %}
 	
 		<div id="photo-edit">
 			<div class="white-box">
-	            {% if store.thumbnail_image_url and store.cover_image_url %}
-                <a href="{% url 'store_image_view_cover' %}" class="upload-image" id="store_thumbnail-link">
+	            <a class="view-image" id="cover_view-img"
+	                {% if not store.thumbnail_image_url or not store.cover_image_url %}
+	                style="cursor:pointer; display:none;"
+	                {% else %}
+	                style="cursor:pointer;"
+	                {% endif %}>
                     <img src="{{ store.thumbnail_image_url }}" alt="" class="image-big" width="200px" height="200px" id="store_thumbnail"/>
                 </a>
-	            {% else %}
-                <a href="{% url 'store_image_upload' %}" class="upload-image" id="store_thumbnail-link">
+                <a href="{% url 'store_image_upload' %}" class="upload-image"  id="cover_upload-img"
+                    {% if store.thumbnail_image_url and store.cover_image_url %}style="display:none;"{% endif %}>
 	                <img src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" alt="" id="store_thumbnail"
 	                    class="image-big" width="200px" height="200px"/>
                 </a>
-                {% endif %}
 			</div>
 			<a href="{% url 'store_image_upload' %}" class="upload-image">Add/Change Photo</a>
 		</div>
@@ -62,5 +125,20 @@
 	    <img src="{% static 'manage/images/ajax-loader.gif' %}" />
 	</div>
 	
+	<div id="dialog-cover-view" style="display: none;">
+	    <img id="view-cover-image" style="max-width:800px; max-height: 800px;"
+	        {% if not store.thumbnail_image_url or not store.cover_image_url %}
+	        src="{% static 'manage/images/store_thumbnail_placeholder.1.2.png' %}" 
+	        {% else %}
+	        src="{{ store.cover_image_url }}" 
+	        {% endif %} />
+       
+        <img id="image-loading" src="{% static 'manage/images/ajax-loader.gif' %}" style="position:relative; top:5px;" />
+		
+	    <div id="cover-image-options" class="form-options" style="display:none;">
+		    <a style="padding:0; margin:0;font: 14px 'Cabin', sans-serif; color:#900;text-decoration:none; cursor:pointer;">Close</a>
+	    </div>
+	</div>
+
 {% endwith %}
 {% endblock %}

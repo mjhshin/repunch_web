@@ -244,16 +244,6 @@ def hours_preview(request):
         "result": result,
         "html": html,
     }), content_type="application/json")
-    
-@login_required
-@dev_login_required
-@access_required(http_response="<h1>Access denied</h1>",\
-content_type="text/html")
-def image_view_cover(request):
-    return render(request, 'manage/image_view.html', {
-        "image_url":\
-            SESSION.get_store(request.session).get("cover_image_url"),
-    })
 
 
 @login_required
@@ -308,9 +298,10 @@ def image_get(request):
     """
     """
     if request.method == "GET":
+        store = SESSION.get_store(request.session)
         return HttpResponse(json.dumps({
-            "src": SESSION.get_store(request.session).thumbnail_image_url,
-            "thumbnail": True,
+            "src_cover": store.cover_image_url,
+            "src_thumbnail": store.thumbnail_image_url,
         }), content_type="application/json")
         
     raise Http404
