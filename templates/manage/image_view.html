@@ -15,7 +15,6 @@
     }
     
 	$(document).ready(function(){
-	    var cover = $("#view-cover-image");
 	    var loading = $("#image-loading");
 	    var options = $("#view-image-options");
 	    
@@ -24,15 +23,35 @@
             "height": "66px",
         }); 
 	    
-	    cover.load(function() {
+	    var img = new Image();
+	    img.src = "{{ image_url }}";
+	    img.onload = function() {
 	        loading.css("display", "none");
 	        options.css("display", "block");
 	    
+	        var width = img.width;
+	        var height = img.height;
+	        var aspect = width / height;
+	        
+	        if (width > height && width > 800) {
+	            width = 800;
+	            height = width / aspect;
+	            
+	        } else if (height > width && height > 800) {
+	            height = 800;
+	            width = height * aspect;
+	            
+	        } else if (width == height && width > 800) {
+	            width = 800;
+	            height = width;
+	        
+	        }
+	    
             window.parent.resizeFrame({
-                "width": addToPixels(cover.css("width"), 34),
-                "height": addToPixels(cover.css("height"), 70),
-            });           
-        });
+                "width": width + 34,
+                "height": height + 70,
+            });      
+	    }
         
 	});
 	</script>
