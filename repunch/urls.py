@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^manage/terms/$', views.manage_terms, name='manage_terms'),
     url(r'^manage/$', views.manage_login, name='manage_login'),
     url(r'^manage/logout$', views.manage_logout, name='manage_logout'),
+    url(r'^manage/admin-controls$', views.manage_admin_controls, name='manage_admin_controls'),
     
     url(r'^gcm/', include('apps.gcm.urls')),
     

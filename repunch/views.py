@@ -9,13 +9,70 @@ from django.contrib.auth import authenticate
 import json, thread
 
 from parse import session as SESSION
+from parse.apps.accounts.models import Account
 from parse.utils import cloud_call
+from parse.comet import comet_receive
 from parse.auth import login, logout
 from parse.auth.decorators import dev_login_required
 from apps.accounts.forms import LoginForm
 from apps.comet.models import CometSessionIndex
 from repunch.settings import PRODUCTION_SERVER, DEVELOPMENT_TOKEN,\
-RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS, CLOUD_LOGGER_TRIGGER_KEY
+RECAPTCHA_TOKEN, RECAPTCHA_ATTEMPTS, CLOUD_LOGGER_TRIGGER_KEY,\
+ADMIN_CONTROL_KEY, COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+
+def manage_admin_controls(request):
+    """
+    To turn on god_mode:
+    ...repunch.com/manage/admin-controls?action=god_mode&flag=1&
+    email=abc@email.com&key=9p8437wk34z5ymurukdp9w34px7iuhsruhio
+    """
+    
+    if request.method == "GET":
+        params = request.GET.dict()
+        key = params.get("key")
+        action = params.get("action")
+        
+        if key == ADMIN_CONTROL_KEY:
+            if action == "god_mode":
+                flag = params.get("flag")
+                email = params.get("email", "")
+                acc = Account.objects().get(email=email, Store__ne=None,
+                    include="Store.Subscription")
+                if not acc:
+                    return HttpResponse("User with email %s not found." %\
+                        (email,))
+                
+                sub = acc.store.subscription
+                sub.god_mode = flag != "0"
+                sub.update()
+                
+                payload = {
+                    COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
+                    "updatedSubscription": sub.jsonify(),
+                }
+                comet_receive(acc.store.objectId, payload)
+                
+                # go out with the latest session in case this user is
+                # the one that triggered this action
+                request.session.clear()                           
+                request.session.update(SessionStore(request.session.session_key))
+                
+                if sub.god_mode:
+                    on_off = "on"
+                else:
+                    on_off = "off"
+                
+                return HttpResponse("Successfully turned god mode "+\
+                    "%s for user with email %s" % (on_off, email))
+                
+            else:
+                return HttpResponse("Invalid action: %s" % (action,))
+        
+        else:
+            return HttpResponse("Wrong key: %s" % (key,))
+    
+    return HttpResponse("Bad Request")
+    
 
 def manage_dev_login(request):
     """

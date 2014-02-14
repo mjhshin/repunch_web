@@ -123,7 +123,7 @@ def message_no_limit(request):
         return HttpResponse("Limit for sending messages has been turned off." +\
             "To turn it back on, please log out and log back in.")
     
-    return HttpResponse("fail")
+    return HttpResponse("Bad Request")
 
 @dev_login_required
 @login_required

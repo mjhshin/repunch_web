@@ -47,6 +47,9 @@ DATABASES = {
     }
 }
 
+# admin controls
+ADMIN_CONTROL_KEY = "9p8437wk34z5ymurukdp9w34px7iuhsruhio"
+
 # this 1 is for django
 AUTH_USER_MODEL = 'accounts.Account'
 
