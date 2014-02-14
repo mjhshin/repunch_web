@@ -260,17 +260,19 @@ def image_upload(request):
             image = form.save(request.session.session_key)
             
             if image.width > image.height: # height is limiting
-                center_width = image.width/2
-                init_y1 = 0
-                init_y2 = image.height
-                init_x1 = center_width - image.height/2
-                init_x2 = center_width + image.height/2
+                center_width = image.width * 0.5
+                init_y1 = image.height * 0.125
+                init_y2 = image.height * 0.875
+                length = init_y2 - init_y1
+                init_x1 = center_width - length / 2
+                init_x2 = center_width + length / 2
             else:
-                center_height = image.height/2
-                init_x1 = 0
-                init_x2 = image.width
-                init_y1 = center_height - image.width/2
-                init_y2 = center_height + image.width/2
+                center_height = image.height * 0.5
+                init_x1 = image.width * 0.125
+                init_x2 = image.width * 0.875
+                length = init_y2 - init_y1
+                init_y1 = center_height - length / 2
+                init_y2 = center_height + length / 2
                 
                 
             return render(request, 'manage/image_crop.djhtml', {

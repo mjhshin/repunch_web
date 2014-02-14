@@ -112,20 +112,16 @@ class UploadImageForm(forms.Form):
             
         if img_aspect < min_aspect or img_aspect > max_aspect:
             raise forms.ValidationError(\
-                "Image aspect ratio must be between 16:9 and 9:16")
+                "Your photo's width-to-height ratio "+\
+                "must be between 16:9 and 9:16")
                 
         # now check for min and max edges
-        if width < height and width < IMAGE_COVER_MIN_EDGE:
+        if width < height and width < IMAGE_COVER_MIN_EDGE or\
+            width > height and height < IMAGE_COVER_MIN_EDGE or\
+            width == height and width < IMAGE_COVER_MIN_EDGE:
             raise forms.ValidationError(\
-                "Image width must be at least " + str(IMAGE_COVER_MIN_EDGE))
-        
-        elif width > height and height < IMAGE_COVER_MIN_EDGE:
-            raise forms.ValidationError(\
-                "Image height must be at least " + str(IMAGE_COVER_MIN_EDGE))
-            
-        elif width == height and width < IMAGE_COVER_MIN_EDGE:
-            raise forms.ValidationError(\
-                "Image width must be at least " + str(IMAGE_COVER_MIN_EDGE))
+                "Your photo must be at least %sx%s pixels" %\
+                (IMAGE_COVER_MIN_EDGE,IMAGE_COVER_MIN_EDGE))
             
         return image
    

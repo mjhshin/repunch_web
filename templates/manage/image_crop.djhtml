@@ -59,7 +59,7 @@
         
         window.parent.resizeFrame({
             "width": {{image.width|add:"34"}},
-            "height": {{image.height|add:"90"}},
+            "height": {{image.height|add:"120"}},
         });           
 	});
 	</script>
@@ -68,6 +68,7 @@
 
 </head>
 <body style="background-image: none; background-color: white;" >
+    <h2 style="text-align:center; margin-top:10px;">Select which part of your photo will be the thumbnail</h2>
 	<form action="{% url 'store_image_crop' %}" method="POST" id="image-crop-form" >
 	    {% csrf_token %}
 		<div class="input-container" >
