@@ -270,7 +270,7 @@ def image_upload(request):
                 center_height = image.height * 0.5
                 init_x1 = image.width * 0.125
                 init_x2 = image.width * 0.875
-                length = init_y2 - init_y1
+                length = init_x2 - init_x1
                 init_y1 = center_height - length / 2
                 init_y2 = center_height + length / 2
                 
