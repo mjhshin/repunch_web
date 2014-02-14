@@ -25,7 +25,7 @@ $(document).ready(function() {
 	{% account_is_admin request.session as is_admin %}
 	{% account_alert_users request.session as alert_users %}
 	{% account_alert_billing request.session as alert_billing %}
-	{% if alert_users > 0 %}
+	{% if alert_users > 0 and not request.session.subscription.gode_mode %}
 	<div class="notification">
 	    <div>
 	    {% if alert_users == 2  %}
@@ -112,15 +112,16 @@ $(document).ready(function() {
 	</div>
 	
 	<div class="section">
-		{% with tmp=request.session.subscription.subscriptionType %}
-        {% with type=tmp|get_sub_type %}
+		{% with sub=request.session.subscription %}
+        {% with type=sub.subscriptionType|get_sub_type %}
+        {% with maxType="2"|get_sub_type %}
 		<div class="section-title">
 			Current Subscription: {{ type.name }}
 		</div>
 		
 		<div class="white-box" id="limits-box" >
 			<div class="limit-details">
-				{% if tmp != 2 %} {# 2 is heavyweight #}
+				{% if sub.subscriptionType != 2 and not sub.god_mode %} {# 2 is heavyweight #}
 				<div class="bar-graph"><div style="height: {% account_user_usage request.session 52 %}px"></div></div>
 				{% else %}
 				<div class="bar-graph" style="visibility:hidden;width:1px;"><div></div></div>
@@ -129,7 +130,7 @@ $(document).ready(function() {
 				<div class="description">
 					<div class="label">USERS</div>
 					<div class="count">{% account_user_count request.session %}</div>
-					<div class="limit">of &nbsp;&nbsp;{% if type.max_users == -1 %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
+					<div class="limit">of &nbsp;&nbsp;{% if type.max_users == -1 or sub.god_mode %}unlimited{% else %}{{ type.max_users }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="limit-details right">
@@ -137,12 +138,11 @@ $(document).ready(function() {
 				<div class="description">
 					<div class="label">SENT MESSAGES</div>
 					<div class="count">{% account_message_count request.session %}</div>
-					<div class="limit">of &nbsp;&nbsp;{{ type.max_messages }}</div>
+					<div class="limit">of &nbsp;&nbsp;{% if sub.god_mode %}{{ maxType.max_messages }}{% else %}{{ type.max_messages }}{% endif %}</div>
 				</div>
 			</div>
 			<div class="clear"></div>
 		</div>
-		{% endwith %}
 		<div id="account-options" class="form-options">
 		    {% if is_admin %}
 			<a href="{% url 'subscription_update' %}" class="button blue">
@@ -152,6 +152,8 @@ $(document).ready(function() {
 			{% endif %}
 		</div>
 	</div>
+	{% endwith %}
+    {% endwith %}
     {% endwith %}
 {% endwith %}
 {% endblock %}

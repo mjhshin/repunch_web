@@ -388,6 +388,10 @@ class Subscription(ParseObject):
         self.pp_cc_id = data.get('pp_cc_id')
         self.date_pp_valid = data.get('date_pp_valid')
         
+        # flag used to mark a retailer as having the highest
+        # level of subscription without having to pay its price.
+        self.god_mode = data.get('god_mode', False)
+        
         # used when the user passes the user limit!!
         # MUST be set back to None if not in use!!!!
         self.date_passed_user_limit =\
@@ -414,7 +418,7 @@ class Subscription(ParseObject):
         """
         #("cc_number", "date_cc_expiration", "pp_cc_id",
         #    "date_pp_valid")
-        return (cls, "subscriptionType", "date_last_billed", "Store")
+        return (cls, "god_mode", "subscriptionType", "date_last_billed", "Store")
     
     def get_full_address(self):
         """

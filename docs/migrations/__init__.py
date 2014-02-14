@@ -4,7 +4,7 @@ Database migration transcripts.
 
 from parse.apps.accounts.models import Account
 from parse.apps.patrons.models import Patron, PunchCode, PatronStore
-from parse.apps.stores.models import Store, StoreLocation
+from parse.apps.stores.models import Store, StoreLocation, Subscription
 from parse.apps.rewards.models import Punch
 
 def rename_punchcode_username_to_userid():
@@ -86,7 +86,15 @@ def store_avatar_to_thumbnail():
         print "Updated Store #" + str(i) + ": " + store.objectId
     
     
-    
+def god_mode():
+    """
+    Added the god_mode boolean column to Subscription.
+    """
+    for i, sub in enumerate(Subscription.objects().filter(limit=999)):
+        sub.god_mode = False
+        sub.update()
+        
+        print "Updated Subscription #" + str(i) + ": " + sub.objectId
     
     
     

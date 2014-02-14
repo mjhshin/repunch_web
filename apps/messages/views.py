@@ -161,8 +161,8 @@ def edit(request, message_id):
             postDict = request.POST.dict().copy()
         
         form = MessageForm(postDict) 
-        subType = SESSION.get_subscription(\
-                    request.session).get('subscriptionType')
+        subscription = SESSION.get_subscription(request.session)
+        subType = subscription.get('subscriptionType')
         
         if form.is_valid():
             
@@ -170,10 +170,16 @@ def edit(request, message_id):
             if 'message_count' in request.session:
                 del request.session['message_count']
             message_count = SESSION.get_message_count(request.session)
-                                    
-            limit_reached = message_count >= sub_type[subType]['max_messages']
             
-            # we always enforce the limit when we are in production
+            if subscription.god_mode:
+                max_messages = sub_type[2]['max_messages']
+            else:
+                max_messages = sub_type[subType]['max_messages']
+                                    
+                                    
+            limit_reached = message_count >= max_messages
+            
+            # We always enforce the limit when we are in production
             # otherwise, we ignore it if we have message_limit_off in our session
             if limit_reached and (PRODUCTION_SERVER or\
                 (not PRODUCTION_SERVER and "message_limit_off" not in request.session)):

@@ -13,7 +13,7 @@ register = template.Library()
 @register.filter
 def get_sub_type(level):
     """ returns the sub dict corresponding to the level """
-    return sub_type[level]
+    return sub_type[int(level)]
 
 @register.simple_tag
 def account_user_usage(session, percent_of=None):
@@ -39,7 +39,6 @@ def account_user_usage(session, percent_of=None):
 def account_alert_users(session):
     subscription = SESSION.get_subscription(session)
     atype = sub_type[subscription.get('subscriptionType')]
-    
     num_patrons = SESSION.get_patronStore_count(session)
     
     if atype['max_users'] == UNLIMITED:

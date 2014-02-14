@@ -54,7 +54,7 @@ class Command(BaseCommand):
         while sub_count > 0:
             for sub in Subscription.objects().filter(\
                 subscriptionType=0, include="Store", 
-                date_passed_user_limit=None,
+                date_passed_user_limit=None, god_mode=False,
                 limit=LIMIT, skip=skip, order="createdAt"):
                 store = sub.store
                 if store.get("patronStores", count=1, limit=0) >\
@@ -81,7 +81,7 @@ class Command(BaseCommand):
         while sub_count > 0:
             for sub in Subscription.objects().filter(\
                 subscriptionType=1, include="Store", 
-                date_passed_user_limit=None,
+                date_passed_user_limit=None, god_mode=False,
                 limit=LIMIT, skip=skip, order="createdAt"):
                 store = sub.store
                 if store.get("patronStores", count=1, limit=0) >\
@@ -149,14 +149,6 @@ class Command(BaseCommand):
                         "patronStore_count": sub.store.get(\
                             "patronStores", limit=0, count=1),
                     }
-                    try:
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
-                    except SMTPServerDisconnected:
-                        conn = mail.get_connection(fail_silently=(not DEBUG))
-                        conn.open()
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
                         
                 # no pp_cc_id
                 else:
@@ -169,14 +161,15 @@ class Command(BaseCommand):
                             relativedelta(days=\
                                 USER_LIMIT_PASSED_DISABLE_DAYS),
                     }
-                    try:
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
-                    except SMTPServerDisconnected:
-                        conn = mail.get_connection(fail_silently=(not DEBUG))
-                        conn.open()
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
+                    
+                try:
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+                except SMTPServerDisconnected:
+                    conn = mail.get_connection(fail_silently=(not DEBUG))
+                    conn.open()
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
       
             # end of while loop
             sub_count -= LIMIT
@@ -319,14 +312,7 @@ class Command(BaseCommand):
                         "patronStore_count": sub.store.get(\
                             "patronStores", limit=0, count=1),
                     }
-                    try:
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
-                    except SMTPServerDisconnected:
-                        conn = mail.get_connection(fail_silently=(not DEBUG))
-                        conn.open()
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
+                    
                 # no pp_cc_id
                 else:
                     package = {
@@ -338,14 +324,15 @@ class Command(BaseCommand):
                             relativedelta(days=\
                                 USER_LIMIT_PASSED_DISABLE_DAYS),
                     }
-                    try:
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
-                    except SMTPServerDisconnected:
-                        conn = mail.get_connection(fail_silently=(not DEBUG))
-                        conn.open()
-                        send_email_passed_user_limit(Account.objects().get(\
-                            Store=sub.Store), sub.store, package, conn)
+                    
+                try:
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
+                except SMTPServerDisconnected:
+                    conn = mail.get_connection(fail_silently=(not DEBUG))
+                    conn.open()
+                    send_email_passed_user_limit(Account.objects().get(\
+                        Store=sub.Store), sub.store, package, conn)
                         
             # end of while loop
             sub_count -= LIMIT
