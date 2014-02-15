@@ -121,7 +121,8 @@ def edit_location(request, store_location_id):
         if new_location:
             store_location = StoreLocation(**postDict)
         else:
-            store_location = StoreLocation(**store_location.__dict__)
+            store_location = SESSION.get_store_location(\
+                request.session, store_location_id)
             store_location.update_locally(postDict, False)
             
         if store_location_form.is_valid(): 
