@@ -35,7 +35,7 @@
 				<h2 id="the-team-title">The Team</h2>
 				
 				{# MATTHEW #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Matthew Tervooren</h4><p><span>Co-Founder & CEO</span></p><div>In the rare instances when Matt's mind wanders away from all things Repunch, he is probably:<ul><li>Exploring the inexhaustible variety of NYC</li><li>Rooting for University of Michigan sports</li><li>Playing tennis or golf</li><li>Reading Hemingway or watching Tarantino</li><li>Surfing or playing wiffle ball on the beach</li><li>Following every movement of the Dutch national soccer team</li></ul></div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Matthew Tervooren</h4><p><span>Co-Founder & CEO</span></p><div>The writing may have been on the wall for Matt's future when he enlisted a brigade of people to do door-to-door baked goods sales throughout grade school. When his mother's kitchen could take no more, Matt shifted his entrepreneurial fervor to the stock market. In high school, he built a program that evaluated stocks and guided his investments in the options market. Matt enjoyed a brief spell on the University of Michigan football team as a walk-on during his freshman year. At Michigan, Matt studied Economics and Entrepreneurship.<br/><br/>In his free time, Matt loves exploring the inexhaustible variety of NYC cuisine. He is a die-hard fan of Dutch soccer and University of Michigan sports. Matt lives in East Village, where he endlessly pursues the perfect cup of coffee.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_matthew.1.0.png' %}" /></div>
 					</div>
@@ -55,7 +55,7 @@
 				{# END SHIN #}
 				
 				{# ANDREW #}
-				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Andrew Tervooren</h4><p><span>Co-Founder & CMO</span></p><div>The writing may have been on the wall for Matt's future when he enlisted a brigade of people to do door-to-door baked goods sales throughout grade school. When his mother's kitchen could take no more, Matt shifted his entrepreneurial fervor to the stock market. In high school, he built a program that evaluated stocks and guided his investments in the options market. Matt enjoyed a brief spell on the University of Michigan football team as a walk-on during his freshman year. At Michigan, Matt studied Economics and Entrepreneurship.<br/><br/>In his free time, Matt loves exploring the inexhaustible variety of NYC cuisine. He is a die-hard fan of Dutch soccer and University of Michigan sports. Matt lives in East Village, where he endlessly pursues the perfect cup of coffee.</div></div>">
+				<div class="the-team-member tooltip" title="<div class='tooltipBox'><h4>Andrew Tervooren</h4><p><span>Co-Founder & CMO</span></p><div>After graduating from Rutgers University, where Andrew was Captain of the Men's Tennis Team, he worked in the Literary Department of the entertainment company, William Morris Endeavor.<br/><br/>He enjoys sports and travel. The next hobbies he would like to pick up: Cooking and Photography. Andrew leads Repunch's marketing efforts.</div></div>">
 					<div class="member-picture-border">
 						<div class="member-picture"><img src="{% static 'public/images/prof_andrew.1.2.png' %}" /></div>
 					</div>
