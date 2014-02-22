@@ -40,11 +40,14 @@ Parse.Cloud.define("register_patron", function(request, response) {
 		patron.set("gender", gender);
 		patron.set("punch_code", punchCode.get("punch_code"));
 		
-		var year = birthday.substring(6, 10);
-		var month = parseInt(birthday.substring(0, 2)) - 1;
-		var day = birthday.substring(3, 5);
-		var dateOfBirth = new Date(year, month, day);
-		patron.set("date_of_birth", dateOfBirth);
+		if (birthday != null && birthday.length > 0)
+		{
+		    var year = birthday.substring(6, 10);
+		    var month = parseInt(birthday.substring(0, 2)) - 1;
+		    var day = birthday.substring(3, 5);
+		    var dateOfBirth = new Date(year, month, day);
+		    patron.set("date_of_birth", dateOfBirth);
+		}
 		
 		if(facebookId != null) {
 			patron.set("facebook_id", facebookId);
