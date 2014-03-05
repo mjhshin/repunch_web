@@ -22,7 +22,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCodeResult) {
 		console.log("PunchCode fetch success.");
         punchCodeResult.set("is_taken", true);
-        punchCodeResult.set("user_id", request.user.get("objectId"));	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCodeResult.set("user_id", request.user.get("objectId"));	//for record keeping purposes. also we use ParseUser.objectId
         											//since facebook users may not have email available.
 		return punchCodeResult.save();
 			
@@ -650,7 +650,21 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		}
 		else {
             console.log("Existing PatronStore found.");
-			response.success(patronStore);
+            fetchPatronAndStore().then(function(patron, store) {
+			    linkExistingPatronStore(patron, store, patronStore).then(function() {
+					response.success(patronStore);
+			    },
+			    function(error) {
+			    	console.log("Failed to add relation from PatronStore to Patron and Store.");
+			    	console.log(error);
+			    	response.error("error");
+			    });
+			},
+			function(error) {
+			    console.log("Failed to fetch Patron and Store.");
+			    console.log(error);
+			    response.error("error");
+			});
 		}
     });
     
@@ -714,8 +728,21 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
         console.log("Fetching Patron and Store in parallel.");
         
         var promises = [];
-        promises.push(patron.fetch());
-        promises.push(store.fetch());
+        promises.push( patron.fetch() );
+        promises.push( store.fetch() );
+
+        return Parse.Promise.when(promises);	
+    }
+
+    function linkExistingPatronStore(patron, store, patronStore) {
+        console.log("Adding relation from existing PatronStore to Patron and Store in parallel.");
+
+        patron.relation("PatronStores").add(patronStore);
+        store.relation("PatronStores").add(patronStore);
+        
+        var promises = [];
+        promises.push( patron.save() );
+        promises.push( store.save() );
 
         return Parse.Promise.when(promises);	
     }
@@ -740,7 +767,7 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 	var storeQuery = new Parse.Query(Store);
 	var patronQuery = new Parse.Query(Patron);
 	
-	var patronStore, store, patron;
+	var patronStore;
 	
 	var promises = [];
 	promises.push( patronStoreQuery.get(patronStoreId) );
@@ -768,20 +795,13 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 		
 	}).then(function() {
 		console.log("Store/Patron save success (in parallel).");
-		return patronStore.destroy();
-
-	}, function(error) {
-		console.log("Store/Patron save fail (in parallel).");
-		return Parse.Promise.error(error);
-		
-	}).then(function() {
-		console.log("PatronStore delete success.");
 		response.success("success");
 
 	}, function(error) {
-		console.log("PatronStore delete fail.");
+		console.log("Store/Patron save fail (in parallel).");
 		console.log(error);
 		response.error("error");
+		
 	});
 });
 
