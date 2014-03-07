@@ -25,7 +25,7 @@ $(document).ready(function() {
 	{% account_is_admin request.session as is_admin %}
 	{% account_alert_users request.session as alert_users %}
 	{% account_alert_billing request.session as alert_billing %}
-	{% if alert_users > 0 and not request.session.subscription.gode_mode %}
+	{% if alert_users > 0 and not request.session.subscription.god_mode %}
 	<div class="notification">
 	    <div>
 	    {% if alert_users == 2  %}
