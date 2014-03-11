@@ -12,44 +12,16 @@ GCM_URL = "https://android.googleapis.com/gcm/send"
 
 RECEIVER_BATCH_SIZE = 200
 
-def gcm_send(postBody):
-    """
-    postBody format/example:
-        
-        {
-            # Required content
-            gcmrkey: "<<GCM_RECEIVE_KEY>>",
-            repunch_receivers: [{
-                "registration_id": "..."
-                "<employee|patron>_id": "...",
-            }, ...],
-	        action: "com.repunch.retailer.PUNCH",
-	        
-	        # 1 to employ backwards compat. 0 otherwise.
-	        # Default is 1.
-            support: [1|0],
-        
-            # optional content (must be less than 4kb)
-            optionalData1: False,
-            optionalData2: 77,
-            optionalData3: "hasjkf",
-            optionalData4: [1,2,3],
-            optionalData5: {1:1, 2:2},
-        }
-        
-    See http://developer.android.com/google/gcm/server.html#params
-    for more GCM parameters.
-    
-    Note that Google GCM Servers convert all data to string.
-    """
-    if str(postBody[GCM_RECEIVE_KEY_NAME]) != GCM_RECEIVE_KEY:
-        return False
-    
-    receivers = postBody['repunch_receivers']
-    if len(receivers) == 0:
-        return True
-        
-    if int(postBody.get("support", 1)) > 0:
+def gcm_send_execute(receivers, data):
+
+    # its either all employee or patron
+    if "employee_id" in receivers[0].keys():
+        which_id = "employee_id"
+    else:
+        which_id = "patron_id"
+
+    # its either all support or not
+    if receivers[0].get("support"):
         api_key = GCM_API_KEY_OLD
     else:
         api_key = GCM_API_KEY_NEW
@@ -60,15 +32,6 @@ def gcm_send(postBody):
         'Authorization': 'key=%s' % (api_key,),
     }
     
-    data = { k:v for k,v in postBody.iteritems()
-        if k not in NON_DATA_PARAMS }
-    
-    
-    # its either all employee or patron
-    if "employee_id" in receivers[0].keys():
-        which_id = "employee_id"
-    else:
-        which_id = "patron_id"
         
     # chunk messages to make sure the employee_ids | patron_ids
     # do not end up exceeding the 4kb limit of a GCM push
@@ -101,6 +64,54 @@ def gcm_send(postBody):
         
         # TODO handle response
         # print res.json()
+        
+
+def gcm_send(postBody):
+    """
+    postBody format/example:
+        
+        {
+            # Required content
+            gcmrkey: "<<GCM_RECEIVE_KEY>>",
+            repunch_receivers: [{
+                "registration_id": "...",
+                "support": [True|False],
+                "<employee|patron>_id": "...",
+            }, ...],
+	        action: "com.repunch.retailer.PUNCH",
+	        
+            # optional content (must be less than 4kb)
+            optionalData1: False,
+            optionalData2: 77,
+            optionalData3: "hasjkf",
+            optionalData4: [1,2,3],
+            optionalData5: {1:1, 2:2},
+        }
+        
+    See http://developer.android.com/google/gcm/server.html#params
+    for more GCM parameters.
     
+    Note that Google GCM Servers convert all data to string.
+    """
+    if str(postBody[GCM_RECEIVE_KEY_NAME]) != GCM_RECEIVE_KEY:
+        return False
+    
+    receivers = postBody['repunch_receivers']
+    if len(receivers) == 0:
+        return True
+        
+    # here we need to divide our receivers between those that use the
+    # support (old) gcm project and ones that don't.
+    support_receivers = [ rec for rec in receivers if rec.get("support") ]
+    nonsupport_receivers = [ rec for rec in receivers if not rec.get("support") ]
+        
+    data = { k:v for k,v in postBody.iteritems()
+        if k not in NON_DATA_PARAMS }
+        
+    if support_receivers:
+        gcm_send_execute(support_receivers, data)
+        
+    if nonsupport_receivers:
+        gcm_send_execute(nonsupport_receivers, data)
     
     return True
