@@ -483,6 +483,7 @@ Parse.Cloud.define("link_employee", function(request, response) {
 Parse.Cloud.define("delete_employee", function(request, response) 
 {
     var employeeId = request.params.employee_id;
+    var supportGCM = request.params.support_gcm_v1;
 
     var EMPLOYEE_NOT_FOUND = "EMPLOYEE_NOT_FOUND";
     
@@ -526,6 +527,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
+                    support: supportGCM == null ? 1 : supportGCM,
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.EMPLOYEE_DELETED",
                 }, 
@@ -652,6 +654,7 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
             console.log("Existing PatronStore found.");
             fetchPatronAndStore().then(function(patron, store) {
 			    linkExistingPatronStore(patron, store, patronStore).then(function() {
+			    	console.log("Successfully added relation from PatronStore to Patron and Store.");
 					response.success(patronStore);
 			    },
 			    function(error) {
@@ -1021,6 +1024,7 @@ Parse.Cloud.define("punch", function(request, response)
 	var storeName = request.params.store_name;
 	var employeeId = request.params.employee_id;
 	var storeLocationId = request.params.store_location_id;
+    var supportGCM = request.params.support_gcm_v1;
    
 	var Patron = Parse.Object.extend("Patron");
 	var PatronStore = Parse.Object.extend("PatronStore");
@@ -1170,6 +1174,7 @@ Parse.Cloud.define("punch", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
+                    support: supportGCM == null ? 1 : supportGCM,
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.consumer.intent.PUNCH",
 			        ordered_broadcast: "y",
@@ -1343,6 +1348,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	var customerName = request.params.name;
 	var messageStatusId = request.params.message_status_id;
 	var isOfferOrGift = (messageStatusId != null);
+    var supportGCM = request.params.support_gcm_v1;
 	
 	var PatronStore = Parse.Object.extend("PatronStore");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -1495,6 +1501,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
+                    support: supportGCM == null ? 1 : supportGCM,
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_REQUEST_REDEEM",
 			        redeem_id: redeemReward.id
@@ -1595,6 +1602,8 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	// optional - if validated by an employee
 	var installationId = request.params.installation_id;
 	var androidInstallationId = request.params.android_installation_id;
+	
+    var supportGCM = request.params.support_gcm_v1;
 	
 	var Store = Parse.Object.extend("Store");
 	var RedeemReward = Parse.Object.extend("RedeemReward");
@@ -1730,6 +1739,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
+                    support: supportGCM == null ? 1 : supportGCM,
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_REJECT_REDEEM",
 			        redeem_id: redeemId,
@@ -1792,6 +1802,8 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	// optional - if validated by an employee
 	var installationId = request.params.installation_id;
 	var androidInstallationId = request.params.android_installation_id;
+	
+    var supportGCM = request.params.support_gcm_v1;
 	
 	var isOfferOrGift = (rewardId == null);
 	
@@ -1948,6 +1960,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
                 headers: { "Content-Type": "application/json"},
                 body: {
                     gcmrkey: "p9wn84m8450yot4ureh",
+                    support: supportGCM == null ? 1 : supportGCM,
                     repunch_receivers: repunchReceivers, 
 			        action: "com.repunch.retailer.INTENT_VALIDATE_REDEEM",
 			        redeem_id: redeemId,
@@ -1995,6 +2008,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        
 	        var extendedPostBody = {
                 gcmrkey: "p9wn84m8450yot4ureh",
+                support: supportGCM == null ? 1 : supportGCM,
                 repunch_receivers: repunchReceivers, 
 	            ordered_broadcast: "y",
 	            notification_time: String(new Date().getTime()),
@@ -2267,6 +2281,8 @@ Parse.Cloud.define("retailer_message", function(request, response) {
     // this is provided when the retailer is replying to a feedback
     var feedbackReplyBody = request.params.feedback_reply_body;
     
+    var supportGCM = request.params.support_gcm_v1;
+    
     var message, receiver_count, redeem_available;
 	var patron_ids = new Array(); 
 	
@@ -2451,6 +2467,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	        
 	        var postBody = {
                 gcmrkey: "p9wn84m8450yot4ureh",
+                support: supportGCM == null ? 1 : supportGCM,
                 repunch_receivers: repunchReceivers, 
 		        action: "com.repunch.consumer.intent.RETAILER_MESSAGE",
 		        ordered_broadcast: "y",
@@ -2602,6 +2619,8 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	var giftDescription = request.params.gift_description;
 	var giftPunches = request.params.gift_punches;
 	
+    var supportGCM = request.params.support_gcm_v1;
+	
 	var Store = Parse.Object.extend("Store");
 	var Patron = Parse.Object.extend("Patron");
 	var PatronStore = Parse.Object.extend("PatronStore");
@@ -2724,6 +2743,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	        
 	        var postBody = {
                 gcmrkey: "p9wn84m8450yot4ureh",
+                support: supportGCM == null ? 1 : supportGCM,
                 repunch_receivers: repunchReceivers, 
 		        action: "com.repunch.consumer.intent.SEND_GIFT",
 		        ordered_broadcast: "y",
@@ -2798,6 +2818,8 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	var messageId = request.params.message_id;
 	var senderName = request.params.sender_name;
 	var body = request.params.body;
+	
+    var supportGCM = request.params.support_gcm_v1;
 	
 	var Patron = Parse.Object.extend("Patron");
 	var Message = Parse.Object.extend("Message");
@@ -2897,6 +2919,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	        
 	        var postBody = {
                 gcmrkey: "p9wn84m8450yot4ureh",
+                support: supportGCM == null ? 1 : supportGCM,
                 repunch_receivers: repunchReceivers, 
 		        action: "com.repunch.consumer.intent.REPLY_TO_GIFT",
 		        ordered_broadcast: "y",
