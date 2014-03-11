@@ -22,7 +22,7 @@ Parse.Cloud.define("register_patron", function(request, response) {
 	punchCodeQuery.first().then(function(punchCodeResult) {
 		console.log("PunchCode fetch success.");
         punchCodeResult.set("is_taken", true);
-        punchCodeResult.set("user_id", request.user.get("objectId"));	//for record keeping purposes. also we use ParseUuser.objectId
+        punchCodeResult.set("user_id", request.user.get("objectId"));	//for record keeping purposes. also we use ParseUser.objectId
         											//since facebook users may not have email available.
 		return punchCodeResult.save();
 			
@@ -497,7 +497,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
 	iosInstallationQuery.equalTo("employee_id", employeeId);
 	iosInstallationQuery.equalTo("deviceType", "ios");
 	androidInstallationQuery.equalTo("employee_id", employeeId);
-    androidInstallationQuery.select("registration_id");
+    androidInstallationQuery.select("registration_id", "support");
     
     employeeQuery.equalTo("objectId", employeeId); 
     userQuery.matchesQuery("Employee", employeeQuery);
@@ -508,17 +508,20 @@ Parse.Cloud.define("delete_employee", function(request, response)
     function gcmPost() {
 	    var promise = new Parse.Promise();
     
-        androidInstallationQuery.first().then(function(installation) {
-	        if(installation == null) {
+        androidInstallationQuery.find().then(function(installations) {
+	        if(installations.length == 0) {
 	            promise.resolve();
 	            return;
 	        }
 	    
 	        var repunchReceivers = new Array();
-            repunchReceivers.push({
-                registration_id: installation.get("registration_id"),
-                employee_id: employeeId,
-            });
+	        for (var i=0; i<installations.length; i++) {
+                repunchReceivers.push({
+                    registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
+                    employee_id: employeeId,
+                });
+            }
 	    
 	        Parse.Cloud.httpRequest({
                 method: "POST",
@@ -527,7 +530,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
                 body: {
                     gcmrkey: "sikxuuq348o75c7seoryt",
                     repunch_receivers: repunchReceivers, 
-			        action: "com.repunch.retailer.EMPLOYEE_DELETED",
+			        action: "com.repunch.retailer.INTENT_EMPLOYEE_DELETED",
                 }, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);
@@ -650,7 +653,22 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
 		}
 		else {
             console.log("Existing PatronStore found.");
-			response.success(patronStore);
+            fetchPatronAndStore().then(function(patron, store) {
+			    linkExistingPatronStore(patron, store, patronStore).then(function() {
+			    	console.log("Successfully added relation from PatronStore to Patron and Store.");
+					response.success(patronStore);
+			    },
+			    function(error) {
+			    	console.log("Failed to add relation from PatronStore to Patron and Store.");
+			    	console.log(error);
+			    	response.error("error");
+			    });
+			},
+			function(error) {
+			    console.log("Failed to fetch Patron and Store.");
+			    console.log(error);
+			    response.error("error");
+			});
 		}
     });
     
@@ -714,8 +732,21 @@ Parse.Cloud.define("add_patronstore", function(request, response) {
         console.log("Fetching Patron and Store in parallel.");
         
         var promises = [];
-        promises.push(patron.fetch());
-        promises.push(store.fetch());
+        promises.push( patron.fetch() );
+        promises.push( store.fetch() );
+
+        return Parse.Promise.when(promises);	
+    }
+
+    function linkExistingPatronStore(patron, store, patronStore) {
+        console.log("Adding relation from existing PatronStore to Patron and Store in parallel.");
+
+        patron.relation("PatronStores").add(patronStore);
+        store.relation("PatronStores").add(patronStore);
+        
+        var promises = [];
+        promises.push( patron.save() );
+        promises.push( store.save() );
 
         return Parse.Promise.when(promises);	
     }
@@ -740,7 +771,7 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 	var storeQuery = new Parse.Query(Store);
 	var patronQuery = new Parse.Query(Patron);
 	
-	var patronStore, store, patron;
+	var patronStore;
 	
 	var promises = [];
 	promises.push( patronStoreQuery.get(patronStoreId) );
@@ -768,20 +799,13 @@ Parse.Cloud.define("delete_patronstore", function(request, response) {
 		
 	}).then(function() {
 		console.log("Store/Patron save success (in parallel).");
-		return patronStore.destroy();
-
-	}, function(error) {
-		console.log("Store/Patron save fail (in parallel).");
-		return Parse.Promise.error(error);
-		
-	}).then(function() {
-		console.log("PatronStore delete success.");
 		response.success("success");
 
 	}, function(error) {
-		console.log("PatronStore delete fail.");
+		console.log("Store/Patron save fail (in parallel).");
 		console.log(error);
 		response.error("error");
+		
 	});
 });
 
@@ -1027,7 +1051,7 @@ Parse.Cloud.define("punch", function(request, response)
 	patronStoreQuery.include("Store");
 	
 	androidInstallationQuery.equalTo("punch_code", punchCode);
-	androidInstallationQuery.select("registration_id", "patron_id");
+	androidInstallationQuery.select("registration_id", "patron_id", "support");
 	iosInstallationQuery.equalTo("punch_code", punchCode);
 	iosInstallationQuery.equalTo('deviceType', 'ios');
 				   
@@ -1140,6 +1164,7 @@ Parse.Cloud.define("punch", function(request, response)
 	            console.log("Pushing installation "+installations[i].id);
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
@@ -1450,7 +1475,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
 	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	    androidInstallationQuery.equalTo("store_id", storeId);
-	    androidInstallationQuery.select("registration_id", "employee_id");
+	    androidInstallationQuery.select("registration_id", "employee_id", "support");
 	    
 	    androidInstallationQuery.find().then(function(installations) {
 	        console.log("Found "+installations.length+" employee installations for store_id "+storeId);
@@ -1465,6 +1490,7 @@ Parse.Cloud.define("request_redeem", function(request, response)
 	            console.log("Pushing installation "+installations[i].id);
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                employee_id: installations[i].get("employee_id"),
 	            });
 	        }
@@ -1682,7 +1708,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
 	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	    androidInstallationQuery.equalTo("store_id", storeId);
-	    androidInstallationQuery.select("registration_id", "employee_id");
+	    androidInstallationQuery.select("registration_id", "employee_id", "support");
 		if (androidInstallationId != null) {
 		    androidInstallationQuery.notEqualTo("objectId", androidInstallationId);
 		}
@@ -1700,6 +1726,7 @@ Parse.Cloud.define("reject_redeem", function(request, response)
 	            console.log("Pushing installation "+installations[i].id);
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                employee_id: installations[i].get("employee_id"),
 	            });
 	        }
@@ -1899,7 +1926,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
 	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	    androidInstallationQuery.equalTo("store_id", storeId);
-	    androidInstallationQuery.select("registration_id", "employee_id");
+	    androidInstallationQuery.select("registration_id", "employee_id", "support");
 		if (androidInstallationId != null) {
 		    console.log("Excluding Android Installation "+androidInstallationId);
 		    androidInstallationQuery.notEqualTo("objectId", androidInstallationId);
@@ -1918,6 +1945,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	            console.log("Pushing installation "+installations[i].id);
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                employee_id: installations[i].get("employee_id"),
 	            });
 	        }
@@ -1957,7 +1985,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	    var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
 	    var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 	    androidInstallationQuery.equalTo("patron_id", patronId);
-	    androidInstallationQuery.select("registration_id", "patron_id");
+	    androidInstallationQuery.select("registration_id", "patron_id", "support");
 	    
 	    androidInstallationQuery.find().then(function(installations) {
 	        if(installations.length == 0) {
@@ -1969,6 +1997,7 @@ Parse.Cloud.define("validate_redeem", function(request, response)
 	        for(var i=0; i<installations.length; i++) {
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
@@ -2414,7 +2443,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	function gcmPost(){
 	    var promise = new Parse.Promise();
 	    
-	    androidInstallationQuery.select("registration_id", "patron_id");
+	    androidInstallationQuery.select("registration_id", "patron_id", "support");
 	    androidInstallationQuery.find().then(function(installations) {
 	        if(installations.length == 0) {
 	            promise.resolve();
@@ -2425,6 +2454,7 @@ Parse.Cloud.define("retailer_message", function(request, response) {
 	        for(var i=0; i<installations.length; i++) {
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
@@ -2686,7 +2716,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
         var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
         var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 		androidInstallationQuery.equalTo("patron_id", giftRecepientId);
-	    androidInstallationQuery.select("registration_id", "patron_id");
+	    androidInstallationQuery.select("registration_id", "patron_id", "support");
 	    
 	    androidInstallationQuery.find().then(function(installations) {
 	        if(installations.length == 0) {
@@ -2698,6 +2728,7 @@ Parse.Cloud.define("send_gift", function(request, response) {
 	        for(var i=0; i<installations.length; i++) {
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
@@ -2859,7 +2890,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
         var AndroidInstallation = Parse.Object.extend("AndroidInstallation");
         var androidInstallationQuery = new Parse.Query(AndroidInstallation);
 		androidInstallationQuery.equalTo("patron_id", receiverPatronId);
-	    androidInstallationQuery.select("registration_id", "patron_id");
+	    androidInstallationQuery.select("registration_id", "patron_id", "support");
 	    
 	    androidInstallationQuery.find().then(function(installations) {
 	        if(installations.length == 0) {
@@ -2871,6 +2902,7 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	        for(var i=0; i<installations.length; i++) {
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
