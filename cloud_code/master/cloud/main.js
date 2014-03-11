@@ -508,18 +508,20 @@ Parse.Cloud.define("delete_employee", function(request, response)
     function gcmPost() {
 	    var promise = new Parse.Promise();
     
-        androidInstallationQuery.first().then(function(installation) {
-	        if(installation == null) {
+        androidInstallationQuery.find().then(function(installations) {
+	        if(installations.length == 0) {
 	            promise.resolve();
 	            return;
 	        }
 	    
 	        var repunchReceivers = new Array();
-            repunchReceivers.push({
-                registration_id: installation.get("registration_id"),
-                support: installation.get("support") == null ? true : installation.get("support"),
-                employee_id: employeeId,
-            });
+	        for (var i=0; i<installations.length; i++) {
+                repunchReceivers.push({
+                    registration_id: installations[i].get("registration_id"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
+                    employee_id: employeeId,
+                });
+            }
 	    
 	        Parse.Cloud.httpRequest({
                 method: "POST",
@@ -1162,7 +1164,7 @@ Parse.Cloud.define("punch", function(request, response)
 	            console.log("Pushing installation "+installations[i].id);
 	            repunchReceivers.push({
 	                registration_id: installations[i].get("registration_id"),
-                    support: installation.get("support") == null ? true : installation.get("support"),
+                    support: installations[i].get("support") == null ? true : installations[i].get("support"),
 	                patron_id: installations[i].get("patron_id"),
 	            });
 	        }
