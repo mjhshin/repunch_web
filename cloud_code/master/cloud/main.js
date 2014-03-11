@@ -530,7 +530,7 @@ Parse.Cloud.define("delete_employee", function(request, response)
                 body: {
                     gcmrkey: "<<GCM_RECEIVE_KEY>>",
                     repunch_receivers: repunchReceivers, 
-			        action: "com.repunch.retailer.EMPLOYEE_DELETED",
+			        action: "com.repunch.retailer.INTENT_EMPLOYEE_DELETED",
                 }, 
                 success: function(httpResponse) {
                     console.log("Post success with " + httpResponse.text);
