@@ -5,7 +5,7 @@ GCM HTTP Sender.
 import requests, json
 
 from repunch.settings import GCM_RECEIVE_KEY, GCM_RECEIVE_KEY_NAME,\
-GCM_API_KEY
+GCM_API_KEY_OLD, GCM_API_KEY_NEW
 
 NON_DATA_PARAMS = (GCM_RECEIVE_KEY_NAME, 'repunch_receivers')
 GCM_URL = "https://android.googleapis.com/gcm/send"
@@ -24,6 +24,10 @@ def gcm_send(postBody):
                 "<employee|patron>_id": "...",
             }, ...],
 	        action: "com.repunch.retailer.PUNCH",
+	        
+	        # 1 to employ backwards compat. 0 otherwise.
+	        # Default is 1.
+            support: [1|0],
         
             # optional content (must be less than 4kb)
             optionalData1: False,
@@ -45,10 +49,15 @@ def gcm_send(postBody):
     if len(receivers) == 0:
         return True
         
+    if int(postBody.get("support", 1)) > 0:
+        api_key = GCM_API_KEY_OLD
+    else:
+        api_key = GCM_API_KEY_NEW
+        
     headers = {
         'UserAgent': "GCM-Server",
         'content-type': 'application/json',
-        'Authorization': 'key=%s' % (GCM_API_KEY,),
+        'Authorization': 'key=%s' % (api_key,),
     }
     
     data = { k:v for k,v in postBody.iteritems()
