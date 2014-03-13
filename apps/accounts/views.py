@@ -8,8 +8,7 @@ from datetime import datetime
 import json, urllib
 
 from libs.dateutil.relativedelta import relativedelta
-from repunch.settings import PHONE_COST_UNIT_COST,\
-COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
+from repunch.settings import COMET_RECEIVE_KEY_NAME, COMET_RECEIVE_KEY
 from apps import isdigit
 from apps.accounts.forms import EmailForm, PasswordForm
 from apps.stores.forms import SubscriptionForm

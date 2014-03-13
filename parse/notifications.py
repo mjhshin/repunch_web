@@ -102,7 +102,7 @@ def send_email_receipt_monthly_success(account, store, subscription,
     invoice, connection=None):
     """
     Called in monthly billing if charging cc was successful.
-    Sends an email to the account holder and ORDER_PLACED_EMAILS
+    Sends an email to the account holder.
     """
     def _wrapper():
         # need to activate the store's timezone for template rendering!

@@ -8,7 +8,7 @@ import json, pytz
 
 from apps.public.forms import ContactForm
 from libs.repunch import rputils
-from repunch.settings import PHONE_COST_UNIT_COST, DEBUG
+from repunch.settings import DEBUG
 from parse.auth.utils import request_password_reset
 from parse.notifications import send_email_signup
 from apps import isdigit

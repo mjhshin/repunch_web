@@ -97,17 +97,28 @@ DATABASES = {
 
 """
 This is the key used to validate the authenticity of requests received
-by 
+by repunch.views.manage_admin_controls
 """
 ADMIN_CONTROL_KEY = "9p8437wk34z5ymurukdp9w34px7iuhsruhio"
 
-# The model that Django will use instead of the User class.
+"""
+1) AUTH_USER_MODEL: the model that Django will use instead of the User class.
+This comes into play for Django authentication in dev login.
+2) USER_CLASS: this is not used by Django itself but by us. We use this
+in parse.core.models and formatter to substitute "Account" with "_User"
+since Account is the class corresponding to our Parse User class.
+"""
 AUTH_USER_MODEL = 'accounts.Account'
+USER_CLASS = "Account"
 
-# For parse notifications
+"""
+The sender name of all emails when in production using sendgrid.
+"""
 EMAIL_FROM = "support@repunch.com"
 
-# configuration for SMTP
+"""
+Email configuration.
+"""
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 if PRODUCTION_SERVER:
@@ -120,7 +131,12 @@ else:
     EMAIL_HOST_PASSWORD = 'q3vnq985v7y34'
     
     
-# for order_placed event
+"""
+1) REPUNCH_ADMINS: emails that technical stuff will be sent to - like
+class validation, suspiscious activity, etc.
+2) ORDER_PLACED_EMAILS: historically used as addresses to send iTouch
+orders to. Now used for signup and monthly billing.
+"""
 if DEBUG:
     ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
     REPUNCH_ADMINS = ORDER_PLACED_EMAILS[:] 
@@ -132,7 +148,9 @@ else:
     else:
         ORDER_PLACED_EMAILS = REPUNCH_ADMINS[:]
     
-# for template rendering
+"""
+Used in email template rendering.
+"""
 if DEBUG:
     ABSOLUTE_HOST = 'localhost:8000'
 else:
@@ -141,7 +159,10 @@ else:
     else:
         ABSOLUTE_HOST = 'dev.repunch.com'
 
-# PARSE 
+
+"""
+Parse API keys and ids.
+"""
 PARSE_VERSION = '1'
 if PRODUCTION_SERVER:
     PARSE_APPLICATION_ID = "m0EdwpRYlJwttZLZ5PUk7y13TWCnvSScdn8tfVoh"
@@ -152,20 +173,33 @@ else:
     PARSE_MASTER_KEY = 'XIiZlcZjzh547FJvWWLlZhrNojXM2PXqA0W9C321'
     REST_API_KEY = "YXEVHl0zsSdDQi1okzekpOjet4nIvVMDlYr2JdfI"
     
+"""
+1) REST_CONNECTION_META: used when making REST requests to parse using
+parse.utils.parse.
+2) PARSE_BATCH_LIMIT: the maximum amount of POSTs and PUTs and DELETEs
+a single parse batch request can contain. This limit is imposed by
+Parse itself so don't change this.
+"""
+REST_CONNECTION_META = {
+   "X-Parse-Application-Id": PARSE_APPLICATION_ID,
+   "X-Parse-REST-API-Key":REST_API_KEY
+}
+PARSE_BATCH_LIMIT = 50
+
+"""
+Used for image cropping.
+"""
 IMAGE_THUMBNAIL_SIZE = (200, 200)
 IMAGE_THUMBNAIL_ASPECT_RATIO = (1,1)
 IMAGE_COVER_ASPECT_RATIO_RANGE = ((9.0,16.0), (16.0,9.0))
 IMAGE_COVER_MIN_EDGE = 512
 IMAGE_COVER_MAX_EDGE = 1024
 SUPPORTED_IMAGE_FORMATS = ("png", "jpg", "jpeg")
-REST_CONNECTION_META = {
-       "X-Parse-Application-Id": PARSE_APPLICATION_ID,
-       "X-Parse-REST-API-Key":REST_API_KEY
-}
-PARSE_BATCH_LIMIT = 50
-USER_CLASS = "Account"
 
-# Stuff for the PAYPAL API
+
+"""
+PAYPAL API keys and ids.
+"""
 if DEBUG or not PRODUCTION_SERVER:
     # PAYPAL SANDBOX credentials need to use LIVE for the real thing
     # endpoint = api.sandbox.paypal.com
@@ -315,8 +349,6 @@ else:
     TEMPLATE_DIRS = (FS_SITE_DIR + '/templates', )
     STATICFILES_DIRS = (FS_SITE_DIR + '/static', )
     
-# order placed on iPod Touch
-PHONE_COST_UNIT_COST = 149 # TOD SET TO 149
 # paginator
 PAGINATION_THRESHOLD = 20
 # days given before account is disabled when passed user limit
