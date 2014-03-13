@@ -1,3 +1,8 @@
+"""
+Views for all the public pages.
+"""
+
+
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -29,53 +34,87 @@ from parse.apps.stores.models import Store, StoreLocation,\
 Subscription, Settings
 
 def terms_mobile(request):
+    """
+    Render the mobile terms and conditions template.
+    """
     return render(request, "public/terms-mobile.djhtml",
         get_notification_ctx())
         
 def privacy_mobile(request):
+    """
+    Render the mobile privacy policy template.
+    """
     return render(request, "public/privacy-mobile.djhtml",
         get_notification_ctx())
 
 @dev_login_required
 def index(request):
+    """
+    Render the home template or redirect to dashboard.
+    """
+    # redirect user to dashboard if already logged in
     if request.session.get('account') is not None and\
         request.session.get('store') is not None and\
         request.session.get('subscription') is not None:
         return redirect(reverse('store_index'))
         
+    # otherwise render the home page
     data = {'home_nav': True}
     return render(request, 'public/index.djhtml', data)
 
 @dev_login_required
 def learn(request):
+    """
+    Render the learn template.
+    """
     data = {'learn_nav': True, "sub_type": sub_type}
     return render(request, 'public/learn.djhtml', data)
 
 @dev_login_required
 def faq(request):
+    """
+    Render the faq template.
+    """
     data = {'faq_nav': True, 'form':ContactForm()}
     return render(request, 'public/faq.djhtml', data)
 
 @dev_login_required
 def about(request):
+    """
+    Render the about template.
+    """
     data = {'about_nav': True}
     return render(request, 'public/about.djhtml', data)
 
 @dev_login_required
 def terms(request):
+    """
+    Render the terms and conditions template.
+    """
     return render(request, 'public/terms.djhtml')
 
 @dev_login_required
 def privacy(request):
+    """
+    Render the privacy policy template.
+    """
     return render(request, 'public/privacy.djhtml')
 
 @dev_login_required
 def contact(request):
+    """
+    Render the contact template or handle a form submission.
+    """
+    
+    # form submission - redirect to thank_you view if form is valid
+    # otherwise re-render the contact template with the form with errors
     if request.method == 'POST': 
         form = ContactForm(request.POST) 
         if form.is_valid(): 
             form.send()
             return redirect(reverse('public_thank_you'))
+            
+    # just render the contact template with a new form.
     else:
         form = ContactForm()
 
@@ -83,15 +122,24 @@ def contact(request):
 
 @dev_login_required
 def thank_you(request):
+    """
+    Render the thank you template.
+    """
     return render(request, 'public/thank_you.djhtml')
 
 @dev_login_required
 def jobs(request):
+    """
+    Render the jobs template.
+    """
     return render(request, 'public/jobs.djhtml')
 
 def categories(request):
-    """ takes in ajax requests and returns a list of choices for
-    autocompletion in json format """
+    """ 
+    Takes in ajax requests and returns a list of choices for
+    autocompletion in json format. This is used in signup for
+    static/public/js/autocomplete.js
+    """
     # term is the key in request.GET
     if request.method == "GET":
         categories = Category.objects.filter(name__istartswith=\
