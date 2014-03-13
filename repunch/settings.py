@@ -1,17 +1,42 @@
+"""
+Settings for the Repunch web project.
+Django version 1.5
+--------------------------------------
+
+
+* All variables in this settings file can and should be accessed using:
+from django.conf import settings
+settings.VARIABLE_NAME
+
+P.S.
+* You will notice that the above method is not actually used at all.
+Instead, we import settings variable directly using:
+from repunch.settings import VARIABLE_NAME
+which is not recommended in the Django documentation. The reason for 
+this is historical. The first guy who created this project from scratch
+did not use django.config.settings so I just followed suit.
+You may change this at any time - it shouldn't affect anything.
+"""
+
 import os
 
-# Production server should always have
-# PRODUCTION_SERVER = True and DEBUG = False
-
-# Set this to True to DISABLE Django user authentication
+"""
+Set this to True if this is the production server. This has the main
+effect of determining which Parse database to use.
+"""
 PRODUCTION_SERVER = False
 
-# SERVER SIDE SHOULD ALWAYS HAVE DEBUG FALSE!
+"""
+Set this to True if you are developing locally. This should always be
+True serverside.
+"""
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
-DEVELOPMENT_TOKEN = "dev_token"
-
+"""
+Determine the paths and protocols to be used.
+Notice that paths serverside "FS_SITE_DIR" must be an absolute path - 
+not relative. Absolute paths is required for cron jobs to function.
+"""
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
     MAIN_TRANSPORT_PROTOCOL = "http"
@@ -28,7 +53,11 @@ else:
         SESSION_COOKIE_SECURE = False
         CSRF_COOKIE_SECURE = False
         
-# Django email related settings
+"""
+This is the guy that will receive emails that Django sends out.
+The emails are mostly errors regarding Unknown hosts,
+which can be ignored.
+"""
 ADMINS = (
     ('Vandolf Estrellado', 'vandolf@repunch.com'),
 )
@@ -50,7 +79,7 @@ DATABASES = {
 # admin controls
 ADMIN_CONTROL_KEY = "9p8437wk34z5ymurukdp9w34px7iuhsruhio"
 
-# this 1 is for django
+# The model that Django will use instead of the User class.
 AUTH_USER_MODEL = 'accounts.Account'
 
 # For parse notifications
@@ -112,10 +141,9 @@ REST_CONNECTION_META = {
        "X-Parse-REST-API-Key":REST_API_KEY
 }
 PARSE_BATCH_LIMIT = 50
-
 USER_CLASS = "Account"
 
-
+# Stuff for the PAYPAL API
 if DEBUG or not PRODUCTION_SERVER:
     # PAYPAL SANDBOX credentials need to use LIVE for the real thing
     # endpoint = api.sandbox.paypal.com
@@ -322,6 +350,10 @@ RECAPTCHA_PUBLIC_KEY = "6LcRz-cSAAAAAIhbaQAFiiPvWqDrsDtIfd98cCWu"
 RECAPTCHA_PRIVATE_KEY = "6LcRz-cSAAAAAPOwkCDj0vHyIcGqqfm3hfOXgvTO"
 RECAPTCHA_ATTEMPTS = 3 # show recaptcha after 3 failed attempts
 RECAPTCHA_TOKEN = "recaptcha_token"
+
+# 
+DEVELOPMENT_TOKEN = "dev_token"
+TEMPLATE_DEBUG = DEBUG
 
 # Note about clearing the session store. We do not need to manually
 # clear the session because "caches automatically delete stale data"
