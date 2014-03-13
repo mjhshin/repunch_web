@@ -1,3 +1,6 @@
+"""
+Views for the My Store and Settings tab in the dashboard.
+"""
 from django.shortcuts import render, redirect
 from django.contrib.auth import SESSION_KEY
 from django.http import Http404
@@ -34,8 +37,12 @@ from parse.auth.decorators import login_required, dev_login_required
 @login_required
 @access_required
 def index(request):
+    """
+    Render the store details template.
+    """
     data = {'account_nav': True}
     
+    # this can be done more gracefully
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
@@ -47,6 +54,11 @@ def index(request):
 @login_required
 @access_required
 def set_active_location(request):
+    """
+    Sets the active store location id in the session.
+    This is used when selecting a store location in the header nav
+    or the tab nav.
+    """
     store_location_id = request.GET.get("store_location_id")
     success = False
     if store_location_id in SESSION.get_store_locations(\
@@ -68,9 +80,15 @@ def set_active_location(request):
 @login_required
 @admin_only(reverse_url="store_index")
 def edit_store(request):
+    """
+    Render the edit store template or handle a form submission from it.
+    """
     data = {'account_nav': True}
     store = SESSION.get_store(request.session)
     
+    # validate form submission and redirect to store details if
+    # success or re-render the store edit template with previous form
+    # input and errors.
     if request.method == "POST":
         store_form = StoreForm(request.POST)
         
@@ -91,6 +109,8 @@ def edit_store(request):
             return redirect(reverse('store_index')+ "?%s" %\
                 urllib.urlencode({'success': 'Store details has been updated.'}))
         
+    # user navigates to this page so just render the store edit template
+    # with a blank form.
     else:
         store_form = StoreForm()
         store_form.initial = store.__dict__.copy()
@@ -103,21 +123,33 @@ def edit_store(request):
 @login_required
 @admin_only(reverse_url="store_index")
 def edit_location(request, store_location_id):
+    """
+    Renders the edit location template or handle form submissions
+    for location creation or update.
+    """
     data = {'account_nav': True, 'store_location_id': store_location_id}
     store = SESSION.get_store(request.session)
     
+    # we are editing a new location if store_location_id is 0
     new_location = store_location_id == '0'
         
     def common(store_location_form):
+        """
+        Returns a rendered store location edit template with the given
+        store location form.
+        """
         data['store_location_form'] = store_location_form
         return render(request, 'manage/store_location_edit.djhtml', data)
             
+    # Handle form submission and return the appropriate json response
     if request.method == 'POST': 
         store_location_form = StoreLocationForm(request.POST)
         
         postDict = request.POST.dict()
         hours = HoursInterpreter(json.loads(postDict["hours"]))
         
+        # we are either creating a new store location or updating an
+        # existing one with new values in the postDict
         if new_location:
             store_location = StoreLocation(**postDict)
         else:
@@ -195,6 +227,7 @@ def edit_location(request, store_location_id):
                     urllib.urlencode({'success': success_msg})
             }), content_type="application/json")
             
+            
         else:
             data['store_location'] = store_location
             data['hours_data'] = hours._format_javascript_input()
@@ -203,9 +236,15 @@ def edit_location(request, store_location_id):
                 "result": "error",
                 "html": common(store_location_form).content,
             }), content_type="application/json")
-                
+       
+    # user navigated to this page so just render a store location edit
+    # template with a blank form (if new_location) or a form with fields
+    # filled out if user is editing an existing location    
     else:
         store_location_form = StoreLocationForm(None)
+        
+        # user is editing an existing location so fill up initial
+        # form content
         if not new_location:
             store_location = SESSION.get_store_location(\
                 request.session, store_location_id)
@@ -221,14 +260,21 @@ def edit_location(request, store_location_id):
          
     return common(store_location_form)
 
-# this accessed only through the edit_store detail page, which
-# requires admin access but this might be useful somewhere else
-# so the admin_only decorator is not used
+
 @dev_login_required
 @login_required
 @access_required(http_response="Access denied", content_type="text/plain")
 @csrf_exempt
 def hours_preview(request):
+    """
+    Returns a json response containing the readable hours in html
+    given a properly formatted POST data. The format of the POST
+    data is specified in the HoursInterpreter.
+    
+    If the hours in the POST data produces an incorrect hours 
+    (overlapping hours or close time lexicographically less than open
+    time, etc).
+    """
     if request.method != "POST":
         return "Bad request"
 
@@ -253,6 +299,15 @@ def hours_preview(request):
 content_type="text/html")
 @csrf_exempt
 def image_upload(request):
+    """
+    Renders the image upload template for GET requests or POST requests
+    with form errors.
+    """
+    
+    # user submitted an image form which we validate
+    # if the form is valid the we render the image crop template
+    # else we render the image upload template with previous form 
+    # input and errors
     if request.method == 'POST': 
         form = UploadImageForm(request.POST, request.FILES)
         if form.is_valid():
@@ -260,7 +315,8 @@ def image_upload(request):
             # save the file locallly
             image = form.save(request.session.session_key)
             
-            if image.width > image.height: # height is limiting
+            # height is limiting
+            if image.width > image.height: 
                 center_width = image.width * 0.5
                 init_y1 = image.height * 0.125
                 init_y2 = image.height * 0.875
@@ -285,6 +341,8 @@ def image_upload(request):
                 'aspect_ratio': IMAGE_THUMBNAIL_ASPECT_RATIO, 
             })
             
+    # user navigated to this page so just render the image upload
+    # template with a blank form.
     else:
         form = UploadImageForm()
     
@@ -299,6 +357,8 @@ def image_upload(request):
 content_type="text/html")
 def image_get(request):
     """
+    Returns a json response containing the cover and thumbnail url
+    for the store.
     """
     if request.method == "GET":
         store = SESSION.get_store(request.session)
@@ -414,9 +474,14 @@ def image_crop(request):
 @login_required
 @admin_only(except_method="GET")
 def settings(request):
+    """
+    Renders the settings page or handles changes to it.
+    """
     data = {'settings_nav': True}
     store = SESSION.get_store(request.session)
     settings = SESSION.get_settings(request.session)
+    
+    # user made changes
     if request.method == 'POST':
         form = SettingsForm(request.POST)
         if form.is_valid(): 
@@ -443,7 +508,10 @@ def settings(request):
 
             data['success'] = "Settings have been saved."
         else:
-            data['error'] = 'Error saving settings.';
+            data['error'] = 'Error saving settings.'
+            
+    # user navigated to this page so just render the settings template
+    # with a filled settings form
     else:
         form = SettingsForm()
         form.initial = settings.__dict__.copy()
@@ -451,7 +519,7 @@ def settings(request):
         form.initial['punches_facebook'] =\
             store.get('punches_facebook')
     
-    # update the session cache
+    # update the session cache since we may have made changes above
     request.session['store'] = store
     request.session['settings'] = settings
     
@@ -463,6 +531,10 @@ def settings(request):
 @login_required
 @admin_only(http_response={"error": "Permission denied"})
 def refresh(request):
+    """
+    Returns a json response containing a new retailer_pin for the store.
+    """
+    
     if request.session.get('account') and\
             request.session.get(SESSION_KEY):
         data = {'success': False}
