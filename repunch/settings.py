@@ -95,7 +95,10 @@ DATABASES = {
     }
 }
 
-# admin controls
+"""
+This is the key used to validate the authenticity of requests received
+by 
+"""
 ADMIN_CONTROL_KEY = "9p8437wk34z5ymurukdp9w34px7iuhsruhio"
 
 # The model that Django will use instead of the User class.
