@@ -1,6 +1,9 @@
 """
 Settings for the Repunch web project.
-Django version 1.5
+Django version 1.5 # NOTICE the 1.5 - very important
+
+Anything settings variable not completely explained here can be found
+at https://docs.djangoproject.com/en/1.5/ref/settings/
 --------------------------------------
 
 
@@ -34,8 +37,20 @@ DEBUG = True
 
 """
 Determine the paths and protocols to be used.
-Notice that paths serverside "FS_SITE_DIR" must be an absolute path - 
-not relative. Absolute paths is required for cron jobs to function.
+
+1) FS_SITE_DIR: must be an absolute path - not relative. 
+Absolute paths is required for cron jobs to function.
+Notice that if DEBUG is True this value is a relative path (os.getcwd()).
+Whereas, if not DEBUG it is an absolute path in the server.
+
+2) MAIN_TRANSPORT_PROTOCOL: either http (development) or https (production)
+
+3) SESSION_COOKIE_SECURE: Same as CSRF_COOKIE_SECURE except this
+is for session cookies.
+
+4) CSRF_COOKIE_SECURE: this is a Django security flag. True if csrf
+tokens received from forms in views requiring csrf protection must
+come from an https connection.
 """
 if DEBUG:
     FS_SITE_DIR = os.getcwd()
@@ -64,6 +79,10 @@ ADMINS = (
 MANAGERS = ADMINS
 #-----------
 
+"""
+The database settings. The values here must be the same as the local
+and serverside mysql database.
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
