@@ -26,7 +26,7 @@ urlpatterns = patterns('',
     url(r'^manage/admin-controls$', views.manage_admin_controls, name='manage_admin_controls'),
     
     url(r'^gcm/', include('apps.gcm.urls')),
-    url(r'^tutorials/', include('apps.tutorials.urls')),
+    url(r'^dev-guide/', include('apps.dev_guide.urls')),
     
     # Parse Stuff
     url(r'^manage/password-reset$', 

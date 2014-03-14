@@ -439,7 +439,7 @@ INSTALLED_APPS = (
     'apps.comet',
     'apps.scripts',
     'apps.gcm',
-    'apps.tutorials',
+    'apps.dev_guide',
     'libs.repunch',
     
     'django_extensions',

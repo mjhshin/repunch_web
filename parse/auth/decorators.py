@@ -139,7 +139,8 @@ def dev_passes_test(test_func, login_url, redirect_field_name,
 def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=LOGIN_URL_DEV,
     http_response=None, content_type="application/json"):
     """
-    Used for preventing non-repunch engineers from accessing all pages
+    Used for preventing non-repunch engineers from accessing any page.
+    This does nothing if PRODUCTION_SERVER is True.
     """
     if PRODUCTION_SERVER:
         actual_decorator = dev_passes_test(
@@ -161,3 +162,30 @@ def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, l
     if function:
         return actual_decorator(function)
     return actual_decorator
+
+def _dev_only(raise_404):
+    """
+    Raises a http_404 if PRODUCTION_SERVER is True.
+    """
+    def _dev_only_decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, *args, **kwargs):
+            if raise_404:
+                raise Http404
+            else:
+                return view_func(request, *args, **kwargs)
+                    
+        return _wrapped_view
+        
+    return _dev_only_decorator
+
+
+def dev_only(function=None):
+    """
+    Raises a http_404 if PRODUCTION_SERVER is True.
+    """
+    actual_decorator = _dev_only(raise_404=PRODUCTION_SERVER)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+    
