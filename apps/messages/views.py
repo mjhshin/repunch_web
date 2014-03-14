@@ -1,3 +1,7 @@
+"""
+Views for the Messages tab in the dashboard.
+"""
+
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib.sessions.backends.cache import SessionStore
@@ -76,6 +80,7 @@ def get_page(request):
         
         return render(request, template, data)
         
+    # user requested this view using a method that is not GET
     return HttpResponse("Bad request")
 
 
