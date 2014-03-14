@@ -15,12 +15,6 @@
 {% block content %}
 	
 	<form action="{% url 'reward_edit' reward_id %}" method="POST" id="reward-form">{% csrf_token %}
-		{% if error or success %}
-		<div class="notification {% if success %}success{% endif %} hide">
-			<div>{{ error }}{{ success }}</div>
-		</div>
-		{% endif %}
-	
 		<h2>{{ is_new|yesno:"Create New,Edit" }} Reward</h2>
 		
 		<div class="input-container" id="reward_name_ic">

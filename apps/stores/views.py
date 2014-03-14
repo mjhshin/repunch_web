@@ -42,7 +42,9 @@ def index(request):
     """
     data = {'account_nav': True}
     
-    # this can be done more gracefully
+    # inserting this success and error message into the template
+    # should be done in a cleaner way - this was done by the first guy
+    # I just didn't bother changing it.
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
