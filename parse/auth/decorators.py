@@ -163,29 +163,3 @@ def dev_login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, l
         return actual_decorator(function)
     return actual_decorator
 
-def _dev_only(raise_404):
-    """
-    Raises a http_404 if PRODUCTION_SERVER is True.
-    """
-    def _dev_only_decorator(view_func):
-        @wraps(view_func, assigned=available_attrs(view_func))
-        def _wrapped_view(request, *args, **kwargs):
-            if raise_404:
-                raise Http404
-            else:
-                return view_func(request, *args, **kwargs)
-                    
-        return _wrapped_view
-        
-    return _dev_only_decorator
-
-
-def dev_only(function=None):
-    """
-    Raises a http_404 if PRODUCTION_SERVER is True.
-    """
-    actual_decorator = _dev_only(raise_404=PRODUCTION_SERVER)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
-    
