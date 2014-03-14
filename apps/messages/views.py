@@ -407,13 +407,12 @@ def details(request, message_id):
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
+            break
             
     if not message:
-        # message not found - assume that it was deleted sice we don't
-        # use comet.js to remove deleted message client side
+        # message not found - redirect to message page with error
         return redirect(reverse('messages_index')+ "?%s" %\
-             urllib.urlencode({'error':\
-                'Message has already been deleted.'}))
+             urllib.urlencode({'error': 'Message not found.'}))
                 
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True,
@@ -426,11 +425,14 @@ def details(request, message_id):
 @access_required
 def feedback(request, feedback_id):
     """
-    TODO
+    Renders the feedback template with the stores feedbacks.
     """
-    data = {'messages_nav': True, 'feedback_id':feedback_id,
-             "store_name":\
-                SESSION.get_store(request.session).get("store_name")}    
+    data = {
+        'messages_nav': True,
+        'feedback_id':feedback_id,
+         "store_name":\
+            SESSION.get_store(request.session).get("store_name"),
+    }    
     
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
@@ -443,12 +445,13 @@ def feedback(request, feedback_id):
             break
             
     if not feedback:
+        # feedack not found - redirect to messages page with error message
         return redirect(reverse('messages_index')+ "?%s" %\
-             urllib.urlencode({'error':\
-                'Feedback has already been deleted.',
+             urllib.urlencode({'error': 'Feedback not found.',
                 "tab_feedback":1}))
     
     if not feedback.is_read:
+        # update the feedback's read if not yet read
         feedback.is_read = True
         feedback.update()
         
@@ -457,6 +460,9 @@ def feedback(request, feedback_id):
     messages_received_list.insert(i_remove, feedback)
     request.session['messages_received_list'] = messages_received_list
         
+    # inserting this success and error message into the template
+    # should be done in a cleaner way - this was done by the 
+    # first guy. I just didn't bother changing it.
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
@@ -472,9 +478,16 @@ def feedback(request, feedback_id):
 @login_required
 @admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_reply(request, feedback_id):
+    """
+    Render the feedback reply template.
+    """
     account = request.session['account']
     store = SESSION.get_store(request.session)
-    data = {'messages_nav': True}
+    # data to be passed in the templace context
+    data = {
+        'messages_nav': True,
+        'from_address': store.get("store_name"),
+    }
     
     # get from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
@@ -487,36 +500,49 @@ def feedback_reply(request, feedback_id):
             break
             
     if not feedback:
+        # feedack not found - redirect to messages page with error message
         return redirect(reverse('messages_index')+ "?%s" %\
-             urllib.urlencode({'error':\
-                'Feedback has already been deleted.'}))
+             urllib.urlencode({'error': 'Feedback not found.'}))
     
     if request.method == 'POST':
+        # user submitted reply form
         body = request.POST.get('body')
         if body is not None:
+            # strip the body so that it doesn't have trailing or
+            # leading whitespaces
             body = body.strip()
         else:
             body = ""
             
         data['body'] = body
-        data['from_address'] = store.get("store_name")
         
         if len(body) == 0:
+            # body cannot be empty
             data['error'] = 'Please enter a message.'  
+            
         elif len(body) > 750:
+            # body cannot exceed 750 cahracters 
             data['error'] = 'Body must be less than 750 characters.' 
-        # double check if feedback already has a reply
-        # should not go here unless it is a hacker 
+            
         elif feedback.get('Reply'):
+            # double check if feedback already has a reply
+            # should not go here unless it is a hacker 
             return redirect(reverse('messages_index')+ "?%s" %\
                  urllib.urlencode({'error':\
                     'Feedback has already been replied to.'}))
+                    
         else:
+            # all valid - this method of validation is dirty and not
+            # the way to do it in Django. Use a form instead. 
+            # I just got lazy here.
+            
+            # create the Parse Message object
             msg = Message.objects().create(message_type=\
                 FEEDBACK, sender_name=store.get('store_name'),
                 store_id=store.objectId, body=body)
+            # add the created reply to the store's sent messages relation
             store.add_relation("SentMessages_", [msg.objectId])
-            # set feedback Reply pointer to message
+            # set feedback Reply pointer to message and update it
             feedback.set('Reply', msg.objectId)
             feedback.update()
             
@@ -529,7 +555,7 @@ def feedback_reply(request, feedback_id):
             # save the session now! cloud_call may take a bit!
             request.session.save()
 
-            # push notification
+            # make the cloud call
             cloud_call("retailer_message", {
                 "store_id":store.objectId,
                 "store_name":store.get('store_name'),
@@ -539,29 +565,29 @@ def feedback_reply(request, feedback_id):
                 "feedback_reply_body": body,
             })
             
-            payload = {
+            # notify other tabs/browsers logged into the same store 
+            # about the newly created message.
+            comet_receive(store.objectId, {
                 COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                 "newMessage":feedback.jsonify()
-            }
-            comet_receive(store.objectId, payload)
+            })
             
             # make sure we have the latest session to save!
             request.session.clear()
             request.session.update(SessionStore(request.session.session_key))
 
             return redirect(reverse('feedback_details', 
-                        args=(feedback.objectId,)) +\
-                        "?%s" % urllib.urlencode({'success':\
-                        'Reply has been sent.'}))
+                args=(feedback.objectId,)) + "?%s" %\
+                urllib.urlencode({'success':'Reply has been sent.'}))
+                
     else:
-        data['from_address'] = store.get("store_name")
-        # if the user manually tweaks the url, then s/he might be
-        # able to reply to a feedback that already has a reply.
+        # user navigated to this page        
         if feedback.get("Reply"):
+            # if the user manually tweaks the url, then s/he might be
+            # able to reply to a feedback that already has a reply.
             return redirect(reverse('feedback_details', 
-                        args=(feedback.objectId,)) +\
-                        "?%s" % urllib.urlencode({'error':\
-                        'Cannot reply more than once.'})) 
+                args=(feedback.objectId,)) + "?%s" %\
+                urllib.urlencode({'error':'Cannot reply more than once.'})) 
         
     # update store session cache
     request.session['store'] = store
@@ -579,8 +605,12 @@ def feedback_reply(request, feedback_id):
 @login_required
 @admin_only(reverse_url="messages_index", reverse_postfix="tab_feedback=1")
 def feedback_delete(request, feedback_id):
+    """
+    Handles requests to delete the feedback with the given feedback_id.
+    """
     store = SESSION.get_store(request.session)
-    # get from the messages_received_list in session cache
+    
+    # get the feedback from the messages_received_list in session cache
     messages_received_list = SESSION.get_messages_received_list(\
         request.session)
     i_remove, feedback = 0, None
@@ -591,44 +621,36 @@ def feedback_delete(request, feedback_id):
             break
             
     if not feedback:
+        # feedback not found - it may have been deleted
         return redirect(reverse('messages_index')+ "?%s" %\
-             urllib.urlencode({'error':\
-                'Feedback has already been deleted.'}))
+             urllib.urlencode({'error': 'Feedback not found.'}))
                 
-    # DO NOT DELETE ANYTHING! Just remove from the store's relation
+    # we don't actually delete the feedback object,
+    # we just remove from the store's relation
     store.remove_relation("ReceivedMessages_", [feedback.objectId])
     
-    # update messages_received_list in session cache
-    messages_received_list = SESSION.get_messages_received_list(\
-        request.session)
-    i_remove = 0
-    for i, m in enumerate(messages_received_list):
-        if m.objectId == feedback.objectId:
-            i_remove = i
-            break
+    # remove it from the messages_received_list in session cache
     messages_received_list.pop(i_remove)
     request.session['messages_received_list'] =\
         messages_received_list
         
-    # notify other dashboards of this change
-    store_id = store.objectId
-    deleted_feedback = Message(objectId=feedback.objectId)
-    payload = {
+    # notify other dashboards logged into the same store of this change
+    comet_receive(store.objectId, {
         COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
-        "deletedFeedback":deleted_feedback.jsonify(),
-    }
-    comet_receive(store.objectId, payload)
-        
-    # no need to save the store since we just removed from relation
+        "deletedFeedback":Message(objectId=feedback.objectId).jsonify(),
+    })
         
     return redirect(reverse('messages_index')+ "?%s" %\
         urllib.urlencode({'success':'Feedback has been deleted.',
             'tab_feedback':1}))
 
+
 @dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index")
 def delete(request, message_id):
-    """ cannot delete a message! """
+    """
+    Cannot delete a sent message!
+    """
     return HttpResponse("error")
 

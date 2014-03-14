@@ -13,12 +13,13 @@ from parse.apps.messages import FEEDBACK, BASIC, OFFER
 from parse.apps.stores.models import Store
 
 # Note another thing in the session is the 
-# django.contrib.auth.SESSION_KEY ehose value is the Parse
+# django.contrib.auth.SESSION_KEY whose value is the Parse
 # session token received on login
 
-# If not PRODUCTION_SERVER, the DEVELOPMENT_TOKEN may also be here
+# this list is not used at all (yet) - just used to keep tabs on what
+# abjects may be in the session.
 SESSION_CACHE = [
-    # temps
+    # If not PRODUCTION_SERVER, the DEVELOPMENT_TOKEN may also be here
     'message_count',
     'message_limit_off',
     'patronStore_count', # PUSH
