@@ -103,8 +103,9 @@ def get_page(request):
 @login_required
 @access_required
 def index(request):
-    data = {'messages_nav': True}
-    
+    """
+    Render the messages template.
+    """
     messages = SESSION.get_messages_sent_list(request.session)
     feedbacks = SESSION.get_messages_received_list(request.session)
         
@@ -112,48 +113,70 @@ def index(request):
     messages.sort(key=lambda r: r.createdAt, reverse=True)
     feedbacks.sort(key=lambda r: r.createdAt, reverse=True)
     
-    data['messages'] = messages[:PAGINATION_THRESHOLD]
-    data['feedback'] = feedbacks[:PAGINATION_THRESHOLD]
-        
-    data["pag_threshold"] = PAGINATION_THRESHOLD
-    data["pag_page"] = 1
-    data["sent_count"] = len(messages)
-    data["feedback_count"] = len(feedbacks)
+    # prepare our template context variables use in our messages template
+    data = {
+        'messages_nav': True,
+        'messages': messages[:PAGINATION_THRESHOLD],
+        'feedback': feedbacks[:PAGINATION_THRESHOLD],
+        'pag_threshold': PAGINATION_THRESHOLD,
+        'pag_page': 1,
+        'sent_count': len(messages),
+        'feedback_count': len(feedbacks),
+        'tab_feedback': request.GET.get('tab_feedback'),
+    }
     
     if SESSION.get_patronStore_count(request.session):
         data['has_patrons'] = True
     
+    # inserting this success and error message into the template
+    # should be done in a cleaner way - this was done by the first guy
+    # I just didn't bother changing it.
     if request.GET.get("success"):
         data['success'] = request.GET.get("success")
     if request.GET.get("error"):
         data['error'] = request.GET.get("error")
     
-    data['tab_feedback'] = request.GET.get('tab_feedback')
     return render(request, 'manage/messages.djhtml', data)
 
 @dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index")
 def message_no_limit(request):
+    """
+    Inserts a token in the dev session that allows bypass of message
+    sending limits.
+    """
+    
+    # this is only available in development - should use our
+    # parse.decorators.dev_only decorator instead of this
     if PRODUCTION_SERVER:
         raise Http404 
 
+    # insert the token in the session and return a plaintext response
+    # confirming the success of the operation
     if request.method == "GET":
         request.session["message_limit_off"] = True
         return HttpResponse("Limit for sending messages has been turned off." +\
             "To turn it back on, please log out and log back in.")
     
+    # only accept GET methods    
     return HttpResponse("Bad Request")
 
 @dev_login_required
 @login_required
 @admin_only(reverse_url="messages_index")
 def edit(request, message_id):
-    store = SESSION.get_store(request.session)
-
-    data = {'messages_nav': True, 'message_id': message_id,
-        "filters": FILTERS}
+    """
+    Render the message edit template for a new message and handles
+    send message forms.
+    """
+    data = {
+        'messages_nav': True,
+        'message_id': message_id,
+        "filters": FILTERS
+    }
         
+    store = SESSION.get_store(request.session)
     # number of patron stores
     mp = SESSION.get_patronStore_count(request.session)
     # make sure cache attr is None for future queries!
@@ -163,40 +186,49 @@ def edit(request, message_id):
     data['mp_slider_min'] = 1
     data['mp_slider_max'] = mp
     
-    
     # redirect if no patrons 
     if not store.get("patronStores", count=1, limit=0):
         return redirect(reverse("messages_index"))
     
+    # user submitted a form by form submission through POST request
+    # or user is coming from an upgrade sequence from subscription_update
     if request.method == 'POST' or (request.method == "GET" and\
         request.GET.get("send_message") and "message_b4_upgrade" in\
         request.session):
         
         if request.method == "GET":
+            # user is coming from an upgrade sequence from subscription_update
             postDict = request.session['message_b4_upgrade'].copy()
             # cleanup temp vars in session
             del request.session['message_b4_upgrade']
             del request.session['from_limit_reached']
+            
         else:
+            # user submitted a form by form submission through POST request
             postDict = request.POST.dict().copy()
         
+        # populate a message form with the POST data for validation
         form = MessageForm(postDict) 
-        subscription = SESSION.get_subscription(request.session)
-        subType = subscription.get('subscriptionType')
         
         if form.is_valid():
-            
+            # form is valid so continue to send the message
+            subscription = SESSION.get_subscription(request.session)
+            subType = subscription.get('subscriptionType')
+        
             # refresh the message count - make sure we get the one in the cloud
             if 'message_count' in request.session:
                 del request.session['message_count']
             message_count = SESSION.get_message_count(request.session)
             
+            # get the max_messages from the user's subscriptionType
+            # or the highest level if god_mode is on
             if subscription.god_mode:
                 max_messages = sub_type[2]['max_messages']
             else:
                 max_messages = sub_type[subType]['max_messages']
-                                    
-                                    
+            
+            # limit is reached if the amount of messages sent this
+            # billing cycle passed the amount for that subscription type                                    
             limit_reached = message_count >= max_messages
             
             # We always enforce the limit when we are in production
@@ -204,40 +236,57 @@ def edit(request, message_id):
             if limit_reached and (PRODUCTION_SERVER or\
                 (not PRODUCTION_SERVER and "message_limit_off" not in request.session)):
                 
+                data['limit_reached'] = limit_reached
+                
+                # not the highest level of subscription so an upgrade
+                # is still possible
                 if subType != 2:
-                    data['limit_reached'] = limit_reached
                     # save the dict to the session
                     request.session['message_b4_upgrade'] =\
                         request.POST.dict().copy()
+                        
+                # the highest level of subscription so no more
+                # upgrades can occur - therefore maxed_out
                 elif subType == 2:
-                    data['limit_reached'] = limit_reached
                     data['maxed_out'] = True
                     
             else:
-                # create the message
-                message = Message(sender_name=\
-                        store.get('store_name'), store_id=store.objectId)
+                # limit has not yet been reached - send the message
+                # build the message from session and POST data
+                message = Message(\
+                    sender_name=store.get('store_name'),
+                    store_id=store.objectId
+                )
                 message.update_locally(postDict, False)
+                
                 
                 # check if attach offer is selected
                 if 'attach_offer' in postDict:
+                    # message has an offer - extract it from the post
+                    # post data ensuring proper datetime format
                     d = parser.parse(postDict['date_offer_expiration'])
                     d = make_aware_to_utc(d, 
                         SESSION.get_store_timezone(request.session))
                     message.set('date_offer_expiration', d)
                     message.set('message_type', OFFER)
+                    
                 else:
-                    # pop the offer
+                    # make sure to delete offer information in the case
+                    # that attach offer is not checked but the form
+                    # submitted still contained offer information
                     message.set('offer_title', None)
                     message.set('date_offer_expiration', None)
                     message.set('message_type', BASIC)
                     
+                # actually create the message to Parse
                 message.create()
+                
+                # put the message in the template context for rendering
                 data['message'] = message
                 # add to the store's relation
                 store.add_relation("SentMessages_", [message.objectId]) 
-                success_message = "Message has been sent."
 
+                # prepare the parameters for the cloud call
                 params = {
                     "store_id":store.objectId,
                     "store_name":store.get('store_name'),
@@ -245,15 +294,19 @@ def edit(request, message_id):
                     "message_id":message.objectId,
                     "filter":message.filter,
                 }
-
+                
+                # process the filter option
                 if message.filter == "idle":
+                    # pass in the correct idle_date which is today
+                    # minus the days specified by idle_latency
                     idle_days = postDict['idle_latency']
                     d = timezone.now() + relativedelta(days=\
                         -1*int(idle_days))
                     params.update({"idle_date":d.isoformat()})
+                    
                 elif message.filter == "most_loyal":
-                    params.update({"num_patrons":\
-                        postDict['num_patrons']})
+                    # pass in the number of patrons
+                    params.update({"num_patrons": postDict['num_patrons']})
                         
                 # update store and message_count in session cache
                 request.session['message_count'] = message_count
@@ -261,12 +314,14 @@ def edit(request, message_id):
                 # save session- cloud_call may take a while!
                 request.session.save()
 
-                # push notification
+                # make the cloud call
                 res = cloud_call("retailer_message", params)
                 if "error" not in res and res.get("result"):
                     message.set("receiver_count",
                         res.get("result").get("receiver_count"))
                         
+                # notify other tabs and windows that are logged into
+                # this store about the new message sent.
                 payload = {
                     COMET_RECEIVE_KEY_NAME: COMET_RECEIVE_KEY,
                     "newMessage":message.jsonify()
@@ -281,10 +336,15 @@ def edit(request, message_id):
                 return HttpResponseRedirect(message.get_absolute_url())
             
         elif 'num_patrons' in form.errors:
+            # form is invalid due to the number of patrons input
+            # for most_loyal filter
             data['error'] = "Number of customers must be a "+\
                                 "whole number and greater than 0."
+                                
         else:
+            # form has some errors
             data['error'] = "The form you submitted has errors."
+            
     else:
         # check if the incoming request is for an account upgrade
         if request.GET.get("do_upgrade"):
@@ -295,8 +355,15 @@ def edit(request, message_id):
                 "?do_upgrade=1")
             
         if message_id in (0, '0'):
+            # this is a new message so just instantiate a new form
             form = MessageForm()
+            
         else:
+            # this is an existing message that the user wants to view
+        
+            # inserting this success and error message into the template
+            # should be done in a cleaner way - this was done by the 
+            # first guy. I just didn't bother changing it.
             if request.GET.get("error"):
                 data['error'] = request.GET.get("error")
             if request.GET.get("success"):
@@ -305,38 +372,49 @@ def edit(request, message_id):
             # get from the messages_sent_list in session cache
             messages_sent_list = SESSION.get_messages_sent_list(\
                 request.session)
-            request.session['messages_sent_list'] =\
-                messages_sent_list
             for m in messages_sent_list:
                 if m.objectId == message_id:
                     data['message'] = m
+                    
             if data['message']:
+                # message is found so fill up the form with its data
                 form = MessageForm(data['message'].__dict__.copy())
+                
             else:
+                # message not found so just instantiate a new form
                 form = MessageForm()
            
     # update store session cache
     request.session['store'] = store
             
+    # inject the form in the template context for rendering
     data['form'] = form
 
     return render(request, 'manage/message_edit.djhtml', data)
+    
 
 @dev_login_required
 @login_required
 @access_required
 def details(request, message_id):
+    """
+    Renders the message details template.
+    """
+    
     # get from the messages_sent_list in session cache
-    messages_sent_list = SESSION.get_messages_sent_list(\
-        request.session)
+    messages_sent_list = SESSION.get_messages_sent_list(request.session)
     message = None
     for m in messages_sent_list:
         if m.objectId == message_id:
             message = m
+            
     if not message:
+        # message not found - assume that it was deleted sice we don't
+        # use comet.js to remove deleted message client side
         return redirect(reverse('messages_index')+ "?%s" %\
              urllib.urlencode({'error':\
                 'Message has already been deleted.'}))
+                
     return render(request, 'manage/message_details.djhtml', 
             {'message':message, 'messages_nav': True,
                 "filters":FILTERS})
@@ -347,6 +425,9 @@ def details(request, message_id):
 @login_required
 @access_required
 def feedback(request, feedback_id):
+    """
+    TODO
+    """
     data = {'messages_nav': True, 'feedback_id':feedback_id,
              "store_name":\
                 SESSION.get_store(request.session).get("store_name")}    
