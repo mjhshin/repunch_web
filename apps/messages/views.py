@@ -36,51 +36,66 @@ def get_page(request):
     Returns the corresponding chunk of rows in html to plug into
     the sent/feedback table.
     """
+    
     if request.method == "GET":
         type = request.GET.get("type")
         page = int(request.GET.get("page")) - 1
+        
         if type == "sent":
+            # we will be rendering the message chunk template
             template = "manage/message_chunk.djhtml" 
+            # retrieve the messages sent from our session cache
             messages = SESSION.get_messages_sent_list(request.session)
-            # sort
+            # our input is called "date" which translates to "createdAt"
             header_map = {"date":"createdAt"}
             header = request.GET.get("header")
-            if header: # header can only be date
+            
+            # header can only be date at the moment
+            if header: 
+                # sort the messages based on given order
                 reverse = request.GET.get("order") == "desc"
                 messages.sort(key=lambda r:\
                     r.__dict__[header_map[header]], reverse=reverse)
             
-            # set the chunk
+            # insert the messages chunk in the template data
             start = page * PAGINATION_THRESHOLD
             end = start + PAGINATION_THRESHOLD
             data = {"messages":messages[start:end]}
             
+            # save our reordered messages 
             request.session["messages_sent_list"] = messages
             
         elif type == "feedback":
+            # we will be rendering the feedback chunk template
             template = "manage/feedback_chunk.djhtml"
+            # retrieve the feedbacks from our session cache.
             feedbacks = SESSION.get_messages_received_list(request.session)
-            # sort
+            
+            # our inputs can be "feedback-date" mapping to "createdAt"
+            # or "feedback-from" mapping to "sender_name"
             header_map = {
                 "feedback-date": "createdAt",
                 "feedback-from": "sender_name", 
             }
             header = request.GET.get("header")
-            if header:
+            if header: 
+                # sort the feedbacks based on the attribute and order
                 reverse = request.GET.get("order") == "desc"
                 feedbacks.sort(key=lambda r:\
                     r.__dict__[header_map[header]], reverse=reverse)
                     
-            request.session["messages_received_list"] = feedbacks
-            
-            # set the chunk
+            # insert the feedbacks chunk in the template data
             start = page * PAGINATION_THRESHOLD 
             end = start + PAGINATION_THRESHOLD
             data = {"feedback":feedbacks[start:end]}
+            
+            # save our reordered feedbacks
+            request.session["messages_received_list"] = feedbacks
         
+        # render our template with the feedback/messages sent chunks
         return render(request, template, data)
         
-    # user requested this view using a method that is not GET
+    # only GET methods are accepted here
     return HttpResponse("Bad request")
 
 
