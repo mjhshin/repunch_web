@@ -1,3 +1,7 @@
+"""
+Views for the analysis tab.
+"""
+
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from django.http import HttpResponse
@@ -18,123 +22,187 @@ from libs.dateutil.relativedelta import relativedelta
 @login_required
 @access_required
 def index(request):
-    data = {'analysis_nav': True}
-    rewards = SESSION.get_store(request.session).get("rewards")
+    """
+    Render the analysis page.
+    """
     # sort the rewards by redemption count in descending order
+    rewards = SESSION.get_store(request.session).get("rewards")
     rewards.sort(key=lambda k: k['redemption_count'], reverse=True)
-    data['rewards'] = rewards
             
-    return render(request, 'manage/analysis.djhtml', data)
+    return render(request, 'manage/analysis.djhtml', {
+        'analysis_nav': True,
+        'rewards': rewards,
+    })
 
 @dev_login_required
 @login_required
 @access_required(http_response={"error": "Access denied"})
 def trends_graph(request, data_type=None, start=None, end=None ):
+    """
+    Handles requests for the trends graph.
+    """
     store = SESSION.get_store(request.session)
+    
+    # We need the store's timezone to convert everything to UTC
+    # because the time we get from start and end are local times
+    # and in order to convert to UTC we must first make start and end
+    # timezone aware. We use parse.utils.make_aware_to_utc to do
+    # this in 1 step. We convert everything to UTC for use in queries.
     store_timezone = SESSION.get_store_timezone(request.session)
     start = datetime.strptime(start, "%Y-%m-%d")
     end = datetime.strptime(end, "%Y-%m-%d")
     start = start.replace(hour=0, minute=0, second=0, microsecond=0)
     end = end.replace(hour=23, minute=59, second=59, microsecond=0)
-    # need to make aware and then convert to utc for querying
     start_aware = make_aware_to_utc(start, store_timezone)
     end_aware = make_aware_to_utc(end, store_timezone)
     
-    columns = []
-    rows = []
+    rows, columns = [], []
+    
     if data_type == 'punches':
+        # we need to return graph data for punches for all days in
+        # between start and end.
+        
+        # columns contains the data that any given row needs to have.
+        # rows contains multiple dates paired with punch count
         columns = [
-                    {"id":"", "label":"Date", "type":"string"},
-                    {"id":"", "label":'Punches', "type":"number"}
-                   ]
+            {"id":"", "label":"Date", "type":"string"},
+            {"id":"", "label":'Punches', "type":"number"}
+        ]
             
-        punch_map = {}
+        # get the Punches
         punches = store.get('punches', createdAt__lte=end_aware,
-                    createdAt__gte=start_aware,order='createdAt',
-                    limit=900)
-        # have to clear the cache attr
+            createdAt__gte=start_aware,order='createdAt', limit=900)
+            
+        # have to clear the punches cache attr of store filled
+        # by the above query
         store.punches = None
         
         #create dictionary for easy search
+        punch_map = {}
         if punches:
             for punch in punches:
-                # first need to convert to local time
+                # The keys in the punch map is the month/day of the
+                # createdAt of the punch object. We also convert it
+                # to the store's local time for when we send back the
+                # data to the client.
                 key = timezone.localtime(punch.createdAt, 
-                        store_timezone).strftime("%m/%d")
+                    store_timezone).strftime("%m/%d")
+                    
                 if key in punch_map:
-                    punch_map[key] = punch_map[key]+\
-                                        punch.get('punches')
+                    # add to the punch count for the existing key
+                    punch_map[key] =\
+                        punch_map[key] + punch.get('punches')
+                        
                 else:
+                    # initialize the key in the punch map
                     punch_map[key] = punch.get('punches')
     
-        rows = []
         for single_date in rputils.daterange(start, end):
+            # we now populate the rows with the corresponding punch counts
+            # str_date is a day in between start and end with the
+            # same format as a key in our punch_map            
             str_date = single_date.strftime("%m/%d")
-            c = [{"v": str_date}]
+            
             try:
                 punch_count = punch_map[str_date]
             except KeyError:
                 punch_count = 0
                     
-            c.append({"v": punch_count})
-            rows.append({'c': c})
-    elif data_type == 'facebook':
-        columns = [
-                    {"id":"", "label":"Date", "type":"string"},
-                    {"id":"", "label":'Posts', "type":"number"}
-                   ]
+            # the first item in our row is the date
+            # the second item is the corresponding punch_count
+            row = [{"v": str_date}, {"v": punch_count}]
+            rows.append({'c': row})
             
-        post_map = {}
+    elif data_type == 'facebook':
+        # we need to return graph data for facebook posts for
+        # all days in between start and end.
+        
+        # columns contains the data that any given row needs to have.
+        # rows contains multiple dates paired with post count
+        columns = [
+            {"id":"", "label":"Date", "type":"string"},
+            {"id":"", "label":'Posts', "type":"number"}
+        ]
+            
+        # get the FacebookPosts
         posts = store.get("facebookPosts", createdAt__lte=end,
                     createdAt__gte=start, limit=900)
+        # have to clear the facebookPosts cache attr of store filled
+        # by the above query
         store.facebookPosts = None
+        
         #create dictionary for easy search
+        post_map = {}
         if posts:
             for post in posts:
+                # The keys in the post map is the month/day of the
+                # createdAt of the punch object. We also convert it
+                # to the store's local time for when we send back the
+                # data to the client.
                 key = timezone.localtime(post.createdAt, 
                     store_timezone).strftime("%m/%d")
+                    
                 if key in post_map:
+                    # add to the post count for the existing key
                     post_map[key] = post_map[key] + 1
+                    
                 else:
+                    # initialize the post count
                     post_map[key] = 1
     
-        rows = []
         for single_date in rputils.daterange(start, end):
+            # we now populate the rows with the corresponding post counts
+            # str_date is a day in between start and end with the
+            # same format as a key in our punch_map    
             str_date = single_date.strftime("%m/%d")
-            c = [{"v": str_date}]
+            
             try:
                 post_count = post_map[str_date]
             except KeyError:
                 post_count = 0
                     
-            c.append({"v": post_count})
-            rows.append({'c': c})
-    else: #patrons
-        # total number of patrons at a particular date
+            # the first item in our row is the date
+            # the second item is the corresponding post_count
+            row = [{"v": str_date}, {"v": post_count}]
+            rows.append({'c': row})
+            
+    else: 
+        # we need to return graph data for unique patrons for
+        # all days in between start and end.
+        
+        # columns contains the data that any given row needs to have.
+        # rows contains multiple dates paired with accumulative patron count
         columns = [
-                    {"id":"", "label":"Date", "type":"string"},
-                    {"id":"", "label":'Patrons', "type":"number"}
-                   ]
-        rows = []
+            {"id":"", "label":"Date", "type":"string"},
+            {"id":"", "label":'Patrons', "type":"number"}
+        ]
+
         for single_date in rputils.daterange(start, end):
+            # str_date is a day in between start and end with the
+            # same format as a key in our punch_map    
             str_date = single_date.strftime("%m/%d")
-            # need to set single_date's hours, mins, sec to max
+            
+            # FIXME In order to get the cumulative count for each day,
+            # we make a query of the count for each day. Optimization?
             d = single_date.replace(hour=23, minute=59, second=59)
             d_aware = make_aware_to_utc(d, store_timezone)
-            c = [{"v": str_date}]
             patron_count = store.get('patronStores', count=1,
                                 limit=0, createdAt__lte=d_aware)
-            store.patronStores = None # not necessary since count only
                     
-            c.append({"v": patron_count})
-            rows.append({'c': c})
+            row = [{"v": str_date}, {"v": patron_count}]
+            rows.append({'c': row})
         
-    return HttpResponse(json.dumps({'cols': columns, 'rows': rows}), content_type="application/json")
+    # return the graph data
+    return HttpResponse(json.dumps({'cols': columns, 'rows': rows}),
+        content_type="application/json")
 
 @dev_login_required
 @login_required
 @access_required(http_response={"error": "Access denied"})
 def breakdown_graph(request, data_type=None, filter=None, range=None):
+    """
+    handles requests for the breakdown graph.
+    """
     store = SESSION.get_store(request.session)
     store_timezone = SESSION.get_store_timezone(request.session)
     (start, end) = rputils.calculate_daterange(range)
