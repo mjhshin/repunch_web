@@ -74,7 +74,7 @@ The emails are mostly errors regarding Unknown hosts,
 which can be ignored.
 """
 ADMINS = (
-    ('Vandolf Estrellado', 'vandolf@repunch.com'),
+    ('Mike Shin', 'mike@repunch.com'),
 )
 MANAGERS = ADMINS
 #-----------
@@ -137,16 +137,11 @@ class validation, suspiscious activity, etc.
 2) ORDER_PLACED_EMAILS: historically used as addresses to send iTouch
 orders to. Now used for signup and monthly billing.
 """
-if DEBUG:
-    ORDER_PLACED_EMAILS = ['vandolf@repunch.com']
-    REPUNCH_ADMINS = ORDER_PLACED_EMAILS[:] 
-else:
-    REPUNCH_ADMINS = ['vandolf@repunch.com', 'mike@repunch.com']
-    
-    if PRODUCTION_SERVER:
-        ORDER_PLACED_EMAILS = ['matt@repunch.com', 'andrew@repunch.com']
-    else:
-        ORDER_PLACED_EMAILS = REPUNCH_ADMINS[:]
+REPUNCH_ADMINS = ['mike@repunch.com']
+ORDER_PLACED_EMAILS = REPUNCH_ADMINS[:]
+
+if not DEBUG and PRODUCTION_SERVER:
+    ORDER_PLACED_EMAILS = ['matt@repunch.com', 'andrew@repunch.com']
     
 """
 Used in email template rendering.
