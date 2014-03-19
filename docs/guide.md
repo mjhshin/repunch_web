@@ -13,7 +13,7 @@
 3. Once connected to the server terminal go to the project folder:
         cd Repunch/repunch_web
         
-4. Pull changes.
+4. Pull changes and restart.
     - If you are pulling updates that does not contain any changes to any .py files:
         sudo git pull origin master
         
@@ -53,4 +53,10 @@
 4. Read up on Python coding style [PEP8](http://legacy.python.org/dev/peps/pep-0008/)
 Some parts of the code violate some of the guidlines but for the most part the code is written in PEP8 style.
 The most important thing is to use SPACES and NEVER TABS. In your text editor make sure to set "insert spaces instead of tabs".
+
+# Accessing the server mysql database as root
+---------------------------------------------
+
+1. If you need to access the mysql database for whatever reason (the password is repunch7575):
+    sudo mysql -u root -p
 
