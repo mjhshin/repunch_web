@@ -91,8 +91,8 @@ from apps.scripts.models import LogBoss
 from repunch.settings import DEBUG, EMAIL_FROM, FS_SITE_DIR
 
 ERRORS = r"([Ee]rror)|([Uu]ncaught)"
-EMAILS = ["vandolf@repunch.com", "mike@repunch.com"]
-EMAILS_BOOT = ["vandolf@repunch.com",]
+EMAILS = ["mike@repunch.com", ]
+EMAILS_BOOT = ["mike@repunch.com", ]
 
 if DEBUG:
     PARSE_CODE_DIR = "./cloud_code/production"
