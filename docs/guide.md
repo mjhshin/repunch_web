@@ -43,6 +43,16 @@
         VII. Start the cloud_logger (only for the development server).
             python manager.py cloud_logger start & disown
         
+# Modify cron job times
+-----------------------
+
+1. Open the crontab
+2. Read the documentation/examples there and make changes.
+3. To commit the changes see the commands that appear in the bottom of the screen.
+    - First you need save the changes.
+        press ctrl+o
+    - Then exit
+        press ctrl+x
 
 # Continuing code development
 -----------------------------
