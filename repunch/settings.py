@@ -31,7 +31,7 @@ PRODUCTION_SERVER = False
 
 """
 Set this to True if you are developing locally. This should always be
-True serverside.
+False serverside.
 """
 DEBUG = True
 
