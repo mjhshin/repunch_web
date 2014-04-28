@@ -103,15 +103,13 @@ def get_store_locations(session):
     """ limit of 100 store locations for now """
     if "store_locations" not in session:
         store = get_store(session)
-        if not store.store_locations:
-            store.fetch_all(with_cache=True)
+        store_tmp = Store.objects().get(objectId=store.objectId,
+            include="store_locations")
             
         store_locations = {}
-        for sl in store.store_locations:
+        for sl in store_tmp.store_locations:
             store_locations[sl.objectId] = sl
-        session['store_locations'] = store_locations
-        
-    return session['store_locations']
+            session['store_locations'] = store_locations
     
 def get_store_locations_list(session):
     """

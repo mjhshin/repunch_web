@@ -506,8 +506,6 @@ class ParseObject(object):
                 if key[0].isupper() and not key.endswith("_") and\
                     not key == "ACL":
                     cache_attrs = cache_attrs + key + ","
-                elif key.startswith("_") and key.isupper():
-                    cache_attrs = cache_attrs + key[1:].lower() + ","
             
             if len(cache_attrs) > 0:
                 res = parse("GET", self.path() + "/" + self.objectId,
