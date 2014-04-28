@@ -22,7 +22,7 @@
             python manage.py clean_comet_session force
             
         II. Stop the cloud_logger (only for the development server).
-            python manager.py cloud_logger stop
+            python manage.py cloud_logger stop
             
         III. Stop apache.
             sudo /etc/init.d/apache2 stop
@@ -41,7 +41,7 @@
             sudo /etc/init.d/apache2 restart
        
         VII. Start the cloud_logger (only for the development server).
-            python manager.py cloud_logger start & disown
+            python manage.py cloud_logger start & disown
         
 # Modify cron job times
 -----------------------
