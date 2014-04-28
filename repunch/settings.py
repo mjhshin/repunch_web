@@ -212,10 +212,12 @@ else:
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 if PRODUCTION_SERVER:
-    ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 
-    'repunch.com', 'www.repunch.com', '23.20.15.30']
+    ALLOWED_HOSTS = ['ec2-23-20-15-30.compute-1.amazonaws.com',
+    'ec2-23-20-15-30.compute-1.amazonaws.com', 'localhost', 'repunch.com',
+    'www.repunch.com', '23.20.15.30']
 else:
-    ALLOWED_HOSTS = ['ec2-204-236-214-138.compute-1.amazonaws.com', 'localhost', 'dev.repunch.com']
+    ALLOWED_HOSTS = ['ec2-54-242-50-156.compute-1.amazonaws.com',
+    'ec2-204-236-214-138.compute-1.amazonaws.com', 'localhost', 'dev.repunch.com'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
