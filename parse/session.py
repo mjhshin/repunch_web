@@ -110,6 +110,8 @@ def get_store_locations(session):
         for sl in store_tmp.store_locations:
             store_locations[sl.objectId] = sl
             session['store_locations'] = store_locations
+
+    return session['store_locations']
     
 def get_store_locations_list(session):
     """
