@@ -217,7 +217,7 @@ if PRODUCTION_SERVER:
     'www.repunch.com', '23.20.15.30']
 else:
     ALLOWED_HOSTS = ['ec2-54-242-50-156.compute-1.amazonaws.com',
-    'ec2-204-236-214-138.compute-1.amazonaws.com', 'localhost', 'dev.repunch.com'
+    'ec2-204-236-214-138.compute-1.amazonaws.com', 'localhost', 'dev.repunch.com']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
