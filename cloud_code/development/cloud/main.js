@@ -3192,6 +3192,108 @@ Parse.Cloud.define("reply_to_gift", function(request, response) {
 	
 });
 
+////////////////////////////////////////////////////
+//
+//                 Bluetooth Redeem
+//
+////////////////////////////////////////////////////
+
+// TODO
+// HTTP POST needed?
+// Error handling
+// Facebook Post?
+
+Parse.Cloud.define("redeem_bluetooth", function(request, response)
+{
+    var storeId = request.params.store_id;
+    var patronStoreId = request.params.patron_store_id;
+    var rewardId = parseInt(request.params.reward_id);
+    var messageStatusId = request.params.message_status_id;
+
+    var Store = Parse.Object.extend("Store");
+    var PatronStore = Parse.Object.extend("PatronStore");
+    var MessageStatus = Parse.Object.extend("MessageStatus");
+
+    var isOfferOrGift = (messageStatusId != null);
+
+    var store, patron, updatedReward;
+
+    if(isOfferOrGift)
+    {
+        var messageStatusQuery = new Parse.Query(MessageStatus);
+        messageStatusQuery.get(messageStatusId).then(function(messageStatusResult) {
+            messageStatusResult.set("redeem_available", "no");
+            return messageStatusResult.save();
+
+        }). then(function(messageStatusResult) {
+            console.log("MessageStatus save success");
+            response.success({ code:"success", result: null });
+        });
+    }
+    else
+    {
+        var patronStoreQuery = new Parse.Query(PatronStore);
+        patronStoreQuery.include("Store");
+        patronStoreQuery.include("Patron");
+        patronStoreQuery.get(patronStoreId).then(function(patronStoreResult) {
+
+            if(patronStoreResult == null) { // Unlikely for bluetooth but still need to handle
+                console.log("PatronStore does not exist.");
+                response.success({ code:"PATRONSTORE_REMOVED", result: null});
+            }
+            else {
+                store = patronStoreResult.get("Store");
+                patron = patronStoreResult.get("Patron");
+
+                // Update the store's rewards redemption_count
+                var rewardsArray = store.get("rewards");
+                var punchesToDeduct;
+
+                for (var i = 0; i < rewardsArray.length; i++) {
+                    if (rewardsArray[i].reward_id == rewardId) {
+                        punchesToDeduct = rewardsArray[i].punches;
+                        rewardsArray[i].redemption_count += 1;
+                        //updatedReward = {
+                        //    redemption_count: rewardsArray[i].redemption_count,
+                        //    reward_id: rewardsArray[i].reward_id,
+                        //};
+                        break;
+                    }
+                }
+            
+                if(patronStoreResult.get("punch_count") >= punchesToDeduct) {
+                    
+                    store.set("rewards", rewardsArray);  // TODO: threading? rewards is shared data.
+
+                    // Update patronStore punch count
+                    patronStoreResult.increment("punch_count", -1*punchesToDeduct);
+
+                    var promises = [];
+                    promises.push( patronStoreResult.save() );
+                    promises.push( store.save() );
+
+                    Parse.Promise.when(promises).then(function(patronStoreResult, storeResult) {   
+                        console.log("PatronStore/Store save success (in parallel).");
+                        response.success({ code:"success", result: null });
+
+                    }, function(error) {
+                        console.log("PatronStore/Store save fail (in parallel).");
+                        response.error("error");
+                    });
+                }
+                else {
+                    // Not enough punches
+                    console.log("PatronStore has insufficient punches.");
+                    response.success({ code:"insufficient", result: null });
+                }
+            }
+        }, function(error) {
+        	console.log("PatronStore fetch fail.");
+        	response.error("error");
+        }); //patronStoreQuery
+    } //!isOfferOrGift
+});
+
 
 ////////////////////////////////////////////////////
 //

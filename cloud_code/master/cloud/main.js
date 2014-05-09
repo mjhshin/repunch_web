@@ -3244,24 +3244,26 @@ Parse.Cloud.define("redeem_bluetooth", function(request, response)
             else {
                 store = patronStoreResult.get("Store");
                 patron = patronStoreResult.get("Patron");
+
+                // Update the store's rewards redemption_count
+                var rewardsArray = store.get("rewards");
+                var punchesToDeduct;
+
+                for (var i = 0; i < rewardsArray.length; i++) {
+                    if (rewardsArray[i].reward_id == rewardId) {
+                        punchesToDeduct = rewardsArray[i].punches;
+                        rewardsArray[i].redemption_count += 1;
+                        //updatedReward = {
+                        //    redemption_count: rewardsArray[i].redemption_count,
+                        //    reward_id: rewardsArray[i].reward_id,
+                        //};
+                        break;
+                    }
+                }
             
                 if(patronStoreResult.get("punch_count") >= punchesToDeduct) {
-                    // Update the store's rewards redemption_count           
-                    var rewardsArray = store.get("rewards");
-                    var punchesToDeduct;
-
-                    for (var i = 0; i < rewards.length; i++) {
-                        if (rewardsArray[i].reward_id == rewardId) {
-                            punchesToDeduct = rewardsArray[i].punches;
-                            rewardsArray[i].redemption_count += 1;
-                            updatedReward = {
-                                redemption_count: rewardsArray[i].redemption_count,
-                                reward_id: rewardsArray[i].reward_id,
-                            };
-                            break;
-                        }
-                    }
-                    store.set("rewards", rewards);  // TODO: threading? rewards is shared data.
+                    
+                    store.set("rewards", rewardsArray);  // TODO: threading? rewards is shared data.
 
                     // Update patronStore punch count
                     patronStoreResult.increment("punch_count", -1*punchesToDeduct);
@@ -3276,6 +3278,7 @@ Parse.Cloud.define("redeem_bluetooth", function(request, response)
 
                     }, function(error) {
                         console.log("PatronStore/Store save fail (in parallel).");
+                        response.error("error");
                     });
                 }
                 else {
@@ -3284,7 +3287,10 @@ Parse.Cloud.define("redeem_bluetooth", function(request, response)
                     response.success({ code:"insufficient", result: null });
                 }
             }
-        } //patronStoreQuery
+        }, function(error) {
+        	console.log("PatronStore fetch fail.");
+        	response.error("error");
+        }); //patronStoreQuery
     } //!isOfferOrGift
 });
 
